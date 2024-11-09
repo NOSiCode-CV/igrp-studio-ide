@@ -1,0 +1,9 @@
+{
+  "welcome_message": "Welcome to our application!",
+  "availableFields": "Campos disponíveis",
+  "clickToAdd": "Clique para adicionar",
+  "currentFields": "Campos atuais",
+  "addFieldHint": "Adicione um campo clicando no painel à esquerda",
+  "edit": "Editar",
+  "delete": "Excluir"
+}
