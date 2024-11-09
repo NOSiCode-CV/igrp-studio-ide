@@ -37,9 +37,9 @@ const RecentsProjects = (): JSX.Element => {
         fetchProjects();
     }, [pagination.page, pagination.size]);
 
-    const handleLoadMore = () => {
+  /*   const handleLoadMore = () => {
         setPagination((prev) => ({ ...prev, size: prev.size + 5 }));
-    };
+    }; */
 
     const handleClick = (p: Project) => {
 
@@ -50,8 +50,8 @@ const RecentsProjects = (): JSX.Element => {
         navigateToNextPage(navigate, p.config)
     }
 
-    const totalProjects = projects.total ?? 0;
-    const requestedTotal = pagination.page * pagination.size;
+    /* const totalProjects = projects.total ?? 0;
+    const requestedTotal = pagination.page * pagination.size; */
 
     return (
         <>
@@ -65,12 +65,12 @@ const RecentsProjects = (): JSX.Element => {
                     {error && <p>{error}</p>}
                     {projects.data.map((p) => (
                         p?.config?.name &&
-                        <div key={p.path} className="flex items-center mb-3" onClick={() => handleClick(p)}>                           
+                        <div key={p.path} className="flex items-center mb-3" onClick={() => handleClick(p)}>
 
                             <button
                                 className="flex-shrink-0 w-12 h-12 rounded-md bg-gray-500 bg-opacity-10 text-primary flex items-center justify-center cursor-pointer hover:bg-opacity-20 transition-colors duration-200"
                             >
-                                 <img src={IconMap[p?.config.type]} />
+                                <img src={IconMap[p?.config.type]} />
                             </button>
 
                             <div className="flex-grow-1 ms-3">
@@ -78,11 +78,11 @@ const RecentsProjects = (): JSX.Element => {
                             </div>
                         </div>
                     ))}
-                    {totalProjects > 0 && requestedTotal < totalProjects && (
+                    {/*  {totalProjects > 0 && requestedTotal < totalProjects && (
                         <button type="button" className="btn btn-link visually-hidden" onClick={handleLoadMore}>
                             {t('loadMore')}
                         </button>
-                    )}
+                    )} */}
                 </div>
             )}
         </>

@@ -1,4 +1,4 @@
-# igrp-studio-horizon
+# IGRP Studio Horizon
 
 An Electron application with React and TypeScript
 

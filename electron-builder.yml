@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: igrp-studio-horizon
+productName: igrp-studio
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: igrp-studio-horizon
+  executableName: igrp-studio
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

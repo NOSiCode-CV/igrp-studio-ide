@@ -1,10 +1,10 @@
 {
-  "name": "igrp-studio-horizon",
+  "name": "igrp-studio",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "IGRP Studio for dev",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "nosi.cv",
+  "homepage": "igrp.cv",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
@@ -25,7 +25,7 @@
     "@electron-toolkit/utils": "^3.0.0",
     "@faker-js/faker": "^9.2.0",
     "@igrp/nextjs-engine": "^0.0.5",
-    "@igrp/spring-engine": "^0.2.8",
+    "@igrp/spring-engine": "^0.3.0",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
