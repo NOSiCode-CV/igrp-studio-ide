@@ -16,8 +16,6 @@ import {
 } from "@renderer/components/ui/sidebar"
 import { ChevronDown, Plus } from "lucide-react"
 
-import SimpleBar from "simplebar-react";
-
 import { cn } from "@renderer/lib/utils"
 import { filterSubItems } from "@renderer/utils/helpers";
 import React, { useState } from "react";
@@ -28,6 +26,7 @@ import FormSearch from "../components/app-search";
 import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
 import { useDispatch } from "react-redux";
 import { setCurrentItem as onSetCurrentItem } from "@renderer/redux/thunks";
+import { ScrollArea } from "@renderer/components/ui/scroll-area";
 
 interface AppSidebarProps {
     className?: string
@@ -69,7 +68,7 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
                 <FormSearch onSearch={(value) => setSearchQuery(value)} className="truncate text-xs" placeholder="Search models, dto..." />
             </SidebarHeader>
             <SidebarContent>
-                <SimpleBar id="scrollbar" className="h-100">
+                <ScrollArea>
                     {filteredNavData.map((item, index) => (
                         <React.Fragment key={index}>
                             <SidebarGroup>
@@ -99,7 +98,10 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
                                                         <SidebarMenuSub>
                                                             {item.subItems?.map((subItem, subIndex) => (
                                                                 <SidebarMenuSubItem key={subIndex}>
-                                                                    <SidebarMenuSubButton onClick={() => setCurrentItem(subItem)} className="cursor-pointer">
+                                                                    <SidebarMenuSubButton
+                                                                        onClick={() => setCurrentItem(subItem)}
+                                                                        className="cursor-pointer"
+                                                                        isActive={activeItem === subItem.id}>
                                                                         {t(subItem.label)}
                                                                     </SidebarMenuSubButton>
                                                                 </SidebarMenuSubItem>
@@ -114,7 +116,7 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
                             </SidebarGroup>
                         </React.Fragment>
                     ))}
-                </SimpleBar>
+                </ScrollArea>
             </SidebarContent>
             <SidebarFooter />
         </Sidebar>

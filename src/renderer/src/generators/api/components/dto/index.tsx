@@ -3,7 +3,7 @@ import { Card, CardBody, Col, FormFeedback, FormGroup, Input, Label, Row } from 
 import { useFormik } from 'formik'
 import Select from 'react-select'
 import { IColumnsTabelProps } from '../Interfaces'
-import { FormList } from '../FormList'
+import { FormList } from '../form-list'
 import useToast from '@renderer/components/useToast'
 import { defaultValues, getTablesColumns, TabList, TemplateOptions, initialValues } from './config'
 import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types'

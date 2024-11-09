@@ -784,6 +784,11 @@
   resolved "https://sonatype.nosi.cv/repository/npm-group/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
+"@radix-ui/number@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/number/-/number-1.1.0.tgz#1e95610461a09cdf8bb05c152e76ca1278d5da46"
+  integrity sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==
+
 "@radix-ui/primitive@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@radix-ui/primitive/-/primitive-1.1.0.tgz#42ef83b3b56dccad5d703ae8c42919a68798bbe2"
@@ -962,6 +967,21 @@
     "@radix-ui/react-primitive" "2.0.0"
     "@radix-ui/react-use-callback-ref" "1.1.0"
     "@radix-ui/react-use-controllable-state" "1.1.0"
+
+"@radix-ui/react-scroll-area@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-scroll-area/-/react-scroll-area-1.2.0.tgz#d09fd693728b09c50145935bec6f91efc2661729"
+  integrity sha512-q2jMBdsJ9zB7QG6ngQNzNwlvxLQqONyL58QbEGwuyRZZb/ARQwk3uQVbCF7GvQVOtV6EU/pDxAw3zRzJZI3rpQ==
+  dependencies:
+    "@radix-ui/number" "1.1.0"
+    "@radix-ui/primitive" "1.1.0"
+    "@radix-ui/react-compose-refs" "1.1.0"
+    "@radix-ui/react-context" "1.1.1"
+    "@radix-ui/react-direction" "1.1.0"
+    "@radix-ui/react-presence" "1.1.1"
+    "@radix-ui/react-primitive" "2.0.0"
+    "@radix-ui/react-use-callback-ref" "1.1.0"
+    "@radix-ui/react-use-layout-effect" "1.1.0"
 
 "@radix-ui/react-separator@^1.1.0":
   version "1.1.0"
@@ -1276,18 +1296,6 @@
   integrity sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==
   dependencies:
     "@types/node" "*"
-
-"@types/lodash-es@^4.17.6":
-  version "4.17.12"
-  resolved "https://registry.yarnpkg.com/@types/lodash-es/-/lodash-es-4.17.12.tgz#65f6d1e5f80539aa7cfbfc962de5def0cf4f341b"
-  integrity sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==
-  dependencies:
-    "@types/lodash" "*"
-
-"@types/lodash@*":
-  version "4.17.13"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.13.tgz#786e2d67cfd95e32862143abe7463a7f90c300eb"
-  integrity sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==
 
 "@types/ms@*":
   version "0.7.34"
@@ -4982,22 +4990,6 @@ simple-update-notifier@2.0.0:
   integrity sha512-a2B9Y0KlNXl9u/vsW6sTIu9vGEpfKu2wRV6l1H3XEas/0gUIzGzBoP/IouTcUQbm9JWZLH3COxyn03TYlFax6w==
   dependencies:
     semver "^7.5.3"
-
-simplebar-core@^1.2.6:
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/simplebar-core/-/simplebar-core-1.2.6.tgz#8317bb6c1bcb38739eae43f1edc902cdd1d858d9"
-  integrity sha512-H5NYU+O+uvqOH5VXw3+lgoc1vTI6jL8LOZJsw4xgRpV7uIPjRpmLPdz0TrouxwKHBhpVLzVIlyKhaRLelIThMw==
-  dependencies:
-    "@types/lodash-es" "^4.17.6"
-    lodash "^4.17.21"
-    lodash-es "^4.17.21"
-
-simplebar-react@^3.2.6:
-  version "3.2.6"
-  resolved "https://registry.yarnpkg.com/simplebar-react/-/simplebar-react-3.2.6.tgz#f44b299a56311912f2faa06b04d9a7603b20ed28"
-  integrity sha512-8jDiBuVCG86JmOrsmkA+4q77iFAEbhU9EX62PohLisg3dnxdLXFFhkxnx2Es3Cxt8IlZFlJsF9GaobFL3ukwiA==
-  dependencies:
-    simplebar-core "^1.2.6"
 
 sisteransi@^1.0.5:
   version "1.0.5"

@@ -30,6 +30,7 @@
     "@radix-ui/react-collapsible": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-scroll-area": "^1.2.0",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
@@ -49,7 +50,6 @@
     "react-router-dom": "^6.28.0",
     "react-toastify": "^10.0.6",
     "reselect": "^5.1.1",
-    "simplebar-react": "^3.2.6",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "yup": "^1.4.0"

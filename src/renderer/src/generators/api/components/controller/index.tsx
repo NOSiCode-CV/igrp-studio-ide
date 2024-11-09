@@ -8,7 +8,7 @@ import {
 } from 'reactstrap'
 import { useFormik } from 'formik'
 import { IColumnsTabelProps } from '../Interfaces'
-import { FormList } from '../FormList'
+import { FormList } from '../form-list'
 import { CardTableList, getTablesColumns, TabList, TabType, defaultValues, initialValues } from './config'
 
 import {

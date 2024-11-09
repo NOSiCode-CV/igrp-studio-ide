@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FormList } from '../FormList'
+import { FormList } from '../form-list'
 import useToast from '@renderer/components/useToast'
 import { useFormik } from 'formik'
 import { btnLabels, defaultValues, getTablesColumns, TabList, initialValues } from './config'
