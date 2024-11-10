@@ -113,7 +113,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 							<TableCell key={index2}>
 								{['text', 'number'].includes(type) && (
 									<Input
-										className="text-xs p-1"
+										className="text-sm"
 										type={type}
 										value={row?.[key] || ''}
 										onChange={(ev) => changeValue(key, index, ev.target.value)}
@@ -169,7 +169,6 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 
 								{['checkbox'].includes(type) && (
 									<input
-										className='ml-3'
 										type="checkbox"
 										checked={row?.[key] || false}
 										onChange={(ev) =>
@@ -187,7 +186,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 						{removeRow && (
 							<td>
 								<Button
-									variant="outline" className="border-0 text-red-500"
+									variant="outline" size="icon" className="border-0 text-red-500"
 									onClick={() => removeRow(index)}
 								>
 									<Trash />

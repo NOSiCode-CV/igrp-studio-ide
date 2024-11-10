@@ -15,6 +15,8 @@ import { Card } from '@renderer/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Label } from '@renderer/components/ui/label'
 import { Input } from '@renderer/components/ui/input'
+import { addNewRow, changeValue, removeRow } from '../../helpers'
+import { TextInput } from '../inputs-form'
 
 interface ModelProps {
     onCancel: () => void
@@ -33,7 +35,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
 
     const validationSchema = useModelValidation({ t })
 
-    const validation: any = useFormik({
+    const formik: any = useFormik({
         enableReinitialize: true,
         initialValues,
         validationSchema,
@@ -43,47 +45,27 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
         }
     })
 
-    const addNewRow = (field: string) => {
-        validation.setFieldValue(field, [...validation.values[field], defaultValues[field]])
-    }
-
-    const removeRow = (field: string, position: number) => {
-        validation.setFieldValue(
-            field,
-            validation.values[field].filter((_, index: number) => index !== position)
-        )
-    }
-
-    const changeValue = (element: string, position: number, value: object, name: string) => {
-        validation.setFieldValue(
-            name,
-            validation.values[name].map((row: any, index: number) =>
-                index === position ? { ...row, [element]: value } : row
-            )
-        )
-    }
-
     const suggestTableName = (name) => {
         return `t_${name.trim().toLowerCase().replace(/\s+/g, '_')}`;
     };
 
     const handleNameBlur = (e) => {
-        validation.handleBlur(e);
+        formik.handleBlur(e);
         const name = e.target.value;
-        if (!validation.values.tableName) {
-            validation.setFieldValue('tableName', suggestTableName(name));
+        if (!formik.values.tableName) {
+            formik.setFieldValue('tableName', suggestTableName(name));
         }
     };
 
     useEffect(() => {
         const res = getTablesColumns({
             selectors,
-            attributes: validation.values.attributes,
+            attributes: formik.values.attributes,
             models,
-            currentModel: validation.values.name
+            currentModel: formik.values.name
         })
         setTableColumns(res)
-    }, [selectors, validation.values])
+    }, [selectors, formik.values])
 
     useEffect(() => {
         if (jsonData) {
@@ -109,22 +91,22 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
 
             const constraints = uniqueConstraints && uniqueConstraints.length > 0 ? uniqueConstraints : [defaultValues.uniqueConstraints]
 
-            validation.setFieldValue('name', name || '')
-            validation.setFieldValue('tableName', tableName || '')
-            validation.setFieldValue('crud', crudValue)
-            validation.setFieldValue('generationType', firstNonEmptyGenerationType)
-            validation.setFieldValue('enableCrud', crud?.enabled || false)
-            validation.setFieldValue('attributes', mergedAttributes || [defaultValues.attributes])
-            validation.setFieldValue('relations', relations || [defaultValues.relations])
-            validation.setFieldValue('uniqueConstraints', constraints)
+            formik.setFieldValue('name', name || '')
+            formik.setFieldValue('tableName', tableName || '')
+            formik.setFieldValue('crud', crudValue)
+            formik.setFieldValue('generationType', firstNonEmptyGenerationType)
+            formik.setFieldValue('enableCrud', crud?.enabled || false)
+            formik.setFieldValue('attributes', mergedAttributes || [defaultValues.attributes])
+            formik.setFieldValue('relations', relations || [defaultValues.relations])
+            formik.setFieldValue('uniqueConstraints', constraints)
 
         } else
-            validation.resetForm()
+            formik.resetForm()
 
     }, [jsonData])
 
     const getValuesToSubmit = () => {
-        const values = { ...validation.values };
+        const values = { ...formik.values };
         const enableCrud = values.enableCrud || false;
         const generationType = values.generationType;
 
@@ -218,13 +200,13 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
 
     const handleCancel = () => {
         onCancel();
-        validation.resetForm();
+        formik.resetForm();
     }
 
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
-        const data = validation?.values?.[value];
-        const errors = validation?.errors?.[value];
+        const data = formik?.values?.[value];
+        const errors = formik?.errors?.[value];
 
         if (columns && data) {
             return (
@@ -232,11 +214,11 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                     columns={columns}
                     data={data}
                     changeValue={(element, position, result) =>
-                        changeValue(element, position, result, value)
+                        changeValue(formik, element, position, result, value)
                     }
                     errors={errors}
-                    addRow={value === 'crud' ? undefined : () => addNewRow(value)}
-                    removeRow={value === 'crud' ? undefined : (position) => removeRow(value, position)}
+                    addRow={value === 'crud' ? undefined : () => addNewRow(formik, value, defaultValues[value])}
+                    removeRow={value === 'crud' ? undefined : (position) => removeRow(formik, value, position)}
                     name={btnLabels?.[value] || 'attributes'}
                 />
             );
@@ -250,47 +232,34 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
             <FormAction
                 onDelete={deleteModel}
                 onCancel={handleCancel}
-                onSubmit={validation.handleSubmit}
+                onSubmit={formik.handleSubmit}
                 isNew={jsonData === null}
                 title="Model" />
 
             <div className="space-y-4 p-4">
-                <Card className="bg-muted/50 shadow-md p-6 ">
+                <Card className="p-6 rounded-sm">
                     <div className="space-y-6">
                         <div className="flex gap-4">
                             <div className="grid grid-cols-4 gap-5">
-                                <div>
-                                    <Label htmlFor="name" className="block text-sm font-medium">Name</Label>
-                                    <Input
-                                        type="text"
-                                        id="name"
-                                        className={`mt-1 block w-full px-3 py-2 border ${validation.touched.name && validation.errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-                                        placeholder="Name of the model"
-                                        onChange={validation.handleChange}
-                                        onBlur={handleNameBlur}
-                                        value={validation.values.name || ""}
-                                    />
-                                    {validation.touched.name && validation.errors.name && (
-                                        <p className="text-sm text-red-500">{validation.errors.name}</p>
-                                    )}
-                                </div>
+                                <TextInput
+                                    label={t('Name')}
+                                    id="name"
+                                    placeholder={t('Name of the model')}
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.name ? formik.errors.name : undefined}
+                                />
 
-                                <div>
-                                    <Label htmlFor="tableName" className="block text-sm font-medium">Table Name</Label>
-                                    <Input
-                                        type="text"
-                                        id="tableName"
-                                        className={`mt-1 block w-full px-3 py-2 border ${validation.touched.tableName && validation.errors.tableName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-                                        placeholder="Name of the model"
-                                        onChange={validation.handleChange}
-                                        onBlur={validation.handleBlur}
-                                        value={validation.values.tableName || ""}
-                                    />
-                                    {validation.touched.tableName && validation.errors.tableName && (
-                                        <p className="text-sm text-red-500">{validation.errors.tableName}</p>
-                                    )}
-                                </div>
-
+                                <TextInput
+                                    label={t('Table Name')}
+                                    id="tableName"
+                                    placeholder={t('Enter Table Name')}
+                                    value={formik.values.tableName}
+                                    onChange={formik.handleChange}
+                                    onBlur={handleNameBlur}
+                                    error={formik.touched.tableName ? formik.errors.tableName : undefined}
+                                />
                             </div>
                         </div>
                         <div className="flex">
@@ -299,9 +268,9 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                                     <input
                                         type="checkbox"
                                         id="audit"
-                                        onChange={validation.handleChange}
-                                        value={validation.values.audit}
-                                        checked={validation.values.audit}
+                                        onChange={formik.handleChange}
+                                        value={formik.values.audit}
+                                        checked={formik.values.audit}
                                     />
                                     <Label>Audit Model</Label>
                                 </div>
@@ -311,9 +280,9 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                                     <input
                                         type="checkbox"
                                         id="enableCrud"
-                                        onChange={validation.handleChange}
-                                        value={validation.values.enableCrud}
-                                        checked={validation.values.enableCrud}
+                                        onChange={formik.handleChange}
+                                        value={formik.values.enableCrud}
+                                        checked={formik.values.enableCrud}
                                     />
                                     <Label htmlFor="tableName">Crud</Label>
                                 </div>
@@ -322,7 +291,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                         </div>
                     </div>
                 </Card>
-                <Card className="bg-muted/50 shadow-md p-6 ">
+                <Card className="p-6 rounded-sm">
                     <Tabs defaultValue="attributes">
                         <TabsList className="grid w-full grid-cols-5">
                             {TabList.map(({ label, value }, key) => (
@@ -331,7 +300,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                         </TabsList>
                         {TabList.map(({ value }, key) => (
                             <TabsContent key={key} value={value}>
-                                <Card>
+                                <Card className='rounded-sm'>
                                     {renderFormList(value)}
                                 </Card>
                             </TabsContent>

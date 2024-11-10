@@ -1,7 +1,7 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { ArrowRightCircle, Command, Database, Folder, Puzzle, RefreshCw } from 'lucide-react'
+import { Command, Database, Folder, Puzzle } from 'lucide-react'
 
 // Function to convert folders into menuItems
 export function generateMenuItems(folders: FolderFiles): MenuItem[] {

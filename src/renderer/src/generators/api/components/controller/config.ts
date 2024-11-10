@@ -52,14 +52,6 @@ export const initialValues: any /*ControllerConfig*/ = {
     ]
 }
 
-export const CardTableList = [
-    { key: 'general', label: 'General' },
-    { key: 'requestParams', label: 'Request Params' },
-    { key: 'pathVariables', label: 'Path Variables' }
-]
-
-export type TabType = 'General' | 'Request Params' | 'Path Variables'
-
 export const TabList = [
     { label: 'General', value: 'general' },
     { label: 'Request Params', value: 'requestParams' },

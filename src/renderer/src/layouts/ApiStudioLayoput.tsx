@@ -53,7 +53,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
             <ToastContainer />
             <Header config={config} basePath={basePath} />
 
-            <div className="flex flex-grow overflow-hidden">
+            <div className="flex flex-grow">
                 <SidebarProvider>
                     <AppSidebar menuItems={menuItems} className='mt-10' config={config} />
                     <SidebarInset>

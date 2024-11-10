@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { Card, CardBody, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap'
 import { useFormik } from 'formik'
-import Select from 'react-select'
 import { IColumnsTabelProps } from '../Interfaces'
-import { FormList } from '../form-list'
 import useToast from '@renderer/components/useToast'
 import { defaultValues, getTablesColumns, TabList, TemplateOptions, initialValues } from './config'
 import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types'
 import { useTranslation } from 'react-i18next'
-
-import {
-	setChangeStatus as onSetChangeStatus,
-} from "@renderer/redux/thunks";
 import { useDispatch } from 'react-redux'
+import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks"
 import FormAction from '../form-actions'
 import { useDtoValidation } from './validation'
+import { FormList } from '../form-list'
+import { Card } from '@renderer/components/ui/card'
+import { addNewRow, changeValue, removeRow } from '../../helpers'
+import { SelectInput, TextInput } from '../inputs-form'
 
 interface DtoProps {
 	jsonData?: any
@@ -26,200 +24,128 @@ interface DtoProps {
 }
 
 const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models }: DtoProps): JSX.Element => {
-
-	const dispatch: any = useDispatch();
+	const dispatch: any = useDispatch()
 	const { showErrorToast, showSuccessToast } = useToast()
-	const { t } = useTranslation();
+	const { t } = useTranslation()
 
-	const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({});
-
+	const [tablesColumns, setTableColumns] = useState<{ [key: string]: IColumnsTabelProps[] }>({})
 	const validationSchema = useDtoValidation({ t })
 
-	const validation: any = useFormik({
+	const formik = useFormik({
 		enableReinitialize: true,
-
 		initialValues,
-
 		validationSchema,
-
-		onSubmit: (values, actions) => {
-			actions.setSubmitting(false)
-			save(values)
+		onSubmit: async (values) => {
+			await handleSave(values)
 		}
 	})
 
-	// Load DTO fields
 	useEffect(() => {
 		if (jsonData) {
 			const { name, template, attributes } = jsonData
-
-			validation.setFieldValue('name', name || '')
-			validation.setFieldValue('template', template || '')
-			validation.setFieldValue('attributes', attributes || [defaultValues.attributes])
-		} else
-			validation.resetForm()
-
+			formik.setFieldValue('name', name || '')
+			formik.setFieldValue('template', template || '')
+			formik.setFieldValue('attributes', attributes || [defaultValues.attributes])
+		} else {
+			formik.resetForm()
+		}
 	}, [jsonData])
 
 	useEffect(() => {
-		const res = getTablesColumns({ selectors, dto, models, currentDto: jsonData?.name })
-		setTableColumns(res)
-	}, [selectors])
+		const columns = getTablesColumns({ selectors, dto, models, currentDto: jsonData?.name })
+		setTableColumns(columns)
+	}, [selectors, dto, models, jsonData])
 
-	const addNewRow = (field: string) => {
-		validation.setFieldValue(field, [...validation.values[field], defaultValues[field]])
-	}
-
-	const removeRow = (field: string, position: number) => {
-		validation.setFieldValue(
-			field,
-			validation.values[field].filter((_, index: number) => index !== position)
-		)
-	}
-
-	const changeValue = (element: string, position: number, value: any, name: string) => {
-		validation.setFieldValue(
-			name,
-			validation.values[name].map((row: any, index: number) =>
-				index === position ? { ...row, [element]: value } : row
-			)
-		)
-	}
-
-	const save = async (newValues: DTOConfig): Promise<void> => {
+	const handleSave = async (newValues: DTOConfig): Promise<void> => {
 		try {
+			const { error } = await window.api.createDto(newValues, basePath)
+			if (error) return showErrorToast(error)
 
-			const { error } = await window.api.createDto(newValues, basePath);
-
-			if (error) {
-				showErrorToast(error);
-				return;
-			}
-
-			dispatch(onSetChangeStatus(true));
-
-			showSuccessToast(`Dto for ${newValues.name} have been successfully added.`);
-
+			dispatch(onSetChangeStatus(true))
+			showSuccessToast(`Dto ${newValues.name} have been successfully added.`);
 		} catch (error) {
-			showErrorToast(error);
+			showErrorToast(error)
 		}
 	}
 
 	const handleDelete = async (): Promise<void> => {
 		try {
-			const { error } = await window.api.deleteDTO({
-				type: 'dto',
-				name: validation.values.name
-			}, basePath);
+			const { error } = await window.api.deleteDTO({ type: 'dto', name: formik.values.name }, basePath)
+			if (error) return showErrorToast(error)
 
-			if (error) {
-				showErrorToast(error);
-				return;
-			}
-
-			dispatch(onSetChangeStatus(true));
+			dispatch(onSetChangeStatus(true))
 			onCancel()
-
-			showSuccessToast('Dto deleted successfully!')
-
+			showSuccessToast(t('Dto deleted successfully!'))
 		} catch (error) {
-			showErrorToast(error);
+			showErrorToast(error)
 		}
 	}
 
-	const handleCancel = () => {
-		onCancel();
-		validation.resetForm();
-	}
+	const renderFormList = (value: string) => {
+		const columns = tablesColumns?.[value];
+		const data = formik?.values?.[value];
+		const errors = formik?.errors?.[value];
+
+		if (columns && data) {
+			return (
+				<FormList
+					columns={columns}
+					data={data}
+					changeValue={(element, position, result) =>
+						changeValue(formik, element, position, result, value)
+					}
+					errors={errors}
+					addRow={() => addNewRow(formik, value, defaultValues[value])}
+					removeRow={(position) => removeRow(formik, value, position)}
+					name={'field'}
+				/>
+			);
+		}
+		return null;
+	};
 
 	return (
 		<React.Fragment>
+
 			<FormAction
 				onDelete={handleDelete}
-				onCancel={handleCancel}
-				onSubmit={validation.handleSubmit}
-				isNew={jsonData === null}
-				title="DTO" />
+				onCancel={onCancel}
+				onSubmit={formik.handleSubmit}
+				isNew={!jsonData}
+				title={t('DTO')}
+			/>
 
-			<Card>
-				<CardBody>
-					<Row>
-						<Col md={4}>
-							<div className="mb-3">
-								<FormGroup>
-									<Label htmlFor="name" className="form-label">
-										Name
-									</Label>
-									<Input
-										type="text"
-										className="form-control"
-										placeholder="Name"
-										id="name"
-										onChange={validation.handleChange}
-										onBlur={validation.handleBlur}
-										value={validation.values.name || ''}
-										invalid={validation.touched.name && validation.errors.name ? true : false}
-									/>
-									{validation.touched.name && validation.errors.name ? (
-										<FormFeedback type="invalid">{validation.errors.name}</FormFeedback>
-									) : null}
-								</FormGroup>
-							</div>
-						</Col>
-						<Col md={4}>
-							<div className="mb-3">
-								<FormGroup>
-									<Label htmlFor="template" className="form-label">
-										Template
-									</Label>
-									<Select
-										id="template"
-										name="select-template"
-										options={TemplateOptions}
-										onChange={(selectedOption) => {
-											validation.setFieldValue('template', selectedOption?.value)
-										}}
-										value={TemplateOptions?.filter((d) => d.value === validation.values.template)}
-										styles={{
-											control: (baseStyles) =>
-												validation.errors.template
-													? { ...baseStyles, borderColor: 'red' }
-													: baseStyles
-										}}
-										isSearchable={false}
-									/>
-									{validation.errors.template ? (
-										<span className="text-danger" style={{ fontSize: 11 }}>
-											{validation.errors.template}
-										</span>
-									) : null}
-								</FormGroup>
-							</div>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<h6 className='text-muted'>Fields</h6>
-							{TabList.map(({ value }) => (
-								tablesColumns && tablesColumns[value] && (
-									<FormList
-										columns={tablesColumns[value]}
-										data={validation.values[value]}
-										changeValue={(element, position, val) =>
-											changeValue(element, position, val, value)
-										}
-										errors={validation.errors[value]}
-										addRow={() => addNewRow(value)}
-										removeRow={(position) => removeRow(value, position)}
-										name={'field'}
-									/>
-								)
-							))}
-						</Col>
-					</Row>
-				</CardBody>
-			</Card>
-		</React.Fragment>
+			<div className="space-y-4 p-4">
+				<Card className="rounded-sm p-6">
+					<div className="flex flex-col gap-4">
+						<div className="grid grid-cols-4 gap-5">
+							<TextInput
+								label={t('Name')}
+								id="name"
+								placeholder={t('Enter name')}
+								value={formik.values.name}
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								error={formik.touched.name ? formik.errors.name : undefined}
+							/>
+							<SelectInput
+								label={t('Template')}
+								id="template"
+								options={TemplateOptions}
+								value={TemplateOptions.find(opt => opt.value === formik.values.template)}
+								onChange={(option) => formik.setFieldValue('template', option?.value)}
+								error={formik.errors.template}
+							/>
+						</div>
+						{TabList.map(({ value }) => (
+							<Card className='rounded-sm'>
+								{renderFormList(value)}
+							</Card>
+						))}
+					</div>
+				</Card>
+			</div>
+		</React.Fragment >
 	)
 }
 
