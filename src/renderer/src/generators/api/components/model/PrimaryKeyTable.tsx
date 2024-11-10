@@ -1,7 +1,8 @@
 import Illustration from "@renderer/components/Ilustration"
-import { Badge, Table } from "reactstrap"
 import Select from 'react-select'
 import { formatMethods } from "../../helpers";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@renderer/components/ui/table";
+import { Badge } from "@renderer/components/ui/badge";
 
 const PrimaryKeyTable = ({ validation, selectors }) => {
 
@@ -21,48 +22,46 @@ const PrimaryKeyTable = ({ validation, selectors }) => {
     )
 
     return (
-        <Table borderless>
-            <thead>
-                <tr className="bg-light">
-                    <th className="text-muted ps-4 w-25">
-                        <div className="text-success fw-normal">Generation Type</div>
-                    </th>
-                    <th className="text-muted">
-                        <div className="text-success fw-normal d-flex align-items-center gap-2">
-                            Primary Key Fields
-                            <div style={{ marginTop: '5px' }}>
-                                <Illustration name="info" />
-                            </div>
+        <Table>
+            <TableHeader className="ps-4">
+                <TableRow>
+                    <TableHead className="w-1/4 ps-4">
+                        <div className="">Generation Type</div>
+                    </TableHead>
+                    <TableHead>
+                        <div className="gap-2 flex align-middle">
+                            <span>Primary Key Fields</span>
+                            <Illustration name="info" />
                         </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr className="bg-white">
-                    <td className="ps-4">
+                    </TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                <TableRow>
+                    <TableCell className="ps-4">
                         <Select
                             id="generationType"
                             name="generationType"
                             options={generateTypes}
                             onBlur={validation.generationType}
                             onChange={(selectedOption) => {
-                                validation.setFieldValue('generationType', selectedOption.value)
+                                validation.setFieldValue('generationType', selectedOption?.value)
                             }}
                             value={generateTypes?.filter((d) => d.value === validation.values.generationType)}
                         />
-                    </td>
-                    <td className="align-middle">
-                        <div className="d-flex gap-2">
+                    </TableCell>
+                    <TableCell className="align-middle">
+                        <div className="flex gap-2">
                             {primaryKeys && primaryKeys.map(({ name }, key) => (
-                                <Badge key={key} className="bg-light text-muted fst-italic fw-normal p-2 pe-3 ps-3 fs-5 text-uppercase">
+                                <Badge key={key} className="bg-light text-gray-500 italic fw-normal p-2 pe-3 ps-3 uppercase">
                                     {name}
                                 </Badge>
                             ))}
                         </div>
-                    </td>
+                    </TableCell>
 
-                </tr>
-            </tbody>
+                </TableRow>
+            </TableBody>
         </Table>
     )
 }

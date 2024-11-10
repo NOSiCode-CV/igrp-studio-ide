@@ -27,13 +27,17 @@ interface ControllerProps {
 }
 
 const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: ControllerProps): JSX.Element => {
+
 	const { t } = useTranslation()
+
 	const dispatch: any = useDispatch()
 
 	const [openAccordion, setOpenAccordion] = useState('ACTION-0')
+
 	const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({})
 
 	const { showErrorToast, showSuccessToast } = useToast()
+
 	const validationSchema = useControllerValidation({ t })
 
 	const formik: any = useFormik({
@@ -260,20 +264,20 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 					</div>
 				</Card>
 				<Accordion type="single" className="w-full space-y-3" collapsible value={openAccordion} onValueChange={toggleBordered}>
-					{formik.values.actions?.map((action, index: number) => (
+					{formik.values.actions?.map((action: any, index: number) => (
 						<AccordionItem value={`ACTION-${index}`} className="shadow px-3 rounded-lg">
 							<AccordionTrigger>
 								<div className='space-x-2 align-middle '>
 									<span>{action?.general?.[0]?.actionName || `ACTION ${index + 1}`}</span>
 									{getErrorsLength(
-										TabList.map((d) => d.value),
+										TabList.map((d) => d.tabId),
 										index
 									) > 0 &&
 										openAccordion !== `ACTION-${index}` && (
 											<Badge variant='outline' className='text-red-500'>
 												<ShieldAlert className='h-4 ' />
 												{getErrorsLength(
-													TabList.map((d) => d.value),
+													TabList.map((d) => d.tabId),
 													index
 												)}
 											</Badge>
@@ -283,29 +287,29 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 							<AccordionContent>
 								<Tabs defaultValue={'general'}>
 									<TabsList className="grid w-full grid-cols-3">
-										{TabList.map(({ label, value }) => (
-											<TabsTrigger key={value} value={value}>
+										{TabList.map(({ label, tabId }, key) => (
+											<TabsTrigger key={key} value={tabId}>
 												{label}
 											</TabsTrigger>
 										))}
 									</TabsList>
 
-									{TabList.map(({ label, value }) => (
-										<TabsContent key={value} value={value}>
-											{tablesColumns && tablesColumns[value] && (
+									{TabList.map(({ tabId, label }, key) => (
+										<TabsContent key={key} value={tabId}>
+											{tablesColumns && tablesColumns[tabId] && (
 												<FormList
-													columns={tablesColumns[value]}
-													data={formik.values.actions[index]?.[value]}
+													columns={tablesColumns[tabId]}
+													data={formik.values.actions[index]?.[tabId]}
 													changeValue={(element, position, value) =>
-														changeValue(element, index, position, value, value)
+														changeValue(element, index, position, value, tabId)
 													}
-													addRow={value !== 'general' ? () => addNewRow(index, value) : undefined}
+													addRow={tabId !== 'general' ? () => addNewRow(index, tabId) : undefined}
 													removeRow={
-														value !== 'general'
-															? (position) => removeRow(value, index, position)
+														tabId !== 'general'
+															? (position) => removeRow(tabId, index, position)
 															: undefined
 													}
-													errors={formik.errors.actions?.[index]?.[value]}
+													errors={formik.errors.actions?.[index]?.[tabId]}
 													name={label}
 												/>
 											)}
@@ -324,7 +328,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 						</AccordionItem>
 					))}
 				</Accordion>
-				<div className="bg-white p-2 shadow w-full">
+				<div className="bg-white px-2  w-full">
 					<Button color="success" variant={'outline'} onClick={handleAddAction}>
 						New Action
 					</Button>

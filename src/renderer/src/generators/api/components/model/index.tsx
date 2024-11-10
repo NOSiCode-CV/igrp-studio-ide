@@ -17,6 +17,7 @@ import { Label } from '@renderer/components/ui/label'
 import { Input } from '@renderer/components/ui/input'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { TextInput } from '../inputs-form'
+import PrimaryKeyTable from './PrimaryKeyTable'
 
 interface ModelProps {
     onCancel: () => void
@@ -301,6 +302,9 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                         {TabList.map(({ value }, key) => (
                             <TabsContent key={key} value={value}>
                                 <Card className='rounded-sm'>
+                                    {value === 'uniqueConstraints'
+                                        && <PrimaryKeyTable validation={formik} selectors={selectors} />
+                                    }
                                     {renderFormList(value)}
                                 </Card>
                             </TabsContent>

@@ -53,9 +53,9 @@ export const initialValues: any /*ControllerConfig*/ = {
 }
 
 export const TabList = [
-    { label: 'General', value: 'general' },
-    { label: 'Request Params', value: 'requestParams' },
-    { label: 'Path Variables', value: 'pathVariables' }
+    { label: 'General', tabId: 'general' },
+    { label: 'Request Params', tabId: 'requestParams' },
+    { label: 'Path Variables', tabId: 'pathVariables' }
 ]
 
 export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTabelProps[] } => {
