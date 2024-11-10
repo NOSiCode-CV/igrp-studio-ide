@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConfigOptions, MenuItem } from "src/main/types";
 import { ROUTES } from "@renderer/routes/routeConstants";
-import { Code, Github, Grid, HelpCircle, Home, Maximize2, Minus, Settings, Square, X } from "lucide-react";
+import { Code, Github, Grid, HelpCircle, Maximize2, Minus, Settings, Square, X } from "lucide-react";
 
 interface HeaderProps {
     config?: ConfigOptions,
@@ -107,7 +107,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                     </button>
                     <button
                         onClick={handleClose}
-                        className="flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        className="flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
                     >
                         <X className="h-4 w-4" />
                         <span className="sr-only">Close</span>
@@ -117,65 +117,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         </header>
     )
 
-    /*     return (
-            <header id="page-topbar" >
-                <div className="layout-width">
-                    <Navbar expand="md" className="navbar-header">
-                        <NavbarBrand href={ROUTES.HOME}>
-                            <div className="d-flex align-items-center gap-3">
-                                {config?.name && <i className='ri ri-home-3-line fs-4' />}
-                                <img src={logo} alt="Logo" height={20} />
-                                <h6 className="mt-3 text-truncate" style={{ maxWidth: '150px' }}>{config?.name}</h6>
-                            </div>
-                        </NavbarBrand>
-    
-                        <NavbarToggler onClick={toggleNavbar} ><i className="ri ri-menu-2-line" /></NavbarToggler>
-                        <Collapse isOpen={isOpen} navbar className="justify-content-end">
-                            <Nav className="ml-auto" navbar>
-    
-                                {config?.name &&
-                                    <NavItem >
-                                        <NavLink className="fs-5 btn-topbar text-center" color="primary" title="Open VS Code" onClick={openVSCode} style={{ cursor: 'pointer' }}>
-                                            <i className="bx bxl-visual-studio" />
-                                        </NavLink>
-                                    </NavItem>
-                                }
-    
-                                {menuItems.map((item, index) => (
-                                    <NavItem key={index}>
-                                        <NavLink href="#" className="btn-topbar fs-5 text-center" title={item?.label}>
-                                            {item?.icon ?? item?.label}
-                                        </NavLink>
-                                    </NavItem>
-                                ))}
-    
-                            </Nav>
-                        </Collapse>
-                        <Nav className="ml-auto" navbar>
-                            <NavItem >
-                                <NavLink onClick={handleMinimize} className="btn-icon fs-5 btn-topbar cursor-pointer">
-                                    <i className="ri ri-subtract-fill" /> 
-                                </NavLink>
-                            </NavItem>
-                            <NavItem >
-                                <NavLink onClick={handleMaximize} className="btn-icon fs-5 btn-topbar cursor-pointer">
-                                    {isMaximized ? (
-                                        <i className="RI ri-checkbox-blank-line" /> 
-                                    ) : (
-                                        <i className="ri ri-checkbox-multiple-blank-line" /> // Maximize icon
-                                    )}
-                                </NavLink>
-                            </NavItem>
-                            <NavItem >
-                                <NavLink onClick={handleClose} className="btn-icon quit fs-4 btn-topbar cursor-pointer">
-                                    <i className="ri ri-close-fill" /> 
-                                </NavLink>
-                            </NavItem>
-                        </Nav>
-                    </Navbar>
-                </div>
-            </header >
-        ) */
 }
 
 export default Header;

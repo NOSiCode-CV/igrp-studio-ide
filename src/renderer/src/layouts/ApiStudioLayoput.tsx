@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
@@ -9,11 +9,11 @@ import {
     setChangeStatus as onSetChangeStatus,
 } from "@renderer/redux/thunks";
 
-import { MenuItem } from 'src/main/types';
 import { generateMenuItems } from '@renderer/utils/helpers';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@renderer/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import Header from './components/header';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -49,17 +49,17 @@ const Layout = (props: LayoutProps): JSX.Element => {
     const menuItems = useMemo(() => generateMenuItems(folders), [folders]);
 
     return (
-        <div className="app-container h-screen flex flex-col">
+        <div className="h-screen flex flex-col">
             <ToastContainer />
             <Header config={config} basePath={basePath} />
 
-            <div className="flex flex-grow">
+            <div className="flex flex-1 overflow-hidden ">
                 <SidebarProvider>
                     <AppSidebar menuItems={menuItems} className='mt-10' config={config} />
-                    <SidebarInset>
-                        <div className="flex flex-1 flex-col">                           
+                    <SidebarInset >
+                        <ScrollArea className='mb-20'>
                             {props.children}
-                        </div>
+                        </ScrollArea>
                     </SidebarInset>
                 </SidebarProvider>
             </div >
