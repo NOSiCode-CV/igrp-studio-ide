@@ -1,8 +1,8 @@
-import GoBack from '@renderer/components/GoBack';
 import { useTranslation } from 'react-i18next';
 import Next from '@renderer/assets/images/Next.svg';
 import Spring from '@renderer/assets/images/Spring.svg';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import GoBack from '@renderer/components/go-back';
 
 interface SelectEnvironmentProps {
 	onEnvironmentCardClick?: (type: string) => void;

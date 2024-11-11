@@ -138,7 +138,7 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models }: Dto
 							/>
 						</div>
 						{TabList.map(({ value }) => (
-							<Card className='rounded-sm'>
+							<Card className='rounded-sm' key={value}>
 								{renderFormList(value)}
 							</Card>
 						))}

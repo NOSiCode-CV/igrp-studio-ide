@@ -14,7 +14,7 @@ const IconMap = {
 };
 
 const RecentsProjects = (): JSX.Element => {
-    const [pagination, setPagination] = useState({ page: 1, size: 5 });
+    const [pagination] = useState({ page: 1, size: 5 });
     const [projects, setProjects] = useState<PageableProjects>({ data: [], total: 0 });
     const [error, setError] = useState<string | null>(null);
 

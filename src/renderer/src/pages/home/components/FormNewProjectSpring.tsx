@@ -9,10 +9,10 @@ import { setConfig, setBasePath, navigateToNextPage } from "@renderer/redux/thun
 import { useTranslation } from 'react-i18next';
 import { ConfigOptions } from 'src/main/types';
 import { useNavigate } from 'react-router-dom';
-import Illustration from '../../../components/Ilustration';
 import Select from "react-select";
-import GoBack from '@renderer/components/GoBack';
 import { Card } from '@renderer/components/ui/card';
+import GoBack from '@renderer/components/go-back';
+import Illustration from '@renderer/components/ilustration';
 
 const DatabaseOptions = [
 	{ value: 'Postgresql', label: 'PostgreSQL' },

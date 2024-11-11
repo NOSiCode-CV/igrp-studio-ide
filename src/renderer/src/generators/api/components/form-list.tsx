@@ -1,10 +1,12 @@
 import { FunctionComponent, useEffect, useState } from 'react'
-import Select from 'react-select'
 import { ITabelContainer } from './Interfaces'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@renderer/components/ui/table'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Plus, Trash } from 'lucide-react'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Combobox } from '@renderer/components/combobox'
+import MultipleSelector from '@renderer/components/multiples-elector'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
 	data,
@@ -109,89 +111,82 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 			<TableBody>
 				{data.length > 0 && data.map((row: any, index: number) => (
 					<TableRow key={index}>
-						{columns.map(({ key, type, options }, index2) => (
-							<TableCell key={index2}>
-								{['text', 'number'].includes(type) && (
-									<Input
-										className="text-sm"
-										type={type}
-										value={row?.[key] || ''}
-										onChange={(ev) => changeValue(key, index, ev.target.value)}
-									//invalid={errors?.[index]?.[key] ? true : false}
-									/>
-								)}
-								{['select', 'multiSelect'].includes(type) && (
-									<Select
-										id={`${key}_${index2}`}
-										name={`${key}_${index2}`}
-										options={dynamicOptions[`${index}-${key}`] || options}
-										value={
-											type === 'multiSelect'
-												? options?.filter((d) => row[key]?.includes(d.value))
-												: (dynamicOptions?.[`${index}-${key}`] || options)?.filter((d) => row[key] && d.value === row[key])
-										}
-										isMulti={type === 'multiSelect'}
-										onChange={(selectedOption) => {
-											if (type === 'multiSelect') {
+						{columns.map(({ name, key, type, options }, index2) => {
+
+							const selectValue = ['select'].includes(type) ?
+								(dynamicOptions?.[`${index}-${key}`] || options)?.filter((d) => row[key] && d.value === row[key])[0]?.value
+								: '';
+
+							const selectMultiValues = ['multiSelect'].includes(type) ? options
+								?.filter((d) => row[key]?.includes(d.value))
+								.map((d) => d.value) : [];
+
+
+							return (
+								<TableCell key={index2}>
+									{['text', 'number'].includes(type) && (
+										<Input
+											className="text-sm"
+											type={type}
+											value={row?.[key] || ''}
+											onChange={(ev) => changeValue(key, index, ev.target.value)}
+										//invalid={errors?.[index]?.[key] ? true : false}
+										/>
+									)}
+
+									{['select'].includes(type) && (
+										<Combobox
+											name={name}
+											placeholder={`Select ${name}`}
+											options={dynamicOptions[`${index}-${key}`] || options}
+											value={selectValue}
+											onChange={(selectedOption) => {
+												handleDependentChange(key, index, selectedOption);
+											}} />
+									)}
+
+									{['multiSelect'].includes(type) && (
+										<MultipleSelector
+											placeholder={`Select ${name}`}
+											options={dynamicOptions[`${index}-${key}`] || options}
+											value={selectMultiValues}
+											onChange={(selectedOption) => {
 												changeValue(
 													key,
 													index,
-													selectedOption ? selectedOption.map((d) => d.value) : []
+													selectedOption,
 												);
-											} else {
-												handleDependentChange(key, index, selectedOption?.value);
-											}
-										}}
-										styles={{
-											control: (baseStyles) => ({
-												...baseStyles,
-												borderColor: errors?.[index]?.[key] ? 'red' : '#e9ebec',
-												minHeight: '28px',
-												height: '28px',
-											}),
-											valueContainer: (provided) => ({
-												...provided,
-												height: '28px',
-												padding: '0 6px'
-											}),
-											input: (provided) => ({
-												...provided,
-												margin: '0px',
-											}),
-											indicatorsContainer: (provided) => ({
-												...provided,
-												height: '28px',
-											}),
-										}}
-										isClearable={type !== 'multiSelect'}
-									/>
-								)}
+											}}
+										/>
+									)}
 
-								{['checkbox'].includes(type) && (
-									<input
-										type="checkbox"
-										checked={row?.[key] || false}
-										onChange={(ev) =>
-											changeValue(key, index, ev.target.checked)
-										}
-									/>
-								)}
-								{errors?.[index]?.[key] ? (
-									<span className="text-red-500" style={{ fontSize: 11 }}>
-										{errors?.[index]?.[key]}
-									</span>
-								) : null}
-							</TableCell>
-						))}
+									{['checkbox'].includes(type) && (
+										<Checkbox
+											id={`${key}_${index2}`}
+											onCheckedChange={(checked) =>
+												changeValue(key, index, checked)
+											}
+											checked={row?.[key] || false}
+										/>
+									)}
+
+									{errors?.[index]?.[key] ? (
+										<span className="text-red-500 text-xs">
+											{errors?.[index]?.[key]}
+										</span>
+									) : null}
+								</TableCell>
+							)
+						})}
 						{removeRow && (
-							<td>
+							<TableCell>
 								<Button
 									variant="outline" size="icon" className="border-0 text-red-500"
 									onClick={() => removeRow(index)}
 								>
 									<Trash />
 								</Button>
-							</td>
+							</TableCell>
 						)}
 					</TableRow>
 				))}

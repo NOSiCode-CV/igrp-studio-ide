@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ModelLayout from './components/model';
 import DtoLayout from './components/dto';
 import ControllerLayout from './components/controller';
@@ -92,7 +92,7 @@ const PageBuilderApi = (): JSX.Element => {
 		<>
 			{option === 'none' && (
 				<>
-					<SidebarTrigger className="ml-1" />
+					<SidebarTrigger className="ml-4 mt-4" />
 					<EmptyPage onClick={handleOptionClick} />
 				</>
 			)}

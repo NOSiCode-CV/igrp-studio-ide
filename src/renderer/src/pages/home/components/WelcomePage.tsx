@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import RecentsProjects from './RecentsProjects';
 import ProjectSelector from './ProjectSelector';
-import Illustration from '../../../components/Ilustration';
+import Illustration from "@renderer/components/ilustration";
 
 interface SelectProjectProps {
   onHandleNewProjectClick?: () => void

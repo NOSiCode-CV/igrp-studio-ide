@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SelectEnvironment from '@renderer/pages/home/components/SelectEnvironment'
 import FormNewProjectNextJS from '@renderer/pages/home/components/FormNewProjectNextJS'
 import FormNewProjectSpring from '@renderer/pages/home/components/FormNewProjectSpring'

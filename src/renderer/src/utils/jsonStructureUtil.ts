@@ -1,5 +1,5 @@
 import { Component } from '@igrp/nextjs-engine/dist/interfaces/types';
-import { HierarchicalComponent } from '@renderer/pages/uiBuilder/interfaces';
+import { HierarchicalComponent } from '@renderer/generators/ui/interfaces';
 
 export const buildJsonStructure = (components: HierarchicalComponent[]): Component[] => {
     return components.map(row => ({

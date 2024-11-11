@@ -1,4 +1,4 @@
-import AlertDialogDelete from '@renderer/components/AlertDialogDelete';
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from '@renderer/components/ui/breadcrumb';
 import { Button } from '@renderer/components/ui/button';
 import { Separator } from '@renderer/components/ui/separator';

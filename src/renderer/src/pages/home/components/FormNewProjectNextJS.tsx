@@ -1,4 +1,3 @@
-import GoBack from '../../../components/GoBack'
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { useEffect, useState } from 'react';
@@ -10,9 +9,10 @@ import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Illustration from '../../../components/Ilustration';
 import { ConfigOptions } from 'src/main/types';
 import { Card } from '@renderer/components/ui/card';
+import GoBack from '@renderer/components/go-back';
+import Illustration from '@renderer/components/ilustration';
 
 interface FormProps {
 	type: String,

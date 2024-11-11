@@ -1,4 +1,4 @@
-import Illustration from "@renderer/components/Ilustration";
+import Illustration from "@renderer/components/ilustration";
 
 const EmptyPage = ({ onClick }) => {
     return (

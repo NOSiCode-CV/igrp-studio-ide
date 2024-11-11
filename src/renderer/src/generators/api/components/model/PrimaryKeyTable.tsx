@@ -1,4 +1,4 @@
-import Illustration from "@renderer/components/Ilustration"
+import Illustration from "@renderer/components/ilustration"
 import Select from 'react-select'
 import { formatMethods } from "../../helpers";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@renderer/components/ui/table";

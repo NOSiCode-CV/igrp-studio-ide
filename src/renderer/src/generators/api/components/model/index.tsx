@@ -14,10 +14,10 @@ import { useTranslation } from 'react-i18next'
 import { Card } from '@renderer/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Label } from '@renderer/components/ui/label'
-import { Input } from '@renderer/components/ui/input'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { TextInput } from '../inputs-form'
 import PrimaryKeyTable from './PrimaryKeyTable'
+import { Checkbox } from '@renderer/components/ui/checkbox'
 
 interface ModelProps {
     onCancel: () => void
@@ -265,27 +265,26 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
                         </div>
                         <div className="flex">
                             <div className="grid grid-cols-4 gap-5 mb-4">
-                                <div className='flex align-middle space-x-2'>
-                                    <input
-                                        type="checkbox"
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
                                         id="audit"
-                                        onChange={formik.handleChange}
-                                        value={formik.values.audit}
+                                        onCheckedChange={(checked) =>
+                                            formik.setFieldValue("audit", checked)
+                                        }
                                         checked={formik.values.audit}
                                     />
-                                    <Label>Audit Model</Label>
+                                    <Label htmlFor="audit">Audit Model</Label>
                                 </div>
 
-                                <div className='flex align-middle space-x-2'>
-
-                                    <input
-                                        type="checkbox"
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
                                         id="enableCrud"
-                                        onChange={formik.handleChange}
-                                        value={formik.values.enableCrud}
+                                        onCheckedChange={(checked) =>
+                                            formik.setFieldValue("enableCrud", checked)
+                                        }
                                         checked={formik.values.enableCrud}
                                     />
-                                    <Label htmlFor="tableName">Crud</Label>
+                                    <Label htmlFor="Crud">Crud</Label>
                                 </div>
 
                             </div>
