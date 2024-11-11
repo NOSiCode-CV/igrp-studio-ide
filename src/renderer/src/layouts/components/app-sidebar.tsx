@@ -13,6 +13,7 @@ import {
     SidebarMenuSub,
     SidebarMenuSubButton,
     SidebarMenuSubItem,
+    useSidebar,
 } from "@renderer/components/ui/sidebar"
 import { ChevronDown, Plus } from "lucide-react"
 
@@ -36,10 +37,11 @@ interface AppSidebarProps {
 
 export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
     const dispatch: any = useDispatch()
-    const { t } = useTranslation()    
+    const { t } = useTranslation()
     const [searchQuery, setSearchQuery] = useState("")
     const [activeItem, setActiveItem] = useState("")
     const filteredNavData = filterSubItems(menuItems, searchQuery)
+    const { state: sidebarState } = useSidebar()
 
     const setCurrentItem = (item) => {
         setActiveItem(item.id)
@@ -48,6 +50,10 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
 
     const openNewProject = (item) => {
         dispatch(onSetCurrentItem(item))
+    }
+
+    const handleSearch = (value: string) => {
+        setSearchQuery(value)
     }
 
     return (
@@ -65,7 +71,7 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
                         <span className="truncate text-xs">Api Generator UI</span>
                     </div>
                 </SidebarMenuButton>
-                <FormSearch onSearch={(value) => setSearchQuery(value)} className="truncate text-xs" placeholder="Search models, dto..." />
+                <FormSearch onSearch={handleSearch} className="truncate text-xs" placeholder="Search models, dto..." sidebarState={sidebarState} />
             </SidebarHeader>
             <SidebarContent>
                 <ScrollArea>
@@ -102,7 +108,7 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
                                                                         onClick={() => setCurrentItem(subItem)}
                                                                         className="cursor-pointer"
                                                                         isActive={activeItem === subItem.id}>
-                                                                        {t(subItem.label)}
+                                                                        {subItem.label}
                                                                     </SidebarMenuSubButton>
                                                                 </SidebarMenuSubItem>
                                                             ))}
