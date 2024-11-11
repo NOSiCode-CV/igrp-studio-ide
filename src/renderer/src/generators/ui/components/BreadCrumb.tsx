@@ -3,7 +3,6 @@ import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import React from 'react';
 import { Button } from 'reactstrap';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
 interface BreadCrumbProps {
@@ -12,13 +11,13 @@ interface BreadCrumbProps {
     onSave: (jsonStructure: Component[]) => void
 }
 
-const StyledDiv = styled.div`
+/* const StyledDiv = styled.div`
    margin-top: -40px;
    width: auto;
    right: 0;
    left: auto;
    position: absolute;
-`;
+`; */
 
 const BreadCrumb = ({ isDesign, onClickIsDesign, onSave }: BreadCrumbProps): JSX.Element => {
 
@@ -34,7 +33,7 @@ const BreadCrumb = ({ isDesign, onClickIsDesign, onSave }: BreadCrumbProps): JSX
 
     return (
         <React.Fragment>
-            <StyledDiv>
+            <div>
                 <div className="page-title-box d-flex align-items-center justify-content-between pt-1 pb-0">
                     <div className='d-flex align-items-center gap-2'>
                         <Button
@@ -60,7 +59,7 @@ const BreadCrumb = ({ isDesign, onClickIsDesign, onSave }: BreadCrumbProps): JSX
                     </div>
 
                 </div>
-            </StyledDiv>
+            </div>
         </React.Fragment>
     );
 };

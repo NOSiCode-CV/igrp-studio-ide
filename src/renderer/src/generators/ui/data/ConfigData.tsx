@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CONTAINER, FIELDS, COMPONENTS, COMPONENT, FEILD } from "@renderer/utils/ComponentTypes";
+import { COMPONENT, COMPONENTS, CONTAINER, FEILD, FIELDS } from "../ComponentTypes";
 
 const Navdata = () => {
 

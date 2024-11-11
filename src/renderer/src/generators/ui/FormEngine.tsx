@@ -1,6 +1,3 @@
-import { LAYOUT_TYPES } from "@igrp/nosi-velzon-ts";
-import useLayoutSettings from "@renderer/layouts/LayoutSettings";
-import Sidebar from "@renderer/layouts/Sidebar";
 import React, { useEffect, useMemo, useState } from "react";
 import { Container } from "reactstrap";
 import RowContainer from "./types/containers/rows";
@@ -12,12 +9,11 @@ import navdata from "./data/ConfigData";
 import CodeMirrorContent from "./components/CodeMirrorContent";
 import { Component, PageConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
 import useToast from "@renderer/components/useToast";
-import SimpleBar from "simplebar-react";
-import styled from "styled-components";
 import { HierarchicalComponent } from "./interfaces";
 
 import { DragDropContext } from 'react-beautiful-dnd';
 import { handleDragEnd } from "./dnd/DraggableItemManager";
+import { ScrollArea } from "@renderer/components/ui/scroll-area";
 
 const addRow = () => {
     const newRowId = generateId("row");
@@ -29,10 +25,10 @@ const addRow = () => {
     return newRow;
 };
 
-const ContainerDesigner = styled.div`
+/* const ContainerDesigner = styled.div`
     height: calc(100vh - 90px); 
 `;
-
+ */
 const FormEngine = ({ basePath, page, pagePath }) => {
 
     const { reorderComponents, moveComponent, getComponentsByRow, setInitComponents, getAllComponents, removeRow, addDroppedComponent, getComponent, setEditingComponent, updateComponent } = useDroppedComponents();
@@ -44,14 +40,14 @@ const FormEngine = ({ basePath, page, pagePath }) => {
     const { showErrorToast, showSuccessToast } = useToast();
 
     const navData = navdata().props.children;
-    let settings = useLayoutSettings({});
+  /*   let settings = useLayoutSettings({});
 
     const memoizedSidebarProps = useMemo(() => ({
         layoutType: LAYOUT_TYPES.TWOCOLUMN,
         leftsidbarSizeType: settings.leftsidbarSizeType,
         sidebarVisibilitytype: settings.sidebarVisibilitytype,
         navData: navData
-    }), [settings.layoutType, navData]);
+    }), [settings.layoutType, navData]); */
 
     const handleClickAddControl = (id: string, type: string) => {
         const newRow = addRow();
@@ -163,12 +159,12 @@ const FormEngine = ({ basePath, page, pagePath }) => {
                     onSave={(json) => handleSave(json)}
                 />
                 <div id="page-builder-gen">
-                    <Sidebar {...memoizedSidebarProps} />
+                    {/* <Sidebar {...memoizedSidebarProps} /> */}
                     <div id="igrp-contents" className="bg-light mt-1">
                         <Container fluid>
                             {isDesign ? (
-                                <ContainerDesigner>
-                                    <SimpleBar id="code-mirror" className="h-100">
+                                <div>
+                                    <ScrollArea id="code-mirror" className="h-100">
                                         <div className="content gen-viewers active" id="gen-design">
 
                                             <div className="igrp-page-header"></div>
@@ -187,13 +183,13 @@ const FormEngine = ({ basePath, page, pagePath }) => {
                                             </div>
 
                                         </div>
-                                    </SimpleBar>
-                                </ContainerDesigner>
+                                    </ScrollArea>
+                                </div>
                             ) : (
                                 <div className="content gen-viewers-code active" id="gen-code">
-                                    <ContainerDesigner>
+                                    <div>
                                         <CodeMirrorContent />
-                                    </ContainerDesigner>
+                                    </div>
                                 </div>
                             )}
 

@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
-import PageBuilderContent from '../PageBuilderContent';
 import FormEngine from '../FormEngine';
-import styled from 'styled-components';
 import { File } from 'src/main/types';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
+import MainPageBuilder from '../page/list-pages';
 
-const FixedTab = styled.div`
+/* const FixedTab = styled.div`
     position: fixed;
     width: 100%;
-`;
+`; */
 
 interface ContentProps {
   basePath?: string,
@@ -31,7 +30,7 @@ const Content: React.FC<ContentProps> = ({ basePath, tabs, activeTab, setActiveT
   }
 
   return (
-    <FixedTab className='navigation-page'>
+    <div className='navigation-page'>
       <Nav tabs className='nav-border-top nav-border-top-primary'>
         {tabs.map((tab) => (
           <NavItem key={tab} className="tab-item">
@@ -66,7 +65,7 @@ const Content: React.FC<ContentProps> = ({ basePath, tabs, activeTab, setActiveT
         {tabs.map((tab) => (
           <TabPane tabId={tab} key={tab}>
             {tab === 'PageBuilder' ? (
-              <PageBuilderContent onPageClick={handleClickOpenGerador} />
+              <MainPageBuilder onPageClick={handleClickOpenGerador} />
             ) : (
 
               <DroppedComponentsProvider>
@@ -76,7 +75,7 @@ const Content: React.FC<ContentProps> = ({ basePath, tabs, activeTab, setActiveT
           </TabPane>
         ))}
       </TabContent>
-    </FixedTab >
+    </div >
   );
 };
 

@@ -35,11 +35,11 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
-    const { t } = useTranslation()
-    const dispatch: any = useDispatch();
-    const [searchQuery, setSearchQuery] = useState("");
+    const dispatch: any = useDispatch()
+    const { t } = useTranslation()    
+    const [searchQuery, setSearchQuery] = useState("")
     const [activeItem, setActiveItem] = useState("")
-    const filteredNavData = filterSubItems(menuItems, searchQuery);
+    const filteredNavData = filterSubItems(menuItems, searchQuery)
 
     const setCurrentItem = (item) => {
         setActiveItem(item.id)

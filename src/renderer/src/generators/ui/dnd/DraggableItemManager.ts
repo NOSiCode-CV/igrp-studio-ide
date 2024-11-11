@@ -3,7 +3,7 @@ import { generateId } from "@renderer/utils/helpers";
 import { DroppedComponent } from "../interfaces";
 import { ComponentProps } from "./DroppedComponentsContext";
 import { ComponentRegistry } from "../data/ComponentRegistry";
-import { COMPONENT, FEILD } from "@renderer/utils/ComponentTypes";
+import { COMPONENT, FEILD } from "../ComponentTypes";
 
 export const handleDragEnd = (
     result: any,

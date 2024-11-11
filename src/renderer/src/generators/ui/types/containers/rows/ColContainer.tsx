@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
-import { DroppedComponent } from '@renderer/pages/uiBuilder/interfaces';
 import BoxContainer from '../BoxContainer';
-import ModalEdition from '@renderer/pages/uiBuilder/components/EditComponent/ModalEdition';
-import { AcceptTypesRegistry, ComponentRegistry } from '@renderer/pages/uiBuilder/data/ComponentRegistry';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { COMPONENT } from '@renderer/utils/ComponentTypes';
+import { DroppedComponent } from '@renderer/generators/ui/interfaces';
+import ModalEdition from '@renderer/generators/ui/components/EditComponent/ModalEdition';
+import { COMPONENT } from '@renderer/generators/ui/ComponentTypes';
+import { AcceptTypesRegistry, ComponentRegistry } from '@renderer/generators/ui/data/ComponentRegistry';
 
 export interface ColProps {
     rowId: string;

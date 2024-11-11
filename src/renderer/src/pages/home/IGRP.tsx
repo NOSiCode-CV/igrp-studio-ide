@@ -45,22 +45,16 @@ function IGRP(): JSX.Element {
   return (
     <div className="container mx-auto px-4">
       {showSelectProject && (
-        <>
-          <WelcomePage onHandleNewProjectClick={handleNewProjectClick} />
-        </>
+        <WelcomePage onHandleNewProjectClick={handleNewProjectClick} />
       )}
       {showSelectEnv && (
-        <>
-          <SelectEnvironment
-            onEnvironmentCardClick={handleEnvironmentCardClick}
-            onBackButtomClick={handleBackButtonClick}
-          />
-        </>
+        <SelectEnvironment
+          onEnvironmentCardClick={handleEnvironmentCardClick}
+          onBackButtomClick={handleBackButtonClick}
+        />
       )}
       {showFormNewProject && (
-        <>
-          <SelectedFormComponent onBackButtonClick={handleBackButtonClick} />
-        </>
+        <SelectedFormComponent onBackButtonClick={handleBackButtonClick} />
       )}
     </div>
   )

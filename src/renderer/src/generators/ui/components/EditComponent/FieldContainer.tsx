@@ -1,16 +1,16 @@
 import { Col, Row } from "reactstrap"
-import SimpleBar from "simplebar-react"
 import { AcceptTypesRegistry } from "../../data/ComponentRegistry"
 import Navdata from "../../data/ConfigData"
 import { findComponentItem, generateId } from "@renderer/utils/helpers"
-import FormSearch from "@renderer/layouts/FormSearch"
 import { useDroppedComponents } from "../../dnd/DroppedComponentsContext"
 import { DroppedComponent } from "../../interfaces"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Field, FieldConfig } from "@igrp/nextjs-engine/dist/interfaces/types"
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { FIELDS } from "@renderer/utils/ComponentTypes"
+import { FIELDS } from "../../ComponentTypes"
+import FormSearch from "@renderer/layouts/components/app-search"
+import { ScrollArea } from "@radix-ui/react-scroll-area"
 
 
 const FieldContainer = ({ componentName, componentId, fields }) => {
@@ -152,7 +152,7 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
                         <div className="mb-2 pb-2 small"><small>{t('clickToAdd')}</small></div>
                     </div>
                     <div className="fields-warraper" style={{ maxHeight: "60vh" }}>
-                        <SimpleBar id="fields" className="h-100">
+                        <ScrollArea id="fields" className="h-100">
                             <Row className="g-2 mx-0">
                                 {filteredAcceptTypes.length > 0 ? (
                                     filteredAcceptTypes.map((element, index) => {
@@ -175,11 +175,11 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
                                     </div>
                                 )}
                             </Row>
-                        </SimpleBar>
+                        </ScrollArea>
                     </div>
                 </Col>
                 <Col md="8" style={{ maxHeight: "60vh" }}>
-                    <SimpleBar id="fields-added" className="h-100">
+                    <ScrollArea id="fields-added" className="h-100">
                         {/* Render other fields */}
                         {renderFieldsByType("others", otherFields, "currentFields")}
 
@@ -191,7 +191,7 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
                                 <small>{t('addFieldHint')}</small>
                             </div>
                         )}
-                    </SimpleBar>
+                    </ScrollArea>
                 </Col>
             </Row>
         </div >

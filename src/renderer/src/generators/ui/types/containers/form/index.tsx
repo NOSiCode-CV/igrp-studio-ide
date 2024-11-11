@@ -4,9 +4,9 @@ import { Card, CardBody, CardFooter, CardHeader, CardTitle } from 'reactstrap';
 import { DroppedComponent } from '../../../interfaces';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import BoxField from '../../fields/BoxFields';
-import { FEILD, FIELDS } from '@renderer/utils/ComponentTypes';
 import { ComponentRegistry } from '../../../data/ComponentRegistry';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { FEILD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
 
 const getItemStyle = (isDragging, draggableStyle, index) => ({
     userSelect: 'none',

@@ -1,11 +1,9 @@
-import { COLUMN, COMPONENTS, FIELDS } from "@renderer/utils/ComponentTypes";
 import { UiButton, UiDate, UiText } from "../types/fields";
 import FormLayout from "../types/containers/form";
-import TableLayout from "../types/containers/table";
+import { COLUMN, COMPONENTS, FIELDS } from "../ComponentTypes";
 
 export const ComponentRegistry: { [key: string]: React.FC<any> } = {
     [COMPONENTS.FORM]: FormLayout,
-    [COMPONENTS.TABLE]: TableLayout,
     [FIELDS.TEXT]: UiText,
     [FIELDS.DATE]: UiDate,
     [FIELDS.BUTTON]: UiButton
