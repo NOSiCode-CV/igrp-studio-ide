@@ -23,27 +23,23 @@ const BoxContainer = ({ children, id, tag, onEdit, dragHandleProps }: BoxContain
     };
 
     return (
-
-        <React.Fragment>
-
-            <div className="gen-declared-containers">
-                <div id={id} className="gen-container-holder">
-                    <CompTools
-                        id={id}
-                        handleClickDeleteComp={handleClickDeleteComp}
-                        handleClickBtnEdition={handleClickBtnEdition}
-                        tag={tag}
-                        dragHandleProps={dragHandleProps}
-                    />
-                    <div className="container-contents">
-                        {React.cloneElement(children, {
-                            id,
-                            tag
-                        })}
-                    </div>
-                </div>
+        <div className="relative group" id={id} >
+            <div className="absolute top-0 right-0 px-2 bg-gray-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
+                <CompTools
+                    id={id}
+                    handleClickDeleteComp={handleClickDeleteComp}
+                    handleClickBtnEdition={handleClickBtnEdition}
+                    tag={tag}
+                    dragHandleProps={dragHandleProps}
+                />
             </div>
-        </React.Fragment>
+            <div className="container-contents">
+                {React.cloneElement(children, {
+                    id,
+                    tag
+                })}
+            </div>
+        </div>
     )
 }
 

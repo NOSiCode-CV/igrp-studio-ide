@@ -1,4 +1,4 @@
-import '@renderer/assets/css/gen.css'
+//import '@renderer/assets/css/gen.css'
 import { useEffect, useState } from "react";
 import { createSelector } from "reselect";
 import { useDispatch, useSelector } from 'react-redux';

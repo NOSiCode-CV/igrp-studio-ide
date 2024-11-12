@@ -1,3 +1,4 @@
+import { Copy, Settings, Trash } from "lucide-react";
 import { useDroppedComponents } from "../../dnd/DroppedComponentsContext"
 
 interface ToolsProps {
@@ -13,20 +14,19 @@ const RowTools = ({ id, onEdit }: ToolsProps) => {
     }
 
     return (
-        <div className="box-tools gen-field-edt-options  shadow-lg gen-settings-holder d-flex align-items-center" >
-
-            <button   className="btn btn-box-tool d-flex align-items-center justify-content-center  field-clone gen-clone-btn" title="">
-                <i className="ri-file-copy-line"></i>
+        <div className="box-tools gen-field-edt-options  gen-settings-holder shadow-lg  flex justify-end" >
+            <button className="btn btn-box-tool flex align-items-center justify-center  field-clone gen-clone-btn" title="">
+                <Copy className="h-4" />
             </button>
 
-            <button  className="btn btn-box-tool d-flex align-items-center justify-content-center  field-edit gen-edition-btn"
+            <button className="btn btn-box-tool flex align-center justify-center  field-edit gen-edition-btn"
                 title="" onClick={onEdit}>
-                <i className="ri-settings-5-line"></i>
+                <Settings className="h-4" />
             </button>
 
-            <button  className="btn btn-box-tool d-flex align-items-center justify-content-center  field-remove"
+            <button className="btn btn-box-tool flex align-items-center justify-center  field-remove"
                 onClick={onClickDeleteField}>
-                <i className="ri-delete-bin-line"></i>
+                <Trash className="h-4" />
             </button>
         </div>
     )

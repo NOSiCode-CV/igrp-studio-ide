@@ -3,7 +3,7 @@ import RowOptions from './RowOptions';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import ColContainer, { ColProps } from './ColContainer';
 import { generateId } from '@renderer/utils/helpers';
-import { HierarchicalComponent } from '@renderer/pages/uiBuilder/interfaces';
+import { HierarchicalComponent } from '@renderer/generators/ui/interfaces';
 
 interface RowContainerProps {
     id: string;
@@ -62,18 +62,22 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
     };
 
     return (
-        <div id={id} className='row gen-row'>
-            <RowOptions
-                onClickAddControl={handleClickAddControl}
-                onClickStructure={handleClickStructure}
-                onClickDeleteSection={() => onClickDeleteSection(id)}
-            />
-
-            {columns.map((column, index) => {
-                return (
-                    <ColContainer key={index} rowId={id} columnId={column.id} colSize={column.colSize} />
-                );
-            })}
+        <div id={id} className="group relative hover:border-2 hover:border-blue-600 hover:rounded-sm">
+            {/* RowOptions only visible on hover */}
+            <div className="absolute z-10 left-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
+                <RowOptions
+                    onClickAddControl={handleClickAddControl}
+                    onClickStructure={handleClickStructure}
+                    onClickDeleteSection={() => onClickDeleteSection(id)}
+                />
+            </div>
+            <div className='p-4'>
+                {columns.map((column, index) => {
+                    return (
+                        <ColContainer key={index} rowId={id} columnId={column.id} colSize={column.colSize} />
+                    );
+                })}
+            </div>
         </div>
     );
 };

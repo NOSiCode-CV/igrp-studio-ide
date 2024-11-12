@@ -1,101 +1,106 @@
+import { Button } from "@renderer/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@renderer/components/ui/dropdown-menu";
+import { Copy, LayoutGrid, Move, Plus, Trash } from "lucide-react";
 import { useState } from "react";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 
 interface RowOptionsProps {
     onClickAddControl: (type: string) => void;
     onClickStructure: (layout: string) => void;
     onClickDeleteSection: () => void;
 }
+
 const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection }: RowOptionsProps) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const toggle = () => setDropdownOpen((prevState) => !prevState);
-
     const closeDropdown = () => setDropdownOpen(false);
 
+    const gridStructures = [
+        [12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [8, 4], [4, 8], [9, 3], [3, 9], [10, 2], [2, 10]
+    ];
+
     return (
-        <>
-            <div className="text-light add-row-control d-flex align-items-center justify-content-center"
-                data-bs-toggle="tooltip" data-bs-placement="top" title="Add New Row"
-                onClick={() => onClickAddControl("bottom")}>
-                <i className="ri ri-add-fill"></i>
-            </div>
+        <div id="row-tools" className="relative flex flex-col items-center justify-between h-full ">
+            {/* Top-aligned button */}
+            <Button
+                className="absolute top-0 text-white flex items-center justify-center cursor-pointer p-2 hover:bg-gray-700 rounded-full"
+                title="Add New Row at Top"
+                onClick={() => onClickAddControl("top")}
+            >
+                <Plus />
+            </Button>
 
-            <div className="text-light add-row-control control-top d-flex align-items-center justify-content-center"
-                data-bs-toggle="tooltip" data-bs-placement="top" title="Add New Row"
-                onClick={() => onClickAddControl("top")}>
-                <i className="ri ri-add-fill"></i>
-            </div>
+            {/* Bottom-aligned button */}
+            <Button
+                className="absolute bottom-0 text-white flex items-center justify-center cursor-pointer p-2 hover:bg-gray-700 rounded-full"
+                title="Add New Row at Bottom"
+                onClick={() => onClickAddControl("bottom")}
+            >
+                <Plus />
+            </Button>
 
-            <div className="row-options">
-                <ul>
-                    <li className="d-flex align-items-center" rel="move" data-bs-toggle="tooltip" data-bs-title="Ordenar" >
-                        <a className="btn-small d-flex align-items-center move-row" href="#"
-                            onClick={(e) => e.preventDefault()}>
-                            <span className="small d-none">Mover</span>
-                            <i className="ri-drag-move-2-fill"></i>
+            <div className="row-options mt-4">
+                <ul className="flex space-x-2">
+                    <li className="flex items-center cursor-pointer" title="Ordenar">
+                        <a className="flex items-center p-2 hover:bg-gray-700 rounded" href="#" onClick={(e) => e.preventDefault()}>
+                            <Move className="h-4" />
                         </a>
                     </li>
 
-                    <li className="d-flex align-items-center" rel="clone" data-bs-toggle="tooltip" data-bs-title="Clonar" >
-                        <a className="btn-small d-flex align-items-center clone-row" href="#"
-                            onClick={(e) => e.preventDefault()}>
-                            <span className="small d-none">Clonar</span>
-                            <i className=" ri-file-copy-line"></i>
+                    <li className="flex items-center cursor-pointer" title="Clonar">
+                        <a className="flex items-center p-2 hover:bg-gray-700 rounded" href="#" onClick={(e) => e.preventDefault()}>
+                            <Copy className="h-4" />
                         </a>
                     </li>
 
-                    <li className="d-flex align-items-center" rel="columns" data-bs-toggle="tooltip" data-bs-title="Estrutura" >
-
-                        <Dropdown isOpen={dropdownOpen} toggle={toggle} size="sm" onMouseLeave={closeDropdown}>
-                            <DropdownToggle
-                                tag="a"
-                                className="btn-small add-columns">
-                                <span className="small d-none">Grid</span>
-                                <i className="ri ri-layout-grid-line"></i>
-                            </DropdownToggle>
-                            <DropdownMenu className="pt-0">
-                                <DropdownItem header >Estrutura</DropdownItem>
-                                <div className="p-3">
-                                    <div className="row-structures-wrapper row g-3">
-                                        {[[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [8, 4], [4, 8], [9, 3], [3, 9], [10, 2], [2, 10]].map((r, index) => (
-                                            <div className="col-3" key={index} onClick={() => onClickStructure(r.join(','))}>
-                                                <div className="row gx-1 column-setter" data-layout={`${r.join(',')}`}>
-                                                    {r.map((c, i) => (
-                                                        <div className={`col-${c}`} key={i}>
-                                                            <div className="struc-col-inner"></div>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                    <li className="flex items-center cursor-pointer" title="Estrutura">
+                        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                            <DropdownMenuTrigger asChild>
+                                <a className="flex items-center p-2 space-x-2 hover:bg-gray-700 rounded" href="#">
+                                    <LayoutGrid className="h-4 w-4" />
+                                </a>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" onPointerLeave={closeDropdown}>
+                                <DropdownMenuLabel>Estrutura</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <div className="grid grid-cols-3 gap-2 p-2">
+                                    {gridStructures.map((structure, index) => (
+                                        <DropdownMenuItem
+                                            key={index}
+                                            onSelect={() => onClickStructure(structure.join(','))}
+                                            className="p-0 focus:bg-transparent"
+                                        >
+                                            <div className="flex w-full cursor-pointer rounded border p-1 hover:bg-accent">
+                                                {structure.map((col, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="bg-muted"
+                                                        style={{ width: `${(col / 12) * 100}%`, height: '20px' }}
+                                                    />
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
+                                        </DropdownMenuItem>
+                                    ))}
                                 </div>
-                            </DropdownMenu>
-                        </Dropdown>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </li>
 
                     <li
-                        className="d-flex align-items-center"
-                        rel="delete-row"
-                        data-bs-toggle="tooltip"
-                        data-bs-title="Eliminar Seção"
+                        className="flex items-center cursor-pointer"
+                        title="Eliminar Seção"
                         onClick={(e) => {
                             e.preventDefault();
                             onClickDeleteSection();
                         }}
                     >
-                        <a className="btn-small d-flex align-items-center" href="#">
-                            <i className="ri-delete-bin-line"></i>
+                        <a className="flex items-center p-2 hover:bg-gray-700 rounded" href="#">
+                            <Trash className="h-4" />
                         </a>
                     </li>
-
                 </ul>
-                <input type="text" className="row-class-setter" placeholder="ROW" />
-
             </div>
-        </>
-    )
-}
+        </div>
+    );
+};
 
 export default RowOptions;

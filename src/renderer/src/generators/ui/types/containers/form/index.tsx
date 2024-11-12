@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import GenNoInfoField from '../../../components/GenNoInfoField';
-import { Card, CardBody, CardFooter, CardHeader, CardTitle } from 'reactstrap';
 import { DroppedComponent } from '../../../interfaces';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import BoxField from '../../fields/BoxFields';
 import { ComponentRegistry } from '../../../data/ComponentRegistry';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FEILD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
+import { Separator } from '@radix-ui/react-separator';
 
 const getItemStyle = (isDragging, draggableStyle, index) => ({
     userSelect: 'none',
@@ -61,11 +62,11 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     };
 
     return (
-        <Card className='igrp-forms mb-0'>
+        <Card className='igrp-forms mb-0 rounded-sm'>
             <CardHeader className='pb-1'>
                 <CardTitle className='fs-13'>{title}</CardTitle>
             </CardHeader>
-            <CardBody>
+            <CardContent>
                 <Droppable droppableId={`${componentId}`}
                     type={FEILD}
                     direction='horizontal'
@@ -75,7 +76,7 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             role="form"
-                            className="row g-3"
+                            className="row space-x-3"
                             style={getListStyle(snapshot.isDraggingOver)}
                         >
                             {formFields.length > 0 ? formFields.map((comp: DroppedComponent, index: number) => {
@@ -127,7 +128,7 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                         </div>
                     )}
                 </Droppable>
-            </CardBody>
+            </CardContent>
             {
                 buttonComponents.length > 0 && (
                     <CardFooter>
