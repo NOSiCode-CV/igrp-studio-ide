@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { ArchiveX, Command, File, Inbox, Send, Trash2 } from "lucide-react"
 
 import {
     Sidebar,
@@ -18,6 +17,9 @@ import {
     useSidebar,
 } from "@renderer/components/ui/sidebar"
 import { cn } from "@renderer/lib/utils"
+import { ChevronDown, Command, GripHorizontal, GripVertical } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@renderer/components/ui/dropdown-menu";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any> // or any other type for your new parameter
@@ -28,10 +30,12 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
 
     const data = props.data;
 
+    const { t } = useTranslation()
+
     // Note: I'm using state to show active item.
     // IRL you should use the url/router.
     const [activeItem, setActiveItem] = React.useState(data[0])
-   // const [mails, setMails] = React.useState(data.mails)
+    // const [mails, setMails] = React.useState(data.mails)
     const { setOpen } = useSidebar()
 
 
@@ -70,28 +74,22 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                         <SidebarGroupContent className="px-1.5 md:px-0">
                             <SidebarMenu>
                                 {data.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuItem key={item.id}>
                                         <SidebarMenuButton
                                             tooltip={{
-                                                children: item.title,
+                                                children: t(item.label),
                                                 hidden: false,
                                             }}
-                                          /*   onClick={() => {
+                                            onClick={(e) => {
                                                 setActiveItem(item)
-                                                const mail = data.mails.sort(() => Math.random() - 0.5)
-                                                setMails(
-                                                    mail.slice(
-                                                        0,
-                                                        Math.max(5, Math.floor(Math.random() * 10) + 1)
-                                                    )
-                                                )
+                                                item.click(e)
                                                 setOpen(true)
-                                            }} */
-                                            isActive={activeItem.title === item.title}
+                                            }}
+                                            isActive={activeItem.id === item.id}
                                             className="px-2.5 md:px-2"
                                         >
-                                            <item.icon />
-                                            <span>{item.title}</span>
+                                            <item.icon className="h-4 w-4" />
+                                            <span>{t(item.label)}</span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 ))}
@@ -111,7 +109,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                 <SidebarHeader className="gap-3.5 border-b p-4">
                     <div className="flex w-full items-center justify-between">
                         <div className="text-base font-medium text-foreground">
-                            {activeItem.title}
+                            {t(activeItem.label)}
                         </div>
                     </div>
                     <SidebarInput placeholder="Type to search..." />
@@ -119,22 +117,19 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                 <SidebarContent>
                     <SidebarGroup className="px-0">
                         <SidebarGroupContent>
-                            {/* {mails.map((mail) => (
-                                <a
-                                    href="#"
-                                    key={mail.email}
-                                    className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                >
-                                    <div className="flex w-full items-center gap-2">
-                                        <span>{mail.name}</span>{" "}
-                                        <span className="ml-auto text-xs">{mail.date}</span>
+                            <div className="grid grid-cols-2 gap-3 p-3 rounded-lg">
+                                {activeItem.subItems?.map((subItem) => (
+                                    <div
+                                        key={subItem.id}
+                                        className="h-24 flex flex-col items-center justify-center bg-white rounded-md p-3 shadow-sm cursor-move space-y-2"
+                                        onClick={() => subItem.click(subItem)}
+                                    >
+                                        <GripHorizontal className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        {subItem.icon && <subItem.icon className="h-5 w-5" />}
+                                        <span className="text-sm text-center">{t(subItem.label)}</span>
                                     </div>
-                                    <span className="font-medium">{mail.subject}</span>
-                                    <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
-                                        {mail.teaser}
-                                    </span>
-                                </a>
-                            ))} */}
+                                ))}
+                            </div>
                         </SidebarGroupContent>
                     </SidebarGroup>
                 </SidebarContent>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { COMPONENT, COMPONENTS, CONTAINER, FEILD, FIELDS } from "../ComponentTypes";
-import { ListTodo } from "lucide-react";
+import { Layers, ListTodo, Pencil, Sheet, Table } from "lucide-react";
 
 const Navdata = () => {
 
@@ -48,7 +48,7 @@ const Navdata = () => {
         {
             id: CONTAINER.FORMS_LISTS,
             label: CONTAINER.FORMS_LISTS,
-            icon: <ListTodo/>,
+            icon: ListTodo,
             link: "/#",
             stateVariables: isFormLayout,
             type: COMPONENT,
@@ -62,25 +62,25 @@ const Navdata = () => {
                 {
                     id: COMPONENTS.FORM,
                     label: "Form",
-                    icon: "ri-file-list-3-line",
+                    icon: Sheet,
                     type: COMPONENTS.FORM,
                 },
                 {
                     id: "formlist",
                     label: "Form List",
-                    icon: " ri-article-line",
+                    icon: "",
                     type: COMPONENTS.FORMLIST,
                 },
                 {
                     id: "separatorlist",
                     label: "Separator List",
-                    icon: " ri-list-unordered",
+                    icon: "",
                     type: COMPONENTS.SEPARATOR_LIST
                 },
                 {
                     id: "table",
                     label: "Table",
-                    icon: "ri-table-2",
+                    icon: Table,
                     type: COMPONENTS.TABLE
                 }
             ]
@@ -88,7 +88,7 @@ const Navdata = () => {
         {
             id: CONTAINER.PAGE_ELEMENTS,
             label: CONTAINER.PAGE_ELEMENTS,
-            icon: "ri-stack-line",
+            icon: Layers,
             link: "/#",
             stateVariables: isFormAction,
             type: COMPONENT,
@@ -102,25 +102,25 @@ const Navdata = () => {
                 {
                     id: "toolsbar",
                     label: "ToolsBar",
-                    icon: "fa-container",
+                    icon: "",
                     type: COMPONENTS.TOOLSBAR
                 },
                 {
                     id: "treelist",
                     label: "Tree List",
-                    icon: "fa-container",
+                    icon: "",
                     type: COMPONENTS.TREELIST
                 },
                 {
                     id: "treemenu",
                     label: "Tree Menu",
-                    icon: "fa-container",
+                    icon: "",
                     type: COMPONENTS.TREEMENU
                 },
                 {
                     id: "verticalmenu",
                     label: "Vertical Menu",
-                    icon: "fa-container",
+                    icon: "",
                     type: COMPONENTS.VERTICAL_MENU
                 }
             ]
@@ -128,7 +128,7 @@ const Navdata = () => {
         {
             id: CONTAINER.FIELDS,
             label: CONTAINER.FIELDS,
-            icon: "ri-pencil-ruler-2-line",
+            icon: Pencil,
             link: "/#",
             stateVariables: isFormFields,
             type: FEILD,
@@ -142,19 +142,19 @@ const Navdata = () => {
                 {
                     id: FIELDS.TEXT,
                     label: "Text",
-                    icon: "ri-edit-box-line",
+                    icon: "",
                     type: FIELDS.TEXT
                 },
                 {
                     id: FIELDS.DATE,
                     label: "Date",
-                    icon: "ri-calendar-line",
+                    icon: "",
                     type: FIELDS.DATE,
                 },
                 {
                     id: FIELDS.BUTTON,
                     label: "Button",
-                    icon: " bx bx-square-rounded",
+                    icon: "",
                     type: FIELDS.BUTTON
                 }
             ]
