@@ -61,10 +61,10 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
             <SidebarHeader>
                 <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1"
                 >
-                    <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-gray-500 bg-opacity-25 text-primary">
-                        <img src={SpringIcon} className="size-8" />
+                    <div className="flex aspect-square items-center justify-center">
+                        <img src={SpringIcon} className="" />
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold"> {config?.name}</span>

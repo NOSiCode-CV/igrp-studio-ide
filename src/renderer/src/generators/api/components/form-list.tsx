@@ -6,7 +6,8 @@ import { Input } from '@renderer/components/ui/input'
 import { Plus, Trash } from 'lucide-react'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import { Combobox } from '@renderer/components/combobox'
-import MultipleSelector from '@renderer/components/multiples-elector'
+import MultipleSelector from '@renderer/components/multiples-selector'
+import { cn } from '@renderer/lib/utils'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
 	data,
@@ -126,11 +127,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 								<TableCell key={index2}>
 									{['text', 'number'].includes(type) && (
 										<Input
-											className="text-sm"
+											className={cn("text-sm", errors?.[index]?.[key] ?  'border-red-500' : '')}
 											type={type}
 											value={row?.[key] || ''}
 											onChange={(ev) => changeValue(key, index, ev.target.value)}
-										//invalid={errors?.[index]?.[key] ? true : false}
 										/>
 									)}
 
@@ -171,7 +171,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 									)}
 
 									{errors?.[index]?.[key] ? (
-										<span className="text-red-500 text-xs">
+										<span className="text-red-500 text-xs -mt-1">
 											{errors?.[index]?.[key]}
 										</span>
 									) : null}

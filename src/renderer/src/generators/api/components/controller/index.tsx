@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import { IColumnsTabelProps } from '../Interfaces'
 import { FormList } from '../form-list'
@@ -230,7 +230,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 	}
 
 	return (
-		<>
+		<React.Fragment>
 			<FormAction
 				onDelete={handleDelete}
 				onCancel={handleCancel}
@@ -334,7 +334,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 					</Button>
 				</div>
 			</div>
-		</>
+		</React.Fragment>
 	)
 }
 

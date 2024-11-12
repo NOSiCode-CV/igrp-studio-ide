@@ -19,7 +19,7 @@ const FormSearch = ({ onSearch, sidebarState, className, placeholder }: SearchPr
     }
 
     return (
-        <div className="mt-2 px-2">
+        <div className="mt-2">
             {sidebarState === 'expanded' ? (
                 <SidebarGroup className="py-0">
                     <SidebarGroupContent className="relative">

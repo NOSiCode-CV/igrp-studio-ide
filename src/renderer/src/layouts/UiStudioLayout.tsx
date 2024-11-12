@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from './components/Header';
+import Header from './components/header';
 import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
@@ -36,8 +36,8 @@ const Layout = (props: LayoutProps): JSX.Element => {
             <div id="layout-wrapper">
                 <ToastContainer />
                 <Header config={config} basePath={basePath} />
-                <div className="main-content" style={{ marginLeft: 0 }}>
-                    <div className="page-content" style={{ marginTop: 0, paddingRight: 0, paddingLeft: 0 }}>
+                <div className="main-content">
+                    <div className="page-content">
                         {React.cloneElement(props.children, { basePath: basePath })}
                     </div>
                 </div>

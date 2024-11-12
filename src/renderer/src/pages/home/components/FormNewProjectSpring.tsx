@@ -13,6 +13,9 @@ import Select from "react-select";
 import { Card } from '@renderer/components/ui/card';
 import GoBack from '@renderer/components/go-back';
 import Illustration from '@renderer/components/ilustration';
+import { Button } from '@renderer/components/ui/button';
+import { Label } from '@renderer/components/ui/label';
+import { Input } from '@renderer/components/ui/input';
 
 const DatabaseOptions = [
 	{ value: 'Postgresql', label: 'PostgreSQL' },
@@ -135,99 +138,97 @@ const FormNewProjectSpring = ({
 								validation.handleSubmit();
 							}}
 						>
-							<div className="space-y-4">
-								<div>
-									<label htmlFor="apiName" className="block text-sm font-medium text-gray-700">{t('nameOfProject')}</label>
-									<input
+							<div className="space-y-2">
+								<Label htmlFor="apiName" className="block text-sm  ">{t('nameOfProject')}</Label>
+								<Input
+									type="text"
+									id="apiName"
+									placeholder="Name of the project"
+									className={`w-full p-2 border rounded-md ${validation.touched.apiName && validation.errors.apiName ? 'border-red-500' : 'border-gray-300'}`}
+									onChange={validation.handleChange}
+									onBlur={validation.handleBlur}
+									value={validation.values.apiName || ""}
+								/>
+								{validation.touched.apiName && validation.errors.apiName ? (
+									<p className="text-sm text-red-500">{validation.errors.apiName}</p>
+								) : null}
+							</div>
+
+							<div className="space-y-2">
+								<Label htmlFor="description" className="block text-sm  ">{t('description')}</Label>
+								<textarea
+									id="description"
+									rows={3}
+									className="w-full p-2 border rounded-md"
+									onChange={validation.handleChange}
+									onBlur={validation.handleBlur}
+									value={validation.values.description || ""}
+								></textarea>
+							</div>
+
+							<div className="grid grid-cols-2 gap-5">
+								<div className="space-y-2">
+									<Label htmlFor="group" className="block text-sm  ">{t('group')}</Label>
+									<Input
 										type="text"
-										id="apiName"
-										placeholder="Name of the project"
-										className={`w-full p-2 border rounded-md ${validation.touched.apiName && validation.errors.apiName ? 'border-red-500' : 'border-gray-300'}`}
+										id="group"
+										placeholder="Group"
+										className={`w-full p-2 rounded-md ${validation.touched.group && validation.errors.group ? 'border-red-500' : 'border-gray-300'}`}
 										onChange={validation.handleChange}
 										onBlur={validation.handleBlur}
-										value={validation.values.apiName || ""}
+										value={validation.values.group || ""}
 									/>
-									{validation.touched.apiName && validation.errors.apiName ? (
-										<p className="text-sm text-red-500">{validation.errors.apiName}</p>
+									{validation.touched.group && validation.errors.group ? (
+										<p className="text-sm text-red-500">{validation.errors.group}</p>
 									) : null}
 								</div>
 
-								<div>
-									<label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('description')}</label>
-									<textarea
-										id="description"
-										rows={3}
-										className="w-full p-2 border rounded-md"
+								<div className="space-y-2">
+									<Label htmlFor="artifact" className="block text-sm  ">{t('artifact')}</Label>
+									<Input
+										type="text"
+										id="artifact"
+										placeholder="Artifact"
+										className={`w-full p-2 border rounded-md ${validation.touched.artifact && validation.errors.artifact ? 'border-red-500' : 'border-gray-300'}`}
 										onChange={validation.handleChange}
 										onBlur={validation.handleBlur}
-										value={validation.values.description || ""}
-									></textarea>
-								</div>
-
-								<div className="grid grid-cols-2 gap-5">
-									<div>
-										<label htmlFor="group" className="block text-sm font-medium text-gray-700">{t('group')}</label>
-										<input
-											type="text"
-											id="group"
-											placeholder="Group"
-											className={`w-full p-2 border rounded-md ${validation.touched.group && validation.errors.group ? 'border-red-500' : 'border-gray-300'}`}
-											onChange={validation.handleChange}
-											onBlur={validation.handleBlur}
-											value={validation.values.group || ""}
-										/>
-										{validation.touched.group && validation.errors.group ? (
-											<p className="text-sm text-red-500">{validation.errors.group}</p>
-										) : null}
-									</div>
-
-									<div>
-										<label htmlFor="artifact" className="block text-sm font-medium text-gray-700">{t('artifact')}</label>
-										<input
-											type="text"
-											id="artifact"
-											placeholder="Artifact"
-											className={`w-full p-2 border rounded-md ${validation.touched.artifact && validation.errors.artifact ? 'border-red-500' : 'border-gray-300'}`}
-											onChange={validation.handleChange}
-											onBlur={validation.handleBlur}
-											value={validation.values.artifact || ""}
-										/>
-										{validation.touched.artifact && validation.errors.artifact ? (
-											<p className="text-sm text-red-500">{validation.errors.artifact}</p>
-										) : null}
-									</div>
-								</div>
-
-								<div>
-									<label htmlFor="database" className="block text-sm font-medium text-gray-700">{t('database')}</label>
-									<Select
-										id="database"
-										options={DatabaseOptions}
-										onChange={(option) => validation.setFieldValue('database', option)}
-										onBlur={() => validation.setFieldTouched('database', true)}
-										value={validation.values.database}
-										className={`w-full ${validation.touched.database && validation.errors.database ? 'border-red-500' : 'border-gray-300'}`}
+										value={validation.values.artifact || ""}
 									/>
-									{validation.touched.database && validation.errors.database?.value ? (
-										<p className="text-sm text-red-500">{validation.errors.database.value}</p>
+									{validation.touched.artifact && validation.errors.artifact ? (
+										<p className="text-sm text-red-500">{validation.errors.artifact}</p>
 									) : null}
 								</div>
 							</div>
 
+							<div className="space-y-2">
+								<Label htmlFor="database" className="block text-sm  ">{t('database')}</Label>
+								<Select
+									id="database"
+									options={DatabaseOptions}
+									onChange={(option) => validation.setFieldValue('database', option)}
+									onBlur={() => validation.setFieldTouched('database', true)}
+									value={validation.values.database}
+									className={`w-full ${validation.touched.database && validation.errors.database ? 'border-red-500' : 'border-gray-300'}`}
+								/>
+								{validation.touched.database && validation.errors.database?.value ? (
+									<p className="text-sm text-red-500">{validation.errors.database.value}</p>
+								) : null}
+							</div>
+
 							<div className="flex justify-end gap-4">
-								<button
+								<Button
 									type="button"
 									className="bg-gray-200 text-sm text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300"
 									onClick={onBackButtonClick}
 								>
 									{t('cancel')}
-								</button>
-								<button
+								</Button>
+								<Button
 									type="submit"
-									className="bg-green-500 text-sm text-white py-2 px-4 rounded-md hover:bg-green-600"
+									className="text-sm py-2 px-4 rounded-md"
 								>
 									{t('save')}
-								</button>
+								</Button>
 							</div>
 						</form>
 					</Card>

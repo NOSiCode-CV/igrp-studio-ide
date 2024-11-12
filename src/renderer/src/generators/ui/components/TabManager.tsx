@@ -1,18 +1,14 @@
-import React, { useState } from 'react';
-import { Button, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { useState } from 'react';
 import classnames from 'classnames';
 import FormEngine from '../FormEngine';
 import { File } from 'src/main/types';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
-
-/* const FixedTab = styled.div`
-    position: fixed;
-    width: 100%;
-`; */
+import { Layers2, X } from 'lucide-react';
+import { Separator } from '@renderer/components/ui/separator';
 
 interface ContentProps {
-  basePath?: string,
+  basePath?: string;
   tabs: string[];
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -20,63 +16,72 @@ interface ContentProps {
   onCloseTab: (tab: string) => void;
 }
 
-const Content: React.FC<ContentProps> = ({ basePath, tabs, activeTab, setActiveTab, onPageClick, onCloseTab }) => {
-
+export default function Component({
+  basePath,
+  tabs,
+  activeTab,
+  setActiveTab,
+  onPageClick,
+  onCloseTab
+}: ContentProps) {
   const [currentPage, setCurrentPage] = useState<File | null>(null);
 
   const handleClickOpenGerador = (pageFile: File) => {
-    onPageClick(pageFile.name)
-    setCurrentPage(pageFile)
-  }
+    onPageClick(pageFile.name);
+    setCurrentPage(pageFile);
+  };
 
   return (
-    <div className='navigation-page'>
-      <Nav tabs className='nav-border-top nav-border-top-primary'>
+    <div className="navigation-page">
+      <div className='sticky top-10'>
+        <nav className="flex border-t border-gray-200 ">
+          {tabs.map((tab) => (
+            <div key={tab}>
+              <button
+                className={classnames(
+                  'px-4 py-2 text-sm font-medium focus:outline-none',
+                  {
+                    'bg-white text-blue-600 border-t border-l border-r': activeTab === tab,
+                    'text-gray-500 hover:text-gray-700 bg-gray-100': activeTab !== tab
+                  }
+                )}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab !== 'PageBuilder' ? (
+                  <div className="flex items-center">
+                    <span>{tab}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCloseTab(tab);
+                      }}
+                      className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    >
+                      <X className='h-4' />
+                    </button>
+                  </div>
+                ) : (
+                  <Layers2 className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          ))}
+        </nav>
+        <Separator />
+      </div>
+      <div className="mt-4">
         {tabs.map((tab) => (
-          <NavItem key={tab} className="tab-item">
-            <NavLink
-              className={classnames({ active: activeTab === tab }, 'text-center m-0')}
-              onClick={() => setActiveTab(tab)}
-              style={{ cursor: 'pointer', width: tab === 'PageBuilder' ? '70px' : "auto" }}
-            >
-              {tab !== 'PageBuilder' ? (
-                <>
-                  <span>{tab}</span>
-                  <Button
-                    close
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCloseTab(tab);
-                    }}
-                    className="close-btn"
-                  >
-                    {/* <i className="ri ri-close-fill" /> */}
-                  </Button>
-                </>
-              ) : (
-                <i className='ri-pages-line fs-5' />
-              )}
-
-            </NavLink>
-          </NavItem>
-        ))}
-      </Nav>
-      <TabContent activeTab={activeTab}>
-        {tabs.map((tab) => (
-          <TabPane tabId={tab} key={tab}>
+          <div key={tab} className={activeTab === tab ? 'block' : 'hidden'}>
             {tab === 'PageBuilder' ? (
               <MainPageBuilder onPageClick={handleClickOpenGerador} />
             ) : (
-
               <DroppedComponentsProvider>
                 <FormEngine basePath={basePath} page={tab} pagePath={currentPage?.path} />
               </DroppedComponentsProvider>
             )}
-          </TabPane>
+          </div>
         ))}
-      </TabContent>
-    </div >
+      </div>
+    </div>
   );
-};
-
-export default Content;
+}

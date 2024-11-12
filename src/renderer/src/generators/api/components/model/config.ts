@@ -115,7 +115,7 @@ export const getTablesColumns = ({
   models,
   currentModel
 }): { [value: string]: IColumnsTabelProps[] } => {
-  const modelsOptions = models
+  const modelsOptions = [models || []]
     .filter((m) => m.name !== currentModel)
     .map((model) => ({
       value: model.name,

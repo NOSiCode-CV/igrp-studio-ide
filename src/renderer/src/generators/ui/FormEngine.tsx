@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Container } from "reactstrap";
+import React, { useEffect, useState } from "react";
 import RowContainer from "./types/containers/rows";
 import { useDroppedComponents } from "./dnd/DroppedComponentsContext";
 import { generateId } from "@renderer/utils/helpers";
@@ -14,6 +13,8 @@ import { HierarchicalComponent } from "./interfaces";
 import { DragDropContext } from 'react-beautiful-dnd';
 import { handleDragEnd } from "./dnd/DraggableItemManager";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
+import { AppSidebar } from "@renderer/layouts/components/app-ui-sidebar";
+import { SidebarInset, SidebarProvider } from "@renderer/components/ui/sidebar";
 
 const addRow = () => {
     const newRowId = generateId("row");
@@ -40,14 +41,14 @@ const FormEngine = ({ basePath, page, pagePath }) => {
     const { showErrorToast, showSuccessToast } = useToast();
 
     const navData = navdata().props.children;
-  /*   let settings = useLayoutSettings({});
-
-    const memoizedSidebarProps = useMemo(() => ({
-        layoutType: LAYOUT_TYPES.TWOCOLUMN,
-        leftsidbarSizeType: settings.leftsidbarSizeType,
-        sidebarVisibilitytype: settings.sidebarVisibilitytype,
-        navData: navData
-    }), [settings.layoutType, navData]); */
+    /*   let settings = useLayoutSettings({});
+  
+      const memoizedSidebarProps = useMemo(() => ({
+          layoutType: LAYOUT_TYPES.TWOCOLUMN,
+          leftsidbarSizeType: settings.leftsidbarSizeType,
+          sidebarVisibilitytype: settings.sidebarVisibilitytype,
+          navData: navData
+      }), [settings.layoutType, navData]); */
 
     const handleClickAddControl = (id: string, type: string) => {
         const newRow = addRow();
@@ -82,9 +83,9 @@ const FormEngine = ({ basePath, page, pagePath }) => {
                 pageName: page,
                 path: page
             }
-  
+
             const { error } = await window.api.addComponentToPage(pageConfig, jsonStructure, basePath);
-  
+
             if (error) {
                 showErrorToast(error);
                 return;
@@ -151,53 +152,52 @@ const FormEngine = ({ basePath, page, pagePath }) => {
     };
 
     return (
-        <React.Fragment>
-            <DragDropContext onDragEnd={onDragEnd}>
-                <BreadCrumb
+        <DragDropContext onDragEnd={onDragEnd}>
+            <SidebarProvider
+                style={
+                    {
+                        "--sidebar-width": "350px",
+                    } as React.CSSProperties
+                }
+            >
+                {/*   <BreadCrumb
                     isDesign={isDesign}
                     onClickIsDesign={handleCLickIsDesign}
                     onSave={(json) => handleSave(json)}
-                />
-                <div id="page-builder-gen">
-                    {/* <Sidebar {...memoizedSidebarProps} /> */}
-                    <div id="igrp-contents" className="bg-light mt-1">
-                        <Container fluid>
+                /> */}
+                <AppSidebar data={navData}/>
+                <SidebarInset>
+                    <div className="flex flex-1 flex-col gap-4 p-4">
+                        <ScrollArea>
                             {isDesign ? (
-                                <div>
-                                    <ScrollArea id="code-mirror" className="h-100">
-                                        <div className="content gen-viewers active" id="gen-design">
 
-                                            <div className="igrp-page-header"></div>
+                                <div className="content gen-viewers active" id="gen-design">
 
-                                            <div className="gen-rows-holder" >
+                                    <div className="igrp-page-header"></div>
 
-                                                {components.map(row => (
-                                                    <RowContainer
-                                                        key={row.id}
-                                                        id={row.id}
-                                                        onClickAddControl={handleClickAddControl}
-                                                        onClickDeleteSection={handleClickDeleteSection}
-                                                    />
-                                                ))}
+                                    <div className="gen-rows-holder" >
 
-                                            </div>
+                                        {components.map(row => (
+                                            <RowContainer
+                                                key={row.id}
+                                                id={row.id}
+                                                onClickAddControl={handleClickAddControl}
+                                                onClickDeleteSection={handleClickDeleteSection}
+                                            />
+                                        ))}
 
-                                        </div>
-                                    </ScrollArea>
-                                </div>
-                            ) : (
-                                <div className="content gen-viewers-code active" id="gen-code">
-                                    <div>
-                                        <CodeMirrorContent />
                                     </div>
-                                </div>
-                            )}
 
-                        </Container>
+                                </div>
+
+                            ) : (
+                                <CodeMirrorContent />
+                            )}
+                        </ScrollArea>
                     </div>
-                </div>
-            </DragDropContext>
-        </React.Fragment>
+                </SidebarInset>
+            </SidebarProvider>
+        </DragDropContext>
     );
 }
 export default FormEngine

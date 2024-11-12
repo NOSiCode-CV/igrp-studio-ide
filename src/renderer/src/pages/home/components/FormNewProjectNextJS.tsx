@@ -13,6 +13,9 @@ import { ConfigOptions } from 'src/main/types';
 import { Card } from '@renderer/components/ui/card';
 import GoBack from '@renderer/components/go-back';
 import Illustration from '@renderer/components/ilustration';
+import { Button } from '@renderer/components/ui/button';
+import { Input } from '@renderer/components/ui/input';
+import { Label } from '@renderer/components/ui/label';
 
 interface FormProps {
 	type: String,
@@ -100,41 +103,39 @@ const FormNewProjectNextJS = ({
 					<Card className='p-6'>
 						<div className="mb-4">
 							<h2 className="text-2xl font-semibold mb-2">{t('newProject')}</h2>
-							<p className="text-lg">{t('newProjectInformatin')}</p>
+							<p className="text-sm text-gray-500">{t('newProjectInformatin')}</p>
 						</div>
 						<form onSubmit={(e) => { e.preventDefault(); validation.handleSubmit(); }}>
-							<div className="space-y-4">
+							<div className="space-y-2">
 								{/* App Name */}
-								<div>
-									<label htmlFor="appName" className="block text-sm font-medium">{t('nameOfProject')}</label>
-									<input
-										type="text"
-										id="appName"
-										className={`mt-1 block w-full px-3 py-2 border ${validation.touched.appName && validation.errors.appName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-										placeholder="Name of the project"
-										onChange={validation.handleChange}
-										onBlur={validation.handleBlur}
-										value={validation.values.appName || ""}
-									/>
-									{validation.touched.appName && validation.errors.appName && (
-										<p className="text-sm text-red-500">{validation.errors.appName}</p>
-									)}
-								</div>
+								<Label htmlFor="appName" className="block text-sm font-medium">{t('nameOfProject')}</Label>
+								<Input
+									type="text"
+									id="appName"
+									className={`block w-full px-3 py-2 ${validation.touched.appName && validation.errors.appName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+									placeholder="Name of the project"
+									onChange={validation.handleChange}
+									onBlur={validation.handleBlur}
+									value={validation.values.appName || ""}
+								/>
+								{validation.touched.appName && validation.errors.appName && (
+									<p className="text-sm text-red-500">{validation.errors.appName}</p>
+								)}
 							</div>
 
 							{/* Buttons */}
 							<div className="mt-4 flex justify-end gap-4">
-								<button
+								<Button
 									type="button"
 									className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md"
 									onClick={onBackButtonClick}>
 									{t('cancel')}
-								</button>
-								<button
+								</Button>
+								<Button
 									type="submit"
-									className="px-4 py-2 bg-green-500 text-white rounded-md">
+									className="px-4 py-2 rounded-md">
 									{t('save')}
-								</button>
+								</Button>
 							</div>
 						</form>
 					</Card>

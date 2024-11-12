@@ -29,6 +29,8 @@ export class ProjectRepository implements IProjectRepository {
     async save(project: Project): Promise<Project> {
         const cfg: {projects: Array<Project>} = await loadCfg();
 
+        project.dt_updated = new Date();
+
         if (!cfg.projects) {
             cfg.projects = [];
         }

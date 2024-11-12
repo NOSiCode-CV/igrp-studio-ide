@@ -37,11 +37,16 @@ const RecentsProjects = (): JSX.Element => {
         fetchProjects();
     }, [pagination.page, pagination.size]);
 
-  /*   const handleLoadMore = () => {
-        setPagination((prev) => ({ ...prev, size: prev.size + 5 }));
-    }; */
+    /*   const handleLoadMore = () => {
+          setPagination((prev) => ({ ...prev, size: prev.size + 5 }));
+      }; */
 
-    const handleClick = (p: Project) => {
+    const handleClick = async (p: Project): Promise<void> => {
+
+        try {
+            await window.repo.project.save(p);
+        } catch (err) {
+        }
 
         dispatch(setBasePath(p.path));
 

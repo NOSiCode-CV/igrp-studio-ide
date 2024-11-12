@@ -37,9 +37,7 @@ const Index = ({ basePath }: PageBuilderProps) => {
     }, [basePath])
 
     return (
-        <React.Fragment>
-            <Content basePath={basePath} tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} onPageClick={handlePageClick} onCloseTab={handleCloseTab} />
-        </React.Fragment>
+        <Content basePath={basePath} tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} onPageClick={handlePageClick} onCloseTab={handleCloseTab} />
     );
 };
 

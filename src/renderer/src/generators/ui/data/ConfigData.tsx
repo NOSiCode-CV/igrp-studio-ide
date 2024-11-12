@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { COMPONENT, COMPONENTS, CONTAINER, FEILD, FIELDS } from "../ComponentTypes";
+import { ListTodo } from "lucide-react";
 
 const Navdata = () => {
 
@@ -47,7 +48,7 @@ const Navdata = () => {
         {
             id: CONTAINER.FORMS_LISTS,
             label: CONTAINER.FORMS_LISTS,
-            icon: "ri-list-check-2",
+            icon: <ListTodo/>,
             link: "/#",
             stateVariables: isFormLayout,
             type: COMPONENT,
