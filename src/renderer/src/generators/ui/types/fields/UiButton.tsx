@@ -15,7 +15,7 @@ const UiButton = ({ componentId, comp, onEdit }: UiButtonProps) => {
         <div className="relative group">
             <Link
                 type="button"
-                className="gen-ctx-menu-holder bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none flex items-center"
+                className="gen-ctx-menu-holder bg-primary text-white py-2 px-4 rounded hover:opacity-75 focus:outline-none flex items-center"
                 to="/#"
                 onClick={(e) => e.preventDefault()}
             >

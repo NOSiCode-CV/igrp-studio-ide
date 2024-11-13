@@ -33,14 +33,10 @@ const Layout = (props: LayoutProps): JSX.Element => {
 
     return (
         <React.Fragment>
-            <div id="layout-wrapper">
-                <ToastContainer />
-                <Header config={config} basePath={basePath} />
-                <div className="main-content">
-                    <div className="page-content">
-                        {React.cloneElement(props.children, { basePath: basePath })}
-                    </div>
-                </div>
+            <ToastContainer />
+            <Header config={config} basePath={basePath} />
+            <div className="main-content">
+                {React.cloneElement(props.children, { basePath: basePath })}
             </div>
         </React.Fragment>
     )

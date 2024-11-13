@@ -6,6 +6,7 @@ import { DroppedComponent } from '@renderer/generators/ui/interfaces';
 import ModalEdition from '@renderer/generators/ui/components/EditComponent/ModalEdition';
 import { COMPONENT } from '@renderer/generators/ui/ComponentTypes';
 import { AcceptTypesRegistry, ComponentRegistry } from '@renderer/generators/ui/data/ComponentRegistry';
+import { GenNoInfoComp } from '@renderer/generators/ui/components/GenNoInfoComp';
 
 export interface ColProps {
     rowId: string;
@@ -25,8 +26,6 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
         setEditingComponent(component);
     };
 
-    const isEmpty = components.length === 0;
-
     return (
 
         <React.Fragment>
@@ -38,7 +37,6 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
 
             <div
                 className={`gen-column col-md-${colSize}`}
-                data-empty={isEmpty ? 'true' : 'false'}
                 id={columnId}
             >
                 <Droppable droppableId={`${rowId}-${columnId}`}
@@ -52,7 +50,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                             className='gen-container-placeholder space-y-4'
                             style={getListStyle(snapshot.isDraggingOver)}
                         >
-                            {components ? components.map((comp: DroppedComponent, index: number) => {
+                            {components.length > 0 ? components.map((comp: DroppedComponent, index: number) => {
                                 const component = ComponentRegistry[comp.componentName];
                                 return (
 
@@ -84,11 +82,9 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                             </div>
                                         )}
                                     </Draggable>
-                                );
-                            }) : !provided.placeholder && (
-                                <p>
-                                    Drop items here
-                                </p>
+                                )
+                            }) : (
+                                <GenNoInfoComp />
                             )}
                             {provided.placeholder}
                         </div>

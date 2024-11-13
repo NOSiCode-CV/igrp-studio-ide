@@ -69,19 +69,17 @@ export default function Component({
         </nav>
         <Separator />
       </div>
-      <div className="mt-4">
-        {tabs.map((tab) => (
-          <div key={tab} className={activeTab === tab ? 'block' : 'hidden'}>
-            {tab === 'PageBuilder' ? (
-              <MainPageBuilder onPageClick={handleClickOpenGerador} />
-            ) : (
-              <DroppedComponentsProvider>
-                <FormEngine basePath={basePath} page={tab} pagePath={currentPage?.path} />
-              </DroppedComponentsProvider>
-            )}
-          </div>
-        ))}
-      </div>
+      {tabs.map((tab) => (
+        <div key={tab} className={activeTab === tab ? 'block' : 'hidden'}>
+          {tab === 'PageBuilder' ? (
+            <MainPageBuilder onPageClick={handleClickOpenGerador} />
+          ) : (
+            <DroppedComponentsProvider>
+              <FormEngine basePath={basePath} page={tab} pagePath={currentPage?.path} />
+            </DroppedComponentsProvider>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

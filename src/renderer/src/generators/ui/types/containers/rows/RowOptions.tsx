@@ -19,35 +19,35 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
     ];
 
     return (
-        <div id="row-tools" className="relative flex flex-col items-center justify-between h-full ">
+        <div id="row-tools">
             {/* Top-aligned button */}
             <Button
-                className="absolute top-0 text-white flex items-center justify-center cursor-pointer p-2 hover:bg-gray-700 rounded-full"
+                className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-[#26678C] text-white z-50 cursor-pointer"
                 title="Add New Row at Top"
                 onClick={() => onClickAddControl("top")}
             >
-                <Plus />
+                <Plus className="h-7 w-7" />
             </Button>
 
             {/* Bottom-aligned button */}
             <Button
-                className="absolute bottom-0 text-white flex items-center justify-center cursor-pointer p-2 hover:bg-gray-700 rounded-full"
+                className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-[#26678C] text-white z-50 cursor-pointer"
                 title="Add New Row at Bottom"
                 onClick={() => onClickAddControl("bottom")}
             >
-                <Plus />
+                <Plus className="h-7 w-7" />
             </Button>
 
-            <div className="row-options mt-4">
-                <ul className="flex space-x-2">
+            <div className="absolute z-10 left-0 top-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
+                <ul className="flex">
                     <li className="flex items-center cursor-pointer" title="Ordenar">
-                        <a className="flex items-center p-2 hover:bg-gray-700 rounded" href="#" onClick={(e) => e.preventDefault()}>
+                        <a className="flex items-center p-1 hover:bg-gray-700 rounded" href="#" onClick={(e) => e.preventDefault()}>
                             <Move className="h-4" />
                         </a>
                     </li>
 
                     <li className="flex items-center cursor-pointer" title="Clonar">
-                        <a className="flex items-center p-2 hover:bg-gray-700 rounded" href="#" onClick={(e) => e.preventDefault()}>
+                        <a className="flex items-center p-1 hover:bg-gray-700 rounded" href="#" onClick={(e) => e.preventDefault()}>
                             <Copy className="h-4" />
                         </a>
                     </li>
@@ -55,7 +55,7 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
                     <li className="flex items-center cursor-pointer" title="Estrutura">
                         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                             <DropdownMenuTrigger asChild>
-                                <a className="flex items-center p-2 space-x-2 hover:bg-gray-700 rounded" href="#">
+                                <a className="flex items-center p-1 space-x-2 hover:bg-gray-700 rounded" href="#">
                                     <LayoutGrid className="h-4 w-4" />
                                 </a>
                             </DropdownMenuTrigger>
@@ -69,13 +69,14 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
                                             onSelect={() => onClickStructure(structure.join(','))}
                                             className="p-0 focus:bg-transparent"
                                         >
-                                            <div className="flex w-full cursor-pointer rounded border p-1 hover:bg-accent">
+                                            <div className="flex w-full cursor-pointer rounded border p-1 hover:bg-accent gap-1">
                                                 {structure.map((col, i) => (
                                                     <div
                                                         key={i}
-                                                        className="bg-muted"
+                                                        className="bg-muted bg-[#0AB39C] hover:bg-[#26678C] transition-colors"
                                                         style={{ width: `${(col / 12) * 100}%`, height: '20px' }}
-                                                    />
+                                                    >
+                                                    </div>
                                                 ))}
                                             </div>
                                         </DropdownMenuItem>
@@ -93,7 +94,7 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
                             onClickDeleteSection();
                         }}
                     >
-                        <a className="flex items-center p-2 hover:bg-gray-700 rounded" href="#">
+                        <a className="flex items-center p-1 hover:bg-gray-700 rounded" href="#">
                             <Trash className="h-4" />
                         </a>
                     </li>

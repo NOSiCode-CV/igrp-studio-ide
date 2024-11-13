@@ -62,9 +62,9 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     };
 
     return (
-        <Card className='igrp-forms mb-0 rounded-sm'>
+        <Card className='mb-0 rounded-sm'>
             <CardHeader className='pb-1'>
-                <CardTitle className='fs-13'>{title}</CardTitle>
+                <CardTitle>{title}</CardTitle>
             </CardHeader>
             <CardContent>
                 <Droppable droppableId={`${componentId}`}
@@ -76,7 +76,7 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             role="form"
-                            className="row space-x-3"
+                            className="space-x-3"
                             style={getListStyle(snapshot.isDraggingOver)}
                         >
                             {formFields.length > 0 ? formFields.map((comp: DroppedComponent, index: number) => {
@@ -131,18 +131,16 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
             </CardContent>
             {
                 buttonComponents.length > 0 && (
-                    <CardFooter>
-                        <div className="d-flex justify-content-end active">
-                            {buttonComponents.map((comp: DroppedComponent) => (
-                                <div key={comp.id} className="mx-2">
-                                    {React.createElement(ComponentRegistry[comp.componentName], {
-                                        comp,
-                                        componentId: comp.id,
-                                        onEdit: () => handleEditClick(comp)
-                                    })}
-                                </div>
-                            ))}
-                        </div>
+                    <CardFooter className="flex justify-end gap-2">
+                        {buttonComponents.map((comp: DroppedComponent) => (
+                            <div key={comp.id}>
+                                {React.createElement(ComponentRegistry[comp.componentName], {
+                                    comp,
+                                    componentId: comp.id,
+                                    onEdit: () => handleEditClick(comp)
+                                })}
+                            </div>
+                        ))}
                     </CardFooter>
                 )
             }

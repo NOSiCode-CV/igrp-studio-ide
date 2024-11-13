@@ -14,17 +14,17 @@ const RowTools = ({ id, onEdit }: ToolsProps) => {
     }
 
     return (
-        <div className="box-tools gen-field-edt-options  gen-settings-holder shadow-lg  flex justify-end" >
-            <button className="btn btn-box-tool flex align-items-center justify-center  field-clone gen-clone-btn" title="">
+        <div className="shadow-lg  flex justify-end" >
+            <button className=" flex align-items-center justify-center  field-clone gen-clone-btn" title="">
                 <Copy className="h-4" />
             </button>
 
-            <button className="btn btn-box-tool flex align-center justify-center  field-edit gen-edition-btn"
+            <button className=" flex align-center justify-center  field-edit gen-edition-btn"
                 title="" onClick={onEdit}>
                 <Settings className="h-4" />
             </button>
 
-            <button className="btn btn-box-tool flex align-items-center justify-center  field-remove"
+            <button className=" flex align-items-center justify-center  field-remove"
                 onClick={onClickDeleteField}>
                 <Trash className="h-4" />
             </button>

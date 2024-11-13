@@ -175,7 +175,7 @@ const FormEngine = ({ basePath, page, pagePath }) => {
 
                                     <div className="igrp-page-header"></div>
 
-                                    <div className="gen-rows-holder" >
+                                    <div className="space-y-6 my-6" >
 
                                         {components.map(row => (
                                             <RowContainer
