@@ -28,7 +28,8 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
 
     return (
 
-        <React.Fragment>
+        <div className={`col-span-${colSize}`}
+            style={{ width: `${(colSize / 12) * 100}%` }}>
             {currentComponent &&
                 <ModalEdition
                     show={currentComponent !== null}
@@ -36,7 +37,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
             }
 
             <div
-                className={`gen-column col-md-${colSize}`}
+                className={`gen-column`}
                 id={columnId}
             >
                 <Droppable droppableId={`${rowId}-${columnId}`}
@@ -91,7 +92,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                     )}
                 </Droppable>
             </div>
-        </React.Fragment>
+        </div>
     );
 };
 

@@ -165,10 +165,10 @@ const FormEngine = ({ basePath, page, pagePath }) => {
                     onClickIsDesign={handleCLickIsDesign}
                     onSave={(json) => handleSave(json)}
                 /> */}
-                <AppSidebar data={navData}/>
+                <AppSidebar data={navData} />
                 <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-4">
-                        <ScrollArea>
+                        <ScrollArea className="h-screen overflow-y-auto">
                             {isDesign ? (
 
                                 <div className="content gen-viewers active" id="gen-design">

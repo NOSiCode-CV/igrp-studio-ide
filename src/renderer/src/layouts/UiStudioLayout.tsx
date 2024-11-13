@@ -32,13 +32,13 @@ const Layout = (props: LayoutProps): JSX.Element => {
     const { config, basePath } = useSelector(selectStudioProperties);
 
     return (
-        <React.Fragment>
+        <div className="h-screen flex flex-col">
             <ToastContainer />
             <Header config={config} basePath={basePath} />
-            <div className="main-content">
+            <div className="main-content overflow-hidden">
                 {React.cloneElement(props.children, { basePath: basePath })}
             </div>
-        </React.Fragment>
+        </div>
     )
 }
 
