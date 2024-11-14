@@ -1,5 +1,4 @@
 import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
-import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@renderer/components/ui/alert-dialog'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
@@ -8,6 +7,7 @@ import * as Yup from "yup";
 import { PATTERNS } from '@renderer/utils/constants';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from "formik";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@renderer/components/ui/dialog'
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -64,8 +64,10 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
     });
 
     return (
-        <AlertDialog open={isOpen} onOpenChange={onClose}>
-            <AlertDialogContent>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogTitle className="">Create New Page</DialogTitle>
+                <DialogDescription/>
                 <form
                     className="needs-validation"
                     onSubmit={(e) => {
@@ -73,12 +75,9 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
                         formik.handleSubmit();
                     }}
                 >
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Create New Page</AlertDialogTitle>
-                    </AlertDialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="pageName" className="text-right">
+                            <Label htmlFor="pageName">
                                 Page Name
                             </Label>
                             <Input
@@ -90,7 +89,7 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
                             />
                         </div>
                     </div>
-                    <AlertDialogFooter>
+                    <DialogFooter>
                         <Button type="button" variant="secondary" onClick={onClose}>
                             Cancel
                         </Button>
@@ -101,9 +100,9 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
                         >
                             {formik.isSubmitting ? "Saving..." : "Save"}
                         </Button>
-                    </AlertDialogFooter>
+                    </DialogFooter>
                 </form>
-            </AlertDialogContent>
-        </AlertDialog>
+            </DialogContent>
+        </Dialog>
     )
 }

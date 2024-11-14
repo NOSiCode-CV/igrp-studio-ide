@@ -7,12 +7,12 @@ import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks"
-import FormAction from '../form-actions'
 import { useDtoValidation } from './validation'
 import { FormList } from '../form-list'
 import { Card } from '@renderer/components/ui/card'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { SelectInput, TextInput } from '../inputs-form'
+import NavigationBar from '../navigation-bar'
 
 interface DtoProps {
 	jsonData?: any
@@ -107,7 +107,7 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models }: Dto
 	return (
 		<React.Fragment>
 
-			<FormAction
+			<NavigationBar
 				onDelete={handleDelete}
 				onCancel={onCancel}
 				onSubmit={formik.handleSubmit}

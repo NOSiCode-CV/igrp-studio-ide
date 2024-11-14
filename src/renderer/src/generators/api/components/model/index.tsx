@@ -5,10 +5,8 @@ import { useFormik } from 'formik'
 import { btnLabels, defaultValues, getTablesColumns, TabList, initialValues } from './config'
 import { ModelConfig, Relation } from '@igrp/spring-engine/dist/interfaces/types'
 import { IColumnsTabelProps } from '../Interfaces'
-
 import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks";
 import { useDispatch } from 'react-redux'
-import FormAction from '../form-actions'
 import { useModelValidation } from './validation'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@renderer/components/ui/card'
@@ -18,6 +16,7 @@ import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { TextInput } from '../inputs-form'
 import PrimaryKeyTable from './PrimaryKeyTable'
 import { Checkbox } from '@renderer/components/ui/checkbox'
+import NavigationBar from '../navigation-bar'
 
 interface ModelProps {
     onCancel: () => void
@@ -230,7 +229,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
     return (
         <React.Fragment>
 
-            <FormAction
+            <NavigationBar
                 onDelete={deleteModel}
                 onCancel={handleCancel}
                 onSubmit={formik.handleSubmit}

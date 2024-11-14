@@ -15,7 +15,7 @@ interface ActionProps {
     isNew?: boolean
 }
 
-const FormAction = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionProps) => {
+const NavigationBar = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionProps) => {
 
     const { t } = useTranslation()
 
@@ -74,4 +74,4 @@ const FormAction = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionProps)
     )
 }
 
-export default FormAction;
+export default NavigationBar;

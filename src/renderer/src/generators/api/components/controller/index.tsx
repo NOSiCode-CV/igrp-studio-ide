@@ -7,7 +7,6 @@ import { getTablesColumns, TabList, defaultValues, initialValues } from './confi
 import { useDispatch } from 'react-redux'
 import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks"
 import useToast from '@renderer/components/useToast'
-import FormAction from '../form-actions'
 import { useControllerValidation } from './validation'
 import { useTranslation } from 'react-i18next'
 import { ControllerAction, ControllerConfig } from '@igrp/spring-engine/dist/interfaces/types'
@@ -18,6 +17,7 @@ import { Button } from '@renderer/components/ui/button'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@renderer/components/ui/accordion'
 import { ShieldAlert } from 'lucide-react'
 import { Badge } from '@renderer/components/ui/badge'
+import NavigationBar from '../navigation-bar'
 
 interface ControllerProps {
 	jsonData?: any
@@ -231,7 +231,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 
 	return (
 		<React.Fragment>
-			<FormAction
+			<NavigationBar
 				onDelete={handleDelete}
 				onCancel={handleCancel}
 				onSubmit={formik.handleSubmit}

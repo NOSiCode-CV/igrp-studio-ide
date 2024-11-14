@@ -661,8 +661,8 @@
 
 "@igrp/spring-engine@^0.3.0":
   version "0.3.0"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0.tgz#ab429025864a6ae774348eb248281cae24da1798"
-  integrity sha512-MbOchCr8HuBRvrpkeQJZH1L5IrT+PXjf8IPlIZ28UsQR2vdCII98X+xh29mzERZqhi4fGVNRwfCbNKRzThBBiw==
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0.tgz#8f7bc245cd402f636c1e17c03ce0b6d15f9b6558"
+  integrity sha512-Z3bLbuv7mkbIQmu1dRuhCvhSVaNad/y/rFofBWOrjUjQgG1y0ipkRIiXDlTdsftLijKlisqr8eVssQ+GqV8ETg==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"

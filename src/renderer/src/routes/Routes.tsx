@@ -36,7 +36,12 @@ function AppRoutes(): JSX.Element {
   return (
     <React.Fragment>
       <Suspense fallback={<Loader />}>
-        <HashRouter>
+        <HashRouter
+          future={{
+            v7_relativeSplatPath: true,
+            v7_startTransition: true,
+          }}
+        >
           <Routes>
             <Route path="/" element={<Navigate to="/igrp" />} />
             {allRoutes.map((route, idx) => (
