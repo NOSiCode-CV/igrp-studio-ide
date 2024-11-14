@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
-import { Button, Col, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { useState } from "react";
 import { useDroppedComponents } from "../../dnd/DroppedComponentsContext";
 import { DroppedComponent } from "../../interfaces";
-import classnames from "classnames";
 import { Link } from "react-router-dom";
 import Copy from "./Copy";
 import FieldContainer from "./FieldContainer";
 import { useTranslation } from "react-i18next";
 import RenderPropsConfig from "./RenderPropsConfig";
 import useConfigComponent from "./useConfigComponent";
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@renderer/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@renderer/components/ui/tabs";
+import { Button } from "@renderer/components/ui/button";
+import { Save } from "lucide-react";
+import { Label } from "@renderer/components/ui/label";
+import { TextInput } from "@renderer/generators/api/components/inputs-form";
+import { Input } from "@renderer/components/ui/input";
 
 interface ModalEditionProps {
     show: boolean;
@@ -18,9 +23,9 @@ interface ModalEditionProps {
 
 const navItems = [
     { id: "properties", label: "Properties" },
-    { id: "2", label: "Fields" },
-    { id: "3", label: "Annotations" },
-    { id: "4", label: "Copy" }
+    { id: "fields", label: "Fields" },
+    { id: "annotations", label: "Annotations" },
+    { id: "copy", label: "Copy" }
 ];
 
 const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps) => {
@@ -28,14 +33,6 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
     const { t } = useTranslation();
 
     const [editionModal, setEditionModal] = useState<boolean>(show);
-
-    const [arrowNavTab, setarrowNavTab] = useState<string>("properties");
-    
-    const arrowNavToggle = (tab: any) => {
-        if (arrowNavTab !== tab) {
-            setarrowNavTab(tab);
-        }
-    };
 
     const { currentComponent, updateComponent, clearEditingComponent } = useDroppedComponents();
 
@@ -73,10 +70,6 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
         setEditionModal(false)
     }
 
-    const closeBtn = (
-        <button className="close btn-close text-white align-items-center" onClick={(handleClose)} type="button"> {/* &times; */}</button>
-    );
-
     const initialFormValues = propsConfig && Object.keys(propsConfig).reduce((acc, key) => {
         acc[key] = propsConfig[key].defaultValue ?? config[key] ?? '';
         return acc;
@@ -94,46 +87,27 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
     };
 
     return (
-        <Modal
-            isOpen={editionModal}
-            toggle={handleClose}
-            backdrop="static"
-            fade={false}
-            size='lg'
-            id="gen-edition-modal"
-        >
-            <ModalHeader className="bg-primary text-light py-3 align-items-center" toggle={onCloseClick} close={closeBtn}>
-                <span className="text-light">{t('settings')}</span>
-            </ModalHeader>
+        <Sheet open={editionModal} onOpenChange={handleClose}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+                <SheetHeader>
+                    <SheetTitle>{t('settings')}</SheetTitle>
+                </SheetHeader>
 
-            <ModalBody className="p-0 pb-5">
-                <Nav pills className="nav nav-pills nav-primary opacity-75 bg-light mb-3">
-                    {navItems.map((item) => (
-                        <NavItem key={item.id}>
-                            <NavLink
-                                style={{ cursor: "pointer", borderRadius: 0 }}
-                                className={classnames({ active: arrowNavTab === item.id })}
-                                onClick={() => arrowNavToggle(item.id)}
-                                id={item.id}
-                            >
-                                {t(item.label)}
-                            </NavLink>
-                        </NavItem>
-                    ))}
+                <div className="py-4">
+                    <Tabs defaultValue="properties">
+                        <TabsList className="grid w-full grid-cols-4">
+                            {navItems.map((item) => (
+                                <TabsTrigger value={item.id} key={item.id}>
+                                    {t(item.label)}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
 
-                </Nav>
-
-                <TabContent
-                    activeTab={arrowNavTab}
-                    className="text-muted"
-                >
-                    <TabPane tabId="properties" id="arrow-properties" className="px-3">
-
-                        <Form role="form">
-                            <Row className='gy-3 group-fields'>
-                                <Col md={6}>
-                                    <FormGroup>
-                                        <Label for="identif">{t('identifier')}</Label>
+                        <TabsContent value="properties">
+                            <form role="form">
+                                <div className="grid gap-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="identif">{t('identifier')}</Label>
                                         <Input
                                             type="text"
                                             id="identif"
@@ -141,46 +115,61 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                                             onChange={(e) => setIdentif(e.target.value)}
                                             placeholder="Enter component Identify"
                                             required
+                                            className="col-span-3"
                                         />
-                                    </FormGroup>
-                                </Col>
+                                    </div>
 
-                                {propsConfig && <RenderPropsConfig propsConfig={propsConfig}
-                                    formValues={formValues}
-                                    handleInputChange={handleInputChange}
-                                />}
+                                    {propsConfig && (
+                                        <RenderPropsConfig
+                                            propsConfig={propsConfig}
+                                            formValues={formValues}
+                                            handleInputChange={handleInputChange}
+                                        />
+                                    )}
+                                </div>
+                            </form>
+                        </TabsContent>
 
-                            </Row>
-                        </Form>
+                        <TabsContent value="fields">
+                            <FieldContainer componentName={componentName} componentId={currentComponent.id} fields={fields} />
+                        </TabsContent>
 
-                    </TabPane>
-                    <TabPane tabId="2" id="arrow-fields">
-                        <FieldContainer componentName={componentName} componentId={currentComponent.id} fields={fields} />
-                    </TabPane>
-                    <TabPane tabId="3" id="arrow-annotation" className="px-3 pb-5">
+                        <TabsContent value="annotation">
+                            <h6>Contact</h6>
+                            <p className="mb-0">
+                                Consistency is the one thing that can take all of the different elements in your design and tie
+                                them together. In an awareness campaign, it is vital for people to recognize your cause.
+                                Consistency piques people’s interest as it becomes popular, which benefits both beginners and
+                                advanced designers. <Link to="#" className="underline font-semibold">Contact Designer</Link>.
+                            </p>
+                        </TabsContent>
 
-                        <h6>Contact</h6>
-                        <p className="mb-0">
-                            Consistency is the one thing that can take all of the different elements in your design, and tie them all together and make them work. In an awareness campaign, it is vital for people to begin put 2 and 2 together and begin to recognize your cause. Consistency piques people’s interest is that it has become more and more popular over the years, which is excellent news to the beginner and advanced <Link to="#" className="text-decoration-underline"><b>Contact Designer</b></Link>.
-                        </p>
-                    </TabPane>
-                    <TabPane tabId="4" id="arrow-copy" className="px-3 pb-5">
-                        <Copy />
-                    </TabPane>
-                </TabContent>
-            </ModalBody>
-            <ModalFooter className={`d-flex align-items-center justify-content-between ${arrowNavTab === "properties" ? '' : 'd-none'}`}>
-                <div className="float-start justify-content-start">
-                    <span className="info object d-none"></span>
-                    <span className="info type d-flex align-items-center">{` `}{componentName}</span>
+                        <TabsContent value="copy">
+                            <Copy />
+                        </TabsContent>
+                    </Tabs>
                 </div>
-            </ModalFooter>
-            <Button data-toggle="tooltip" type="button" color="primary"
-                className="waves-effect waves-light" id="gen-edit-confirm"
-                onClick={handleConfirm}>
-                <i className="ri ri-save-line"></i>
-            </Button>
-        </Modal>
+
+                <SheetFooter
+                    className={`flex items-center justify-between`}
+                >
+                    <div className="flex justify-start">
+                        <span className="info hidden"></span>
+                        <span className="info flex items-center">{` `}{componentName}</span>
+                    </div>
+
+                    <Button
+                        type="button"
+                        className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded"
+                        id="gen-edit-confirm"
+                        onClick={handleConfirm}
+                    >
+                        <Save />
+                    </Button>
+                </SheetFooter>
+            </SheetContent>
+        </Sheet>
+
     )
 }
 

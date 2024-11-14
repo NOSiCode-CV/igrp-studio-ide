@@ -1,40 +1,39 @@
-import { Col, FormGroup, Label, Input } from 'reactstrap';
+import { Combobox } from "@renderer/components/combobox";
+import { Checkbox } from "@renderer/components/ui/checkbox";
+import { Input } from "@renderer/components/ui/input";
+import { Label } from "@renderer/components/ui/label";
 import Select from "react-select";
 
 const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
- 
+
     return Object.keys(propsConfig).map((key) => {
-       
-        const config = propsConfig[key]; 
+
+        const config = propsConfig[key];
 
         return (
-            <Col md={6} key={key}>
-                <FormGroup>
-                    <Label for={key}>{config.label}</Label>
-                    {(() => {
+
+            <div className="grid grid-cols-4 items-center gap-4" key={key}>
+                <Label htmlFor={key}>{config.label}</Label>
+                {
+                    (() => {
                         switch (config.type) {
                             case 'boolean':
                                 return (
-                                    <div className="form-check form-switch form-switch-md" dir="ltr">
-                                        <Input
-                                            type="checkbox"
-                                            name={key}
-                                            checked={formValues[key] ?? config.defaultValue}
-                                            onChange={handleInputChange}
-                                            className='form-check-input'
-                                        />
-                                    </div>
+                                    <Checkbox
+                                        name={key}
+                                        checked={formValues[key] ?? config.defaultValue}
+                                        onChange={handleInputChange}
+                                    />
                                 );
                             case 'select':
                                 return (
-                                    <Select
-                                        type="select"
+                                    <Combobox
                                         name={key}
                                         value={formValues[key] ?? config.defaultValue}
                                         onChange={handleInputChange}
                                         options={config.options}
                                     >
-                                    </Select>
+                                    </Combobox>
                                 );
                             case 'text':
                             default:
@@ -47,9 +46,9 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                     />
                                 );
                         }
-                    })()}
-                </FormGroup>
-            </Col>
+                    })()
+                }
+            </div >
         );
     });
 };

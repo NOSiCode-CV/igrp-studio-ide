@@ -99,7 +99,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                 </SidebarContent>
                 <SidebarFooter>
                     {/* <NavUser user={data.user} /> */}
-                    <SidebarTrigger />
+                    <SidebarTrigger className="mb-20"/>
                 </SidebarFooter>
             </Sidebar>
 
