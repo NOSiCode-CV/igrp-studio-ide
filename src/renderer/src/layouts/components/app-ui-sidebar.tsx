@@ -17,9 +17,8 @@ import {
     useSidebar,
 } from "@renderer/components/ui/sidebar"
 import { cn } from "@renderer/lib/utils"
-import { ChevronDown, Command, GripHorizontal, GripVertical } from "lucide-react";
+import { Command, GripHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@renderer/components/ui/dropdown-menu";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any> // or any other type for your new parameter
@@ -99,7 +98,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                 </SidebarContent>
                 <SidebarFooter>
                     {/* <NavUser user={data.user} /> */}
-                    <SidebarTrigger className="mb-20"/>
+                    <SidebarTrigger className="mb-20" />
                 </SidebarFooter>
             </Sidebar>
 

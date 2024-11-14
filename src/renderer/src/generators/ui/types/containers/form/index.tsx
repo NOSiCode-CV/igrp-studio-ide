@@ -7,7 +7,6 @@ import { ComponentRegistry } from '../../../data/ComponentRegistry';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FEILD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
-import { Separator } from '@radix-ui/react-separator';
 
 const getItemStyle = (isDragging, draggableStyle, index) => ({
     userSelect: 'none',

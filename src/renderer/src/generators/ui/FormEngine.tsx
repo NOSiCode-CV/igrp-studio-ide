@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import RowContainer from "./types/containers/rows";
 import { useDroppedComponents } from "./dnd/DroppedComponentsContext";
 import { generateId } from "@renderer/utils/helpers";
-import BreadCrumb from "./components/BreadCrumb";
 
 import navdata from "./data/ConfigData";
 import CodeMirrorContent from "./components/CodeMirrorContent";
@@ -15,6 +14,7 @@ import { handleDragEnd } from "./dnd/DraggableItemManager";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
 import { AppSidebar } from "@renderer/layouts/components/app-ui-sidebar";
 import { SidebarInset, SidebarProvider } from "@renderer/components/ui/sidebar";
+import { buildJsonStructure } from "@renderer/utils/jsonStructureUtil";
 
 const addRow = () => {
     const newRowId = generateId("row");
@@ -26,29 +26,41 @@ const addRow = () => {
     return newRow;
 };
 
-/* const ContainerDesigner = styled.div`
-    height: calc(100vh - 90px); 
-`;
- */
-const FormEngine = ({ basePath, page, pagePath }) => {
+interface FormEngineProps {
+    basePath: string | undefined;
+    page: string;
+    pagePath: string | undefined;
+    isDesign: boolean;
+    onSave: () => void;
+}
+
+interface FormEngineRef {
+    handleSave: () => void;
+}
+
+const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(({ basePath, pagePath, page, isDesign }, ref) => {
 
     const { reorderComponents, moveComponent, getComponentsByRow, setInitComponents, getAllComponents, removeRow, addDroppedComponent, getComponent, setEditingComponent, updateComponent } = useDroppedComponents();
 
     const components = getAllComponents();
 
-    const [isDesign, setIsDesign] = useState(true);
+    //const [isDesign, setIsDesign] = useState(true);
 
     const { showErrorToast, showSuccessToast } = useToast();
 
     const navData = navdata().props.children;
-    /*   let settings = useLayoutSettings({});
-  
-      const memoizedSidebarProps = useMemo(() => ({
-          layoutType: LAYOUT_TYPES.TWOCOLUMN,
-          leftsidbarSizeType: settings.leftsidbarSizeType,
-          sidebarVisibilitytype: settings.sidebarVisibilitytype,
-          navData: navData
-      }), [settings.layoutType, navData]); */
+
+    // Internal handleSave function in FormEngine
+    const internalHandleSave = () => {
+        console.log("FormEngine save triggered");
+        const jsonStructure = buildJsonStructure(components);
+        handleSave(jsonStructure)
+    };
+
+    // Expose handleSave to parent via ref
+    useImperativeHandle(ref, () => ({
+        handleSave: internalHandleSave,
+    }));
 
     const handleClickAddControl = (id: string, type: string) => {
         const newRow = addRow();
@@ -78,6 +90,9 @@ const FormEngine = ({ basePath, page, pagePath }) => {
 
     const handleSave = async (jsonStructure: Component[]) => {
         try {
+
+            if (pagePath === undefined || basePath === undefined) return;
+
             const pageConfig: PageConfig = {
                 type: 'page',
                 pageName: page,
@@ -97,14 +112,13 @@ const FormEngine = ({ basePath, page, pagePath }) => {
         }
     };
 
-    const handleCLickIsDesign = () => {
-        setIsDesign(!isDesign)
-    }
-
     //TODO for refactor after accert new json model
     useEffect(() => {
         const getJsonData = async () => {
             try {
+
+                if (pagePath === undefined) return;
+
                 const data = await window.api.getJsonContent(pagePath);
                 if (data.components) {
 
@@ -160,11 +174,6 @@ const FormEngine = ({ basePath, page, pagePath }) => {
                     } as React.CSSProperties
                 }
             >
-                {/*   <BreadCrumb
-                    isDesign={isDesign}
-                    onClickIsDesign={handleCLickIsDesign}
-                    onSave={(json) => handleSave(json)}
-                /> */}
                 <AppSidebar data={navData} />
                 <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-4">
@@ -199,5 +208,5 @@ const FormEngine = ({ basePath, page, pagePath }) => {
             </SidebarProvider>
         </DragDropContext>
     );
-}
-export default FormEngine
+});
+export default FormEngine;

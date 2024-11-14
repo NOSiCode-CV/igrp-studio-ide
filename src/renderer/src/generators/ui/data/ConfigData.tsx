@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { COMPONENT, COMPONENTS, CONTAINER, FEILD, FIELDS } from "../ComponentTypes";
-import { Layers, ListTodo, Pencil, Sheet, Table } from "lucide-react";
+import { Layers, LayoutList, ListTodo, ListTree, Pencil, Sheet, Table } from "lucide-react";
 
 const Navdata = () => {
 
@@ -68,7 +68,7 @@ const Navdata = () => {
                 {
                     id: "formlist",
                     label: "Form List",
-                    icon: "",
+                    icon: LayoutList,
                     type: COMPONENTS.FORMLIST,
                 },
                 {
@@ -108,7 +108,7 @@ const Navdata = () => {
                 {
                     id: "treelist",
                     label: "Tree List",
-                    icon: "",
+                    icon: ListTree,
                     type: COMPONENTS.TREELIST
                 },
                 {

@@ -2,7 +2,6 @@ import { Combobox } from "@renderer/components/combobox";
 import { Checkbox } from "@renderer/components/ui/checkbox";
 import { Input } from "@renderer/components/ui/input";
 import { Label } from "@renderer/components/ui/label";
-import Select from "react-select";
 
 const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
 

@@ -9,7 +9,7 @@ interface SearchProps {
     className?: string,
     onSearch: (searchTerm: string) => void;
     placeholder?: string | "Search for widget...",
-    sidebarState: string
+    sidebarState?: string
 }
 
 const FormSearch = ({ onSearch, sidebarState, className, placeholder }: SearchProps) => {

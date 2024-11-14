@@ -146,7 +146,7 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
         <div className="field-container -px-3">
             <Row className="mx-0">
                 <Col md="4" className="igrp-bg-light mt-n3 mb-n5 py-3">
-                    <FormSearch onSearch={(value) => setSearchQuery(value)} />
+                    <FormSearch  onSearch={(value) => setSearchQuery(value)} />
                     <div className="px-2">
                         <h6 className="text-white">{t('availableFields')}</h6>
                         <div className="mb-2 pb-2 small"><small>{t('clickToAdd')}</small></div>

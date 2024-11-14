@@ -12,7 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@renderer/components/u
 import { Button } from "@renderer/components/ui/button";
 import { Save } from "lucide-react";
 import { Label } from "@renderer/components/ui/label";
-import { TextInput } from "@renderer/generators/api/components/inputs-form";
 import { Input } from "@renderer/components/ui/input";
 
 interface ModalEditionProps {

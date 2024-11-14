@@ -1,5 +1,5 @@
 
-const useConfigComponent = (componetName: string) => {
+const useConfigComponent = (_componetName: string) => {
 
     const bootstrapWidths = Array.from({ length: 12 }, (_, index) => ({
         value: index + 1,
