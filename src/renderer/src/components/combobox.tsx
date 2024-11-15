@@ -63,9 +63,9 @@ export function Combobox({ options, value, onChange, placeholder = "Select items
 					<CommandList>
 						<CommandEmpty>No Item found.</CommandEmpty>
 						<CommandGroup>
-							{options.map((opt) => (
+							{options.map((opt, idx) => (
 								<CommandItem
-									key={opt.value}
+									key={`${opt.value}-${idx}`}
 									value={opt.value}
 									onSelect={(currentValue) => handleSelect(currentValue)}
 								>

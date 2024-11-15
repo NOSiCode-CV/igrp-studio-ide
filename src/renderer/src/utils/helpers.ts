@@ -81,6 +81,7 @@ export function filterItems(navData: any, searchQuery: string) {
 }
 
 export function filterSubItems(navData: any, searchQuery: string) {
+  if (!searchQuery) return navData
   return navData
     .map((item) => {
       const filteredSubItems = item?.subItems

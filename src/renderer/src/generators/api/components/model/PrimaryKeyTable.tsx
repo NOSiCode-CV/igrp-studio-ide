@@ -1,8 +1,8 @@
 import Illustration from "@renderer/components/ilustration"
-import Select from 'react-select'
 import { formatMethods } from "../../helpers";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@renderer/components/ui/table";
 import { Badge } from "@renderer/components/ui/badge";
+import { Combobox } from "@renderer/components/combobox";
 
 const PrimaryKeyTable = ({ validation, selectors }) => {
 
@@ -20,6 +20,8 @@ const PrimaryKeyTable = ({ validation, selectors }) => {
             | undefined
         )?.GENERATION_TYPES || []
     )
+
+    const selectValue = generateTypes?.filter((d) => d.value === validation.values.generationType)[0]?.value;
 
     return (
         <Table>
@@ -39,16 +41,16 @@ const PrimaryKeyTable = ({ validation, selectors }) => {
             <TableBody>
                 <TableRow>
                     <TableCell className="ps-4">
-                        <Select
-                            id="generationType"
-                            name="generationType"
+
+                        <Combobox
+                            name={'generationType'}
+                            placeholder={`Select ${name}`}
                             options={generateTypes}
-                            onBlur={validation.generationType}
+                            value={selectValue}
                             onChange={(selectedOption) => {
-                                validation.setFieldValue('generationType', selectedOption?.value)
-                            }}
-                            value={generateTypes?.filter((d) => d.value === validation.values.generationType)}
-                        />
+                                validation.setFieldValue('generationType', selectedOption)
+                            }} />
+
                     </TableCell>
                     <TableCell className="align-middle">
                         <div className="flex gap-2">

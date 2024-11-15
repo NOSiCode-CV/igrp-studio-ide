@@ -1,7 +1,3 @@
-"use client"
-
-import * as React from "react"
-
 import {
     Sidebar,
     SidebarContent,
@@ -15,28 +11,45 @@ import {
     SidebarMenuItem,
     SidebarTrigger,
     useSidebar,
-} from "@renderer/components/ui/sidebar"
-import { cn } from "@renderer/lib/utils"
+} from "@renderer/components/ui/sidebar";
+import { cn } from "@renderer/lib/utils";
 import { Command, GripHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { filterSubItems } from "@renderer/utils/helpers";
+import { useEffect, useState } from "react";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-    data: Array<any> // or any other type for your new parameter
+    data: Array<any>; // Define the appropriate type for your data
 };
 
+export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
+    const { setOpen } = useSidebar();
+    const { t } = useTranslation();
 
-export function AppSidebar({ ...props }: AppSidebarProps) {
+    // Preserve the original data separately
+    const [originalData, _setOriginalData] = useState(initialData);
+    const [filteredData, setFilteredData] = useState(initialData);
 
-    const data = props.data;
+    const [searchQuery, setSearchQuery] = useState("");
+    const [activeItem, setActiveItem] = useState(initialData[0] || {});
 
-    const { t } = useTranslation()
+    // Update filtered data whenever the search query or original data changes
+    useEffect(() => {
+        if (searchQuery.trim() === "") {
+            setFilteredData(originalData);
+        } else {
+            setFilteredData(filterSubItems(originalData, searchQuery));
+        }
+    }, [searchQuery, originalData]);
 
-    // Note: I'm using state to show active item.
-    // IRL you should use the url/router.
-    const [activeItem, setActiveItem] = React.useState(data[0])
-    // const [mails, setMails] = React.useState(data.mails)
-    const { setOpen } = useSidebar()
+    // Ensure the active item stays in sync with filtered data
+    useEffect(() => {
+        setActiveItem(filteredData[0] || {});
+    }, [filteredData]);
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
 
     return (
         <Sidebar
@@ -44,13 +57,8 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
             className={cn("overflow-hidden [&>[data-sidebar=sidebar]]:flex-row mt-20", props.className)}
             {...props}
         >
-            {/* This is the first sidebar */}
-            {/* We disable collapsible and adjust width to icon. */}
-            {/* This will make the sidebar appear as icons. */}
-            <Sidebar
-                collapsible="none"
-                className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r"
-            >
+            {/* First Sidebar */}
+            <Sidebar collapsible="none" className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r">
                 <SidebarHeader>
                     <SidebarMenu>
                         <SidebarMenuItem>
@@ -72,19 +80,16 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                     <SidebarGroup>
                         <SidebarGroupContent className="px-1.5 md:px-0">
                             <SidebarMenu>
-                                {data.map((item) => (
+                                {filteredData.map((item) => (
                                     <SidebarMenuItem key={item.id}>
                                         <SidebarMenuButton
-                                            tooltip={{
-                                                children: t(item.label),
-                                                hidden: false,
-                                            }}
+                                            tooltip={{ children: t(item.label), hidden: false }}
                                             onClick={(e) => {
-                                                setActiveItem(item)
-                                                item.click(e)
-                                                setOpen(true)
+                                                setActiveItem(item);
+                                                item.click(e);
+                                                setOpen(true);
                                             }}
-                                            isActive={activeItem.id === item.id}
+                                            isActive={activeItem?.id === item.id}
                                             className="px-2.5 md:px-2"
                                         >
                                             <item.icon className="h-4 w-4" />
@@ -97,42 +102,45 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                     </SidebarGroup>
                 </SidebarContent>
                 <SidebarFooter>
-                    {/* <NavUser user={data.user} /> */}
                     <SidebarTrigger className="mb-20" />
                 </SidebarFooter>
             </Sidebar>
 
-            {/* This is the second sidebar */}
-            {/* We disable collapsible and let it fill remaining space */}
+            {/* Second Sidebar */}
             <Sidebar collapsible="none" className="hidden flex-1 md:flex">
                 <SidebarHeader className="gap-3.5 border-b p-4">
                     <div className="flex w-full items-center justify-between">
                         <div className="text-base font-medium text-foreground">
-                            {t(activeItem.label)}
+                            {t(activeItem?.label)}
                         </div>
                     </div>
-                    <SidebarInput placeholder="Type to search..." />
+                    <SidebarInput
+                        placeholder="Type to search..."
+                        value={searchQuery}
+                        onChange={handleInputChange}
+                    />
                 </SidebarHeader>
                 <SidebarContent>
                     <SidebarGroup className="px-0">
                         <SidebarGroupContent>
                             <div className="grid grid-cols-2 gap-3 p-3 rounded-lg">
-                                {activeItem.subItems?.map((subItem) => (
-                                    <div
-                                        key={subItem.id}
-                                        className="h-24 flex flex-col items-center justify-center bg-white rounded-md p-3 shadow-sm cursor-move space-y-2"
-                                        onClick={() => subItem.click(subItem)}
-                                    >
-                                        <GripHorizontal className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                        {subItem.icon && <subItem.icon className="h-5 w-5" />}
-                                        <span className="text-sm text-center">{t(subItem.label)}</span>
-                                    </div>
-                                ))}
+                                {activeItem?.subItems &&
+                                    activeItem.subItems.map((subItem) => (
+                                        <div
+                                            key={subItem.id}
+                                            className="h-24 flex flex-col items-center justify-center bg-white rounded-md p-3 shadow-sm cursor-move space-y-2"
+                                            onClick={() => subItem.click(subItem)}
+                                        >
+                                            <GripHorizontal className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                            {subItem.icon && <subItem.icon className="h-5 w-5" />}
+                                            <span className="text-sm text-center">{t(subItem.label)}</span>
+                                        </div>
+                                    ))}
                             </div>
                         </SidebarGroupContent>
                     </SidebarGroup>
                 </SidebarContent>
             </Sidebar>
         </Sidebar>
-    )
+    );
 }

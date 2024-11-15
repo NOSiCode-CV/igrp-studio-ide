@@ -127,7 +127,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 								<TableCell key={index2}>
 									{['text', 'number'].includes(type) && (
 										<Input
-											className={cn("text-sm", errors?.[index]?.[key] ?  'border-red-500' : '')}
+											className={cn("text-sm", errors?.[index]?.[key] ? 'border-red-500' : '')}
 											type={type}
 											value={row?.[key] || ''}
 											onChange={(ev) => changeValue(key, index, ev.target.value)}
@@ -136,6 +136,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 
 									{['select'].includes(type) && (
 										<Combobox
+											key={`${index}-${index2}`}
 											name={name}
 											placeholder={`Select ${name}`}
 											options={dynamicOptions[`${index}-${key}`] || options}

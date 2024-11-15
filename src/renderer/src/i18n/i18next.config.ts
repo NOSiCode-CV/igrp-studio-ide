@@ -10,6 +10,8 @@ const isDev = window.api.i18nextElectronBackend.clientOptions.environment === 'd
 const prependPath =
   isMac && !isDev ? window.api.i18nextElectronBackend.clientOptions.resourcesPath : '.'
 
+const path = isDev ? prependPath + '/src/renderer/src/i18n/locales' : 'locales'
+
 if (!backend) {
   console.error('i18nextElectronBackend is not defined')
 } else {
@@ -20,8 +22,8 @@ if (!backend) {
       fallbackLng: LNG.DEFAULT_LANGUAGE,
       debug: true,
       backend: {
-        loadPath: prependPath + '/src/renderer/src/i18n/locales/{{lng}}/{{ns}}.json',
-        addPath: prependPath + '/src/renderer/src/i18n/locales/{{lng}}/{{ns}}.missing.json'
+        loadPath: path + '/{{lng}}/{{ns}}.json',
+        addPath: path + '/{{lng}}/{{ns}}.missing.json'
       },
       interpolation: {
         escapeValue: false

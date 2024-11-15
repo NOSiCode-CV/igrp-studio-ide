@@ -100,7 +100,7 @@
     },
     "extraResources": [
       {
-        "from": "./src/renderer/src/i18n",
+        "from": "./src/renderer/src/i18n/locales",
         "to": "locales",
         "filter": ["**/*"]
       }
