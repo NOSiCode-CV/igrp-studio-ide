@@ -13,27 +13,27 @@ import {
     useSidebar,
 } from "@renderer/components/ui/sidebar";
 import { cn } from "@renderer/lib/utils";
-import { Command, GripHorizontal } from "lucide-react";
+import { Command } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { filterSubItems } from "@renderer/utils/helpers";
 import { useEffect, useState } from "react";
+import { Droppable } from 'react-beautiful-dnd';
+import DraggableElement from "@renderer/generators/ui/dnd/DraggableElement";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-    data: Array<any>; // Define the appropriate type for your data
+    data: Array<any>; 
 };
 
 export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
 
-    // Preserve the original data separately
     const [originalData, _setOriginalData] = useState(initialData);
     const [filteredData, setFilteredData] = useState(initialData);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [activeItem, setActiveItem] = useState(initialData[0] || {});
 
-    // Update filtered data whenever the search query or original data changes
     useEffect(() => {
         if (searchQuery.trim() === "") {
             setFilteredData(originalData);
@@ -42,7 +42,6 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
         }
     }, [searchQuery, originalData]);
 
-    // Ensure the active item stays in sync with filtered data
     useEffect(() => {
         setActiveItem(filteredData[0] || {});
     }, [filteredData]);
@@ -59,7 +58,7 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
         >
             {/* First Sidebar */}
             <Sidebar collapsible="none" className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r">
-                <SidebarHeader>
+                <SidebarHeader className="pr-0">
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
@@ -123,20 +122,26 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                 <SidebarContent>
                     <SidebarGroup className="px-0">
                         <SidebarGroupContent>
-                            <div className="grid grid-cols-2 gap-3 p-3 rounded-lg">
-                                {activeItem?.subItems &&
-                                    activeItem.subItems.map((subItem) => (
-                                        <div
-                                            key={subItem.id}
-                                            className="h-24 flex flex-col items-center justify-center bg-white rounded-md p-3 shadow-sm cursor-move space-y-2"
-                                            onClick={() => subItem.click(subItem)}
-                                        >
-                                            <GripHorizontal className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                            {subItem.icon && <subItem.icon className="h-5 w-5" />}
-                                            <span className="text-sm text-center">{t(subItem.label)}</span>
-                                        </div>
-                                    ))}
-                            </div>
+                            <Droppable droppableId={`${activeItem.id}`} key={activeItem.id} isDropDisabled={true} type={activeItem.type}>
+                                {(provided) => (
+                                    <div className="grid grid-cols-2 gap-3 p-3 rounded-lg"
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}>
+                                        {activeItem?.subItems &&
+                                            activeItem.subItems.map((subItem, key) => (
+                                                <div
+                                                    key={subItem.id}
+                                                    className="flex flex-col items-center justify-center bg-white rounded-md p-2 shadow-sm cursor-move space-y-2"
+                                                    onClick={() => subItem.click(subItem)}
+                                                >
+                                                    <DraggableElement item={subItem} index={key} />
+                                                </div>
+                                            ))}
+
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
                         </SidebarGroupContent>
                     </SidebarGroup>
                 </SidebarContent>

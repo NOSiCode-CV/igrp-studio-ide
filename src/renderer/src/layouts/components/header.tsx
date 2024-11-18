@@ -6,6 +6,7 @@ import { ROUTES } from "@renderer/routes/routeConstants";
 import { Code, Github, Grid, HelpCircle, Maximize2, Minus, Settings, Square, X } from "lucide-react";
 import { SettingsDialog } from '@renderer/components/settings-dialog';
 import { HelpDialog } from '@renderer/components/help-dialog';
+import { cn } from '@renderer/lib/utils';
 
 interface HeaderProps {
     config?: ConfigOptions,
@@ -13,6 +14,9 @@ interface HeaderProps {
 }
 
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
+
+    const isMac = window.api.i18nextElectronBackend.clientOptions.platform === 'darwin'
+
     const navigate = useNavigate()
 
     const [openSettings, setOpenSettings] = useState(false)
@@ -84,6 +88,17 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         },
     ]
 
+    const WindowButton = ({ onClick, icon, label, className }: { onClick: () => void; icon: JSX.Element; label: string, className?: string }) => (
+        <button
+            onClick={onClick}
+            className={cn("flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300", className)}
+            title={label}
+        >
+            {icon}
+            <span className="sr-only">{label}</span>
+        </button>
+    );
+
     return (
         <>
             <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -112,27 +127,14 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 <span className="sr-only">{item.label}</span>
                             </button>
                         ))}
-                        <button
-                            onClick={handleMinimize}
-                            className="flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                        >
-                            <Minus className="h-4 w-4" />
-                            <span className="sr-only">Minimize</span>
-                        </button>
-                        <button
-                            onClick={handleMaximize}
-                            className="flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                        >
-                            {isMaximized ? <Square className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                            <span className="sr-only">{isMaximized ? "Restore" : "Maximize"}</span>
-                        </button>
-                        <button
-                            onClick={handleClose}
-                            className="flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                        >
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Close</span>
-                        </button>
+
+                        {!isMac && (
+                            <>
+                                <WindowButton onClick={handleMinimize} icon={<Minus className="h-4 w-4" />} label="Minimize" />
+                                <WindowButton onClick={handleMaximize} icon={isMaximized ? <Square className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />} label={isMaximized ? 'Restore' : 'Maximize'} />
+                                <WindowButton onClick={handleClose} icon={<X className="h-4 w-4" />} label="Close" className='hover:bg-red-500 hover:text-white'/>
+                            </>
+                        )}
                     </div>
                 </div>
             </header>
