@@ -176,16 +176,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(({ basePath, pageP
             >
                 <AppSidebar data={navData} />
                 <SidebarInset>
-                    <div className="flex flex-1 flex-col gap-4 p-4">
-                        <ScrollArea className="h-screen overflow-y-auto">
+                    <div className="flex flex-1 flex-col gap-4 px-4">
+                        <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto pr-3">
                             {isDesign ? (
-
-                                <div className="content gen-viewers active" id="gen-design">
-
+                                <>
                                     <div className="igrp-page-header"></div>
-
                                     <div className="space-y-6 my-6" >
-
                                         {components.map(row => (
                                             <RowContainer
                                                 key={row.id}
@@ -194,11 +190,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(({ basePath, pageP
                                                 onClickDeleteSection={handleClickDeleteSection}
                                             />
                                         ))}
-
                                     </div>
-
-                                </div>
-
+                                </>
                             ) : (
                                 <CodeMirrorContent />
                             )}

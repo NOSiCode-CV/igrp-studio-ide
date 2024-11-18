@@ -15,8 +15,8 @@ const DraggableElement = ({ item, index }) => {
                         {...provided.dragHandleProps}
                         className={`transition-colors duration-200 
                             ${snapshot.isDragging ? 'bg-blue-100' : 'bg-transparent'} 
-                            max-w-[200px] flex flex-col items-center justify-center 
-                            text-center text-xs  p-2 space-y-1`}
+                            flex flex-col items-center justify-center 
+                            text-center text-xs  w-full space-y-1 p-2`}
                     >
                         <GripHorizontal className="h-4 w-4 text-gray-400 opacity-75" aria-hidden="true" />
                         {item.icon ? (<item.icon className="h-5 w-5" />) : (<Settings className="h-5 w-5"/>) }

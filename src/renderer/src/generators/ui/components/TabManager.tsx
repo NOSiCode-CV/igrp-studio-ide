@@ -55,35 +55,34 @@ export default function Component({
             <nav className="flex justify-between border-t border-gray-200 pr-6">
                 <div className="flex">
                     {tabs.map((tab) => (
-                        <div key={tab}>
-                            <button
-                                className={classnames(
-                                    'px-4 py-2 text-sm font-medium focus:outline-none',
-                                    {
-                                        'bg-white text-[#3AA0D9] border-t-2 border-[#3AA0D9]': activeTab === tab,
-                                        'text-gray-500 hover:text-gray-700 bg-gray-100': activeTab !== tab
-                                    }
-                                )}
-                                onClick={() => setActiveTab(tab)}
+
+                        <div key={tab}
+                            className={classnames(
+                                'px-4 py-2 text-sm font-medium focus:outline-none cursor-pointer',
+                                {
+                                    'bg-white text-[#3AA0D9] border-t-2 border-[#3AA0D9]': activeTab === tab,
+                                    'text-gray-500 hover:text-gray-700 bg-gray-100': activeTab !== tab
+                                }
+                            )}
+                            onClick={() => setActiveTab(tab)}
                             >
-                                {tab !== 'PageBuilder' ? (
-                                    <div className="flex items-center">
-                                        <span>{tab}</span>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onCloseTab(tab);
-                                            }}
-                                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                                        >
-                                            <X className='h-3' />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button>
-                                        <Layers2 className="w-4 h-4" /></button>
-                                )}
-                            </button>
+                            {tab !== 'PageBuilder' ? (
+                                <div className="flex items-center">
+                                    <span>{tab}</span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onCloseTab(tab);
+                                        }}
+                                        className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                                    >
+                                        <X className='h-3' />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button>
+                                    <Layers2 className="w-4 h-4" /></button>
+                            )}
                         </div>
                     ))}
                 </div>

@@ -21,7 +21,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import DraggableElement from "@renderer/generators/ui/dnd/DraggableElement";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-    data: Array<any>; 
+    data: Array<any>;
 };
 
 export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
@@ -131,8 +131,12 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                                             activeItem.subItems.map((subItem, key) => (
                                                 <div
                                                     key={subItem.id}
-                                                    className="flex flex-col items-center justify-center bg-white rounded-md p-2 shadow-sm cursor-move space-y-2"
-                                                    onClick={() => subItem.click(subItem)}
+                                                    className="flex flex-col items-center justify-center bg-white rounded-md shadow-sm"
+                                                    onClick={() => {
+                                                        if (typeof subItem.click === "function") {
+                                                            subItem.click(subItem);
+                                                        }
+                                                    }}
                                                 >
                                                     <DraggableElement item={subItem} index={key} />
                                                 </div>

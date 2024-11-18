@@ -11,8 +11,8 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
 
         return (
 
-            <div className="grid grid-cols-4 items-center gap-4" key={key}>
-                <Label htmlFor={key}>{config.label}</Label>
+            <div className="space-y-3" key={key}>
+                <Label htmlFor={key} className="mr-3">{config.label}</Label>
                 {
                     (() => {
                         switch (config.type) {
@@ -42,6 +42,7 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                         name={key}
                                         value={formValues[key] ?? config.defaultValue}
                                         onChange={handleInputChange}
+                                        className=""
                                     />
                                 );
                         }

@@ -8,44 +8,22 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FEILD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
 
-const getItemStyle = (isDragging, draggableStyle, index) => ({
-    userSelect: 'none',
-    background: isDragging ? 'lightgreen' : '',
-    ...draggableStyle,
-    maxWidth: index === 0 ? window.innerWidth : window.innerWidth / 2,
-    // styles we need to apply on draggables
-    ...draggableStyle,
-    overflow: "hidden"
-});
-
-const getListStyle = isDraggingOver => ({
-    background: isDraggingOver ? "lightblue" : "",
-    border: isDraggingOver ? '2px dashed blue' : 'none',
-    display: "flex"
-});
-
 export interface FormComponentProps {
-    componentName: string,
-    componentId: string,
-    acceptTypes: string[],
-    comp: DroppedComponent,
-    onEdit: () => void
+    componentName: string;
+    componentId: string;
+    acceptTypes: string[];
+    comp: DroppedComponent;
+    onEdit: () => void;
 }
 
 const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
-
-    if (!componentId) return;
-
     const [formFields, setFormFields] = useState<DroppedComponent[]>([]);
-
     const [buttonComponents, setButtonComponents] = useState<DroppedComponent[]>([]);
 
     const { setEditingComponent } = useDroppedComponents();
-
     const { title } = comp.config;
 
     useEffect(() => {
-
         if (comp.fields) {
             const fields = comp.fields;
             const buttons = fields.filter((field: any) => field.componentName === FIELDS.BUTTON);
@@ -60,90 +38,105 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
         setEditingComponent(component);
     };
 
+    const renderFields = () =>
+        formFields.length > 0 ? (
+            formFields.map((field: DroppedComponent, index: number) => {
+                const component = ComponentRegistry[field.componentName];
+                return (
+                    <Draggable key={field.id} draggableId={field.id} index={index}>
+                        {(provided, _snapshot) => (
+                            component && (
+                                <div
+                                    className=""
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={{ ...provided.draggableProps.style }}
+                                >
+                                    <BoxField
+                                        id={field.id}
+                                        size={3}
+                                        onEdit={() => handleEditClick(field)}
+                                    >
+                                        {React.createElement(component, {
+                                            comp: field,
+                                            componentId: field.id,
+                                        })}
+                                    </BoxField>
+                                </div>
+                            )
+                        )}
+                    </Draggable>
+                );
+            })
+        ) : (
+            <GenNoInfoField />
+        );
+
+    const renderButtons = () =>
+        buttonComponents.map((button: DroppedComponent, index: number) => {
+            const component = ComponentRegistry[button.componentName];
+            return (
+                <Draggable key={button.id} draggableId={`${button.id}`} index={index}>
+                    {(provided, _snapshot) => (
+                        component && (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={{ ...provided.draggableProps.style }}
+                            >
+                                {React.createElement(component, {
+                                    comp: button,
+                                    componentId: button.id,
+                                    onEdit: () => handleEditClick(button),
+                                })}
+                            </div>
+                        )
+                    )}
+                </Draggable>
+            );
+        });
+
+
     return (
-        <Card className='mb-0 rounded-sm'>
-            <CardHeader className='pb-1'>
+        <Card className="rounded-sm">
+            <CardHeader>
                 <CardTitle>{title}</CardTitle>
             </CardHeader>
             <CardContent>
-                <Droppable droppableId={`${componentId}`}
-                    type={FEILD}
-                    direction='horizontal'
-                    isCombineEnabled>
-                    {(provided: any, snapshot: any) => (
+                <Droppable droppableId={`${componentId}`} type={FEILD} direction="horizontal" isCombineEnabled>
+                    {(provided, snapshot) => (
                         <div
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             role="form"
-                            className="space-x-3"
-                            style={getListStyle(snapshot.isDraggingOver)}
+                            className={`grid grid-cols-4 gap-4 ${snapshot.isDraggingOver ? 'border-2 border-blue-500' : ''
+                                }`}
                         >
-                            {formFields.length > 0 ? formFields.map((comp: DroppedComponent, index: number) => {
-                                const component = ComponentRegistry[comp.componentName];
-                                return (
-                                    <Draggable
-                                        key={comp.id}
-                                        draggableId={comp.id}
-                                        index={index}
-                                    >
-                                        {(provided: any, snapshot: any) => (
-
-                                            component && (
-
-                                                <div
-                                                    className={`col-md-${3} gen-fields-holder`}
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    style={getItemStyle(
-                                                        snapshot.isDragging,
-                                                        provided.draggableProps.style,
-                                                        index
-                                                    )}
-                                                >
-                                                    <BoxField key={comp.id}
-                                                        id={comp.id}
-                                                        size={3}
-                                                        onEdit={() => handleEditClick(comp)}
-                                                    >
-                                                        {React.createElement(component, {
-                                                            comp,
-                                                            componentId: comp.id
-                                                        })
-                                                        }
-                                                    </BoxField>
-                                                </div>
-                                            )
-
-                                        )}
-                                    </Draggable>
-                                )
-                            }) : (
-                                <GenNoInfoField />
-                            )}
-
+                            {renderFields()}
                             {provided.placeholder}
-
                         </div>
                     )}
                 </Droppable>
             </CardContent>
-            {
-                buttonComponents.length > 0 && (
-                    <CardFooter className="flex justify-end gap-2">
-                        {buttonComponents.map((comp: DroppedComponent) => (
-                            <div key={comp.id}>
-                                {React.createElement(ComponentRegistry[comp.componentName], {
-                                    comp,
-                                    componentId: comp.id,
-                                    onEdit: () => handleEditClick(comp)
-                                })}
+            {buttonComponents.length > 0 && (
+                <CardFooter className="flex justify-end gap-2">
+                    <Droppable droppableId={`${componentId}`} type={FEILD} direction="horizontal">
+                        {(provided, snapshot) => (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className={`flex gap-2 ${snapshot.isDraggingOver ? 'border-2 border-green-500' : ''}`}
+                            >
+                                {renderButtons()}
+                                {provided.placeholder}
                             </div>
-                        ))}
-                    </CardFooter>
-                )
-            }
-        </Card >
+                        )}
+                    </Droppable>
+                </CardFooter>
+            )}
+        </Card>
     );
 };
 

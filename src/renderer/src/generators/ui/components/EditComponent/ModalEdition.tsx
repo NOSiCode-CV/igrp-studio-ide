@@ -7,12 +7,18 @@ import FieldContainer from "./FieldContainer";
 import { useTranslation } from "react-i18next";
 import RenderPropsConfig from "./RenderPropsConfig";
 import useConfigComponent from "./useConfigComponent";
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@renderer/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@renderer/components/ui/tabs";
 import { Button } from "@renderer/components/ui/button";
 import { Save } from "lucide-react";
 import { Label } from "@renderer/components/ui/label";
 import { Input } from "@renderer/components/ui/input";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@renderer/components/ui/dialog"
 
 interface ModalEditionProps {
     show: boolean;
@@ -86,11 +92,11 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
     };
 
     return (
-        <Sheet open={editionModal} onOpenChange={handleClose}>
-            <SheetContent className="w-[400px] sm:w-[540px]">
-                <SheetHeader>
-                    <SheetTitle>{t('settings')}</SheetTitle>
-                </SheetHeader>
+        <Dialog open={editionModal} onOpenChange={handleClose}>
+            <DialogContent className="md:max-h-[680px] md:max-w-[700px] lg:max-w-[800px]">
+                <DialogHeader>
+                    <DialogTitle>{t('settings')}</DialogTitle>
+                </DialogHeader>
 
                 <div className="py-4">
                     <Tabs defaultValue="properties">
@@ -105,7 +111,7 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                         <TabsContent value="properties">
                             <form role="form">
                                 <div className="grid gap-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
+                                    <div className="flex flex-col space-y-3">
                                         <Label htmlFor="identif">{t('identifier')}</Label>
                                         <Input
                                             type="text"
@@ -119,11 +125,13 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                                     </div>
 
                                     {propsConfig && (
-                                        <RenderPropsConfig
-                                            propsConfig={propsConfig}
-                                            formValues={formValues}
-                                            handleInputChange={handleInputChange}
-                                        />
+                                        <div className="grip grip-col-6 gap-4">
+                                            <RenderPropsConfig
+                                                propsConfig={propsConfig}
+                                                formValues={formValues}
+                                                handleInputChange={handleInputChange}
+                                            />
+                                        </div>
                                     )}
                                 </div>
                             </form>
@@ -149,7 +157,7 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                     </Tabs>
                 </div>
 
-                <SheetFooter
+                <DialogFooter
                     className={`flex items-center justify-between`}
                 >
                     <div className="flex justify-start">
@@ -165,9 +173,9 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                     >
                         <Save />
                     </Button>
-                </SheetFooter>
-            </SheetContent>
-        </Sheet>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
 
     )
 }
