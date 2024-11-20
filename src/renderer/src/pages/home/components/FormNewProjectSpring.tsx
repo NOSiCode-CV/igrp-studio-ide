@@ -134,7 +134,7 @@ const FormNewProjectSpring = ({
 			<div className="flex items-center ">
 				<GoBack handleBackClick={onBackButtonClick} />
 			</div>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+			<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5">
 				<div className="md:col-span-1">
 					<Card className='p-6'>
 						<div className="mb-4">
@@ -273,7 +273,7 @@ const FormNewProjectSpring = ({
 						</form>
 					</Card>
 				</div>
-				<div className="xl:w-1/2 md:w-full hidden sm:block">
+				<div className="xl:w-1/2 hidden md:flex items-center justify-center text-center">
 					<Illustration name="Project" />
 				</div>
 			</div>
