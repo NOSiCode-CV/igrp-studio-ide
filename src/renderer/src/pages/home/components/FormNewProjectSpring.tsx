@@ -110,6 +110,7 @@ const FormNewProjectSpring = ({
 				description: formData.description,
 				artifact: formData.artifact,
 				database: formData.database,
+				projectStructureStyle: formData.projectStructureStyle,
 			};
 
 			const { error } = await window.api.createApi(formData, filePath);

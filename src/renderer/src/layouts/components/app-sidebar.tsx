@@ -86,7 +86,7 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold"> {config?.name}</span>
-                        <span className="truncate text-xs">Api Generator UI</span>
+                        <span className="truncate text-xs">{config?.projectStructureStyle}</span>
                     </div>
                     <CreateModuleDialog basePath={basePath} />
                 </SidebarMenuButton>
@@ -115,7 +115,7 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                                         >
                                             {dropdownMenus.map((opt, key) => (
                                                 <DropdownMenuItem key={key}
-                                                    onClick={() => openNewProject({...opt, module: item.label})}>{t(opt.label)}</DropdownMenuItem>
+                                                    onClick={() => openNewProject({ ...opt, module: item.label })}>{t(opt.label)}</DropdownMenuItem>
                                             ))}
                                         </DropdownMenuContent>
                                     </DropdownMenu>

@@ -268,7 +268,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: C
 				</Card>
 				<Accordion type="single" className="w-full space-y-3" collapsible value={openAccordion} onValueChange={toggleBordered}>
 					{formik.values.actions?.map((action: any, index: number) => (
-						<AccordionItem value={`ACTION-${index}`} className="shadow px-3 rounded-lg">
+						<AccordionItem value={`ACTION-${index}`} className="shadow px-3 rounded-lg" key={index}>
 							<AccordionTrigger>
 								<div className='space-x-2 align-middle '>
 									<span>{action?.general?.[0]?.actionName || `ACTION ${index + 1}`}</span>

@@ -53,6 +53,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 					database: parsedConfig.database,
 					description: parsedConfig.description,
 					package: parsedConfig.package,
+					projectStructureStyle: parsedConfig.projectStructureStyle,
 				}
 			} else if (baseApiPath.endsWith('baseApp.json')) {
 				config = {
@@ -134,8 +135,6 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 
 					for (const entry of directoryContents) {
 
-						console.log(entry)
-
 						isDirectory = entry.isDirectory()
 						const fullPath = join(directory, entry.name);
 						// If the directory contains any files or subdirectories, process them
@@ -148,16 +147,19 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 
 						} else {
 
+
 							let groupedFiles: Record<string, File[]> = {};
 							let name = entry.name.split('.')[0]
 
-							if (!groupedFiles[name]) {
-								groupedFiles[name] = [];
+							if (name.toLowerCase() !== 'module') {
+								if (!groupedFiles[name]) {
+									groupedFiles[name] = [];
+								}
+
+								groupedFiles[name].push({ name, path: fullPath });
+
+								folderStructure.files.push(groupedFiles);
 							}
-
-							groupedFiles[name].push({ name, path: fullPath });
-
-							folderStructure.files.push(groupedFiles);
 
 						}
 

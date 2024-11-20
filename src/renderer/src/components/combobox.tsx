@@ -49,7 +49,7 @@ export function Combobox({ options, value, onChange, placeholder = "Select items
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
-					className={cn("w-[200px] justify-between", className)}
+					className={cn("w-[200px] justify-between text-gray-500", className)}
 				>
 					{value
 						? options.find((opt) => opt.value === value)?.label
@@ -59,7 +59,7 @@ export function Combobox({ options, value, onChange, placeholder = "Select items
 			</PopoverTrigger>
 			<PopoverContent className={cn("w-[200px] p-0", className)}>
 				<Command>
-					<CommandInput placeholder={placeholder} className="h-9" />
+					<CommandInput placeholder={placeholder} className="h-8" />
 					<CommandList>
 						<CommandEmpty>No Item found.</CommandEmpty>
 						<CommandGroup>
