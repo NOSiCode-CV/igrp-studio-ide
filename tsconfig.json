@@ -5,6 +5,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["jest"],
+        "module": "commonjs",
+        "target": "esnext",
+        "esModuleInterop": true,
+        "skipLibCheck": true
   }
 }

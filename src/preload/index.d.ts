@@ -21,7 +21,7 @@ interface CustomAPI {
     deletePage: (pageConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     addComponentToPage: (pageConfig: PageConfig, components: Component[], basePath: string) => Promise<HandlerResponse>;
 
-    fetchSelectors: (basePath: string) => Promise<[]>
+    fetchSelectors: (module: string, basePath: string) => Promise<[]>
 
     openDirectory: (buttonLabel: string) => Promise<IOpenProject>;
     fetchFiles: (basePath: string) => Promise<FolderFiles>;

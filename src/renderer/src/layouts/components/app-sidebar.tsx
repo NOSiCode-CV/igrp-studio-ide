@@ -15,7 +15,7 @@ import {
     SidebarMenuSubItem,
     useSidebar,
 } from "@renderer/components/ui/sidebar"
-import { ChevronDown, Plus } from "lucide-react"
+import { ChevronDown, ChevronRight, MoreHorizontal, Plus } from "lucide-react"
 
 import { cn } from "@renderer/lib/utils"
 import { filterSubItems } from "@renderer/utils/helpers";
@@ -29,6 +29,7 @@ import { useDispatch } from "react-redux";
 import { setCurrentItem as onSetCurrentItem } from "@renderer/redux/thunks";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
 import { CreateModuleDialog } from "@renderer/generators/api/components/create-module-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@renderer/components/ui/dropdown-menu";
 
 interface AppSidebarProps {
     className?: string
@@ -58,6 +59,21 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
         setSearchQuery(value)
     }
 
+    const dropdownMenus = [
+        {
+            label: 'dto',
+            type: "dto"
+        },
+        {
+            label: 'models',
+            type: "models"
+        },
+        {
+            label: 'controllers',
+            type: "controllers"
+        }
+    ]
+
     return (
         <Sidebar className={cn('flex flex-col', className)} collapsible="icon">
             <SidebarHeader>
@@ -72,7 +88,7 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                         <span className="truncate font-semibold"> {config?.name}</span>
                         <span className="truncate text-xs">Api Generator UI</span>
                     </div>
-                    <CreateModuleDialog basePath={basePath}/>
+                    <CreateModuleDialog basePath={basePath} />
                 </SidebarMenuButton>
                 <FormSearch onSearch={handleSearch} className="truncate text-xs" placeholder="Search models, dto..." sidebarState={sidebarState} />
             </SidebarHeader>
@@ -81,47 +97,72 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                     {filteredNavData.map((item, index) => (
                         <React.Fragment key={index}>
                             <SidebarGroup>
-                                {item.isHeader ? (
-                                    <SidebarGroupLabel>{t(item.label)}</SidebarGroupLabel>
-                                ) : (
-                                    <SidebarGroupContent>
-                                        <SidebarMenu>
-                                            <Collapsible defaultOpen className="group/collapsible">
-                                                <SidebarMenuItem>
-                                                    <CollapsibleTrigger asChild>
-                                                        <SidebarMenuButton className="w-full justify-between">
-                                                            <div className="flex items-center">
-                                                                <item.icon className="mr-2 h-4 w-4" />
-                                                                <span>{t(item.label)}</span>
-                                                            </div>
-                                                            <div className="flex items-center">
-                                                                <SidebarMenuAction className="mr-2">
-                                                                    <Plus className="h-4 w-4" onClick={() => openNewProject(item)} />
-                                                                    <span className="sr-only">{t(`Add ${item.label}`)}</span>
-                                                                </SidebarMenuAction>
-                                                                <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                                                            </div>
-                                                        </SidebarMenuButton>
-                                                    </CollapsibleTrigger>
-                                                    <CollapsibleContent>
-                                                        <SidebarMenuSub>
-                                                            {item.subItems?.map((subItem, subIndex) => (
-                                                                <SidebarMenuSubItem key={subIndex}>
-                                                                    <SidebarMenuSubButton
-                                                                        onClick={() => setCurrentItem(subItem)}
-                                                                        className="cursor-pointer"
-                                                                        isActive={activeItem === subItem.id}>
-                                                                        {subItem.label}
-                                                                    </SidebarMenuSubButton>
-                                                                </SidebarMenuSubItem>
-                                                            ))}
-                                                        </SidebarMenuSub>
-                                                    </CollapsibleContent>
-                                                </SidebarMenuItem>
-                                            </Collapsible>
-                                        </SidebarMenu>
-                                    </SidebarGroupContent>
+
+                                {item.isHeader && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <SidebarGroupLabel className="flex items-center justify-between cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                                                <span>{item.label}</span>
+                                                <div className="ml-2 flex items-center">
+                                                    <MoreHorizontal className="h-4 w-4 text-gray-500 ml-auto" />
+                                                </div>
+                                            </SidebarGroupLabel>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            side={"right"}
+                                            align={"start"}
+                                            className="min-w-56 rounded-lg"
+                                        >
+                                            {dropdownMenus.map((opt, key) => (
+                                                <DropdownMenuItem key={key}
+                                                    onClick={() => openNewProject({...opt, module: item.label})}>{t(opt.label)}</DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 )}
+
+                                {item.subItems?.map((menu, menuIndex) => {
+
+                                    return (
+                                        <SidebarGroupContent key={menuIndex}>
+                                            <SidebarMenu>
+                                                <Collapsible defaultOpen className="group/collapsible">
+                                                    <SidebarMenuItem>
+                                                        <CollapsibleTrigger asChild>
+                                                            <SidebarMenuButton className="w-full justify-between">
+                                                                <div className="flex items-center">
+                                                                    {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                                                                    <span>{t(menu.label)}</span>
+                                                                </div>
+                                                                <div className="flex items-center">
+                                                                    {/*  <SidebarMenuAction className="mr-2">
+                                                                        <Plus className="h-4 w-4" onClick={() => openNewProject(menu)} />
+                                                                        <span className="sr-only">{t(`Add ${menu.label}`)}</span>
+                                                                    </SidebarMenuAction> */}
+                                                                    <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                                                                </div>
+                                                            </SidebarMenuButton>
+                                                        </CollapsibleTrigger>
+                                                        <CollapsibleContent>
+                                                            <SidebarMenuSub>
+                                                                {menu.subItems?.map((subItem, subIndex) => (
+                                                                    <SidebarMenuSubItem key={subIndex}>
+                                                                        <SidebarMenuSubButton
+                                                                            onClick={() => setCurrentItem(subItem)}
+                                                                            className="cursor-pointer"
+                                                                            isActive={activeItem === subItem.id}>
+                                                                            {subItem.label}
+                                                                        </SidebarMenuSubButton>
+                                                                    </SidebarMenuSubItem>
+                                                                ))}
+                                                            </SidebarMenuSub>
+                                                        </CollapsibleContent>
+                                                    </SidebarMenuItem>
+                                                </Collapsible>
+                                            </SidebarMenu>
+                                        </SidebarGroupContent>
+                                    )
+                                })}
                             </SidebarGroup>
                         </React.Fragment>
                     ))}

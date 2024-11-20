@@ -57,15 +57,21 @@ export interface MenuItem {
     badgeColor?: string; // optional field for badges
     badgeName?: string; // optional field for badges
     type?: string;
-    component?: React.ReactNode
+    component?: React.ReactNode,
+    path?: string,
+    module?: string
 }
 
-export type FolderFiles = {
-    [folder: string]: Array<File>;
-};
+type FolderFiles = { [folderName: string]: FolderFileStructure };
 
 export interface File {
     name: string;
     path: string;
     config?: Object
+}
+
+export interface FolderFileStructure {
+    name: string;
+    files: Array<Record<string, File[]>>; // Group files by subfolder
+    path: string;
 }

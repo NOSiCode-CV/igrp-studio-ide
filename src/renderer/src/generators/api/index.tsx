@@ -12,7 +12,7 @@ import { SidebarTrigger } from '@renderer/components/ui/sidebar';
 
 interface PageBuilderState {
 	basePath: string;
-	currentItem: { path: string; type: 'models' | 'controllers' | 'dto' } | null;
+	currentItem: { path: string; module: string, type: 'models' | 'controllers' | 'dto' } | null;
 	folderFiles: {
 		models?: any[];
 		dto?: any[];
@@ -25,6 +25,7 @@ const PageBuilderApi = (): JSX.Element => {
 	const [selectors, setSelectors] = useState<any[]>([]);
 	const [currentData, setCurrentData] = useState<any>(null);
 	const [option, setOption] = useState<OptionType>('none');
+	const [module, setModule] = useState<string>("shared")
 
 	const dispatch: any = useDispatch();
 	const navigate = useNavigate();
@@ -48,6 +49,7 @@ const PageBuilderApi = (): JSX.Element => {
 				const data = await window.api.getJsonContent(currentItem.path);
 				setCurrentData(data);
 				setOption(currentItem.type);
+				setModule(currentItem.module)
 				dispatch(setCurrentItem(null));
 			} catch (error) {
 				console.error('Failed to load JSON content:', error);
@@ -66,7 +68,7 @@ const PageBuilderApi = (): JSX.Element => {
 	useEffect(() => {
 		const getAllSelectors = async () => {
 			try {
-				const allSelectors = await window.api.fetchSelectors(basePath);
+				const allSelectors = await window.api.fetchSelectors(module,basePath);
 				setSelectors(allSelectors);
 			} catch (error) {
 				console.error('Failed to fetch selectors:', error);
@@ -76,7 +78,7 @@ const PageBuilderApi = (): JSX.Element => {
 		if (basePath) {
 			getAllSelectors();
 		}
-	}, [basePath]);
+	}, [basePath, module]);
 
 	const handleCancel = () => {
 		setOption('none');
@@ -85,6 +87,7 @@ const PageBuilderApi = (): JSX.Element => {
 
 	const handleOptionClick = (opt: OptionType) => {
 		setOption(opt);
+		setModule("shared")
 		setCurrentData(null);
 	};
 
@@ -103,6 +106,7 @@ const PageBuilderApi = (): JSX.Element => {
 					selectors={selectors}
 					jsonData={currentData}
 					models={models}
+					module={module}
 				/>
 			)}
 			{option === 'controllers' && (
@@ -111,6 +115,7 @@ const PageBuilderApi = (): JSX.Element => {
 					basePath={basePath}
 					selectors={selectors}
 					jsonData={currentData}
+					module={module}
 				/>
 			)}
 			{option === 'dto' && (
@@ -121,6 +126,7 @@ const PageBuilderApi = (): JSX.Element => {
 					jsonData={currentData}
 					dto={dto}
 					models={models}
+					module={module}
 				/>
 			)}
 		</>

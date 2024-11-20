@@ -22,11 +22,12 @@ import NavigationBar from '../navigation-bar'
 interface ControllerProps {
 	jsonData?: any
 	basePath: string
+	module: string
 	selectors: Array<any>
 	onCancel: () => void
 }
 
-const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: ControllerProps): JSX.Element => {
+const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: ControllerProps): JSX.Element => {
 
 	const { t } = useTranslation()
 
@@ -102,6 +103,8 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors }: Controlle
 			...values,
 			actions
 		}
+
+		newValues.module = module
 
 		return newValues
 

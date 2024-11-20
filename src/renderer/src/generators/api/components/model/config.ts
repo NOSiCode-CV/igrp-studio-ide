@@ -3,6 +3,7 @@ import { IColumnsTabelProps } from '../Interfaces'
 
 export const initialValues = {
   type: 'model',
+  module: '',
   name: '',
   tableName: '',
   audit: true,

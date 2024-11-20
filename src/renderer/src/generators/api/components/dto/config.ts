@@ -4,6 +4,7 @@ import { IColumnsTabelProps } from "../Interfaces"
 
 export const initialValues: DTOConfig = {
 	type: 'dto',
+    module: '',
 	name: '',
 	template: "classic",
 	attributes: [

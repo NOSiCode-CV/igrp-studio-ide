@@ -45,5 +45,8 @@
   "Enter component Identify": "Enter component Identify",
   "noResultsFound": "No results found",
   "currentButtons": "Actions",
-  "msgInfoAccpetName": "The attribute name must contain only alphabetic characters and cannot contain spaces or special characters."
+  "msgInfoAccpetName": "The attribute name must contain only alphabetic characters and cannot contain spaces or special characters.",
+  "dto": "Data Objects",
+  "models": "Models",
+  "controllers": "Controllers"
 }

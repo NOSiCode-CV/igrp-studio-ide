@@ -18,12 +18,13 @@ interface DtoProps {
 	jsonData?: any
 	onCancel: () => void
 	basePath: string
+	module: string
 	selectors: Array<any>
 	models?: Array<any>
 	dto?: Array<any>
 }
 
-const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models }: DtoProps): JSX.Element => {
+const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models, module }: DtoProps): JSX.Element => {
 	const dispatch: any = useDispatch()
 	const { showErrorToast, showSuccessToast } = useToast()
 	const { t } = useTranslation()
@@ -58,6 +59,7 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models }: Dto
 
 	const handleSave = async (newValues: DTOConfig): Promise<void> => {
 		try {
+			newValues.module = module
 			const { error } = await window.api.createDto(newValues, basePath)
 			if (error) return showErrorToast(error)
 

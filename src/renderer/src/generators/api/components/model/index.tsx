@@ -21,12 +21,13 @@ import NavigationBar from '../navigation-bar'
 interface ModelProps {
     onCancel: () => void
     basePath: string
+    module: string
     selectors: Array<any>
     jsonData?: any
     models?: Array<any>
 }
 
-const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelProps): JSX.Element => {
+const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }: ModelProps): JSX.Element => {
 
     const { t } = useTranslation()
     const dispatch: any = useDispatch();
@@ -152,6 +153,8 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models }: ModelP
         }
 
         if (!enableCrud && !newValues.crud?.path) delete newValues.crud
+
+        newValues.module = module
 
         return newValues;
 

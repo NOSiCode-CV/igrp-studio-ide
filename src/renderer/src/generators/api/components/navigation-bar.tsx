@@ -39,7 +39,7 @@ const NavigationBar = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionPro
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="#" >
-                            <span className='uppercase font-semibold text-gray-900'> {`Create New ${title}`}</span>
+                            <span className='uppercase font-semibold text-gray-900'> {`Create New ${t(title)}`}</span>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </BreadcrumbList>

@@ -1,10 +1,9 @@
 import { dialog } from 'electron';
-import { join } from 'path';
-import { ConfigOptions, IOpenProject, FolderFiles, File } from '../types';
+import { join, basename } from 'path';
+import { ConfigOptions, IOpenProject, File, FolderFileStructure, FolderFiles } from '../types';
 import { promisify } from 'util';
 const fs = require("fs");
 
-const readFile = promisify(fs.readFile);
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
 	const result = await dialog.showOpenDialog({
@@ -24,6 +23,9 @@ export async function openDirectory(buttonLabel?: string): Promise<IOpenProject>
 }
 
 export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderExists: boolean; config?: ConfigOptions }> {
+
+	const readFile = promisify(fs.readFile);
+
 	const specificFolder = '.igrpstudio';
 	const fullFolderPath = join(folderPath, specificFolder);
 
@@ -68,8 +70,45 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 	return { folderExists, config };
 }
 
-export async function fetchFiles(basePath: string): Promise<FolderFiles> {
+// Helper function to recursively read files from directories and group them by subfolder
+async function readDirectoryFiles(directoryPath: string): Promise<Record<string, File[]>> {
+	let groupedFiles: Record<string, File[]> = {};
 
+	try {
+		// Read entries in the directory
+		const entries = await fs.promises.readdir(directoryPath, { withFileTypes: true });
+		// Process each entry
+		for (const entry of entries) {
+			const fullPath = join(directoryPath, entry.name);
+			if (entry.isDirectory()) {
+				// If it's a directory, recursively read its files
+				const subFolderFiles = await readDirectoryFiles(fullPath);
+
+				// Group files under their respective subfolder names
+				Object.entries(subFolderFiles).forEach(([subfolder, files]) => {
+					if (!groupedFiles[subfolder]) {
+						groupedFiles[subfolder] = [];
+					}
+					groupedFiles[subfolder] = groupedFiles[subfolder].concat(files);
+				});
+			} else {
+				// If it's a file, add it to a generic "files" array
+				const folderName = basename(directoryPath);
+				if (!groupedFiles[folderName]) {
+					groupedFiles[folderName] = [];
+				}
+				groupedFiles[folderName].push({ name: entry.name.split('.')[0], path: fullPath });
+			}
+		}
+	} catch (error) {
+		console.error(`Error reading directory ${directoryPath}:`, error);
+	}
+
+	return groupedFiles;
+}
+
+// Main function to fetch files from the base directory and group them by subfolder (like dto, controller)
+export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 	const folders: FolderFiles = {};
 	const studioDirectory = join(basePath, '.igrpstudio');
 
@@ -80,21 +119,44 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 		// Filter out only directories (not files)
 		const directories = entries.filter(entry => entry.isDirectory()).map(entry => entry.name);
 
+		// Iterate through each directory
 		for (const folder of directories) {
-
 			const directory = join(studioDirectory, folder);
+			const folderStructure: FolderFileStructure = { name: folder, path: directory, files: [] };
 
 			try {
 
 				if (fs.existsSync(directory)) {
+					// Check if the directory contains files or subdirectories
+					const directoryContents = await fs.promises.readdir(directory, { withFileTypes: true });
 
-					// Read all files within the directory
-					let files: Array<File> = await readFiles(directory);
+					let isDirectory: boolean = false
 
-					// Add the folder and its files to the result object
-					folders[folder] = files;
+					for (const entry of directoryContents) {
+						
+						isDirectory = entry.isDirectory()
+
+						// If the directory contains any files or subdirectories, process them
+						if (isDirectory) {
+
+							const fullPath = join(directory, entry.name);
+
+							// Call a function to handle the files and subdirectories
+							const groupedFiles = await readDirectoryFiles(fullPath);
+							
+							folderStructure.files.push(groupedFiles);
+
+						}
+						
+					}
+					// Add the folder structure to the result object
+					/* if (!folders[folder]) {
+						folders[folder] = {};
+					} */
+					folders[folder] = folderStructure ;
+				} else {
+					console.error(`Directory does not exist: ${directory}`);
 				}
-
 			} catch (error) {
 				console.error(`Error reading directory ${directory}:`, error);
 			}
@@ -106,33 +168,6 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 	return folders;
 }
 
-async function readFiles(directory: string): Promise<Array<File>> {
-
-	let files: Array<File> = [];
-
-	try {
-		await fs.accessSync(directory);
-
-		// Read all files in the directory
-		const _files = await fs.readdirSync(directory);
-
-		// Filter JSON files and extract their names
-		const jsonFiles = _files.filter(file => file.endsWith('.json'));
-		const names = jsonFiles.map(file => file.replace('.json', ''));
-
-		// Assuming you want to return an array of PageConfig objects
-		files = names.map(name => ({
-			name: name,
-			path: join(directory, name + '.json')
-		}));
-
-	} catch (error) {
-		console.error('Error reading directory:', error);
-	}
-
-	return files;
-}
-
 export async function getJsonContent(filePath: string): Promise<any> {
 	try {
 		const jsonData = fs.readFileSync(filePath, 'utf-8');
@@ -141,4 +176,8 @@ export async function getJsonContent(filePath: string): Promise<any> {
 		console.error('Error reading JSON file:', err);
 		return null;
 	}
+}
+
+export function addNumbers(a: number, b: number) {
+	return a + b;
 }

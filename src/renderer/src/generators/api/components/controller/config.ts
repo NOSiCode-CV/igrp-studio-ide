@@ -22,6 +22,7 @@ export const defaultValues: any = {
 
 export const initialValues: any /*ControllerConfig*/ = {
     type: 'controller',
+    module: '',
     name: '',
     basePath: '',
     actions: [

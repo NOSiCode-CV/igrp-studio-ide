@@ -128,8 +128,8 @@ const api = {
     }
   },
 
-  fetchSelectors: (basePath: string) =>
-    ipcRenderer.invoke('spring-engine:fetch-selectors', basePath),
+  fetchSelectors: (module: string, basePath: string) =>
+    ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
   openDirectory: (buttonLabel: string) => ipcRenderer.invoke('open-directory', buttonLabel),
   fetchFiles: (basePath: string) => ipcRenderer.invoke('igrp-studio:fetch-files', basePath),
