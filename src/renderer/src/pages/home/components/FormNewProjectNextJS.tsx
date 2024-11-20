@@ -2,7 +2,6 @@ import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { useEffect, useState } from 'react';
 import { ApiConfig } from '@igrp/spring-engine/dist/interfaces/types';
-import { ENV_TYPES, PATTERNS } from '@renderer/utils/constants';
 import { AppConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import { setConfig, setBasePath, navigateToNextPage } from "@renderer/redux/thunks";
 import { useDispatch } from 'react-redux';
@@ -12,10 +11,11 @@ import { useTranslation } from 'react-i18next';
 import { ConfigOptions } from 'src/main/types';
 import { Card } from '@renderer/components/ui/card';
 import GoBack from '@renderer/components/go-back';
-import Illustration from '@renderer/components/ilustration';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
+import Illustration from '@renderer/components/ilustration';
+import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 
 interface FormProps {
 	type: String,

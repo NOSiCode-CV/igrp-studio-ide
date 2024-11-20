@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { useEffect, useState } from 'react';
 import { ApiConfig } from '@igrp/spring-engine/dist/interfaces/types';
-import { ENV_TYPES, PATTERNS } from '@renderer/utils/constants';
+import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
 import { setConfig, setBasePath, navigateToNextPage } from "@renderer/redux/thunks";
@@ -16,11 +16,18 @@ import Illustration from '@renderer/components/ilustration';
 import { Button } from '@renderer/components/ui/button';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group';
+import { Checkbox } from '@renderer/components/ui/checkbox';
 
 const DatabaseOptions = [
 	{ value: 'Postgresql', label: 'PostgreSQL' },
 	{ value: 'Oracle', label: 'Oracle' },
 	{ value: 'MySQL', label: 'MySQL' }
+];
+
+const projectStructureStyle = [
+	{ value: 'technical', label: 'Technical' },
+	{ value: 'domain', label: 'Domain' }
 ];
 
 interface FormProps {
@@ -35,7 +42,9 @@ const initialValues: ApiConfig = {
 	group: "",
 	description: "",
 	artifact: "",
-	database: "Postgresql"
+	database: "Postgresql",
+	projectStructureStyle: "technical",
+	enableObservability: false
 };
 
 const FormNewProjectSpring = ({
@@ -60,7 +69,7 @@ const FormNewProjectSpring = ({
 		})
 	});
 
-	const validation: any = useFormik({
+	const formik: any = useFormik({
 		enableReinitialize: true,
 		initialValues,
 		validationSchema,
@@ -90,8 +99,8 @@ const FormNewProjectSpring = ({
 	const createProject = async (): Promise<void> => {
 		try {
 			const formData = {
-				...validation.values,
-				database: validation.values.database ? validation.values.database['value'] : "",
+				...formik.values,
+				database: formik.values.database ? formik.values.database['value'] : "",
 			};
 
 			const config: ConfigOptions = {
@@ -135,7 +144,7 @@ const FormNewProjectSpring = ({
 							className="space-y-6"
 							onSubmit={(e) => {
 								e.preventDefault();
-								validation.handleSubmit();
+								formik.handleSubmit();
 							}}
 						>
 							<div className="space-y-2">
@@ -144,13 +153,13 @@ const FormNewProjectSpring = ({
 									type="text"
 									id="apiName"
 									placeholder="Name of the project"
-									className={`w-full p-2 border rounded-md ${validation.touched.apiName && validation.errors.apiName ? 'border-red-500' : 'border-gray-300'}`}
-									onChange={validation.handleChange}
-									onBlur={validation.handleBlur}
-									value={validation.values.apiName || ""}
+									className={`w-full p-2 border rounded-md ${formik.touched.apiName && formik.errors.apiName ? 'border-red-500' : 'border-gray-300'}`}
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									value={formik.values.apiName || ""}
 								/>
-								{validation.touched.apiName && validation.errors.apiName ? (
-									<p className="text-sm text-red-500">{validation.errors.apiName}</p>
+								{formik.touched.apiName && formik.errors.apiName ? (
+									<p className="text-sm text-red-500">{formik.errors.apiName}</p>
 								) : null}
 							</div>
 
@@ -160,9 +169,9 @@ const FormNewProjectSpring = ({
 									id="description"
 									rows={3}
 									className="w-full p-2 border rounded-md"
-									onChange={validation.handleChange}
-									onBlur={validation.handleBlur}
-									value={validation.values.description || ""}
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									value={formik.values.description || ""}
 								></textarea>
 							</div>
 
@@ -173,13 +182,13 @@ const FormNewProjectSpring = ({
 										type="text"
 										id="group"
 										placeholder="Group"
-										className={`w-full p-2 rounded-md ${validation.touched.group && validation.errors.group ? 'border-red-500' : 'border-gray-300'}`}
-										onChange={validation.handleChange}
-										onBlur={validation.handleBlur}
-										value={validation.values.group || ""}
+										className={`w-full p-2 rounded-md ${formik.touched.group && formik.errors.group ? 'border-red-500' : 'border-gray-300'}`}
+										onChange={formik.handleChange}
+										onBlur={formik.handleBlur}
+										value={formik.values.group || ""}
 									/>
-									{validation.touched.group && validation.errors.group ? (
-										<p className="text-sm text-red-500">{validation.errors.group}</p>
+									{formik.touched.group && formik.errors.group ? (
+										<p className="text-sm text-red-500">{formik.errors.group}</p>
 									) : null}
 								</div>
 
@@ -189,13 +198,13 @@ const FormNewProjectSpring = ({
 										type="text"
 										id="artifact"
 										placeholder="Artifact"
-										className={`w-full p-2 border rounded-md ${validation.touched.artifact && validation.errors.artifact ? 'border-red-500' : 'border-gray-300'}`}
-										onChange={validation.handleChange}
-										onBlur={validation.handleBlur}
-										value={validation.values.artifact || ""}
+										className={`w-full p-2 border rounded-md ${formik.touched.artifact && formik.errors.artifact ? 'border-red-500' : 'border-gray-300'}`}
+										onChange={formik.handleChange}
+										onBlur={formik.handleBlur}
+										value={formik.values.artifact || ""}
 									/>
-									{validation.touched.artifact && validation.errors.artifact ? (
-										<p className="text-sm text-red-500">{validation.errors.artifact}</p>
+									{formik.touched.artifact && formik.errors.artifact ? (
+										<p className="text-sm text-red-500">{formik.errors.artifact}</p>
 									) : null}
 								</div>
 							</div>
@@ -205,14 +214,44 @@ const FormNewProjectSpring = ({
 								<Select
 									id="database"
 									options={DatabaseOptions}
-									onChange={(option) => validation.setFieldValue('database', option)}
-									onBlur={() => validation.setFieldTouched('database', true)}
-									value={validation.values.database}
-									className={`w-full ${validation.touched.database && validation.errors.database ? 'border-red-500' : 'border-gray-300'}`}
+									onChange={(option) => formik.setFieldValue('database', option)}
+									onBlur={() => formik.setFieldTouched('database', true)}
+									value={formik.values.database}
+									className={`w-full ${formik.touched.database && formik.errors.database ? 'border-red-500' : 'border-gray-300'}`}
 								/>
-								{validation.touched.database && validation.errors.database?.value ? (
-									<p className="text-sm text-red-500">{validation.errors.database.value}</p>
+								{formik.touched.database && formik.errors.database?.value ? (
+									<p className="text-sm text-red-500">{formik.errors.database.value}</p>
 								) : null}
+							</div>
+
+							<div className="mb-4">
+								<h2 className="text-xl font-medium">{t('Developer preferences')}</h2>
+							</div>
+
+							<div className="space-y-3">
+								<Label htmlFor="projectStructureStyle" className="block text-sm">{t('Project Structure Style')}</Label>
+								<RadioGroup defaultValue="technical" className="flex flex-col"
+									value={formik.values.projectStructureStyle}
+									onValueChange={(value) => formik.setFieldValue("projectStructureStyle", value)}>
+									{projectStructureStyle.map((style) => (
+										<div key={style.value} className="flex items-center space-x-2">
+											<RadioGroupItem value={style.value} id={style.value} />
+											<Label htmlFor={style.value}>{style.label}</Label>
+										</div>
+									))}
+								</RadioGroup>
+
+							</div>
+
+							<div className="flex items-center space-x-3">
+								<Checkbox
+									id="enableObservability"
+									onCheckedChange={(checked) =>
+										formik.setFieldValue("enableObservability", checked)
+									}
+									checked={formik.values.enableObservability}
+								/>
+								<Label htmlFor="enableObservability">{t('Enable Observability')}</Label>
 							</div>
 
 							<div className="flex justify-end gap-4">

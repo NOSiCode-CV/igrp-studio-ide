@@ -2,11 +2,12 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { IProjectRepository } from '@renderer/interfaces/types'
 import { AppConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
-import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
 
 interface CustomAPI {
 
     createApi: (apiConfig: ApiConfig, basePath: string) => Promise<HandlerResponse>;
+    createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
     createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
     createController: (controllerConfig: ControllerConfig, basePath: string) => Promise<HandlerResponse>;

@@ -26,6 +26,10 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
 
     if (!acceptTypes) return
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
     const onclickToAdd = (item: any) => {
         const fieldId = generateId(componentId + "_" + item.type)
 
@@ -148,7 +152,7 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
         <div className="flex flex-col md:flex-row gap-4 max-h-[370px]">
             {/* Sidebar */}
             <div className="bg-gray-100 p-4 rounded md:w-1/3 space-y-2">
-                <Input onChange={setSearchQuery} placeholder="Type to search" />
+                <Input onChange={handleInputChange} placeholder="Type to search" />
                 <div className="flex flex-col">
                     <small className="text-gray-800">{t("availableFields")}</small>
                     <small className="text-gray-600 italic">{t("clickToAdd")}</small>

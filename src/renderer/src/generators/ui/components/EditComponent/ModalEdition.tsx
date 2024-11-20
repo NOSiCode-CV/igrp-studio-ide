@@ -110,8 +110,8 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
 
                         <TabsContent value="properties">
                             <form role="form">
-                                <div className="grid gap-4">
-                                    <div className="flex flex-col space-y-3">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-3">
                                         <Label htmlFor="identif">{t('identifier')}</Label>
                                         <Input
                                             type="text"
@@ -125,13 +125,12 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                                     </div>
 
                                     {propsConfig && (
-                                        <div className="grip grip-col-6 gap-4">
-                                            <RenderPropsConfig
-                                                propsConfig={propsConfig}
-                                                formValues={formValues}
-                                                handleInputChange={handleInputChange}
-                                            />
-                                        </div>
+
+                                        <RenderPropsConfig
+                                            propsConfig={propsConfig}
+                                            formValues={formValues}
+                                            handleInputChange={handleInputChange}
+                                        />
                                     )}
                                 </div>
                             </form>
@@ -157,25 +156,28 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
                     </Tabs>
                 </div>
 
-                <DialogFooter
-                    className={`flex items-center justify-between`}
-                >
-                    <div className="flex justify-start">
-                        <span className="info hidden"></span>
-                        <span className="info flex items-center">{` `}{componentName}</span>
+                <DialogFooter className="flex items-center sm:justify-between">
+                    {/* Info Section */}
+                    <div className="flex justify-start items-center space-x-2 text-sm italic">
+                        {/* Component Name */}
+                        <span className="info flex items-center">
+                            TIPO:{componentName || <i className="text-gray-500">No Component Name</i>}
+                        </span>
                     </div>
 
+                    {/* Save Button */}
                     <Button
                         type="button"
-                        className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded"
                         id="gen-edit-confirm"
                         onClick={handleConfirm}
+                        className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded"
+                        aria-label="Save changes"
                     >
                         <Save />
                     </Button>
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </Dialog >
 
     )
 }

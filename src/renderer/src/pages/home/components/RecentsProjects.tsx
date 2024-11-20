@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PageableProjects, Project } from "src/main/types";
-import { ENV_TYPES } from "@renderer/utils/constants";
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 import NextIcon from '@renderer/assets/images/Next30x30.svg'
 import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
 

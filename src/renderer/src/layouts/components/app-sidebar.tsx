@@ -28,14 +28,16 @@ import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
 import { useDispatch } from "react-redux";
 import { setCurrentItem as onSetCurrentItem } from "@renderer/redux/thunks";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
+import { CreateModuleDialog } from "@renderer/generators/api/components/create-module-dialog";
 
 interface AppSidebarProps {
     className?: string
     menuItems: MenuItem[]
     config?: ConfigOptions,
+    basePath: string
 }
 
-export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
+export function AppSidebar({ className, menuItems, config, basePath }: AppSidebarProps) {
     const dispatch: any = useDispatch()
     const { t } = useTranslation()
     const [searchQuery, setSearchQuery] = useState("")
@@ -70,6 +72,7 @@ export function AppSidebar({ className, menuItems, config }: AppSidebarProps) {
                         <span className="truncate font-semibold"> {config?.name}</span>
                         <span className="truncate text-xs">Api Generator UI</span>
                     </div>
+                    <CreateModuleDialog basePath={basePath}/>
                 </SidebarMenuButton>
                 <FormSearch onSearch={handleSearch} className="truncate text-xs" placeholder="Search models, dto..." sidebarState={sidebarState} />
             </SidebarHeader>

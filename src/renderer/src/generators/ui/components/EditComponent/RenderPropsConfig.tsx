@@ -12,7 +12,7 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
         return (
 
             <div className="space-y-3" key={key}>
-                <Label htmlFor={key} className="mr-3">{config.label}</Label>
+                <Label htmlFor={key}>{config.label}</Label>
                 {
                     (() => {
                         switch (config.type) {
@@ -22,6 +22,7 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                         name={key}
                                         checked={formValues[key] ?? config.defaultValue}
                                         onChange={handleInputChange}
+                                        className="ml-3"
                                     />
                                 );
                             case 'select':
@@ -31,8 +32,8 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                         value={formValues[key] ?? config.defaultValue}
                                         onChange={handleInputChange}
                                         options={config.options}
-                                    >
-                                    </Combobox>
+                                        className="w-full"
+                                    />
                                 );
                             case 'text':
                             default:

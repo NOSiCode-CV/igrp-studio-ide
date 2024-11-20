@@ -55,7 +55,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
 
             <div className="flex flex-1 overflow-hidden">
                 <SidebarProvider>
-                    <AppSidebar menuItems={menuItems} className='mt-10' config={config} />
+                    <AppSidebar menuItems={menuItems} className='mt-10' config={config} basePath={basePath}/>
                     <SidebarInset >
                         <ScrollArea className='mb-20'>
                             {props.children}

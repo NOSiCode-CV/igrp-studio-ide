@@ -4,10 +4,10 @@ import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
 import useToast from "@renderer/components/useToast";
 import * as Yup from "yup";
-import { PATTERNS } from '@renderer/utils/constants';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from "formik";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@renderer/components/ui/dialog'
+import { PATTERNS } from '@renderer/constants/appConstants';
 
 const initialValues: PageConfig = {
     type: 'page',

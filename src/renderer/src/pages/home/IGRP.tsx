@@ -2,8 +2,8 @@ import { useState } from 'react'
 import SelectEnvironment from '@renderer/pages/home/components/SelectEnvironment'
 import FormNewProjectNextJS from '@renderer/pages/home/components/FormNewProjectNextJS'
 import FormNewProjectSpring from '@renderer/pages/home/components/FormNewProjectSpring'
-import { ENV_TYPES } from '@renderer/utils/constants';
 import WelcomePage from './components/WelcomePage';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 const componentMap = {
   [ENV_TYPES.NEXTJS]: FormNewProjectNextJS,

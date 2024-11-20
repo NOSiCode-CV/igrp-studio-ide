@@ -1,4 +1,4 @@
-import { PATTERNS } from '@renderer/utils/constants';
+import { PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup'
 
 

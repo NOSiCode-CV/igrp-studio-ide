@@ -25,6 +25,14 @@ const api = {
     }
   },
 
+  createModule: async (moduleConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
+    try {
+      return await ipcRenderer.invoke('spring-engine:create-module', moduleConfig, basePath)
+    } catch (error) {
+      return handleError(error)
+    }
+  },
+
   createModel: async (modelConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
     try {
       return await ipcRenderer.invoke('spring-engine:create-model', modelConfig, basePath)

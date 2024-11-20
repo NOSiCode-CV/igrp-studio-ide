@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
 import { FolderFiles, Handler, IOpenProject, Project } from './types'
-import { addController, addDTO, addModel, deleteController, deleteDTO, deleteModel, engineTypes, newApi } from '@igrp/spring-engine'
+import { addController, addDTO, addModel, addModule, deleteController, deleteDTO, deleteModel, engineTypes, newApi } from '@igrp/spring-engine'
 import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
 import { fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './helpers/repo/projects'
@@ -156,6 +156,10 @@ handleWithCustomErrors(
   }
 )
 
+handleWithCustomErrors('spring-engine:create-module', async (_event, moduleConfig, basePath) => {
+  await addModule(moduleConfig, basePath)
+})
+
 handleWithCustomErrors('spring-engine:create-model', async (_event, modelConfig, basePath) => {
   await addModel(modelConfig, basePath)
 })
@@ -195,8 +199,8 @@ handleWithCustomErrors(
   }
 )
 
-ipcMain.handle('spring-engine:fetch-selectors', async (_event, basePath: string) => {
-  return await engineTypes(basePath)
+ipcMain.handle('spring-engine:fetch-selectors', async (_event, module: string, basePath: string) => {
+  return await engineTypes(module, basePath)
 })
 
 handleWithCustomErrors(

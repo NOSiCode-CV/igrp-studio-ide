@@ -2,71 +2,73 @@
 
 import * as React from "react"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon } from 'lucide-react'
+import { DateRange } from "react-day-picker"
 
 import { cn } from "@renderer/lib/utils"
 import { Button } from "@renderer/components/ui/button"
-import { Calendar, CalendarProps } from "@renderer/components/ui/calendar"
+import { Calendar } from "@renderer/components/ui/calendar"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@renderer/components/ui/popover"
 
 type DatePickerProps = {
-    name: string
-    placeholder?: string
-    initialDate?: Date
-    dateFormat?: string
-    onDateChange?: (date: Date | undefined) => void
-    buttonVariant?: string
-    buttonClassName?: string
-    calendarProps?: Partial<CalendarProps>
-    popoverClassName?: string
+  name: string
+  placeholder?: string
+  initialDate?: Date
+  dateFormat?: string
+  onDateChange?: (date: Date | undefined) => void
+  buttonClassName?: string
+  calendarProps?: Omit<React.ComponentProps<typeof Calendar>, 'mode' | 'selected' | 'onSelect'>
+  popoverClassName?: string
 }
 
 export function DatePicker({
-    name,
-    placeholder = "Pick a date",
-    initialDate,
-    dateFormat = "dd-MM-yyyy",
-    onDateChange,
-    buttonVariant = "outline",
-    buttonClassName,
-    calendarProps = {},
-    popoverClassName,
+  placeholder = "Pick a date",
+  initialDate,
+  dateFormat = "dd-MM-yyyy",
+  buttonClassName,
+  popoverClassName,
 }: DatePickerProps) {
-    const [date, setDate] = React.useState<Date | undefined>(initialDate)
+  const [date, _setDate] = React.useState<DateRange | undefined>(
+    initialDate ? { from: initialDate, to: initialDate } : undefined
+  )
 
-    const handleDateChange = (selectedDate: Date | undefined) => {
-        setDate(selectedDate)
-        onDateChange?.(selectedDate)
-    }
+  /* const _handleDateChange = (selectedDate: DateRange | undefined) => {
+    setDate(selectedDate)
+    onDateChange?.(selectedDate?.from)
+  } */
 
-    return (
-        <Popover key={name}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant={buttonVariant}
-                    className={cn(
-                        "justify-start text-left font-normal",
-                        !date && "text-muted-foreground",
-                        buttonClassName
-                    )}
-                >
-                    <CalendarIcon className="mr-2" />
-                    {date ? format(date, dateFormat) : <span>{placeholder}</span>}
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className={cn("w-auto p-0", popoverClassName)}>
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={handleDateChange}
-                    initialFocus
-                    {...calendarProps}
-                />
-            </PopoverContent>
-        </Popover>
-    )
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-[240px] justify-start text-left font-normal",
+            !date && "text-muted-foreground",
+            buttonClassName
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date?.from ? (
+            format(date.from, dateFormat)
+          ) : (
+            <span>{placeholder}</span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className={cn("w-auto p-0", popoverClassName)} align="start">
+      {/*   <Calendar
+          mode="single"
+          selected={date}
+          onSelect={handleDateChange}
+          initialFocus
+          {...calendarProps}
+        /> */}
+      </PopoverContent>
+    </Popover>
+  )
 }
