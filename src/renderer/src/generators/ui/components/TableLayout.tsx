@@ -15,6 +15,7 @@ interface DefaultTableProps {
 }
 
 export function TableLayout({ content, columns, actions }: DefaultTableProps) {
+
   return (
     <Table>
       <TableHeader>

@@ -28,6 +28,7 @@ const MainPageBuilder = ({
 
     const dispatch: any = useDispatch();
 
+    const [content, setContent] = useState<any>([]);
     const [page, setPage] = useState<any>([]);
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -44,7 +45,7 @@ const MainPageBuilder = ({
         })
     );
 
-    const { basePath, pages } = useSelector(selectProperties);  
+    const { basePath, pages } = useSelector(selectProperties);
 
     const tableColumns = [
         { header: 'Page Name', accessorKey: 'name', enableSorting: true, enableColumnFilter: true },
@@ -91,6 +92,17 @@ const MainPageBuilder = ({
         }
     }, [loadingTable]);
 
+    useEffect(() => {
+        if (pages?.files) {
+            // Transform the pages structure into a flat array
+            const flattenedPages = pages.files.flatMap(page =>
+                Object.values(page).flat()
+            );
+
+            setContent(flattenedPages);
+        }
+    }, [pages])
+
     const actions = (cell: any) => (
         <div className="flex space-x-2" >
             <Button title='Add Components' variant="ghost" size="icon" onClick={() => onClickBtnGerador(cell.row.original)}>
@@ -116,7 +128,7 @@ const MainPageBuilder = ({
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <TableLayout content={pages || []} columns={tableColumns} actions={actions} />
+                    <TableLayout content={content || []} columns={tableColumns} actions={actions} />
                 </CardContent>
             </Card>
 

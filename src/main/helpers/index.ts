@@ -133,27 +133,36 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 					let isDirectory: boolean = false
 
 					for (const entry of directoryContents) {
-						
-						isDirectory = entry.isDirectory()
 
+						console.log(entry)
+
+						isDirectory = entry.isDirectory()
+						const fullPath = join(directory, entry.name);
 						// If the directory contains any files or subdirectories, process them
 						if (isDirectory) {
 
-							const fullPath = join(directory, entry.name);
-
 							// Call a function to handle the files and subdirectories
 							const groupedFiles = await readDirectoryFiles(fullPath);
-							
+
+							folderStructure.files.push(groupedFiles);
+
+						} else {
+
+							let groupedFiles: Record<string, File[]> = {};
+							let name = entry.name.split('.')[0]
+
+							if (!groupedFiles[name]) {
+								groupedFiles[name] = [];
+							}
+
+							groupedFiles[name].push({ name, path: fullPath });
+
 							folderStructure.files.push(groupedFiles);
 
 						}
-						
+
 					}
-					// Add the folder structure to the result object
-					/* if (!folders[folder]) {
-						folders[folder] = {};
-					} */
-					folders[folder] = folderStructure ;
+					folders[folder] = folderStructure;
 				} else {
 					console.error(`Directory does not exist: ${directory}`);
 				}

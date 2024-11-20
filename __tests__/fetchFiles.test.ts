@@ -3,7 +3,7 @@ import { join } from 'path';
 import fs from 'fs';
 
 describe('fetchFiles', () => {
-    const basePath = '//Users/carlosgraca/Documents/Projects/nosi/TesteApps/AlphThree';
+    const basePath = '//Users/carlosgraca/Documents/Projects/nosi/TesteApps/teste';
     const studioDirectory = join(basePath, '.igrpstudio');
 
     it('should read files from an existing directory', async () => {
