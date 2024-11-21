@@ -148,6 +148,9 @@ const repo = {
     },
     save: (p: Project) => {
       return ipcRenderer.invoke('igrp-studio:repo:project.save', p)
+    },
+    delete: (p: Project, index: number) => {
+      return ipcRenderer.invoke('igrp-studio:repo:project.delete', p, index)
     }
   }
 }

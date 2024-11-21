@@ -133,6 +133,7 @@ const FormNewProjectSpring = ({
 		<div className="space-y-6">
 			<div className="flex items-center ">
 				<GoBack handleBackClick={onBackButtonClick} />
+				<h2 className="text-2xl font-bold">{t('springenv')}</h2>
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5">
 				<div className="md:col-span-1">
@@ -208,7 +209,13 @@ const FormNewProjectSpring = ({
 										<p className="text-sm text-red-500">{formik.errors.artifact}</p>
 									) : null}
 								</div>
+								{formik.values.group && (
+									<p className='w-full text-sm font-medium italic -mt-2'>{`Package Name: ${formik.values.group}.${formik.values.artifact}`} </p>
+								)}
 							</div>
+
+
+
 
 							<div className="space-y-2">
 								<Label htmlFor="database" className="block text-sm  ">{t('database')}</Label>
@@ -273,7 +280,7 @@ const FormNewProjectSpring = ({
 						</form>
 					</Card>
 				</div>
-				<div className="xl:w-1/2 hidden md:flex items-center justify-center text-center">
+				<div className="hidden md:flex items-center justify-center text-center">
 					<Illustration name="Project" />
 				</div>
 			</div>

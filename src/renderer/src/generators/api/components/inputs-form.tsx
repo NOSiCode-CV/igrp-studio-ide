@@ -29,7 +29,7 @@ export const SelectInput = ({ label, id, options, value, onChange, error }) => (
 			value={value}
 			onChange={onChange}
 			classNamePrefix="select"
-			className={`w-full ${error ? 'border-red-500' : 'border-gray-300'}`}
+			className={`w-full text-sm ${error ? 'border-red-500' : 'border-gray-300'}`}
 		/>
 		{error && <p className="text-sm text-red-600">{error}</p>}
 	</div>

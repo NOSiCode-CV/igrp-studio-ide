@@ -250,7 +250,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }
                                     placeholder={t('Name of the model')}
                                     value={formik.values.name}
                                     onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
+                                    onBlur={handleNameBlur}
                                     error={formik.touched.name ? formik.errors.name : undefined}
                                 />
 
@@ -260,7 +260,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }
                                     placeholder={t('Enter Table Name')}
                                     value={formik.values.tableName}
                                     onChange={formik.handleChange}
-                                    onBlur={handleNameBlur}
+                                    onBlur={formik.handleBlur}
                                     error={formik.touched.tableName ? formik.errors.tableName : undefined}
                                 />
                             </div>

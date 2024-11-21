@@ -1,28 +1,29 @@
 import { DTOConfig } from "@igrp/spring-engine/dist/interfaces/types"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../Interfaces"
+import { OPTION_TYPE } from "@renderer/constants/appConstants"
 
 export const initialValues: DTOConfig = {
-	type: 'dto',
+    type: 'dto',
     module: '',
-	name: '',
-	template: "classic",
-	attributes: [
-		{
-			name: '',
-			ns: 'java',
-			type: 'String',
+    name: '',
+    template: "classic",
+    attributes: [
+        {
+            name: '',
+            ns: 'java',
+            type: 'String',
             isList: false
-		}
-	]
+        }
+    ]
 }
 
 export const defaultValues: any = {
-	attributes: {
-		name: '',
-		ns: 'java',
-		type: 'String'
-	}
+    attributes: {
+        name: '',
+        ns: 'java',
+        type: 'String'
+    }
 }
 
 export const TabList = [
@@ -36,7 +37,7 @@ export const TemplateOptions = [
 
 export const NamespacesOptions = [
     { label: 'DTO', value: 'dto' },
-    { label: 'Model', value: 'model' },
+    { label: 'Model', value: 'models' },
     { label: 'Java', value: 'java' }
 ]
 
@@ -50,21 +51,21 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
         )?.ATTRIBUTE_TYPES || []
     )
 
-    const getOptions = (selectedValue) => {
-        return selectedValue
+    const getOptions = (objects) => {
+        return objects !== undefined ? objects
             .filter(m => m.name !== currentDto)
             .map(item => ({
                 label: item.name,
-                value: item.name                
-            }));
+                value: item.name
+            })) : [];
     }
 
     const getUpdatedTypesForNamespace = (selectedValue) => {
 
-        if (selectedValue === 'dto')
+        if (selectedValue === OPTION_TYPE.DATA_OBJECTS)
             return getOptions(dto)
 
-        if (selectedValue === 'model')
+        if (selectedValue === OPTION_TYPE.MODELS)
             return getOptions(models)
 
         return paramsTypesData
@@ -88,7 +89,7 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
                 options: paramsTypesData,
                 width: '20%',
                 dependsOn: 'ns',
-                getOptions: (selectedValue) => getUpdatedTypesForNamespace(selectedValue), 
+                getOptions: (selectedValue) => getUpdatedTypesForNamespace(selectedValue),
             },
             { key: 'isList', name: 'Is List', type: 'checkbox' },
         ]

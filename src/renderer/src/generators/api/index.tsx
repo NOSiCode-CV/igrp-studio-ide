@@ -9,17 +9,17 @@ import { useNavigate } from 'react-router-dom';
 import { setCurrentItem } from '@renderer/redux/thunks';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { SidebarTrigger } from '@renderer/components/ui/sidebar';
+import { extractByType } from './helpers';
+import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 
 interface PageBuilderState {
 	basePath: string;
-	currentItem: { path: string; module: string, type: 'models' | 'controllers' | 'dto' } | null;
+	currentItem: { path: string; module: string, type: OptionType } | null;
 	folderFiles: {
 		models?: any[];
 		dto?: any[];
 	};
 }
-
-type OptionType = 'models' | 'controllers' | 'dto' | 'none';
 
 const PageBuilderApi = (): JSX.Element => {
 	const [selectors, setSelectors] = useState<any[]>([]);
@@ -32,12 +32,20 @@ const PageBuilderApi = (): JSX.Element => {
 
 	const selectState = (state: any): PageBuilderState => state.PageBuilder;
 
-	const selectProperties = createSelector(selectState, (studio) => ({
-		basePath: studio.basePath,
-		currentItem: studio.currentItem,
-		models: studio.folderFiles?.models,
-		dto: studio.folderFiles?.dto,
-	}));
+	const selectProperties = createSelector(
+		selectState,
+		(studio) => {
+			const moduleData = studio.folderFiles[module];
+
+			return {
+				basePath: studio.basePath,
+				currentItem: studio.currentItem,
+				models: extractByType(moduleData, OPTION_TYPE.MODELS),
+				dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
+				controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
+			};
+		}
+	);
 
 	const { currentItem, basePath, models, dto } = useSelector(selectProperties);
 
@@ -68,7 +76,7 @@ const PageBuilderApi = (): JSX.Element => {
 	useEffect(() => {
 		const getAllSelectors = async () => {
 			try {
-				const allSelectors = await window.api.fetchSelectors(module,basePath);
+				const allSelectors = await window.api.fetchSelectors(module, basePath);
 				setSelectors(allSelectors);
 			} catch (error) {
 				console.error('Failed to fetch selectors:', error);
@@ -99,7 +107,7 @@ const PageBuilderApi = (): JSX.Element => {
 					<EmptyPage onClick={handleOptionClick} />
 				</>
 			)}
-			{option === 'models' && (
+			{option === OPTION_TYPE.MODELS && (
 				<ModelLayout
 					onCancel={handleCancel}
 					basePath={basePath}
@@ -109,7 +117,7 @@ const PageBuilderApi = (): JSX.Element => {
 					module={module}
 				/>
 			)}
-			{option === 'controllers' && (
+			{option === OPTION_TYPE.CONTROLLERS && (
 				<ControllerLayout
 					onCancel={handleCancel}
 					basePath={basePath}
@@ -118,7 +126,7 @@ const PageBuilderApi = (): JSX.Element => {
 					module={module}
 				/>
 			)}
-			{option === 'dto' && (
+			{option === OPTION_TYPE.DATA_OBJECTS && (
 				<DtoLayout
 					onCancel={handleCancel}
 					basePath={basePath}

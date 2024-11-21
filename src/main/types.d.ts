@@ -41,8 +41,10 @@ export type PageableProjects = { data: Array<Project>, total: number }
 
 export interface IProjectRepository {
     async save(project: Project): Promise<Project>;
+    async delete(project: Project, index: number): Promise<void>;
     async findAllRecent(page: Page): Promise<PageableProjects>;
     async findAll(): Promise<Array<Project>>;
+
 }
 
 export interface MenuItem {

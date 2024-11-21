@@ -22,18 +22,18 @@ const RecentsProjects = (): JSX.Element => {
     const dispatch: any = useDispatch();
     const { t } = useTranslation();
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            setError(null);
-            try {
-                const res = await window.repo.project.findAllRecent(pagination);
-                setProjects(res);
-            } catch (err) {
-                setError("Failed to fetch projects");
-            } finally {
-            }
-        };
+    const fetchProjects = async () => {
+        setError(null);
+        try {
+            const res = await window.repo.project.findAllRecent(pagination);
+            setProjects(res);
+        } catch (err) {
+            setError("Failed to fetch projects");
+        } finally {
+        }
+    };
 
+    useEffect(() => {
         fetchProjects();
     }, [pagination.page, pagination.size]);
 
@@ -58,6 +58,16 @@ const RecentsProjects = (): JSX.Element => {
     /* const totalProjects = projects.total ?? 0;
     const requestedTotal = pagination.page * pagination.size; */
 
+    const handleClear = async (projectRecent: Project, index: number): Promise<void> => {
+        try {
+            await window.repo.project.delete(projectRecent, index);
+            fetchProjects();
+        } catch (err) {
+            setError("Failed to fetch projects");
+        } finally {
+        }
+    }
+
     return (
         <>
             {projects.data.length > 0 && (
@@ -68,20 +78,39 @@ const RecentsProjects = (): JSX.Element => {
                     </div>
 
                     {error && <p>{error}</p>}
-                    {projects.data.map((p) => (
-                        p?.config?.name &&
-                        <div key={p.path} className="flex items-center mb-3" onClick={() => handleClick(p)}>
-
-                            <button
-                                className="flex-shrink-0 w-12 h-12 rounded-md bg-gray-500 bg-opacity-10 text-primary flex items-center justify-center cursor-pointer hover:bg-opacity-20 transition-colors duration-200"
+                    {projects.data.map((p, index) => (
+                        p?.config?.name && (
+                            <div
+                                key={p.path}
+                                className="relative flex items-center mb-3 group"
                             >
-                                <img src={IconMap[p?.config.type]} />
-                            </button>
+                                {/* Button with Icon */}
+                                <button
+                                    className="relative flex-shrink-0 w-12 h-12 rounded-md bg-gray-500 bg-opacity-10 text-primary flex items-center justify-center cursor-pointer hover:bg-opacity-20 transition-colors duration-200"
+                                    onClick={() => handleClick(p)}
+                                >
+                                    <img src={IconMap[p?.config.type]} alt="Project Icon" />
 
-                            <div className="flex-grow-1 ms-3">
-                                <h5 className="text-base font-medium" style={{ maxWidth: '150px' }}>{p.config.name}</h5>
+                                    {/* "X" Icon (Shown on Hover) */}
+                                    <span
+                                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent triggering the button click handler
+                                            handleClear(p, index); // Your clear handler function
+                                        }}
+                                    >
+                                        X
+                                    </span>
+                                </button>
+
+                                {/* Project Name */}
+                                <div className="flex-grow-1 ms-3 cursor-pointer" onClick={() => handleClick(p)}>
+                                    <h5 className="text-base font-medium" style={{ maxWidth: '150px' }}>
+                                        {p.config.name}
+                                    </h5>
+                                </div>
                             </div>
-                        </div>
+                        )
                     ))}
                     {/*  {totalProjects > 0 && requestedTotal < totalProjects && (
                         <button type="button" className="btn btn-link visually-hidden" onClick={handleLoadMore}>

@@ -114,7 +114,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                 <DialogHeader>
                     <DialogTitle>Create New Module</DialogTitle>
                     <DialogDescription>
-                        Enter the name for your new module. Click save when you're done.
+                        {t('dialogDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={(e) => { e.preventDefault(); formik.handleSubmit(); }}>
@@ -123,7 +123,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                             <Label htmlFor="name" className="text-right">
                                 Module Name
                             </Label>
-                            <div className='col-span-3'> 
+                            <div className='col-span-3'>
                                 <Input
                                     id="name"
                                     onChange={formik.handleChange}

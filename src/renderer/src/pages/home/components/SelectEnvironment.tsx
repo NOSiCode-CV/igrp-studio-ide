@@ -21,15 +21,15 @@ const SelectEnvironment = ({
 
 	const environmentCards = [
 		{
-			title: 'Next.js Environment',
-			description: 'Front-end Generator UI',
+			title: t('nextjsEnv'),
+			description: ('frontGeneratorUI'),
 			image: Next,
 			onClick: () => onEnvironmentCardClick(ENV_TYPES.NEXTJS),
 			hoverStyles: 'hover:bg-black group-hover:text-white'
 		},
 		{
-			title: 'Spring Environment',
-			description: 'API Generator UI',
+			title: t('springenv'),
+			description: ('APIGeneratorUI'),
 			image: Spring,
 			onClick: () => onEnvironmentCardClick(ENV_TYPES.SPRING),
 			hoverStyles: 'hover:bg-[#6DB33F] group-hover:text-white'

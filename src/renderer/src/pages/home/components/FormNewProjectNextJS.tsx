@@ -96,6 +96,7 @@ const FormNewProjectNextJS = ({
 		<div className="space-y-6">
 			<div className="flex items-center">
 				<GoBack handleBackClick={onBackButtonClick} />
+				<h2 className="text-2xl font-bold">{t('nextjsEnv')}</h2>
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 				{/* Form Section */}

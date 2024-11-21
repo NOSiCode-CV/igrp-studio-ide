@@ -76,4 +76,30 @@ export class ProjectRepository implements IProjectRepository {
         const cfg = await loadCfg();
         return cfg.projects;
     }
+
+    async delete(project: Project, index?: number): Promise<void> {
+        const cfg = await loadCfg();
+    
+        // Verifica se o array de projetos existe
+        if (!cfg.projects || cfg.projects.length === 0) {
+            throw new Error("No projects available to delete.");
+        }
+    
+        if (index !== undefined) {
+            // Remoção pelo índice
+            if (index < 0 || index >= cfg.projects.length) {
+                throw new Error("Index out of bounds.");
+            }
+            cfg.projects.splice(index, 1); // Remove o projeto pelo índice
+        } else {
+            // Remoção pelo caminho do projeto
+            const projectIndex = cfg.projects.findIndex((p) => p.path === project.path);
+            if (projectIndex === -1) {
+                throw new Error("Project not found.");
+            }
+            cfg.projects.splice(projectIndex, 1); // Remove o projeto pelo caminho
+        }
+    
+        await saveCfg(cfg); // Salva a configuração atualizada
+    }
 }

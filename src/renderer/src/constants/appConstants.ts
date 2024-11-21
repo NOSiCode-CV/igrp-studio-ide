@@ -18,3 +18,11 @@ export const PATTERNS = {
     PATH_VALIDATION: /^[a-zA-Z_/]+$/,  
 };
 
+
+export enum OPTION_TYPE {
+    MODELS = "models",
+    CONTROLLERS = "controllers",
+    DATA_OBJECTS = "dto"
+};
+
+export type OptionType = 'models' | 'controllers' | 'dto' | 'none';

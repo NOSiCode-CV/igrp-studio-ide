@@ -5,10 +5,10 @@
   "openProject": "Open Project",
   "recent": "Recent",
   "loadMore": "••• Load More •••",
-  "frontGeneratorUI": "Front - Generator UI",
-  "nextjsEnv": "Next.js env",
-  "springenv": "Spring env",
-  "APIGeneratorUI": "Next.js env",
+  "frontGeneratorUI": "Front-end Generator UI",
+  "nextjsEnv": "Next.js Environment",
+  "springenv": "Spring Environment",
+  "APIGeneratorUI": "API Generator UI",
   "selectEnvironment": "Select environment",
   "goBack": "Go Back",
   "newProjectInformatin": "Create a new project by filling out the information below.",
@@ -48,5 +48,6 @@
   "msgInfoAccpetName": "The attribute name must contain only alphabetic characters and cannot contain spaces or special characters.",
   "dto": "Data Objects",
   "models": "Models",
-  "controllers": "Controllers"
+  "controllers": "Controllers",
+  "dialogDescription": "Enter the name for your new module. Click save when you're done."
 }

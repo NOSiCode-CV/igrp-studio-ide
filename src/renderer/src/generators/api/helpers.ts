@@ -1,3 +1,4 @@
+import { OptionType } from '@renderer/constants/appConstants';
 import { FormikValues } from 'formik';
 
 export function formatMethods(elements: string[]): { label: string; value: string }[] {
@@ -39,4 +40,12 @@ export const changeValue = (
       index === position ? { ...row, [element]: value } : row
     )
   );
+};
+
+
+export const extractByType = (moduleData: any, type: OptionType) => {
+
+  const files = moduleData?.files ?? [];
+
+  return files.find((item: any) => item[type])?.[type] ?? [];
 };

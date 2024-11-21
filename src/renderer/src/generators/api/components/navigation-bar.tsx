@@ -65,7 +65,7 @@ const NavigationBar = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionPro
                     {t('cancel')}
                 </Button>
 
-                <Button color="success" onClick={onSubmit}>
+                <Button color="success" onClick={onSubmit} type="submit">
                     {t('save')}
                 </Button>
 

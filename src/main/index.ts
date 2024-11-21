@@ -228,6 +228,11 @@ ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: Project)
   await repo.save(project)
 })
 
+ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: Project, index: number) => {
+  await repo.delete(project, index)
+})
+
+
 handleWithCustomErrors(
   'next-engine:create-app',
   async (_event, appConfig: AppConfig, basePath: string) => {

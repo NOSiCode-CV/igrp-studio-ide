@@ -67,7 +67,9 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogTitle className="">Create New Page</DialogTitle>
-                <DialogDescription/>
+                <DialogDescription>
+                    {t('dialogDescription')}
+                </DialogDescription>
                 <form
                     className="needs-validation"
                     onSubmit={(e) => {
