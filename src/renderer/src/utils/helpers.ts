@@ -74,7 +74,7 @@ function createMenuHeader(label: string, folderName?: string): MenuItem {
 	}
 }
 
-function createSubMenuItems(files: any, folderName: string): MenuItem[] {
+export function createSubMenuItems(files: any, folderName: string): MenuItem[] {
 	return files.map((file) => ({
 		id: file.name,
 		label: file.name,

@@ -7,7 +7,6 @@ import {
     SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
-    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
@@ -15,7 +14,7 @@ import {
     SidebarMenuSubItem,
     useSidebar,
 } from "@renderer/components/ui/sidebar"
-import { ChevronDown, ChevronRight, MoreHorizontal, Plus } from "lucide-react"
+import { ChevronDown, MoreHorizontal } from "lucide-react"
 
 import { cn } from "@renderer/lib/utils"
 import { filterSubItems } from "@renderer/utils/helpers";
