@@ -13,7 +13,17 @@ export const initialValues: DTOConfig = {
             name: '',
             ns: 'java',
             type: 'String',
-            isList: false
+            required: false,
+            before: false,
+            after: false,
+            positive: false,
+            minLength: 0,
+            maxLength: 10,
+            regex: '',
+            isList: false,
+            isEmail: false,
+            isUrl: false,
+            primaryKey: false,
         }
     ]
 }
@@ -74,14 +84,7 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
     return {
         attributes: [
             { key: 'name', name: 'Name', type: 'text', width: '40%' },
-            {
-                key: 'ns',
-                name: 'Namespace',
-                type: 'select',
-                options: NamespacesOptions,
-                width: '30%',
-
-            },
+            { key: 'ns', name: 'Namespace', type: 'select', options: NamespacesOptions, width: '30%' },
             {
                 key: 'type',
                 name: 'Type',

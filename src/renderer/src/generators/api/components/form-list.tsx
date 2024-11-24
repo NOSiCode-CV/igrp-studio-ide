@@ -102,11 +102,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 							{name}
 						</TableHead>
 					))}
-					<TableHead style={{ width: "15px" }}>
-						<div className="d-flex justify-content-end me-3">
-							{removeRow ? 'Actions' : undefined}
-						</div>
-					</TableHead>
+					<TableHead style={{ width: "15px" }}></TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>

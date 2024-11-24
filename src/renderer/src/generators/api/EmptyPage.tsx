@@ -1,6 +1,10 @@
 import Illustration from "@renderer/components/ilustration";
+import { useTranslation } from "react-i18next";
 
 const EmptyPage = ({ onClick }) => {
+
+    const {t} = useTranslation();
+
     return (
         <div className="flex justify-center items-center w-full h-[calc(100vh-140px)] relative">
             <Illustration name="Empty" />
@@ -10,19 +14,19 @@ const EmptyPage = ({ onClick }) => {
                         className="bg-[#008054] text-white px-4 py-2 rounded hover:bg-green-700"
                         onClick={() => onClick('models')}
                     >
-                        New Model
+                        {t('newObject', {name: t('Model')})}
                     </button>
                     <button
                         className="bg-[#008054] text-white px-4 py-2 rounded hover:bg-green-700"
                         onClick={() => onClick('controllers')}
                     >
-                        New Controller
+                        {t('newObject', {name: t('Controller')})}
                     </button>
                     <button
                         className="bg-[#008054] text-white px-4 py-2 rounded hover:bg-green-700"
                         onClick={() => onClick('dto')}
                     >
-                        New DTO
+                        {t('newObject', {name: t('dto')})}
                     </button>
                 </div>
             </div>

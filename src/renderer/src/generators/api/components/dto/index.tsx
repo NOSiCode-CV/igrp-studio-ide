@@ -8,11 +8,11 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks"
 import { useDtoValidation } from './validation'
-import { FormList } from '../form-list'
 import { Card } from '@renderer/components/ui/card'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { SelectInput, TextInput } from '../inputs-form'
 import NavigationBar from '../navigation-bar'
+import AttributesCard from './attributes'
 
 interface DtoProps {
 	jsonData?: any
@@ -60,11 +60,13 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models, modul
 	const handleSave = async (newValues: DTOConfig): Promise<void> => {
 		try {
 			newValues.module = module
+
 			const { error } = await window.api.createDto(newValues, basePath)
 			if (error) return showErrorToast(error)
 
 			dispatch(onSetChangeStatus(true))
-			showSuccessToast(`Dto ${newValues.name} have been successfully added.`);
+
+			showSuccessToast(t('createdSuccess', {name: t("dto"), value: newValues.name}))
 		} catch (error) {
 			showErrorToast(error)
 		}
@@ -77,7 +79,7 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models, modul
 
 			dispatch(onSetChangeStatus(true))
 			onCancel()
-			showSuccessToast(t('Dto deleted successfully!'))
+			showSuccessToast(t('deletedSuccess', {name: t("dto")}))
 		} catch (error) {
 			showErrorToast(error)
 		}
@@ -90,16 +92,18 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models, modul
 
 		if (columns && data) {
 			return (
-				<FormList
-					columns={columns}
+				<AttributesCard
+					dto={dto}
+					models={models}
+					currentDto={jsonData?.name}
 					data={data}
-					changeValue={(element, position, result) =>
-						changeValue(formik, element, position, result, value)
-					}
+					selectors={selectors}
 					errors={errors}
 					addRow={() => addNewRow(formik, value, defaultValues[value])}
 					removeRow={(position) => removeRow(formik, value, position)}
-					name={'field'}
+					changeValue={(element, position, result) =>
+						changeValue(formik, element, position, result, value)
+					}
 				/>
 			);
 		}
@@ -114,7 +118,7 @@ const DtoLayout = ({ jsonData, onCancel, basePath, selectors, dto, models, modul
 				onCancel={onCancel}
 				onSubmit={formik.handleSubmit}
 				isNew={!jsonData}
-				title={t('DTO')}
+				title='dto'
 			/>
 
 			<div className="space-y-4 p-4">

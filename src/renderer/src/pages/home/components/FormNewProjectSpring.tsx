@@ -1,7 +1,6 @@
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { useEffect, useState } from 'react';
-import { ApiConfig } from '@igrp/spring-engine/dist/interfaces/types';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
@@ -18,6 +17,7 @@ import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group';
 import { Checkbox } from '@renderer/components/ui/checkbox';
+import { BaseApiConfig } from '@igrp/spring-engine/dist/interfaces/types';
 
 const DatabaseOptions = [
 	{ value: 'Postgresql', label: 'PostgreSQL' },
@@ -33,10 +33,10 @@ const projectStructureStyle = [
 interface FormProps {
 	type: String;
 	onBackButtonClick?: () => void;
-	onSaveButtonClick?: (apiConfig: ApiConfig, filePath: string) => void;
+	onSaveButtonClick?: (apiConfig: BaseApiConfig, filePath: string) => void;
 }
 
-const initialValues: ApiConfig = {
+const initialValues: BaseApiConfig = {
 	type: ENV_TYPES.SPRING,
 	apiName: "",
 	group: "",
@@ -129,6 +129,18 @@ const FormNewProjectSpring = ({
 		}
 	};
 
+	const PackageName = () => {
+		return (
+			<>
+				{formik.values.group && (
+					<p className="w-full text-sm font-medium italic -mt-2">
+						{`Package Name: ${formik.values.group.replace(/[-\s]/g, '_')}.${formik.values.artifact.replace(/[-\s]/g, '_')}`}
+					</p>
+				)}
+			</>
+		);
+	};
+
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center ">
@@ -209,13 +221,8 @@ const FormNewProjectSpring = ({
 										<p className="text-sm text-red-500">{formik.errors.artifact}</p>
 									) : null}
 								</div>
-								{formik.values.group && (
-									<p className='w-full text-sm font-medium italic -mt-2'>{`Package Name: ${formik.values.group}.${formik.values.artifact}`} </p>
-								)}
+								<PackageName />
 							</div>
-
-
-
 
 							<div className="space-y-2">
 								<Label htmlFor="database" className="block text-sm  ">{t('database')}</Label>

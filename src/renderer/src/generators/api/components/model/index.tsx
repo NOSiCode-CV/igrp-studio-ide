@@ -173,7 +173,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }
 
             dispatch(onSetChangeStatus(true));
 
-            showSuccessToast(`Model ${values.name} have been successfully added.`);
+            showSuccessToast(t('createdSuccess', {name: t("model"), value: values.name}))
 
         } catch (error) {
             showErrorToast(error);
@@ -194,7 +194,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }
             dispatch(onSetChangeStatus(true));
             onCancel()
 
-            showSuccessToast('Model deleted successfully!')
+            showSuccessToast(t('deletedSuccess', {name: t("model")}))
 
         } catch (error) {
             showErrorToast(error);
@@ -237,7 +237,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }
                 onCancel={handleCancel}
                 onSubmit={formik.handleSubmit}
                 isNew={jsonData === null}
-                title="Model" />
+                title="model"/>
 
             <div className="space-y-4 p-4">
                 <Card className="p-6 rounded-sm">

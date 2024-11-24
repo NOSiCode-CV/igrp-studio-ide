@@ -90,7 +90,7 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                     </div>
                     <CreateModuleDialog basePath={basePath} />
                 </SidebarMenuButton>
-                <FormSearch onSearch={handleSearch} className="truncate text-xs" placeholder="Search models, dto..." sidebarState={sidebarState} />
+                <FormSearch onSearch={handleSearch} className="truncate text-xs" placeholder="Search models, data objects..." sidebarState={sidebarState} />
             </SidebarHeader>
             <SidebarContent>
                 <ScrollArea>
@@ -135,10 +135,6 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                                                                     <span>{t(menu.label)}</span>
                                                                 </div>
                                                                 <div className="flex items-center">
-                                                                    {/*  <SidebarMenuAction className="mr-2">
-                                                                        <Plus className="h-4 w-4" onClick={() => openNewProject(menu)} />
-                                                                        <span className="sr-only">{t(`Add ${menu.label}`)}</span>
-                                                                    </SidebarMenuAction> */}
                                                                     <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                                                                 </div>
                                                             </SidebarMenuButton>

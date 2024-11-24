@@ -200,7 +200,9 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: C
 			}
 
 			dispatch(onSetChangeStatus(true))
-			showSuccessToast(`Controller ${values.name} has been successfully added.`)
+
+			showSuccessToast(t('createdSuccess', {name: t("controller"), value: values.name}))
+
 		} catch (error: unknown) {
 			showErrorToast(error)
 		}
@@ -220,7 +222,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: C
 			dispatch(onSetChangeStatus(true));
 			onCancel()
 
-			showSuccessToast('Controller deleted successfully!')
+			showSuccessToast(t('deletedSuccess', {name: t("controller")}))
 
 		} catch (error) {
 			showErrorToast(error);
@@ -239,7 +241,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: C
 				onCancel={handleCancel}
 				onSubmit={formik.handleSubmit}
 				isNew={!jsonData}
-				title="Controller"
+				title="controller"
 			/>
 
 			<div className="space-y-4 p-4">

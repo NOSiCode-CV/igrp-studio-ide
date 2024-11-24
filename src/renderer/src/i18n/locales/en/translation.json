@@ -49,5 +49,10 @@
   "dto": "Data Objects",
   "models": "Models",
   "controllers": "Controllers",
-  "dialogDescription": "Enter the name for your new module. Click save when you're done."
+  "model": "Model",
+  "controller": "Controller",
+  "dialogDescription": "Enter the name for your new module. Click save when you're done.",
+  "newObject": "New {{name}}",
+  "deletedSuccess" : "{{name}} deleted successfully!",
+  "createdSuccess": "{{name}} {values} have been successfully added."
 }

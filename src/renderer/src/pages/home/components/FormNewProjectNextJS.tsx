@@ -1,7 +1,6 @@
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { useEffect, useState } from 'react';
-import { ApiConfig } from '@igrp/spring-engine/dist/interfaces/types';
 import { AppConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import { setConfig, setBasePath, navigateToNextPage } from "@renderer/redux/thunks";
 import { useDispatch } from 'react-redux';
@@ -16,11 +15,12 @@ import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import Illustration from '@renderer/components/ilustration';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
+import { BaseApiConfig } from '@igrp/spring-engine/dist/interfaces/types';
 
 interface FormProps {
 	type: String,
 	onBackButtonClick?: () => void;
-	onSaveButtonClick?: (apiConfig: ApiConfig, filePath: string) => void;
+	onSaveButtonClick?: (apiConfig: BaseApiConfig, filePath: string) => void;
 }
 
 const initialValues: AppConfig = {

@@ -1,12 +1,12 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { IProjectRepository } from '@renderer/interfaces/types'
-import { AppConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
+import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
 
 interface CustomAPI {
 
-    createApi: (apiConfig: ApiConfig, basePath: string) => Promise<HandlerResponse>;
+    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
     createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
     createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
@@ -27,7 +27,7 @@ interface CustomAPI {
     fetchFiles: (basePath: string) => Promise<FolderFiles>;
     getJsonContent: (filePath: string) => Promise<any>;
 
-    createAppNext: (apiConfig: AppConfig, basePath: string) => Promise<HandlerResponse>;
+    createAppNext: (appConfig: AppConfig, basePath: string) => Promise<HandlerResponse>;
 
     openVSCode: (basePath: string | undefined) => Promise<void>;
 

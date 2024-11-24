@@ -10,7 +10,7 @@ import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-en
 import { fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './helpers/repo/projects'
 import {
-  ApiConfig,
+  BaseApiConfig,
   ControllerConfig,
   DTOBaseConfig,
   DTOConfig,
@@ -137,7 +137,7 @@ const repo = new ProjectRepository()
 
 handleWithCustomErrors(
   'spring-engine:create-api',
-  async (_event, apiConfig: ApiConfig, basePath: string) => {
+  async (_event, apiConfig: BaseApiConfig, basePath: string) => {
     await newApi(apiConfig, basePath)
 
     await repo.save({

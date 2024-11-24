@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
-  ApiConfig,
+  BaseApiConfig,
   ControllerConfig,
   DTOBaseConfig,
   DTOConfig,
@@ -17,7 +17,7 @@ const handleError = (error: unknown): HandlerResponse => ({
 
 // Custom APIs for renderer
 const api = {
-  createApi: async (apiConfig: ApiConfig, basePath: string): Promise<HandlerResponse> => {
+  createApi: async (apiConfig: BaseApiConfig, basePath: string): Promise<HandlerResponse> => {
     try {
       return await ipcRenderer.invoke('spring-engine:create-api', apiConfig, basePath)
     } catch (error) {
