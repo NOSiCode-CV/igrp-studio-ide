@@ -3,7 +3,12 @@ import Header from './components/header'
 import { ToastContainer } from 'react-toastify'
 import withRouter from '@renderer/common/withRouter'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { IGRPSidebar, IGRPSidebarContent, SidebarData, SidebarProvider } from '@igrp/igrp-design-system'
+import {
+  IGRPSidebar,
+  IGRPSidebarContent,
+  SidebarData,
+  SidebarProvider
+} from '@igrp/igrp-design-system'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
 import { Home, Settings } from 'lucide-react'
 
@@ -33,10 +38,12 @@ const MainLayout = (props: LayoutProps): JSX.Element => {
       <div className="flex flex-1 overflow-hidden">
         <SidebarProvider>
           <IGRPSidebar className="mt-10">
-            <IGRPSidebarContent items={navData}/>
+            <IGRPSidebarContent items={navData} />
           </IGRPSidebar>
           <SidebarInset>
-            <ScrollArea className="mb-20">{props.children}</ScrollArea>
+            <ScrollArea className="mb-20">
+              {props.children}
+            </ScrollArea>
           </SidebarInset>
         </SidebarProvider>
       </div>

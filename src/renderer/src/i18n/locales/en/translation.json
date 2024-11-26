@@ -3,7 +3,7 @@
   "start": "Start",
   "newProject": "New Project",
   "openProject": "Open Project",
-  "recent": "Recent",
+  "recent": "Recent Projects",
   "loadMore": "••• Load More •••",
   "frontGeneratorUI": "Front-end Generator UI",
   "nextjsEnv": "Next.js Environment",
@@ -54,5 +54,5 @@
   "dialogDescription": "Enter the name for your new module. Click save when you're done.",
   "newObject": "New {{name}}",
   "deletedSuccess" : "{{name}} deleted successfully!",
-  "createdSuccess": "{{name}} {value} have been successfully added."
+  "createdSuccess": "{{name}} {{value}} have been successfully added."
 }

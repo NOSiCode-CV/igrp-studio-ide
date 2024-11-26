@@ -45,7 +45,7 @@ function IGRP(): JSX.Element {
   return (
     <div className="container mx-auto px-4">
       {showSelectProject && (
-        <WelcomePage onHandleNewProjectClick={handleNewProjectClick} />
+        <WelcomePage onHandleNewProjectClick={handleNewProjectClick}/>
       )}
       {showSelectEnv && (
         <SelectEnvironment

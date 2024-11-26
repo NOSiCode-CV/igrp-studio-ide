@@ -1,126 +1,271 @@
-import { setConfig, setBasePath, navigateToNextPage } from "@renderer/redux/thunks";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { PageableProjects, Project } from "src/main/types";
-import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { setConfig, setBasePath, navigateToNextPage } from '@renderer/redux/thunks'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { PageableProjects, Project } from 'src/main/types'
+import { ENV_TYPES } from '@renderer/constants/appConstants'
 import NextIcon from '@renderer/assets/images/Next30x30.svg'
 import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
+import { Calendar, ChevronRight, Clock, FolderOpen, GitFork } from 'lucide-react'
+import { LoadingSpinner } from '@renderer/components/loading-spinner'
+import { EmptyState } from '@renderer/components/empty-state'
+import { Image } from '@radix-ui/react-avatar'
+import { Button } from '@renderer/components/ui/button'
+import { formatDate } from 'date-fns'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { Input } from '@renderer/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select'
 
-const IconMap = {
-    [ENV_TYPES.NEXTJS]: NextIcon,
-    [ENV_TYPES.SPRING]: SpringIcon,
-};
+const projectIcons = {
+  [ENV_TYPES.NEXTJS]: NextIcon,
+  [ENV_TYPES.SPRING]: SpringIcon
+}
 
 const RecentsProjects = (): JSX.Element => {
-    const [pagination] = useState({ page: 1, size: 5 });
-    const [projects, setProjects] = useState<PageableProjects>({ data: [], total: 0 });
-    const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true)
 
-    const navigate = useNavigate();
-    const dispatch: any = useDispatch();
-    const { t } = useTranslation();
+  const [pagination] = useState({ page: 1, size: 5 })
+  const [projects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
+  const [error, setError] = useState<string | null>(null)
 
-    const fetchProjects = async () => {
-        setError(null);
-        try {
-            const res = await window.repo.project.findAllRecent(pagination);
-            setProjects(res);
-        } catch (err) {
-            setError("Failed to fetch projects");
-        } finally {
-        }
-    };
+  const navigate = useNavigate()
+  const dispatch: any = useDispatch()
+  const { t } = useTranslation()
 
-    useEffect(() => {
-        fetchProjects();
-    }, [pagination.page, pagination.size]);
+  const fetchProjects = async () => {
+    setError(null)
+    try {
+      const res = await window.repo.project.findAllRecent(pagination)
+      setProjects(res)
+    } catch (err) {
+      setError('Failed to fetch projects')
+    } finally {
+    }
+  }
 
-    /*   const handleLoadMore = () => {
+  useEffect(() => {
+    fetchProjects()
+  }, [pagination.page, pagination.size])
+
+  /*   const handleLoadMore = () => {
           setPagination((prev) => ({ ...prev, size: prev.size + 5 }));
       }; */
 
-    const handleClick = async (p: Project): Promise<void> => {
+  const handleOpenProject = async (p: Project): Promise<void> => {
+    try {
+      await window.repo.project.save(p)
+    } catch (err) {}
 
-        try {
-            await window.repo.project.save(p);
-        } catch (err) {
-        }
+    dispatch(setBasePath(p.path))
 
-        dispatch(setBasePath(p.path));
+    dispatch(setConfig(p.config))
 
-        dispatch(setConfig(p.config));
+    navigateToNextPage(navigate, p.config)
+  }
 
-        navigateToNextPage(navigate, p.config)
-    }
-
-    /* const totalProjects = projects.total ?? 0;
+  /* const totalProjects = projects.total ?? 0;
     const requestedTotal = pagination.page * pagination.size; */
 
-    const handleClear = async (projectRecent: Project, index: number): Promise<void> => {
-        try {
-            await window.repo.project.delete(projectRecent, index);
-            fetchProjects();
-        } catch (err) {
-            setError("Failed to fetch projects");
-        } finally {
-        }
+  const handleClear = async (projectRecent: Project, index: number): Promise<void> => {
+    try {
+      await window.repo.project.delete(projectRecent, index)
+      fetchProjects()
+    } catch (err) {
+      setError('Failed to fetch projects')
+    } finally {
     }
+  }
 
-    return (
-        <>
-            {projects.data.length > 0 && (
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => setIsLoading(false), 1500)
+  }, [])
 
-                <div className="space-y-4">
-                    <div className="mt-4 mb-3 pb-2">
-                        <h3 className="text-lg font-semibold">{t('recent')}</h3>
-                    </div>
+  const handleCloneProject = ({ projectRecent: Project }) => {}
 
-                    {error && <p>{error}</p>}
-                    {projects.data.map((p, index) => (
-                        p?.config?.name && (
-                            <div
-                                key={p.path}
-                                className="relative flex items-center mb-3 group"
-                            >
-                                {/* Button with Icon */}
-                                <button
-                                    className="relative flex-shrink-0 w-12 h-12 rounded-md bg-gray-500 bg-opacity-10 text-primary flex items-center justify-center cursor-pointer hover:bg-opacity-20 transition-colors duration-200"
-                                    onClick={() => handleClick(p)}
-                                >
-                                    <img src={IconMap[p?.config.type]} alt="Project Icon" />
+  const renderProjectCard = (project: Project, isCompact: boolean = false) => (
+    <Card key={project.name} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
+      <CardHeader className={isCompact ? 'p-2' : ''}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            {/*  <Image
+              src={projectIcons[project.type as keyof typeof projectIcons]}
+              alt={`${project.type} logo`}
+              width={isCompact ? 16 : 20}
+              height={isCompact ? 16 : 20}
+              className="mr-2"
+            /> */}
+            <CardTitle className={`${isCompact ? 'text-sm' : 'text-lg'}`}>
+              {project.config.name}
+            </CardTitle>
+          </div>
+          <Button variant="ghost" size="sm">
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className={`flex-grow ${isCompact ? 'p-2' : ''}`}>
+        {!isCompact && <p className="text-sm text-muted-foreground mb-2">{project.description}</p>}
+        <div className="flex items-center text-xs text-muted-foreground">
+          <Calendar className="w-3 h-3 mr-1" />
+          <span>Last modified: {project.updated_at}</span>
+        </div>
+      </CardContent>
+      <CardContent className={`pt-0 ${isCompact ? 'p-2' : ''}`}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={() => handleOpenProject(project)}
+        >
+          <FolderOpen className="w-3 h-3 mr-1" />
+          <span className="text-xs">Open</span>
+        </Button>
+      </CardContent>
+    </Card>
+  )
 
-                                    {/* "X" Icon (Shown on Hover) */}
-                                    <span
-                                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Prevent triggering the button click handler
-                                            handleClear(p, index); // Your clear handler function
-                                        }}
-                                    >
-                                        X
-                                    </span>
-                                </button>
+  return (
+    <>
+      <Card className="mb-6 bg-card text-card-foreground">
+        <CardHeader>
+          <CardTitle className="flex items-center text-foreground">
+            <Clock className="w-5 h-5 mr-2" />
+            {t('recent')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : projects.data.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {projects.data.map((project) => renderProjectCard(project, true))}
+            </div>
+          ) : (
+            <EmptyState
+              message="No recent projects found. Start by creating a new project!"
+              className="text-muted-foreground"
+            />
+          )}
+        </CardContent>
+      </Card>
 
-                                {/* Project Name */}
-                                <div className="flex-grow-1 ms-3 cursor-pointer" onClick={() => handleClick(p)}>
-                                    <h5 className="text-base font-medium" style={{ maxWidth: '150px' }}>
-                                        {p.config.name}
-                                    </h5>
-                                </div>
-                            </div>
-                        )
-                    ))}
-                    {/*  {totalProjects > 0 && requestedTotal < totalProjects && (
-                        <button type="button" className="btn btn-link visually-hidden" onClick={handleLoadMore}>
-                            {t('loadMore')}
-                        </button>
-                    )} */}
+      {/* All Projects Section */}
+      <Card className="bg-card text-card-foreground">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-foreground">All Projects</CardTitle>
+            <Tabs defaultValue="local">
+              <TabsList>
+                <TabsTrigger
+                  value="local"
+                  className="data-[state=active]:bg-background data-[state=active]:text-foreground"
+                >
+                  Local Projects
+                </TabsTrigger>
+                <TabsTrigger
+                  value="remote"
+                  className="data-[state=active]:bg-background data-[state=active]:text-foreground"
+                >
+                  GitHub/GitLab Projects
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="local">
+            <TabsContent value="local">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="flex-1 relative">
+                 {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
+                  <Input
+                    type="text"
+                    placeholder="Search local projects..."
+                    //value={localSearchQuery}
+                    //onChange={(e) => setLocalSearchQuery(e.target.value)}
+                    className="pl-8 placeholder-muted-foreground"
+                  />
                 </div>
-            )}
-        </>
-    );
-};
+                <Select //value={localProjectOrder} onValueChange={setLocalProjectOrder}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Order by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lastModified">Last Modified</SelectItem>
+                    <SelectItem value="name">Name</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : /* localProjects.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                 {sortProjects(
+                    localProjects.filter(
+                      (project) =>
+                        project.name.toLowerCase().includes(localSearchQuery.toLowerCase()) ||
+                        project.description.toLowerCase().includes(localSearchQuery.toLowerCase())
+                    )
+                  ).map(renderProjectCard)} 
+                </div>
+              ) :  */(
+                <EmptyState
+                  message="No local projects found. Start by creating a new project!"
+                  className="text-muted-foreground"
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="remote">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="flex-1 relative">
+                 {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
+                  <Input
+                    type="text"
+                    placeholder="Search remote projects..."
+                   // value={remoteSearchQuery}
+                   // onChange={(e) => setRemoteSearchQuery(e.target.value)}
+                    className="pl-8 placeholder-muted-foreground"
+                  />
+                </div>
+                <Select //value={remoteProjectOrder} onValueChange={setRemoteProjectOrder}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Order by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lastModified">Last Modified</SelectItem>
+                    <SelectItem value="name">Name</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : /* remoteProjects.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {sortProjects(
+                    remoteProjects.filter(
+                      (project) =>
+                        project.name.toLowerCase().includes(remoteSearchQuery.toLowerCase()) ||
+                        project.description.toLowerCase().includes(remoteSearchQuery.toLowerCase())
+                    )
+                  ).map(renderProjectCard)}
+                </div>
+              ) :  */(
+                <EmptyState
+                  message="No remote projects found. Start by cloning a project from GitHub or GitLab!"
+                  className="text-muted-foreground"
+                />
+              )}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </>
+  )
+}
 
-export default RecentsProjects;
+export default RecentsProjects
