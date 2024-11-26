@@ -51,7 +51,7 @@ export function Combobox({ options, value, onChange, placeholder = "Select items
 					aria-expanded={open}
 					className={cn("w-[200px] justify-between text-gray-500", className)}
 				>
-					{value
+					{value && options !== undefined
 						? options.find((opt) => opt.value === value)?.label
 						: placeholder}
 					<ChevronsUpDown className="opacity-50" />
@@ -63,7 +63,7 @@ export function Combobox({ options, value, onChange, placeholder = "Select items
 					<CommandList>
 						<CommandEmpty>No Item found.</CommandEmpty>
 						<CommandGroup>
-							{options.map((opt, idx) => (
+							{options !== undefined && options.map((opt, idx) => (
 								<CommandItem
 									key={`${opt.value}-${idx}`}
 									value={opt.value}

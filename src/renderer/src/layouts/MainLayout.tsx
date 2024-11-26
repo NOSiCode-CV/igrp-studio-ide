@@ -3,25 +3,23 @@ import Header from './components/header'
 import { ToastContainer } from 'react-toastify'
 import withRouter from '@renderer/common/withRouter'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { Sidebar, SidebarData, SidebarProvider } from '@igrp/igrp-design-system'
+import { IGRPSidebar, IGRPSidebarContent, SidebarData, SidebarProvider } from '@igrp/igrp-design-system'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
 
 interface LayoutProps {
   children: React.ReactNode
 }
 
-const navData: SidebarData = {
-  navMain: [
-    {
-      title: 'Home',
-      url: '#'
-    },
-    {
-      title: 'Settings',
-      url: '#'
-    }
-  ]
-}
+const navData: SidebarData[] = [
+  {
+    title: 'Home',
+    url: '#'
+  },
+  {
+    title: 'Settings',
+    url: '#'
+  }
+]
 
 const MainLayout = (props: LayoutProps): JSX.Element => {
   return (
@@ -31,8 +29,9 @@ const MainLayout = (props: LayoutProps): JSX.Element => {
 
       <div className="flex flex-1 overflow-hidden">
         <SidebarProvider>
-          <Sidebar data={navData} className="mt-10">
-          </Sidebar>
+          {/* <IGRPSidebar className="mt-10">
+            <IGRPSidebarContent items={navData}/>
+          </IGRPSidebar> */}
           <SidebarInset>
             <ScrollArea className="mb-20">{props.children}</ScrollArea>
           </SidebarInset>

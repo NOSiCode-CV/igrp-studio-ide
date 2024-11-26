@@ -780,10 +780,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@igrp/igrp-design-system@^1.0.0-alpha.5":
-  version "1.0.0-alpha.5"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.5.tgz#85217f99317d0f2f08bd1f97d9ec78b876990bdd"
-  integrity sha512-KvUe7fHl93JdYKdUURgMQR2/D+g4r2Wepu/7IjpOt5Jg7fEKmD47qRojZzqYQ2Hqa5qyv7GBr36wh3J8SOuY+A==
+"@igrp/igrp-design-system@^1.0.0-alpha.7":
+  version "1.0.0-alpha.7"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.7.tgz#78019569bacec4db21e9a92c0cf64d4065a5953e"
+  integrity sha512-InE3VX7r6X0mWJG3i9KQ9THqCAb3koHy+7p9M+2LnLRFBPcQssNpQH81XXrRTCwpNWzzVsgVhe+66Uh5a1U/OQ==
   dependencies:
     "@radix-ui/react-collapsible" "^1.1.1"
     "@radix-ui/react-dialog" "^1.1.2"
