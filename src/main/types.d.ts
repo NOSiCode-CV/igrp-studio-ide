@@ -62,7 +62,9 @@ export interface MenuItem {
     type?: string;
     component?: React.ReactNode,
     path?: string,
-    module?: string
+    module?: string,
+    dropdownMenus?:[][{ label: string; type: string; }]
+    dropdownclick?: (e: any) => void;
 }
 
 type FolderFiles = { [folderName: string]: FolderFileStructure };

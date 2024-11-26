@@ -5,7 +5,6 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -22,75 +21,59 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@renderer/components/ui/collapsible";
 import { ConfigOptions, MenuItem } from "src/main/types";
-import FormSearch from "../components/app-search";
-import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
-import { useDispatch } from "react-redux";
-import { setCurrentItem as onSetCurrentItem } from "@renderer/redux/thunks";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
-import { CreateModuleDialog } from "@renderer/generators/api/components/create-module-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@renderer/components/ui/dropdown-menu";
+import { AppSidebarHeader } from "./app-sidebar-header";
 
 interface AppSidebarProps {
     className?: string
     menuItems: MenuItem[]
     config?: ConfigOptions,
-    basePath: string
+    basePath?: string
+    header?: boolean
 }
 
-export function AppSidebar({ className, menuItems, config, basePath }: AppSidebarProps) {
-    const dispatch: any = useDispatch()
+export function AppSidebar({ className, menuItems, config, basePath , header}: AppSidebarProps) {
+   
     const { t } = useTranslation()
+    const { state: sidebarState } = useSidebar()
     const [searchQuery, setSearchQuery] = useState("")
     const [activeItem, setActiveItem] = useState("")
     const filteredNavData = filterSubItems(menuItems, searchQuery)
-    const { state: sidebarState } = useSidebar()
+   
 
     const setCurrentItem = (item) => {
         setActiveItem(item.id)
-        dispatch(onSetCurrentItem(item))
-    }
-
-    const openNewProject = (item) => {
-        dispatch(onSetCurrentItem(item))
     }
 
     const handleSearch = (value: string) => {
         setSearchQuery(value)
     }
 
-    const dropdownMenus = [
-        {
-            label: 'dto',
-            type: "dto"
-        },
-        {
-            label: 'models',
-            type: "models"
-        },
-        {
-            label: 'controllers',
-            type: "controllers"
+    const handleSubItemClick = (e: React.MouseEvent, subItem: MenuItem) => {
+        e.preventDefault
+        if (subItem.click) {
+            subItem.click(subItem);
         }
-    ]
+        setCurrentItem(subItem);
+    };
+
+    const handleDropdownClick = (item: MenuItem) => {
+        if (item.dropdownclick) {
+            item.dropdownclick(item);
+        }
+    };
 
     return (
         <Sidebar className={cn('flex flex-col', className)} collapsible="icon">
-            <SidebarHeader>
-                <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1"
-                >
-                    <div className="flex aspect-square items-center justify-center">
-                        <img src={SpringIcon} className="" />
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold"> {config?.name}</span>
-                        <span className="truncate text-xs">{config?.projectStructureStyle}</span>
-                    </div>
-                    <CreateModuleDialog basePath={basePath} />
-                </SidebarMenuButton>
-                <FormSearch onSearch={handleSearch} className="truncate text-xs" placeholder="Search models, data objects..." sidebarState={sidebarState} />
-            </SidebarHeader>
+           {header && 
+                <AppSidebarHeader
+                    config={config}
+                    basePath={basePath}
+                    sidebarState={sidebarState}
+                    handleSearch={handleSearch}
+                />
+            }
             <SidebarContent>
                 <ScrollArea>
                     {filteredNavData.map((item, index) => (
@@ -112,9 +95,10 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                                             align={"start"}
                                             className="min-w-56 rounded-lg"
                                         >
-                                            {dropdownMenus.map((opt, key) => (
+                                            {item.dropdownMenus && 
+                                            item.dropdownMenus.map((opt, key) => (
                                                 <DropdownMenuItem key={key}
-                                                    onClick={() => openNewProject({ ...opt, module: item.label })}>{t(opt.label)}</DropdownMenuItem>
+                                                    onClick={() => handleDropdownClick({...opt, ...item} )}>{t(opt.label)}</DropdownMenuItem>
                                             ))}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -143,7 +127,7 @@ export function AppSidebar({ className, menuItems, config, basePath }: AppSideba
                                                                 {menu.subItems?.map((subItem, subIndex) => (
                                                                     <SidebarMenuSubItem key={subIndex}>
                                                                         <SidebarMenuSubButton
-                                                                            onClick={() => setCurrentItem(subItem)}
+                                                                            onClick={(e) => handleSubItemClick(e, subItem)}
                                                                             className="cursor-pointer"
                                                                             isActive={activeItem === subItem.id}>
                                                                             {subItem.label}

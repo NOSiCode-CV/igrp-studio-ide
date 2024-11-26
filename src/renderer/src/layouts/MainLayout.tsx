@@ -1,25 +1,45 @@
-import React, { } from 'react';
-import Header from './components/header';
-import { ToastContainer } from 'react-toastify';
-import withRouter from '@renderer/common/withRouter';
+import React from 'react'
+import Header from './components/header'
+import { ToastContainer } from 'react-toastify'
+import withRouter from '@renderer/common/withRouter'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Sidebar, SidebarData, SidebarProvider } from '@igrp/igrp-design-system'
+import { SidebarInset } from '@renderer/components/ui/sidebar'
 
 interface LayoutProps {
-    children: React.ReactNode;
+  children: React.ReactNode
+}
+
+const navData: SidebarData = {
+  navMain: [
+    {
+      title: 'Home',
+      url: '#'
+    },
+    {
+      title: 'Settings',
+      url: '#'
+    }
+  ]
 }
 
 const MainLayout = (props: LayoutProps): JSX.Element => {
+  return (
+    <div className="h-screen flex flex-col">
+      <ToastContainer />
+      <Header />
 
-    return (
-        <div className="flex flex-col h-screen">
-            <ToastContainer />
-            <Header />
-            <main className="flex-1 overflow-auto p-6 pt-12">
-                <div className="max-w-7xl mx-auto">
-                    {props.children}
-                </div>
-            </main>
-        </div>        
-    )
+      <div className="flex flex-1 overflow-hidden">
+        <SidebarProvider>
+          <Sidebar data={navData} className="mt-10">
+          </Sidebar>
+          <SidebarInset>
+            <ScrollArea className="mb-20">{props.children}</ScrollArea>
+          </SidebarInset>
+        </SidebarProvider>
+      </div>
+    </div>
+  )
 }
 
 export default withRouter(MainLayout)

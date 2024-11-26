@@ -18,12 +18,14 @@
 		"build:unpack": "npm run build && electron-builder --dir",
 		"build:win": "npm run build && electron-builder --win",
 		"build:mac": "electron-vite build && electron-builder --mac",
-		"build:linux": "electron-vite build && electron-builder --linux"
+		"build:linux": "electron-vite build && electron-builder --linux",
+		"prebuild": "cp -R src/renderer/src/i18n/locales build/locales"
 	},
 	"dependencies": {
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/utils": "^3.0.0",
 		"@faker-js/faker": "^9.2.0",
+		"@igrp/igrp-design-system": "^1.0.0-alpha.5",
 		"@igrp/nextjs-engine": "^0.0.5",
 		"@igrp/spring-engine": "^0.3.0-alpha-4.1.12",
 		"@radix-ui/react-accordion": "^1.2.1",
@@ -107,11 +109,8 @@
 		},
 		"extraResources": [
 			{
-				"from": "src/renderer/src/i18n/locales",
-				"to": "locales",
-				"filter": [
-					"**/*"
-				]
+				"from": "./src/renderer/src/i18n/locales",
+				"to": "renderer/locales"
 			}
 		]
 	}

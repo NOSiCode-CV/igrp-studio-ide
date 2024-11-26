@@ -3,8 +3,9 @@ import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { Command, Database, Folder, Puzzle } from 'lucide-react'
 
+
 // Function to convert folders into menuItems
-export function generateMenuItems(folders: FolderFiles): MenuItem[] {
+export function generateMenuItems(folders: FolderFiles, dispatch): MenuItem[] {
 	const menuItems: MenuItem[] = [];
 
 	// Iterate through each folder in the folders object
@@ -14,6 +15,21 @@ export function generateMenuItems(folders: FolderFiles): MenuItem[] {
 			label: folderName,
 			subItems: [],
 			isHeader: true,
+			
+			dropdownMenus: [
+				{
+					label: 'dto',
+					type: "dto"
+				},
+				{
+					label: 'models',
+					type: "models"
+				},
+				{
+					label: 'controllers',
+					type: "controllers"
+				}
+			]
 		};
 
 		// Process each folder's content
@@ -43,11 +59,11 @@ export function generateMenuItems(folders: FolderFiles): MenuItem[] {
 	return menuItems;
 }
 
-function capitalize(str: string): string {
+export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-function createMenuHeader(label: string, folderName?: string): MenuItem {
+export function createMenuHeader(label: string, folderName?: string): MenuItem {
 	const icon = folderName
 		? (() => {
 			switch (folderName.toLowerCase()) {
@@ -81,7 +97,7 @@ export function createSubMenuItems(files: any, folderName: string): MenuItem[] {
 		link: ROUTES.PATH_PAGE_BUILDER_API,
 		path: file.path,
 		type: folderName,
-		icon: 'ri-subtract-line'
+		icon: ''
 	}))
 }
 

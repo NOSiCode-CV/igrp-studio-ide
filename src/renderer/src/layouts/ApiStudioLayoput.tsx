@@ -14,6 +14,7 @@ import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import Header from './components/header';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import Navdata from './components/nav-data';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -46,7 +47,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         }
     }, [changeStatus, basePath, dispatch]);
 
-    const menuItems = useMemo(() => generateMenuItems(folders), [folders]);
+    const menuItems = Navdata(folders).menuItems
 
     return (
         <div className="h-screen flex flex-col">
@@ -55,7 +56,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
 
             <div className="flex flex-1 overflow-hidden">
                 <SidebarProvider>
-                    <AppSidebar menuItems={menuItems} className='mt-10' config={config} basePath={basePath}/>
+                    <AppSidebar menuItems={menuItems} className='mt-10' config={config} basePath={basePath} header/>
                     <SidebarInset >
                         <ScrollArea className='mb-20'>
                             {props.children}

@@ -57,11 +57,16 @@ const AttributesCard = ({ selectors, data, errors, currentDto, dto, models, addR
     const handleDependentChange = (key, index, selectedValue) => {
         changeValue(key, index, selectedValue)
 
-        setObjectTypes(getUpdatedTypesForNamespace(selectedValue))
-
+        const updatedOptions = getUpdatedTypesForNamespace(selectedValue);
+        setDynamicOptions((prev) => ({
+            ...prev,
+            [selectedValue]: updatedOptions,
+        }));
     };
 
-    const [objectTypes, setObjectTypes] = useState(getUpdatedTypesForNamespace(""));
+    const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>({
+        java: getUpdatedTypesForNamespace(""),
+    });
 
     const toInitCap = (text) => 
         text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase());
@@ -105,7 +110,7 @@ const AttributesCard = ({ selectors, data, errors, currentDto, dto, models, addR
                                 key={`${index}`}
                                 name={'type'}
                                 placeholder={`Select Type`}
-                                options={objectTypes}
+                                options={dynamicOptions[row?.['ns']]}
                                 value={row?.['type'] || ''}
                                 onChange={(selectedOption) => {
                                     handleDependentChange('type', index, selectedOption);
