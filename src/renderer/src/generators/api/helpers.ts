@@ -49,3 +49,48 @@ export const extractByType = (moduleData: any, type: OptionType) => {
 
   return files.find((item: any) => item[type])?.[type] ?? [];
 };
+
+// Helper function to merge files by their type (dto, controllers, models)
+export const mergeFilesByType = (files: any[]) => {
+  const mergedFiles: any[] = [];
+
+  files.forEach((item: any) => {
+    Object.keys(item).forEach((key) => {
+      // Check if the type already exists in mergedFiles
+      const existingItem = mergedFiles.find((mergedItem) => mergedItem[key]);
+
+      if (existingItem) {
+        // If the type exists, add the new files to it
+        existingItem[key] = [...existingItem[key], ...item[key]];
+      } else {
+        // If the type doesn't exist, create a new entry
+        mergedFiles.push({ [key]: item[key] });
+      }
+    });
+  });
+
+  return mergedFiles;
+};
+
+export const getMergedFiles = (studio: any, module: string) => {
+
+  const currentModuleData = studio.folderFiles[module] || {};
+  const sharedModuleData = studio.folderFiles["shared"] || {};
+
+  // If the module is not "shared", merge its files with "shared" files
+  let mergedFiles = [];
+
+  if (module !== "shared") {
+    // Merge files of the current module and the shared module, preserving the type of files
+    const currentFiles = currentModuleData.files || [];
+    const sharedFiles = sharedModuleData.files || [];
+
+    // Use a helper function to merge the files by their type (dto, controllers, models)
+    mergedFiles = mergeFilesByType([...currentFiles, ...sharedFiles]);
+  } else {
+    // If the module is "shared", just use its own files
+    mergedFiles = sharedModuleData.files || [];
+  }
+
+  return { ...currentModuleData, files: mergedFiles };
+};
