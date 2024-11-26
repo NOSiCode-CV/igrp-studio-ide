@@ -5,6 +5,7 @@ import withRouter from '@renderer/common/withRouter'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { IGRPSidebar, IGRPSidebarContent, SidebarData, SidebarProvider } from '@igrp/igrp-design-system'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
+import { Home, Settings } from 'lucide-react'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -13,11 +14,13 @@ interface LayoutProps {
 const navData: SidebarData[] = [
   {
     title: 'Home',
-    url: '#'
+    url: '#',
+    icon: Home
   },
   {
     title: 'Settings',
-    url: '#'
+    url: '#',
+    icon: Settings
   }
 ]
 
@@ -29,9 +32,9 @@ const MainLayout = (props: LayoutProps): JSX.Element => {
 
       <div className="flex flex-1 overflow-hidden">
         <SidebarProvider>
-          {/* <IGRPSidebar className="mt-10">
+          <IGRPSidebar className="mt-10">
             <IGRPSidebarContent items={navData}/>
-          </IGRPSidebar> */}
+          </IGRPSidebar>
           <SidebarInset>
             <ScrollArea className="mb-20">{props.children}</ScrollArea>
           </SidebarInset>
