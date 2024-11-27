@@ -18,7 +18,7 @@ import { NamespacesOptions } from './config'
 import { useEffect, useState } from 'react'
 import { PopoverDto } from './popover-dto'
 import { Checkbox } from '@renderer/components/ui/checkbox'
-import { Label } from '@renderer/components/ui/label'
+import { useTranslation } from 'react-i18next'
 
 interface AttributesCardProps {
   currentDto: string
@@ -43,6 +43,7 @@ const AttributesCard = ({
   removeRow,
   changeValue
 }: AttributesCardProps) => {
+
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>({})
 
   const paramsTypesData = formatMethods(
@@ -51,6 +52,14 @@ const AttributesCard = ({
         | { ATTRIBUTE_TYPES: string[] }
         | undefined
     )?.ATTRIBUTE_TYPES || []
+  )
+
+  const collectionTypes = formatMethods(
+    (
+      selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
+        | { COLLECTION_TYPES: string[] }
+        | undefined
+    )?.COLLECTION_TYPES || []
   )
 
   const getOptions = (objects) => {
@@ -93,8 +102,6 @@ const AttributesCard = ({
     })
   }, [data])
 
-  const toInitCap = (text) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
-
   return (
     <Table>
       <TableHeader className="ps-4">
@@ -102,7 +109,6 @@ const AttributesCard = ({
           <TableHead>Name</TableHead>
           <TableHead>Namespace</TableHead>
           <TableHead>Type</TableHead>
-          <TableHead>IsList?</TableHead>
           <TableHead> </TableHead>
           <TableHead style={{ width: '15px' }}></TableHead>
         </TableRow>
@@ -144,54 +150,15 @@ const AttributesCard = ({
                 />
               </TableCell>
               <TableCell>
-                <Checkbox
-                  id={`${index}`}
-                  onCheckedChange={(checked) => changeValue('isList', index, checked)}
-                  checked={row?.['isList'] || false}
+                <PopoverDto
+                  key={index}
+                  index={index}
+                  row={row}
+                  changeValue={(element, position, value) =>
+                    changeValue(element, position, value)
+                  }
+                  collectionTypes={collectionTypes}
                 />
-              </TableCell>
-              <TableCell>
-                <PopoverDto key={index}>
-                  {[
-                    'required',
-                    'isEmail',
-                    'before',
-                    'after',
-                    'positive',
-                    'isEmail',
-                    'isUrl',
-                    'primaryKey'
-                  ].map((field) => (
-                    <div key={`${field}-${index}`} className="grid grid-cols-3 items-center gap-4">
-                      <Label htmlFor={`${field}-${index}`}>{toInitCap(field)}</Label>
-                      <Checkbox
-                        id={`${field}-${index}`}
-                        onCheckedChange={(checked) => changeValue(field, index, checked)}
-                        checked={row?.[field] || false}
-                      />
-                    </div>
-                  ))}
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="minLength">Min Length</Label>
-                    <Input
-                      id="minLength"
-                      defaultValue="0"
-                      className="col-span-2 h-8"
-                      value={row?.['minLength'] || ''}
-                      onChange={(ev) => changeValue('minLength', index, ev.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="maxLength">Max Length</Label>
-                    <Input
-                      id="maxLength"
-                      defaultValue="10"
-                      className="col-span-2 h-8"
-                      value={row?.['maxLength'] || ''}
-                      onChange={(ev) => changeValue('maxLength', index, ev.target.value)}
-                    />
-                  </div>
-                </PopoverDto>
               </TableCell>
 
               <TableCell>

@@ -20,10 +20,10 @@ export const initialValues: DTOConfig = {
             minLength: undefined,
             maxLength: undefined,
             regex: '',
-            isList: false,
             isEmail: false,
             isUrl: false,
             primaryKey: false,
+            collectionType: ''
         }
     ]
 }
