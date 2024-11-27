@@ -236,7 +236,6 @@ ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: Projec
 handleWithCustomErrors(
   'next-engine:create-app',
   async (_event, appConfig: AppConfig, basePath: string) => {
-    console.log(appConfig)
     await newApp(appConfig, basePath)
     await repo.save({
       path: basePath,

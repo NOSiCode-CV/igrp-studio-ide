@@ -1,5 +1,5 @@
 import { setConfig, setBasePath, navigateToNextPage } from '@renderer/redux/thunks'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -8,7 +8,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants'
 import NextIcon from '@renderer/assets/images/Next30x30.svg'
 import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
-import { Calendar, ChevronRight, Clock, FolderOpen, GitFork } from 'lucide-react'
+import { Calendar, ChevronRight, Clock, FolderOpen, GitFork, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
 import { EmptyState } from '@renderer/components/empty-state'
 import { Image } from '@radix-ui/react-avatar'
@@ -16,7 +16,13 @@ import { Button } from '@renderer/components/ui/button'
 import { formatDate } from 'date-fns'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Input } from '@renderer/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@renderer/components/ui/select'
 
 const projectIcons = {
   [ENV_TYPES.NEXTJS]: NextIcon,
@@ -24,20 +30,36 @@ const projectIcons = {
 }
 
 const RecentsProjects = (): JSX.Element => {
-  const [isLoading, setIsLoading] = useState(true)
-
-  const [pagination] = useState({ page: 1, size: 5 })
-  const [projects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
-  const [error, setError] = useState<string | null>(null)
-
   const navigate = useNavigate()
   const dispatch: any = useDispatch()
   const { t } = useTranslation()
 
+  const [localSearchQuery, setLocalSearchQuery] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+
+  const [allProjects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
+  const [localProjects, setLocalProjects] = useState<Project[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  const [projectOrder, setProjectOrder] = useState<string>('lastModified')
+  const [localProjectOrder, setLocalProjectOrder] = useState<string>('lastModified')
+  const [remoteProjectOrder, setRemoteProjectOrder] = useState<string>('lastModified')
+
+  const sortProjects = (projects) => {
+    return [...projects].sort((a, b) => {
+      if (projectOrder === 'name') {
+        return a.name.localeCompare(b.name)
+      } else if (projectOrder === 'lastModified') {
+        return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+      }
+      return 0
+    })
+  }
+
   const fetchProjects = async () => {
     setError(null)
     try {
-      const res = await window.repo.project.findAllRecent(pagination)
+      const res = await window.repo.project.findAllRecent()
       setProjects(res)
     } catch (err) {
       setError('Failed to fetch projects')
@@ -47,11 +69,16 @@ const RecentsProjects = (): JSX.Element => {
 
   useEffect(() => {
     fetchProjects()
-  }, [pagination.page, pagination.size])
+  }, [])
 
-  /*   const handleLoadMore = () => {
-          setPagination((prev) => ({ ...prev, size: prev.size + 5 }));
-      }; */
+  useEffect(() => {
+    console.log(allProjects.data)
+    const localProjects = allProjects.data.filter(
+      (project) => project?.location === undefined //|| project?.location === 'local'
+    )
+    setLocalProjects(localProjects)
+    console.log(localProjects)
+  }, [allProjects])
 
   const handleOpenProject = async (p: Project): Promise<void> => {
     try {
@@ -90,7 +117,7 @@ const RecentsProjects = (): JSX.Element => {
       <CardHeader className={isCompact ? 'p-2' : ''}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            {/*  <Image
+            {/* <Image
               src={projectIcons[project.type as keyof typeof projectIcons]}
               alt={`${project.type} logo`}
               width={isCompact ? 16 : 20}
@@ -110,7 +137,7 @@ const RecentsProjects = (): JSX.Element => {
         {!isCompact && <p className="text-sm text-muted-foreground mb-2">{project.description}</p>}
         <div className="flex items-center text-xs text-muted-foreground">
           <Calendar className="w-3 h-3 mr-1" />
-          <span>Last modified: {project.updated_at}</span>
+          <span>Last modified: {formatDate(project.dt_updated, 'MMM d, yyyy')}</span>
         </div>
       </CardContent>
       <CardContent className={`pt-0 ${isCompact ? 'p-2' : ''}`}>
@@ -139,9 +166,9 @@ const RecentsProjects = (): JSX.Element => {
         <CardContent>
           {isLoading ? (
             <LoadingSpinner />
-          ) : projects.data.length > 0 ? (
+          ) : allProjects.data.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {projects.data.map((project) => renderProjectCard(project, true))}
+              {allProjects.data.map((project) => renderProjectCard(project, true))}
             </div>
           ) : (
             <EmptyState
@@ -180,17 +207,16 @@ const RecentsProjects = (): JSX.Element => {
             <TabsContent value="local">
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex-1 relative">
-                 {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type="text"
                     placeholder="Search local projects..."
-                    //value={localSearchQuery}
-                    //onChange={(e) => setLocalSearchQuery(e.target.value)}
+                    value={localSearchQuery}
+                    onChange={(e) => setLocalSearchQuery(e.target.value)}
                     className="pl-8 placeholder-muted-foreground"
                   />
                 </div>
-                <Select //value={localProjectOrder} onValueChange={setLocalProjectOrder}
-                >
+                <Select value={localProjectOrder} onValueChange={setLocalProjectOrder}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Order by" />
                   </SelectTrigger>
@@ -202,17 +228,21 @@ const RecentsProjects = (): JSX.Element => {
               </div>
               {isLoading ? (
                 <LoadingSpinner />
-              ) : /* localProjects.length > 0 ? (
+              ) : localProjects.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {sortProjects(
+                  {sortProjects(
                     localProjects.filter(
                       (project) =>
-                        project.name.toLowerCase().includes(localSearchQuery.toLowerCase()) ||
-                        project.description.toLowerCase().includes(localSearchQuery.toLowerCase())
+                        project.config.name
+                          .toLowerCase()
+                          .includes(localSearchQuery.toLowerCase()) ||
+                        project.config?.description
+                          .toLowerCase()
+                          .includes(localSearchQuery.toLowerCase())
                     )
-                  ).map(renderProjectCard)} 
+                  ).map(renderProjectCard)}
                 </div>
-              ) :  */(
+              ) : (
                 <EmptyState
                   message="No local projects found. Start by creating a new project!"
                   className="text-muted-foreground"
@@ -222,12 +252,12 @@ const RecentsProjects = (): JSX.Element => {
             <TabsContent value="remote">
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex-1 relative">
-                 {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
+                  {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
                   <Input
                     type="text"
                     placeholder="Search remote projects..."
-                   // value={remoteSearchQuery}
-                   // onChange={(e) => setRemoteSearchQuery(e.target.value)}
+                    // value={remoteSearchQuery}
+                    // onChange={(e) => setRemoteSearchQuery(e.target.value)}
                     className="pl-8 placeholder-muted-foreground"
                   />
                 </div>
@@ -244,7 +274,8 @@ const RecentsProjects = (): JSX.Element => {
               </div>
               {isLoading ? (
                 <LoadingSpinner />
-              ) : /* remoteProjects.length > 0 ? (
+              ) : (
+                /* remoteProjects.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {sortProjects(
                     remoteProjects.filter(
@@ -254,8 +285,7 @@ const RecentsProjects = (): JSX.Element => {
                     )
                   ).map(renderProjectCard)}
                 </div>
-              ) :  */(
-                <EmptyState
+              ) :  */ <EmptyState
                   message="No remote projects found. Start by cloning a project from GitHub or GitLab!"
                   className="text-muted-foreground"
                 />

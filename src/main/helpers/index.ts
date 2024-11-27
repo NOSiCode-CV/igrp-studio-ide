@@ -136,6 +136,7 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 					for (const entry of directoryContents) {
 
 						isDirectory = entry.isDirectory()
+						
 						const fullPath = join(directory, entry.name);
 						// If the directory contains any files or subdirectories, process them
 						if (isDirectory) {

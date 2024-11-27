@@ -13,7 +13,7 @@ export const initialValues = {
     {
       name: '',
       type: 'String',
-      length: 0,
+      length: null,
       defaultValue: '',
       nullable: true,
       unique: false,

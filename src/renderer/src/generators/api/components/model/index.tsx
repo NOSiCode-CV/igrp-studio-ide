@@ -122,7 +122,7 @@ const ModelLayout = ({ onCancel, basePath, selectors, jsonData, models, module }
         const attributes = values.attributes
             .map(({ ...field }) => ({
                 ...field,
-                length: field.length ? Number(field.length) : null,
+                length: field.length ? Number(field.length) : 255,
                 nullable: !field.nullable,
                 generationType: field.primaryKey === true ? generationType : ""
             }));

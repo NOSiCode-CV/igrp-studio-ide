@@ -18,7 +18,8 @@ export type Project = {
     path: string,
     config: ConfigOptions
     dt_created?: Date,
-    dt_updated?: Date
+    dt_updated?: Date,
+    location: location
 }
 
 export interface ConfigOptions {

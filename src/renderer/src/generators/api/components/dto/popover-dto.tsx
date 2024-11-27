@@ -70,7 +70,7 @@ export function PopoverDto({ index, row, collectionTypes, changeValue }: Popover
                       onChange={(ev) => changeValue('maxLength', index, ev.target.value)}
                     />
                   </div>
-				  <div className="grid grid-cols-3 items-center gap-4">
+                  <div className="grid grid-cols-3 items-center gap-4">
                     <Label htmlFor="regex">Regex</Label>
                     <Input
                       id="regex"

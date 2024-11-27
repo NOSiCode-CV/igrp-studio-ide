@@ -17,8 +17,6 @@ import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { NamespacesOptions } from './config'
 import { useEffect, useState } from 'react'
 import { PopoverDto } from './popover-dto'
-import { Checkbox } from '@renderer/components/ui/checkbox'
-import { useTranslation } from 'react-i18next'
 
 interface AttributesCardProps {
   currentDto: string

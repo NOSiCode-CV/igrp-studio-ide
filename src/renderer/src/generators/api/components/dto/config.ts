@@ -28,14 +28,6 @@ export const initialValues: DTOConfig = {
     ]
 }
 
-export const defaultValues: any = {
-    attributes: {
-        name: '',
-        ns: 'java',
-        type: 'String'
-    }
-}
-
 export const TabList = [
     { label: 'Fields', value: 'attributes' },
 ]

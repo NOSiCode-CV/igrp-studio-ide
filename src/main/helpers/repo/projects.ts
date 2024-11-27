@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import fs from 'fs'
 import { readFile, writeFile } from 'fs/promises';
-import { Project, Page, PageableProjects, IProjectRepository  } from '../../types'
+import { Project, PageableProjects, IProjectRepository  } from '../../types'
 
 
 const filename = app.getPath('userData') + "/rp-settings.json";
@@ -45,31 +45,16 @@ export class ProjectRepository implements IProjectRepository {
         return project;
     }
 
-    async findAllRecent(page: Page): Promise<PageableProjects> {
-        if (page.page < 1) {
-            throw new Error("'page' must be greater than or equal to 1");
-        }
-
-        if (page.size < 1) {
-            throw new Error("'size' must be greater than or equal to 1");
-        }
-
-        const start = (page.page-1) * page.size;
-        let end = start + page.size;
+    async findAllRecent(): Promise<PageableProjects> {
 
         const projects = await this.findAll();
         if (!projects) return {data:[], total: 0};
 
-        if (start >= projects.length) return {data:[], total: projects.length};
-        if (end > projects.length) {
-            end = projects.length;
-        }
-        
         const sorted = projects.sort((a, b) => {
             return newRecentDate(b).getTime() - newRecentDate(a).getTime();
         });
         
-        return {data: sorted.slice(start, end), total: projects.length} ;
+        return {data: sorted.slice(0, projects.length), total: projects.length} ;
     }
 
     async findAll(): Promise<Array<Project>> {
