@@ -136,8 +136,12 @@ const RecentsProjects = (): JSX.Element => {
       <CardContent className={`flex-grow ${isCompact ? 'p-2' : ''}`}>
         {!isCompact && <p className="text-sm text-muted-foreground mb-2">{project.description}</p>}
         <div className="flex items-center text-xs text-muted-foreground">
-          <Calendar className="w-3 h-3 mr-1" />
-          <span>Last modified: {formatDate(project.dt_updated, 'MMM d, yyyy')}</span>
+          {project.dt_updated && (
+            <>
+              <Calendar className="w-3 h-3 mr-1" />
+              <span>Last modified: {formatDate(project.dt_updated, 'MMM d, yyyy')}</span>
+            </>
+          )}
         </div>
       </CardContent>
       <CardContent className={`pt-0 ${isCompact ? 'p-2' : ''}`}>
