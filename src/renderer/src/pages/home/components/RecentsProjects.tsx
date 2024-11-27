@@ -72,12 +72,10 @@ const RecentsProjects = (): JSX.Element => {
   }, [])
 
   useEffect(() => {
-    console.log(allProjects.data)
     const localProjects = allProjects.data.filter(
       (project) => project?.location === undefined //|| project?.location === 'local'
     )
     setLocalProjects(localProjects)
-    console.log(localProjects)
   }, [allProjects])
 
   const handleOpenProject = async (p: Project): Promise<void> => {
@@ -110,20 +108,18 @@ const RecentsProjects = (): JSX.Element => {
     setTimeout(() => setIsLoading(false), 1500)
   }, [])
 
-  const handleCloneProject = ({ projectRecent: Project }) => {}
-
   const renderProjectCard = (project: Project, isCompact: boolean = false) => (
-    <Card key={project.name} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
+    <Card key={project.config.name} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
       <CardHeader className={isCompact ? 'p-2' : ''}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            {/* <Image
-              src={projectIcons[project.type as keyof typeof projectIcons]}
+            <img
+              src={projectIcons[project.config.type]}
               alt={`${project.type} logo`}
               width={isCompact ? 16 : 20}
               height={isCompact ? 16 : 20}
               className="mr-2"
-            /> */}
+            />
             <CardTitle className={`${isCompact ? 'text-sm' : 'text-lg'}`}>
               {project.config.name}
             </CardTitle>
@@ -211,7 +207,7 @@ const RecentsProjects = (): JSX.Element => {
             <TabsContent value="local">
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5" />
                   <Input
                     type="text"
                     placeholder="Search local projects..."
