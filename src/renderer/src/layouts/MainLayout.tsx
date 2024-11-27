@@ -10,13 +10,13 @@ import {
 } from '@igrp/igrp-design-system'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
 import { Home, Settings } from 'lucide-react'
-import { SidebarData } from '@igrp/igrp-design-system/dist/types'
+import { SidebarProps } from '@igrp/igrp-design-system/dist/types'
 
 interface LayoutProps {
   children: React.ReactNode
 }
 
-const navData: SidebarData[] = [
+const navData: SidebarProps[] = [
   {
     title: 'Home',
     url: '#',
@@ -30,6 +30,7 @@ const navData: SidebarData[] = [
 ]
 
 const MainLayout = (props: LayoutProps): JSX.Element => {
+
   return (
     <div className="h-screen flex flex-col">
       <ToastContainer />

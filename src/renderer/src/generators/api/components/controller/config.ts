@@ -1,3 +1,4 @@
+import { ControllerConfig } from "@igrp/spring-engine/dist/interfaces/types"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../Interfaces"
 
@@ -20,7 +21,7 @@ export const defaultValues: any = {
     }
 }
 
-export const initialValues: any /*ControllerConfig*/ = {
+export const initialValues = {
     type: 'controller',
     module: '',
     name: '',
@@ -39,7 +40,7 @@ export const initialValues: any /*ControllerConfig*/ = {
             ],
             requestParams: [
                 {
-                    type: '',
+                    type: 'string',
                     name: ''
                 }
             ],
