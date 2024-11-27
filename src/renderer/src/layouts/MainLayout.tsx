@@ -6,11 +6,11 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import {
   IGRPSidebar,
   IGRPSidebarContent,
-  SidebarData,
   SidebarProvider
 } from '@igrp/igrp-design-system'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
 import { Home, Settings } from 'lucide-react'
+import { SidebarData } from '@igrp/igrp-design-system/dist/types'
 
 interface LayoutProps {
   children: React.ReactNode

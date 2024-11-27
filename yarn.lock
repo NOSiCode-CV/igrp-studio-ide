@@ -780,13 +780,17 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@igrp/igrp-design-system@^1.0.0-alpha.8":
-  version "1.0.0-alpha.8"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.8.tgz#0bb16bd235c857c907fd1ab7db7c6ee194c4992f"
-  integrity sha512-8f9NrHmwFY8ClWkoiVXFcDpraPn43EjrPrY+i7sDsi0gpWKF/J6EfpKAx7wsZcTBsOCAyAw4jqC0ujpDWMlNfQ==
+"@igrp/igrp-design-system@^1.0.0-alpha.10":
+  version "1.0.0-alpha.10"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.10.tgz#a3d4edda9f4b5e24798ce74dcef5c062f14dd3a0"
+  integrity sha512-f7h/3As+QOcO/JiAQwtMCgKWLIklRX3EdY7JCeogKU9K0c/URdn/ncJMq1yzkc37u5N1uHIru5hNESzP+atsGw==
   dependencies:
+    "@radix-ui/react-avatar" "^1.1.1"
     "@radix-ui/react-collapsible" "^1.1.1"
     "@radix-ui/react-dialog" "^1.1.2"
+    "@radix-ui/react-dropdown-menu" "^2.1.2"
+    "@radix-ui/react-popover" "^1.1.2"
+    "@radix-ui/react-scroll-area" "^1.2.1"
     "@radix-ui/react-separator" "^1.1.0"
     "@radix-ui/react-slot" "^1.1.0"
     "@radix-ui/react-tooltip" "^1.1.4"
@@ -795,6 +799,7 @@
     clsx "^2.1.1"
     lucide-react "^0.461.0"
     next "^14.2.15"
+    next-themes "^0.4.3"
 
 "@igrp/nextjs-engine@^0.0.5":
   version "0.0.5"
@@ -811,10 +816,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.3.0-alpha-4.1.13":
-  version "0.3.0-alpha-4.1.13"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.1.13.tgz#47e123ed45d4aaf6342dec9eb7fd184d3b6bea9e"
-  integrity sha512-TAyl7aLkMOvO37mdzf+w9aEeyRvQ+EVPvhppUymA2kDYncm0OcKExMEl9XpztnDjpp1DZ0NRXiMFT5tw4IBizA==
+"@igrp/spring-engine@^0.3.0-alpha-4.1.14":
+  version "0.3.0-alpha-4.1.14"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.1.14.tgz#a30e953f9ef7e5c5ec41d079fbc9468e8364aab8"
+  integrity sha512-BuUakHmHNX1Z4Ot38CF+Iq/cr7pk5M4us/MaqPunkkHRACAfAXzUv9FYUB2ArtxqZkqdpIbD22q/FNnT6PdTYA==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -1598,6 +1603,21 @@
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-scroll-area/-/react-scroll-area-1.2.0.tgz#d09fd693728b09c50145935bec6f91efc2661729"
   integrity sha512-q2jMBdsJ9zB7QG6ngQNzNwlvxLQqONyL58QbEGwuyRZZb/ARQwk3uQVbCF7GvQVOtV6EU/pDxAw3zRzJZI3rpQ==
+  dependencies:
+    "@radix-ui/number" "1.1.0"
+    "@radix-ui/primitive" "1.1.0"
+    "@radix-ui/react-compose-refs" "1.1.0"
+    "@radix-ui/react-context" "1.1.1"
+    "@radix-ui/react-direction" "1.1.0"
+    "@radix-ui/react-presence" "1.1.1"
+    "@radix-ui/react-primitive" "2.0.0"
+    "@radix-ui/react-use-callback-ref" "1.1.0"
+    "@radix-ui/react-use-layout-effect" "1.1.0"
+
+"@radix-ui/react-scroll-area@^1.2.1":
+  version "1.2.1"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@radix-ui/react-scroll-area/-/react-scroll-area-1.2.1.tgz#610c53e07d017e24b62bd73a0a6eb23fa7331b3b"
+  integrity sha512-FnM1fHfCtEZ1JkyfH/1oMiTcFBQvHKl4vD9WnpwkLgtF+UmnXMCad6ECPTaAjcDjam+ndOEJWgHyKDGNteWSHw==
   dependencies:
     "@radix-ui/number" "1.1.0"
     "@radix-ui/primitive" "1.1.0"
@@ -5690,6 +5710,11 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
+
+next-themes@^0.4.3:
+  version "0.4.3"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/next-themes/-/next-themes-0.4.3.tgz#ea54552d5986936d177eed393ea50b658ae44800"
+  integrity sha512-nG84VPkTdUHR2YeD89YchvV4I9RbiMAql3GiLEQlPvq1ioaqPaIReK+yMRdg/zgiXws620qS1rU30TiWmmG9lA==
 
 next@^14.2.15:
   version "14.2.18"
