@@ -18,13 +18,13 @@ interface LayoutProps {
 
 const navData: SidebarProps[] = [
   {
-    title: 'Home',
-    url: '#',
+    name: 'Home',
+    href: '#',
     icon: Home
   },
   {
-    title: 'Settings',
-    url: '#',
+    name: 'Settings',
+    href: '#',
     icon: Settings
   }
 ]
@@ -38,7 +38,7 @@ const MainLayout = (props: LayoutProps): JSX.Element => {
 
       <div className="flex flex-1 overflow-hidden">
         <SidebarProvider>
-          <IGRPSidebar className="mt-10">
+          <IGRPSidebar className="mt-10" >
             <IGRPSidebarContent items={navData} />
           </IGRPSidebar>
           <SidebarInset>

@@ -43,7 +43,7 @@ export function AppSidebar({ className, menuItems, config, basePath , header}: A
    
 
     const setCurrentItem = (item) => {
-        setActiveItem(item.id)
+        setActiveItem(item.label)
     }
 
     const handleSearch = (value: string) => {
@@ -98,7 +98,7 @@ export function AppSidebar({ className, menuItems, config, basePath , header}: A
                                             {item.dropdownMenus && 
                                             item.dropdownMenus.map((opt, key) => (
                                                 <DropdownMenuItem key={key}
-                                                    onClick={() => handleDropdownClick({...opt, ...item} )}>{t(opt.label)}</DropdownMenuItem>
+                                                    onClick={() => handleDropdownClick({module: item.label, ...opt, ...item} )}>{t(opt.label)}</DropdownMenuItem>
                                             ))}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -129,7 +129,7 @@ export function AppSidebar({ className, menuItems, config, basePath , header}: A
                                                                         <SidebarMenuSubButton
                                                                             onClick={(e) => handleSubItemClick(e, subItem)}
                                                                             className="cursor-pointer"
-                                                                            isActive={activeItem === subItem.id}>
+                                                                            isActive={activeItem === subItem.label}>
                                                                             {subItem.label}
                                                                         </SidebarMenuSubButton>
                                                                     </SidebarMenuSubItem>

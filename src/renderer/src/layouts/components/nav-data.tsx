@@ -18,6 +18,7 @@ const Navdata = (folders) => {
 			subItems: [],
 			isHeader: true,
             dropdownclick: function (item) {
+				console.log("item", item)
                 dispatch(onSetCurrentItem(item))
             },
 			dropdownMenus: [
@@ -49,8 +50,8 @@ const Navdata = (folders) => {
 					path: file.path,
 					module: folderName,
 					type: categoryName,
-					click: function (subItem) {
-						dispatch(onSetCurrentItem(subItem))
+					click: function (subItem: any) {
+						dispatch(onSetCurrentItem(subItem)); 
 					},
 				}));
 

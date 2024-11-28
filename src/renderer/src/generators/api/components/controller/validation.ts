@@ -45,9 +45,9 @@ export function useControllerValidation({ t }) {
                         accepts: Yup.string().when('method', (method, schema) =>
                             methodConditions(method, schema, ['POST', 'PUT', 'PATCH'], 'Accepts is required for POST, PUT, PATCH')
                         ),
-                        requestBody: Yup.string().when('method', (method, schema) =>
+                        /* requestBody: Yup.string().when('method', (method, schema) =>
                             methodConditions(method, schema, ['POST', 'PUT', 'PATCH'], 'Request Body is required for POST, PUT, PATCH')
-                        ),
+                        ), */
                         response: Yup.string().required('Response Type is required')
                     })
                 ),
