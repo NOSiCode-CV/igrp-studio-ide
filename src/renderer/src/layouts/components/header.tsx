@@ -7,6 +7,7 @@ import { Code, Github, Grid, HelpCircle, Maximize2, Minus, Settings, Square, X }
 import { SettingsDialog } from '@renderer/components/settings-dialog';
 import { HelpDialog } from '@renderer/components/help-dialog';
 import { cn } from '@renderer/lib/utils';
+import { ModeToggle } from '@renderer/components/mode-toogle';
 
 interface HeaderProps {
     config?: ConfigOptions,
@@ -108,6 +109,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                         <p className="text-sm font-medium">IGRP Studio</p>
                     </div>
                     <div className="flex items-center space-x-2">
+                        <ModeToggle/>
                         {config?.name && <button
                             onClick={openVSCode}
                             className="flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"

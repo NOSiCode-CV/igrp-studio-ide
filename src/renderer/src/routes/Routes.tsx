@@ -7,7 +7,7 @@ import MainLayout from '@renderer/layouts/MainLayout'
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
 import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayoput'
 
-const IGRP = lazy(() => import('@renderer/pages/home/IGRP'))
+const IDEInitialScreen = lazy(() => import('@renderer/pages/home/ide-initial-screen'))
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'))
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'))
 
@@ -27,8 +27,8 @@ const apiRoutes = [
 
 const othersRoutes = [
   {
-    path: '/igrp',
-    component: <IGRP />
+    path: '/ide-initial-screen',
+    component: <IDEInitialScreen />
   }
 ]
 
@@ -43,7 +43,7 @@ function AppRoutes(): JSX.Element {
           }}
         >
           <Routes>
-            <Route path="/" element={<Navigate to="/igrp" />} />
+            <Route path="/" element={<Navigate to={ROUTES.HOME} />} />
             {allRoutes.map((route, idx) => (
               <Route
                 path={route.path}

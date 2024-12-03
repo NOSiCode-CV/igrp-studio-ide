@@ -1,19 +1,14 @@
 import { useTranslation } from 'react-i18next'
-import RecentsProjects from './RecentsProjects'
 import { Button } from '@renderer/components/ui/button'
 import { FolderOpen, GitFork, PlusCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import useToast from '@renderer/components/useToast'
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks'
+import { CreateProject } from './components/new-project-dialog'
+import RecentsProjects from './components/recents-projects'
 
-interface SelectProjectProps {
-  onHandleNewProjectClick?: () => void
-}
-
-const WelcomePage = ({
-  onHandleNewProjectClick = (): void => {}
-}: SelectProjectProps): JSX.Element => {
+ const IDEInitialScreen = (): JSX.Element => {
   
   const { t } = useTranslation()
 
@@ -49,10 +44,7 @@ const WelcomePage = ({
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-foreground">Welcome to IGRP Studio</h1>
         <div className="flex space-x-4">
-          <Button variant="default" onClick={onHandleNewProjectClick}>
-            <PlusCircle className="w-4 h-4 mr-2" />
-            {t('New Project')}
-          </Button>
+          <CreateProject/>
           <Button variant="outline">
             <GitFork className="w-4 h-4 mr-2" />
             {t('Clone Project')}
@@ -69,4 +61,4 @@ const WelcomePage = ({
   )
 }
 
-export default WelcomePage
+export default IDEInitialScreen

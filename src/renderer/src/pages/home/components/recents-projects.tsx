@@ -1,17 +1,14 @@
 import { setConfig, setBasePath, navigateToNextPage } from '@renderer/redux/thunks'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { PageableProjects, Project } from 'src/main/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
-import NextIcon from '@renderer/assets/images/Next30x30.svg'
-import SpringIcon from '@renderer/assets/images/Spring30x30.svg'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
-import { Calendar, ChevronRight, Clock, FolderOpen, GitFork, Search } from 'lucide-react'
+import { Calendar, ChevronRight, Clock, FolderOpen, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
 import { EmptyState } from '@renderer/components/empty-state'
-import { Image } from '@radix-ui/react-avatar'
 import { Button } from '@renderer/components/ui/button'
 import { formatDate } from 'date-fns'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
@@ -25,8 +22,8 @@ import {
 } from '@renderer/components/ui/select'
 
 const projectIcons = {
-  [ENV_TYPES.NEXTJS]: NextIcon,
-  [ENV_TYPES.SPRING]: SpringIcon
+  [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
+  [ENV_TYPES.SPRING]: 'https://www.svgrepo.com/show/354380/spring-icon.svg'
 }
 
 const RecentsProjects = (): JSX.Element => {
