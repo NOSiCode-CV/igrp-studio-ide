@@ -10,7 +10,7 @@ import { Calendar, ChevronRight, Clock, FolderOpen, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
 import { EmptyState } from '@renderer/components/empty-state'
 import { Button } from '@renderer/components/ui/button'
-import { formatDate } from 'date-fns'
+import { formatDate, formatDistance, subDays } from 'date-fns'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Input } from '@renderer/components/ui/input'
 import {
@@ -132,7 +132,7 @@ const RecentsProjects = (): JSX.Element => {
           {project.dt_updated && (
             <>
               <Calendar className="w-3 h-3 mr-1" />
-              <span>Last modified: {formatDate(project.dt_updated, 'MMM d, yyyy')}</span>
+              <span>Last modified: {formatDistance(project.dt_updated, new Date(), { addSuffix: true })}</span>
             </>
           )}
         </div>
