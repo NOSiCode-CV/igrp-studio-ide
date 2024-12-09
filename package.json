@@ -105,7 +105,6 @@
 		},
 		"linux": {
 			"icon": "build/icons/icon.png"
-		},
-		"extraResources": [ { "from": "src/renderer/src/localization/locales/", "to": "locales/", "filter": ["**/*"] }]
+		}
 	}
 }
