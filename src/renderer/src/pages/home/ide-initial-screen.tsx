@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Button } from '@renderer/components/ui/button'
-import { FolderOpen, GitFork, PlusCircle } from 'lucide-react'
+import { FolderOpen, GitFork } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import useToast from '@renderer/components/useToast'

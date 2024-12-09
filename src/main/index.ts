@@ -37,7 +37,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     },
-	titleBarStyle: "hidden",
+    titleBarStyle: "hidden",
   })
 
   mainWindow.maximize()
@@ -56,7 +56,7 @@ function createWindow(): void {
   const startUrl =
     is.dev && process.env['ELECTRON_RENDERER_URL']
       ? process.env['ELECTRON_RENDERER_URL']
-      : `file://${join(__dirname, '../renderer/index.html')}#/igrp`
+      : `file://${join(__dirname, '../renderer/index.html')}#/ide-initial-screen`
 
   mainWindow.loadURL(startUrl)
 
@@ -143,6 +143,7 @@ handleWithCustomErrors(
     await repo.save({
       path: basePath,
       dt_created: new Date(),
+      location: 'local',
       config: {
         type: apiConfig.type,
         name: apiConfig.apiName,
@@ -240,6 +241,7 @@ handleWithCustomErrors(
     await repo.save({
       path: basePath,
       dt_created: new Date(),
+      location: 'local',
       config: {
         type: appConfig.type,
         name: appConfig.appName

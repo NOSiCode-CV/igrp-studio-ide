@@ -45,8 +45,8 @@ export class ProjectRepository implements IProjectRepository {
         return project;
     }
 
-    async findAllRecent(): Promise<PageableProjects> {
-
+    async findAllRecent(_page): Promise<PageableProjects> {
+       
         const projects = await this.findAll();
         if (!projects) return {data:[], total: 0};
 

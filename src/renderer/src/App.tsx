@@ -7,7 +7,6 @@ import rootReducer from './redux'
 
 const store = configureStore({ reducer: rootReducer, devTools: true })
 
-import '@renderer/i18n/i18next.config'
 import { ThemeProvider } from './components/theme-provider'
 
 const App = () => {

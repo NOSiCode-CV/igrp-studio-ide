@@ -1,5 +1,6 @@
 export const ROUTES = {
-  HOME: '/ide-initial-screen',
+  HOME: '/',
   PATH_PAGE_BUILDER_API: '/page-builder-api',
-  PATH_PAGE_BUILDER_UI: '/page-builder-ui'
+  PATH_PAGE_BUILDER_UI: '/page-builder-ui',
+  PAHT_IDE_INITIAL_SCREEN: '/ide-initial-screen'
 }

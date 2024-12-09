@@ -10,7 +10,7 @@ import { Calendar, ChevronRight, Clock, FolderOpen, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
 import { EmptyState } from '@renderer/components/empty-state'
 import { Button } from '@renderer/components/ui/button'
-import { formatDate, formatDistance, subDays } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Input } from '@renderer/components/ui/input'
 import {

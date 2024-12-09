@@ -27,7 +27,7 @@ const apiRoutes = [
 
 const othersRoutes = [
   {
-    path: '/ide-initial-screen',
+    path: ROUTES.PAHT_IDE_INITIAL_SCREEN,
     component: <IDEInitialScreen />
   }
 ]
@@ -43,7 +43,7 @@ function AppRoutes(): JSX.Element {
           }}
         >
           <Routes>
-            <Route path="/" element={<Navigate to={ROUTES.HOME} />} />
+            <Route path="/" element={<Navigate to={ROUTES.PAHT_IDE_INITIAL_SCREEN} />} />
             {allRoutes.map((route, idx) => (
               <Route
                 path={route.path}
