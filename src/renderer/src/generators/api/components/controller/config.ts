@@ -14,12 +14,12 @@ export const defaultValues: any = {
     requestParams: {
         type: '',
         name: '',
-        required: boolean
+        isRequired: boolean
     },
     pathVariables: {
         type: '',
         name: '',
-        required: boolean
+        isRequired: boolean
     }
 }
 
@@ -44,14 +44,14 @@ export const initialValues = {
                 {
                     type: 'string',
                     name: '',
-                    required: true
+                    isRequired: true
                 }
             ],
             pathVariables: [
                 {
                     type: '',
                     name: '',
-                    required: true
+                    isRequired: true
                 }
             ]
         }
@@ -122,7 +122,7 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
         requestParams: [
             { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
             { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'required', name: 'Is Required?', type: 'checkbox', width: '25%' }
+            { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' }
         ],
         pathVariables: [
             {
@@ -133,7 +133,7 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
                 width: '25%'
             },
             { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'required', name: 'Is Required?', type: 'checkbox', width: '25%' }
+            { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' }
         ]
     }
 }

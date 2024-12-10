@@ -191,6 +191,7 @@ const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: C
 
 	const handleSave = async (): Promise<void> => {
 		try {
+		
 			const values = getValuesToSubmit()
 			
 			const { error } = await window.api.createController(values, basePath)
