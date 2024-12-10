@@ -1,4 +1,4 @@
-import { ControllerConfig } from "@igrp/spring-engine/dist/interfaces/types"
+import { boolean } from "yup"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../Interfaces"
 
@@ -13,11 +13,13 @@ export const defaultValues: any = {
     },
     requestParams: {
         type: '',
-        name: ''
+        name: '',
+        required: boolean
     },
     pathVariables: {
         type: '',
-        name: ''
+        name: '',
+        required: boolean
     }
 }
 
@@ -41,13 +43,15 @@ export const initialValues = {
             requestParams: [
                 {
                     type: 'string',
-                    name: ''
+                    name: '',
+                    required: true
                 }
             ],
             pathVariables: [
                 {
                     type: '',
-                    name: ''
+                    name: '',
+                    required: true
                 }
             ]
         }
@@ -117,7 +121,8 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
         ],
         requestParams: [
             { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
-            { key: 'name', name: 'Name', type: 'text', width: '25%' }
+            { key: 'name', name: 'Name', type: 'text', width: '25%' },
+            { key: 'required', name: 'Is Required?', type: 'checkbox', width: '25%' }
         ],
         pathVariables: [
             {
@@ -127,7 +132,8 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
                 options: paramsTypesData.filter((param: any) => param.value !== 'Object'),
                 width: '25%'
             },
-            { key: 'name', name: 'Name', type: 'text', width: '25%' }
+            { key: 'name', name: 'Name', type: 'text', width: '25%' },
+            { key: 'required', name: 'Is Required?', type: 'checkbox', width: '25%' }
         ]
     }
 }
