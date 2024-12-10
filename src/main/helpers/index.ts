@@ -61,8 +61,6 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 					name: parsedConfig.appName,
 				}
 			}
-
-			console.log('API ConfigOptions:', config);
 		} catch (error) {
 			console.error(`Error reading ${baseApiPath}:`, error);
 		}

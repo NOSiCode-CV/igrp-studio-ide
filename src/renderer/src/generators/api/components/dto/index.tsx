@@ -69,8 +69,6 @@ const DtoLayout = ({
     try {
       newValues.module = module
 
-      console.log(newValues)
-
       const { error } = await window.api.createDto(newValues, basePath)
       if (error) return showErrorToast(error)
 

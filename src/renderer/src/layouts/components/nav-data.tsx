@@ -18,7 +18,6 @@ const Navdata = (folders) => {
 			subItems: [],
 			isHeader: true,
             dropdownclick: function (item) {
-				console.log("item", item)
                 dispatch(onSetCurrentItem(item))
             },
 			dropdownMenus: [

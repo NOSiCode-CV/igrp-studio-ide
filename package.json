@@ -24,7 +24,7 @@
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/utils": "^3.0.0",
 		"@faker-js/faker": "^9.2.0",
-		"@igrp/igrp-design-system": "^1.0.0-alpha.51",
+		"@igrp/igrp-design-system": "^1.0.0-alpha.54",
 		"@igrp/nextjs-engine": "^0.0.5",
 		"@igrp/spring-engine": "^0.3.0-alpha-4.2.8",
 		"@radix-ui/react-accordion": "^1.2.1",
