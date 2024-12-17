@@ -1,4 +1,3 @@
-import React from "react";
 import { useDispatch } from "react-redux";
 import { setCurrentItem as onSetCurrentItem } from "@renderer/redux/thunks";
 import { createMenuHeader } from "@renderer/utils/helpers";

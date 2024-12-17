@@ -1,14 +1,14 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Access the backend from the preload script
 import backend from "i18next-electron-fs-backend";
 import { LNG } from '@renderer/constants/appConstants';
 
-const isMac = window.api.i18nextElectronBackend.clientOptions.platform === "darwin";
-const isDev = window.api.i18nextElectronBackend.clientOptions.environment === "development";
-const prependPath = isMac && !isDev ? window.api.i18nextElectronBackend.clientOptions.resourcesPath : ".";
+//const isMac = window.api.i18nextElectronBackend.clientOptions.platform === "darwin";
+//const isDev = window.api.i18nextElectronBackend.clientOptions.environment === "development";
+//const prependPath = isMac && !isDev ? window.api.i18nextElectronBackend.clientOptions.resourcesPath : ".";
 
+// @ts-ignore
 import enCommon from '/src/localization/locales/en/translation.json';
 
 if (!backend) {

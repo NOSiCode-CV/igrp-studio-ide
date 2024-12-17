@@ -9,9 +9,6 @@ import { useTranslation } from 'react-i18next'
 import { ConfigOptions } from 'src/main/types'
 import { useNavigate } from 'react-router-dom'
 import Select from 'react-select'
-import { Card } from '@renderer/components/ui/card'
-import GoBack from '@renderer/components/go-back'
-import Illustration from '@renderer/components/ilustration'
 import { Button } from '@renderer/components/ui/button'
 import { Label } from '@renderer/components/ui/label'
 import { Input } from '@renderer/components/ui/input'
@@ -39,7 +36,8 @@ const initialValues: BaseApiConfig = {
   artifact: '',
   database: 'Postgresql',
   projectStructureStyle: 'technical',
-  enableObservability: false
+  enableObservability: false,
+  igrpCoreVersion: ''
 }
 
 const FormNewProjectSpring = (): JSX.Element => {
@@ -245,7 +243,9 @@ const FormNewProjectSpring = (): JSX.Element => {
             {projectStructureStyle.map((style) => (
               <div key={style.value} className="flex items-center space-x-2">
                 <RadioGroupItem value={style.value} id={style.value} />
-                <Label htmlFor={style.value} className="text-muted-foreground">{style.label}</Label>
+                <Label htmlFor={style.value} className="text-muted-foreground">
+                  {style.label}
+                </Label>
               </div>
             ))}
           </RadioGroup>
@@ -257,7 +257,9 @@ const FormNewProjectSpring = (): JSX.Element => {
             onCheckedChange={(checked) => formik.setFieldValue('enableObservability', checked)}
             checked={formik.values.enableObservability}
           />
-          <Label htmlFor="enableObservability" className="text-muted-foreground">{t('Enable Observability')}</Label>
+          <Label htmlFor="enableObservability" className="text-muted-foreground">
+            {t('Enable Observability')}
+          </Label>
         </div>
 
         <Button variant="default" type="submit" className="w-full mt-6">

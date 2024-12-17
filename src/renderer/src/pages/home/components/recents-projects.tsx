@@ -36,11 +36,10 @@ const RecentsProjects = (): JSX.Element => {
 
   const [allProjects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
   const [localProjects, setLocalProjects] = useState<Project[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [_error, setError] = useState<string | null>(null)
 
-  const [projectOrder, setProjectOrder] = useState<string>('lastModified')
+  const [projectOrder] = useState<string>('lastModified')
   const [localProjectOrder, setLocalProjectOrder] = useState<string>('lastModified')
-  const [remoteProjectOrder, setRemoteProjectOrder] = useState<string>('lastModified')
 
   const sortProjects = (projects) => {
     return [...projects].sort((a, b) => {
@@ -87,69 +86,62 @@ const RecentsProjects = (): JSX.Element => {
     navigateToNextPage(navigate, p.config)
   }
 
-  /* const totalProjects = projects.total ?? 0;
-    const requestedTotal = pagination.page * pagination.size; */
-
-  const handleClear = async (projectRecent: Project, index: number): Promise<void> => {
-    try {
-      await window.repo.project.delete(projectRecent, index)
-      fetchProjects()
-    } catch (err) {
-      setError('Failed to fetch projects')
-    } finally {
-    }
-  }
-
   useEffect(() => {
-    // Simulate loading
     setTimeout(() => setIsLoading(false), 1500)
   }, [])
 
-  const renderProjectCard = (project: Project, isCompact: boolean = false) => (
-    <Card key={project.config.name} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
-      <CardHeader className={isCompact ? 'p-2' : ''}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <img
-              src={projectIcons[project.config.type]}
-              alt={`${project.type} logo`}
-              width={isCompact ? 16 : 20}
-              height={isCompact ? 16 : 20}
-              className="mr-2"
-            />
-            <CardTitle className={`${isCompact ? 'text-sm' : 'text-lg'}`}>
-              {project.config.name}
-            </CardTitle>
+  const RenderProjectCard = (project: Project, isCompact: boolean = false) => {
+    return (
+      <Card key={project.config.name} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
+        <CardHeader className={isCompact ? 'p-2' : ''}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <img
+                src={projectIcons[project.config.type]}
+                alt={`${project.config.type} logo`}
+                width={isCompact ? 16 : 20}
+                height={isCompact ? 16 : 20}
+                className="mr-2"
+              />
+              <CardTitle className={`${isCompact ? 'text-sm' : 'text-lg'}`}>
+                {project.config.name}
+              </CardTitle>
+            </div>
+            <Button variant="ghost" size="sm">
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
-          <Button variant="ghost" size="sm">
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className={`flex-grow ${isCompact ? 'p-2' : ''}`}>
-        {!isCompact && <p className="text-sm text-muted-foreground mb-2">{project.description}</p>}
-        <div className="flex items-center text-xs text-muted-foreground">
-          {project.dt_updated && (
-            <>
-              <Calendar className="w-3 h-3 mr-1" />
-              <span>Last modified: {formatDistance(project.dt_updated, new Date(), { addSuffix: true })}</span>
-            </>
+        </CardHeader>
+        <CardContent className={`flex-grow ${isCompact ? 'p-2' : ''}`}>
+          {!isCompact && (
+            <p className="text-sm text-muted-foreground mb-2">{project.config.description}</p>
           )}
-        </div>
-      </CardContent>
-      <CardContent className={`pt-0 ${isCompact ? 'p-2' : ''}`}>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
-          onClick={() => handleOpenProject(project)}
-        >
-          <FolderOpen className="w-3 h-3 mr-1" />
-          <span className="text-xs">Open</span>
-        </Button>
-      </CardContent>
-    </Card>
-  )
+          <div className="flex items-center text-xs text-muted-foreground">
+            {project.dt_updated && (
+              <>
+                <Calendar className="w-3 h-3 mr-1" />
+                <span>
+                  Last modified:{' '}
+                  {formatDistance(project.dt_updated, new Date(), { addSuffix: true })}
+                </span>
+              </>
+            )}
+          </div>
+        </CardContent>
+        <CardContent className={`pt-0 ${isCompact ? 'p-2' : ''}`}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => handleOpenProject(project)}
+          >
+            <FolderOpen className="w-3 h-3 mr-1" />
+            <span className="text-xs">Open</span>
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <>
@@ -165,7 +157,7 @@ const RecentsProjects = (): JSX.Element => {
             <LoadingSpinner />
           ) : allProjects.data.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {allProjects.data.slice(0, 3).map((project) => renderProjectCard(project, true))}
+              {allProjects.data.slice(0, 3).map((project) => RenderProjectCard(project, true))}
             </div>
           ) : (
             <EmptyState
@@ -228,16 +220,10 @@ const RecentsProjects = (): JSX.Element => {
               ) : localProjects.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {sortProjects(
-                    localProjects.filter(
-                      (project) =>
-                        project.config.name
-                          .toLowerCase()
-                          .includes(localSearchQuery.toLowerCase()) ||
-                        project.config?.description
-                          .toLowerCase()
-                          .includes(localSearchQuery.toLowerCase())
+                    localProjects.filter((project) =>
+                      project.config.name.toLowerCase().includes(localSearchQuery.toLowerCase())
                     )
-                  ).map(renderProjectCard)}
+                  ).map((project) => RenderProjectCard(project, true))}
                 </div>
               ) : (
                 <EmptyState
@@ -272,17 +258,7 @@ const RecentsProjects = (): JSX.Element => {
               {isLoading ? (
                 <LoadingSpinner />
               ) : (
-                /* remoteProjects.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sortProjects(
-                    remoteProjects.filter(
-                      (project) =>
-                        project.name.toLowerCase().includes(remoteSearchQuery.toLowerCase()) ||
-                        project.description.toLowerCase().includes(remoteSearchQuery.toLowerCase())
-                    )
-                  ).map(renderProjectCard)}
-                </div>
-              ) :  */ <EmptyState
+                <EmptyState
                   message="No remote projects found. Start by cloning a project from GitHub or GitLab!"
                   className="text-muted-foreground"
                 />

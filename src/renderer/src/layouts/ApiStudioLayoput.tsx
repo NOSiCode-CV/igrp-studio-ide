@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
@@ -9,7 +9,6 @@ import {
     setChangeStatus as onSetChangeStatus,
 } from "@renderer/redux/thunks";
 
-import { generateMenuItems } from '@renderer/utils/helpers';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import Header from './components/header';

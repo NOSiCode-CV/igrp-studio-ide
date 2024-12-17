@@ -2,95 +2,95 @@ import { OptionType } from '@renderer/constants/appConstants';
 import { FormikValues } from 'formik';
 
 export function formatMethods(elements: string[]): { label: string; value: string }[] {
-  return elements.map((element) => ({
-    label: element,
-    value: element,
-  }));
+	return elements.map((element) => ({
+		label: element,
+		value: element,
+	}));
 }
 
 export const addNewRow = (
-  formik: FormikValues,
-  field: string,
-  defaultValue: any
+	formik: FormikValues,
+	field: string,
+	defaultValue: any
 ): void => {
-  formik.setFieldValue(field, [...formik.values[field], defaultValue]);
+	formik.setFieldValue(field, [...formik.values[field], defaultValue]);
 };
 
 export const removeRow = (
-  formik: FormikValues,
-  field: string,
-  position: number
+	formik: FormikValues,
+	field: string,
+	position: number
 ): void => {
-  formik.setFieldValue(
-    field,
-    formik.values[field].filter((_: any, index: number) => index !== position)
-  );
+	formik.setFieldValue(
+		field,
+		formik.values[field].filter((_: any, index: number) => index !== position)
+	);
 };
 
 export const changeValue = (
-  formik: FormikValues,
-  element: string,
-  position: number,
-  value: any,
-  field: string
+	formik: FormikValues,
+	element: string,
+	position: number,
+	value: any,
+	field: string
 ): void => {
-  formik.setFieldValue(
-    field,
-    formik.values[field].map((row: any, index: number) =>
-      index === position ? { ...row, [element]: value } : row
-    )
-  );
+	formik.setFieldValue(
+		field,
+		formik.values[field].map((row: any, index: number) =>
+			index === position ? { ...row, [element]: value } : row
+		)
+	);
 };
 
 
 export const extractByType = (moduleData: any, type: OptionType) => {
 
-  const files = moduleData?.files ?? [];
+	const files = moduleData?.files ?? [];
 
-  return files.find((item: any) => item[type])?.[type] ?? [];
+	return files.find((item: any) => item[type])?.[type] ?? [];
 };
 
 // Helper function to merge files by their type (dto, controllers, models)
 export const mergeFilesByType = (files: any[]) => {
-  const mergedFiles: any[] = [];
+	const mergedFiles: any[] = [];
 
-  files.forEach((item: any) => {
-    Object.keys(item).forEach((key) => {
-      // Check if the type already exists in mergedFiles
-      const existingItem = mergedFiles.find((mergedItem) => mergedItem[key]);
+	files.forEach((item: any) => {
+		Object.keys(item).forEach((key) => {
+			// Check if the type already exists in mergedFiles
+			const existingItem = mergedFiles.find((mergedItem) => mergedItem[key]);
 
-      if (existingItem) {
-        // If the type exists, add the new files to it
-        existingItem[key] = [...existingItem[key], ...item[key]];
-      } else {
-        // If the type doesn't exist, create a new entry
-        mergedFiles.push({ [key]: item[key] });
-      }
-    });
-  });
+			if (existingItem) {
+				// If the type exists, add the new files to it
+				existingItem[key] = [...existingItem[key], ...item[key]];
+			} else {
+				// If the type doesn't exist, create a new entry
+				mergedFiles.push({ [key]: item[key] });
+			}
+		});
+	});
 
-  return mergedFiles;
+	return mergedFiles;
 };
 
 export const getMergedFiles = (studio: any, module: string) => {
 
-  const currentModuleData = studio.folderFiles[module] || {};
-  const sharedModuleData = studio.folderFiles["shared"] || {};
+	const currentModuleData = studio.folderFiles[module] || {};
+	const sharedModuleData = studio.folderFiles["shared"] || {};
 
-  // If the module is not "shared", merge its files with "shared" files
-  let mergedFiles = [];
+	let mergedFiles: any[] = [];
+	
+	if (module !== "shared") {
 
-  if (module !== "shared") {
-    // Merge files of the current module and the shared module, preserving the type of files
-    const currentFiles = currentModuleData.files || [];
-    const sharedFiles = sharedModuleData.files || [];
+		const currentFiles = currentModuleData.files || [];
+		const sharedFiles = sharedModuleData.files || [];
 
-    // Use a helper function to merge the files by their type (dto, controllers, models)
-    mergedFiles = mergeFilesByType([...currentFiles, ...sharedFiles]);
-  } else {
-    // If the module is "shared", just use its own files
-    mergedFiles = sharedModuleData.files || [];
-  }
+		// Use a helper function to merge the files by their type (dto, controllers, models)
+		mergedFiles = mergeFilesByType([...currentFiles, ...sharedFiles]);
 
-  return { ...currentModuleData, files: mergedFiles };
+	} else {
+		// If the module is "shared", just use its own files
+		mergedFiles = sharedModuleData.files || [];
+	}
+
+	return { ...currentModuleData, files: mergedFiles };
 };

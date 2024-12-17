@@ -5,7 +5,7 @@ import { Command, Database, Folder, Puzzle } from 'lucide-react'
 
 
 // Function to convert folders into menuItems
-export function generateMenuItems(folders: FolderFiles, dispatch): MenuItem[] {
+export function generateMenuItems(folders: FolderFiles): MenuItem[] {
 	const menuItems: MenuItem[] = [];
 
 	// Iterate through each folder in the folders object
@@ -15,7 +15,7 @@ export function generateMenuItems(folders: FolderFiles, dispatch): MenuItem[] {
 			label: folderName,
 			subItems: [],
 			isHeader: true,
-			
+
 			dropdownMenus: [
 				{
 					label: 'dto',

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { setCurrentItem } from '@renderer/redux/thunks';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { SidebarTrigger } from '@renderer/components/ui/sidebar';
-import { extractByType, getMergedFiles, mergeFilesByType } from './helpers';
+import { extractByType, getMergedFiles } from './helpers';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 
 interface PageBuilderState {
