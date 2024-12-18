@@ -780,10 +780,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@igrp/igrp-design-system@^1.0.0-alpha.54":
-  version "1.0.0-alpha.54"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.54.tgz#c3aaf8ae22979bdb4ba42054985256e5253926cb"
-  integrity sha512-LmKAYjfD99YPBbcx1WwhLHTnfA2V4xSzAhqKuaCp6GE4rKiStTluuke9XQc81QUcC96TW3wInxPEPlrDonOYKg==
+"@igrp/igrp-design-system@^1.0.0-alpha.66":
+  version "1.0.0-alpha.66"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.66.tgz#bab86cb8a17175b7b5c38bd4f826e20c1ed922c7"
+  integrity sha512-rHLnGiZcQIR0oBb7foEcL5w4I7f4Km3EJTryrbpYzjf+Hqto/AFcXFrF1PAV1pklRFOk0RlJeWA7KnzObFzAaQ==
   dependencies:
     "@radix-ui/react-alert-dialog" "^1.1.2"
     "@radix-ui/react-avatar" "^1.1.1"
@@ -818,7 +818,7 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.3.0-alpha-4.2.8":
+"@igrp/spring-engine@0.3.0-alpha-4.2.8":
   version "0.3.0-alpha-4.2.8"
   resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.2.8.tgz#6629d5948808ee45408d7dd97b780c11228fc713"
   integrity sha512-GB00E3IWnsw9+hRviNF3hugq6dOFEuMv7E86QHqg84/jsni8rCjHwqVJt2v+NRqUvBcnTWyIOaI9odxNasttSQ==
@@ -6191,6 +6191,11 @@ process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
+
+process@^0.11.10:
+  version "0.11.10"
+  resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
+  integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
 progress@^2.0.3:
   version "2.0.3"

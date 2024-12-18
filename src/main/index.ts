@@ -35,7 +35,9 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      //nodeIntegration: true, // Enable Node.js in the renderer process
+     // contextIsolation: false // Allow the `process` global
     },
     titleBarStyle: "hidden",
   })

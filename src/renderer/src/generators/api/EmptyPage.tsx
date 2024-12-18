@@ -1,37 +1,56 @@
-import Illustration from "@renderer/components/ilustration";
-import { useTranslation } from "react-i18next";
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent } from '@renderer/components/ui/card'
+import { Database, FileCode, FileText } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const EmptyPage = ({ onClick }) => {
+  const { t } = useTranslation()
 
-    const {t} = useTranslation();
+  const actions = [
+    {
+      title: t('newObject', { name: t('Model') }),
+      icon: <Database className="h-6 w-6" />,
+      onClick: () => onClick('models'),
+      type: 'models'
+    },
+    {
+      title: t('newObject', { name: t('Controller') }),
+      icon: <FileCode className="h-6 w-6" />,
+      onClick: () => onClick('controllers'),
+      type: 'controllers'
+    },
+    {
+      title: t('newObject', { name: t('dto') }),
+      icon: <FileText className="h-6 w-6" />,
+      onClick: () => onClick('dto'),
+      type: 'dto'
+    }
+  ]
 
-    return (
-        <div className="flex justify-center items-center w-full h-[calc(100vh-140px)] relative">
-            <Illustration name="Empty" />
-            <div className="absolute text-center mt-6">
-                <div className="flex gap-4 mt-20">
-                    <button
-                        className="bg-[#008054] text-white px-4 py-2 rounded hover:bg-green-700"
-                        onClick={() => onClick('models')}
-                    >
-                        {t('newObject', {name: t('Model')})}
-                    </button>
-                    <button
-                        className="bg-[#008054] text-white px-4 py-2 rounded hover:bg-green-700"
-                        onClick={() => onClick('controllers')}
-                    >
-                        {t('newObject', {name: t('Controller')})}
-                    </button>
-                    <button
-                        className="bg-[#008054] text-white px-4 py-2 rounded hover:bg-green-700"
-                        onClick={() => onClick('dto')}
-                    >
-                        {t('newObject', {name: t('dto')})}
-                    </button>
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4 bg-background">
+      <div className="w-full max-w-4xl space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {actions.map((action) => (
+            <Card
+              key={action.type}
+              className="group hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={action.onClick}
+            >
+              <CardContent className="p-6 flex flex-col items-center justify-center space-y-4">
+                <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  {action.icon}
                 </div>
-            </div>
+                <Button variant="default" className="w-full">
+                  {action.title}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-    );
-};
+      </div>
+    </div>
+  )
+}
 
-export default EmptyPage;
+export default EmptyPage

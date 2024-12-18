@@ -4,9 +4,9 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import ErrorBoundary from './components/error-boundary'
-import Loader from './components/loader'
 
 import '@renderer/localization/i18next.config'
+import Loader from './components/loader'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
