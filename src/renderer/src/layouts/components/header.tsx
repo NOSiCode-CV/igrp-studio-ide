@@ -1,19 +1,8 @@
 import logo from '@renderer/assets/images/igrp-blue.svg'
 import { useEffect, useState } from 'react'
-import { ConfigOptions, MenuItem } from 'src/main/types'
+import { ConfigOptions } from 'src/main/types'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import {
-  Bell,
-  Code,
-  Github,
-  Grid,
-  HelpCircle,
-  Maximize2,
-  Minus,
-  Settings,
-  Square,
-  X
-} from 'lucide-react'
+import { Bell, Code, Maximize2, Minus, Settings, Square, X } from 'lucide-react'
 import { SettingsDialog } from '@renderer/components/settings-dialog'
 import { HelpDialog } from '@renderer/components/help-dialog'
 import { cn } from '@renderer/lib/utils'
@@ -122,7 +111,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                 </Button>
               )}
 
-              <Button variant="ghost" size="sm" onClick={setOpenSettings}>
+              <Button variant="ghost" size="sm" onClick={() => setOpenSettings(true)}>
                 <Settings className="w-5 h-5" />
                 <span className="sr-only">Settings</span>
               </Button>
