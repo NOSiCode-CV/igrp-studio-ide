@@ -2,10 +2,10 @@ import { ROUTES } from './routeConstants';
 import React, { lazy, Suspense } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import Loader from '@renderer/components/loader'
 import MainLayout from '@renderer/layouts/MainLayout'
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
 import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayoput'
+import Loader from '@renderer/components/loader';
 
 const IDEInitialScreen = lazy(() => import('@renderer/pages/home/ide-initial-screen'))
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'))

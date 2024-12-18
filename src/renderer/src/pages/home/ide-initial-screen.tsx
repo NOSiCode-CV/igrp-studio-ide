@@ -7,9 +7,9 @@ import useToast from '@renderer/components/useToast'
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks'
 import { CreateProject } from './components/new-project-dialog'
 import RecentsProjects from './components/recents-projects'
+import { PageHeader } from '@igrp/igrp-design-system'
 
- const IDEInitialScreen = (): JSX.Element => {
-  
+const IDEInitialScreen = (): JSX.Element => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -40,11 +40,10 @@ import RecentsProjects from './components/recents-projects'
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Welcome to IGRP Studio</h1>
-        <div className="flex space-x-4">
-          <CreateProject/>
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <PageHeader title="Welcome to IGRP Studio">
+        <div className="flex justify-end space-x-3 ">
+          <CreateProject />
           <Button variant="outline">
             <GitFork className="w-4 h-4 mr-2" />
             {t('Clone Project')}
@@ -54,7 +53,7 @@ import RecentsProjects from './components/recents-projects'
             {t('Open Project')}
           </Button>
         </div>
-      </div>
+      </PageHeader>
 
       <RecentsProjects />
     </div>

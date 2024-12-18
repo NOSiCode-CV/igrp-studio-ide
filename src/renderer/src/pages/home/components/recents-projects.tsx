@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { PageableProjects, Project } from 'src/main/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
-import { Calendar, ChevronRight, Clock, FolderOpen, Search } from 'lucide-react'
+import { Calendar, ChevronRight, Clock, FolderOpen, LayoutDashboard, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
 import { EmptyState } from '@renderer/components/empty-state'
 import { Button } from '@renderer/components/ui/button'
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@renderer/components/ui/select'
+import { IGRPContainer } from '@igrp/igrp-design-system'
 
 const projectIcons = {
   [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
@@ -90,9 +91,9 @@ const RecentsProjects = (): JSX.Element => {
     setTimeout(() => setIsLoading(false), 1500)
   }, [])
 
-  const RenderProjectCard = (project: Project, isCompact: boolean = false) => {
+  const RenderProjectCard = (project: Project, isCompact: boolean = false, index: number) => {
     return (
-      <Card key={project.config.name} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
+      <Card key={index} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
         <CardHeader className={isCompact ? 'p-2' : ''}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -145,128 +146,122 @@ const RecentsProjects = (): JSX.Element => {
 
   return (
     <>
-      <Card className="mb-6 bg-card text-card-foreground">
-        <CardHeader>
-          <CardTitle className="flex items-center text-foreground">
-            <Clock className="w-5 h-5 mr-2" />
-            {t('recent')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : allProjects.data.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {allProjects.data.slice(0, 3).map((project) => RenderProjectCard(project, true))}
-            </div>
-          ) : (
-            <EmptyState
-              message="No recent projects found. Start by creating a new project!"
-              className="text-muted-foreground"
-            />
-          )}
-        </CardContent>
-      </Card>
-
-      {/* All Projects Section */}
-      <Card className="bg-card text-card-foreground">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-foreground">All Projects</CardTitle>
-            <Tabs defaultValue="local">
-              <TabsList>
-                <TabsTrigger
-                  value="local"
-                  className="data-[state=active]:bg-background data-[state=active]:text-foreground"
-                >
-                  Local Projects
-                </TabsTrigger>
-                <TabsTrigger
-                  value="remote"
-                  className="data-[state=active]:bg-background data-[state=active]:text-foreground"
-                >
-                  GitHub/GitLab Projects
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+      <IGRPContainer>
+        <div className="flex items-center text-foreground">
+          <Clock className="w-5 h-5 mr-2" />
+          {t('recent')}
+        </div>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : allProjects.data.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {allProjects.data.slice(0, 3).map((project, index) => RenderProjectCard(project, true, index))}
           </div>
-        </CardHeader>
-        <CardContent>
+        ) : (
+          <EmptyState
+            message="No recent projects found. Start by creating a new project!"
+            className="text-muted-foreground"
+          />
+        )}
+      </IGRPContainer>
+      {/* All Projects Section */}
+      <IGRPContainer>
+        <div className="flex justify-between items-center">
+		  <div className="flex items-center text-foreground">
+          <LayoutDashboard className="w-5 h-5 mr-2" />
+          {t('All Projects')}
+        </div>
           <Tabs defaultValue="local">
-            <TabsContent value="local">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5" />
-                  <Input
-                    type="text"
-                    placeholder="Search local projects..."
-                    value={localSearchQuery}
-                    onChange={(e) => setLocalSearchQuery(e.target.value)}
-                    className="pl-8 placeholder-muted-foreground"
-                  />
-                </div>
-                <Select value={localProjectOrder} onValueChange={setLocalProjectOrder}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Order by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lastModified">Last Modified</SelectItem>
-                    <SelectItem value="name">Name</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {isLoading ? (
-                <LoadingSpinner />
-              ) : localProjects.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sortProjects(
-                    localProjects.filter((project) =>
-                      project.config.name.toLowerCase().includes(localSearchQuery.toLowerCase())
-                    )
-                  ).map((project) => RenderProjectCard(project, true))}
-                </div>
-              ) : (
-                <EmptyState
-                  message="No local projects found. Start by creating a new project!"
-                  className="text-muted-foreground"
-                />
-              )}
-            </TabsContent>
-            <TabsContent value="remote">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex-1 relative">
-                  {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
-                  <Input
-                    type="text"
-                    placeholder="Search remote projects..."
-                    // value={remoteSearchQuery}
-                    // onChange={(e) => setRemoteSearchQuery(e.target.value)}
-                    className="pl-8 placeholder-muted-foreground"
-                  />
-                </div>
-                <Select //value={remoteProjectOrder} onValueChange={setRemoteProjectOrder}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Order by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lastModified">Last Modified</SelectItem>
-                    <SelectItem value="name">Name</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {isLoading ? (
-                <LoadingSpinner />
-              ) : (
-                <EmptyState
-                  message="No remote projects found. Start by cloning a project from GitHub or GitLab!"
-                  className="text-muted-foreground"
-                />
-              )}
-            </TabsContent>
+            <TabsList>
+              <TabsTrigger
+                value="local"
+                className="data-[state=active]:bg-background data-[state=active]:text-foreground"
+              >
+                Local Projects
+              </TabsTrigger>
+              <TabsTrigger
+                value="remote"
+                className="data-[state=active]:bg-background data-[state=active]:text-foreground"
+              >
+                GitHub/GitLab Projects
+              </TabsTrigger>
+            </TabsList>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+        <Tabs defaultValue="local">
+          <TabsContent value="local">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5" />
+                <Input
+                  type="text"
+                  placeholder="Search local projects..."
+                  value={localSearchQuery}
+                  onChange={(e) => setLocalSearchQuery(e.target.value)}
+                  className="pl-8 placeholder-muted-foreground"
+                />
+              </div>
+              <Select value={localProjectOrder} onValueChange={setLocalProjectOrder}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Order by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lastModified">Last Modified</SelectItem>
+                  <SelectItem value="name">Name</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : localProjects.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sortProjects(
+                  localProjects.filter((project) =>
+                    project.config.name.toLowerCase().includes(localSearchQuery.toLowerCase())
+                  )
+                ).map((project, index) => RenderProjectCard(project, true, index))}
+              </div>
+            ) : (
+              <EmptyState
+                message="No local projects found. Start by creating a new project!"
+                className="text-muted-foreground"
+              />
+            )}
+          </TabsContent>
+          <TabsContent value="remote">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="flex-1 relative">
+                {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
+                <Input
+                  type="text"
+                  placeholder="Search remote projects..."
+                  // value={remoteSearchQuery}
+                  // onChange={(e) => setRemoteSearchQuery(e.target.value)}
+                  className="pl-8 placeholder-muted-foreground"
+                />
+              </div>
+              <Select //value={remoteProjectOrder} onValueChange={setRemoteProjectOrder}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Order by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lastModified">Last Modified</SelectItem>
+                  <SelectItem value="name">Name</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <EmptyState
+                message="No remote projects found. Start by cloning a project from GitHub or GitLab!"
+                className="text-muted-foreground"
+              />
+            )}
+          </TabsContent>
+        </Tabs>
+      </IGRPContainer>
     </>
   )
 }
