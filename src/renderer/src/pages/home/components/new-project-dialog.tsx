@@ -42,7 +42,7 @@ export function CreateProject() {
           New Project
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] bg-background text-foreground">
+      <DialogContent className="w-full sm:w-[540px] sm:max-w-[75vw] lg:max-w-[960px] bg-background text-foreground">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Create New Project</DialogTitle>
         </DialogHeader>
