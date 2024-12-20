@@ -27,9 +27,9 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1"
             >
-                <div className="flex aspect-square items-center justify-center">
+               {/*  <div className="flex aspect-square items-center justify-center">
                     <img src={SpringIcon} className="" />
-                </div>
+                </div> */}
                 <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">{config?.name}</span>
                     <span className="truncate text-xs">{config?.projectStructureStyle}</span>

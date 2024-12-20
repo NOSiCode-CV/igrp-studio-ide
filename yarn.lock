@@ -803,10 +803,10 @@
     eslint-plugin-prettier "^5.2.1"
     lucide-react "^0.465.0"
 
-"@igrp/nextjs-engine@^0.0.5":
-  version "0.0.5"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/nextjs-engine/-/nextjs-engine-0.0.5.tgz#091903675bd56984e4ce059cb3a61acb3ab5bb6c"
-  integrity sha512-B5/BOxKbIkCB2i+dWxZOvjRjNfcgtJ8oEWmFng7IUsRUcDY5+fi5zYVCYtzAWaHQIAD3uottAzK2oDhdDFRctA==
+"@igrp/nextjs-engine@^0.1.5":
+  version "0.1.5"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/nextjs-engine/-/nextjs-engine-0.1.5.tgz#db840f464f4ccbd7a2e60968bb1c6091011c19ca"
+  integrity sha512-LRP8pUPKBZTuUduJAmKO5B1yB07An+Lt0HBlfw/QcJL7QAnfartdpYqO1E5jIbA3xsJa/y85LvAFgU7mDFRCCw==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"

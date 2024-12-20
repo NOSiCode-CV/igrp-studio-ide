@@ -35,7 +35,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         <div className="h-screen flex flex-col">
             <ToastContainer />
             <Header config={config} basePath={basePath} />
-            <div className="main-content overflow-hidden">
+            <div className="overflow-hidden">
                 {React.cloneElement(props.children, { basePath: basePath })}
             </div>
         </div>

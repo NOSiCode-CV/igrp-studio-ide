@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { PageableProjects, Project } from 'src/main/types'
-import { ENV_TYPES } from '@renderer/constants/appConstants'
+import {  projectIcons } from '@renderer/constants/appConstants'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import { Calendar, ChevronRight, Clock, FolderOpen, LayoutDashboard, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
@@ -22,10 +22,6 @@ import {
 } from '@renderer/components/ui/select'
 import { IGRPContainer } from '@igrp/igrp-design-system'
 
-const projectIcons = {
-  [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-  [ENV_TYPES.SPRING]: 'https://www.svgrepo.com/show/354380/spring-icon.svg'
-}
 
 const RecentsProjects = (): JSX.Element => {
   const navigate = useNavigate()

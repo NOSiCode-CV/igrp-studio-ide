@@ -1,70 +1,74 @@
-import React, { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
-import withRouter from '@renderer/common/withRouter';
-import { createSelector } from 'reselect';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from 'react'
+import { ToastContainer } from 'react-toastify'
+import withRouter from '@renderer/common/withRouter'
+import { createSelector } from 'reselect'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
-    getPages as onGetFolderFiles,
-    setChangeStatus as onSetChangeStatus,
-} from "@renderer/redux/thunks";
+  getPages as onGetFolderFiles,
+  setChangeStatus as onSetChangeStatus
+} from '@renderer/redux/thunks'
 
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
-import { AppSidebar } from './components/app-sidebar';
-import Header from './components/header';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import Navdata from './components/nav-data';
+import Header from './components/header'
+import Navdata from './components/nav-data'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
+import VerticalMenu from './components/vertical-menu'
+import { AppSidebar } from './components/app-sidebar'
 
 interface LayoutProps {
-    children: React.ReactNode;
+  children: React.ReactElement<{ basePath: string }>;
 }
 
 const Layout = (props: LayoutProps): JSX.Element => {
-    const dispatch: any = useDispatch();
+  const dispatch: any = useDispatch()
 
-    const selectStudioState = (state: any) => state.PageBuilder;
-    const selectStudioProperties = createSelector(
-        selectStudioState,
-        (studio) => ({
-            config: studio.config,
-            folders: studio.folderFiles,
-            basePath: studio.basePath,
-            changeStatus: studio.changeStatus,
-        })
-    );
+  const selectStudioState = (state: any) => state.PageBuilder
+  const selectStudioProperties = createSelector(selectStudioState, (studio) => ({
+    config: studio.config,
+    folders: studio.folderFiles,
+    basePath: studio.basePath,
+    changeStatus: studio.changeStatus
+  }))
 
-    const { changeStatus, config, basePath, folders } = useSelector(selectStudioProperties);
+  const { changeStatus, config, basePath, folders } = useSelector(selectStudioProperties)
 
-    useEffect(() => {
-        dispatch(onGetFolderFiles(basePath));
-    }, [basePath, dispatch]);
+  useEffect(() => {
+    dispatch(onGetFolderFiles(basePath))
+  }, [basePath, dispatch])
 
-    useEffect(() => {
-        if (changeStatus) {
-            dispatch(onGetFolderFiles(basePath));
-            dispatch(onSetChangeStatus(false));
-        }
-    }, [changeStatus, basePath, dispatch]);
+  useEffect(() => {
+    if (changeStatus) {
+      dispatch(onGetFolderFiles(basePath))
+      dispatch(onSetChangeStatus(false))
+    }
+  }, [changeStatus, basePath, dispatch])
 
-    const menuItems = Navdata(folders).menuItems
+  const menuItems = Navdata(folders).menuItems
 
-    return (
-        <div className="h-screen flex flex-col">
-            <ToastContainer />
-            <Header config={config} basePath={basePath} />
+  return (
+    <SidebarProvider>
+      <div className="h-screen flex flex-col w-full">
+        <ToastContainer />
+        <Header config={config} basePath={basePath} />
 
-            <div className="flex flex-1 overflow-hidden">
-                <SidebarProvider>
-                    <AppSidebar menuItems={menuItems} className='mt-10' config={config} basePath={basePath} header/>
-                    <SidebarInset >
-                        <ScrollArea className='mb-20'>
-                            {props.children}
-                        </ScrollArea>
-                    </SidebarInset>
-                </SidebarProvider>
-            </div >
-        </div >
-    );
+        <div className="flex flex-1 overflow-hidden">
+          <VerticalMenu config={config} />
+          <AppSidebar
+            menuItems={menuItems}
+            className="mt-10 ml-20"
+            config={config}
+            basePath={basePath}
+            header
+          />
+          <SidebarInset className="flex-1">
+            <div className="overflow-hidden">
+              {React.cloneElement(props.children, { basePath: basePath })}
+            </div>
+          </SidebarInset>
+        </div>
+      </div>
+    </SidebarProvider>
+  )
 }
 
-export default withRouter(Layout);
+export default withRouter(Layout)

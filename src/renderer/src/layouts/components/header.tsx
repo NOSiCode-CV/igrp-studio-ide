@@ -93,10 +93,10 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
   )
 
   return (
-    <>
+    <> 
       <TooltipProvider>
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-10 items-center justify-between px-4">
+        <header className="sticky h-10 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex items-center justify-between px-4">
             <div className="flex items-center space-x-2 home cursor-pointer" onClick={openPage}>
               <img src={logo} alt="Logo" className="h-6 w-auto" />
               <p className="text-sm font-medium">IGRP Studio</p>

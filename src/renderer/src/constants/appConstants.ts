@@ -15,7 +15,7 @@ export const PATTERNS = {
     NAME_VALIDATION_PATTERN: /^[A-Za-z][A-Za-z0-9_]*$/,
     NAMESPACE_VALIDATION_PATTERN: /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/,
     PARAMS_VALIDATION: /^[a-zA-Z0-9_]+$/,
-    PATH_VALIDATION: /^[a-zA-Z_/]+$/,  
+    PATH_VALIDATION: /^[a-zA-Z_/]+$/,
 };
 
 
@@ -26,3 +26,10 @@ export enum OPTION_TYPE {
 };
 
 export type OptionType = 'models' | 'controllers' | 'dto' | 'none';
+
+export const projectIcons = {
+    [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
+    [ENV_TYPES.SPRING]: 'https://www.svgrepo.com/show/354380/spring-icon.svg'
+}
+
+export const PAGE_DEFAULT = 'Overview'

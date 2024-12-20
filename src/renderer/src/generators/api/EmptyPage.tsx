@@ -8,13 +8,13 @@ const EmptyPage = ({ onClick }) => {
 
   const actions = [
     {
-      title: t('newObject', { name: t('Model') }),
+      title: t('newObject', { name: t('model') }),
       icon: <Database className="h-6 w-6" />,
       onClick: () => onClick('models'),
       type: 'models'
     },
     {
-      title: t('newObject', { name: t('Controller') }),
+      title: t('newObject', { name: t('controller') }),
       icon: <FileCode className="h-6 w-6" />,
       onClick: () => onClick('controllers'),
       type: 'controllers'
@@ -30,7 +30,7 @@ const EmptyPage = ({ onClick }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4 bg-background">
       <div className="w-full max-w-4xl space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4">
           {actions.map((action) => (
             <Card
               key={action.type}
