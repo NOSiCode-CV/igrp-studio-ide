@@ -201,6 +201,14 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       ?.MYME_TYPES || []
   )
 
+  const responseTypes = formatMethods(
+    (
+        selectors.find((selector) => 'RESPONSE_TYPES' in selector) as
+        | { RESPONSE_TYPES: string[] }
+        | undefined
+    )?.RESPONSE_TYPES || []
+)
+
   const onSubmit = async () => {
     const errors = await formik.validateForm()
     if (Object.keys(errors).length === 0) {
@@ -249,7 +257,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
           </CardHeader>
           <CardContent>
             <div className="flex gap-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor={'method'} className="block text-sm font-medium text-gray-700">
                   {'Method Type'}
                 </Label>
@@ -259,6 +267,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                   value={formik.values.method}
                   onChange={(value) => formik.setFieldValue('method', value)}
                   options={httpMethods}
+                  className='h-9'
                 />
               </div>
 
@@ -295,7 +304,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             <TabRequest formik={formik} tablesColumns={tablesColumns} />
           </TabsContent>
           <TabsContent value={'response'}>
-            <TabResponse formik={formik} responseTypes={typesData} />
+            <TabResponse formik={formik} responseTypes={responseTypes} contentTypes={typesData}/>
           </TabsContent>
         </Tabs>
       </div>

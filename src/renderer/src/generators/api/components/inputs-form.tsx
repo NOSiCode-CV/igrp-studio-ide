@@ -9,7 +9,7 @@ export const TextInput = ({ label, id, placeholder, value, onChange, onBlur, err
 		<Input
 			type="text"
 			id={id}
-			className={`block w-full  ${error ? 'border-red-500' : ''}`}
+			className={` w-full  ${error ? 'border-red-500' : ''}`}
 			placeholder={placeholder}
 			value={value}
 			onChange={onChange}
@@ -22,14 +22,14 @@ export const TextInput = ({ label, id, placeholder, value, onChange, onBlur, err
 // Helper Component: SelectInput
 export const SelectInput = ({ label, id, options, value, onChange, error }) => (
 	<div className="space-y-2">
-		<Label htmlFor={id} className="block text-sm">{label}</Label>
+		<Label htmlFor={id} className=" text-sm">{label}</Label>
 		<Combobox
 			name={id}
 			options={options}
 			value={value}
 			onChange={onChange}
 			placeholder={`Select ${label}`}
-			className={`w-full ${error ? 'border-red-500' : ''}`}
+			className={`w-full h-9 ${error ? 'border-red-500' : ''}`}
 		/>
 		{error && <p className="text-sm text-red-600">{error}</p>}
 	</div>

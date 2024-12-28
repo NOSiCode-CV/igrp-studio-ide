@@ -9,10 +9,10 @@ import { Combobox } from '@igrp/igrp-design-system'
 import { httpStatusCodes } from '@renderer/constants/appConstants'
 interface AddResponseModalProps {
   onSave: (response: { name: string; statusCode: string; contentType: string }) => void
-  responseTypes: any
+  contentTypes: any
 }
 
-const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, responseTypes }) => {
+const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentTypes }) => {
   const [name, setName] = useState('')
   const [statusCode, setStatusCode] = useState('')
   const [contentType, setContentType] = useState('')
@@ -63,7 +63,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, responseTyp
               <Label className="">Content Type</Label>
               <Combobox
                 name={'contentType'}
-                options={responseTypes}
+                options={contentTypes}
                 value={contentType}
                 onChange={(value) => setContentType(value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"

@@ -5,13 +5,22 @@ import { Combobox } from '@igrp/igrp-design-system'
 import { useTranslation } from 'react-i18next'
 import { Input } from '@renderer/components/ui/input'
 import { httpStatusCodes } from '@renderer/constants/appConstants'
+import { cn } from '@renderer/lib/utils'
+import { FormList } from '../form-list'
+import { IColumnsTabelProps } from '../Interfaces'
+import { addNewRow, changeValue, removeRow } from '../../helpers'
 
 interface TabResponseProps {
   formik: any
   responseTypes: any
+  contentTypes: any
 }
 
-export const TabResponse: React.FC<TabResponseProps> = ({ formik, responseTypes }) => {
+export const TabResponse: React.FC<TabResponseProps> = ({
+  formik,
+  responseTypes,
+  contentTypes
+}) => {
   const { t } = useTranslation()
 
   const [activeResponseTab, setActiveResponseTab] = useState<string>('200')
@@ -43,6 +52,28 @@ export const TabResponse: React.FC<TabResponseProps> = ({ formik, responseTypes 
     }))
   }
 
+  const properties = [
+    {
+      type: '',
+      name: '',
+      value: '',
+      isRequired: false
+    }
+  ]
+
+  const response: IColumnsTabelProps[] = [
+    { key: 'type', name: 'Type', type: 'select', options: responseTypes, width: '25%' },
+    {
+      key: 'group',
+      name: '',
+      type: 'group',
+      items: [
+        { key: 'advanced', name: '', type: 'popover', width: '25%' }
+      ]
+    },
+    { key: 'description', name: 'Description', type: 'text', width: '50%' },
+  ]
+
   return (
     <div className="w-full">
       {/* Response Tabs Navigation */}
@@ -60,7 +91,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({ formik, responseTypes 
             </button>
           ))}
         </div>
-        <AddResponseModal onSave={handleAddResponse} responseTypes={responseTypes} />
+        <AddResponseModal onSave={handleAddResponse} contentTypes={contentTypes} />
       </div>
 
       {/* Response Tab Content */}
@@ -71,7 +102,10 @@ export const TabResponse: React.FC<TabResponseProps> = ({ formik, responseTypes 
           const contentType = Object.keys(content)[0]
 
           return (
-            <div key={statusCode} className={activeResponseTab === statusCode ? 'block' : 'hidden'}>
+            <div
+              key={statusCode}
+              className={cn('space-y-4', activeResponseTab === statusCode ? 'block' : 'hidden')}
+            >
               <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor={'statusCode'} className="">
@@ -82,7 +116,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({ formik, responseTypes 
                     name="statusCode"
                     value={statusCode}
                     onChange={(value) => formik.setFieldValue('contentType', value)}
-                    className="w-full focus:ring-igrp focus:border-igrp"
+                    className="w-full focus:ring-igrp focus:border-igrp h-9"
                     placeholder="e.g., 200, 400"
                   />
                 </div>
@@ -106,10 +140,21 @@ export const TabResponse: React.FC<TabResponseProps> = ({ formik, responseTypes 
                     value={contentType}
                     placeholder="Select Content Type"
                     onChange={(value) => formik.setFieldValue('contentType', value)}
-                    options={responseTypes}
+                    options={contentTypes}
+                    className='h-9'
                   />
                 </div>
               </div>
+              <p className="text-sm text-foreground">Data Schema</p>
+              <FormList
+                columns={response}
+                data={properties}
+                changeValue={(element, position, value) =>
+                  changeValue(formik, element, position, value, 'tabBody')
+                }
+                errors={formik.errors['tabBody']}
+                name={'Form Data'}
+              />
             </div>
           )
         })}

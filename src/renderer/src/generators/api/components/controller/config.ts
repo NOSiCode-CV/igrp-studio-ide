@@ -5,7 +5,17 @@ export const initialValues = {
     actionName: '',
     path: '',
     method: 'GET',
-    requestBody: '',
+    requestBody: {
+        'multipart/form-data': {
+            type: "Object",
+            properties: [{
+                type: '',
+                name: '',
+                value: '',
+                isRequired: true
+            }]
+        },
+    },
     response: 'Object',
     responses: {
         '200': {
@@ -48,7 +58,6 @@ export const TabList = [
 ]
 
 export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTabelProps[] } => {
-
     const headersTypes = formatMethods(
         (
             selectors.find((selector) => 'HTTP_HEADER_TYPES' in selector) as
@@ -99,7 +108,7 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
             {
                 key: 'group', name: '', type: 'group', items: [
                     { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popover', width: '25%' }
+                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
                 ]
             }
         ],
@@ -117,7 +126,7 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
                 key: 'group', name: '', type: 'group', items: [
 
                     { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popover', width: '25%' }
+                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
                 ]
             }
         ],
@@ -129,14 +138,20 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
                 key: 'group', name: '', type: 'group', items: [
 
                     { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popover', width: '25%' }
+                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
                 ]
             }
         ],
-        bodyContent: [
+        requestBody: [
             { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'type', name: 'Type', type: 'select', options: typesData, width: '25%' },
-            { key: 'value', name: 'Value', type: 'text', width: '25%' }
+            { key: 'value', name: 'Value', type: 'text', width: '25%' },
+            { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
+            {
+                key: 'group', name: '', type: 'group', items: [
+                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
+                ]
+            }
         ],
     }
 }

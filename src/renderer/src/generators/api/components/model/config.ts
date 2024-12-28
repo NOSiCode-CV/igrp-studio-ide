@@ -160,11 +160,12 @@ export const getTablesColumns = ({
     attributes: [
       { key: 'name', name: 'Name', type: 'text' },
       { key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
-      { key: 'length', name: 'Lenght', type: 'number', width: '75px' },
-      { key: 'defaultValue', name: 'Default Value', type: 'text' },
-      { key: 'unique', name: 'Unique', type: 'checkbox' },
-      { key: 'nullable', name: 'Required', type: 'checkbox' },
-      { key: 'primaryKey', name: 'Primary Key', type: 'checkbox' }
+      { key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
+      {
+        key: 'group', name: '', type: 'group', items: [
+          { key: 'advanced', name: '', type: 'popoverModel', width: '25%' }
+        ]
+      }
     ],
     relations: [
       {

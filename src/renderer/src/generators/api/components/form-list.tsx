@@ -16,13 +16,14 @@ import { Checkbox } from '@renderer/components/ui/checkbox'
 import { Combobox } from '@igrp/igrp-design-system'
 import MultipleSelector from '@renderer/components/multiples-selector'
 import { cn } from '@renderer/lib/utils'
-import { PopoverComp } from './popover-comp'
+import { PopoverController } from './controller/popover'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@renderer/components/ui/tooltip'
+import { PopoverModel } from './model/popover'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
@@ -114,7 +115,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
               {name}
             </TableHead>
           ))}
-          <TableHead style={{ width: '15px' }}></TableHead>
+          {removeRow && <TableHead style={{ width: '15px' }}></TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -151,14 +152,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                   onChange={(selectedOption) =>
                                     changeValue(item.key, index, selectedOption)
                                   }
-                                  className="w-auto"
+                                  className="w-auto h-8"
                                 />
                               )}
 
                               {item.type === 'checkbox' && (
                                 <TooltipProvider>
                                   <Tooltip>
-                                    <TooltipTrigger className='flex align-center'>
+                                    <TooltipTrigger className="flex align-center">
                                       <Checkbox
                                         id={`${item.key}_${index2}`}
                                         onCheckedChange={(checked) =>
@@ -172,8 +173,18 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 </TooltipProvider>
                               )}
 
-                              {item.type === 'popover' && (
-                                <PopoverComp
+                              {item.type === 'popoverController' && (
+                                <PopoverController
+                                  key={itemIndex}
+                                  index={index}
+                                  row={row}
+                                  changeValue={(element, position, value) =>
+                                    changeValue(element, position, value)
+                                  }
+                                />
+                              )}
+                              {item.type === 'popoverModel' && (
+                                <PopoverModel
                                   key={itemIndex}
                                   index={index}
                                   row={row}
@@ -210,7 +221,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             onChange={(selectedOption) => {
                               handleDependentChange(key, index, selectedOption)
                             }}
-                            className="w-full"
+                            className="w-full h-9"
                           />
                         )}
                         {['multiSelect'].includes(type) && (
@@ -231,14 +242,24 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                           />
                         )}
                         {['popover'].includes(type) && (
-                          <PopoverComp
+                          <PopoverController
                             key={index}
                             index={index}
                             row={row}
                             changeValue={(element, position, value) =>
                               changeValue(element, position, value)
                             }
-                          ></PopoverComp>
+                          />
+                        )}
+                        {['popoverModel'].includes(type) && (
+                          <PopoverModel
+                            key={index}
+                            index={index}
+                            row={row}
+                            changeValue={(element, position, value) =>
+                              changeValue(element, position, value)
+                            }
+                          />
                         )}
                       </>
                     )}

@@ -9,24 +9,24 @@ interface TabRequestProps {
 
 export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns }) => {
   const [activeTab, setActiveTab] = useState<'params' | 'headers' | 'body'>('params')
-  const [bodyType, setBodyType] = useState<'none' | 'formData' | 'json'>('none')
+  const [bodyType, setBodyType] = useState<'none' | 'multipart/form-data' | 'json'>('none')
 
   const tabQueryParams = 'requestParams'
   const tabPathVariables = 'pathVariables'
   const tabHeaders = 'headers'
-  const tabBody = 'bodyContent'
+  const tabBody = 'requestBody'
 
   const columnsQuery = tablesColumns[tabQueryParams]
   const columnsVariables = tablesColumns[tabPathVariables]
   const columnsHeaders = tablesColumns[tabHeaders]
   const columnsBody = tablesColumns[tabBody]
 
-  const handleBodyTypeChange = (type: 'none' | 'formData' | 'json') => {
+  const handleBodyTypeChange = (type: 'none' | 'multipart/form-data' | 'json') => {
     setBodyType(type)
 
     // Clear formik values for body content when type changes
     if (type === 'none') {
-      formik.setFieldValue('bodyContent', [])
+      formik.setFieldValue('requestBody', [])
     }
   }
 
@@ -62,7 +62,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
       <div className={activeTab === 'params' ? 'block' : 'hidden'}>
         {columnsQuery && (
           <div className="space-y-3">
-            <p className='text-sm'>Query Parameters</p>
+            <p className="text-sm">Query Parameters</p>
             <FormList
               columns={columnsQuery}
               data={formik.values[tabQueryParams]}
@@ -74,7 +74,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
               errors={formik.errors[tabQueryParams]}
               name={'Query Parameter'}
             />
-            <p className='text-sm'>Variables</p>
+            <p className="text-sm">Variables</p>
             <FormList
               columns={columnsVariables}
               data={formik.values[tabPathVariables]}
@@ -114,8 +114,8 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
               None
             </Badge>
             <Badge
-              onClick={() => handleBodyTypeChange('formData')}
-              variant={bodyType === 'formData' ? 'default' : 'outline'}
+              onClick={() => handleBodyTypeChange('multipart/form-data')}
+              variant={bodyType === 'multipart/form-data' ? 'default' : 'outline'}
             >
               Form Data
             </Badge>
@@ -128,18 +128,26 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
           </div>
         </div>
 
-        {bodyType === 'formData' && columnsBody && (
-          <FormList
-            columns={columnsBody}
-            data={formik.values[tabBody] || []}
-            changeValue={(element, position, value) =>
-              changeValue(formik, element, position, value, tabBody)
-            }
-            addRow={() => addNewRow(formik, tabBody, 'formData')}
-            removeRow={(position) => removeRow(formik, tabBody, position)}
-            errors={formik.errors[tabBody]}
-            name={'Form Data'}
-          />
+        {bodyType === 'none' && columnsBody && (
+          <div className="text-center rounded p-8 border">
+            <p className="text-muted-foreground text-xs">This request has no body parameters</p>
+          </div>
+        )}
+
+        {bodyType === 'multipart/form-data' && columnsBody && (
+          <>
+            <FormList
+              columns={columnsBody}
+              data={formik.values[tabBody]['multipart/form-data'].properties || []}
+              changeValue={(element, position, value) =>
+                changeValue(formik, element, position, value, tabBody)
+              }
+              addRow={() => addNewRow(formik, tabBody, null)}
+              removeRow={(position) => removeRow(formik, tabBody, position)}
+              errors={formik.errors[tabBody]}
+              name={'Form Data'}
+            />
+          </>
         )}
 
         {bodyType === 'json' && (
