@@ -780,10 +780,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@igrp/igrp-design-system@^1.0.0-alpha.66":
-  version "1.0.0-alpha.66"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.66.tgz#bab86cb8a17175b7b5c38bd4f826e20c1ed922c7"
-  integrity sha512-rHLnGiZcQIR0oBb7foEcL5w4I7f4Km3EJTryrbpYzjf+Hqto/AFcXFrF1PAV1pklRFOk0RlJeWA7KnzObFzAaQ==
+"@igrp/igrp-design-system@^1.0.0-alpha.70":
+  version "1.0.0-alpha.70"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.70.tgz#5d9cea10534d7b2d1f00682ba5c08ebe99b07ec8"
+  integrity sha512-M8N/eNDuM5cdlP1VWAY3cZJv664TATLuYpoM/2qqFiYqmqZfAZQQVrbCsQ4qu8B77q9uW91h65pPm68Ffjf7GA==
   dependencies:
     "@radix-ui/react-alert-dialog" "^1.1.2"
     "@radix-ui/react-avatar" "^1.1.1"
@@ -818,10 +818,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@0.3.0-alpha-4.2.8":
-  version "0.3.0-alpha-4.2.8"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.2.8.tgz#6629d5948808ee45408d7dd97b780c11228fc713"
-  integrity sha512-GB00E3IWnsw9+hRviNF3hugq6dOFEuMv7E86QHqg84/jsni8rCjHwqVJt2v+NRqUvBcnTWyIOaI9odxNasttSQ==
+"@igrp/spring-engine@0.3.0-alpha-4.2.13":
+  version "0.3.0-alpha-4.2.13"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.2.13.tgz#94d913c7b23b2645a4363b63a46b254002824e33"
+  integrity sha512-KxbdvLrRF0zP5vD5+Ct6NTMRZMAvipuQyShf441FjykPZuN/AyzenC0JtfKRmMRWqDLnN2g/HbGgZrC88dcU8Q==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"

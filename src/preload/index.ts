@@ -138,6 +138,8 @@ const api = {
 
   openVSCode: (basePath: string) => ipcRenderer.invoke('igrp-studio:open-vs-code', basePath),
 
+  getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
+
   i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
 }
 

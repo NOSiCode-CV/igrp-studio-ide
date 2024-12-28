@@ -1,73 +1,60 @@
-import { boolean } from "yup"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../Interfaces"
 
-export const defaultValues: any = {
-    general: {
-        actionName: '',
-        path: '',
-        method: '',
-        accepts: '',
-        requestBody: '',
-        response: ''
-    },
-    requestParams: {
-        type: '',
-        name: '',
-        isRequired: boolean
-    },
-    pathVariables: {
-        type: '',
-        name: '',
-        isRequired: boolean
-    }
-}
-
 export const initialValues = {
-    type: 'controller',
-    module: '',
-    name: '',
-    basePath: '',
-    actions: [
+    actionName: '',
+    path: '',
+    method: 'GET',
+    requestBody: '',
+    response: 'Object',
+    responses: {
+        '200': {
+            description: "OK",
+            content: {
+                "application/json": {
+                }
+            }
+        },
+    },
+    requestParams: [
         {
-            general: [
-                {
-                    actionName: '',
-                    path: '',
-                    method: '',
-                    accepts: '',
-                    requestBody: '',
-                    response: ''
-                }
-            ],
-            requestParams: [
-                {
-                    type: 'string',
-                    name: '',
-                    isRequired: true
-                }
-            ],
-            pathVariables: [
-                {
-                    type: '',
-                    name: '',
-                    isRequired: true
-                }
-            ]
+            type: '',
+            name: '',
+            value: '',
+            isRequired: true
+        }
+    ],
+    pathVariables: [
+        {
+            type: '',
+            name: '',
+            value: '',
+            isRequired: true
+        }
+    ],
+    headers: [
+        {
+            type: '',
+            header: 'Accept',
+            value: '',
+            isRequired: true
         }
     ]
 }
 
 export const TabList = [
-    { label: 'General', tabId: 'general' },
-    { label: 'Request Params', tabId: 'requestParams' },
-    { label: 'Path Variables', tabId: 'pathVariables' }
+    { label: 'Request', tabId: 'request' },
+    { label: 'Response', tabId: 'response' }
 ]
 
 export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTabelProps[] } => {
-    const methodsData = formatMethods(
-        (selectors.find((selector) => 'METHODS' in selector) as { METHODS: string[] } | undefined)
-            ?.METHODS || []
+
+    const headersTypes = formatMethods(
+        (
+            selectors.find((selector) => 'HTTP_HEADER_TYPES' in selector) as
+            | { HTTP_HEADER_TYPES: string[] }
+            | undefined
+        )?.HTTP_HEADER_TYPES || []
     )
 
     const requestBodyData = formatMethods(
@@ -93,47 +80,63 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
 
     const paramsTypesData = formatMethods(
         (
-            selectors.find((selector) => 'PARAMS_TYPES' in selector) as
-            | { PARAMS_TYPES: string[] }
+            selectors.find((selector) => 'REQUEST_PARAMS' in selector) as
+            | { REQUEST_PARAMS: string[] }
             | undefined
-        )?.PARAMS_TYPES || []
+        )?.REQUEST_PARAMS || []
     )
     return {
-        general: [
-            { key: 'actionName', name: 'Action Name', type: 'text', width: '16%' },
-            { key: 'path', name: 'Path', type: 'text', width: '16%' },
-            { key: 'method', name: 'Method', type: 'select', options: methodsData, width: '16%' },
-            { key: 'accepts', name: 'Accepts', type: 'select', options: typesData, width: '16%' },
-            {
-                key: 'requestBody',
-                name: 'Request Body',
-                type: 'select',
-                options: requestBodyData,
-                width: '16%'
-            },
-            {
-                key: 'response',
-                name: 'Response Type',
-                type: 'select',
-                options: responseTypesData,
-                width: '16%'
-            }
-        ],
         requestParams: [
-            { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
             { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' }
-        ],
-        pathVariables: [
+            { key: 'value', name: 'Value', type: 'text', width: '25%' },
             {
                 key: 'type',
                 name: 'Type',
                 type: 'select',
-                options: paramsTypesData.filter((param: any) => param.value !== 'Object'),
+                options: paramsTypesData,
                 width: '25%'
             },
+            {
+                key: 'group', name: '', type: 'group', items: [
+                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'advanced', name: '', type: 'popover', width: '25%' }
+                ]
+            }
+        ],
+        pathVariables: [
             { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' }
-        ]
+            { key: 'value', name: 'Value', type: 'text', width: '25%' },
+            {
+                key: 'type',
+                name: 'Type',
+                type: 'select',
+                options: paramsTypesData,
+                width: '25%'
+            },
+            {
+                key: 'group', name: '', type: 'group', items: [
+
+                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'advanced', name: '', type: 'popover', width: '25%' }
+                ]
+            }
+        ],
+        headers: [
+            { key: 'header', name: 'Header', type: 'select', options: headersTypes, width: '25%' },
+            { key: 'value', name: 'Value', type: 'text', width: '25%' },
+            { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
+            {
+                key: 'group', name: '', type: 'group', items: [
+
+                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'advanced', name: '', type: 'popover', width: '25%' }
+                ]
+            }
+        ],
+        bodyContent: [
+            { key: 'name', name: 'Name', type: 'text', width: '25%' },
+            { key: 'type', name: 'Type', type: 'select', options: typesData, width: '25%' },
+            { key: 'value', name: 'Value', type: 'text', width: '25%' }
+        ],
     }
 }

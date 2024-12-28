@@ -3,7 +3,7 @@ import { join } from 'path';
 import fs from 'fs';
 
 describe('fetchFiles', () => {
-    const basePath = '//Users/carlosgraca/Documents/Projects/nosi/TesteApps/teste';
+    const basePath = '///Users/carlosgraca/Projects/nosi/TesteApps/AlphThree';
     const studioDirectory = join(basePath, '.igrpstudio');
 
     it('should read files from an existing directory', async () => {
@@ -12,3 +12,4 @@ describe('fetchFiles', () => {
         expect(result).not.toEqual({});
     });
 });
+

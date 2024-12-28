@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { FolderFiles, Handler, IOpenProject, Project } from './types'
+import { FolderFiles, Handler, HandlerResponse, IOpenProject, Project } from './types'
 import { addController, addDTO, addModel, addModule, deleteController, deleteDTO, deleteModel, engineTypes, newApi } from '@igrp/spring-engine'
 import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
 import { fetchFiles, getJsonContent, openDirectory } from './helpers'
@@ -37,7 +37,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       //nodeIntegration: true, // Enable Node.js in the renderer process
-     // contextIsolation: false // Allow the `process` global
+      // contextIsolation: false // Allow the `process` global
     },
     titleBarStyle: "hidden",
   })
@@ -324,3 +324,33 @@ ipcMain.on('start-drag', (_event) => {
     // Add other snapping conditions for top-right, bottom-left, and bottom-right
   })
 })
+
+
+// Handler para buscar versões
+ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<HandlerResponse> => {
+  try {
+    const response = await fetch(endpoint);
+
+    if (!response.ok) {
+      throw new Error(`Erro na API: ${response.status} - ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error("Formato de resposta inesperado");
+    }
+
+    // Retorna somente os números de versão
+    return {
+      result: data.items.map((item: { version: string }) => item.version),
+    };
+  } catch (error) {
+    console.error("Erro ao buscar versões:", error);
+
+    // Retorna o erro no formato definido
+    return {
+      error: error instanceof Error ? error.message : "Erro desconhecido",
+    };
+  }
+});

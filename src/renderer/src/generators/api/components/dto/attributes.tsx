@@ -8,7 +8,6 @@ import {
   TableHeader,
   TableRow
 } from '@renderer/components/ui/table'
-import { Combobox } from '@renderer/components/combobox'
 import { Button } from '@renderer/components/ui/button'
 import { Plus, Trash } from 'lucide-react'
 import { Input } from '@renderer/components/ui/input'
@@ -17,6 +16,7 @@ import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { NamespacesOptions } from './config'
 import { useEffect, useState } from 'react'
 import { PopoverDto } from './popover-dto'
+import { Combobox } from '@igrp/igrp-design-system'
 
 interface AttributesCardProps {
   currentDto: string

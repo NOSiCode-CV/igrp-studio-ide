@@ -67,9 +67,7 @@ const DtoLayout = ({
 
   const handleSave = async (newValues: DTOConfig): Promise<void> => {
     try {
-      newValues.module = module
-
-      const { error } = await window.api.createDto(newValues, basePath)
+      const { error } = await window.api.createDto({ ...newValues, module }, basePath)
       if (error) return showErrorToast(error)
 
       dispatch(onSetChangeStatus(true))
@@ -83,7 +81,7 @@ const DtoLayout = ({
   const handleDelete = async (): Promise<void> => {
     try {
       const { error } = await window.api.deleteDTO(
-        { type: 'dto', name: formik.values.name },
+        { type: 'dto', name: formik.values.name, module },
         basePath
       )
       if (error) return showErrorToast(error)
@@ -101,7 +99,7 @@ const DtoLayout = ({
     const data = formik?.values?.[value]
     const errors = formik?.errors?.[value]
 
-	const dValues = initialValues.attributes[0]
+    const dValues = initialValues.attributes[0]
 
     if (columns && data) {
       return (
@@ -150,8 +148,8 @@ const DtoLayout = ({
                 label={t('Template')}
                 id="template"
                 options={TemplateOptions}
-                value={TemplateOptions.find((opt) => opt.value === formik.values.template)}
-                onChange={(option) => formik.setFieldValue('template', option?.value)}
+                value={formik.values.template}
+                onChange={(option) => formik.setFieldValue('template', option)}
                 error={formik.errors.template}
               />
             </div>

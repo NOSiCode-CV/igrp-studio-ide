@@ -94,7 +94,7 @@ const FormNewProjectNextJS = (): JSX.Element => {
         {' '}
         <div className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="appName" className="text-muted-foreground">
+            <Label htmlFor="appName">
               Project Name
             </Label>
             <Input

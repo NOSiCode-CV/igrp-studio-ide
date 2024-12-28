@@ -98,7 +98,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                             <Button
                                 variant="outline"
                                 size="icon"
-                                className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200 bg-primary text-primary-foreground"
+                                className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200 bg-igrp text-primary-foreground"
                             >
                                 <Plus className="h-4 w-4" />
                                 <span className="sr-only">Create new module</span>

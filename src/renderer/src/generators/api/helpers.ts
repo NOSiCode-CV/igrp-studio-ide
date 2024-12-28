@@ -72,13 +72,21 @@ export const mergeFilesByType = (files: any[]) => {
 	return mergedFiles;
 };
 
+export const getModulesArray = (modulesObject) => {
+	return Object.keys(modulesObject).map((key) => ({
+		label: modulesObject[key].name,
+		value: key
+	}));
+};
+
+
 export const getMergedFiles = (studio: any, module: string) => {
 
 	const currentModuleData = studio.folderFiles[module] || {};
 	const sharedModuleData = studio.folderFiles["shared"] || {};
 
 	let mergedFiles: any[] = [];
-	
+
 	if (module !== "shared") {
 
 		const currentFiles = currentModuleData.files || [];
@@ -94,3 +102,22 @@ export const getMergedFiles = (studio: any, module: string) => {
 
 	return { ...currentModuleData, files: mergedFiles };
 };
+
+export const getStatusLabel = (statusCode: string): string => {
+	switch (statusCode) {
+		case '200':
+			return 'Default (200)';
+		case '400':
+			return 'Bad Request (400)';
+		case '401':
+			return 'Unauthorized (401)';
+		case '404':
+			return 'Not Found (404)';
+		case '500':
+			return 'Internal Server Error (500)';
+		default:
+			return `Error (${statusCode})`;
+	}
+};
+
+export const toInitCap = (text) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())

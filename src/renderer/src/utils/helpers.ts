@@ -1,7 +1,8 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Command, Database, Folder, Puzzle } from 'lucide-react'
+import { Database, FileCode, Folder, FileText } from 'lucide-react'
+import { httpMethods } from '@renderer/constants/appConstants';
 
 
 // Function to convert folders into menuItems
@@ -68,11 +69,11 @@ export function createMenuHeader(label: string, folderName?: string): MenuItem {
 		? (() => {
 			switch (folderName.toLowerCase()) {
 				case 'controllers':
-					return Command
+					return FileCode
 				case 'models':
 					return Database
 				case 'dto':
-					return Puzzle
+					return FileText
 				default:
 					return Folder // Default icon for other folders
 			}
@@ -169,3 +170,6 @@ export const generateFakeDataForField = (field: any) => {
 			return faker.lorem.words(3) // Fallback to text if type is unknown
 	}
 }
+export const getBadgeColor = (method: string): string | undefined => {
+	return httpMethods.find((item) => item.value === method)?.color;
+};

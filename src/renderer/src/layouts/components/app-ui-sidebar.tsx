@@ -138,7 +138,7 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                                                         }
                                                     }}
                                                 >
-                                                    <DraggableElement item={subItem} index={key} />
+                                                     <DraggableElement item={subItem} index={key} />
                                                 </div>
                                             ))}
 

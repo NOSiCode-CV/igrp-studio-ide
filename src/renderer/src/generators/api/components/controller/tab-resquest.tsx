@@ -1,0 +1,157 @@
+import React, { useState } from 'react'
+import { FormList } from '../form-list'
+import { addNewRow, changeValue, removeRow } from '../../helpers'
+import { Badge } from '@renderer/components/ui/badge'
+interface TabRequestProps {
+  formik: any
+  tablesColumns: any
+}
+
+export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns }) => {
+  const [activeTab, setActiveTab] = useState<'params' | 'headers' | 'body'>('params')
+  const [bodyType, setBodyType] = useState<'none' | 'formData' | 'json'>('none')
+
+  const tabQueryParams = 'requestParams'
+  const tabPathVariables = 'pathVariables'
+  const tabHeaders = 'headers'
+  const tabBody = 'bodyContent'
+
+  const columnsQuery = tablesColumns[tabQueryParams]
+  const columnsVariables = tablesColumns[tabPathVariables]
+  const columnsHeaders = tablesColumns[tabHeaders]
+  const columnsBody = tablesColumns[tabBody]
+
+  const handleBodyTypeChange = (type: 'none' | 'formData' | 'json') => {
+    setBodyType(type)
+
+    // Clear formik values for body content when type changes
+    if (type === 'none') {
+      formik.setFieldValue('bodyContent', [])
+    }
+  }
+
+  return (
+    <div className="w-full">
+      {/* Tab Navigation */}
+      <div className="flex space-x-4 border-b mb-4 text-sm">
+        <button
+          onClick={() => setActiveTab('params')}
+          className={`px-4 py-2 ${
+            activeTab === 'params' ? 'border-b-2 border-igrp text-igrp' : ''
+          }`}
+        >
+          Params
+        </button>
+        <button
+          onClick={() => setActiveTab('body')}
+          className={`px-4 py-2 ${activeTab === 'body' ? 'border-b-2 border-igrp text-igrp' : ''}`}
+        >
+          Body
+        </button>
+        <button
+          onClick={() => setActiveTab('headers')}
+          className={`px-4 py-2 ${
+            activeTab === 'headers' ? 'border-b-2 border-igrp text-igrp' : ''
+          }`}
+        >
+          Headers
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className={activeTab === 'params' ? 'block' : 'hidden'}>
+        {columnsQuery && (
+          <div className="space-y-3">
+            <p className='text-sm'>Query Parameters</p>
+            <FormList
+              columns={columnsQuery}
+              data={formik.values[tabQueryParams]}
+              changeValue={(element, position, value) =>
+                changeValue(formik, element, position, value, tabQueryParams)
+              }
+              addRow={() => addNewRow(formik, tabQueryParams, tabQueryParams)}
+              removeRow={(position) => removeRow(formik, tabQueryParams, position)}
+              errors={formik.errors[tabQueryParams]}
+              name={'Query Parameter'}
+            />
+            <p className='text-sm'>Variables</p>
+            <FormList
+              columns={columnsVariables}
+              data={formik.values[tabPathVariables]}
+              changeValue={(element, position, value) =>
+                changeValue(formik, element, position, value, tabPathVariables)
+              }
+              addRow={() => addNewRow(formik, tabPathVariables, tabPathVariables)}
+              removeRow={(position) => removeRow(formik, tabPathVariables, position)}
+              errors={formik.errors[tabPathVariables]}
+              name={'Variable'}
+            />
+          </div>
+        )}
+      </div>
+      <div className={activeTab === 'headers' ? 'block' : 'hidden'}>
+        {columnsHeaders && (
+          <FormList
+            columns={columnsHeaders}
+            data={formik.values[tabHeaders]}
+            changeValue={(element, position, value) =>
+              changeValue(formik, element, position, value, tabHeaders)
+            }
+            addRow={() => addNewRow(formik, tabHeaders, tabHeaders)}
+            removeRow={(position) => removeRow(formik, tabQueryParams, position)}
+            errors={formik.errors[tabHeaders]}
+            name={tabHeaders}
+          />
+        )}
+      </div>
+      <div className={activeTab === 'body' ? 'block' : 'hidden'}>
+        <div className="mb-4">
+          <div className="flex space-x-4 text-sm">
+            <Badge
+              onClick={() => handleBodyTypeChange('none')}
+              variant={bodyType === 'none' ? 'default' : 'outline'}
+            >
+              None
+            </Badge>
+            <Badge
+              onClick={() => handleBodyTypeChange('formData')}
+              variant={bodyType === 'formData' ? 'default' : 'outline'}
+            >
+              Form Data
+            </Badge>
+            <Badge
+              onClick={() => handleBodyTypeChange('json')}
+              variant={bodyType === 'json' ? 'default' : 'outline'}
+            >
+              JSON
+            </Badge>
+          </div>
+        </div>
+
+        {bodyType === 'formData' && columnsBody && (
+          <FormList
+            columns={columnsBody}
+            data={formik.values[tabBody] || []}
+            changeValue={(element, position, value) =>
+              changeValue(formik, element, position, value, tabBody)
+            }
+            addRow={() => addNewRow(formik, tabBody, 'formData')}
+            removeRow={(position) => removeRow(formik, tabBody, position)}
+            errors={formik.errors[tabBody]}
+            name={'Form Data'}
+          />
+        )}
+
+        {bodyType === 'json' && (
+          <textarea
+            value={formik.values['bodyContent']}
+            onChange={(e) => formik.setFieldValue('bodyContent', e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp sm:text-sm"
+            rows={6}
+            placeholder="Enter JSON body"
+          ></textarea>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -4,7 +4,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import MainLayout from '@renderer/layouts/MainLayout'
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
-import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayoput'
+import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayout'
 import { Loader } from 'lucide-react';
 
 const IDEInitialScreen = lazy(() => import('@renderer/pages/home/ide-initial-screen'))

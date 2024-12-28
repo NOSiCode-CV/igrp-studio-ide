@@ -41,7 +41,7 @@ export const initialValues = {
     {
       name: '',
       columns: [],
-      options: ''
+      unique: false
     }
   ],
 
@@ -85,7 +85,8 @@ export const defaultValues: any = {
   },
   uniqueConstraints: {
     name: '',
-    columns: []
+    columns: [],
+    unique: false
   }
 }
 
@@ -116,12 +117,13 @@ export const getTablesColumns = ({
   models,
   currentModel
 }): { [value: string]: IColumnsTabelProps[] } => {
-  const modelsOptions = [models || []]
-    .filter((m) => m.name !== currentModel)
+
+  const modelsOptions = (models || [])
+    .filter((model) => model.name !== currentModel) // Exclude the current model
     .map((model) => ({
       value: model.name,
-      label: model.name
-    }))
+      label: model.name,
+    }));
 
   const columns = attributes.map((attribute) => ({
     value: attribute.name,
@@ -131,26 +133,26 @@ export const getTablesColumns = ({
   const disabledOptions = formatMethods(
     (
       selectors.find((selector) => 'CRUD_DISABLED_OPTIONS' in selector) as
-        | { CRUD_DISABLED_OPTIONS: string[] }
-        | undefined
+      | { CRUD_DISABLED_OPTIONS: string[] }
+      | undefined
     )?.CRUD_DISABLED_OPTIONS || []
   )
 
   const relationTypeOptions = formatMethods(
     (
       selectors.find((selector) => 'RELATIONSHIP_TYPES' in selector) as
-        | { RELATIONSHIP_TYPES: string[] }
-        | undefined
+      | { RELATIONSHIP_TYPES: string[] }
+      | undefined
     )?.RELATIONSHIP_TYPES || []
   )
 
   const fieldTypeOptions = formatMethods(
     (
       selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
-        | {
-            ATTRIBUTE_TYPES: string[]
-          }
-        | undefined
+      | {
+        ATTRIBUTE_TYPES: string[]
+      }
+      | undefined
     )?.ATTRIBUTE_TYPES || []
   )
 
@@ -198,10 +200,9 @@ export const getTablesColumns = ({
         width: '50%'
       },
       {
-        key: 'options',
-        name: 'Options',
+        key: 'unique',
+        name: 'Unique',
         type: 'checkbox',
-        options: indexOptionsOptions,
         width: '25%'
       }
     ],

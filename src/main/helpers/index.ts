@@ -72,7 +72,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 // Helper function to recursively read files from directories and group them by subfolder
 async function readDirectoryFiles(directoryPath: string): Promise<Record<string, File[]>> {
 	let groupedFiles: Record<string, File[]> = {};
-
+	const readFile = promisify(fs.readFile);
 	try {
 		// Read entries in the directory
 		const entries = await fs.promises.readdir(directoryPath, { withFileTypes: true });
@@ -96,7 +96,9 @@ async function readDirectoryFiles(directoryPath: string): Promise<Record<string,
 				if (!groupedFiles[folderName]) {
 					groupedFiles[folderName] = [];
 				}
-				groupedFiles[folderName].push({ name: entry.name.split('.')[0], path: fullPath });
+				const data = await readFile(fullPath, 'utf8');
+				const parsedConfig = JSON.parse(data);
+				groupedFiles[folderName].push({ name: entry.name.split('.')[0], path: fullPath, content: parsedConfig });
 			}
 		}
 	} catch (error) {
@@ -134,7 +136,7 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 					for (const entry of directoryContents) {
 
 						isDirectory = entry.isDirectory()
-						
+
 						const fullPath = join(directory, entry.name);
 						// If the directory contains any files or subdirectories, process them
 						if (isDirectory) {

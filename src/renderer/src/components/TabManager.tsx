@@ -1,6 +1,5 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import classnames from 'classnames'
-import { File } from 'src/main/types'
 import { Plus, X } from 'lucide-react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from './ui/button'
@@ -23,20 +22,19 @@ interface ContentProps {
   setActiveTab: (tab: string) => void
   setNewTab: (tab: TabItem) => void
   onCloseTab: (tab: string) => void
+  currentItem: any
 }
 
 const TabManager = ({
-  basePath,
   tabs,
   activeTab,
   setActiveTab,
   setNewTab,
-  onCloseTab
+  onCloseTab,
+  currentItem
 }: ContentProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-  const [currentPage, setCurrentPage] = useState<File | null>(null)
-  const formEngineRefs = useRef<{ [key: string]: { handleSave: () => void } | null }>({})
 
   // Handle opening a new tab
   const handleNewTab = () => {
@@ -50,13 +48,7 @@ const TabManager = ({
     }, 0)
   }
 
-  // Handle saving changes in the current tab
-  const handleSave = () => {
-    formEngineRefs.current[activeTab]?.handleSave()
-  }
-
   const handleOpenNew = (tab: TabItem) => {
-    console.log(tab)
     setNewTab({
       ...tab
     })
@@ -66,55 +58,54 @@ const TabManager = ({
     <>
       {/* Tabs Navigation */}
       <nav className="flex justify-between">
-          <div className="flex flex-1 w-[100px]">
-            <ScrollArea ref={scrollAreaRef}>
-              <div className="flex items-center">
-                {tabs.map((tab) => (
-                  <React.Fragment key={tab.id}>
-                    <div
-                      className={classnames(
-                        'px-4 h-10 text-sm font-medium focus:outline-none cursor-pointer align-middle flex',
-                        {
-                          'bg-white text-[#3AA0D9] border-t-2 border-[#3AA0D9]':
-                            activeTab === tab.id
-                        }
+        <div className="flex flex-1 w-[100px]">
+          <ScrollArea ref={scrollAreaRef}>
+            <div className="flex items-center  whitespace-nowrap">
+              {tabs.map((tab) => (
+                <React.Fragment key={tab.id}>
+                  <div
+                    className={classnames(
+                      'px-4 h-10 text-sm font-medium focus:outline-none cursor-pointer align-middle flex',
+                      {
+                        'text-igrp border-t-2 border-igrp': activeTab === tab.id
+                      }
+                    )}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <div className="flex items-center space-x-1 group/tab">
+                      <span>{tab.title}</span>
+                      {tab.id !== 'tab-0' && (
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onCloseTab(tab.id)
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            'opacity-0 group-hover/tab:opacity-100 size-4',
+                            tab.id === 'tab-0' ? 'invisible' : ''
+                          )}
+                        >
+                          <X className="h-3" />
+                        </Button>
                       )}
-                      onClick={() => setActiveTab(tab.id)}
-                    >
-                      <div className="flex items-center space-x-1 group/tab">
-                        <span>{tab.title}</span>
-                        {tab.id !== 'tab-0' && (
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              onCloseTab(tab.id)
-                            }}
-                            variant="ghost"
-                            size="sm"
-                            className={cn(
-                              'opacity-0 group-hover/tab:opacity-100 size-4',
-                              tab.id === 'tab-0' ? 'invisible' : ''
-                            )}
-                          >
-                            <X className="h-3" />
-                          </Button>
-                        )}
-                      </div>
                     </div>
-                    <Separator orientation="vertical" className="mr-2 h-4" />
-                  </React.Fragment>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-            <div className="flex items-center px-2 gap-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleNewTab}>
-                <Plus className="h-4 w-4" />
-                <span className="sr-only">New Endpoint</span>
-              </Button>
+                  </div>
+                  <Separator orientation="vertical" className="mr-2 h-4" />
+                </React.Fragment>
+              ))}
             </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+          <div className="flex items-center px-2 gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleNewTab}>
+              <Plus className="h-4 w-4" />
+              <span className="sr-only">New Endpoint</span>
+            </Button>
           </div>
-        </nav>
+        </div>
+      </nav>
 
       <Separator />
 
@@ -124,7 +115,7 @@ const TabManager = ({
           {tab.id === 'tab-0' ? (
             <Overview onOpenNew={handleOpenNew} open={tab.open} />
           ) : (
-            <New onOpenNew={handleOpenNew} open={tab.open} tab={tab} />
+            <New onOpenNew={handleOpenNew} open={tab.open} tab={tab} currentItem={currentItem} />
           )}
         </div>
       ))}

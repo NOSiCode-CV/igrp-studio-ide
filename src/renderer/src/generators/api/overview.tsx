@@ -1,114 +1,39 @@
-import { useEffect, useState } from 'react'
-import ModelLayout from './components/model'
-import DtoLayout from './components/dto'
-import ControllerLayout from './components/controller'
 import EmptyPage from './EmptyPage'
-import { createSelector } from 'reselect'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { setCurrentItem } from '@renderer/redux/thunks'
-import { ROUTES } from '@renderer/routes/routeConstants'
-import { extractByType, getMergedFiles } from './helpers'
-import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants'
+import { OptionType } from '@renderer/constants/appConstants'
 import { TabItem } from '@renderer/components/TabManager'
 import { useTranslation } from 'react-i18next'
-import { PageHeader } from '@igrp/igrp-design-system'
-
-interface PageBuilderState {
-  basePath: string
-  currentItem: { path: string; module: string; type: OptionType } | null
-  folderFiles: {
-    models?: any[]
-    dto?: any[]
-  }
-}
+import { IGRPContainer, PageHeader } from '@igrp/igrp-design-system'
+import DashboardOverview from './components/dashboard-overview'
 
 interface NewProps {
   onOpenNew: (tab: TabItem) => void
   open: OptionType
 }
 
-const Overview = ({ onOpenNew, open = 'none' }: NewProps): JSX.Element => {
-  const [selectors, setSelectors] = useState<any[]>([])
-  const [currentData, setCurrentData] = useState<any>(null)
-  const [option, setOption] = useState<OptionType>(open)
-  const [module, setModule] = useState<string>('shared')
-
+const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
   const { t } = useTranslation()
-  const dispatch: any = useDispatch()
-  const navigate = useNavigate()
-
-  const selectState = (state: any): PageBuilderState => state.PageBuilder
-
-  const selectProperties = createSelector(selectState, (studio) => {
-    const moduleData = getMergedFiles(studio, module)
-
-    return {
-      basePath: studio.basePath,
-      currentItem: studio.currentItem,
-      models: extractByType(moduleData, OPTION_TYPE.MODELS),
-      dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
-      controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS)
-    }
-  })
-
-  const { currentItem, basePath, models, dto } = useSelector(selectProperties)
-
-  useEffect(() => {
-    const getJsonData = async () => {
-      if (!currentItem) return
-
-      try {
-        const data = await window.api.getJsonContent(currentItem.path)
-        setCurrentData(data)
-        setOption(currentItem.type)
-        setModule(currentItem.module)
-        dispatch(setCurrentItem(null))
-      } catch (error) {
-        console.error('Failed to load JSON content:', error)
-      }
-    }
-
-    getJsonData()
-  }, [currentItem, dispatch])
-
-  useEffect(() => {
-    if (!basePath) {
-      navigate(ROUTES.HOME)
-    }
-  }, [basePath, navigate])
-
-  useEffect(() => {
-    const getAllSelectors = async () => {
-      try {
-        const allSelectors = await window.api.fetchSelectors(module, basePath)
-        setSelectors(allSelectors)
-      } catch (error) {
-        console.error('Failed to fetch selectors:', error)
-      }
-    }
-
-    if (basePath) {
-      getAllSelectors()
-    }
-  }, [basePath, module])
-
   const handleOptionClick = (opt: OptionType) => {
-    setOption(opt)
-    setModule('shared')
-    setCurrentData(null)
-
     onOpenNew({
       id: `tab-${Date.now()}`,
-      title: `New ${t(opt)}`,
+      title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
       open: opt
     })
   }
 
+  const stats = {
+    modules: 12,
+    controllers: 24,
+    schemas: 18,
+    dtos: 36
+  }
+
   return (
-    <div className="space-y-4 container mt-6">
-      <PageHeader title="API Overview" description="Manage your API endpoints"></PageHeader>
-      <EmptyPage onClick={handleOptionClick} />
+    <div className="flex flex-col items-center mt-16 p-4 bg-background">
+      <div className="w-full max-w-4xl space-y-8">
+        <PageHeader title="API Overview" description="Manage your API endpoints"></PageHeader>
+        <DashboardOverview stats={stats} />
+        <EmptyPage onClick={handleOptionClick} />
+      </div>
     </div>
   )
 }

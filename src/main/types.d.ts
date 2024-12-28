@@ -61,11 +61,13 @@ export interface MenuItem {
     badgeColor?: string; // optional field for badges
     badgeName?: string; // optional field for badges
     type?: string;
+    sutType?: string;
     component?: React.ReactNode,
     path?: string,
     module?: string,
-    dropdownMenus?:[][{ label: string; type: string; }]
+    dropdownMenus?: [][{ label: string; type: string; }]
     dropdownclick?: (e: any) => void;
+    content?: any,
 }
 
 type FolderFiles = { [folderName: string]: FolderFileStructure };
@@ -74,6 +76,7 @@ export interface File {
     name: string;
     path: string;
     config?: Object
+    content?: Object
 }
 
 export interface FolderFileStructure {

@@ -1,4 +1,4 @@
-import { Combobox } from '@renderer/components/combobox'
+import { Combobox } from '@igrp/igrp-design-system'
 import { Button } from '@renderer/components/ui/button'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import { Input } from '@renderer/components/ui/input'
@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toInitCap } from '../../helpers'
 
 interface PopoverDtoProps {
   children?: ReactNode
@@ -15,8 +16,6 @@ interface PopoverDtoProps {
   collectionTypes: any[]
   changeValue: (element: string, position: number, value: any) => void
 }
-
-const toInitCap = (text) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
 
 export function PopoverDto({ index, row, collectionTypes, changeValue }: PopoverDtoProps) {
   const { t } = useTranslation()

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@renderer/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import {
@@ -17,9 +17,11 @@ import {
 import { PlusCircle, MoreHorizontal } from 'lucide-react'
 import FormNewProjectNextJS from './new-project-nextjs'
 import FormNewProjectSpring from './new-project-springboot'
+import { HandlerResponse } from 'src/main/types'
 
 export function CreateProject() {
   const [open, setOpen] = useState(false)
+  const [versions, setVersions] = useState({})
 
   const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
@@ -33,6 +35,24 @@ export function CreateProject() {
 
   const mainFrameworks = ['nextjs', 'springboot']
   const additionalFrameworks = ['aspnet', 'vuejs', 'angular', 'laravel', 'django']
+
+  useEffect(() => {
+    const getVersions = async () => {
+      const data: HandlerResponse = await window.api.getVersions(
+        'https://sonatype.nosi.cv/service/rest/v1/search?repository=igrp-framework&group=cv.igrp&name=core'
+      )
+
+      const options = data.result.map((value) => {
+        return {
+          label: value,
+          value: value
+        }
+      })
+
+      setVersions(options)
+    }
+    getVersions()
+  }, [])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -92,7 +112,7 @@ export function CreateProject() {
             <FormNewProjectNextJS />
           </TabsContent>
           <TabsContent value="springboot">
-            <FormNewProjectSpring />
+            <FormNewProjectSpring versions={versions} />
           </TabsContent>
         </Tabs>
       </DialogContent>

@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@renderer/routes/routeConstants'
 import TabManager, { TabItem } from '@renderer/components/TabManager'
 import { PAGE_DEFAULT } from '@renderer/constants/appConstants'
+import { useTranslation } from 'react-i18next'
 
 interface PageBuilderProps {
   basePath?: string
+  currentItem: any
 }
 
-const Index = ({ basePath }: PageBuilderProps) => {
+const Index = ({ basePath, currentItem }: PageBuilderProps) => {
+  const { t } = useTranslation()
+
   const [tabs, setTabs] = useState<Array<TabItem>>([
     { id: 'tab-0', title: PAGE_DEFAULT, open: 'none' }
   ])
   const [activeTab, setActiveTab] = useState('tab-0')
-  const navigate = useNavigate()
 
   // Add a new tab or activate an existing one
   const handleNewTab = (tab: TabItem) => {
@@ -39,12 +40,16 @@ const Index = ({ basePath }: PageBuilderProps) => {
     })
   }
 
-  // Navigate to the home route if basePath is empty or undefined
   useEffect(() => {
-    if (!basePath) {
-      navigate(ROUTES.HOME)
-    }
-  }, [basePath, navigate])
+    if (currentItem)
+      handleNewTab({
+        id: `tab-${currentItem.isHeader ? Date.now() : currentItem.label}`,
+        title: currentItem.isHeader
+          ? t(`new${currentItem.type.charAt(0).toUpperCase() + currentItem.type.slice(1)}`)
+          : currentItem.label,
+        open: currentItem.type
+      })
+  }, [currentItem])
 
   return (
     <TabManager
@@ -54,6 +59,7 @@ const Index = ({ basePath }: PageBuilderProps) => {
       setActiveTab={setActiveTab}
       setNewTab={handleNewTab}
       onCloseTab={handleCloseTab}
+      currentItem={currentItem}
     />
   )
 }

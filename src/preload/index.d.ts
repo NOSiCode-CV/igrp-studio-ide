@@ -31,6 +31,8 @@ interface CustomAPI {
 
     openVSCode: (basePath: string | undefined) => Promise<void>;
 
+    getVersions: (endpoint: string) => Promise<HandlerResponse>,
+
     i18nextElectronBackend: any
 }
 

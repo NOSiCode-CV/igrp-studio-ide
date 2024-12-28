@@ -8,7 +8,6 @@ import { setConfig, setBasePath, navigateToNextPage } from '@renderer/redux/thun
 import { useTranslation } from 'react-i18next'
 import { ConfigOptions } from 'src/main/types'
 import { useNavigate } from 'react-router-dom'
-import Select from 'react-select'
 import { Button } from '@renderer/components/ui/button'
 import { Label } from '@renderer/components/ui/label'
 import { Input } from '@renderer/components/ui/input'
@@ -16,6 +15,8 @@ import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import { BaseApiConfig } from '@igrp/spring-engine/dist/interfaces/types'
 import { PlusCircle } from 'lucide-react'
+import { Combobox } from '@igrp/igrp-design-system'
+import { Textarea } from '@renderer/components/ui/Textarea'
 
 const DatabaseOptions = [
   { value: 'Postgresql', label: 'PostgreSQL' },
@@ -40,7 +41,8 @@ const initialValues: BaseApiConfig = {
   igrpCoreVersion: ''
 }
 
-const FormNewProjectSpring = (): JSX.Element => {
+const FormNewProjectSpring = ({ versions }): JSX.Element => {
+  console.log(versions)
   const navigate = useNavigate()
   const dispatch: any = useDispatch()
   const { showErrorToast } = useToast()
@@ -55,9 +57,7 @@ const FormNewProjectSpring = (): JSX.Element => {
       .max(20, t('maxLengthExceeded', { max: 20 })),
     group: Yup.string().required(t('fieldRequired', { name: 'Group' })),
     artifact: Yup.string().required(t('fieldRequired', { name: 'Artifact' })),
-    database: Yup.object().shape({
-      value: Yup.string().required(t('fieldRequired', { name: 'Database selection' }))
-    })
+    database:Yup.string().required(t('fieldRequired', { name: 'ArDatabase selectiontifact' }))
   })
 
   const formik: any = useFormik({
@@ -90,8 +90,7 @@ const FormNewProjectSpring = (): JSX.Element => {
   const createProject = async (): Promise<void> => {
     try {
       const formData = {
-        ...formik.values,
-        database: formik.values.database ? formik.values.database['value'] : ''
+        ...formik.values
       }
 
       const config: ConfigOptions = {
@@ -141,9 +140,7 @@ const FormNewProjectSpring = (): JSX.Element => {
     >
       <div className="space-y-4 mt-4">
         <div className="space-y-2">
-          <Label htmlFor="apiName" className="text-muted-foreground">
-            {t('nameOfProject')}
-          </Label>
+          <Label htmlFor="apiName">{t('nameOfProject')}</Label>
           <Input
             type="text"
             id="apiName"
@@ -159,24 +156,20 @@ const FormNewProjectSpring = (): JSX.Element => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description" className="text-muted-foreground">
-            {t('description')}
-          </Label>
-          <textarea
+          <Label htmlFor="description">{t('description')}</Label>
+          <Textarea
             id="description"
             rows={3}
             className="w-full p-2 border rounded-md"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.description || ''}
-          ></textarea>
+          ></Textarea>
         </div>
 
         <div className="grid grid-cols-2 gap-5">
           <div className="space-y-2">
-            <Label htmlFor="group" className="text-muted-foreground">
-              {t('group')}
-            </Label>
+            <Label htmlFor="group">{t('group')}</Label>
             <Input
               type="text"
               id="group"
@@ -192,9 +185,7 @@ const FormNewProjectSpring = (): JSX.Element => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="artifact" className="text-muted-foreground">
-              {t('artifact')}
-            </Label>
+            <Label htmlFor="artifact">{t('artifact')}</Label>
             <Input
               type="text"
               id="artifact"
@@ -212,28 +203,23 @@ const FormNewProjectSpring = (): JSX.Element => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="database" className="text-muted-foreground">
-            {t('database')}
-          </Label>
-          <Select
-            id="database"
+          <Label htmlFor="database">{t('database')}</Label>
+          <Combobox
+            name="database"
             options={DatabaseOptions}
             onChange={(option) => formik.setFieldValue('database', option)}
-            onBlur={() => formik.setFieldTouched('database', true)}
             value={formik.values.database}
             className={`w-full ${formik.touched.database && formik.errors.database ? 'border-red-500' : 'border-gray-300'}`}
           />
-          {formik.touched.database && formik.errors.database?.value ? (
-            <p className="text-sm text-red-500">{formik.errors.database.value}</p>
+          {formik.touched.database && formik.errors.database ? (
+            <p className="text-sm text-red-500">{formik.errors.database}</p>
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label className="text-muted-foreground">Configuration</Label>
+          <Label>Configuration</Label>
         </div>
         <div className="space-y-3">
-          <Label htmlFor="projectStructureStyle" className="text-muted-foreground">
-            {t('Project Structure Style')}
-          </Label>
+          <Label htmlFor="projectStructureStyle">{t('Project Structure Style')}</Label>
           <RadioGroup
             defaultValue="technical"
             className="flex flex-col"
@@ -257,9 +243,21 @@ const FormNewProjectSpring = (): JSX.Element => {
             onCheckedChange={(checked) => formik.setFieldValue('enableObservability', checked)}
             checked={formik.values.enableObservability}
           />
-          <Label htmlFor="enableObservability" className="text-muted-foreground">
-            {t('Enable Observability')}
-          </Label>
+          <Label htmlFor="enableObservability">{t('Enable Observability')}</Label>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="igrpCoreVersion">{t('IGRP Core Version')}</Label>
+          <Combobox
+            name="igrpCoreVersion"
+            options={versions}
+            onChange={(option) => formik.setFieldValue('igrpCoreVersion', option)}
+            value={formik.values.igrpCoreVersion}
+            className={`w-full ${formik.touched.igrpCoreVersion && formik.errors.igrpCoreVersion ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {formik.touched.igrpCoreVersion && formik.errors.igrpCoreVersion?.value ? (
+            <p className="text-sm text-red-500">{formik.errors.igrpCoreVersion.value}</p>
+          ) : null}
         </div>
 
         <Button variant="default" type="submit" className="w-full mt-6">

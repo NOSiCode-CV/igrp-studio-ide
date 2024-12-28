@@ -2,7 +2,7 @@ import Illustration from "@renderer/components/ilustration"
 import { formatMethods } from "../../helpers";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@renderer/components/ui/table";
 import { Badge } from "@renderer/components/ui/badge";
-import { Combobox } from "@renderer/components/combobox";
+import { Combobox } from '@igrp/igrp-design-system'
 
 const PrimaryKeyTable = ({ validation, selectors }) => {
 

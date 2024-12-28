@@ -1,348 +1,306 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import { IColumnsTabelProps } from '../Interfaces'
-import { FormList } from '../form-list'
-import { getTablesColumns, TabList, defaultValues, initialValues } from './config'
+import { getTablesColumns, TabList, initialValues } from './config'
 
 import { useDispatch } from 'react-redux'
-import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks"
-import useToast from '@renderer/components/useToast'
-import { useControllerValidation } from './validation'
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
+import { useActionValidation } from './validation'
 import { useTranslation } from 'react-i18next'
 import { ControllerAction, ControllerConfig } from '@igrp/spring-engine/dist/interfaces/types'
-import { Card } from '@renderer/components/ui/card'
-import { TextInput } from '../inputs-form'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@renderer/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
-import { Button } from '@renderer/components/ui/button'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@renderer/components/ui/accordion'
-import { ShieldAlert } from 'lucide-react'
-import { Badge } from '@renderer/components/ui/badge'
+import { Combobox } from '@igrp/igrp-design-system'
+import { formatMethods } from '../../helpers'
+import { Input } from '@renderer/components/ui/input'
+import { TabRequest } from './tab-resquest'
+
+import useToast from '@renderer/components/useToast'
 import NavigationBar from '../navigation-bar'
+import { CreateEndpointDialog } from './create-endpoint-dialog'
+import { TextInput } from '../inputs-form'
+import { Label } from '@renderer/components/ui/label'
+import { TabResponse } from './tab-response'
+import { httpMethods } from '@renderer/constants/appConstants'
 
 interface ControllerProps {
-	jsonData?: any
-	basePath: string
-	module: string
-	selectors: Array<any>
-	onCancel: () => void
+  jsonData?: any
+  basePath: string
+  defaultModule: string
+  selectors: Array<any>
+  onCancel: () => void
+  currentItem: any
+  modules: Array<any>
 }
 
-const ControllerLayout = ({ jsonData, onCancel, basePath, selectors , module}: ControllerProps): JSX.Element => {
+const ControllerLayout: React.FC<ControllerProps> = ({
+  jsonData,
+  onCancel,
+  basePath,
+  selectors,
+  defaultModule,
+  currentItem,
+  modules
+}: ControllerProps) => {
+  const { t } = useTranslation()
 
-	const { t } = useTranslation()
+  const [title, setTitle] = useState('')
+  const [name, setName] = useState('')
+  const [pathController, setPathController] = useState('')
+  const [root, setRoot] = useState('')
+  const [module, setModule] = useState<string | undefined>(defaultModule)
 
-	const dispatch: any = useDispatch()
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-	const [openAccordion, setOpenAccordion] = useState('ACTION-0')
+  const dispatch: any = useDispatch()
 
-	const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({})
+  const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({})
 
-	const { showErrorToast, showSuccessToast } = useToast()
+  const { showErrorToast, showSuccessToast } = useToast()
 
-	const validationSchema = useControllerValidation({ t })
+  const validationSchema = useActionValidation({ t })
 
-	const formik: any = useFormik({
-		enableReinitialize: true,
-		initialValues,
-		validationSchema,
-		onSubmit: (_values, actions) => {
-			actions.setSubmitting(false)
-			handleSave()
-		}
-	})
+  const formik: any = useFormik({
+    enableReinitialize: true,
+    initialValues,
+    validationSchema,
+    onSubmit: (_values, actions) => {
+      actions.setSubmitting(false)
+      handleSave()
+    }
+  })
 
-	useEffect(() => {
-		const res = getTablesColumns(selectors)
-		setTableColumns(res)
-	}, [selectors])
+  useEffect(() => {
+    const res = getTablesColumns(selectors)
+    setTableColumns(res)
+  }, [selectors])
 
-	useEffect(() => {
-		if (jsonData) {
-			const { actions, name, basePath } = jsonData
-			const newActions = actions.map(({ actionName, path, method, accepts, requestBody, response, pathVariables, requestParams }) => ({
-				general: [{ actionName, path, method, accepts, requestBody, response }],
-				pathVariables: pathVariables || [defaultValues.pathVariables],
-				requestParams: requestParams || [defaultValues.requestParams],
-			}))
+  useEffect(() => {
+    if (jsonData) {
+      const { name, basePath } = jsonData
 
-			formik.setFieldValue('name', name)
-			formik.setFieldValue('basePath', basePath)
-			formik.setFieldValue('actions', newActions)
-		} else
-			formik.resetForm()
-	}, [jsonData])
+      setTitle(`${name}(${basePath})`)
+      setName(name)
+      setPathController(basePath)
+    }
+  }, [jsonData])
 
-	const getValuesToSubmit = () => {
-		const values = { ...formik.values };
+  useEffect(() => {
+    if (currentItem && currentItem.content) {
+      const { actionName, path, method, pathVariables, requestParams, headers } =
+        currentItem.content
 
-		const transformedActions = values.actions.map(action => {
+      formik.setFieldValue('actionName', actionName || initialValues.actionName)
+      formik.setFieldValue('method', method || initialValues.method)
+      formik.setFieldValue('path', path || initialValues.path)
+      formik.setFieldValue('pathVariables', pathVariables || initialValues.pathVariables)
+      formik.setFieldValue('requestParams', requestParams || initialValues.requestParams)
+      formik.setFieldValue('headers', headers || initialValues.headers)
+    }
+    if (currentItem) setRoot(currentItem.path)
+  }, [currentItem])
 
-			const generalData = action.general[0] || {};
+  const getValuesToSubmit = async () => {
+    const values = { ...formik.values }
 
-			// Filter out invalid pathVariables
-			const validPathVariables = action.pathVariables && action.pathVariables.filter(
-				item => item.type && item.name
-			);
+    delete values.responses
 
-			// Filter out invalid requestParams
-			const validRequestParams = action.requestParams && action.requestParams.filter(
-				item => item.type && item.name
-			);
+    const data = await window.api.getJsonContent(root)
 
-			return {
-				...generalData,
-				...action,
-				pathVariables: validPathVariables,
-				requestParams: validRequestParams
-			};
-		});
+    const validPathVariables =
+      values.pathVariables && values.pathVariables.filter((item) => item.type && item.name)
 
-		const actions: ControllerAction[] = transformedActions.map(({ general, ...rest }) => rest);
+    // Filter out invalid requestParams
+    const validRequestParams =
+      values.requestParams && values.requestParams.filter((item) => item.type && item.name)
 
-		const newValues: ControllerConfig = {
-			...values,
-			actions
-		}
+    const validHeaders = values.headers && values.headers.filter((item) => item.type && item.header)
 
-		newValues.module = module
+    const newAction = {
+      ...values,
+      pathVariables: validPathVariables,
+      requestParams: validRequestParams,
+      headers: validHeaders
+    }
 
-		return newValues
+    // Merge or replace actions
+    const mergedActions = (data?.actions || []).map((dataAction) => {
+      const isMatchingAction = values.actionName === dataAction.actionName
 
-	}
+      return isMatchingAction ? newAction : dataAction
+    })
 
-	const toggleBordered = (id: any) => {
-		if (openAccordion !== id) {
-			setOpenAccordion(id);
-		}
-	};
+    const finalActions: ControllerAction[] = mergedActions.length > 0 ? mergedActions : [newAction]
 
+    const newValues: ControllerConfig = {
+      type: 'controller',
+      name: name,
+      basePath: pathController,
+      actions: finalActions
+    }
 
-	const handleAddAction = () => {
-		formik.setFieldValue('actions', [
-			...formik.values.actions,
-			{ general: [defaultValues.general], pathVariables: [defaultValues.pathVariables], requestParams: [defaultValues.requestParams] }
-		])
+    newValues.module = module
 
-		setOpenAccordion(`ACTION-${formik.values.actions.length}`)
-	}
+    return newValues
+  }
 
-	const handleDeleteAction = (position: number) => {
-		formik.setFieldValue(
-			'actions',
-			formik.values.actions?.filter((_, index) => index !== position)
-		)
-	}
+  const handleSave = async (): Promise<void> => {
+    try {
+      const values = await getValuesToSubmit()
 
-	const getErrorsLength = (values: string[], position: number) => {
-		return values.reduce((count, value) => {
-			const errors = formik.errors?.actions?.[position]?.[value];
-			if (Array.isArray(errors)) {
-				// Only count if errors is an array
-				return count + errors.reduce((sum, d) => sum + (d ? Object.keys(d).length : 0), 0);
-			}
-			return count;
-		}, 0);
-	};
+      const { error } = await window.api.createController(values, basePath)
 
+      console.log(values, error)
 
-	const addNewRow = (actionIndex: number, field: string) => {
-		formik.setFieldValue(
-			'actions',
-			formik.values.actions.map((action: any, index: number) =>
-				actionIndex === index
-					? { ...action, [field]: [...action?.[field], defaultValues[field]] }
-					: action
-			)
-		)
-	}
+      if (error) {
+        showErrorToast(error)
+        return
+      }
 
-	const removeRow = (field: string, actionIndex: number, position: number) => {
-		formik.setFieldValue(
-			'actions',
-			formik.values.actions.map((action: any, index: number) =>
-				actionIndex === index
-					? { ...action, [field]: action?.[field]?.filter((_, i: number) => position !== i) }
-					: action
-			)
-		)
-	}
+      dispatch(onSetChangeStatus(true))
 
-	const changeValue = (
-		element: string,
-		actionPosition: number,
-		position: number,
-		value: any,
-		name: string
-	) => {
-		formik.setFieldValue(
-			'actions',
-			formik.values.actions.map((action: any, index: number) =>
-				index === actionPosition
-					? {
-						...action,
-						[name]: action?.[name]?.map((row: any, i: number) =>
-							position === i ? { ...row, [element]: value } : row
-						)
-					}
-					: action
-			)
-		)
-	}
+      showSuccessToast(t('createdSuccess', { name: t('controller'), value: values.name }))
+    } catch (error: unknown) {
+      showErrorToast(error)
+    }
+  }
 
-	const handleSave = async (): Promise<void> => {
-		try {
-		
-			const values = getValuesToSubmit()
-			
-			const { error } = await window.api.createController(values, basePath)
+  const handleDelete = async (): Promise<void> => {
+    try {
+      const values = await getValuesToSubmit()
 
-			if (error) {
-				showErrorToast(error)
-				return
-			}
+      const { error } = await window.api.deleteController(values, basePath)
 
-			dispatch(onSetChangeStatus(true))
+      if (error) {
+        showErrorToast(error)
+        return
+      }
 
-			showSuccessToast(t('createdSuccess', {name: t("controller"), value: values.name}))
+      dispatch(onSetChangeStatus(true))
+      onCancel()
 
-		} catch (error: unknown) {
-			showErrorToast(error)
-		}
-	}
+      showSuccessToast(t('deletedSuccess', { name: t('controller') }))
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
 
-	const handleDelete = async (): Promise<void> => {
-		try {
-			const values = getValuesToSubmit()
+  const handleCancel = () => {
+    onCancel()
+    formik.resetForm()
+  }
 
-			const { error } = await window.api.deleteController(values, basePath);
+  const typesData = formatMethods(
+    (selectors.find((selector) => 'MYME_TYPES' in selector) as { MYME_TYPES: string[] } | undefined)
+      ?.MYME_TYPES || []
+  )
 
-			if (error) {
-				showErrorToast(error);
-				return;
-			}
+  const onSubmit = async () => {
+    const errors = await formik.validateForm()
+    if (Object.keys(errors).length === 0) {
+      // No validation errors, proceed with submit
+      if (name) {
+        formik.handleSubmit()
+      } else {
+        setIsModalOpen(true)
+      }
+    } else {
+      // Handle validation errors (optional)
+      console.error('Validation errors:', errors)
+    }
+  }
 
-			dispatch(onSetChangeStatus(true));
-			onCancel()
+  return (
+    <React.Fragment>
+      <NavigationBar
+        onDelete={handleDelete}
+        onCancel={handleCancel}
+        onSubmit={onSubmit}
+        isNew={!jsonData}
+        title={title || 'Create a new Action'}
+      />
 
-			showSuccessToast(t('deletedSuccess', {name: t("controller")}))
+      <CreateEndpointDialog
+        isOpen={isModalOpen}
+        basePath={basePath}
+        mode="formik"
+        onConfirm={(values) => {
+          setName(values.name)
+          setPathController(values.basePath)
+          setModule(values.module)
 
-		} catch (error) {
-			showErrorToast(error);
-		}
-	}
+          formik.handleSubmit()
+        }}
+        onClose={() => setIsModalOpen(false)}
+        modules={modules}
+      />
 
-	const handleCancel = () => {
-		onCancel();
-		formik.resetForm();
-	}
+      <div className="space-y-4 p-4">
+        <Card className="rounded">
+          <CardHeader>
+            <CardTitle>Definition</CardTitle>
+            <CardDescription>Provide the name and configuration for this action</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="space-y-2">
+                <Label htmlFor={'method'} className="block text-sm font-medium text-gray-700">
+                  {'Method Type'}
+                </Label>
+                <Combobox
+                  name={t('method')}
+                  placeholder={t('Enter Method')}
+                  value={formik.values.method}
+                  onChange={(value) => formik.setFieldValue('method', value)}
+                  options={httpMethods}
+                />
+              </div>
 
-	return (
-		<React.Fragment>
-			<NavigationBar
-				onDelete={handleDelete}
-				onCancel={handleCancel}
-				onSubmit={formik.handleSubmit}
-				isNew={!jsonData}
-				title="controller"
-			/>
-
-			<div className="space-y-4 p-4">
-				<Card className="rounded-sm p-6">
-					<div className="flex gap-4 mb-4">
-						<TextInput
-							label={t('Name')}
-							id="name"
-							placeholder={t('Enter name')}
-							value={formik.values.name}
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							error={formik.touched.name ? formik.errors.name : undefined}
-						/>
-						<TextInput
-							label={t('Base Path')}
-							id="basePath"
-							placeholder={t('Enter Base Path')}
-							value={formik.values.basePath}
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							error={formik.touched.basePath ? formik.errors.basePath : undefined}
-						/>
-
-					</div>
-				</Card>
-				<Accordion type="single" className="w-full space-y-3" collapsible value={openAccordion} onValueChange={toggleBordered}>
-					{formik.values.actions?.map((action: any, index: number) => (
-						<AccordionItem value={`ACTION-${index}`} className="shadow px-3 rounded-lg" key={index}>
-							<AccordionTrigger>
-								<div className='space-x-2 align-middle '>
-									<span>{action?.general?.[0]?.actionName || `ACTION ${index + 1}`}</span>
-									{getErrorsLength(
-										TabList.map((d) => d.tabId),
-										index
-									) > 0 &&
-										openAccordion !== `ACTION-${index}` && (
-											<Badge variant='outline' className='text-red-500'>
-												<ShieldAlert className='h-4 ' />
-												{getErrorsLength(
-													TabList.map((d) => d.tabId),
-													index
-												)}
-											</Badge>
-										)}
-								</div>
-							</AccordionTrigger>
-							<AccordionContent>
-								<Tabs defaultValue={'general'}>
-									<TabsList className="grid w-full grid-cols-3">
-										{TabList.map(({ label, tabId }, key) => (
-											<TabsTrigger key={key} value={tabId}>
-												{label}
-											</TabsTrigger>
-										))}
-									</TabsList>
-
-									{TabList.map(({ tabId, label }, key) => (
-										<TabsContent key={key} value={tabId}>
-											{tablesColumns && tablesColumns[tabId] && (
-												<FormList
-													columns={tablesColumns[tabId]}
-													data={formik.values.actions[index]?.[tabId]}
-													changeValue={(element, position, value) =>
-														changeValue(element, index, position, value, tabId)
-													}
-													addRow={tabId !== 'general' ? () => addNewRow(index, tabId) : undefined}
-													removeRow={
-														tabId !== 'general'
-															? (position) => removeRow(tabId, index, position)
-															: undefined
-													}
-													errors={formik.errors.actions?.[index]?.[tabId]}
-													name={label}
-												/>
-											)}
-											<Button
-												size="sm"
-												variant="outline"
-												className="ms-1 mt-4 outline outline-1 outline-red-500 text-red-500"
-												onClick={() => handleDeleteAction(index)}
-											>
-												{t('delete')}
-											</Button>
-										</TabsContent>
-									))}
-								</Tabs>
-							</AccordionContent>
-						</AccordionItem>
-					))}
-				</Accordion>
-				<div className="bg-white px-2  w-full">
-					<Button color="success" variant={'outline'} onClick={handleAddAction}>
-						New Action
-					</Button>
-				</div>
-			</div>
-		</React.Fragment>
-	)
+              <TextInput
+                label={'Path'}
+                id={t('path')}
+                placeholder={t('/posts/[id]')}
+                value={formik.values.path}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.errors['path']}
+              />
+              <TextInput
+                id={'actionName'}
+                label={t('Action Name')}
+                placeholder={t('getPosts')}
+                value={formik.values.actionName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.errors['actionName']}
+              />
+            </div>
+          </CardContent>
+        </Card>
+        <Tabs defaultValue={'request'}>
+          <TabsList className="grid w-full grid-cols-4">
+            {TabList.map(({ label, tabId }, key) => (
+              <TabsTrigger key={key} value={tabId}>
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value={'request'}>
+            <TabRequest formik={formik} tablesColumns={tablesColumns} />
+          </TabsContent>
+          <TabsContent value={'response'}>
+            <TabResponse formik={formik} responseTypes={typesData} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </React.Fragment>
+  )
 }
 
 export default ControllerLayout

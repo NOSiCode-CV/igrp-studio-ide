@@ -12,25 +12,29 @@ import {
 import Header from './components/header'
 import Navdata from './components/nav-data'
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
-import VerticalMenu from './components/vertical-menu'
 import { AppSidebar } from './components/app-sidebar'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@renderer/routes/routeConstants'
 
 interface LayoutProps {
-  children: React.ReactElement<{ basePath: string }>;
+  children: React.ReactElement<{ basePath: string; currentItem: any }>
 }
 
 const Layout = (props: LayoutProps): JSX.Element => {
   const dispatch: any = useDispatch()
+  const navigate = useNavigate()
 
   const selectStudioState = (state: any) => state.PageBuilder
   const selectStudioProperties = createSelector(selectStudioState, (studio) => ({
     config: studio.config,
     folders: studio.folderFiles,
     basePath: studio.basePath,
-    changeStatus: studio.changeStatus
+    changeStatus: studio.changeStatus,
+    currentItem: studio.currentItem
   }))
 
-  const { changeStatus, config, basePath, folders } = useSelector(selectStudioProperties)
+  const { currentItem, changeStatus, config, basePath, folders } =
+    useSelector(selectStudioProperties)
 
   useEffect(() => {
     dispatch(onGetFolderFiles(basePath))
@@ -45,24 +49,35 @@ const Layout = (props: LayoutProps): JSX.Element => {
 
   const menuItems = Navdata(folders).menuItems
 
+  useEffect(() => {
+    if (!basePath) {
+      navigate(ROUTES.HOME)
+    }
+  }, [basePath, navigate])
+
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': '380px'
+        } as React.CSSProperties
+      }
+    >
       <div className="h-screen flex flex-col w-full">
         <ToastContainer />
         <Header config={config} basePath={basePath} />
 
         <div className="flex flex-1 overflow-hidden">
-          <VerticalMenu config={config} />
           <AppSidebar
             menuItems={menuItems}
-            className="mt-10 ml-20"
+            className="mt-10"
             config={config}
             basePath={basePath}
             header
           />
           <SidebarInset className="flex-1">
             <div className="overflow-hidden">
-              {React.cloneElement(props.children, { basePath: basePath })}
+              {React.cloneElement(props.children, { basePath, currentItem })}
             </div>
           </SidebarInset>
         </div>
