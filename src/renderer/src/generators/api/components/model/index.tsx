@@ -317,7 +317,6 @@ const ModelLayout = ({
             <TabsList className="grid w-full grid-cols-5">
               {TabList.map(({ label, value }, key) => (
                 <TabsTrigger key={key} value={value}>
-                  {' '}
                   {label}
                 </TabsTrigger>
               ))}

@@ -53,22 +53,29 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
         )?.ATTRIBUTE_TYPES || []
     )
 
+    const collectionTypes = formatMethods(
+        (
+            selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
+            | { COLLECTION_TYPES: string[] }
+            | undefined
+        )?.COLLECTION_TYPES || []
+    )
+
     const getOptions = (objects) => {
-        return objects !== undefined ? objects
-            .filter(m => m.name !== currentDto)
-            .map(item => ({
-                label: item.name,
-                value: item.name
-            })) : [];
+        return objects !== undefined
+            ? objects
+                .filter((m) => m.name !== currentDto)
+                .map((item) => ({
+                    label: item.name,
+                    value: item.name
+                }))
+            : []
     }
 
     const getUpdatedTypesForNamespace = (selectedValue) => {
+        if (selectedValue === OPTION_TYPE.DATA_OBJECTS) return getOptions(dto)
 
-        if (selectedValue === OPTION_TYPE.DATA_OBJECTS)
-            return getOptions(dto)
-
-        if (selectedValue === OPTION_TYPE.MODELS)
-            return getOptions(models)
+        if (selectedValue === OPTION_TYPE.MODELS) return getOptions(models)
 
         return paramsTypesData
     }
@@ -86,7 +93,11 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
                 dependsOn: 'ns',
                 getOptions: (selectedValue) => getUpdatedTypesForNamespace(selectedValue),
             },
-            { key: 'isList', name: 'Is List', type: 'checkbox' },
+            {
+                key: 'group', name: '', type: 'group', items: [
+                    { key: 'advanced', name: '', type: 'popoverDto', options: collectionTypes }
+                ]
+            }
         ]
     }
 }

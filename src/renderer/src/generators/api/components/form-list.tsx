@@ -25,6 +25,7 @@ import {
 } from '@renderer/components/ui/tooltip'
 import { PopoverModel } from './model/popover'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
+import { PopoverDto } from './dto/popover-dto'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
@@ -203,8 +204,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     <div className="flex gap-2 align-center">
                                       {items.map((item, itemIndex) => {
                                         const itemValue = row[item.key] || ''
-                                        const itemOptions =
-                                          item.type === 'select' ? item.options : null
+                                        const itemOptions = item.options || []
 
                                         return (
                                           <div key={itemIndex} className="flex items-center">
@@ -256,6 +256,17 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 changeValue={(element, position, value) =>
                                                   changeValue(element, position, value)
                                                 }
+                                              />
+                                            )}
+                                            {item.type === 'popoverDto' && (
+                                              <PopoverDto
+                                                key={itemIndex}
+                                                index={index}
+                                                row={row}
+                                                changeValue={(element, position, value) =>
+                                                  changeValue(element, position, value)
+                                                }
+                                                collectionTypes={itemOptions || []}
                                               />
                                             )}
                                           </div>
@@ -328,6 +339,17 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           changeValue={(element, position, value) =>
                                             changeValue(element, position, value)
                                           }
+                                        />
+                                      )}
+                                      {['popoverDto'].includes(type) && (
+                                        <PopoverDto
+                                          key={index}
+                                          index={index}
+                                          row={row}
+                                          changeValue={(element, position, value) =>
+                                            changeValue(element, position, value)
+                                          }
+                                          collectionTypes={options}
                                         />
                                       )}
                                     </>

@@ -1,24 +1,9 @@
-import { formatMethods } from '../../helpers'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@renderer/components/ui/table'
-import { Button } from '@renderer/components/ui/button'
-import { Plus, Trash } from 'lucide-react'
-import { Input } from '@renderer/components/ui/input'
-import { cn } from '@renderer/lib/utils'
-import { OPTION_TYPE } from '@renderer/constants/appConstants'
-import { NamespacesOptions } from './config'
-import { useEffect, useState } from 'react'
-import { PopoverDto } from './popover-dto'
-import { Combobox } from '@igrp/igrp-design-system'
+import { FormList } from '../form-list'
+import { IColumnsTabelProps } from '../Interfaces'
 
 interface AttributesCardProps {
+  columns: IColumnsTabelProps[]
+  formik: any
   currentDto: string
   selectors: any
   data: any[] | []
@@ -31,18 +16,15 @@ interface AttributesCardProps {
 }
 
 const AttributesCard = ({
-  selectors,
+  columns,
+  formik,
   data,
   errors,
-  currentDto,
-  dto,
-  models,
   addRow,
   removeRow,
   changeValue
 }: AttributesCardProps) => {
-
-  const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>({})
+  /* const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>({})
 
   const paramsTypesData = formatMethods(
     (
@@ -77,9 +59,9 @@ const AttributesCard = ({
     if (selectedValue === OPTION_TYPE.MODELS) return getOptions(models)
 
     return paramsTypesData
-  }
+  } */
 
-  const handleDependentChange = (key, index, selectedValue) => {
+/*   const handleDependentChange = (key, index, selectedValue) => {
     changeValue(key, index, selectedValue)
 
     const updatedOptions = getUpdatedTypesForNamespace(selectedValue)
@@ -87,8 +69,8 @@ const AttributesCard = ({
       ...prev,
       [selectedValue]: updatedOptions
     }))
-  }
-
+  } */
+/* 
   useEffect(() => {
     if (!data) return
     data.map((map) => {
@@ -98,10 +80,22 @@ const AttributesCard = ({
         [map.ns]: updatedOptions
       }))
     })
-  }, [data])
+  }, [data]) */
 
   return (
-    <Table>
+    <FormList
+      formik={formik}
+      columns={columns}
+      data={data}
+      changeValue={changeValue}
+      errors={errors}
+      addRow={addRow}
+      removeRow={removeRow}
+      btnLabels={'Attribute'}
+      name={'attributes'}
+    />
+
+    /*   <Table>
       <TableHeader className="ps-4">
         <TableRow>
           <TableHead>Name</TableHead>
@@ -184,7 +178,7 @@ const AttributesCard = ({
           </TableRow>
         </TableFooter>
       )}
-    </Table>
+    </Table> */
   )
 }
 export default AttributesCard

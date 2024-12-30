@@ -104,6 +104,8 @@ const DtoLayout = ({
     if (columns && data) {
       return (
         <AttributesCard
+          columns={columns}
+          formik={formik}
           dto={dto}
           models={models}
           currentDto={jsonData?.name}
