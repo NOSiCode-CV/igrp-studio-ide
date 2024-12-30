@@ -160,10 +160,10 @@ export const getTablesColumns = ({
     attributes: [
       { key: 'name', name: 'Name', type: 'text' },
       { key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
-      { key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
       {
         key: 'group', name: '', type: 'group', items: [
-          { key: 'advanced', name: '', type: 'popoverModel', width: '25%' }
+          { key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
+          { key: 'advanced', name: '', type: 'popoverModel' }
         ]
       }
     ],

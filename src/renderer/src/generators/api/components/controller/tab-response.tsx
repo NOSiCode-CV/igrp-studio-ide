@@ -8,7 +8,7 @@ import { httpStatusCodes } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
 import { FormList } from '../form-list'
 import { IColumnsTabelProps } from '../Interfaces'
-import { addNewRow, changeValue, removeRow } from '../../helpers'
+import { changeValue } from '../../helpers'
 
 interface TabResponseProps {
   formik: any
@@ -148,12 +148,12 @@ export const TabResponse: React.FC<TabResponseProps> = ({
               <p className="text-sm text-foreground">Data Schema</p>
               <FormList
                 columns={response}
+                formik={formik}
                 data={properties}
                 changeValue={(element, position, value) =>
-                  changeValue(formik, element, position, value, 'tabBody')
+                  changeValue(formik, element, position, value, 'properties')
                 }
-                errors={formik.errors['tabBody']}
-                name={'Form Data'}
+                name={'properties'}
               />
             </div>
           )

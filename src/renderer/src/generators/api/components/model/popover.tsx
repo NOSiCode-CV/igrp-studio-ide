@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { PackageCheck } from 'lucide-react'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toInitCap } from '../../helpers'
 import { Switch } from '@renderer/components/ui/Switch'
@@ -20,14 +20,6 @@ interface PopoverProps {
 
 export function PopoverModel({ index, row, changeValue }: PopoverProps) {
   const { t } = useTranslation()
-
-  const [isInteger, setIsInteger] = useState(false)
-  const [isBoolean, setIsBoolean] = useState(false)
-
-  useEffect(() => {
-    setIsInteger(row?.['type'] === 'integer' || row?.['type'] === 'long')
-    setIsBoolean(row?.['type'] === 'boolean')
-  }, [row])
 
   return (
     <Popover>

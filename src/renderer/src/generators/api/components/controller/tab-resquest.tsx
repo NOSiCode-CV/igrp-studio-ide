@@ -64,6 +64,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
           <div className="space-y-3">
             <p className="text-sm">Query Parameters</p>
             <FormList
+              formik={formik}
               columns={columnsQuery}
               data={formik.values[tabQueryParams]}
               changeValue={(element, position, value) =>
@@ -72,10 +73,12 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
               addRow={() => addNewRow(formik, tabQueryParams, tabQueryParams)}
               removeRow={(position) => removeRow(formik, tabQueryParams, position)}
               errors={formik.errors[tabQueryParams]}
-              name={'Query Parameter'}
+              btnLabels={'Query Parameter'}
+              name={tabQueryParams}
             />
             <p className="text-sm">Variables</p>
             <FormList
+              formik={formik}
               columns={columnsVariables}
               data={formik.values[tabPathVariables]}
               changeValue={(element, position, value) =>
@@ -84,7 +87,8 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
               addRow={() => addNewRow(formik, tabPathVariables, tabPathVariables)}
               removeRow={(position) => removeRow(formik, tabPathVariables, position)}
               errors={formik.errors[tabPathVariables]}
-              name={'Variable'}
+              btnLabels={'Variable'}
+              name={tabPathVariables}
             />
           </div>
         )}
@@ -92,6 +96,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
       <div className={activeTab === 'headers' ? 'block' : 'hidden'}>
         {columnsHeaders && (
           <FormList
+            formik={formik}
             columns={columnsHeaders}
             data={formik.values[tabHeaders]}
             changeValue={(element, position, value) =>
@@ -100,6 +105,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
             addRow={() => addNewRow(formik, tabHeaders, tabHeaders)}
             removeRow={(position) => removeRow(formik, tabQueryParams, position)}
             errors={formik.errors[tabHeaders]}
+            btnLabels={tabHeaders}
             name={tabHeaders}
           />
         )}
@@ -138,14 +144,16 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
           <>
             <FormList
               columns={columnsBody}
-              data={formik.values[tabBody]['multipart/form-data'].properties || []}
+              data={formik.values[tabBody]['multipart/form-data']['properties'] || []}
+              formik={formik}
               changeValue={(element, position, value) =>
                 changeValue(formik, element, position, value, tabBody)
               }
-              addRow={() => addNewRow(formik, tabBody, null)}
+              addRow={() => addNewRow(formik, tabBody, 'formData')}
               removeRow={(position) => removeRow(formik, tabBody, position)}
               errors={formik.errors[tabBody]}
-              name={'Form Data'}
+              name={'requestBody.multipart/form-data.properties'}
+              btnLabels=''
             />
           </>
         )}

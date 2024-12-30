@@ -108,7 +108,7 @@ const AttributesCard = ({
           <TableHead>Namespace</TableHead>
           <TableHead>Type</TableHead>
           <TableHead> </TableHead>
-          <TableHead style={{ width: '15px' }}></TableHead>
+          <TableHead className='w-4'></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

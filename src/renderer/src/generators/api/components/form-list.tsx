@@ -11,7 +11,7 @@ import {
 } from '@renderer/components/ui/table'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
-import { Plus, Trash } from 'lucide-react'
+import { GripVertical, Plus, Trash } from 'lucide-react'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import { Combobox } from '@igrp/igrp-design-system'
 import MultipleSelector from '@renderer/components/multiples-selector'
@@ -24,19 +24,25 @@ import {
   TooltipTrigger
 } from '@renderer/components/ui/tooltip'
 import { PopoverModel } from './model/popover'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
+  formik,
   errors,
   changeValue,
   addRow,
   removeRow,
   columns,
-  name
+  name,
+  btnLabels
 }) => {
-  const [formData, setFormData] = useState(data || {})
-
+  const [formData, setFormData] = useState(data || [])
   const [dynamicOptions, setDynamicOptions] = useState({})
+
+  useEffect(() => {
+    setFormData(data)
+  }, [data])
 
   const updateDependentFields = (key, index, selectedValue) => {
     // Procura por colunas que dependem da chave atual
@@ -106,193 +112,264 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }
   }
 
+  const onDragEnd = (result: any) => {
+    const { source, destination } = result
+
+    // Check if destination exists
+    if (!destination) return
+
+    // If the item is dropped in the same position, do nothing
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return
+    }
+
+    // Create a copy of the current data
+    const updatedData = Array.from(formData)
+
+    // Remove the item from its source position
+    const [movedItem] = updatedData.splice(source.index, 1)
+
+    // Insert the item at the destination position
+    updatedData.splice(destination.index, 0, movedItem)
+
+    // Update the state
+    setFormData(updatedData)
+    formik.setFieldValue(name, updatedData)
+  }
+
   return (
-    <Table>
-      <TableHeader className="ps-4">
-        <TableRow>
-          {columns.map(({ name, width }, index) => (
-            <TableHead style={{ width }} key={index}>
-              {name}
-            </TableHead>
-          ))}
-          {removeRow && <TableHead style={{ width: '15px' }}></TableHead>}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.length > 0 &&
-          data.map((row: any, index: number) => (
-            <TableRow key={index} className={`group/item`}>
-              {columns.map(({ name, key, type, options, items }, index2) => {
-                const selectValue = ['select'].includes(type)
-                  ? (dynamicOptions?.[`${index}-${key}`] || options)?.filter(
-                      (d) => row[key] && d.value === row[key]
-                    )[0]?.value
-                  : ''
-
-                const selectMultiValues = ['multiSelect'].includes(type)
-                  ? options?.filter((d) => row[key]?.includes(d.value)).map((d) => d.value)
-                  : []
-
-                return (
-                  <TableCell key={index2}>
-                    {type === 'group' && items && items?.length > 0 ? (
-                      <div className="flex gap-2 align-center">
-                        {items.map((item, itemIndex) => {
-                          const itemValue = row[item.key] || ''
-                          const itemOptions = item.type === 'select' ? item.options : null
-
-                          return (
-                            <div key={itemIndex} className="flex items-center">
-                              {item.type === 'select' && (
-                                <Combobox
-                                  name={item.name}
-                                  placeholder={`Select ${item.name}`}
-                                  options={itemOptions || []}
-                                  value={itemValue}
-                                  onChange={(selectedOption) =>
-                                    changeValue(item.key, index, selectedOption)
-                                  }
-                                  className="w-auto h-8"
-                                />
-                              )}
-
-                              {item.type === 'checkbox' && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger className="flex align-center">
-                                      <Checkbox
-                                        id={`${item.key}_${index2}`}
-                                        onCheckedChange={(checked) =>
-                                          changeValue(item.key, index, checked)
-                                        }
-                                        checked={row?.[item.key] || false}
-                                      />
-                                    </TooltipTrigger>
-                                    <TooltipContent>{item.name}</TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              )}
-
-                              {item.type === 'popoverController' && (
-                                <PopoverController
-                                  key={itemIndex}
-                                  index={index}
-                                  row={row}
-                                  changeValue={(element, position, value) =>
-                                    changeValue(element, position, value)
-                                  }
-                                />
-                              )}
-                              {item.type === 'popoverModel' && (
-                                <PopoverModel
-                                  key={itemIndex}
-                                  index={index}
-                                  row={row}
-                                  changeValue={(element, position, value) =>
-                                    changeValue(element, position, value)
-                                  }
-                                />
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId={`${name}`}>
+        {(provided: any) => (
+          <Table ref={provided.innerRef} {...provided.droppableProps}>
+            <TableHeader>
+              <TableRow>
+                {columns.map(({ name, width }, index) => (
+                  <TableHead style={{ width }} key={index}>
+                    {index === 0 ? (
+                      <span className="flex items-center">
+                        <button className="me-1" disabled>
+                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                        {name}
+                      </span>
                     ) : (
-                      <>
-                        {' '}
-                        {['text', 'number'].includes(type) && (
-                          <Input
-                            className={cn(
-                              'text-sm',
-                              errors?.[index]?.[key] ? 'border-red-500' : ''
-                            )}
-                            type={type}
-                            value={row?.[key] || ''}
-                            onChange={(ev) => changeValue(key, index, ev.target.value)}
-                          />
-                        )}
-                        {['select'].includes(type) && (
-                          <Combobox
-                            key={`${index}-${index2}`}
-                            name={name}
-                            placeholder={`Select ${name}`}
-                            options={dynamicOptions[`${index}-${key}`] || options}
-                            value={selectValue}
-                            onChange={(selectedOption) => {
-                              handleDependentChange(key, index, selectedOption)
-                            }}
-                            className="w-full h-9"
-                          />
-                        )}
-                        {['multiSelect'].includes(type) && (
-                          <MultipleSelector
-                            placeholder={`Select ${name}`}
-                            options={dynamicOptions[`${index}-${key}`] || options}
-                            value={selectMultiValues}
-                            onChange={(selectedOption) => {
-                              changeValue(key, index, selectedOption)
-                            }}
-                          />
-                        )}
-                        {['checkbox'].includes(type) && (
-                          <Checkbox
-                            id={`${key}_${index2}`}
-                            onCheckedChange={(checked) => changeValue(key, index, checked)}
-                            checked={row?.[key] || false}
-                          />
-                        )}
-                        {['popover'].includes(type) && (
-                          <PopoverController
-                            key={index}
-                            index={index}
-                            row={row}
-                            changeValue={(element, position, value) =>
-                              changeValue(element, position, value)
-                            }
-                          />
-                        )}
-                        {['popoverModel'].includes(type) && (
-                          <PopoverModel
-                            key={index}
-                            index={index}
-                            row={row}
-                            changeValue={(element, position, value) =>
-                              changeValue(element, position, value)
-                            }
-                          />
-                        )}
-                      </>
+                      name
                     )}
+                  </TableHead>
+                ))}
+                {removeRow && <TableHead className="w-[10px]"></TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {formData &&
+                formData.map((row: any, index: number) => {
+                  const rowId = row.id || `row-${name}-${index}`
+
+                  return (
+                    <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
+                      {(provided: any) => (
+                        <TableRow
+                          className={`group/item`}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                        >
+                          {columns.map(({ name, key, type, options, items }, index2) => {
+                            const selectValue = ['select'].includes(type)
+                              ? (dynamicOptions?.[`${index}-${key}`] || options)?.filter(
+                                  (d) => row[key] && d.value === row[key]
+                                )[0]?.value
+                              : ''
+
+                            const selectMultiValues = ['multiSelect'].includes(type)
+                              ? options
+                                  ?.filter((d) => row[key]?.includes(d.value))
+                                  .map((d) => d.value)
+                              : []
+
+                            return (
+                              <TableCell key={index2}>
+                                <div className="flex">
+                                  {index2 === 0 && (
+                                    <button
+                                      className="opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0"
+                                      {...provided.dragHandleProps}
+                                    >
+                                      <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                    </button>
+                                  )}
+
+                                  {type === 'group' && items && items?.length > 0 ? (
+                                    <div className="flex gap-2 align-center">
+                                      {items.map((item, itemIndex) => {
+                                        const itemValue = row[item.key] || ''
+                                        const itemOptions =
+                                          item.type === 'select' ? item.options : null
+
+                                        return (
+                                          <div key={itemIndex} className="flex items-center">
+                                            {item.type === 'select' && (
+                                              <Combobox
+                                                name={item.name}
+                                                placeholder={`Select ${item.name}`}
+                                                options={itemOptions || []}
+                                                value={itemValue}
+                                                onChange={(selectedOption) =>
+                                                  changeValue(item.key, index, selectedOption)
+                                                }
+                                                className="w-auto h-8"
+                                              />
+                                            )}
+
+                                            {item.type === 'checkbox' && (
+                                              <TooltipProvider>
+                                                <Tooltip>
+                                                  <TooltipTrigger className="flex align-center">
+                                                    <Checkbox
+                                                      id={`${item.key}_${index2}`}
+                                                      onCheckedChange={(checked) =>
+                                                        changeValue(item.key, index, checked)
+                                                      }
+                                                      checked={row?.[item.key] || false}
+                                                    />
+                                                  </TooltipTrigger>
+                                                  <TooltipContent>{item.name}</TooltipContent>
+                                                </Tooltip>
+                                              </TooltipProvider>
+                                            )}
+
+                                            {item.type === 'popoverController' && (
+                                              <PopoverController
+                                                key={itemIndex}
+                                                index={index}
+                                                row={row}
+                                                changeValue={(element, position, value) =>
+                                                  changeValue(element, position, value)
+                                                }
+                                              />
+                                            )}
+                                            {item.type === 'popoverModel' && (
+                                              <PopoverModel
+                                                key={itemIndex}
+                                                index={index}
+                                                row={row}
+                                                changeValue={(element, position, value) =>
+                                                  changeValue(element, position, value)
+                                                }
+                                              />
+                                            )}
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  ) : (
+                                    <>
+                                      {' '}
+                                      {['text', 'number'].includes(type) && (
+                                        <Input
+                                          className={cn(
+                                            'text-sm',
+                                            errors?.[index]?.[key] ? 'border-red-500' : ''
+                                          )}
+                                          type={type}
+                                          value={row?.[key] || ''}
+                                          onChange={(ev) =>
+                                            changeValue(key, index, ev.target.value)
+                                          }
+                                        />
+                                      )}
+                                      {['select'].includes(type) && (
+                                        <Combobox
+                                          key={`${index}-${index2}`}
+                                          name={name}
+                                          placeholder={`Select ${name}`}
+                                          options={dynamicOptions[`${index}-${key}`] || options}
+                                          value={selectValue}
+                                          onChange={(selectedOption) => {
+                                            handleDependentChange(key, index, selectedOption)
+                                          }}
+                                          className="w-full h-9"
+                                        />
+                                      )}
+                                      {['multiSelect'].includes(type) && (
+                                        <MultipleSelector
+                                          placeholder={`Select ${name}`}
+                                          options={dynamicOptions[`${index}-${key}`] || options}
+                                          value={selectMultiValues}
+                                          onChange={(selectedOption) => {
+                                            changeValue(key, index, selectedOption)
+                                          }}
+                                        />
+                                      )}
+                                      {['checkbox'].includes(type) && (
+                                        <Checkbox
+                                          id={`${key}_${index2}`}
+                                          onCheckedChange={(checked) =>
+                                            changeValue(key, index, checked)
+                                          }
+                                          checked={row?.[key] || false}
+                                        />
+                                      )}
+                                      {['popover'].includes(type) && (
+                                        <PopoverController
+                                          key={index}
+                                          index={index}
+                                          row={row}
+                                          changeValue={(element, position, value) =>
+                                            changeValue(element, position, value)
+                                          }
+                                        />
+                                      )}
+                                      {['popoverModel'].includes(type) && (
+                                        <PopoverModel
+                                          key={index}
+                                          index={index}
+                                          row={row}
+                                          changeValue={(element, position, value) =>
+                                            changeValue(element, position, value)
+                                          }
+                                        />
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </TableCell>
+                            )
+                          })}
+                          {removeRow && (
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`text-red-500 opacity-0 group-hover/item:opacity-100`}
+                                onClick={() => removeRow(index)}
+                              >
+                                <Trash />
+                              </Button>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      )}
+                    </Draggable>
+                  )
+                })}
+            </TableBody>
+            {addRow && (
+              <TableFooter>
+                <TableRow>
+                  <TableCell className="text-left">
+                    <Button variant={'outline'} onClick={addRow} className="text-capitalize">
+                      <Plus />
+                      {`New ${btnLabels}`}
+                    </Button>
                   </TableCell>
-                )
-              })}
-              {removeRow && (
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className={`border-0 text-red-500 opacity-0 group-hover/item:opacity-100`}
-                    onClick={() => removeRow(index)}
-                  >
-                    <Trash />
-                  </Button>
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
-      </TableBody>
-      {addRow && (
-        <TableFooter>
-          <TableRow>
-            <TableCell className="text-left">
-              <Button variant={'outline'} onClick={addRow} className="text-capitalize">
-                <Plus />
-                {`New ${name}`}
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      )}
-    </Table>
+                </TableRow>
+              </TableFooter>
+            )}
+            {provided.placeholder}
+          </Table>
+        )}
+      </Droppable>
+    </DragDropContext>
   )
 }

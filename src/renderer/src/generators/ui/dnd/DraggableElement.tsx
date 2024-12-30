@@ -1,5 +1,5 @@
 import { GripHorizontal, Settings } from "lucide-react";
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import { useTranslation } from "react-i18next";
 
 const DraggableElement = ({ item, index }) => {

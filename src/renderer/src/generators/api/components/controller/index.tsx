@@ -18,7 +18,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Combobox } from '@igrp/igrp-design-system'
 import { formatMethods } from '../../helpers'
-import { Input } from '@renderer/components/ui/input'
 import { TabRequest } from './tab-resquest'
 
 import useToast from '@renderer/components/useToast'

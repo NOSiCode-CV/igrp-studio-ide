@@ -4,7 +4,7 @@ import { DroppedComponent } from '../../../interfaces';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import BoxField from '../../fields/BoxFields';
 import { ComponentRegistry } from '../../../data/ComponentRegistry';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { FEILD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
 

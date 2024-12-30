@@ -1,6 +1,5 @@
 import React from "react";
 import { SidebarHeader, SidebarMenuButton } from "@renderer/components/ui/sidebar";
-import SpringIcon from '@renderer/assets/images/Spring30x30.svg';
 import FormSearch from "../components/app-search";
 import { CreateModuleDialog } from "@renderer/generators/api/components/create-module-dialog";
 import { cn } from "@renderer/lib/utils";

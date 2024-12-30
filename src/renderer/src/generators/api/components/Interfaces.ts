@@ -11,10 +11,12 @@ export interface IColumnsTabelProps {
 
 export interface ITabelContainer {
   data: any[]
+  formik: any
   errors?: any
   changeValue: (element: string, position: number, value: any) => void
   addRow?: () => void
   removeRow?: (value: number) => void
   columns: IColumnsTabelProps[]
-  name?: string
+  name: string
+  btnLabels?: string
 }

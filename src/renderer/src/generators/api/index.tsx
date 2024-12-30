@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 interface PageBuilderProps {
   basePath?: string
-  currentItem: any
+  currentItem?: any
 }
 
 const Index = ({ basePath, currentItem }: PageBuilderProps) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormList } from '../form-list'
 import useToast from '@renderer/components/useToast'
 import { useFormik } from 'formik'
@@ -226,33 +226,35 @@ const ModelLayout = ({
 
   const renderFormList = (value: string) => {
     const columns = tablesColumns?.[value]
-    const data = formik?.values?.[value]
     const errors = formik?.errors?.[value]
 
-    if (columns && data) {
-      return (
-        <FormList
-          columns={columns}
-          data={data}
-          changeValue={(element, position, result) =>
-            changeValue(formik, element, position, result, value)
-          }
-          errors={errors}
-          addRow={
-            value === 'crud' ? undefined : () => addNewRow(formik, value, defaultValues[value])
-          }
-          removeRow={
-            value === 'crud' ? undefined : (position) => removeRow(formik, value, position)
-          }
-          name={btnLabels?.[value] || 'attributes'}
-        />
-      )
-    }
-    return null
+    return (
+      <>
+        {columns && formik?.values?.[value] && (
+          <FormList
+            columns={columns}
+            formik={formik}
+            data={formik.values[value]}
+            changeValue={(element, position, result) =>
+              changeValue(formik, element, position, result, value)
+            }
+            errors={errors}
+            addRow={
+              value === 'crud' ? undefined : () => addNewRow(formik, value, defaultValues[value])
+            }
+            removeRow={
+              value === 'crud' ? undefined : (position) => removeRow(formik, value, position)
+            }
+            btnLabels={btnLabels[value]}
+            name={value}
+          />
+        )}
+      </>
+    )
   }
 
   return (
-    <React.Fragment>
+    <>
       <NavigationBar
         onDelete={deleteModel}
         onCancel={handleCancel}
@@ -333,7 +335,7 @@ const ModelLayout = ({
           </Tabs>
         </Card>
       </div>
-    </React.Fragment>
+    </>
   )
 }
 

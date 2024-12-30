@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   useSidebar
 } from '@renderer/components/ui/sidebar'
-import { Badge, ChevronDown, FileText, Home, Server, Settings } from 'lucide-react'
+import { Badge, ChevronDown, FileText, Home, Server } from 'lucide-react'
 
 import { cn } from '@renderer/lib/utils'
 import { filterSubItems } from '@renderer/utils/helpers'

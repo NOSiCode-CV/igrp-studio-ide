@@ -35,7 +35,6 @@ const TabManager = ({
 }: ContentProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-
   // Handle opening a new tab
   const handleNewTab = () => {
     const newTabId = `tab-${tabs.length + 1}`
