@@ -5,6 +5,7 @@ import { MenuItem } from 'src/main/types'
 import { Boxes } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
+import { ROUTES } from '@renderer/routes/routeConstants'
 
 const Navdata = (folders: any) => {
   const dispatch: any = useDispatch()
@@ -56,8 +57,9 @@ const Navdata = (folders: any) => {
             path: file.path,
             module: folderName,
             type: categoryName,
-            subItems: getSubItems(categoryName, file, file.path,folderName, onClickItem),
-            click: (subItem) => onClickItem(subItem)
+            link: ROUTES.PATH_PAGE_BUILDER_API,
+            subItems: getSubItems(categoryName, file, file.path, folderName, onClickItem),
+            click: (subItem: MenuItem) => onClickItem(subItem)
           })
         )
 
@@ -87,12 +89,13 @@ function getSubItems(
       label: action.actionName,
       path: path,
       type: OPTION_TYPE.CONTROLLERS,
-      sutType: OPTION_TYPE.ACTION,
+      subType: OPTION_TYPE.ACTION,
       click: (subItem) => onClickItem(subItem),
       badgeColor: getBadgeColor(action.method),
       badgeName: action.method,
       content: action,
-      module: folderName
+      module: folderName,
+      link: ROUTES.PATH_PAGE_BUILDER_API
     }))
   }
   return []

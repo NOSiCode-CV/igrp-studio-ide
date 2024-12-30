@@ -1,6 +1,7 @@
 import { IGRPContainer } from '@igrp/igrp-design-system'
 import { Button } from '@renderer/components/ui/button'
 import { Card, CardContent } from '@renderer/components/ui/card'
+import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { FileCode, Database, FileText } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -11,29 +12,26 @@ const EmptyPage = ({ onClick }) => {
     {
       title: t('newObject', { name: t('model') }),
       icon: <Database className="h-6 w-6" />,
-      onClick: () => onClick('models'),
-      type: 'models'
+      onClick: () => onClick(OPTION_TYPE.MODELS)
     },
     {
       title: t('newObject', { name: t('controller') }),
       icon: <FileCode className="h-6 w-6" />,
-      onClick: () => onClick('controllers'),
-      type: 'controllers'
+      onClick: () => onClick(OPTION_TYPE.ACTION)
     },
     {
       title: t('newDto'),
       icon: <FileText className="h-6 w-6" />,
-      onClick: () => onClick('dto'),
-      type: 'dto'
+      onClick: () => onClick(OPTION_TYPE.DATA_OBJECTS)
     }
   ]
 
   return (
     <IGRPContainer>
       <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4">
-        {actions.map((action) => (
+        {actions.map((action, key) => (
           <Card
-            key={action.type}
+            key={key}
             className="group hover:border-primary/50 transition-colors cursor-pointer"
             onClick={action.onClick}
           >

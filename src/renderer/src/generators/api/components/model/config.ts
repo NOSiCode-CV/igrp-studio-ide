@@ -81,7 +81,7 @@ export const defaultValues: any = {
   indexes: {
     name: '',
     columns: [],
-    options: ''
+    unique: false
   },
   uniqueConstraints: {
     name: '',

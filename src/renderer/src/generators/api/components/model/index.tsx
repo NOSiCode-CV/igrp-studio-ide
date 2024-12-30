@@ -17,29 +17,31 @@ import { TextInput } from '../inputs-form'
 import PrimaryKeyTable from './PrimaryKeyTable'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import NavigationBar from '../navigation-bar'
+import { ROUTES } from '@renderer/routes/routeConstants'
+import { useNavigate } from 'react-router-dom'
 
 interface ModelProps {
-  onCancel: () => void
   basePath: string
   module: string
   selectors: Array<any>
-  jsonData?: any
   models?: Array<any>
+  currentItem: any
 }
 
 const ModelLayout = ({
-  onCancel,
   basePath,
   selectors,
-  jsonData,
   models,
-  module
+  module,
+  currentItem
 }: ModelProps): JSX.Element => {
   const { t } = useTranslation()
   const dispatch: any = useDispatch()
   const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({})
   const { showErrorToast, showSuccessToast } = useToast()
+  const [data, setData] = useState<any>(null)
 
+  const navigate = useNavigate()
   const validationSchema = useModelValidation({ t })
 
   const formik: any = useFormik({
@@ -75,7 +77,25 @@ const ModelLayout = ({
   }, [selectors, formik.values])
 
   useEffect(() => {
-    if (jsonData) {
+    const getJsonData = async () => {
+      if (!currentItem) return
+
+      try {
+        const data = await window.api.getJsonContent(currentItem.path)
+        setData(data)
+        //setOption(currentItem.subType || currentItem.type)
+        //setModule(currentItem.module)
+        //dispatch(setCurrentItem(null))
+      } catch (error) {
+        console.error('Failed to load JSON content:', error)
+      }
+    }
+
+    getJsonData()
+  }, [currentItem])
+
+  useEffect(() => {
+    if (data) {
       const {
         name,
         tableName,
@@ -85,7 +105,7 @@ const ModelLayout = ({
         relations,
         uniqueConstraints,
         indexes
-      } = jsonData
+      } = data
 
       const crudValue = crud ? [crud] : [defaultValues.crud]
 
@@ -125,7 +145,7 @@ const ModelLayout = ({
       formik.setFieldValue('uniqueConstraints', constraints)
       formik.setFieldValue('indexes', indexesTable)
     } else formik.resetForm()
-  }, [jsonData])
+  }, [data])
 
   const getValuesToSubmit = () => {
     const values = { ...formik.values }
@@ -139,7 +159,7 @@ const ModelLayout = ({
 
     const uniqueConstraints = values.uniqueConstraints?.filter((rel) => rel.name !== '') || []
 
-    const uniqueIndexes = values.indexes?.filter((idx) => idx.name !== '') || []
+    const indexes = values.indexes?.filter((idx) => idx.name !== '') || []
 
     const attributes = values.attributes.map(({ ...field }) => ({
       ...field,
@@ -166,7 +186,7 @@ const ModelLayout = ({
       attributes: filteredAttributes,
       relations,
       uniqueConstraints,
-      uniqueIndexes,
+      indexes,
       crud: {
         ...values.crud?.[0],
         enabled: enableCrud
@@ -193,6 +213,8 @@ const ModelLayout = ({
 
       dispatch(onSetChangeStatus(true))
 
+      navigate(ROUTES.PATH_PAGE_BUILDER_API)
+
       showSuccessToast(t('createdSuccess', { name: t('model'), value: values.name }))
     } catch (error) {
       showErrorToast(error)
@@ -211,17 +233,11 @@ const ModelLayout = ({
       }
 
       dispatch(onSetChangeStatus(true))
-      onCancel()
 
       showSuccessToast(t('deletedSuccess', { name: t('model') }))
     } catch (error) {
       showErrorToast(error)
     }
-  }
-
-  const handleCancel = () => {
-    onCancel()
-    formik.resetForm()
   }
 
   const renderFormList = (value: string) => {
@@ -257,9 +273,8 @@ const ModelLayout = ({
     <>
       <NavigationBar
         onDelete={deleteModel}
-        onCancel={handleCancel}
         onSubmit={formik.handleSubmit}
-        isNew={jsonData === null}
+        isNew={data === null}
         title="model"
       />
 

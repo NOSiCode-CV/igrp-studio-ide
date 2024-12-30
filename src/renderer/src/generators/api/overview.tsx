@@ -28,7 +28,7 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-col items-center mt-16 p-4 bg-background">
+    <div className="flex flex-col items-center mt-6 p-4 bg-background">
       <div className="w-full max-w-4xl space-y-8">
         <PageHeader title="API Overview" description="Manage your API endpoints"></PageHeader>
         <DashboardOverview stats={stats} />

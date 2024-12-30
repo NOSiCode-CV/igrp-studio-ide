@@ -27,20 +27,18 @@ import { TextInput } from '../inputs-form'
 import { Label } from '@renderer/components/ui/label'
 import { TabResponse } from './tab-response'
 import { httpMethods } from '@renderer/constants/appConstants'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@renderer/routes/routeConstants'
 
 interface ControllerProps {
-  jsonData?: any
   basePath: string
   defaultModule: string
   selectors: Array<any>
-  onCancel: () => void
   currentItem: any
   modules: Array<any>
 }
 
 const ControllerLayout: React.FC<ControllerProps> = ({
-  jsonData,
-  onCancel,
   basePath,
   selectors,
   defaultModule,
@@ -48,12 +46,14 @@ const ControllerLayout: React.FC<ControllerProps> = ({
   modules
 }: ControllerProps) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   const [title, setTitle] = useState('')
   const [name, setName] = useState('')
   const [pathController, setPathController] = useState('')
   const [root, setRoot] = useState('')
   const [module, setModule] = useState<string | undefined>(defaultModule)
+  const [data, setData] = useState<any>(null)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -76,19 +76,37 @@ const ControllerLayout: React.FC<ControllerProps> = ({
   })
 
   useEffect(() => {
+    const getJsonData = async () => {
+      if (!currentItem) return
+
+      try {
+        const data = await window.api.getJsonContent(currentItem.path)
+        setData(data)
+        //setOption(currentItem.subType || currentItem.type)
+        //setModule(currentItem.module)
+        //dispatch(setCurrentItem(null))
+      } catch (error) {
+        console.error('Failed to load JSON content:', error)
+      }
+    }
+
+    getJsonData()
+  }, [currentItem])
+
+  useEffect(() => {
     const res = getTablesColumns(selectors)
     setTableColumns(res)
   }, [selectors])
 
   useEffect(() => {
-    if (jsonData) {
-      const { name, basePath } = jsonData
+    if (data) {
+      const { name, basePath } = data
 
       setTitle(`${name}(${basePath})`)
       setName(name)
       setPathController(basePath)
     }
-  }, [jsonData])
+  }, [data])
 
   useEffect(() => {
     if (currentItem && currentItem.content) {
@@ -141,10 +159,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       type: 'controller',
       name: name,
       basePath: pathController,
-      actions: finalActions
+      actions: finalActions,
+      module
     }
-
-    newValues.module = module
 
     return newValues
   }
@@ -182,17 +199,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       }
 
       dispatch(onSetChangeStatus(true))
-      onCancel()
+      navigate(ROUTES.PATH_PAGE_BUILDER_API)
 
       showSuccessToast(t('deletedSuccess', { name: t('controller') }))
     } catch (error) {
       showErrorToast(error)
     }
-  }
-
-  const handleCancel = () => {
-    onCancel()
-    formik.resetForm()
   }
 
   const typesData = formatMethods(
@@ -202,11 +214,11 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
   const responseTypes = formatMethods(
     (
-        selectors.find((selector) => 'RESPONSE_TYPES' in selector) as
+      selectors.find((selector) => 'RESPONSE_TYPES' in selector) as
         | { RESPONSE_TYPES: string[] }
         | undefined
     )?.RESPONSE_TYPES || []
-)
+  )
 
   const onSubmit = async () => {
     const errors = await formik.validateForm()
@@ -227,9 +239,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     <React.Fragment>
       <NavigationBar
         onDelete={handleDelete}
-        onCancel={handleCancel}
         onSubmit={onSubmit}
-        isNew={!jsonData}
+        isNew={!data}
         title={title || 'Create a new Action'}
       />
 
@@ -266,7 +277,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                   value={formik.values.method}
                   onChange={(value) => formik.setFieldValue('method', value)}
                   options={httpMethods}
-                  className='h-9'
+                  className="h-9"
                 />
               </div>
 
@@ -303,7 +314,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             <TabRequest formik={formik} tablesColumns={tablesColumns} />
           </TabsContent>
           <TabsContent value={'response'}>
-            <TabResponse formik={formik} responseTypes={responseTypes} contentTypes={typesData}/>
+            <TabResponse formik={formik} responseTypes={responseTypes} contentTypes={typesData} />
           </TabsContent>
         </Tabs>
       </div>

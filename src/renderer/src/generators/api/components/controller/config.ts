@@ -5,17 +5,7 @@ export const initialValues = {
     actionName: '',
     path: '',
     method: 'GET',
-    requestBody: {
-        'multipart/form-data': {
-            type: "Object",
-            properties: [{
-                type: '',
-                name: '',
-                value: '',
-                isRequired: true
-            }]
-        },
-    },
+    requestBody: "",
     response: 'Object',
     responses: {
         '200': {

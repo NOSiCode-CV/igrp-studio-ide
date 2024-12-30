@@ -13,29 +13,31 @@ import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { SelectInput, TextInput } from '../inputs-form'
 import NavigationBar from '../navigation-bar'
 import AttributesCard from './attributes'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@renderer/routes/routeConstants'
 
 interface DtoProps {
-  jsonData?: any
-  onCancel: () => void
   basePath: string
   module: string
   selectors: Array<any>
   models?: Array<any>
   dto?: Array<any>
+  currentItem: any
 }
 
 const DtoLayout = ({
-  jsonData,
-  onCancel,
   basePath,
   selectors,
   dto,
   models,
-  module
+  module,
+  currentItem
 }: DtoProps): JSX.Element => {
   const dispatch: any = useDispatch()
+  const navigate = useNavigate()
   const { showErrorToast, showSuccessToast } = useToast()
   const { t } = useTranslation()
+  const [data, setData] = useState<any>(null)
 
   const [tablesColumns, setTableColumns] = useState<{ [key: string]: IColumnsTabelProps[] }>({})
   const validationSchema = useDtoValidation({ t })
@@ -50,20 +52,38 @@ const DtoLayout = ({
   })
 
   useEffect(() => {
-    if (jsonData) {
-      const { name, template, attributes } = jsonData
+    const getJsonData = async () => {
+      if (!currentItem) return
+
+      try {
+        const data = await window.api.getJsonContent(currentItem.path)
+        setData(data)
+        //setOption(currentItem.subType || currentItem.type)
+        //setModule(currentItem.module)
+        //dispatch(setCurrentItem(null))
+      } catch (error) {
+        console.error('Failed to load JSON content:', error)
+      }
+    }
+
+    getJsonData()
+  }, [currentItem])
+
+  useEffect(() => {
+    if (data) {
+      const { name, template, attributes } = data
       formik.setFieldValue('name', name || '')
       formik.setFieldValue('template', template || '')
       formik.setFieldValue('attributes', attributes || initialValues.attributes)
     } else {
       formik.resetForm()
     }
-  }, [jsonData])
+  }, [data])
 
   useEffect(() => {
-    const columns = getTablesColumns({ selectors, dto, models, currentDto: jsonData?.name })
+    const columns = getTablesColumns({ selectors, dto, models, currentDto: data?.name })
     setTableColumns(columns)
-  }, [selectors, dto, models, jsonData])
+  }, [selectors, dto, models, data])
 
   const handleSave = async (newValues: DTOConfig): Promise<void> => {
     try {
@@ -87,7 +107,7 @@ const DtoLayout = ({
       if (error) return showErrorToast(error)
 
       dispatch(onSetChangeStatus(true))
-      onCancel()
+      navigate(ROUTES.PATH_PAGE_BUILDER_API)
       showSuccessToast(t('deletedSuccess', { name: t('dto') }))
     } catch (error) {
       showErrorToast(error)
@@ -108,7 +128,7 @@ const DtoLayout = ({
           formik={formik}
           dto={dto}
           models={models}
-          currentDto={jsonData?.name}
+          currentDto={data?.name}
           data={data}
           selectors={selectors}
           errors={errors}
@@ -127,9 +147,8 @@ const DtoLayout = ({
     <React.Fragment>
       <NavigationBar
         onDelete={handleDelete}
-        onCancel={onCancel}
         onSubmit={formik.handleSubmit}
-        isNew={!jsonData}
+        isNew={!data}
         title="dto"
       />
 

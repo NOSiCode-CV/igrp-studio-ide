@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import { Plus, X } from 'lucide-react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from './ui/button'
-import New from '@renderer/generators/api/new'
+import PageController from '@renderer/generators/api/PageController'
 import { OptionType } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
 import Overview from '@renderer/generators/api/overview'
@@ -13,6 +13,7 @@ export interface TabItem {
   id: string
   title: string
   open: OptionType
+  item?: any
 }
 
 interface ContentProps {
@@ -22,7 +23,6 @@ interface ContentProps {
   setActiveTab: (tab: string) => void
   setNewTab: (tab: TabItem) => void
   onCloseTab: (tab: string) => void
-  currentItem: any
 }
 
 const TabManager = ({
@@ -30,8 +30,7 @@ const TabManager = ({
   activeTab,
   setActiveTab,
   setNewTab,
-  onCloseTab,
-  currentItem
+  onCloseTab
 }: ContentProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
@@ -52,7 +51,7 @@ const TabManager = ({
       ...tab
     })
   }
-
+ 
   return (
     <>
       {/* Tabs Navigation */}
@@ -109,15 +108,21 @@ const TabManager = ({
       <Separator />
 
       {/* Tab Content */}
-      {tabs.map((tab) => (
-        <div key={tab.id} className={activeTab === tab.id ? 'block' : 'hidden'}>
-          {tab.id === 'tab-0' ? (
-            <Overview onOpenNew={handleOpenNew} open={tab.open} />
-          ) : (
-            <New onOpenNew={handleOpenNew} open={tab.open} tab={tab} currentItem={currentItem} />
-          )}
-        </div>
-      ))}
+      {tabs.map((tab) => {
+        return (
+          <div key={tab.id} className={activeTab === tab.id ? 'block' : 'hidden'}>
+            {tab.id === 'tab-0' ? (
+              <Overview onOpenNew={handleOpenNew} open={tab.open} />
+            ) : (
+              <PageController
+                onOpenNew={handleOpenNew}
+                open={tab.open}
+                tab={tab}
+              />
+            )}
+          </div>
+        )
+      })}
     </>
   )
 }

@@ -4,12 +4,12 @@ import DtoLayout from './components/dto'
 import ControllerLayout from './components/controller'
 import EmptyPage from './EmptyPage'
 import { createSelector } from 'reselect'
-import { useSelector, useDispatch } from 'react-redux'
-import { setCurrentItem } from '@renderer/redux/thunks'
+import { useSelector } from 'react-redux'
 import { extractByType, getMergedFiles, getModulesArray } from './helpers'
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants'
 import { TabItem } from '@renderer/components/TabManager'
 import { useTranslation } from 'react-i18next'
+import ControllerOverview from './components/controller/overview'
 
 interface PageBuilderState {
   basePath: string
@@ -24,17 +24,14 @@ interface NewProps {
   onOpenNew: (tab: TabItem) => void
   open: OptionType
   tab: TabItem
-  currentItem: any
 }
 
-const New = ({ onOpenNew, open = 'none', tab, currentItem }: NewProps): JSX.Element => {
+const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
   const [selectors, setSelectors] = useState<any[]>([])
-  const [currentData, setCurrentData] = useState<any>(null)
   const [option, setOption] = useState<OptionType>(open)
   const [module, setModule] = useState<string>('shared')
 
   const { t } = useTranslation()
-  const dispatch: any = useDispatch()
 
   const selectState = (state: any): PageBuilderState => state.PageBuilder
 
@@ -49,25 +46,7 @@ const New = ({ onOpenNew, open = 'none', tab, currentItem }: NewProps): JSX.Elem
     }
   })
 
-  const { basePath, models, dto, modules } = useSelector(selectProperties)
-
-  useEffect(() => {
-    const getJsonData = async () => {
-      if (!currentItem) return
-
-      try {
-        const data = await window.api.getJsonContent(currentItem.path)
-        setCurrentData(data)
-        setOption(currentItem.type)
-        setModule(currentItem.module)
-        dispatch(setCurrentItem(null))
-      } catch (error) {
-        console.error('Failed to load JSON content:', error)
-      }
-    }
-
-    getJsonData()
-  }, [currentItem, dispatch])
+  const { basePath, models, dto, modules, controllers } = useSelector(selectProperties)
 
   useEffect(() => {
     const getAllSelectors = async () => {
@@ -84,15 +63,9 @@ const New = ({ onOpenNew, open = 'none', tab, currentItem }: NewProps): JSX.Elem
     }
   }, [basePath, module])
 
-  const handleCancel = () => {
-    setOption('none')
-    setCurrentData(null)
-  }
-
   const handleOptionClick = (opt: OptionType) => {
     setOption(opt)
     setModule('shared')
-    setCurrentData(null)
 
     onOpenNew({
       ...tab,
@@ -106,45 +79,47 @@ const New = ({ onOpenNew, open = 'none', tab, currentItem }: NewProps): JSX.Elem
       {option === 'none' && (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4 bg-background">
           <div className="w-full max-w-4xl space-y-8">
-            {' '}
-            <EmptyPage onClick={handleOptionClick} />{' '}
+            <EmptyPage onClick={handleOptionClick} />
           </div>
         </div>
       )}
       {option === OPTION_TYPE.MODELS && (
         <ModelLayout
-          onCancel={handleCancel}
           basePath={basePath}
           selectors={selectors}
-          jsonData={currentData}
           models={models}
           module={module}
+          currentItem={tab.item}
+        />
+      )}
+      {option === OPTION_TYPE.ACTION && (
+        <ControllerLayout
+          basePath={basePath}
+          selectors={selectors}
+          defaultModule={module}
+          currentItem={tab.item}
+          modules={modules}
         />
       )}
       {option === OPTION_TYPE.CONTROLLERS && (
-        <ControllerLayout
-          onCancel={handleCancel}
+        <ControllerOverview
           basePath={basePath}
-          selectors={selectors}
-          jsonData={currentData}
-          defaultModule={module}
-          currentItem={currentItem}
-          modules={modules}
+          currentItem={tab.item}
+          controllers={controllers}
         />
       )}
       {option === OPTION_TYPE.DATA_OBJECTS && (
         <DtoLayout
-          onCancel={handleCancel}
           basePath={basePath}
           selectors={selectors}
-          jsonData={currentData}
           dto={dto}
           models={models}
           module={module}
+          currentItem={tab.item}
         />
       )}
     </>
   )
 }
 
-export default New
+export default PageController

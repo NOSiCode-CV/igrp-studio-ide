@@ -9,6 +9,7 @@ interface PageBuilderProps {
 }
 
 const Index = ({ basePath, currentItem }: PageBuilderProps) => {
+
   const { t } = useTranslation()
 
   const [tabs, setTabs] = useState<Array<TabItem>>([
@@ -43,11 +44,12 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
   useEffect(() => {
     if (currentItem)
       handleNewTab({
-        id: `tab-${currentItem.isHeader ? Date.now() : currentItem.label}`,
+        id: `tab-${currentItem.module}-${currentItem.isHeader ? Date.now() : currentItem.label}`,
         title: currentItem.isHeader
           ? t(`new${currentItem.type.charAt(0).toUpperCase() + currentItem.type.slice(1)}`)
           : currentItem.label,
-        open: currentItem.type
+        open: currentItem.subType || currentItem.type,
+        item: currentItem
       })
   }, [currentItem])
 
@@ -59,7 +61,6 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
       setActiveTab={setActiveTab}
       setNewTab={handleNewTab}
       onCloseTab={handleCloseTab}
-      currentItem={currentItem}
     />
   )
 }

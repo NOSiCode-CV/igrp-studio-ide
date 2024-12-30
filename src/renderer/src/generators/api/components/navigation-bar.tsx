@@ -14,13 +14,12 @@ import { useTranslation } from 'react-i18next'
 
 interface ActionProps {
   onDelete: () => void
-  onCancel: () => void
   onSubmit: () => void
   title: string
   isNew?: boolean
 }
 
-const NavigationBar = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionProps) => {
+const NavigationBar = ({ onSubmit, onDelete, title, isNew }: ActionProps) => {
   const { t } = useTranslation()
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false)
@@ -59,11 +58,7 @@ const NavigationBar = ({ onCancel, onSubmit, onDelete, title, isNew }: ActionPro
             <Trash /> {t('delete')}
           </Button>
         )}
-
-        <Button variant="outline" onClick={onCancel} className="border text-gray-600">
-          {t('cancel')}
-        </Button>
-
+        
         <Button color="success" onClick={onSubmit} type="submit">
           {t('save')}
         </Button>

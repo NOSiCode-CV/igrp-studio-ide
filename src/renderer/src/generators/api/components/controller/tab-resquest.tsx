@@ -26,7 +26,23 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
 
     // Clear formik values for body content when type changes
     if (type === 'none') {
-      formik.setFieldValue('requestBody', [])
+      formik.setFieldValue('requestBody', '')
+    } else if (type === 'multipart/form-data') {
+      const content = {
+        'multipart/form-data': {
+          type: 'Object',
+          properties: [
+            {
+              type: '',
+              name: '',
+              value: '',
+              isRequired: true
+            }
+          ]
+        }
+      }
+
+      formik.setFieldValue('requestBody', content)
     }
   }
 
@@ -153,7 +169,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns })
               removeRow={(position) => removeRow(formik, tabBody, position)}
               errors={formik.errors[tabBody]}
               name={'requestBody.multipart/form-data.properties'}
-              btnLabels=''
+              btnLabels=""
             />
           </>
         )}

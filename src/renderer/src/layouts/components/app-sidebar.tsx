@@ -29,6 +29,7 @@ import { ConfigOptions, MenuItem } from 'src/main/types'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { AppSidebarHeader } from './app-sidebar-header'
 import { DropdownSidebarMenuButton } from './dropdown-sidebar-menu-button'
+import { useNavigate } from 'react-router-dom'
 
 interface AppSidebarProps {
   className?: string
@@ -63,7 +64,6 @@ export function AppSidebar({ className, menuItems, config, basePath, header }: A
     { icon: FileText, link: '/documents', label: 'Documents' },
     { icon: Badge, link: '/settings', label: 'Settings' }
   ]
-
   return (
     <>
       <Sidebar
@@ -192,13 +192,20 @@ const SidebarGroupContentComp: React.FC<{
   activeItem: string
 }> = ({ item, handleSubItemClick, activeItem }) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const handleNavigation = (link) => {
+    if (link) navigate(link)
+  }
   return (
     <SidebarGroupContent>
       <SidebarMenu>
         <Collapsible defaultOpen className="group/collapsible">
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton className="w-full justify-between">
+              <SidebarMenuButton
+                className="w-full justify-between"
+                onClick={(e) => {handleNavigation(item.link); handleSubItemClick(e, item)}}
+              >
                 <div className="flex items-center">
                   {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                   <span>
@@ -225,7 +232,10 @@ const SidebarGroupContentComp: React.FC<{
                     // Renderizar como item final
                     <SidebarMenuSubItem key={subIndex}>
                       <SidebarMenuSubButton
-                        onClick={(e) => handleSubItemClick(e, subItem)}
+                        onClick={(e) => {
+                          handleNavigation(subItem.link)
+                          handleSubItemClick(e, subItem)
+                        }}
                         className="cursor-pointer"
                         isActive={activeItem === subItem.label}
                       >

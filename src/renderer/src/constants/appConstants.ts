@@ -26,7 +26,7 @@ export enum OPTION_TYPE {
     ACTION = 'action',
 };
 
-export type OptionType = 'models' | 'controllers' | 'dto' | 'none';
+export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'none';
 
 export const projectIcons = {
     [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
