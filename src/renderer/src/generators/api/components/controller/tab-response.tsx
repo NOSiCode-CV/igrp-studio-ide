@@ -74,6 +74,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
     { key: 'description', name: 'Description', type: 'text', width: '50%' },
   ]
 
+  console.log(response)
+
   return (
     <div className="w-full">
       {/* Response Tabs Navigation */}

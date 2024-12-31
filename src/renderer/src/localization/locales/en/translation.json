@@ -59,5 +59,6 @@
   "createdSuccess": "{{name}} {{value}} have been successfully added.",
   "newDto": "New Data Object",
   "newModels": "New Schema",
-  "newControllers": "New Endpoint"
+  "newControllers": "New Endpoint",
+  "newAction": "New Action"
 }

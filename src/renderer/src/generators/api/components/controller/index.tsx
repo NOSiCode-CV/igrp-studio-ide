@@ -27,32 +27,30 @@ import { TextInput } from '../inputs-form'
 import { Label } from '@renderer/components/ui/label'
 import { TabResponse } from './tab-response'
 import { httpMethods } from '@renderer/constants/appConstants'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@renderer/routes/routeConstants'
 
 interface ControllerProps {
   basePath: string
-  defaultModule: string
   selectors: Array<any>
   currentItem: any
   modules: Array<any>
+  onCloseTab: () => void
+  onUpdateTab: (newId: string) => void
 }
 
 const ControllerLayout: React.FC<ControllerProps> = ({
   basePath,
   selectors,
-  defaultModule,
   currentItem,
-  modules
+  modules,
+  onCloseTab,
+  onUpdateTab
 }: ControllerProps) => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   const [title, setTitle] = useState('')
   const [name, setName] = useState('')
   const [pathController, setPathController] = useState('')
-  const [root, setRoot] = useState('')
-  const [module, setModule] = useState<string | undefined>(defaultModule)
+  const [module, setModule] = useState<string | undefined>()
   const [data, setData] = useState<any>(null)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -75,21 +73,18 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     }
   })
 
-  useEffect(() => {
-    const getJsonData = async () => {
-      if (!currentItem) return
+  const getJsonData = async () => {
+    if (!currentItem) return
 
-      try {
-        const data = await window.api.getJsonContent(currentItem.path)
-        setData(data)
-        //setOption(currentItem.subType || currentItem.type)
-        //setModule(currentItem.module)
-        //dispatch(setCurrentItem(null))
-      } catch (error) {
-        console.error('Failed to load JSON content:', error)
-      }
+    try {
+      const data = await window.api.getJsonContent(currentItem.path)
+      setData(data)
+    } catch (error) {
+      console.error('Failed to load JSON content:', error)
     }
+  }
 
+  useEffect(() => {
     getJsonData()
   }, [currentItem])
 
@@ -120,7 +115,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       formik.setFieldValue('requestParams', requestParams || initialValues.requestParams)
       formik.setFieldValue('headers', headers || initialValues.headers)
     }
-    if (currentItem) setRoot(currentItem.path)
+    if (currentItem) {
+      setModule(currentItem.module)
+    }
   }, [currentItem])
 
   const getValuesToSubmit = async () => {
@@ -128,7 +125,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     delete values.responses
 
-    const data = await window.api.getJsonContent(root)
+    getJsonData()
 
     const validPathVariables =
       values.pathVariables && values.pathVariables.filter((item) => item.type && item.name)
@@ -146,14 +143,21 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       headers: validHeaders
     }
 
+    // Check if a matching action exists in data?.actions
+    const existingActions = data?.actions || []
+    const isActionExisting = existingActions.some(
+      (dataAction) => dataAction.actionName === values.actionName
+    )
+
     // Merge or replace actions
-    const mergedActions = (data?.actions || []).map((dataAction) => {
-      const isMatchingAction = values.actionName === dataAction.actionName
+    const mergedActions = existingActions.map((dataAction) =>
+      dataAction.actionName === values.actionName ? newAction : dataAction
+    )
 
-      return isMatchingAction ? newAction : dataAction
-    })
-
-    const finalActions: ControllerAction[] = mergedActions.length > 0 ? mergedActions : [newAction]
+    // If no matching action, add the new action
+    const finalActions: ControllerAction[] = isActionExisting
+      ? mergedActions
+      : [...existingActions, newAction]
 
     const newValues: ControllerConfig = {
       type: 'controller',
@@ -173,6 +177,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       const { error } = await window.api.createController(values, basePath)
 
       console.log(values, error)
+
+      onUpdateTab(formik.values.name)
 
       if (error) {
         showErrorToast(error)
@@ -199,7 +205,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
       }
 
       dispatch(onSetChangeStatus(true))
-      navigate(ROUTES.PATH_PAGE_BUILDER_API)
+
+      onCloseTab()
 
       showSuccessToast(t('deletedSuccess', { name: t('controller') }))
     } catch (error) {
@@ -213,18 +220,15 @@ const ControllerLayout: React.FC<ControllerProps> = ({
   )
 
   const responseTypes = formatMethods(
-    (
-      selectors.find((selector) => 'RESPONSE_TYPES' in selector) as
-        | { RESPONSE_TYPES: string[] }
-        | undefined
-    )?.RESPONSE_TYPES || []
+    (selectors.find((selector) => 'BODY_TYPES' in selector) as { BODY_TYPES: string[] } | undefined)
+      ?.BODY_TYPES || []
   )
 
   const onSubmit = async () => {
     const errors = await formik.validateForm()
     if (Object.keys(errors).length === 0) {
       // No validation errors, proceed with submit
-      if (name) {
+      if (name && module && module !== 'shared') {
         formik.handleSubmit()
       } else {
         setIsModalOpen(true)

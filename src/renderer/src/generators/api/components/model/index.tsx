@@ -17,23 +17,23 @@ import { TextInput } from '../inputs-form'
 import PrimaryKeyTable from './PrimaryKeyTable'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import NavigationBar from '../navigation-bar'
-import { ROUTES } from '@renderer/routes/routeConstants'
-import { useNavigate } from 'react-router-dom'
 
 interface ModelProps {
   basePath: string
-  module: string
   selectors: Array<any>
   models?: Array<any>
   currentItem: any
+  onCloseTab: () => void
+  onUpdateTab: (tabId: string) => void
 }
 
 const ModelLayout = ({
   basePath,
   selectors,
   models,
-  module,
-  currentItem
+  currentItem,
+  onCloseTab,
+  onUpdateTab
 }: ModelProps): JSX.Element => {
   const { t } = useTranslation()
   const dispatch: any = useDispatch()
@@ -41,7 +41,6 @@ const ModelLayout = ({
   const { showErrorToast, showSuccessToast } = useToast()
   const [data, setData] = useState<any>(null)
 
-  const navigate = useNavigate()
   const validationSchema = useModelValidation({ t })
 
   const formik: any = useFormik({
@@ -192,7 +191,7 @@ const ModelLayout = ({
         enabled: enableCrud
       },
       primaryKey: hasListPk ? primaryKey : [],
-      module
+      module: currentItem.module
     }
 
     if (!enableCrud && !newValues.crud?.path) delete newValues.crud
@@ -213,7 +212,7 @@ const ModelLayout = ({
 
       dispatch(onSetChangeStatus(true))
 
-      navigate(ROUTES.PATH_PAGE_BUILDER_API)
+      onUpdateTab(formik.values.name)
 
       showSuccessToast(t('createdSuccess', { name: t('model'), value: values.name }))
     } catch (error) {
@@ -233,6 +232,8 @@ const ModelLayout = ({
       }
 
       dispatch(onSetChangeStatus(true))
+
+      onCloseTab()
 
       showSuccessToast(t('deletedSuccess', { name: t('model') }))
     } catch (error) {

@@ -24,9 +24,17 @@ interface NewProps {
   onOpenNew: (tab: TabItem) => void
   open: OptionType
   tab: TabItem
+  onCloseTab: (tab: string) => void
+  onUpdateTab: (oldId: string, newId: string) => void
 }
 
-const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
+const PageController = ({
+  onOpenNew,
+  onCloseTab,
+  onUpdateTab,
+  open,
+  tab
+}: NewProps): JSX.Element => {
   const [selectors, setSelectors] = useState<any[]>([])
   const [option, setOption] = useState<OptionType>(open)
   const [module, setModule] = useState<string>('shared')
@@ -74,6 +82,14 @@ const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
     })
   }
 
+  const hangleClose = () => {
+    onCloseTab(tab.id)
+  }
+
+  const handleUpdate = (tabId: string) => {
+    onUpdateTab(tab.id, `tab-${tab.item.module}-${tabId}`)
+  }
+
   return (
     <>
       {option === 'none' && (
@@ -88,25 +104,23 @@ const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
           basePath={basePath}
           selectors={selectors}
           models={models}
-          module={module}
           currentItem={tab.item}
+          onCloseTab={hangleClose}
+          onUpdateTab={handleUpdate}
         />
       )}
       {option === OPTION_TYPE.ACTION && (
         <ControllerLayout
           basePath={basePath}
           selectors={selectors}
-          defaultModule={module}
           currentItem={tab.item}
           modules={modules}
+          onCloseTab={hangleClose}
+          onUpdateTab={handleUpdate}
         />
       )}
       {option === OPTION_TYPE.CONTROLLERS && (
-        <ControllerOverview
-          basePath={basePath}
-          currentItem={tab.item}
-          controllers={controllers}
-        />
+        <ControllerOverview basePath={basePath} currentItem={tab.item} controllers={controllers} />
       )}
       {option === OPTION_TYPE.DATA_OBJECTS && (
         <DtoLayout
@@ -114,8 +128,9 @@ const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
           selectors={selectors}
           dto={dto}
           models={models}
-          module={module}
           currentItem={tab.item}
+          onCloseTab={hangleClose}
+          onUpdateTab={handleUpdate}
         />
       )}
     </>

@@ -13,16 +13,15 @@ import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { SelectInput, TextInput } from '../inputs-form'
 import NavigationBar from '../navigation-bar'
 import AttributesCard from './attributes'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@renderer/routes/routeConstants'
 
 interface DtoProps {
   basePath: string
-  module: string
   selectors: Array<any>
   models?: Array<any>
   dto?: Array<any>
   currentItem: any
+  onCloseTab: () => void
+  onUpdateTab: (newId: string) => void
 }
 
 const DtoLayout = ({
@@ -30,11 +29,12 @@ const DtoLayout = ({
   selectors,
   dto,
   models,
-  module,
-  currentItem
+  currentItem,
+  onCloseTab,
+  onUpdateTab
 }: DtoProps): JSX.Element => {
   const dispatch: any = useDispatch()
-  const navigate = useNavigate()
+
   const { showErrorToast, showSuccessToast } = useToast()
   const { t } = useTranslation()
   const [data, setData] = useState<any>(null)
@@ -87,10 +87,15 @@ const DtoLayout = ({
 
   const handleSave = async (newValues: DTOConfig): Promise<void> => {
     try {
-      const { error } = await window.api.createDto({ ...newValues, module }, basePath)
+      const { error } = await window.api.createDto(
+        { ...newValues, module: currentItem.module },
+        basePath
+      )
       if (error) return showErrorToast(error)
 
       dispatch(onSetChangeStatus(true))
+
+      onUpdateTab(formik.values.name)
 
       showSuccessToast(t('createdSuccess', { name: t('dto'), value: newValues.name }))
     } catch (error) {
@@ -101,13 +106,13 @@ const DtoLayout = ({
   const handleDelete = async (): Promise<void> => {
     try {
       const { error } = await window.api.deleteDTO(
-        { type: 'dto', name: formik.values.name, module },
+        { type: 'dto', name: formik.values.name, module: currentItem.module },
         basePath
       )
       if (error) return showErrorToast(error)
 
       dispatch(onSetChangeStatus(true))
-      navigate(ROUTES.PATH_PAGE_BUILDER_API)
+      onCloseTab()
       showSuccessToast(t('deletedSuccess', { name: t('dto') }))
     } catch (error) {
       showErrorToast(error)

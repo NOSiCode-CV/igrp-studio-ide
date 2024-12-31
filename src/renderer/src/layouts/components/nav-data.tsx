@@ -14,33 +14,49 @@ const Navdata = (folders: any) => {
 
   const { t } = useTranslation()
 
-  const onClickItem = (subItem: any) => {
-    dispatch(onSetCurrentItem(subItem))
+  const onClickItem = (item: any) => {
+    delete item.icon
+    delete item.click
+    delete item.subItems
+    delete item.dropdownclick
+    dispatch(onSetCurrentItem(item))
   }
 
   Object.keys(folders).forEach((folderName: string) => {
+    const dropdownSubMenus = [
+      {
+        label: t('newAction'),
+        type: OPTION_TYPE.ACTION
+      }
+    ]
+
+    const dropdownMenus = [
+      {
+        label: t(`newDto`),
+        type: OPTION_TYPE.DATA_OBJECTS
+      },
+      {
+        label: t('newModels'),
+        type: OPTION_TYPE.MODELS
+      }
+    ]
+
+    if (folderName !== 'shared') {
+      dropdownMenus.unshift({
+        label: t('newControllers'),
+        type: OPTION_TYPE.ACTION
+      })
+    }
+
     const folderMenuItem: MenuItem = {
       icon: Boxes,
       label: folderName,
+      module: folderName,
       subItems: [],
-      isHeader: true,
       dropdownclick: function (item) {
         onClickItem(item)
       },
-      dropdownMenus: [
-        {
-          label: t(`newDto`),
-          type: 'dto'
-        },
-        {
-          label: t('newModels'),
-          type: 'models'
-        },
-        {
-          label: t('newControllers'),
-          type: 'controllers'
-        }
-      ]
+      dropdownMenus
     }
 
     // Process each folder's content
@@ -59,7 +75,11 @@ const Navdata = (folders: any) => {
             type: categoryName,
             link: ROUTES.PATH_PAGE_BUILDER_API,
             subItems: getSubItems(categoryName, file, file.path, folderName, onClickItem),
-            click: (subItem: MenuItem) => onClickItem(subItem)
+            click: (subItem: MenuItem) => onClickItem(subItem),
+            dropdownclick: function (item: MenuItem) {
+              onClickItem(item)
+            },
+            dropdownMenus: dropdownSubMenus
           })
         )
 

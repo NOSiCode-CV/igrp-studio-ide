@@ -52,7 +52,7 @@ export function AppSidebar({ className, menuItems, config, basePath, header }: A
   }
 
   const handleSubItemClick = (e: React.MouseEvent, subItem: MenuItem) => {
-    e.preventDefault
+    e.preventDefault()
     if (subItem.click) {
       subItem.click(subItem)
     }
@@ -142,24 +142,23 @@ export function AppSidebar({ className, menuItems, config, basePath, header }: A
                         <Collapsible defaultOpen className="group/collapsible">
                           <SidebarMenuItem>
                             <CollapsibleTrigger asChild>
-                              <SidebarMenuButton className="w-full justify-between">
+                              <SidebarMenuButton className="w-full justify-between group/icon">
                                 <div className="flex items-center space-x-2">
+                                  <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180"  />
                                   {item.icon && <item.icon className="h-4 w-4" />}
                                   <span>{t(item.label)}</span>
                                 </div>
-                                <div className="flex items-center">
-                                  {item.isHeader && (
+                                <div className="flex items-center opacity-0 group-hover/icon:opacity-100">
+                                  {item.dropdownMenus && (
                                     <DropdownSidebarMenuButton
-                                      dropdownMenus={item.dropdownMenus}
                                       menuItem={item}
                                     />
                                   )}
-                                  <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                                 </div>
                               </SidebarMenuButton>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
-                              <SidebarMenuSub>
+                              <SidebarMenuSub className="!pr-0 !mr-0">
                                 {item.subItems?.map((menu, menuIndex) => {
                                   return (
                                     <SidebarGroupContentComp
@@ -199,26 +198,37 @@ const SidebarGroupContentComp: React.FC<{
   return (
     <SidebarGroupContent>
       <SidebarMenu>
-        <Collapsible defaultOpen className="group/collapsible">
+        <Collapsible defaultOpen className={cn(`group/collapsibleItem`)}>
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
               <SidebarMenuButton
-                className="w-full justify-between"
-                onClick={(e) => {handleNavigation(item.link); handleSubItemClick(e, item)}}
+                className="w-full justify-between group/icon"
+                onClick={(e) => {
+                  handleNavigation(item.link)
+                  handleSubItemClick(e, item)
+                }}
               >
-                <div className="flex items-center">
+                <div className="flex items-center space-x-2">
+                  <ChevronDown
+                    className={cn(
+                      `h-4 w-4 transition-transform group-data-[state=open]/collapsibleItem:rotate-180`
+                    )}
+                  />
+
                   {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                   <span>
                     {t(item.label)} {item.subItems && `(${item.subItems.length})`}
                   </span>
                 </div>
-                <div className="flex items-center">
-                  <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                <div className="flex items-center opacity-0 group-hover/icon:opacity-100">
+                  {item.dropdownMenus && (
+                    <DropdownSidebarMenuButton menuItem={item} />
+                  )}
                 </div>
               </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <SidebarMenuSub>
+              <SidebarMenuSub className="!pr-0 !mr-0">
                 {item.subItems?.map((subItem, subIndex) =>
                   subItem.subItems && subItem.subItems?.length > 0 ? (
                     // Renderizar recursivamente se subItems existir

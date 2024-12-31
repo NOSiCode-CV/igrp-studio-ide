@@ -23,6 +23,7 @@ interface ContentProps {
   setActiveTab: (tab: string) => void
   setNewTab: (tab: TabItem) => void
   onCloseTab: (tab: string) => void
+  onUpdateTab: (oldId: string, newId: string)=> void
 }
 
 const TabManager = ({
@@ -30,7 +31,8 @@ const TabManager = ({
   activeTab,
   setActiveTab,
   setNewTab,
-  onCloseTab
+  onCloseTab,
+  onUpdateTab
 }: ContentProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
@@ -118,6 +120,8 @@ const TabManager = ({
                 onOpenNew={handleOpenNew}
                 open={tab.open}
                 tab={tab}
+                onCloseTab={onCloseTab}
+                onUpdateTab={onUpdateTab}
               />
             )}
           </div>

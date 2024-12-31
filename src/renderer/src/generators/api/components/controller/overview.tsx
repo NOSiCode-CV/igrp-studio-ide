@@ -31,10 +31,6 @@ const ControllerOverview = ({ controllers }: PageBuilderProps) => {
     },
     {
       accessorKey: 'method',
-      header: 'Method Type'
-    },
-    {
-      accessorKey: 'method',
       header: 'Method Type',
       cell: ({ row }) => {
         const method = row.getValue('method') as string

@@ -9,7 +9,6 @@ interface PageBuilderProps {
 }
 
 const Index = ({ basePath, currentItem }: PageBuilderProps) => {
-
   const { t } = useTranslation()
 
   const [tabs, setTabs] = useState<Array<TabItem>>([
@@ -34,17 +33,36 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
       const updatedTabs = prevTabs.filter((t) => t.id !== tabId)
       if (activeTab === tabId) {
         const newActiveTab =
-          updatedTabs.length > 0 ? updatedTabs[updatedTabs.length - 1].id : PAGE_DEFAULT
+          updatedTabs.length > 0 ? updatedTabs[updatedTabs.length - 1].id : 'tab-0'
         setActiveTab(newActiveTab)
       }
       return updatedTabs
     })
   }
 
+  const handleUpdateTab = (oldId: string, newId: string) => {
+    /*  setTabs((prevTabs) =>
+      prevTabs.map((t) =>
+        t.id === oldId
+          ? {
+              ...t,
+              id: newId,
+              item
+            }
+          : t
+      )
+    );
+
+    setActiveTab(newId);
+
+    console.log(tabs) */
+  }
+
   useEffect(() => {
+    console.log(currentItem)
     if (currentItem)
       handleNewTab({
-        id: `tab-${currentItem.module}-${currentItem.isHeader ? Date.now() : currentItem.label}`,
+        id: `tab-${currentItem.module}-${currentItem.isNew ? Date.now() : currentItem.label}`,
         title: currentItem.isHeader
           ? t(`new${currentItem.type.charAt(0).toUpperCase() + currentItem.type.slice(1)}`)
           : currentItem.label,
@@ -61,6 +79,7 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
       setActiveTab={setActiveTab}
       setNewTab={handleNewTab}
       onCloseTab={handleCloseTab}
+      onUpdateTab={handleUpdateTab}
     />
   )
 }
