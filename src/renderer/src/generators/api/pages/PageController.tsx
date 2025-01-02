@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import ModelLayout from './components/model';
-import DtoLayout from './components/dto';
-import ControllerLayout from './components/controller';
+import ModelLayout from './model';
+import DtoLayout from './dto';
+import ControllerLayout from './controller';
 import EmptyPage from './EmptyPage';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { extractByType, getMergedFiles, getModulesArray } from './helpers';
+import { extractByType, getMergedFiles, getModulesArray } from '../helpers';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { TabItem } from '@renderer/components/TabManager';
 import { useTranslation } from 'react-i18next';
-import ControllerOverview from './components/controller/overview';
+import ControllerOverview from './controller/overview';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 interface PageBuilderState {

@@ -10,8 +10,8 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useDtoValidation } from './validation'
 import { Card } from '@renderer/components/ui/card'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
-import { SelectInput, TextInput } from '../inputs-form'
-import NavigationBar from '../navigation-bar'
+import { SelectInput, TextInput } from '../../components/inputs-form'
+import NavigationBar from '../../components/navigation-bar'
 import AttributesCard from './attributes'
 
 interface DtoProps {

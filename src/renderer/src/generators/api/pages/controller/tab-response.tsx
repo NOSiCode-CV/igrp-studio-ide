@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Input } from '@renderer/components/ui/input';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
-import { JSONSchemaBuilder } from '../JSONSchema';
+import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import {
     Card,

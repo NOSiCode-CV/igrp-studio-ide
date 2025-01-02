@@ -3,7 +3,7 @@ import { OptionType } from '@renderer/constants/appConstants'
 import { TabItem } from '@renderer/components/TabManager'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '@igrp/igrp-design-system'
-import DashboardOverview from './components/dashboard-overview'
+import DashboardOverview from '../components/dashboard-overview'
 
 interface NewProps {
   onOpenNew: (tab: TabItem) => void

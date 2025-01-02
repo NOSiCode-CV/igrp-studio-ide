@@ -13,10 +13,10 @@ import { Card } from '@renderer/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Label } from '@renderer/components/ui/label'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
-import { TextInput } from '../inputs-form'
+import { TextInput } from '../../components/inputs-form'
 import PrimaryKeyTable from './PrimaryKeyTable'
 import { Checkbox } from '@renderer/components/ui/checkbox'
-import NavigationBar from '../navigation-bar'
+import NavigationBar from '../../components/navigation-bar'
 
 interface ModelProps {
   basePath: string

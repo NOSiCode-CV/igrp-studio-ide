@@ -9,7 +9,7 @@ import { Loader } from 'lucide-react';
 
 const IDEInitialScreen = lazy(() => import('@renderer/pages/home/ide-initial-screen'))
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'))
-const PageController = lazy(() => import('@renderer/generators/api/components/controller/overview'))
+const PageController = lazy(() => import('@renderer/generators/api/pages/controller/overview'))
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'))
 
 const allRoutes = [

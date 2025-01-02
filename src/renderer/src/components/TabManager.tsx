@@ -3,10 +3,10 @@ import classnames from 'classnames'
 import { Plus, X } from 'lucide-react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from './ui/button'
-import PageController from '@renderer/generators/api/PageController'
+import PageController from '@renderer/generators/api/pages/PageController'
 import { OptionType } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
-import Overview from '@renderer/generators/api/overview'
+import Overview from '@renderer/generators/api/pages/overview'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
 
 export interface TabItem {

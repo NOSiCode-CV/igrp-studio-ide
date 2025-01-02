@@ -16,16 +16,16 @@ import { Checkbox } from '@renderer/components/ui/checkbox'
 import { Combobox } from '@igrp/igrp-design-system'
 import MultipleSelector from '@renderer/components/multiples-selector'
 import { cn } from '@renderer/lib/utils'
-import { PopoverController } from './controller/popover'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@renderer/components/ui/tooltip'
-import { PopoverModel } from './model/popover'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
-import { PopoverDto } from './dto/popover-dto'
+import { PopoverController } from '../pages/controller/popover'
+import { PopoverModel } from '../pages/model/popover'
+import { PopoverDto } from '../pages/dto/popover-dto'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
