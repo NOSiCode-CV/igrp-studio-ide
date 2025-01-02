@@ -59,7 +59,6 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
   }
 
   useEffect(() => {
-    console.log(currentItem)
     if (currentItem)
       handleNewTab({
         id: `tab-${currentItem.module}-${currentItem.isNew ? Date.now() : currentItem.label}`,

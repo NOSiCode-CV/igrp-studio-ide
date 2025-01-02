@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { FormList } from '../form-list'
 import { addNewRow, changeValue, removeRow } from '../../helpers'
 import { Badge } from '@renderer/components/ui/badge'
+import { FormList } from '../../components/form-list'
 interface TabRequestProps {
   formik: any
   tablesColumns: any

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { FormList } from '../form-list'
 import useToast from '@renderer/components/useToast'
 import { useFormik } from 'formik'
 import { btnLabels, defaultValues, getTablesColumns, TabList, initialValues } from './config'
@@ -17,6 +16,7 @@ import { TextInput } from '../../components/inputs-form'
 import PrimaryKeyTable from './PrimaryKeyTable'
 import { Checkbox } from '@renderer/components/ui/checkbox'
 import NavigationBar from '../../components/navigation-bar'
+import { FormList } from '../../components/form-list'
 
 interface ModelProps {
   basePath: string

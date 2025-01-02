@@ -1,7 +1,6 @@
 import { AlertDialog, IGRPContainer, IGRPDataTable } from '@igrp/igrp-design-system'
 import { ColumnDef } from '@igrp/igrp-design-system/dist/types'
 import { IGRPTabs, IGRPTabsContent, IGRPTabsList, IGRPTabsTrigger } from '@renderer/components/tabs'
-import { Badge } from '@renderer/components/ui/badge'
 import { Button } from '@renderer/components/ui/button'
 import { getBadgeColor } from '@renderer/utils/helpers'
 import { Trash2 } from 'lucide-react'
@@ -10,17 +9,17 @@ import { useTranslation } from 'react-i18next'
 interface PageBuilderProps {
   basePath?: string
   currentItem?: any
-  controllers: any
+  controllers?: any
 }
 
 export type Endpoint = {
   codigoAcompanhamento: string
 }
 
-const ControllerOverview = ({ controllers }: PageBuilderProps) => {
+const ControllerOverview = ({ currentItem }: PageBuilderProps) => {
   const { t } = useTranslation()
 
-  const data = controllers[0].content.actions
+  const data = currentItem.content.actions
 
   const handleDelete = (endpoint: Endpoint) => {console.log(endpoint)}
 

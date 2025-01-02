@@ -88,7 +88,6 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
         }
     }
 
-
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <TooltipProvider>

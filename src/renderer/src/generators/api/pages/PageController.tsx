@@ -128,7 +128,6 @@ const PageController = ({
                 <ControllerOverview
                     basePath={basePath}
                     currentItem={tab.item}
-                    controllers={controllers}
                 />
             )}
             {option === OPTION_TYPE.DATA_OBJECTS && (
