@@ -1,5 +1,5 @@
 import { FormList } from '../form-list'
-import { IColumnsTabelProps } from '../Interfaces'
+import { IColumnsTabelProps } from '../../types/Interfaces'
 
 interface AttributesCardProps {
   columns: IColumnsTabelProps[]

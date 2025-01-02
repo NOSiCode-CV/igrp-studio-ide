@@ -1,5 +1,5 @@
 import { formatMethods } from "../../helpers"
-import { IColumnsTabelProps } from "../Interfaces"
+import { IColumnsTabelProps } from "../../types/Interfaces"
 
 export const initialValues = {
     actionName: '',
@@ -12,6 +12,19 @@ export const initialValues = {
             description: "OK",
             content: {
                 "application/json": {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string', description: "Is Description" },
+                        age: { type: 'integer', description: "" },
+                        address: {
+                            type: 'object',
+                            description: "",
+                            properties: {
+                                street: { type: 'string', description: "" },
+                                city: { type: 'string', description: "" },
+                            },
+                        },
+                    },
                 }
             }
         },

@@ -173,3 +173,23 @@ export const generateFakeDataForField = (field: any) => {
 export const getBadgeColor = (method: string): string | undefined => {
 	return httpMethods.find((item) => item.value === method)?.color;
 };
+
+
+export const getStatusLabel = (statusCode: string): string => {
+	switch (statusCode) {
+		case '200':
+			return 'OK';
+		case '400':
+			return 'Bad Request';
+		case '401':
+			return 'Unauthorized';
+		case '404':
+			return 'Not Found';
+		case '500':
+			return 'Internal Server Error';
+		default:
+			return `Error (${statusCode})`;
+	}
+};
+
+export const toInitCap = (text) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())

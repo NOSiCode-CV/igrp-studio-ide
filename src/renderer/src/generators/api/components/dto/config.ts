@@ -1,6 +1,6 @@
 import { DTOConfig } from "@igrp/spring-engine/dist/interfaces/types"
 import { formatMethods } from "../../helpers"
-import { IColumnsTabelProps } from "../Interfaces"
+import { IColumnsTabelProps } from "../../types/Interfaces"
 import { OPTION_TYPE } from "@renderer/constants/appConstants"
 
 export const initialValues: DTOConfig = {

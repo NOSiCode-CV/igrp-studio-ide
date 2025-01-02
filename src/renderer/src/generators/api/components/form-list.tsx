@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from 'react'
-import { ITabelContainer } from './Interfaces'
+import { ITabelContainer } from '../types/Interfaces'
 import {
   Table,
   TableBody,
@@ -189,7 +189,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                               : []
 
                             return (
-                              <TableCell key={index2}>
+                              <TableCell key={index2} className='!py-1'>
                                 <div className="flex">
                                   {index2 === 0 && (
                                     <button
@@ -279,7 +279,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                       {['text', 'number'].includes(type) && (
                                         <Input
                                           className={cn(
-                                            'text-sm',
+                                            'h-8 text-sm',
                                             errors?.[index]?.[key] ? 'border-red-500' : ''
                                           )}
                                           type={type}
@@ -299,7 +299,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           onChange={(selectedOption) => {
                                             handleDependentChange(key, index, selectedOption)
                                           }}
-                                          className="w-full h-9"
+                                          className="w-full h-8"
                                         />
                                       )}
                                       {['multiSelect'].includes(type) && (
@@ -359,7 +359,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             )
                           })}
                           {removeRow && (
-                            <TableCell>
+                            <TableCell className='!py-1'>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -379,7 +379,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
             {addRow && (
               <TableFooter>
                 <TableRow>
-                  <TableCell className="text-left">
+                  <TableCell className="text-left !py-1">
                     <Button variant={'outline'} onClick={addRow} className="text-capitalize">
                       <Plus />
                       {`New ${btnLabels}`}

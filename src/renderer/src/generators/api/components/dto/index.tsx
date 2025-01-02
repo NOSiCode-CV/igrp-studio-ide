@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { IColumnsTabelProps } from '../Interfaces'
+import { IColumnsTabelProps } from '../../types/Interfaces'
 import useToast from '@renderer/components/useToast'
 import { getTablesColumns, TabList, TemplateOptions, initialValues } from './config'
 import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types'

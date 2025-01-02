@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { IColumnsTabelProps } from '../Interfaces'
+import { IColumnsTabelProps } from '../../types/Interfaces'
 import { getTablesColumns, TabList, initialValues } from './config'
 
 import { useDispatch } from 'react-redux'
@@ -123,7 +123,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
   const getValuesToSubmit = async () => {
     const values = { ...formik.values }
 
-    delete values.responses
+    delete values.responsee
 
     getJsonData()
 

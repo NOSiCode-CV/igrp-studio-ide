@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui
 import { PackageCheck } from 'lucide-react'
 import { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toInitCap } from '../../helpers'
+import { toInitCap } from '@renderer/utils/helpers'
 import { Switch } from '@renderer/components/ui/Switch'
 import { Separator } from '@renderer/components/ui/separator'
 import { Input } from '@renderer/components/ui/input'

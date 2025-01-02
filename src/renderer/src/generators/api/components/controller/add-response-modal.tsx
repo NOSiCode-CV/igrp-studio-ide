@@ -1,4 +1,3 @@
-// AddResponseModal.tsx
 import { DialogDescription, DialogTitle, DialogTrigger } from '@radix-ui/react-dialog'
 import { Button } from '@renderer/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from '@renderer/components/ui/dialog'
@@ -7,6 +6,7 @@ import { Label } from '@renderer/components/ui/label'
 import React, { useState } from 'react'
 import { Combobox } from '@igrp/igrp-design-system'
 import { httpStatusCodes } from '@renderer/constants/appConstants'
+import { getStatusLabel } from '@renderer/utils/helpers'
 interface AddResponseModalProps {
   onSave: (response: { name: string; statusCode: string; contentType: string }) => void
   contentTypes: any
@@ -26,6 +26,12 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentType
     }
   }
 
+  const handleChangeCode = (value) =>{
+    setStatusCode(value)
+    if(name==='')
+      setName(getStatusLabel(value))
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -39,6 +45,17 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentType
         <form onSubmit={handleSave}>
           <div className="space-y-4">
             <div className="space-y-2">
+              <Label className="">HTTP Status Code</Label>
+              <Combobox
+                options={httpStatusCodes}
+                name="statusCode"
+                value={statusCode}
+                onChange={(value) => handleChangeCode(value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
+                placeholder="e.g., 200, 400"
+              />
+            </div>
+            <div className="space-y-2">
               <Label className="">Name</Label>
               <Input
                 type="text"
@@ -46,17 +63,6 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentType
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
                 placeholder="Response Name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="">HTTP Status Code</Label>
-              <Combobox
-                options={httpStatusCodes}
-                name="statusCode"
-                value={statusCode}
-                onChange={(value) => setStatusCode(value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
-                placeholder="e.g., 200, 400"
               />
             </div>
             <div className="space-y-2">

@@ -1,5 +1,5 @@
 import { formatMethods } from '../../helpers'
-import { IColumnsTabelProps } from '../Interfaces'
+import { IColumnsTabelProps } from '../../types/Interfaces'
 
 export const initialValues = {
   type: 'model',

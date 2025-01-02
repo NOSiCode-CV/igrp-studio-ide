@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toInitCap } from '../../helpers'
+import { toInitCap } from '@renderer/utils/helpers'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { PackageCheck } from 'lucide-react'
 import { Separator } from '@renderer/components/ui/separator'

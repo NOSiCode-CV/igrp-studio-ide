@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux'
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks'
 import { createMenuHeader, getBadgeColor } from '@renderer/utils/helpers'
 import { MenuItem } from 'src/main/types'
-import { Boxes } from 'lucide-react'
+import { Boxes, Layers } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { ROUTES } from '@renderer/routes/routeConstants'
@@ -49,7 +49,7 @@ const Navdata = (folders: any) => {
     }
 
     const folderMenuItem: MenuItem = {
-      icon: Boxes,
+      icon: folderName === 'shared' ?  Layers : Boxes,
       label: folderName,
       module: folderName,
       subItems: [],
@@ -79,7 +79,7 @@ const Navdata = (folders: any) => {
             dropdownclick: function (item: MenuItem) {
               onClickItem(item)
             },
-            dropdownMenus: dropdownSubMenus
+            dropdownMenus: categoryName=== OPTION_TYPE.CONTROLLERS ? dropdownSubMenus: []
           })
         )
 
