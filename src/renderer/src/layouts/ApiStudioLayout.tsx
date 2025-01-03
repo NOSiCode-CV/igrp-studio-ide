@@ -76,7 +76,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
             header
           />
           <SidebarInset className="flex-1">
-            <div className="overflow-hidden">
+            <div className="">
               {React.cloneElement(props.children, { basePath, currentItem })}
             </div>
           </SidebarInset>

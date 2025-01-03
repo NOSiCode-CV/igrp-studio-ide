@@ -6,8 +6,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { Button } from '@renderer/components/ui/button';
 import { MenuItem } from 'src/main/types';
+import { SidebarMenuAction } from '@renderer/components/ui/sidebar';
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;
@@ -26,9 +26,9 @@ export const DropdownSidebarMenuButton: React.FC<
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant={'ghost'} size={'icon'}>
-                    <Plus className="h-4 w-4 text-muted-foreground" />
-                </Button>
+                <div className='text-muted-foreground hover:text-foreground'>
+                    <Plus className='h-4 w-4'/>
+                </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
                 side="right"
@@ -38,15 +38,16 @@ export const DropdownSidebarMenuButton: React.FC<
                 {menuItem.dropdownMenus.map((menu, idx) => (
                     <DropdownMenuItem
                         key={idx}
-                        onClick={() =>
+                        onClick={(e) => {
+                            e.stopPropagation();
                             handleDropdownClick({
                                 ...menu,
                                 ...menuItem,
                                 type: menu.type,
                                 label: menu.label,
                                 isNew: true,
-                            })
-                        }
+                            });
+                        }}
                     >
                         {menu.label}
                     </DropdownMenuItem>

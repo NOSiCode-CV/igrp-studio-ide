@@ -207,7 +207,7 @@ function Three({
                     handleSubItemClick(e, item);
                     handleOpenChange(!open);
                 }}
-                className="data-[active=true]:bg-transparent group/icon flex justify-between"
+                className="data-[active=true]:bg-transparent group/icon justify-between items-center align-middle"
                 isActive={activeItem === item.label}
             >
                 <div className="flex items-center space-x-2">
@@ -235,7 +235,7 @@ function Three({
                     </span>
                 </div>
 
-                <div className="flex items-center opacity-0 group-hover/icon:opacity-100">
+                <div className="opacity-0 flex items-center group-hover/icon:opacity-100">
                     <DropdownSidebarMenuButton menuItem={item} />
                 </div>
             </SidebarMenuButton>

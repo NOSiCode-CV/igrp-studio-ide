@@ -52,10 +52,11 @@ const PageController = ({
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
             modules: getModulesArray(studio.folderFiles),
+            folderFiles: studio.folderFiles
         };
     });
 
-    const { basePath, models, dto, modules, controllers } =
+    const { basePath, models, dto, modules } =
         useSelector(selectProperties);
 
     useEffect(() => {

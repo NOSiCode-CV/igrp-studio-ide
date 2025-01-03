@@ -22,16 +22,15 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
 }) => {
     return (
         <SidebarHeader className={cn('flex flex-col', className)}>
-            <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1"
+            <div
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 flex flex-1 justify-between"
             >
-                <div className="grid flex-1 text-left text-sm leading-tight">
+                <div className="grid flex-1 text-left text-sm leading-tight items-center">
                     <span className="truncate font-semibold">{config?.name}</span>
                     <span className="truncate text-xs">{config?.projectStructureStyle}</span>
                 </div>
                 {basePath && <CreateModuleDialog basePath={basePath} />}
-            </SidebarMenuButton>
+            </div>
             <FormSearch
                 onSearch={handleSearch}
                 className="truncate text-xs"
