@@ -13,6 +13,7 @@ interface AddResponseModalProps {
 }
 
 const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentTypes }) => {
+  const [open, setOpen] = React.useState(false)
   const [name, setName] = useState('')
   const [statusCode, setStatusCode] = useState('')
   const [contentType, setContentType] = useState('')
@@ -23,6 +24,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentType
       setName('')
       setStatusCode('')
       setContentType('')
+      setOpen(false)
     }
   }
 
@@ -33,7 +35,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentType
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}> 
       <DialogTrigger asChild>
         <button className="px-4 py-2 text-gray-500 hover:text-igrp">+ Add Status</button>
       </DialogTrigger>
@@ -42,7 +44,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({ onSave, contentType
           <DialogTitle>Add a Response</DialogTitle>
           <DialogDescription />
         </DialogHeader>
-        <form onSubmit={handleSave}>
+        <form onSubmit={(e)=>{e.preventDefault(); handleSave()}}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="">HTTP Status Code</Label>

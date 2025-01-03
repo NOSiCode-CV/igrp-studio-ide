@@ -2,7 +2,7 @@ import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { Database, FileCode, Folder, FileText } from 'lucide-react'
-import { httpMethods } from '@renderer/constants/appConstants';
+import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
 
 // Function to convert folders into menuItems
@@ -176,20 +176,8 @@ export const getBadgeColor = (method: string): string | undefined => {
 
 
 export const getStatusLabel = (statusCode: string): string => {
-	switch (statusCode) {
-		case '200':
-			return 'OK';
-		case '400':
-			return 'Bad Request';
-		case '401':
-			return 'Unauthorized';
-		case '404':
-			return 'Not Found';
-		case '500':
-			return 'Internal Server Error';
-		default:
-			return `Error (${statusCode})`;
-	}
+    const status = httpStatusCodes.find((status) => status.value === statusCode);
+    return status ? status.label.replace(`${status.value} `, '') : `Error (${statusCode})`;
 };
 
 export const toInitCap = (text) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
