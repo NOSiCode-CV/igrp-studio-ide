@@ -1,3 +1,4 @@
+import { Schema } from "yup"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 
@@ -12,19 +13,21 @@ export const initialValues = {
             description: "OK",
             content: {
                 "application/json": {
-                    type: 'object',
-                    properties: {
-                        name: { type: 'string', description: "Is Description" },
-                        age: { type: 'integer', description: "" },
-                        address: {
-                            type: 'object',
-                            description: "",
-                            properties: {
-                                street: { type: 'string', description: "" },
-                                city: { type: 'string', description: "" },
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            name: { type: 'string', description: "Is Description" },
+                            age: { type: 'integer', description: "" },
+                            address: {
+                                type: 'object',
+                                description: "",
+                                properties: {
+                                    street: { type: 'string', description: "" },
+                                    city: { type: 'string', description: "" },
+                                },
                             },
                         },
-                    },
+                    }
                 }
             }
         },
@@ -99,14 +102,13 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
     )
     return {
         requestParams: [
-            { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'value', name: 'Value', type: 'text', width: '25%' },
+            { key: 'name', name: 'Name', type: 'text' },
+            { key: 'value', name: 'Value', type: 'text' },
             {
                 key: 'type',
                 name: 'Type',
                 type: 'select',
                 options: paramsTypesData,
-                width: '25%'
             },
             {
                 key: 'group', name: '', type: 'group', items: [
@@ -116,14 +118,13 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
             }
         ],
         pathVariables: [
-            { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'value', name: 'Value', type: 'text', width: '25%' },
+            { key: 'name', name: 'Name', type: 'text' },
+            { key: 'value', name: 'Value', type: 'text', },
             {
                 key: 'type',
                 name: 'Type',
                 type: 'select',
                 options: paramsTypesData,
-                width: '25%'
             },
             {
                 key: 'group', name: '', type: 'group', items: [

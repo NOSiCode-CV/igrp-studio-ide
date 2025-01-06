@@ -2,19 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
-import {
-    Trash2,
-    ChevronRight,
-    ChevronDown,
-    Plus
-} from 'lucide-react';
+import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
+import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { FieldOptionsPopover } from './FieldOptionsPopover';
-import { SchemaField, SchemaType } from '../../types/schema';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
+import { SchemaField } from '../../types/schema';
+import { TypeSelectorPopover } from './TypeSelectorPopover';
 
 interface SchemaFieldRowProps {
     id: string;
@@ -26,6 +18,8 @@ interface SchemaFieldRowProps {
     onAlert: (message: string | null) => void;
     isNew?: boolean;
     index?: number;
+    schemaTypes?: { label: string; value: string }[];
+
 }
 
 export function SchemaFieldRow({
@@ -38,7 +32,10 @@ export function SchemaFieldRow({
     onAlert,
     isNew = false,
     index,
+    schemaTypes
 }: SchemaFieldRowProps) {
+    if (!field) return;
+
     const [isExpanded, setIsExpanded] = useState(
         field.type === 'object' || field.type === 'array'
     );
@@ -170,6 +167,7 @@ export function SchemaFieldRow({
                         onAddSubfield={onAddSubfield}
                         onAlert={onAlert}
                         index={subIndex}
+                        schemaTypes={schemaTypes}
                     />
                 )
             );
@@ -213,45 +211,13 @@ export function SchemaFieldRow({
                         }
                     />
                 </TableCell>
-                <TableCell className='!py-1'>
+                <TableCell className="!py-1">
                     <div className="flex flex-1 items-center">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="h-6 px-2 text-sm"
-                                >
-                                    {type}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-40 p-0">
-                                <div className="flex flex-col">
-                                    {(
-                                        [
-                                            'object',
-                                            'array',
-                                            'string',
-                                            'integer',
-                                            'number',
-                                            'boolean',
-                                        ] as SchemaType[]
-                                    ).map((t) => (
-                                        <Button
-                                            key={t}
-                                            variant={
-                                                t === type
-                                                    ? 'secondary'
-                                                    : 'ghost'
-                                            }
-                                            className="justify-start h-8 px-2 text-sm rounded-none"
-                                            onClick={() => handleTypeChange(t)}
-                                        >
-                                            {t}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
+                        <TypeSelectorPopover
+                            type={type}
+                            onTypeChange={(t) => handleTypeChange(t)}
+                            schemaTypes={schemaTypes}
+                        />
                         <FieldOptionsPopover
                             field={field}
                             onUpdate={(updatedField) =>
@@ -260,7 +226,7 @@ export function SchemaFieldRow({
                         />
                     </div>
                 </TableCell>
-                <TableCell className='!py-1'>
+                <TableCell className="!py-1">
                     <Input
                         ref={descInputRef}
                         value={description}

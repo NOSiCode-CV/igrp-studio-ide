@@ -1,189 +1,335 @@
-import React, { useState } from 'react'
-import { addNewRow, changeValue, removeRow } from '../../helpers'
-import { Badge } from '@renderer/components/ui/badge'
-import { FormList } from '../../components/form-list'
+import React, { useState } from 'react';
+import { addNewRow, changeValue, removeRow } from '../../helpers';
+import { Badge } from '@renderer/components/ui/badge';
+import { FormList } from '../../components/form-list';
+import {
+    IGRPTabs,
+    IGRPTabsContent,
+    IGRPTabsList,
+    IGRPTabsTrigger,
+} from '@renderer/components/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { Combobox } from '@igrp/igrp-design-system';
+import { useTranslation } from 'react-i18next';
+import { JSONSchemaBuilder } from '../../components/JSONSchema';
+import { JSONSchema } from '../../types/schema';
+import { Card, CardContent } from '@renderer/components/ui/card';
 interface TabRequestProps {
-  formik: any
-  tablesColumns: any
+    formik: any;
+    tablesColumns: any;
+    contentTypes: any;
+    schemaTypes?: { label: string; value: string }[];
 }
 
-export const TabRequest: React.FC<TabRequestProps> = ({ formik, tablesColumns }) => {
-  const [activeTab, setActiveTab] = useState<'params' | 'headers' | 'body'>('params')
-  const [bodyType, setBodyType] = useState<'none' | 'multipart/form-data' | 'json'>('none')
+export const TabRequest: React.FC<TabRequestProps> = ({
+    formik,
+    tablesColumns,
+    contentTypes,
+    schemaTypes,
+}) => {
+    const { t } = useTranslation();
 
-  const tabQueryParams = 'requestParams'
-  const tabPathVariables = 'pathVariables'
-  const tabHeaders = 'headers'
-  const tabBody = 'requestBody'
+    const [bodyType, setBodyType] = useState<
+        'none' | 'multipart/form-data' | 'json'
+    >('none');
 
-  const columnsQuery = tablesColumns[tabQueryParams]
-  const columnsVariables = tablesColumns[tabPathVariables]
-  const columnsHeaders = tablesColumns[tabHeaders]
-  const columnsBody = tablesColumns[tabBody]
+    const [contentType, setContentType] = useState('application/json');
 
-  const handleBodyTypeChange = (type: 'none' | 'multipart/form-data' | 'json') => {
-    setBodyType(type)
+    const tabQueryParams = 'requestParams';
+    const tabPathVariables = 'pathVariables';
+    const tabHeaders = 'headers';
+    const tabBody = 'requestBody';
 
-    // Clear formik values for body content when type changes
-    if (type === 'none') {
-      formik.setFieldValue('requestBody', '')
-    } else if (type === 'multipart/form-data') {
-      const content = {
-        'multipart/form-data': {
-          type: 'Object',
-          properties: [
-            {
-              type: '',
-              name: '',
-              value: '',
-              isRequired: true
-            }
-          ]
+    const columnsQuery = tablesColumns[tabQueryParams];
+    const columnsVariables = tablesColumns[tabPathVariables];
+    const columnsHeaders = tablesColumns[tabHeaders];
+    const columnsBody = tablesColumns[tabBody];
+
+    const handleBodyTypeChange = (
+        type: 'none' | 'multipart/form-data' | 'json'
+    ) => {
+        setBodyType(type);
+
+        // Clear formik values for body content when type changes
+        if (type === 'none') {
+            formik.setFieldValue('requestBody', '');
+        } else if (type === 'multipart/form-data') {
+            const content = {
+                'multipart/form-data': {
+                    type: 'Object',
+                    properties: [
+                        {
+                            type: '',
+                            name: '',
+                            value: '',
+                            isRequired: true,
+                        },
+                    ],
+                },
+            };
+
+            formik.setFieldValue('requestBody', { content });
+        } else formik.setFieldValue('requestBody', { content: {} });
+    };
+
+    const handleSchemaChange = (newSchema: JSONSchema) => {
+        const currentSchema = formik.values.requestBody?.content[contentType];
+
+        // Se o schema for o mesmo, não faça nada
+        if (
+            currentSchema &&
+            JSON.stringify(currentSchema.schema) === JSON.stringify(newSchema)
+        ) {
+            return; // Não há mudanças, então não faça nada
         }
-      }
 
-      formik.setFieldValue('requestBody', content)
-    }
-  }
+        const content = {
+            [contentType]: {
+                schema: newSchema,
+            },
+        };
 
-  return (
-    <div className="w-full">
-      {/* Tab Navigation */}
-      <div className="flex space-x-4 border-b mb-4 text-sm">
-        <button
-          onClick={() => setActiveTab('params')}
-          className={`px-4 py-2 ${
-            activeTab === 'params' ? 'border-b-2 border-igrp text-igrp' : ''
-          }`}
-        >
-          Params
-        </button>
-        <button
-          onClick={() => setActiveTab('body')}
-          className={`px-4 py-2 ${activeTab === 'body' ? 'border-b-2 border-igrp text-igrp' : ''}`}
-        >
-          Body
-        </button>
-        <button
-          onClick={() => setActiveTab('headers')}
-          className={`px-4 py-2 ${
-            activeTab === 'headers' ? 'border-b-2 border-igrp text-igrp' : ''
-          }`}
-        >
-          Headers
-        </button>
-      </div>
+        formik.setFieldValue('requestBody', { content });
+    };
 
-      {/* Tab Content */}
-      <div className={activeTab === 'params' ? 'block' : 'hidden'}>
-        {columnsQuery && (
-          <div className="space-y-3">
-            <p className="text-sm">Query Parameters</p>
-            <FormList
-              formik={formik}
-              columns={columnsQuery}
-              data={formik.values[tabQueryParams]}
-              changeValue={(element, position, value) =>
-                changeValue(formik, element, position, value, tabQueryParams)
-              }
-              addRow={() => addNewRow(formik, tabQueryParams, tabQueryParams)}
-              removeRow={(position) => removeRow(formik, tabQueryParams, position)}
-              errors={formik.errors[tabQueryParams]}
-              btnLabels={'Query Parameter'}
-              name={tabQueryParams}
-            />
-            <p className="text-sm">Variables</p>
-            <FormList
-              formik={formik}
-              columns={columnsVariables}
-              data={formik.values[tabPathVariables]}
-              changeValue={(element, position, value) =>
-                changeValue(formik, element, position, value, tabPathVariables)
-              }
-              addRow={() => addNewRow(formik, tabPathVariables, tabPathVariables)}
-              removeRow={(position) => removeRow(formik, tabPathVariables, position)}
-              errors={formik.errors[tabPathVariables]}
-              btnLabels={'Variable'}
-              name={tabPathVariables}
-            />
-          </div>
-        )}
-      </div>
-      <div className={activeTab === 'headers' ? 'block' : 'hidden'}>
-        {columnsHeaders && (
-          <FormList
-            formik={formik}
-            columns={columnsHeaders}
-            data={formik.values[tabHeaders]}
-            changeValue={(element, position, value) =>
-              changeValue(formik, element, position, value, tabHeaders)
-            }
-            addRow={() => addNewRow(formik, tabHeaders, tabHeaders)}
-            removeRow={(position) => removeRow(formik, tabQueryParams, position)}
-            errors={formik.errors[tabHeaders]}
-            btnLabels={tabHeaders}
-            name={tabHeaders}
-          />
-        )}
-      </div>
-      <div className={activeTab === 'body' ? 'block' : 'hidden'}>
-        <div className="mb-4">
-          <div className="flex space-x-4 text-sm">
-            <Badge
-              onClick={() => handleBodyTypeChange('none')}
-              variant={bodyType === 'none' ? 'default' : 'outline'}
-            >
-              None
-            </Badge>
-            <Badge
-              onClick={() => handleBodyTypeChange('multipart/form-data')}
-              variant={bodyType === 'multipart/form-data' ? 'default' : 'outline'}
-            >
-              Form Data
-            </Badge>
-            <Badge
-              onClick={() => handleBodyTypeChange('json')}
-              variant={bodyType === 'json' ? 'default' : 'outline'}
-            >
-              JSON
-            </Badge>
-          </div>
-        </div>
+    return (
+        <>
+            <IGRPTabs defaultValue="params">
+                <IGRPTabsList className="w-full">
+                    <IGRPTabsTrigger value="params">Params</IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="body">Body</IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="headers">Headers</IGRPTabsTrigger>
+                </IGRPTabsList>
+                <IGRPTabsContent value="params">
+                    {columnsQuery && (
+                        <div className="space-y-3">
+                            <p className="text-sm">Query Parameters</p>
+                            <FormList
+                                formik={formik}
+                                columns={columnsQuery}
+                                data={formik.values[tabQueryParams]}
+                                changeValue={(element, position, value) =>
+                                    changeValue(
+                                        formik,
+                                        element,
+                                        position,
+                                        value,
+                                        tabQueryParams
+                                    )
+                                }
+                                addRow={() =>
+                                    addNewRow(
+                                        formik,
+                                        tabQueryParams,
+                                        tabQueryParams
+                                    )
+                                }
+                                removeRow={(position) =>
+                                    removeRow(formik, tabQueryParams, position)
+                                }
+                                errors={formik.errors[tabQueryParams]}
+                                btnLabels={'Query Parameter'}
+                                name={tabQueryParams}
+                            />
+                            <p className="text-sm">Variables</p>
+                            <FormList
+                                formik={formik}
+                                columns={columnsVariables}
+                                data={formik.values[tabPathVariables]}
+                                changeValue={(element, position, value) =>
+                                    changeValue(
+                                        formik,
+                                        element,
+                                        position,
+                                        value,
+                                        tabPathVariables
+                                    )
+                                }
+                                addRow={() =>
+                                    addNewRow(
+                                        formik,
+                                        tabPathVariables,
+                                        tabPathVariables
+                                    )
+                                }
+                                removeRow={(position) =>
+                                    removeRow(
+                                        formik,
+                                        tabPathVariables,
+                                        position
+                                    )
+                                }
+                                errors={formik.errors[tabPathVariables]}
+                                btnLabels={'Variable'}
+                                name={tabPathVariables}
+                            />
+                        </div>
+                    )}
+                </IGRPTabsContent>
+                <IGRPTabsContent value="body">
+                    <div className="mb-4">
+                        <div className="flex space-x-4 text-sm">
+                            <Badge
+                                onClick={() => handleBodyTypeChange('none')}
+                                variant={
+                                    bodyType === 'none' ? 'default' : 'outline'
+                                }
+                                className="cursor-pointer"
+                            >
+                                None
+                            </Badge>
+                            <Badge
+                                onClick={() =>
+                                    handleBodyTypeChange('multipart/form-data')
+                                }
+                                variant={
+                                    bodyType === 'multipart/form-data'
+                                        ? 'default'
+                                        : 'outline'
+                                }
+                                className="cursor-pointer"
+                            >
+                                Form Data
+                            </Badge>
+                            <Badge
+                                onClick={() => handleBodyTypeChange('json')}
+                                variant={
+                                    bodyType === 'json' ? 'default' : 'outline'
+                                }
+                                className="cursor-pointer"
+                            >
+                                JSON
+                            </Badge>
+                        </div>
+                    </div>
 
-        {bodyType === 'none' && columnsBody && (
-          <div className="text-center rounded p-8 border">
-            <p className="text-muted-foreground text-xs">This request has no body parameters</p>
-          </div>
-        )}
+                    {bodyType === 'none' && columnsBody && (
+                        <div className="text-center rounded p-8 border">
+                            <p className="text-muted-foreground text-xs">
+                                This request has no body parameters
+                            </p>
+                        </div>
+                    )}
 
-        {bodyType === 'multipart/form-data' && columnsBody && (
-          <>
-            <FormList
-              columns={columnsBody}
-              data={formik.values[tabBody]['multipart/form-data']['properties'] || []}
-              formik={formik}
-              changeValue={(element, position, value) =>
-                changeValue(formik, element, position, value, tabBody)
-              }
-              addRow={() => addNewRow(formik, tabBody, 'formData')}
-              removeRow={(position) => removeRow(formik, tabBody, position)}
-              errors={formik.errors[tabBody]}
-              name={'requestBody.multipart/form-data.properties'}
-              btnLabels=""
-            />
-          </>
-        )}
+                    {bodyType === 'multipart/form-data' && columnsBody && (
+                        <>
+                            <FormList
+                                columns={columnsBody}
+                                data={
+                                    formik.values[tabBody][
+                                        'multipart/form-data'
+                                    ]['properties'] || []
+                                }
+                                formik={formik}
+                                changeValue={(element, position, value) =>
+                                    changeValue(
+                                        formik,
+                                        element,
+                                        position,
+                                        value,
+                                        tabBody
+                                    )
+                                }
+                                addRow={() =>
+                                    addNewRow(formik, tabBody, 'formData')
+                                }
+                                removeRow={(position) =>
+                                    removeRow(formik, tabBody, position)
+                                }
+                                errors={formik.errors[tabBody]}
+                                name={
+                                    'requestBody.multipart/form-data.properties'
+                                }
+                                btnLabels=""
+                            />
+                        </>
+                    )}
 
-        {bodyType === 'json' && (
-          <textarea
-            value={formik.values['bodyContent']}
-            onChange={(e) => formik.setFieldValue('bodyContent', e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp sm:text-sm"
-            rows={6}
-            placeholder="Enter JSON body"
-          ></textarea>
-        )}
-      </div>
-    </div>
-  )
-}
+                    {bodyType === 'json' && (
+                        <div className="space-y-3">
+                            <Combobox
+                                name={t('contentType')}
+                                value={contentType}
+                                placeholder="Select Content Type"
+                                onChange={(value) => setContentType(value)}
+                                options={contentTypes}
+                                className="w-1/3 focus:ring-igrp focus:border-igrp h-8"
+                            />
+                            <Card className="rounded">
+                                <CardContent className="p-3">
+                                    <Tabs defaultValue="value">
+                                        <TabsList>
+                                            <TabsTrigger value="value">
+                                                Value
+                                            </TabsTrigger>
+                                            <TabsTrigger value="schema">
+                                                Data Schema
+                                            </TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="value">
+                                            <div className="mt-3">
+                                                <textarea
+                                                    value={
+                                                        formik.values[
+                                                            'bodyContent'
+                                                        ]
+                                                    }
+                                                    onChange={(e) =>
+                                                        formik.setFieldValue(
+                                                            'bodyContent',
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp sm:text-sm"
+                                                    rows={6}
+                                                    placeholder="Enter JSON body"
+                                                ></textarea>
+                                            </div>
+                                        </TabsContent>
+                                        <TabsContent value="schema">
+                                            <JSONSchemaBuilder
+                                                schemaTypes={schemaTypes}
+                                                initialSchema={null}
+                                                onSchemaChange={(value) => {
+                                                    handleSchemaChange(value);
+                                                }}
+                                            />
+                                        </TabsContent>
+                                    </Tabs>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
+                </IGRPTabsContent>
+                <IGRPTabsContent value="headers">
+                    {columnsHeaders && (
+                        <FormList
+                            formik={formik}
+                            columns={columnsHeaders}
+                            data={formik.values[tabHeaders]}
+                            changeValue={(element, position, value) =>
+                                changeValue(
+                                    formik,
+                                    element,
+                                    position,
+                                    value,
+                                    tabHeaders
+                                )
+                            }
+                            addRow={() =>
+                                addNewRow(formik, tabHeaders, tabHeaders)
+                            }
+                            removeRow={(position) =>
+                                removeRow(formik, tabQueryParams, position)
+                            }
+                            errors={formik.errors[tabHeaders]}
+                            btnLabels={tabHeaders}
+                            name={tabHeaders}
+                        />
+                    )}
+                </IGRPTabsContent>
+            </IGRPTabs>
+        </>
+    );
+};

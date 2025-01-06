@@ -14,17 +14,20 @@ import {
     CardHeader,
     CardTitle,
 } from '@renderer/components/ui/card';
+import { AddResponseMenu } from './add-response-menu';
 
 interface TabResponseProps {
     formik: any;
-    responseTypes: any;
+    schemaTypes?: { label: string; value: string }[];
     contentTypes: any;
 }
 
 export const TabResponse: React.FC<TabResponseProps> = ({
     formik,
     contentTypes,
+    schemaTypes,
 }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
 
     const [activeResponseTab, setActiveResponseTab] = useState<string>('200');
@@ -43,9 +46,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                 description: name,
                 content: {
                     [contentType]: {
-                        type: 'object',
-                        description: '',
-                        properties: {},
+                        schema: {},
                     },
                 },
             },
@@ -62,22 +63,21 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
     const handleSchemaChange = (
         statusCode: string,
-        contentType: string = 'application/json', // Default to 'application/json'
+        contentType: string = 'application/json',
         newSchema: JSONSchema
     ) => {
-        // Here you would typically send the updated schema to your backend
-        //console.log('statusCode', statusCode, 'Schema updated:', newSchema);
+        // Verificar se o schema realmente mudou antes de atualizar
+        const currentSchema =
+            formik.values.responses[statusCode]?.content[contentType];
 
-		// Verificar se o schema realmente mudou antes de atualizar
-		const currentSchema = formik.values.responses[statusCode]?.content[contentType];
-  
-		// Se o schema for o mesmo, não faça nada
-		if (
-		  currentSchema &&
-		  JSON.stringify(currentSchema.properties) === JSON.stringify(newSchema.properties)
-		) {
-		  return; // Não há mudanças, então não faça nada
-		}
+        // Se o schema for o mesmo, não faça nada
+        if (
+            currentSchema &&
+            JSON.stringify(currentSchema.schema) ===
+                JSON.stringify(newSchema)
+        ) {
+            return; // Não há mudanças, então não faça nada
+        }
 
         // Update the content for the given statusCode
         const updatedResponses = {
@@ -87,16 +87,20 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                 content: {
                     ...formik.values.responses[statusCode]?.content,
                     [contentType]: {
-                        ...formik.values.responses[statusCode]?.content[contentType],
-                        type: 'object',
-                        properties: newSchema.properties || {},
+                        ...formik.values.responses[statusCode]?.content[
+                            contentType
+                        ],
+                        schema: newSchema || {},
                     },
                 },
             },
         };
 
         formik.setFieldValue('responses', updatedResponses);
+    };
 
+    const handleAddBlankResponse = () => {
+        setIsModalOpen(true);
     };
 
     return (
@@ -119,9 +123,12 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     ))}
                 </div>
                 <AddResponseModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
                     onSave={handleAddResponse}
                     contentTypes={contentTypes}
                 />
+                <AddResponseMenu onAddBlankResponse={handleAddBlankResponse} />
             </div>
 
             {/* Response Tab Content */}
@@ -130,7 +137,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const description = responses[statusCode].description;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];
-                    const contentData = content[contentType];
+                    const contentData = content[contentType]['schema'];
                     return (
                         <div
                             key={statusCode}
@@ -141,7 +148,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     : 'hidden'
                             )}
                         >
-                            <div className="grid grid-cols-4 gap-4">
+                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor={'statusCode'} className="">
                                         {'HTTP Status Code'}
@@ -198,6 +205,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 </CardHeader>
                                 <CardContent>
                                     <JSONSchemaBuilder
+                                        schemaTypes={schemaTypes}
                                         initialSchema={contentData}
                                         onSchemaChange={(value) => {
                                             handleSchemaChange(

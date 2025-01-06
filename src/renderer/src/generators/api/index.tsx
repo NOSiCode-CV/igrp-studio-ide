@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import TabManager, { TabItem } from '@renderer/components/TabManager';
+import TabManager, { TabItem } from '@renderer/generators/api/components/TabManager';
 import { PAGE_DEFAULT } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
 

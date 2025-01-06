@@ -40,7 +40,7 @@ const IDEInitialScreen = (): JSX.Element => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
       <PageHeader title="Welcome to IGRP Studio">
         <div className="flex justify-end space-x-3 ">
           <CreateProject />

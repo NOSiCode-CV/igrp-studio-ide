@@ -7,10 +7,9 @@ import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { extractByType, getMergedFiles, getModulesArray } from '../helpers';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
-import { TabItem } from '@renderer/components/TabManager';
+import { TabItem } from '@renderer/generators/api/components/TabManager';
 import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 interface PageBuilderState {
     basePath: string;

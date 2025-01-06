@@ -1,4 +1,4 @@
-export type SchemaType = 'object' | 'array' | 'string' | 'number' | 'integer' | 'boolean';
+import { SchemaType } from "@igrp/spring-engine/dist/interfaces/types";
 
 export interface SchemaField {
   name: string;
@@ -15,8 +15,11 @@ export interface SchemaField {
   examples?: any[];
   minimum?: number;
   maximum?: number;
+  maxLength?: number;
+  minLength?: number;
   multipleOf?: number;
   title?: string;
+  pattern?: string;
 }
 
 export interface JSONSchema {

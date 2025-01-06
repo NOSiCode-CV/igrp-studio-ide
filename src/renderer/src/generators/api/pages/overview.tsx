@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import EmptyPage from './EmptyPage';
 import { OptionType } from '@renderer/constants/appConstants';
-import { TabItem } from '@renderer/components/TabManager';
+import { TabItem } from '@renderer/generators/api/components/TabManager';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@igrp/igrp-design-system';
 import DashboardOverview from '../components/dashboard-overview';
 
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { ContainerScrollArea } from '../components/ContainerScrollArea';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
@@ -70,16 +72,18 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     }, [folders]);
 
     return (
-        <div className="flex flex-col items-center mt-6 p-4 bg-background">
-            <div className="w-full max-w-4xl space-y-8">
-                <PageHeader
-                    title="API Overview"
-                    description="Manage your API endpoints"
-                />
-                <DashboardOverview stats={stats} />
-                <EmptyPage onClick={handleOptionClick} />
+        <ContainerScrollArea>
+            <div className="flex flex-col items-center mt-6 p-4 bg-background">
+                <div className="w-full max-w-4xl space-y-8">
+                    <PageHeader
+                        title="API Overview"
+                        description="Manage your API endpoints"
+                    />
+                    <DashboardOverview stats={stats} />
+                    <EmptyPage onClick={handleOptionClick} />
+                </div>
             </div>
-        </div>
+        </ContainerScrollArea>
     );
 };
 

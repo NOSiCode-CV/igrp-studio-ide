@@ -1,7 +1,7 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Database, FileCode, Folder, FileText } from 'lucide-react'
+import { Database, FileCode, Folder, FileText, Circle, LucideIcon, Zap } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
 
@@ -64,21 +64,8 @@ export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export function createMenuHeader(label: string, folderName?: string): MenuItem {
-	const icon = folderName
-		? (() => {
-			switch (folderName.toLowerCase()) {
-				case 'controllers':
-					return FileCode
-				case 'models':
-					return Database
-				case 'dto':
-					return FileText
-				default:
-					return Folder // Default icon for other folders
-			}
-		})()
-		: ''
+export function createMenuHeader(label: string, folderName: string): MenuItem {
+	const icon = getIcon(folderName);
 
 	return {
 		label,
@@ -176,8 +163,23 @@ export const getBadgeColor = (method: string): string | undefined => {
 
 
 export const getStatusLabel = (statusCode: string): string => {
-    const status = httpStatusCodes.find((status) => status.value === statusCode);
-    return status ? status.label.replace(`${status.value} `, '') : `Error (${statusCode})`;
+	const status = httpStatusCodes.find((status) => status.value === statusCode);
+	return status ? status.label.replace(`${status.value} `, '') : `Error (${statusCode})`;
 };
 
-export const toInitCap = (text) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
+export const toInitCap = (text: string) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
+
+export const getIcon = (folderName: string): LucideIcon => {
+	switch (folderName.toLowerCase()) {
+		case 'controllers':
+			return FileCode;
+		case 'models':
+			return Database;
+		case 'dto':
+			return FileText;
+		case 'action':
+			return Zap;
+		default:
+			return Circle;
+	}
+};

@@ -82,14 +82,13 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
 
     return {
         attributes: [
-            { key: 'name', name: 'Name', type: 'text', width: '40%' },
-            { key: 'ns', name: 'Namespace', type: 'select', options: NamespacesOptions, width: '30%' },
+            { key: 'name', name: 'Name', type: 'text'},
+            { key: 'ns', name: 'Namespace', type: 'select', options: NamespacesOptions},
             {
                 key: 'type',
                 name: 'Type',
                 type: 'select',
                 options: paramsTypesData,
-                width: '20%',
                 dependsOn: 'ns',
                 getOptions: (selectedValue) => getUpdatedTypesForNamespace(selectedValue),
             },

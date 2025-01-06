@@ -294,6 +294,7 @@ const FormNewProjectSpring = ({ versions }): JSX.Element => {
                         {t('IGRP Core Version')}
                     </Label>
                     <Combobox
+                        placeholder="Select version"
                         name="igrpCoreVersion"
                         options={versions}
                         onChange={(option) =>

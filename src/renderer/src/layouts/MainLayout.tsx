@@ -42,7 +42,7 @@ const MainLayout = (props: LayoutProps): JSX.Element => {
             <IGRPSidebarContent items={navData} />
           </IGRPSidebar>
           <SidebarInset>
-            <ScrollArea className="mb-20">
+            <ScrollArea className='h-full'>
               {props.children}
             </ScrollArea>
           </SidebarInset>

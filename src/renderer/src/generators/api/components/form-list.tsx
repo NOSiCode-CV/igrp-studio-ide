@@ -159,7 +159,17 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     )}
                   </TableHead>
                 ))}
-                {removeRow && <TableHead className="w-[10px]"></TableHead>}
+                {<TableHead className="text-right">
+                    {addRow && <Button
+                            onClick={() => addRow()}
+                            variant="ghost"
+                            size="sm"
+                            className="text-green-500 h-6 w-6"
+                        >
+                            <Plus size={14} />
+                            <span className="sr-only">{`New ${btnLabels}`}</span>
+                        </Button>}
+                </TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -376,7 +386,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                   )
                 })}
             </TableBody>
-            {addRow && (
+            {/* {addRow && (
               <TableFooter>
                 <TableRow>
                   <TableCell className="text-left !py-1">
@@ -387,7 +397,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                   </TableCell>
                 </TableRow>
               </TableFooter>
-            )}
+            )} */}
             {provided.placeholder}
           </Table>
         )}

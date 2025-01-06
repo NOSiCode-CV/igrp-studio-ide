@@ -13,6 +13,7 @@ import { JSONSchema, SchemaField } from '../../types/schema';
 import { JSONSchemaModal } from './JSONSchemaModal';
 
 interface JSONSchemaBuilderProps {
+    schemaTypes?: { label: string; value: string }[];
     initialSchema?: JSONSchema | null;
     onSchemaChange?: (schema: JSONSchema) => void;
 }
@@ -20,6 +21,7 @@ interface JSONSchemaBuilderProps {
 export function JSONSchemaBuilder({
     initialSchema,
     onSchemaChange,
+    schemaTypes,
 }: JSONSchemaBuilderProps) {
     const [newFields, setNewFields] = useState<Record<string, SchemaField>>({});
     const [alert, setAlert] = useState<string | null>(null);
@@ -39,7 +41,9 @@ export function JSONSchemaBuilder({
     });
 
     const [fieldOrder, setFieldOrder] = useState<string[]>(() =>
-        initialSchema ? Object.keys(initialSchema.properties) : []
+        initialSchema && initialSchema?.properties
+            ? Object.keys(initialSchema.properties)
+            : []
     );
 
     useEffect(() => {
@@ -104,7 +108,7 @@ export function JSONSchemaBuilder({
         ) {
             const propertyNames = new Set<string>();
             updatedField.properties = Object.fromEntries(
-                Object.entries(updatedField.properties).map(([key, value]) => {
+                Object.entries(updatedField.properties).map(([_key, value]) => {
                     const updatedValue = checkAndUpdateDuplicateNames(
                         value,
                         updatedField,
@@ -251,7 +255,7 @@ export function JSONSchemaBuilder({
                             [updatedField.name]: updatedField,
                         },
                     }));
-                    setFieldOrder(prev => [...prev, updatedField.name]);
+                    setFieldOrder((prev) => [...prev, updatedField.name]);
                     setNewFields((prev) => {
                         const { [id]: _, ...rest } = prev;
                         return rest;
@@ -397,6 +401,7 @@ export function JSONSchemaBuilder({
                         onDelete={() => handleDeleteField(id, false)}
                         onAddSubfield={handleAddNewField}
                         onAlert={setAlert}
+                        schemaTypes={schemaTypes}
                     />
                 ))}
                 {Object.entries(newFields).map(([id, field]) => (
@@ -412,6 +417,7 @@ export function JSONSchemaBuilder({
                         onAddSubfield={handleAddNewField}
                         onAlert={setAlert}
                         isNew={true}
+                        schemaTypes={schemaTypes}
                     />
                 ))}
             </TableBody>

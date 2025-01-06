@@ -1,89 +1,93 @@
-import React, { useEffect } from 'react'
-import { ToastContainer } from 'react-toastify'
-import withRouter from '@renderer/common/withRouter'
-import { createSelector } from 'reselect'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import withRouter from '@renderer/common/withRouter';
+import { createSelector } from 'reselect';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  getPages as onGetFolderFiles,
-  setChangeStatus as onSetChangeStatus
-} from '@renderer/redux/thunks'
+    getPages as onGetFolderFiles,
+    setChangeStatus as onSetChangeStatus,
+} from '@renderer/redux/thunks';
 
-import Header from './components/header'
-import Navdata from './components/nav-data'
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
-import { AppSidebar } from './components/app-sidebar'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@renderer/routes/routeConstants'
+import Header from './components/header';
+import Navdata from './components/nav-data';
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { AppSidebar } from './components/app-sidebar';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@renderer/routes/routeConstants';
 
 interface LayoutProps {
-  children: React.ReactElement<{ basePath: string; currentItem: any }>
+    children: React.ReactElement<{ basePath: string; currentItem: any }>;
 }
 
 const Layout = (props: LayoutProps): JSX.Element => {
-  const dispatch: any = useDispatch()
-  const navigate = useNavigate()
+    const dispatch: any = useDispatch();
+    const navigate = useNavigate();
 
-  const selectStudioState = (state: any) => state.PageBuilder
-  const selectStudioProperties = createSelector(selectStudioState, (studio) => ({
-    config: studio.config,
-    folders: studio.folderFiles,
-    basePath: studio.basePath,
-    changeStatus: studio.changeStatus,
-    currentItem: studio.currentItem
-  }))
+    const selectStudioState = (state: any) => state.PageBuilder;
+    const selectStudioProperties = createSelector(
+        selectStudioState,
+        (studio) => ({
+            config: studio.config,
+            folders: studio.folderFiles,
+            basePath: studio.basePath,
+            changeStatus: studio.changeStatus,
+            currentItem: studio.currentItem,
+        })
+    );
 
-  const { currentItem, changeStatus, config, basePath, folders } =
-    useSelector(selectStudioProperties)
+    const { currentItem, changeStatus, config, basePath, folders } =
+        useSelector(selectStudioProperties);
 
-  useEffect(() => {
-    dispatch(onGetFolderFiles(basePath))
-  }, [basePath, dispatch])
+    useEffect(() => {
+        dispatch(onGetFolderFiles(basePath));
+    }, [basePath, dispatch]);
 
-  useEffect(() => {
-    if (changeStatus) {
-      dispatch(onGetFolderFiles(basePath))
-      dispatch(onSetChangeStatus(false))
-    }
-  }, [changeStatus, basePath, dispatch])
+    useEffect(() => {
+        if (changeStatus) {
+            dispatch(onGetFolderFiles(basePath));
+            dispatch(onSetChangeStatus(false));
+        }
+    }, [changeStatus, basePath, dispatch]);
 
-  const menuItems = Navdata(folders).menuItems
+    const menuItems = Navdata(folders).menuItems;
 
-  useEffect(() => {
-    if (!basePath) {
-      navigate(ROUTES.HOME)
-    }
-  }, [basePath, navigate])
+    useEffect(() => {
+        if (!basePath) {
+            navigate(ROUTES.HOME);
+        }
+    }, [basePath, navigate]);
 
-  return (
-    <SidebarProvider
-      style={
-        {
-          '--sidebar-width': '380px'
-        } as React.CSSProperties
-      }
-    >
-      <div className="h-screen flex flex-col w-full">
-        <ToastContainer />
-        <Header config={config} basePath={basePath} />
+    return (
+        <SidebarProvider
+            style={
+                {
+                    '--sidebar-width': '380px',
+                } as React.CSSProperties
+            }
+        >
+            <div className="h-screen flex flex-col w-full">
+                <ToastContainer />
+                <Header config={config} basePath={basePath} />
 
-        <div className="flex flex-1 overflow-hidden">
-          <AppSidebar
-            menuItems={menuItems}
-            className="mt-10"
-            config={config}
-            basePath={basePath}
-            header
-          />
-          <SidebarInset className="flex-1">
-            <div className="">
-              {React.cloneElement(props.children, { basePath, currentItem })}
+                <div className="flex flex-1 overflow-hidden">
+                    <AppSidebar
+                        menuItems={menuItems}
+                        className="mt-10"
+                        config={config}
+                        basePath={basePath}
+                        header
+                    />
+                    <SidebarInset className="flex-1">
+                        {React.cloneElement(props.children, {
+                            basePath,
+                            currentItem,
+                        })}
+                    </SidebarInset>
+                </div>
             </div>
-          </SidebarInset>
-        </div>
-      </div>
-    </SidebarProvider>
-  )
-}
+        </SidebarProvider>
+    );
+};
 
-export default withRouter(Layout)
+export default withRouter(Layout);
