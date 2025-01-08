@@ -8,7 +8,7 @@ import {
   ModelConfig
 } from '@igrp/spring-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
-import { HandlerResponse, Page, Project } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, Page, Project } from '../main/types'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -132,13 +132,28 @@ const api = {
     ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
   openDirectory: (buttonLabel: string) => ipcRenderer.invoke('open-directory', buttonLabel),
+
   fetchFiles: (basePath: string) => ipcRenderer.invoke('igrp-studio:fetch-files', basePath),
+
   getJsonContent: (filePath: string) =>
     ipcRenderer.invoke('igrp-studio:get-json-content', filePath),
 
   openVSCode: (basePath: string) => ipcRenderer.invoke('igrp-studio:open-vs-code', basePath),
 
   getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
+
+  //Database
+  connectToDatabase: async (config: Connection): Promise<DatabaseResponse> => {
+    return await ipcRenderer.invoke('connect-database', config)
+  },
+
+  getTables: async (connectionName: string): Promise<DatabaseResponse> => {
+    return await ipcRenderer.invoke('get-tables', connectionName)
+  },
+
+  getTableStructure: async (connectionName: string, tableName: string): Promise<DatabaseResponse> => {
+    return await ipcRenderer.invoke('get-table-structure', connectionName, tableName)
+  },
 
   i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
 }
@@ -153,6 +168,17 @@ const repo = {
     },
     delete: (p: Project, index: number) => {
       return ipcRenderer.invoke('igrp-studio:repo:project.delete', p, index)
+    }
+  },
+  connection: {
+    findAll: () => {
+      return ipcRenderer.invoke('igrp-studio:repo:connection.findAll')
+    },
+    save: (connection: Connection) => {
+      return ipcRenderer.invoke('igrp-studio:repo:connection.save', connection)
+    },
+    delete: (connection: Connection) => {
+      return ipcRenderer.invoke('igrp-studio:repo:connection.delete', connection)
     }
   }
 }

@@ -6,6 +6,10 @@ import { Boxes, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
 import { ROUTES } from '@renderer/routes/routeConstants';
+import { lazy } from 'react';
+const DatabaseManagerModal = lazy(
+    () => import('@renderer/generators/api/components/DatabaseManager')
+);
 
 const Navdata = (folders: any) => {
     const dispatch: any = useDispatch();
@@ -13,6 +17,39 @@ const Navdata = (folders: any) => {
     const menuItems: MenuItem[] = [];
 
     const { t } = useTranslation();
+    const dropdownSchemas = [
+        {
+            label: t('newModels'),
+            type: OPTION_TYPE.MODELS,
+        },
+        {
+            label: t('Import data table from database'),
+            type: OPTION_TYPE.IMPORT_TABLE_DB,
+            componentName: <DatabaseManagerModal />,
+        },
+        {
+            label: t('Import JSON Schema Files'),
+            type: OPTION_TYPE.MODELS,
+        },
+    ];
+
+    const dropdownSubMenus = [
+        {
+            label: t('newAction'),
+            type: OPTION_TYPE.ACTION,
+        },
+    ];
+
+    const dropdownMenus = [
+        {
+            label: t(`newDto`),
+            type: OPTION_TYPE.DATA_OBJECTS,
+        },
+        {
+            label: t('newModels'),
+            type: OPTION_TYPE.MODELS,
+        },
+    ];
 
     const onClickItem = (item: any) => {
         delete item.icon;
@@ -23,31 +60,12 @@ const Navdata = (folders: any) => {
     };
 
     Object.keys(folders).forEach((folderName: string) => {
-        const dropdownSubMenus = [
-            {
-                label: t('newAction'),
-                type: OPTION_TYPE.ACTION,
-            },
-        ];
-
-        const dropdownMenus = [
-            {
-                label: t(`newDto`),
-                type: OPTION_TYPE.DATA_OBJECTS,
-            },
-            {
-                label: t('newModels'),
-                type: OPTION_TYPE.MODELS,
-            },
-        ];
-
         if (folderName !== 'shared') {
             dropdownMenus.unshift({
                 label: t('newControllers'),
                 type: OPTION_TYPE.ACTION,
             });
         }
-
         const folderMenuItem: MenuItem = {
             icon: folderName === 'shared' ? Layers : Boxes,
             label: folderName,
@@ -63,11 +81,28 @@ const Navdata = (folders: any) => {
         folders[folderName].files.forEach((folder) => {
             // Iterate through the categories (e.g., "dto", "controller") within the folder
             Object.keys(folder).forEach((categoryName: string) => {
+                const getDropdownMenus = (category: string): MenuItem[] => {
+                    switch (category) {
+                        case OPTION_TYPE.MODELS:
+                            return dropdownSchemas;
+                        default:
+                            return [];
+                    }
+                };
+
                 // Create a category menu item
                 const categoryMenuItem: MenuItem = createMenuHeader(
                     categoryName,
                     categoryName
                 );
+
+                categoryMenuItem.dropdownclick = function (item: MenuItem) {
+                    onClickItem(item);
+                };
+
+                categoryMenuItem.dropdownclick = (item: MenuItem) =>
+                    onClickItem(item);
+                categoryMenuItem.dropdownMenus = getDropdownMenus(categoryName);
 
                 // Add each file in the category as a sub-item
                 categoryMenuItem.subItems = folder[categoryName].map(

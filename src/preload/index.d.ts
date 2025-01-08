@@ -3,6 +3,7 @@ import { IOpenProject } from './types';
 import { IProjectRepository } from '@renderer/interfaces/types'
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { Connection, IConnenctionRepository } from 'src/main/types';
 
 interface CustomAPI {
 
@@ -33,6 +34,13 @@ interface CustomAPI {
 
     getVersions: (endpoint: string) => Promise<HandlerResponse>,
 
+    //Database
+    connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
+
+    getTables: (connectionName: string) => Promise<DatabaseResponse>,
+
+    getTableStructure: (connectionName: string, tableName: string) => Promise<DatabaseResponse>,
+
     i18nextElectronBackend: any
 }
 
@@ -48,7 +56,7 @@ declare global {
     interface Window {
         electron: ElectronAPI
         api: CustomAPI,
-        repo: { project: IProjectRepository },
+        repo: { project: IProjectRepository, connection: IConnenctionRepository },
         menu: CustomMenu
     }
 }

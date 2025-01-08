@@ -26,7 +26,7 @@ import {
 import { ConfigOptions, MenuItem } from 'src/main/types';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppSidebarHeader } from './app-sidebar-header';
-import { DropdownSidebarMenuButton } from './dropdown-sidebar-menu-button';
+import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 
 interface AppSidebarProps {
@@ -68,6 +68,7 @@ export function AppSidebar({
         { icon: FileText, link: '/documents', label: 'Documents' },
         { icon: Badge, link: '/settings', label: 'Settings' },
     ];
+
     return (
         <>
             <Sidebar
@@ -186,6 +187,7 @@ function Three({
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
 }) {
+   
     const [open, setOpen] = React.useState(true);
 
     const handleOpenChange = (newState) => {

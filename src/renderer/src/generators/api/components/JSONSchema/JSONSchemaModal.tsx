@@ -36,14 +36,14 @@ export function JSONSchemaModal({ generateJSONSchema }: JSONSchemaModalProps) {
                     <FileJson className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px]">
+            <DialogContent className="md:max-h-[70vh] md:max-w-[700px] max-w-[800px]">
                 <DialogHeader>
                     <DialogTitle>JSON Schema Preview</DialogTitle>
                     <DialogDescription>
                         This is a preview of your generated JSON schema.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="mt-4">
+                <div className="my-1">
                     <pre className="p-4 bg-gray-100 rounded overflow-auto max-h-[60vh]">
                         {jsonSchema}
                     </pre>

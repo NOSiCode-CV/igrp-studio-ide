@@ -92,7 +92,7 @@ const PageController = ({
     };
 
     const handleUpdate = (tabId: string) => {
-        onUpdateTab(tab.id, `tab-${tab.item.module}-${tabId}`);
+        onUpdateTab(tab.id, `tab-${tab.item?.module}-${tabId}`);
     };
 
     return (

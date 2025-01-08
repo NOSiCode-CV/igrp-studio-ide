@@ -160,7 +160,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                   </TableHead>
                 ))}
                 {<TableHead className="text-right">
-                    {addRow && <Button
+                    {addRow && 
+                     <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
                             onClick={() => addRow()}
                             variant="ghost"
                             size="sm"
@@ -168,7 +172,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         >
                             <Plus size={14} />
                             <span className="sr-only">{`New ${btnLabels}`}</span>
-                        </Button>}
+                        </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
+
+                        </Tooltip>
+                        </TooltipProvider>}
                 </TableHead>}
               </TableRow>
             </TableHeader>
@@ -233,19 +242,19 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 
                                             {item.type === 'checkbox' && (
                                               <TooltipProvider>
-                                                <Tooltip>
-                                                  <TooltipTrigger className="flex align-center">
+                                              <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                  <div className="flex align-center">
                                                     <Checkbox
                                                       id={`${item.key}_${index2}`}
-                                                      onCheckedChange={(checked) =>
-                                                        changeValue(item.key, index, checked)
-                                                      }
+                                                      onCheckedChange={(checked) => changeValue(item.key, index, checked)}
                                                       checked={row?.[item.key] || false}
                                                     />
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>{item.name}</TooltipContent>
-                                                </Tooltip>
-                                              </TooltipProvider>
+                                                  </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>{item.name}</TooltipContent>
+                                              </Tooltip>
+                                            </TooltipProvider>
                                             )}
 
                                             {item.type === 'popoverController' && (

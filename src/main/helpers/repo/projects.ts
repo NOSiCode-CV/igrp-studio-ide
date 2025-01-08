@@ -3,7 +3,6 @@ import fs from 'fs'
 import { readFile, writeFile } from 'fs/promises';
 import { Project, PageableProjects, IProjectRepository  } from '../../types'
 
-
 const filename = app.getPath('userData') + "/rp-settings.json";
 
 async function loadCfg(){

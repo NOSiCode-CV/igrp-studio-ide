@@ -45,7 +45,13 @@ export interface IProjectRepository {
     async delete(project: Project, index: number): Promise<void>;
     async findAllRecent(page: Page): Promise<PageableProjects>;
     async findAll(): Promise<Array<Project>>;
+}
 
+export interface IConnenctionRepository {
+    async save(connection: Connection): Promise<Connection>;
+    async delete(connectionName: string): Promise<void>;
+    async findAll(): Promise<Array<Connection>>;
+    async findOne(name: string): Promise<Connection>;
 }
 
 export interface MenuItem {
@@ -83,4 +89,24 @@ export interface FolderFileStructure {
     name: string;
     files: Array<Record<string, File[]>>; // Group files by subfolder
     path: string;
+}
+
+export interface DatabaseResponse {
+    success: boolean, message?: string, tables?: any, structure?: any
+}
+
+export interface Connection {
+    description?: string;
+    name: string;
+    databaseType: string;
+    connectionType: 'general' | 'ssh';
+    host: string;
+    port: number | null;
+    user: string;
+    password: string;
+    sshHost?: string;
+    sshPort?: string;
+    sshUsername?: string;
+    sshPassword?: string;
+    database: string;
 }

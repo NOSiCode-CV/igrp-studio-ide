@@ -56,6 +56,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 }: ControllerProps) => {
     const { t } = useTranslation();
 
+    const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
     const [name, setName] = useState('');
     const [pathController, setPathController] = useState('');
@@ -125,6 +126,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 headers,
             } = currentItem.content;
 
+            setOldActionName(actionName);
+
             formik.setFieldValue(
                 'actionName',
                 actionName || initialValues.actionName
@@ -149,9 +152,11 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const getValuesToSubmit = async () => {
         const values = { ...formik.values };
 
-        delete values.responsee;
+        if(!values.requestBody) delete values.requestBody
 
         getJsonData();
+
+        const actionName = oldActionName || values.actionName;
 
         const validPathVariables =
             values.pathVariables &&
@@ -176,12 +181,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         // Check if a matching action exists in data?.actions
         const existingActions = data?.actions || [];
         const isActionExisting = existingActions.some(
-            (dataAction) => dataAction.actionName === values.actionName
+            (dataAction) => dataAction.actionName === oldActionName
         );
 
         // Merge or replace actions
         const mergedActions = existingActions.map((dataAction) =>
-            dataAction.actionName === values.actionName ? newAction : dataAction
+            dataAction.actionName === actionName ? newAction : dataAction
         );
 
         // If no matching action, add the new action
@@ -226,7 +231,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     value: values.name,
                 })
             );
-        } catch (error: unknown) {
+        } catch (error: unknown) { 
             showErrorToast(error);
         }
     };
@@ -234,21 +239,44 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const handleDelete = async (): Promise<void> => {
         try {
             const values = await getValuesToSubmit();
+            const countActions = values.actions.length;
 
-            const { error } = await window.api.deleteController(
-                values,
-                basePath
-            );
+            if (countActions === 1) {
+                // Delete the entire controller if there's only one action
+                const { error } = await window.api.deleteController(
+                    values,
+                    basePath
+                );
 
-            if (error) {
-                showErrorToast(error);
-                return;
+                if (error) {
+                    showErrorToast(error);
+                    return;
+                }
+            } else {
+                // Remove only the current action and save the updated actions
+                const updatedActions = values.actions.filter(
+                    (dataAction) => dataAction.actionName !== formik.actionName
+                );
+
+                const updatedValues = {
+                    ...values,
+                    actions: updatedActions,
+                };
+
+                const { error } = await window.api.createController(
+                    updatedValues,
+                    basePath
+                );
+
+                if (error) {
+                    showErrorToast(error);
+                    return;
+                }
             }
 
+            // Notify of successful deletion or update
             dispatch(onSetChangeStatus(true));
-
             onCloseTab();
-
             showSuccessToast(t('deletedSuccess', { name: t('controller') }));
         } catch (error) {
             showErrorToast(error);
@@ -308,6 +336,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 }}
                 onClose={() => setIsModalOpen(false)}
                 modules={modules}
+                defaultModule={module}
             />
             <ContainerScrollArea size="lg">
                 <div className="space-y-4 p-4">

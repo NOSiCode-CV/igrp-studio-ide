@@ -24,6 +24,7 @@ export enum OPTION_TYPE {
     CONTROLLERS = "controllers",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
+    IMPORT_TABLE_DB = 'import_table_db',
 };
 
 export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'none';
