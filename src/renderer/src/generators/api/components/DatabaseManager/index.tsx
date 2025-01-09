@@ -20,6 +20,7 @@ import { Button } from '@renderer/components/ui/button';
 import { getValuesToSubmit, initialValues } from '../../pages/model/config';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
+import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean;
@@ -63,62 +64,100 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
         if (!basePath) return;
 
         const errorMessages: string[] = [];
+        const processedTables = new Set<string>(); 
 
-        for (const key in selectedRows) {
-            if (Object.hasOwn(selectedRows, key)) {
-                try {
-                    // Obtém a estrutura da tabela
-                    const { success, message, structure } =
-                        await window.api.getTableStructure(
-                            selectedConnection,
-                            key
-                        );
+        const processTable = async (tableName: string) => {
+            if (processedTables.has(tableName)) return; 
+            processedTables.add(tableName);
 
-                    if (success) {
-                        console.log(structure);
+            try {
+          
+                const { success, message, structure } =
+                    await window.api.getTableStructure(
+                        selectedConnection,
+                        tableName
+                    );
 
-                        // Mapeia os atributos da estrutura da tabela para o formato necessário
-                        const attributes = structure.map((column) => ({
-                            name: column.name || '',
-                            type: typeMapping[column.data_type] || 'String', // Map types
-                            length: column.max_length || null,
-                            defaultValue: column.default_value || '',
-                            nullable: column.is_nullable || true,
-                            unique: column.is_unique || false,
-                            primaryKey: column.is_primary_key || false,
+                if (success) {
+                   // console.log(structure);
+
+                    // Map the attributes
+                    const attributes = structure.map((column) => ({
+                        name: column.name || '',
+                        type: typeMapping[column.data_type] || 'String', // Map types
+                        length: column.max_length || null,
+                        defaultValue: !column.is_primary_key
+                            ? column.default_value
+                            : '',
+                        nullable: column.is_nullable || true,
+                        unique: column.is_unique || false,
+                        primaryKey: column.is_primary_key || false,
+                    }));
+
+                    // Map the relations
+                    const relations = structure
+                        .filter((column) => column.foreign_key_table !== null)
+                        .map((column) => ({
+                            relationType: 'ManyToOne',
+                            entity: toFullCamelCaseFromSnakeCase(
+                                column.foreign_key_table
+                            ),
+                            joinColumn: column.foreign_key_column,
+                            mappedBy: '',
+                            joinTable: '',
+                            inverseJoinColumn: '',
                         }));
 
-                        // Monta o objeto final para a tabela
-                        const tableJson = {
-                            ...initialValues,
-                            tableName: key, // Nome da tabela
-                            attributes,
-                            name: key.charAt(0).toUpperCase() + key.slice(1), // Nome formatado
-                        };
+                    //console.log(`Relations for table ${tableName}:`, relations);
 
-                        const values = getValuesToSubmit(
-                            tableJson,
-                            item.module
-                        );
-
-                        const { error } = await window.api.createModel(
-                            values,
-                            basePath
-                        );
-
-                        if (error) errorMessages.push(error);
-                    } else {
-                        console.error(
-                            `Failed to fetch structure for table: ${key}. Message: ${message}`
-                        );
+                    // Add referenced foreign_key_table to selectedRows dynamically if not present
+                    for (const column of structure.filter(
+                        (col) => col.foreign_key_table
+                    )) {
+                        const foreignKeyTable = column.foreign_key_table;
+                        if (!selectedRows[foreignKeyTable]) {
+                            selectedRows[foreignKeyTable] = true; // Add to the list
+                            await processTable(foreignKeyTable); // Recursive call
+                        }
                     }
-                } catch (error) {
-                    const message =
-                        error instanceof Error
-                            ? error.message
-                            : 'An unknown error occurred';
-                    errorMessages.push(message);
+
+                    // Final table object
+                    const tableJson = {
+                        ...initialValues,
+                        tableName: tableName,
+                        attributes,
+                        relations,
+                        name:
+                            tableName.charAt(0).toUpperCase() +
+                            tableName.slice(1), // Capitalize table name
+                    };
+
+                    const values = getValuesToSubmit(tableJson, item.module);
+
+                    const { error } = await window.api.createModel(
+                        values,
+                        basePath
+                    );
+
+                    if (error) errorMessages.push(error);
+                } else {
+                    console.error(
+                        `Failed to fetch structure for table: ${tableName}. Message: ${message}`
+                    );
                 }
+            } catch (error) {
+                const message =
+                    error instanceof Error
+                        ? error.message
+                        : 'An unknown error occurred';
+                errorMessages.push(message);
+            }
+        };
+
+        // Process all initially selected rows
+        for (const key in selectedRows) {
+            if (Object.hasOwn(selectedRows, key)) {
+                await processTable(key);
             }
         }
 
@@ -127,7 +166,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 showErrorToast(errMsg);
             });
         } else {
-            showSuccessToast(t('schmeacreatedSuccess'));
+            showSuccessToast(t('schemaCreatedSuccess'));
         }
     };
 

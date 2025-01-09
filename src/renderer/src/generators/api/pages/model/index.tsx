@@ -47,6 +47,7 @@ const ModelLayout = ({
     onCloseTab,
     onUpdateTab,
 }: ModelProps): JSX.Element => {
+
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const [tablesColumns, setTableColumns] = useState<{

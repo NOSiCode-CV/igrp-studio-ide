@@ -51,8 +51,6 @@ export function AppSidebar({
     const [activeItem, setActiveItem] = useState('');
     const filteredNavData = filterSubItems(menuItems, searchQuery);
 
-    console.log(basePath)
-
     const handleSearch = (value: string) => {
         setSearchQuery(value);
     };

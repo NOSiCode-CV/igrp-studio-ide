@@ -16,14 +16,12 @@ function createKnexConnection(config: Connection) {
     });
 }
 
-async function getTables(config: Connection) {
-    const knex = await createKnexConnection(config)
+async function getTables(knex: any) {
     const inspector = SchemaInspector(knex);
     return await inspector.tables();
 }
 
-async function getTableStructure(config: Connection, tableName: string) {
-    const knex = await createKnexConnection(config)
+async function getTableStructure(knex: any, tableName: string) {
     const inspector = SchemaInspector(knex);
     return await inspector.columnInfo(tableName);
 }

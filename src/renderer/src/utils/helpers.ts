@@ -183,3 +183,14 @@ export const getIcon = (folderName: string): LucideIcon => {
 			return Circle;
 	}
 };
+
+
+export function toFullCamelCaseFromSnakeCase(str: string) {
+	if (!str) return '';
+
+	return capitalize(str
+		.toLowerCase()
+		.split('_')
+		.map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+		.join(''));
+}

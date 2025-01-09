@@ -11,15 +11,22 @@ import {
 import { Combobox, IGRPDataTable } from '@igrp/igrp-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 import { Separator } from '@renderer/components/ui/separator';
 import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
+import { Schema } from 'yup';
+import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
+
+const actions = [
+    {
+        label: 'Overwrite',
+        value: 'overwrite',
+    },
+    {
+        label: 'Ignore',
+        value: 'ignore',
+    },
+];
 
 export type Database = {
     id: string;
@@ -45,6 +52,8 @@ export function TableManager({
     const [selectedTable, setSelectedTable] = useState<string | null>(null);
     const [previewColumns, setPreviewColumns] = useState<Array<any>>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [module, setModule] = useState('');
+    const [action, setAction] = useState('overwrite');
 
     useEffect(() => {
         const getConnections = async () => {
@@ -62,7 +71,7 @@ export function TableManager({
 
     const handleConnectionSelect = async (connectionName: string) => {
         setSelectedConnection(connectionName);
-        onSelectedConnection(connectionName)
+        onSelectedConnection(connectionName);
 
         setSelectedTable(null);
         setPreviewColumns([]);
@@ -76,6 +85,7 @@ export function TableManager({
                     return {
                         tableName: table,
                         id: table,
+                        schemaName: toFullCamelCaseFromSnakeCase(table),
                     };
                 });
                 setTables(tablesArr);
@@ -84,7 +94,6 @@ export function TableManager({
             if (message) showErrorToast(message);
         } catch (error) {
             console.error('Error fetching tables:', error);
-            // Here you might want to show an error message to the user
         } finally {
             setIsLoading(false);
         }
@@ -95,7 +104,6 @@ export function TableManager({
         const { success, message, structure } =
             await window.api.getTableStructure(selectedConnection, table);
         if (!success) showErrorToast(message);
-        console.log(structure);
         setPreviewColumns(structure);
     };
 
@@ -141,12 +149,16 @@ export function TableManager({
                 </div>
             ),
         },
+        {
+            header: 'Modified schema name',
+            accessorKey: 'schemaName',
+        },
     ];
 
     return (
-        <div className="flex mt-3 space-x-3">
-            <div className="w-1/2 space-y-4">
-                <div className="w-full flex flex-1 space-x-2">
+        <>
+            <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
                     <Label>Database Connections</Label>
                     <Combobox
                         value={selectedConnection}
@@ -157,13 +169,26 @@ export function TableManager({
                         className="w-full"
                     />
                 </div>
-                <Card className="rounded-sm">
-                    <CardHeader className="p-3">
-                        <CardTitle>Database table</CardTitle>
-                    </CardHeader>
-                    <Separator />
-                    <CardContent>
-                        <ScrollArea className="h-[450px] w-full">
+                <div className="space-y-2">
+                    <Label className="text-xs">
+                        While matching the same shcema
+                    </Label>
+                    <Combobox
+                        value={action}
+                        name="action"
+                        onChange={(value) => setAction(value)}
+                        placeholder="Select a action"
+                        options={actions}
+                        className="w-full"
+                    />
+                </div>
+            </div>
+            <div className="flex mt-3 space-x-3">
+                <div className="w-1/2 space-y-4">
+                    <div className="rounded border">
+                        <h4 className="p-2 text-sm">Database table</h4>
+                        <Separator />
+                        <ScrollArea className="h-[450px] w-full px-2">
                             {isLoading ? (
                                 <div className="text-center">
                                     Loading tables...
@@ -177,48 +202,50 @@ export function TableManager({
                                 />
                             )}
                         </ScrollArea>
-                    </CardContent>
-                </Card>
-            </div>
-            <div className="w-1/2">
-                {selectedTable ? (
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">
-                            Table Preview: {selectedTable}
-                        </h3>
-                        <ScrollArea className="h-[450px] w-full rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Columnn</TableHead>
-                                        <TableHead>Data Type</TableHead>
-                                        <TableHead>IsNullable</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {previewColumns.map((column, key) => (
-                                        <TableRow key={key}>
-                                            <TableCell>
-                                                {column?.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {column?.data_type}
-                                            </TableCell>
-                                            <TableCell>
-                                                {column?.is_nullable}
-                                            </TableCell>
+                    </div>
+                </div>
+                <div className="w-1/2 space-y-3">
+                    {selectedTable ? (
+                        <>
+                            <h3 className="text-sm text-muted-foreground">
+                                Preview - {selectedTable}
+                            </h3>
+                            <ScrollArea className="h-[450px] w-full rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Columnn</TableHead>
+                                            <TableHead>Data Type</TableHead>
+                                            <TableHead>IsNullable</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </ScrollArea>
-                    </div>
-                ) : (
-                    <div className="h-[500px] flex items-center justify-center text-gray-500">
-                        Select a table to preview
-                    </div>
-                )}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {previewColumns.map((column, key) => (
+                                            <TableRow key={key}>
+                                                <TableCell>
+                                                    {column?.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {column?.data_type}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {column?.is_nullable
+                                                        ? 'Yes'
+                                                        : 'NO'}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </ScrollArea>
+                        </>
+                    ) : (
+                        <div className="h-[500px] flex items-center justify-center text-muted-foreground text-sm">
+                            Select a table to preview
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }

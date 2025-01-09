@@ -37,7 +37,7 @@ const PageController = ({
 }: NewProps): JSX.Element => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
-    const [module, setModule] = useState<string>('shared');
+    const [module, setModule] = useState<string>('');
 
     const { t } = useTranslation();
 
@@ -51,12 +51,11 @@ const PageController = ({
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
             modules: getModulesArray(studio.folderFiles),
-            folderFiles: studio.folderFiles
+            folderFiles: studio.folderFiles,
         };
     });
 
-    const { basePath, models, dto, modules } =
-        useSelector(selectProperties);
+    const { basePath, models, dto, modules } = useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -75,6 +74,10 @@ const PageController = ({
             getAllSelectors();
         }
     }, [basePath, module]);
+
+    useEffect(() => {
+        if (tab.item) setModule(tab.item.module || module);
+    }, [tab]);
 
     const handleOptionClick = (opt: OptionType) => {
         setOption(opt);
