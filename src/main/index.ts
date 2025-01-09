@@ -7,8 +7,8 @@ import fs from 'fs'
 import { Connection, DatabaseResponse, FolderFiles, Handler, HandlerResponse, IOpenProject, Project } from './types'
 import { addController, addDTO, addModel, addModule, deleteController, deleteDTO, deleteModel, engineTypes, newApi } from '@igrp/spring-engine'
 import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
-import { fetchFiles, getJsonContent, openDirectory } from './helpers'
-import { ProjectRepository } from './helpers/repo/projects'
+import { fetchFiles, getJsonContent, handleWithCustomErrors, openDirectory } from './helpers'
+import { ProjectRepository } from './repo/projects'
 import {
     BaseApiConfig,
     ControllerConfig,
@@ -18,8 +18,10 @@ import {
 } from '@igrp/spring-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { exec } from 'child_process'
-import { ConnectionRepository } from './helpers/repo/database-data'
+import { ConnectionRepository } from './repo/database-data'
 import { createKnexConnection, getTables, getTableStructure } from './helpers/Knex'
+
+import './handlers/apiHandler';
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -115,15 +117,6 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-const handleWithCustomErrors = (channel: string, handler: Handler) => {
-    ipcMain.handle(channel, async (event: IpcMainInvokeEvent, ...args: any[]) => {
-        try {
-            return { result: await Promise.resolve(handler(event, ...args)) }
-        } catch (e) {
-            return { error: e }
-        }
-    })
-}
 
 ipcMain.on('open-directory-dialog', async (event) => {
     await dialog
@@ -379,7 +372,7 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
 // IPC Handlers Database
 ipcMain.handle('connect-database', async (_event, config): Promise<DatabaseResponse> => {
     try {
-        knex = await createKnexConnection(config);
+        globalKnex = await createKnexConnection(config);
         return { success: true, message: 'Connected successfully' };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred';

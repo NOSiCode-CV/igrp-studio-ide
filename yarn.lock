@@ -965,6 +965,20 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
+"@igrp/dotnet-engine@^0.0.1-alpha.1":
+  version "0.0.1-alpha.1"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/dotnet-engine/-/dotnet-engine-0.0.1-alpha.1.tgz#5607ca757da40b6d9f1cb5eaab7bc3ab66b1aa15"
+  integrity sha512-Uc57UNMQcEx2imdSpOyeKjpMly1COlLWgJ2AMMizUD8dbapkHm0cp77Y1UyrSJBxhHlF7uc5lFQthdW3TUaXzw==
+  dependencies:
+    ajv "^8.17.1"
+    ajv-errors "^3.0.0"
+    ajv-formats "^3.0.1"
+    fs-extra "^11.2.0"
+    sass "^1.77.8"
+    source-map-loader "^5.0.0"
+    ts-loader "^9.5.1"
+    uuid "^9.0.0"
+
 "@igrp/igrp-design-system@^1.0.0-alpha.74":
   version "1.0.0-alpha.74"
   resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/igrp-design-system/-/igrp-design-system-1.0.0-alpha.74.tgz#e42b7c8e9fc4f8b2a36a199f1349bc41521b30dc"
@@ -1003,10 +1017,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@0.3.0-alpha-4.4.7":
-  version "0.3.0-alpha-4.4.7"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.4.7.tgz#43751e14e3d3bd057eea45735f87381ebb332278"
-  integrity sha512-6rDCouifA4u0F7CvRX5g8MaTP8iXqaV8+MR8oBr4URoRyYyDFqZ46WH/TohbqOoj70sRCwMWnDCeALfiSzVGgQ==
+"@igrp/spring-engine@0.3.0-alpha-4.4.8":
+  version "0.3.0-alpha-4.4.8"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.4.8.tgz#246a5f5ca25598f08b0da5d5981fa327d873937b"
+  integrity sha512-6fDOXJ+hblUj+ZMCfnkTVI2mVkeGZOyOHa0aygadEKiHJNpiXOWKR/xqNKcL6bFIkaZaXHgO7inIvkTT6LZHaw==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -8466,6 +8480,11 @@ uuid@^8.3.0:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+
+uuid@^9.0.0:
+  version "9.0.1"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

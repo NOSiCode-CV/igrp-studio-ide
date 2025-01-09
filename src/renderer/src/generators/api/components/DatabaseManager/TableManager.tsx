@@ -14,7 +14,6 @@ import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
 import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Schema } from 'yup';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 
 const actions = [

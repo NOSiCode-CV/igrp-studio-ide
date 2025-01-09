@@ -16,7 +16,7 @@ import { Badge, ChevronRight, FileText, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Collapsible,
@@ -49,7 +49,9 @@ export function AppSidebar({
     const { state: sidebarState } = useSidebar();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
-    const filteredNavData = filterSubItems(menuItems, searchQuery);
+    const menuApp = filterSubItems(menuItems, searchQuery);
+
+    const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
     const handleSearch = (value: string) => {
         setSearchQuery(value);
@@ -63,10 +65,19 @@ export function AppSidebar({
         setActiveItem(subItem.label);
     };
 
+    useEffect(() => {
+        setActiveMenu(menuApp || []);
+    }, [menuApp]);
+
+    const handleClickMenu = (id: string) => {
+        if (id === 'app') setActiveMenu(menuApp);
+        else setActiveMenu([]);
+    };
+
     const menuIcons: MenuItem[] = [
         { icon: Server, link: '/app', label: 'APIs', id: 'app' },
-        { icon: FileText, link: '/documents', label: 'Documents' },
-        { icon: Badge, link: '/settings', label: 'Settings' },
+        { icon: FileText, link: '/documents', label: 'documents' },
+        { icon: Badge, link: '/settings', label: 'settings' },
     ];
 
     return (
@@ -116,6 +127,7 @@ export function AppSidebar({
                                                 }}
                                                 onClick={() => {
                                                     setOpen(true);
+                                                    handleClickMenu(item.id);
                                                 }}
                                                 className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
                                                 isActive={item.id === 'app'}
@@ -154,7 +166,7 @@ export function AppSidebar({
                         <ScrollArea>
                             <SidebarGroup>
                                 <SidebarGroupContent>
-                                    {filteredNavData.map(
+                                    {activeMenu.map(
                                         (item: MenuItem, index: number) => (
                                             <SidebarMenu key={index}>
                                                 <Three
@@ -183,7 +195,7 @@ function Three({
     item,
     handleSubItemClick,
     activeItem,
-    basePath
+    basePath,
 }: {
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
@@ -240,7 +252,10 @@ function Three({
                 </div>
 
                 <div className="opacity-0 flex items-center group-hover/icon:opacity-100">
-                    <DropdownSidebarMenuButton menuItem={item} basePath={basePath}/>
+                    <DropdownSidebarMenuButton
+                        menuItem={item}
+                        basePath={basePath}
+                    />
                 </div>
             </SidebarMenuButton>
         );
