@@ -17,6 +17,7 @@ const Navdata = (folders: any) => {
     const menuItems: MenuItem[] = [];
 
     const { t } = useTranslation();
+
     const dropdownSchemas = [
         {
             label: t('newModels'),
@@ -96,43 +97,46 @@ const Navdata = (folders: any) => {
                     categoryName
                 );
 
-                categoryMenuItem.dropdownclick = function (item: MenuItem) {
-                    onClickItem(item);
+                const menuItem = {
+                    ...categoryMenuItem,
+                    dropdownMenus: getDropdownMenus(categoryName),
+                    dropdownclick: function (item: MenuItem) {
+                        onClickItem(item);
+                    },
+                    module: folderName,
+                    subItems: folder[categoryName].map(
+                        (file: {
+                            name: string;
+                            path: string;
+                            content: any;
+                        }) => ({
+                            label: file.name,
+                            path: file.path,
+                            module: folderName,
+                            type: categoryName,
+                            link: ROUTES.PATH_PAGE_BUILDER_API,
+                            subItems: getSubItems(
+                                categoryName,
+                                file,
+                                file.path,
+                                folderName,
+                                onClickItem
+                            ),
+                            click: (subItem: MenuItem) => onClickItem(subItem),
+                            dropdownclick: function (item: MenuItem) {
+                                onClickItem(item);
+                            },
+                            dropdownMenus:
+                                categoryName === OPTION_TYPE.CONTROLLERS
+                                    ? dropdownSubMenus
+                                    : [],
+                            content: file?.content,
+                        })
+                    ),
                 };
 
-                categoryMenuItem.dropdownclick = (item: MenuItem) =>
-                    onClickItem(item);
-                categoryMenuItem.dropdownMenus = getDropdownMenus(categoryName);
-
-                // Add each file in the category as a sub-item
-                categoryMenuItem.subItems = folder[categoryName].map(
-                    (file: { name: string; path: string; content: any }) => ({
-                        label: file.name,
-                        path: file.path,
-                        module: folderName,
-                        type: categoryName,
-                        link: ROUTES.PATH_PAGE_BUILDER_API,
-                        subItems: getSubItems(
-                            categoryName,
-                            file,
-                            file.path,
-                            folderName,
-                            onClickItem
-                        ),
-                        click: (subItem: MenuItem) => onClickItem(subItem),
-                        dropdownclick: function (item: MenuItem) {
-                            onClickItem(item);
-                        },
-                        dropdownMenus:
-                            categoryName === OPTION_TYPE.CONTROLLERS
-                                ? dropdownSubMenus
-                                : [],
-                        content: file?.content,
-                    })
-                );
-
                 // Add the category menu item to the folder's sub-items
-                folderMenuItem.subItems!.push(categoryMenuItem);
+                folderMenuItem.subItems!.push(menuItem);
             });
         });
 

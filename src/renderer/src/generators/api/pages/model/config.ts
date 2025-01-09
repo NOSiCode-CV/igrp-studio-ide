@@ -1,3 +1,4 @@
+import { ModelConfig, Relation } from '@igrp/spring-engine/dist/interfaces/types'
 import { formatMethods } from '../../helpers'
 import { IColumnsTabelProps } from '../../types/Interfaces'
 
@@ -213,3 +214,57 @@ export const getTablesColumns = ({
     ]
   }
 }
+
+export const getValuesToSubmit = (values, module) => {
+  const enableCrud = values.enableCrud || false;
+  const generationType = values.generationType;
+
+  delete values.enableCrud;
+  delete values.generationType;
+
+  const relations: Relation[] =
+    values.relations?.filter((rel) => rel.relationType !== '') || [];
+
+  const uniqueConstraints =
+    values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
+
+  const indexes = values.indexes?.filter((idx) => idx.name !== '') || [];
+
+  const attributes = values.attributes.map(({ ...field }) => ({
+    ...field,
+    length: field.length ? Number(field.length) : 255,
+    nullable: !field.nullable,
+    generationType: field.primaryKey === true ? generationType : '',
+  }));
+
+  const primaryKey = values.attributes
+    .filter((attribute) => attribute.primaryKey === true)
+    .map(({ name, type }) => ({
+      name,
+      type,
+    }));
+
+  const hasListPk = primaryKey.length > 1 ? true : false;
+
+  const filteredAttributes = hasListPk
+    ? attributes.filter((attribute) => attribute.primaryKey !== true)
+    : attributes;
+
+  const newValues: ModelConfig = {
+    ...values,
+    attributes: filteredAttributes,
+    relations,
+    uniqueConstraints,
+    indexes,
+    crud: {
+      ...values.crud?.[0],
+      enabled: enableCrud,
+    },
+    primaryKey: hasListPk ? primaryKey : [],
+    module
+  };
+
+  if (!enableCrud && !newValues.crud?.path) delete newValues.crud;
+
+  return newValues;
+};

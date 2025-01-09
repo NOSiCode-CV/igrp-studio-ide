@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import {
     Table,
@@ -27,7 +26,15 @@ export type Database = {
     tableName: string;
 };
 
-export function TableManager() {
+interface TableManagerProps {
+    onRowsSubmit: (rows: any[]) => void;
+    onSelectedConnection: (value: string) => void;
+}
+
+export function TableManager({
+    onRowsSubmit,
+    onSelectedConnection,
+}: TableManagerProps) {
     const { showErrorToast } = useToast();
 
     const [connections, setConnections] = useState<
@@ -55,6 +62,8 @@ export function TableManager() {
 
     const handleConnectionSelect = async (connectionName: string) => {
         setSelectedConnection(connectionName);
+        onSelectedConnection(connectionName)
+
         setSelectedTable(null);
         setPreviewColumns([]);
         setIsLoading(true);
@@ -91,7 +100,7 @@ export function TableManager() {
     };
 
     const handleChangeRows = (value) => {
-        console.log(value);
+        onRowsSubmit(value);
     };
 
     const columns: ColumnDef<Database>[] = [
@@ -113,7 +122,10 @@ export function TableManager() {
             cell: ({ row }) => (
                 <Checkbox
                     checked={row.getIsSelected()}
-                    onCheckedChange={(value) => {row.toggleSelected(!!value);  handleTableSelect(row.original.tableName)}}
+                    onCheckedChange={(value) => {
+                        row.toggleSelected(!!value);
+                        handleTableSelect(row.original.tableName);
+                    }}
                     aria-label="Select row"
                 />
             ),
@@ -161,7 +173,7 @@ export function TableManager() {
                                     columns={columns}
                                     data={tables}
                                     onRowSelectionChange={handleChangeRows}
-                                    rowId='id'
+                                    rowId="id"
                                 />
                             )}
                         </ScrollArea>

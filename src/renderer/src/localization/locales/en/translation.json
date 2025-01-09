@@ -60,5 +60,6 @@
   "newDto": "New Data Object",
   "newModels": "New Schema",
   "newControllers": "New Endpoint",
-  "newAction": "New Action"
+  "newAction": "New Action",
+  "schmeacreatedSuccess": "Schemas have been successfully added."
 }

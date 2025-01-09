@@ -10,11 +10,13 @@ import { MenuItem } from 'src/main/types';
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;
+    basePath?: string
 }
 
 export const DropdownSidebarMenuButton: React.FC<
     DropdownSidebarMenuButtonProps
-> = ({ menuItem }) => {
+> = ({ menuItem, basePath }) => {
+
     const [activeComponent, setActiveComponent] =
         useState<React.ReactNode | null>(null);
 
@@ -24,7 +26,8 @@ export const DropdownSidebarMenuButton: React.FC<
     const handleDropdownClick = (item) => {
         if (item.componentName) {
             setActiveComponent(item.componentName);
-            setModalProps(item.props || {});
+            setModalProps(item || {});
+            setIsOpen(true)
         } else if (item.dropdownclick) {
             item.dropdownclick(item);
         }
@@ -52,14 +55,13 @@ export const DropdownSidebarMenuButton: React.FC<
                                 handleDropdownClick({
                                     ...menu,
                                     ...menuItem,
-                                    type: menu.type,
-                                    label: menu.label,
                                     isNew: true,
                                 });
                             }}
                         >
                             {menu.label}
                         </DropdownMenuItem>
+                        
                     ))}
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -67,9 +69,10 @@ export const DropdownSidebarMenuButton: React.FC<
             {activeComponent && (
                 <div className="modal-container">
                     {React.cloneElement(activeComponent as React.ReactElement, {
-                        isOpen: true,
-                        setIsOpen,
-                        modalProps,
+                        item: modalProps,
+                        basePath: basePath,
+                        isOpen,
+                        setIsOpen
                     })}
                 </div>
             )}

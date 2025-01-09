@@ -33,7 +33,7 @@ interface AppSidebarProps {
     className?: string;
     menuItems: MenuItem[];
     config?: ConfigOptions;
-    basePath?: string;
+    basePath: string;
     header?: boolean;
 }
 
@@ -50,6 +50,8 @@ export function AppSidebar({
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
     const filteredNavData = filterSubItems(menuItems, searchQuery);
+
+    console.log(basePath)
 
     const handleSearch = (value: string) => {
         setSearchQuery(value);
@@ -164,6 +166,7 @@ export function AppSidebar({
                                                         handleSubItemClick
                                                     }
                                                     activeItem={activeItem}
+                                                    basePath={basePath}
                                                 />
                                             </SidebarMenu>
                                         )
@@ -182,12 +185,13 @@ function Three({
     item,
     handleSubItemClick,
     activeItem,
+    basePath
 }: {
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
+    basePath: string;
 }) {
-   
     const [open, setOpen] = React.useState(true);
 
     const handleOpenChange = (newState) => {
@@ -238,7 +242,7 @@ function Three({
                 </div>
 
                 <div className="opacity-0 flex items-center group-hover/icon:opacity-100">
-                    <DropdownSidebarMenuButton menuItem={item} />
+                    <DropdownSidebarMenuButton menuItem={item} basePath={basePath}/>
                 </div>
             </SidebarMenuButton>
         );
@@ -266,6 +270,7 @@ function Three({
                                 item={subItem}
                                 handleSubItemClick={handleSubItemClick}
                                 activeItem={activeItem}
+                                basePath={basePath}
                             />
                         ))}
                     </SidebarMenuSub>
