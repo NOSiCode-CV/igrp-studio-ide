@@ -1,8 +1,8 @@
 // engines/SpringEngine.ts
 import { newApi } from '@igrp/spring-engine';
-import { BaseEngine } from './BaseEngine';
 import { ProjectRepository } from '../repo/projects';
-import { BaseApiConfig } from '../engine';
+import { BaseApiConfig } from '../types';
+import { BaseEngine } from '../interfaces';
 
 export class SpringEngine implements BaseEngine {
 
@@ -17,15 +17,7 @@ export class SpringEngine implements BaseEngine {
       path: basePath,
       dt_created: new Date(),
       location: 'local',
-      config: {
-        type: apiConfig.type,
-        name: apiConfig.apiName,
-        group: apiConfig.group,
-        artifact: apiConfig.artifact,
-        database: apiConfig.database,
-        description: apiConfig.description,
-        package: apiConfig.package,
-      },
+      config: apiConfig,
     });
   }
 }

@@ -1,13 +1,8 @@
+
 export const LNG = {
     SUPPORTED_LANGUAGES: ['pt', 'en'],
     DEFAULT_LANGUAGE: 'en',
     NAMESSPACE: 'translation'
-};
-
-export enum ENV_TYPES {
-    NEXTJS = "nextjs",
-    SPRING = "springboot",
-    DOTNET = "dotnet"
 };
 
 export const PATTERNS = {
@@ -31,8 +26,8 @@ export enum OPTION_TYPE {
 export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'none';
 
 export const projectIcons = {
-    nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-    springboot: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
+    baseApp: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
+    baseApi: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
     aspnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
@@ -69,3 +64,10 @@ export const httpMethods = [
     { value: "OPTIONS", label: "OPTIONS", color: "text-indigo-500" },
     { value: "TRACE", label: "TRACE", color: "text-pink-500" },
 ]
+
+
+export enum ENV_TYPES {
+    NEXTJS = "baseApp",
+    SPRING = "baseApi",
+    DOTNET = "dotnet"
+};

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { DatabaseTypes, ProjectStructureStyle } from "@igrp/spring-engine/dist/interfaces/types";
 
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any;
 
@@ -96,3 +97,23 @@ export interface Connection {
     sshPassword?: string;
     database: string;
 }
+
+export interface BaseApiConfig {
+    type: 'baseApi' | 'dotnet';
+    apiName: string;
+    group: string;
+    artifact: string;
+    database: DatabaseTypes;
+    description?: string;
+    package?: string;
+    projectStructureStyle: ProjectStructureStyle;
+    name?: string;
+    enableObservability: boolean;
+    igrpCoreVersion: string;
+}
+
+export enum ENV_TYPES {
+    NEXTJS = "baseApp",
+    SPRING = "baseApi",
+    DOTNET = "dotnet"
+};

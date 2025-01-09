@@ -13,3 +13,7 @@ export interface IConnenctionRepository {
     async findAll(): Promise<Array<Connection>>;
     async findOne(name: string): Promise<Connection>;
 }
+
+export interface BaseEngine {
+    createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void>;
+}

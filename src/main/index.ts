@@ -1,27 +1,18 @@
-import { app, shell, BrowserWindow, ipcMain, IpcMainInvokeEvent, dialog, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { Connection, DatabaseResponse, FolderFiles, Handler, HandlerResponse, IOpenProject, Project } from './types'
-import { addController, addDTO, addModel, addModule, deleteController, deleteDTO, deleteModel, engineTypes, newApi } from '@igrp/spring-engine'
-import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
-import { fetchFiles, getJsonContent, handleWithCustomErrors, openDirectory } from './helpers'
+import { FolderFiles, HandlerResponse, IOpenProject, Project } from './types'
+
+import { fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './repo/projects'
-import {
-    BaseApiConfig,
-    ControllerConfig,
-    DTOBaseConfig,
-    DTOConfig,
-    ModelConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
+
 import { exec } from 'child_process'
-import { ConnectionRepository } from './repo/database-data'
-import { createKnexConnection, getTables, getTableStructure } from './helpers/Knex'
 
 import './handlers/apiHandler';
+import './handlers/dbHandler';
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -29,9 +20,6 @@ let mainWindow: BrowserWindow
 
 const repo = new ProjectRepository()
 
-const repoConnection = new ConnectionRepository()
-
-let globalKnex = null
 
 function createWindow(): void {
     // Create the browser window.
@@ -136,91 +124,6 @@ ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<I
     return await openDirectory(buttonLabel)
 })
 
-
-handleWithCustomErrors(
-    'spring-engine:create-api',
-    async (_event, apiConfig: BaseApiConfig, basePath: string) => {
-
-        await newApi(apiConfig, basePath)
-
-        await repo.save({
-            path: basePath,
-            dt_created: new Date(),
-            location: 'local',
-            config: {
-                type: apiConfig.type,
-                name: apiConfig.apiName,
-                group: apiConfig.group,
-                artifact: apiConfig.artifact,
-                database: apiConfig.database,
-                description: apiConfig.description,
-                package: apiConfig.package
-            }
-        })
-    }
-)
-
-handleWithCustomErrors('spring-engine:create-module', async (_event, moduleConfig, basePath) => {
-    await addModule(moduleConfig, basePath)
-})
-
-handleWithCustomErrors('spring-engine:create-model', async (_event, modelConfig, basePath) => {
-    await addModel(modelConfig, basePath)
-})
-
-handleWithCustomErrors(
-    'spring-engine:delete-model',
-    async (_event, modelConfig: ModelConfig, basePath: string) => {
-        await deleteModel(modelConfig, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'spring-engine:delete-dto',
-    async (_event, config: DTOBaseConfig, basePath: string) => {
-        await deleteDTO(config, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'spring-engine:delete-controller',
-    async (_event, config: ControllerConfig, basePath: string) => {
-        await deleteController(config, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'spring-engine:create-dto',
-    async (_event, dtoConfig: DTOConfig, basePath: string) => {
-        await addDTO(dtoConfig, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'spring-engine:create-controller',
-    async (_event, controllerConfig: ControllerConfig, basePath: string) => {
-        await addController(controllerConfig, basePath)
-    }
-)
-
-ipcMain.handle('spring-engine:fetch-selectors', async (_event, module: string, basePath: string) => {
-    return await engineTypes(module, basePath)
-})
-
-handleWithCustomErrors(
-    'next-engine:create-page',
-    async (_event, pageConfig: PageConfig, basePath: string) => {
-        await newPage(pageConfig, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:add-component-page',
-    async (_event, pageConfig: PageConfig, components: Component[], basePath: string) => {
-        await addComponentToPage(pageConfig, components, basePath)
-    }
-)
-
 ipcMain.handle(
     'igrp-studio:repo:project.findAllRecent',
     async (_event, page: { page: number; size: number }) => {
@@ -235,42 +138,6 @@ ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: Project)
 ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: Project, index: number) => {
     await repo.delete(project, index)
 })
-
-ipcMain.handle('igrp-studio:repo:connection.findAll', async (_event): Promise<Array<Connection>> => {
-    return await repoConnection.findAll()
-})
-
-ipcMain.handle('igrp-studio:repo:connection.save', async (_event, connection: Connection) => {
-    await repoConnection.save(connection)
-})
-
-ipcMain.handle('igrp-studio:repo:connection.delete', async (_event, connectionName: string) => {
-    await repoConnection.delete(connectionName)
-})
-
-
-handleWithCustomErrors(
-    'next-engine:create-app',
-    async (_event, appConfig: AppConfig, basePath: string) => {
-        await newApp(appConfig, basePath)
-        await repo.save({
-            path: basePath,
-            dt_created: new Date(),
-            location: 'local',
-            config: {
-                type: appConfig.type,
-                name: appConfig.appName
-            }
-        })
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:delete-page',
-    async (_event, pageConfig: PageConfig, basePath: string) => {
-        await deletePage(pageConfig, basePath)
-    }
-)
 
 ipcMain.handle(
     'igrp-studio:fetch-files',
@@ -369,37 +236,3 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
 });
 
 
-// IPC Handlers Database
-ipcMain.handle('connect-database', async (_event, config): Promise<DatabaseResponse> => {
-    try {
-        globalKnex = await createKnexConnection(config);
-        return { success: true, message: 'Connected successfully' };
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'An unknown error occurred';
-        return { success: false, message };
-    }
-});
-
-ipcMain.handle('get-tables', async (_event, connectionName): Promise<DatabaseResponse> => {
-    try {
-        const connectionConfig: Connection = await repoConnection.findOne(connectionName)
-        const knex = globalKnex || await createKnexConnection(connectionConfig)
-        const tables = await getTables(knex);
-        return { success: true, tables };
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'An unknown error occurred';
-        return { success: false, message };
-    }
-});
-
-ipcMain.handle('get-table-structure', async (_event, connectionName, tableName) => {
-    try {
-        const connectionConfig: Connection = await repoConnection.findOne(connectionName)
-        const knex = globalKnex || await createKnexConnection(connectionConfig)
-        const structure = await getTableStructure(knex, tableName);
-        return { success: true, structure };
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'An unknown error occurred';
-        return { success: false, message };
-    }
-});

@@ -31,7 +31,7 @@ export function CreateProject() {
     const [open, setOpen] = useState(false);
     const [versions, setVersions] = useState({});
 
-    const mainFrameworks = ['nextjs', 'springboot', 'aspnet'];
+    const mainFrameworks = ['baseApp', 'baseApi', 'aspnet'];
     const additionalFrameworks = ['vuejs', 'angular', 'laravel', 'django'];
 
     useEffect(() => {

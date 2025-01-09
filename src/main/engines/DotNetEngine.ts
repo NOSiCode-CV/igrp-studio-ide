@@ -1,14 +1,14 @@
 // engines/DotNetEngine.ts
-import { BaseApiConfig } from '../engine';
+import { BaseEngine } from '../interfaces';
 import { ProjectRepository } from '../repo/projects';
-import { BaseEngine } from './BaseEngine';
+import { BaseApiConfig } from '../types';
 
 export class DotNetEngine implements BaseEngine {
   async createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void> {
 
     const repo = new ProjectRepository()
 
-     await newApi(apiConfig, basePath);
+    //await newApi(apiConfig, basePath);
 
     // Lógica específica do .NET
     console.log('Creating API for .NET');
@@ -16,14 +16,7 @@ export class DotNetEngine implements BaseEngine {
       path: basePath,
       dt_created: new Date(),
       location: 'local',
-      config: {
-        type: apiConfig.type,
-        name: apiConfig.apiName,
-        framework: apiConfig.framework, // Específico do .NET
-        database: apiConfig.database,
-        description: apiConfig.description,
-        namespace: apiConfig.namespace,
-      },
+      config:apiConfig,
     });
   }
 }

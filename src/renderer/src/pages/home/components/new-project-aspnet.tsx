@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
+import { PATTERNS, ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
 import {
@@ -11,7 +11,7 @@ import {
 } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
 import { ConfigOptions } from 'src/main/types';
-import { BaseApiConfig } from 'src/main/engine';
+import { BaseApiConfig } from 'src/main/types';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@renderer/components/ui/button';
 import { Label } from '@renderer/components/ui/label';

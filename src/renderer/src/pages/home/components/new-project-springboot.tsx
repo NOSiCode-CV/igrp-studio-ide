@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
+import {PATTERNS, ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
 import {
