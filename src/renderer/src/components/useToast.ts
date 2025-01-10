@@ -28,7 +28,7 @@ const useToast = () => {
 		const errors = Array.isArray(error) ? error : [error];
 
 		errors.forEach(err => {
-			const errorMessage = err.message || err || 'An unknown error occurred';
+			const errorMessage = err?.message || err || 'An unknown error occurred';
 			displayError(errorMessage);
 		});
 

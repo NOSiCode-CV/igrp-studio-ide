@@ -1,6 +1,6 @@
-import { dialog } from 'electron';
+import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join, basename } from 'path';
-import { ConfigOptions, IOpenProject, File, FolderFileStructure, FolderFiles } from '../types';
+import { ConfigOptions, IOpenProject, File, FolderFileStructure, FolderFiles, Handler } from '../types';
 import { promisify } from 'util';
 const fs = require("fs");
 
@@ -192,4 +192,14 @@ export async function getJsonContent(filePath: string): Promise<any> {
 
 export function addNumbers(a: number, b: number) {
 	return a + b;
+}
+
+export const handleWithCustomErrors = (channel: string, handler: Handler) => {
+	ipcMain.handle(channel, async (event: IpcMainInvokeEvent, ...args: any[]) => {
+		try {
+			return { result: await Promise.resolve(handler(event, ...args)) }
+		} catch (e) {
+			return { error: e }
+		}
+	})
 }

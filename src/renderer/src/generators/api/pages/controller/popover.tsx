@@ -23,6 +23,7 @@ import { Switch } from '@renderer/components/ui/Switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
 import { toInitCap } from '@renderer/utils/helpers';
+import CodeEditor from '@renderer/components/code-editor';
 
 interface PopoverProps {
     children?: ReactNode;
@@ -41,6 +42,8 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
         setIsInteger(row?.['type'] === 'integer' || row?.['type'] === 'long');
         setIsBoolean(row?.['type'] === 'boolean');
     }, [row]);
+
+    const handleChangeEditor = (value) => {};
 
     return (
         <Popover>
@@ -62,7 +65,7 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                     {t('Open advanced settings')}
                 </TooltipContent>
             </Tooltip>
-            <PopoverContent className="w-100" align="end" side="bottom">
+            <PopoverContent className="w-[425px]" align="end" side="bottom">
                 <Tabs defaultValue="dataType">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="dataType">
@@ -277,7 +280,13 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                             )}
                         </div>
                     </TabsContent>
-                    <TabsContent value="jsonSchema"></TabsContent>
+                    <TabsContent value="jsonSchema">
+                        <CodeEditor
+                            value={JSON.stringify(row, null, 2)}
+                            onChange={handleChangeEditor}
+                            className="w-100"
+                        />
+                    </TabsContent>
                 </Tabs>
             </PopoverContent>
         </Popover>

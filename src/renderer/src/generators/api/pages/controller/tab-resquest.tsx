@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import { Card, CardContent } from '@renderer/components/ui/card';
+import CodeEditor from '@renderer/components/code-editor';
+
 interface TabRequestProps {
     formik: any;
     tablesColumns: any;
@@ -46,6 +48,15 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     const columnsHeaders = tablesColumns[tabHeaders];
     const columnsBody = tablesColumns[tabBody];
 
+    const properties = [
+        {
+            type: '',
+            name: '',
+            value: '',
+            isRequired: true,
+        },
+    ];
+
     const handleBodyTypeChange = (
         type: 'none' | 'multipart/form-data' | 'json'
     ) => {
@@ -58,14 +69,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
             const content = {
                 'multipart/form-data': {
                     type: 'Object',
-                    properties: [
-                        {
-                            type: '',
-                            name: '',
-                            value: '',
-                            isRequired: true,
-                        },
-                    ],
+                    properties,
                 },
             };
 
@@ -87,6 +91,16 @@ export const TabRequest: React.FC<TabRequestProps> = ({
         const content = {
             [contentType]: {
                 schema: newSchema,
+            },
+        };
+
+        formik.setFieldValue('requestBody', { content });
+    };
+
+    const handleChangeEditor = (value) => {
+        const content = {
+            [contentType]: {
+                schema: value,
             },
         };
 
@@ -219,7 +233,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                 data={
                                     formik.values[tabBody][
                                         'multipart/form-data'
-                                    ]['properties'] || []
+                                    ]?.['properties'] || properties
                                 }
                                 formik={formik}
                                 changeValue={(element, position, value) =>
@@ -269,22 +283,18 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                         </TabsList>
                                         <TabsContent value="value">
                                             <div className="mt-3">
-                                                <textarea
+                                                <CodeEditor
                                                     value={
-                                                        formik.values[
-                                                            'bodyContent'
-                                                        ]
+                                                        formik.values
+                                                            .bodyContent?.[
+                                                            'content'
+                                                        ] || ''
                                                     }
-                                                    onChange={(e) =>
-                                                        formik.setFieldValue(
-                                                            'bodyContent',
-                                                            e.target.value
-                                                        )
+                                                    onChange={
+                                                        handleChangeEditor
                                                     }
-                                                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp sm:text-sm"
-                                                    rows={6}
-                                                    placeholder="Enter JSON body"
-                                                ></textarea>
+                                                    className="my-custom-class"
+                                                />
                                             </div>
                                         </TabsContent>
                                         <TabsContent value="schema">

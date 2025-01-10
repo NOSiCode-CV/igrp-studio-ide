@@ -11,6 +11,12 @@ import { Plus } from 'lucide-react';
 import { SchemaFieldRow } from './SchemaFieldRow';
 import { JSONSchema, SchemaField } from '../../types/schema';
 import { JSONSchemaModal } from './JSONSchemaModal';
+import {
+    Tooltip,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { TooltipContent } from '@radix-ui/react-tooltip';
 
 interface JSONSchemaBuilderProps {
     schemaTypes?: { label: string; value: string }[];
@@ -373,15 +379,25 @@ export function JSONSchemaBuilder({
                     <TableHead>Type</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead className="text-right">
-                        <Button
-                            onClick={() => handleAddNewField()}
-                            variant="ghost"
-                            size="sm"
-                            className="text-green-500 h-6 w-6"
-                        >
-                            <Plus size={14} />
-                            <span className="sr-only">Add new field</span>
-                        </Button>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={() => handleAddNewField()}
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-green-500 h-6 w-6"
+                                    >
+                                        <Plus size={14} />
+                                        <span className="sr-only">
+                                            Add new field
+                                        </span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Add new field</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                       
                         <JSONSchemaModal
                             generateJSONSchema={generateJSONSchema}
                         />

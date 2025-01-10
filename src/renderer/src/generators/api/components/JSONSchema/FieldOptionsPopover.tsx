@@ -18,6 +18,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Separator } from '@renderer/components/ui/separator';
+import CodeEditor from '@renderer/components/code-editor';
 
 interface FieldOptionsPopoverProps {
     field: SchemaField;
@@ -41,6 +42,10 @@ export function FieldOptionsPopover({
 		const updatedField = { ...field, [key]: value  };
         onUpdate(updatedField);
     };
+
+    const handleChangeEditor = (value)=>{
+
+    }
 
     return (
         <Popover>
@@ -68,7 +73,7 @@ export function FieldOptionsPopover({
           </TooltipContent>
         </Tooltip> */}
             </PopoverTrigger>
-            <PopoverContent className="w-100">
+            <PopoverContent className="w-[425px]">
                 <Tabs defaultValue="dataType">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="dataType">
@@ -327,6 +332,12 @@ export function FieldOptionsPopover({
                                 />
                             </div>
                         </div>
+                    </TabsContent>
+                    <TabsContent value="jsonSchema">
+                        <CodeEditor
+                            value={JSON.stringify(field, null, 2)}
+                            onChange={handleChangeEditor}
+                        />
                     </TabsContent>
                 </Tabs>
             </PopoverContent>

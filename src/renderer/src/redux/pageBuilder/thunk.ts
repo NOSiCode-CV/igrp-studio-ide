@@ -1,5 +1,4 @@
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { ConfigOptions, FolderFiles } from '../../../../main/types';
 
 import {
   setConfigAction,
@@ -10,6 +9,7 @@ import {
 } from './reducer';
 import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
+import { ConfigOptions, FolderFiles } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 /**
  * set BasePath

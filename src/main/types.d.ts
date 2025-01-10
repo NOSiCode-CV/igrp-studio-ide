@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { DatabaseTypes, ProjectStructureStyle } from "@igrp/spring-engine/dist/interfaces/types";
 
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any;
 
@@ -19,7 +20,7 @@ export type Project = {
     config: ConfigOptions
     dt_created?: Date,
     dt_updated?: Date,
-    location: location
+    location?: location
 }
 
 export interface ConfigOptions {
@@ -39,14 +40,6 @@ export type Page = {
 }
 
 export type PageableProjects = { data: Array<Project>, total: number }
-
-export interface IProjectRepository {
-    async save(project: Project): Promise<Project>;
-    async delete(project: Project, index: number): Promise<void>;
-    async findAllRecent(page: Page): Promise<PageableProjects>;
-    async findAll(): Promise<Array<Project>>;
-
-}
 
 export interface MenuItem {
     id?: string; // id might be optional
@@ -95,3 +88,42 @@ export interface Repository {
   clone_url: string;
   updated_at: string | null;
 }
+export interface DatabaseResponse {
+    success: boolean, message?: string, tables?: any, structure?: any
+}
+
+export interface Connection {
+    description?: string;
+    name: string;
+    databaseType: string;
+    connectionType: 'general' | 'ssh';
+    host: string;
+    port: number | null;
+    user: string;
+    password: string;
+    sshHost?: string;
+    sshPort?: string;
+    sshUsername?: string;
+    sshPassword?: string;
+    database: string;
+}
+
+export interface BaseApiConfig {
+    type: 'baseApi' | 'dotnet';
+    apiName: string;
+    group: string;
+    artifact: string;
+    database: DatabaseTypes;
+    description?: string;
+    package?: string;
+    projectStructureStyle: ProjectStructureStyle;
+    name?: string;
+    enableObservability: boolean;
+    igrpCoreVersion: string;
+}
+
+export enum ENV_TYPES {
+    NEXTJS = "baseApp",
+    SPRING = "baseApi",
+    DOTNET = "dotnet"
+};

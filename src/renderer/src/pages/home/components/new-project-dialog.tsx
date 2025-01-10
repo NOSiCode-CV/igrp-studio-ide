@@ -24,29 +24,15 @@ import { PlusCircle, MoreHorizontal } from 'lucide-react';
 import FormNewProjectNextJS from './new-project-nextjs';
 import FormNewProjectSpring from './new-project-springboot';
 import { HandlerResponse } from 'src/main/types';
+import FormNewProjectAspent from './new-project-aspnet';
+import { projectIcons } from '@renderer/constants/appConstants';
 
 export function CreateProject() {
     const [open, setOpen] = useState(false);
     const [versions, setVersions] = useState({});
 
-    const projectIcons = {
-        nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-        springboot: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-        aspnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
-        vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
-        angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
-        laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
-        django: 'https://www.svgrepo.com/show/353657/django-icon.svg',
-    };
-
-    const mainFrameworks = ['nextjs', 'springboot'];
-    const additionalFrameworks = [
-        'aspnet',
-        'vuejs',
-        'angular',
-        'laravel',
-        'django',
-    ];
+    const mainFrameworks = ['baseApp', 'baseApi', 'aspnet'];
+    const additionalFrameworks = ['vuejs', 'angular', 'laravel', 'django'];
 
     useEffect(() => {
         const getVersions = async () => {
@@ -83,7 +69,7 @@ export function CreateProject() {
                 </DialogHeader>
                 <Tabs defaultValue="nextjs">
                     <div className="flex items-center justify-between mb-4">
-                        <TabsList className="flex-grow grid grid-cols-2 max-w-none bg-muted dark:bg-gray-700">
+                        <TabsList className="flex-grow grid grid-cols-3 max-w-none bg-muted dark:bg-gray-700">
                             {mainFrameworks.map((framework) => (
                                 <TabsTrigger
                                     key={framework}
@@ -134,6 +120,9 @@ export function CreateProject() {
                     </TabsContent>
                     <TabsContent value="springboot">
                         <FormNewProjectSpring versions={versions} />
+                    </TabsContent>
+                    <TabsContent value="aspnet">
+                        <FormNewProjectAspent versions={versions} />
                     </TabsContent>
                 </Tabs>
             </DialogContent>

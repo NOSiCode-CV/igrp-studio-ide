@@ -7,11 +7,8 @@ import {
     getTablesColumns,
     TabList,
     initialValues,
+    getValuesToSubmit,
 } from './config';
-import {
-    ModelConfig,
-    Relation,
-} from '@igrp/spring-engine/dist/interfaces/types';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
@@ -50,6 +47,7 @@ const ModelLayout = ({
     onCloseTab,
     onUpdateTab,
 }: ModelProps): JSX.Element => {
+
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const [tablesColumns, setTableColumns] = useState<{
@@ -99,9 +97,6 @@ const ModelLayout = ({
             try {
                 const data = await window.api.getJsonContent(currentItem.path);
                 setData(data);
-                //setOption(currentItem.subType || currentItem.type)
-                //setModule(currentItem.module)
-                //dispatch(setCurrentItem(null))
             } catch (error) {
                 console.error('Failed to load JSON content:', error);
             }
@@ -176,64 +171,9 @@ const ModelLayout = ({
         } else formik.resetForm();
     }, [data]);
 
-    const getValuesToSubmit = () => {
-        const values = { ...formik.values };
-        const enableCrud = values.enableCrud || false;
-        const generationType = values.generationType;
-
-        delete values.enableCrud;
-        delete values.generationType;
-
-        const relations: Relation[] =
-            values.relations?.filter((rel) => rel.relationType !== '') || [];
-
-        const uniqueConstraints =
-            values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
-
-        const indexes = values.indexes?.filter((idx) => idx.name !== '') || [];
-
-        const attributes = values.attributes.map(({ ...field }) => ({
-            ...field,
-            length: field.length ? Number(field.length) : 255,
-            nullable: !field.nullable,
-            generationType: field.primaryKey === true ? generationType : '',
-        }));
-
-        const primaryKey = values.attributes
-            .filter((attribute) => attribute.primaryKey === true)
-            .map(({ name, type }) => ({
-                name,
-                type,
-            }));
-
-        const hasListPk = primaryKey.length > 1 ? true : false;
-
-        const filteredAttributes = hasListPk
-            ? attributes.filter((attribute) => attribute.primaryKey !== true)
-            : attributes;
-
-        const newValues: ModelConfig = {
-            ...values,
-            attributes: filteredAttributes,
-            relations,
-            uniqueConstraints,
-            indexes,
-            crud: {
-                ...values.crud?.[0],
-                enabled: enableCrud,
-            },
-            primaryKey: hasListPk ? primaryKey : [],
-            module: currentItem.module,
-        };
-
-        if (!enableCrud && !newValues.crud?.path) delete newValues.crud;
-
-        return newValues;
-    };
-
     const handleSave = async (): Promise<void> => {
         try {
-            const values = getValuesToSubmit();
+            const values = getValuesToSubmit(formik.values, currentItem.module);
 
             const { error } = await window.api.createModel(values, basePath);
 
@@ -256,7 +196,7 @@ const ModelLayout = ({
 
     const deleteModel = async (): Promise<void> => {
         try {
-            const values = getValuesToSubmit();
+            const values = getValuesToSubmit(formik.values, currentItem.module);
 
             const { error } = await window.api.deleteModel(values, basePath);
 
@@ -296,21 +236,11 @@ const ModelLayout = ({
                             )
                         }
                         errors={errors}
-                        addRow={
-                            value === 'crud'
-                                ? undefined
-                                : () =>
-                                      addNewRow(
-                                          formik,
-                                          value,
-                                          defaultValues[value]
-                                      )
+                        addRow={() =>
+                            addNewRow(formik, value, defaultValues[value])
                         }
-                        removeRow={
-                            value === 'crud'
-                                ? undefined
-                                : (position) =>
-                                      removeRow(formik, value, position)
+                        removeRow={(position) =>
+                            removeRow(formik, value, position)
                         }
                         btnLabels={btnLabels[value]}
                         name={value}

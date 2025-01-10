@@ -1,8 +1,10 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
-import { IProjectRepository } from '@renderer/interfaces/types'
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { Connection, IConnenctionRepository } from 'src/main/types';
+import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
+
 
 interface CustomAPI {
 
@@ -15,7 +17,6 @@ interface CustomAPI {
     deleteDTO: (config: DTOBaseConfig, basePath: string) => Promise<HandlerResponse>;
     deleteModel: (config: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     deleteController: (config: ControllerConfig, basePath: string) => Promise<HandlerResponse>;
-
 
     createPage: (modelConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     deletePage: (pageConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
@@ -33,7 +34,18 @@ interface CustomAPI {
 
     getVersions: (endpoint: string) => Promise<HandlerResponse>,
 
+    //Database
+    connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
+
+    getTables: (connectionName: string) => Promise<DatabaseResponse>,
+
+    getTableStructure: (connectionName: string, tableName: string) => Promise<DatabaseResponse>,
+
     i18nextElectronBackend: any
+}
+
+interface BaseEngine {
+    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
 }
 
 interface CustomMenu {
@@ -48,7 +60,8 @@ declare global {
     interface Window {
         electron: ElectronAPI
         api: CustomAPI,
-        repo: { project: IProjectRepository },
-        menu: CustomMenu
+        repo: { project: IProjectRepository, connection: IConnenctionRepository },
+        menu: CustomMenu,
+        engine: BaseEngine
     }
 }

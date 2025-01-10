@@ -1,12 +1,8 @@
+
 export const LNG = {
     SUPPORTED_LANGUAGES: ['pt', 'en'],
     DEFAULT_LANGUAGE: 'en',
     NAMESSPACE: 'translation'
-};
-
-export enum ENV_TYPES {
-    NEXTJS = "baseApp",
-    SPRING = "baseApi"
 };
 
 export const PATTERNS = {
@@ -24,13 +20,19 @@ export enum OPTION_TYPE {
     CONTROLLERS = "controllers",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
+    IMPORT_TABLE_DB = 'import_table_db',
 };
 
 export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'none';
 
 export const projectIcons = {
-    [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-    [ENV_TYPES.SPRING]: 'https://www.svgrepo.com/show/354380/spring-icon.svg'
+    baseApp: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
+    baseApi: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
+    aspnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
+    vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
+    angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
+    laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
+    django: 'https://www.svgrepo.com/show/353657/django-icon.svg',
 }
 
 export const PAGE_DEFAULT = 'Overview'
@@ -62,3 +64,10 @@ export const httpMethods = [
     { value: "OPTIONS", label: "OPTIONS", color: "text-indigo-500" },
     { value: "TRACE", label: "TRACE", color: "text-pink-500" },
 ]
+
+
+export enum ENV_TYPES {
+    NEXTJS = "baseApp",
+    SPRING = "baseApi",
+    DOTNET = "dotnet"
+};

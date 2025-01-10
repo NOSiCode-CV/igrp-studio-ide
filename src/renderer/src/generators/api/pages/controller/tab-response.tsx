@@ -15,6 +15,8 @@ import {
     CardTitle,
 } from '@renderer/components/ui/card';
 import { AddResponseMenu } from './add-response-menu';
+import { Button } from '@renderer/components/ui/button';
+import { Trash } from 'lucide-react';
 
 interface TabResponseProps {
     formik: any;
@@ -46,7 +48,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                 description: name,
                 content: {
                     [contentType]: {
-                        schema: {},
+                        schema: null,
                     },
                 },
             },
@@ -73,8 +75,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         // Se o schema for o mesmo, não faça nada
         if (
             currentSchema &&
-            JSON.stringify(currentSchema.schema) ===
-                JSON.stringify(newSchema)
+            JSON.stringify(currentSchema.schema) === JSON.stringify(newSchema)
         ) {
             return; // Não há mudanças, então não faça nada
         }
@@ -90,7 +91,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                         ...formik.values.responses[statusCode]?.content[
                             contentType
                         ],
-                        schema: newSchema || {},
+                        schema: newSchema,
                     },
                 },
             },
@@ -101,6 +102,19 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
     const handleAddBlankResponse = () => {
         setIsModalOpen(true);
+    };
+
+    const handleClose = (statusCode: string) => {
+        const updatedResponses = { ...responses };
+        delete updatedResponses[statusCode];
+
+        formik.setFieldValue('responses', updatedResponses);
+        setResponses(updatedResponses);
+
+        if (activeResponseTab === statusCode) {
+            const remainingTabs = Object.keys(updatedResponses);
+            setActiveResponseTab(remainingTabs[0]);
+        }
     };
 
     return (
@@ -198,7 +212,18 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         className="w-full focus:ring-igrp focus:border-igrp h-9"
                                     />
                                 </div>
+                                {Object.keys(responses).length > 1 && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="absolute right-3"
+                                        onClick={() => handleClose(statusCode)}
+                                    >
+                                        <Trash />
+                                    </Button>
+                                )}
                             </div>
+
                             <Card className="rounded">
                                 <CardHeader>
                                     <CardTitle>Data Schema</CardTitle>

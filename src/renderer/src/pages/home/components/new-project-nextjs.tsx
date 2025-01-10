@@ -11,7 +11,7 @@ import { ConfigOptions } from 'src/main/types'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
-import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
+import { PATTERNS, ENV_TYPES } from '@renderer/constants/appConstants'
 import { PlusCircle } from 'lucide-react'
 
 const initialValues: AppConfig = {
