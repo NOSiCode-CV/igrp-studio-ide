@@ -1,5 +1,5 @@
 import React from "react";
-import { SidebarHeader, SidebarMenuButton } from "@renderer/components/ui/sidebar";
+import { SidebarHeader } from "@renderer/components/ui/sidebar";
 import FormSearch from "../components/app-search";
 import { CreateModuleDialog } from "@renderer/generators/api/components/create-module-dialog";
 import { cn } from "@renderer/lib/utils";

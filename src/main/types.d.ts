@@ -84,3 +84,14 @@ export interface FolderFileStructure {
     files: Array<Record<string, File[]>>; // Group files by subfolder
     path: string;
 }
+
+export interface Repository {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string | null;
+  private: boolean;
+  html_url: string;
+  clone_url: string;
+  updated_at: string | null;
+}

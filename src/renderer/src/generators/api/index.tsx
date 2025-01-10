@@ -45,7 +45,7 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
         });
     };
 
-    const handleUpdateTab = (oldId: string, newId: string) => {
+    const handleUpdateTab = (_oldId: string, _newId: string) => {
         /*  setTabs((prevTabs) =>
       prevTabs.map((t) =>
         t.id === oldId

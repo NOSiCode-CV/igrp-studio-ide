@@ -11,7 +11,6 @@ import { ScrollArea, ScrollBar } from '../../../components/ui/scroll-area';
 import { getIcon } from '@renderer/utils/helpers';
 import {
     ContextMenu,
-    ContextMenuCheckboxItem,
     ContextMenuContent,
     ContextMenuItem,
     ContextMenuShortcut,

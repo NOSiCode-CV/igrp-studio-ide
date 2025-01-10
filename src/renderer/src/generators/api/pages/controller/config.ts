@@ -1,4 +1,3 @@
-import { Schema } from "yup"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 
@@ -72,26 +71,26 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
         )?.HTTP_HEADER_TYPES || []
     )
 
-    const requestBodyData = formatMethods(
-        (
-            selectors.find((selector) => 'BODY_REQUEST' in selector) as
-            | { BODY_REQUEST: string[] }
-            | undefined
-        )?.BODY_REQUEST || []
-    )
+    // const requestBodyData = formatMethods(
+    //     (
+    //         selectors.find((selector) => 'BODY_REQUEST' in selector) as
+    //         | { BODY_REQUEST: string[] }
+    //         | undefined
+    //     )?.BODY_REQUEST || []
+    // )
 
-    const typesData = formatMethods(
-        (selectors.find((selector) => 'MYME_TYPES' in selector) as { MYME_TYPES: string[] } | undefined)
-            ?.MYME_TYPES || []
-    )
+    // const typesData = formatMethods(
+    //     (selectors.find((selector) => 'MYME_TYPES' in selector) as { MYME_TYPES: string[] } | undefined)
+    //         ?.MYME_TYPES || []
+    // )
 
-    const responseTypesData = formatMethods(
-        (
-            selectors.find((selector) => 'RESPONSE_TYPES' in selector) as
-            | { RESPONSE_TYPES: string[] }
-            | undefined
-        )?.RESPONSE_TYPES || []
-    )
+    // const responseTypesData = formatMethods(
+    //     (
+    //         selectors.find((selector) => 'RESPONSE_TYPES' in selector) as
+    //         | { RESPONSE_TYPES: string[] }
+    //         | undefined
+    //     )?.RESPONSE_TYPES || []
+    // )
 
     const paramsTypesData = formatMethods(
         (

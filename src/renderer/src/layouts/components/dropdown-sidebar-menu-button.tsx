@@ -7,7 +7,6 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 import { MenuItem } from 'src/main/types';
-import { SidebarMenuAction } from '@renderer/components/ui/sidebar';
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;

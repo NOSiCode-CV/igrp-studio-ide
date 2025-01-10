@@ -7,6 +7,7 @@ export const buildJsonStructure = (components: HierarchicalComponent[]): Compone
             {
                 Col: row.columns.map(col => ({
                     id: col.id,
+                    colSize: col.colSize,
                     components: col.components.map(({ ...comp }) => comp as any),
                 })),
             },

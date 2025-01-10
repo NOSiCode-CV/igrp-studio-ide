@@ -66,7 +66,7 @@ const RecentsProjects = (): JSX.Element => {
 
   useEffect(() => {
     const localProjects = allProjects.data.filter(
-      (project) => project?.location === undefined //|| project?.location === 'local'
+      (project) => project?.location === undefined || project?.location === 'local'
     )
     setLocalProjects(localProjects)
   }, [allProjects])

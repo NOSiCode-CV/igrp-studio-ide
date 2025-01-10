@@ -158,7 +158,7 @@ export function SchemaFieldRow({
                         }}
                         onDelete={() => {
                             const { [subId]: _, ...newProperties } =
-                                field.properties;
+                                field.properties || {};
                             onUpdate(
                                 { ...field, properties: newProperties },
                                 index

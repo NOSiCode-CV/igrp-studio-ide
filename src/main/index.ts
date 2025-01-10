@@ -18,6 +18,21 @@ import {
 } from '@igrp/spring-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { exec } from 'child_process'
+import { handleProtocolCallback, setupGitHubOAuth } from './helpers/github'
+
+import { TokenService } from './services/token-service';
+import { GitHubService } from './services/github-service';
+
+const isDev = process.env.NODE_ENV === 'development';
+if (!isDev) {
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient('igrp-studio');
+  }
+}
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -69,10 +84,19 @@ function createWindow(): void {
   installExtensions(mainWindow)
 }
 
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]])
+  }
+} else {
+  app.setAsDefaultProtocolClient('igrp-studio')
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -86,14 +110,19 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
+  // Initialize services github and token
+  await GitHubService.initializeServices();
   createWindow()
 
+ 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -117,6 +146,45 @@ const handleWithCustomErrors = (channel: string, handler: Handler) => {
   })
 }
 
+// Handler para o protocolo personalizado AUTH
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  const mainWindow = BrowserWindow.getFocusedWindow();
+  if (mainWindow && url.startsWith('igrp-studio://')) {
+    handleProtocolCallback(url, mainWindow);
+  }
+});
+
+// Suporte para Windows em produção
+app.on('second-instance', (_event, commandLine) => {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+  if (mainWindow) {
+    const url = commandLine.find(arg => arg.startsWith('igrp-studio://'));
+    if (url) {
+      handleProtocolCallback(url, mainWindow);
+    }
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
+ipcMain.on('github-oauth', async () => {
+  const mainWindow = BrowserWindow.getFocusedWindow();
+  if (!mainWindow) return;
+
+  try {
+    await setupGitHubOAuth(mainWindow, isDev);
+  } catch (error) {
+    console.error('OAuth setup failed:', error);
+  }
+});
+
+// Handler para o protocolo personalizado
+app.on('open-url', (event) => {
+  event.preventDefault();
+  // O app será focado automaticamente quando receber o protocolo
+});
+
 ipcMain.on('open-directory-dialog', async (event) => {
   await dialog
     .showOpenDialog(mainWindow, {
@@ -134,6 +202,43 @@ ipcMain.on('open-directory-dialog', async (event) => {
 ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<IOpenProject> => {
   return await openDirectory(buttonLabel)
 })
+
+ipcMain.on('save-token', async (_event, token) => {
+  TokenService.setToken(token);
+  await GitHubService.initialize(token);
+});
+
+// IGRP Studio github handlers
+ipcMain.handle('github-initialize', async (_event, token) => {
+  await GitHubService.initialize(token);
+  TokenService.setToken(token);
+  return true;
+});
+
+ipcMain.handle('github-user-info', async () => {
+  return GitHubService.getUserInfo();
+});
+
+// ipcMain.handle('github-repositories', async () => {
+//   return GitHubService.listRepositories();
+// });
+
+ipcMain.handle('github-repositories', async (event) => {
+  const mainWindow = BrowserWindow.fromWebContents(event.sender);
+  return GitHubService.listIGRPStudioRepositories(mainWindow as BrowserWindow);
+});
+
+ipcMain.handle('clone-repository', async (event, repoUrl) => {
+  const mainWindow = BrowserWindow.fromWebContents(event.sender);
+  return GitHubService.cloneRepository(repoUrl, mainWindow as BrowserWindow);
+});
+
+ipcMain.handle('list-branches', async (_event, projectPath) => {
+  return GitHubService.listBranches(projectPath);
+});
+ipcMain.handle('checkout-branch', async (_event, { projectPath, branchName }) => {
+  return GitHubService.checkoutBranch(projectPath, branchName);
+});
 
 const repo = new ProjectRepository()
 

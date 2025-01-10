@@ -10,7 +10,7 @@ interface ContextMenuProps {
 }
 
 export const ContextMenuTabApi: React.FC<ContextMenuProps> = (
-    isOpen,
+    _isOpen,
     onClose
 ) => {
     return (
