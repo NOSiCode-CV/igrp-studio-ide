@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import { PATTERNS, ENV_TYPES } from '@renderer/constants/appConstants';
+import { PATTERNS, ENV_TYPES, DatabaseOptions, projectStructureStyle } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
 import {
@@ -25,21 +25,9 @@ import { PlusCircle } from 'lucide-react';
 import { Combobox } from '@igrp/igrp-design-system';
 import { Textarea } from '@renderer/components/ui/Textarea';
 
-const DatabaseOptions = [
-    { value: 'Postgresql', label: 'PostgreSQL' },
-    { value: 'Oracle', label: 'Oracle' },
-    { value: 'MySQL', label: 'MySQL' },
-];
-
-const projectStructureStyle = [
-    { value: 'technical', label: 'Technical' },
-    { value: 'domain', label: 'Domain' },
-];
-
 const initialValues: BaseApiConfig = {
     type: ENV_TYPES.DOTNET,
     apiName: '',
-    group: '',
     description: '',
     artifact: '',
     database: 'Postgresql',
@@ -61,7 +49,6 @@ const FormNewProjectAspent = ({ versions }): JSX.Element => {
             .required(t('thisFieldRequired', { name: 'Name' }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
             .max(20, t('maxLengthExceeded', { max: 20 })),
-        group: Yup.string().required(t('fieldRequired', { name: 'Group' })),
         artifact: Yup.string().required(
             t('fieldRequired', { name: 'Artifact' })
         ),
@@ -106,7 +93,6 @@ const FormNewProjectAspent = ({ versions }): JSX.Element => {
             const config: ConfigOptions = {
                 type: formData.type,
                 name: formData.name,
-                group: formData.group,
                 description: formData.description,
                 artifact: formData.artifact,
                 database: formData.database,
@@ -126,18 +112,6 @@ const FormNewProjectAspent = ({ versions }): JSX.Element => {
         } catch (error) {
             showErrorToast(error);
         }
-    };
-
-    const PackageName = () => {
-        return (
-            <>
-                {formik.values.group && (
-                    <p className="w-full text-sm font-medium italic -mt-2">
-                        {`Package Name: ${formik.values.group.replace(/[-\s]/g, '_')}.${formik.values.artifact.replace(/[-\s]/g, '_')}`}
-                    </p>
-                )}
-            </>
-        );
     };
 
     return (
@@ -179,43 +153,22 @@ const FormNewProjectAspent = ({ versions }): JSX.Element => {
                     ></Textarea>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="group">{t('group')}</Label>
-                        <Input
-                            type="text"
-                            id="group"
-                            placeholder="Group"
-                            className={`w-full p-2 rounded-md ${formik.touched.group && formik.errors.group ? 'border-red-500' : 'border-gray-300'}`}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={formik.values.group || ''}
-                        />
-                        {formik.touched.group && formik.errors.group ? (
-                            <p className="text-sm text-red-500">
-                                {formik.errors.group}
-                            </p>
-                        ) : null}
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="artifact">{t('artifact')}</Label>
-                        <Input
-                            type="text"
-                            id="artifact"
-                            placeholder="Artifact"
-                            className={`w-full p-2 border rounded-md ${formik.touched.artifact && formik.errors.artifact ? 'border-red-500' : 'border-gray-300'}`}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={formik.values.artifact || ''}
-                        />
-                        {formik.touched.artifact && formik.errors.artifact ? (
-                            <p className="text-sm text-red-500">
-                                {formik.errors.artifact}
-                            </p>
-                        ) : null}
-                    </div>
-                    <PackageName />
+                <div className="space-y-2">
+                    <Label htmlFor="artifact">{t('artifact')}</Label>
+                    <Input
+                        type="text"
+                        id="artifact"
+                        placeholder="Artifact"
+                        className={`w-full p-2 border rounded-md ${formik.touched.artifact && formik.errors.artifact ? 'border-red-500' : 'border-gray-300'}`}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.artifact || ''}
+                    />
+                    {formik.touched.artifact && formik.errors.artifact ? (
+                        <p className="text-sm text-red-500">
+                            {formik.errors.artifact}
+                        </p>
+                    ) : null}
                 </div>
 
                 <div className="space-y-2">

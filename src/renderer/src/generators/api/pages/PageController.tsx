@@ -10,6 +10,7 @@ import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { TabItem } from '@renderer/generators/api/components/TabManager';
 import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
+import { ResponseLayout } from './response';
 
 interface PageBuilderState {
     basePath: string;
@@ -81,8 +82,6 @@ const PageController = ({
 
     const handleOptionClick = (opt: OptionType) => {
         setOption(opt);
-        setModule('shared');
-
         onOpenNew({
             ...tab,
             title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
@@ -139,6 +138,15 @@ const PageController = ({
                     selectors={selectors}
                     dto={dto}
                     models={models}
+                    currentItem={tab.item}
+                    onCloseTab={hangleClose}
+                    onUpdateTab={handleUpdate}
+                />
+            )}
+            {option === OPTION_TYPE.RESPONSE && (
+                <ResponseLayout
+                    basePath={basePath}
+                    selectors={selectors}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}

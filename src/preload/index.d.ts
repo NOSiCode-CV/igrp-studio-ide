@@ -8,7 +8,6 @@ import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces'
 
 interface CustomAPI {
 
-    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
     createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
     createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
@@ -45,7 +44,8 @@ interface CustomAPI {
 }
 
 interface BaseEngine {
-    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
+    createApi: (apiConfig: any, basePath: string) => Promise<HandlerResponse>;
+    createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
 interface CustomMenu {

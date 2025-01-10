@@ -41,7 +41,7 @@ const Navdata = (folders: any) => {
         },
     ];
 
-    const dropdownMenus = [
+    let dropdownMenus = [
         {
             label: t(`newDto`),
             type: OPTION_TYPE.DATA_OBJECTS,
@@ -61,12 +61,23 @@ const Navdata = (folders: any) => {
     };
 
     Object.keys(folders).forEach((folderName: string) => {
-        if (folderName !== 'shared') {
+
+        dropdownMenus = dropdownMenus.filter(
+            (menu) => menu.type !== OPTION_TYPE.RESPONSE && menu.type !== OPTION_TYPE.ACTION
+        );
+        
+        if (folderName === 'shared') {
+            dropdownMenus.unshift({
+                label: t('newResponses'),
+                type: OPTION_TYPE.RESPONSE,
+            });
+        } else {
             dropdownMenus.unshift({
                 label: t('newControllers'),
                 type: OPTION_TYPE.ACTION,
             });
         }
+        
         const folderMenuItem: MenuItem = {
             icon: folderName === 'shared' ? Layers : Boxes,
             label: folderName,

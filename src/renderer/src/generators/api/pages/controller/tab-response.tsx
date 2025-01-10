@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AddResponseModal from './add-response-modal';
+import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
 import { Combobox } from '@igrp/igrp-design-system';
 import { useTranslation } from 'react-i18next';

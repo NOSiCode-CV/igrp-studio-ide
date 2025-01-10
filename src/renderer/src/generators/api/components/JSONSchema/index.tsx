@@ -378,7 +378,7 @@ export function JSONSchemaBuilder({
                     <TableHead>Name</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead className="text-right">
+                    <TableHead className="text-right flex flex-1">
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>

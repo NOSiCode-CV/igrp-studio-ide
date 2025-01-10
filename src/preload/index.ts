@@ -8,7 +8,6 @@ import {
 } from '@igrp/spring-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, Project } from '../main/types'
-import { BaseApiConfig } from '../main/engine'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -152,9 +151,16 @@ const api = {
 }
 
 const engine = {
-	createApi: async (apiConfig: BaseApiConfig, basePath: string): Promise<HandlerResponse> => {
+	createApi: async (apiConfig: any, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('engine:create-api', apiConfig, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}

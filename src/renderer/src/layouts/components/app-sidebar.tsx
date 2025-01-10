@@ -51,6 +51,7 @@ export function AppSidebar({
     const [activeItem, setActiveItem] = useState('');
     const menuApp = filterSubItems(menuItems, searchQuery);
 
+    const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
     const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
     const handleSearch = (value: string) => {
@@ -69,15 +70,26 @@ export function AppSidebar({
         setActiveMenu(menuApp || []);
     }, [menuApp]);
 
-    const handleClickMenu = (id: string) => {
-        if (id === 'app') setActiveMenu(menuApp);
+    const handleClickMenu = (item: MenuItem) => {
+        setActiveMenuGroup(item.label);
+        if (item.id === 'apis') setActiveMenu(menuApp);
         else setActiveMenu([]);
     };
 
     const menuIcons: MenuItem[] = [
-        { icon: Server, link: '/app', label: 'APIs', id: 'app' },
-        { icon: FileText, link: '/documents', label: 'documents' },
-        { icon: Badge, link: '/settings', label: 'settings' },
+        { icon: Server, link: '/app', label: t('apis'), id: 'apis' },
+        {
+            icon: FileText,
+            link: '/documents',
+            label: t('documents'),
+            id: 'documents',
+        },
+        {
+            icon: Badge,
+            link: '/settings',
+            label: t('settings'),
+            id: 'settings',
+        },
     ];
 
     return (
@@ -127,10 +139,10 @@ export function AppSidebar({
                                                 }}
                                                 onClick={() => {
                                                     setOpen(true);
-                                                    handleClickMenu(item.id);
+                                                    handleClickMenu(item);
                                                 }}
                                                 className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
-                                                isActive={item.id === 'app'}
+                                                isActive={item.label === activeMenuGroup}
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
                                                     {item.icon && (
@@ -156,7 +168,8 @@ export function AppSidebar({
                 <Sidebar collapsible="none" className="hidden flex-1 md:flex">
                     {header && (
                         <AppSidebarHeader
-                            config={config}
+                            name={config?.name}
+                            description={activeMenuGroup}
                             basePath={basePath}
                             sidebarState={sidebarState}
                             handleSearch={handleSearch}

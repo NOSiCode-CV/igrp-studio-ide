@@ -1,6 +1,5 @@
 // handlers/apiHandler.ts
 
-import { BaseApiConfig } from '../engine';
 import { EngineFactory } from '../engines/EngineFactory';
 import { handleWithCustomErrors } from '../helpers';
 import {
@@ -19,9 +18,25 @@ import { ipcMain } from 'electron';
 
 handleWithCustomErrors(
     'engine:create-api',
-    async (_event, apiConfig: BaseApiConfig, basePath: string) => {
+    async (_event, apiConfig: any, basePath: string) => {
         const engine = EngineFactory.getEngine(apiConfig.type);
         await engine.createApi(apiConfig, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    'engine:create-response',
+    async (_event, response: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createResponse(response, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    'engine:create-response',
+    async (_event, response: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createResponse(response, basePath);
     }
 );
 

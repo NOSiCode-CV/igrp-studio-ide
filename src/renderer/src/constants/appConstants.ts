@@ -21,14 +21,15 @@ export enum OPTION_TYPE {
     DATA_OBJECTS = "dto",
     ACTION = 'action',
     IMPORT_TABLE_DB = 'import_table_db',
+    RESPONSE = 'responses'
 };
 
-export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'none';
+export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'responses' | 'none';
 
 export const projectIcons = {
     baseApp: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
     baseApi: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-    aspnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
+    dotnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
     laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
@@ -71,3 +72,14 @@ export enum ENV_TYPES {
     SPRING = "baseApi",
     DOTNET = "dotnet"
 };
+
+export const DatabaseOptions = [
+    { value: 'Postgresql', label: 'PostgreSQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'MySQL', label: 'MySQL' },
+];
+
+export const projectStructureStyle = [
+    { value: 'technical', label: 'Technical' },
+    { value: 'domain', label: 'Domain' },
+];

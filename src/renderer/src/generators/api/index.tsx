@@ -67,7 +67,7 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
         if (currentItem)
             handleNewTab({
                 id: `tab-${currentItem.module}-${currentItem.isNew ? Date.now() : currentItem.label}`,
-                title: currentItem.isHeader
+                title: currentItem.isNew
                     ? t(
                           `new${currentItem.type.charAt(0).toUpperCase() + currentItem.type.slice(1)}`
                       )

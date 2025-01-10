@@ -1,8 +1,8 @@
 // engines/SpringEngine.ts
-import { newApi } from '@igrp/spring-engine';
+import { addResponse, newApi } from '@igrp/spring-engine';
 import { ProjectRepository } from '../repo/projects';
-import { BaseApiConfig } from '../types';
 import { BaseEngine } from '../interfaces';
+import { BaseApiConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
 
 export class SpringEngine implements BaseEngine {
 
@@ -10,14 +10,23 @@ export class SpringEngine implements BaseEngine {
 
     const repo = new ProjectRepository()
 
+    const config = {
+      ...apiConfig,
+      type: 'baseApi'
+    }
+
     // Lógica específica do Spring
-    await newApi(apiConfig, basePath);
+    await newApi(config, basePath);
 
     await repo.save({
       path: basePath,
       dt_created: new Date(),
       location: 'local',
-      config: apiConfig,
+      config: { ...config, name: config.apiName },
     });
+  }
+
+  async createResponse(config: ResponseConfig, basePath: string): Promise<void> {
+    await addResponse(config, basePath);
   }
 }

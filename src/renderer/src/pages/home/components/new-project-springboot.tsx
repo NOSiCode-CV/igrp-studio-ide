@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import {PATTERNS, ENV_TYPES } from '@renderer/constants/appConstants';
+import {PATTERNS, ENV_TYPES, DatabaseOptions, projectStructureStyle } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import useToast from '../../../components/useToast';
 import {
@@ -25,17 +25,6 @@ import { PlusCircle } from 'lucide-react';
 import { Combobox } from '@igrp/igrp-design-system';
 import { Textarea } from '@renderer/components/ui/Textarea';
 
-const DatabaseOptions = [
-    { value: 'Postgresql', label: 'PostgreSQL' },
-    { value: 'Oracle', label: 'Oracle' },
-    { value: 'MySQL', label: 'MySQL' },
-];
-
-const projectStructureStyle = [
-    { value: 'technical', label: 'Technical' },
-    { value: 'domain', label: 'Domain' },
-];
-
 const initialValues: BaseApiConfig = {
     type: ENV_TYPES.SPRING,
     apiName: '',
@@ -49,7 +38,6 @@ const initialValues: BaseApiConfig = {
 };
 
 const FormNewProjectSpring = ({ versions }): JSX.Element => {
-    console.log(versions);
     const navigate = useNavigate();
     const dispatch: any = useDispatch();
     const { showErrorToast } = useToast();

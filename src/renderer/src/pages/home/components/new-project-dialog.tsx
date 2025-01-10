@@ -31,7 +31,7 @@ export function CreateProject() {
     const [open, setOpen] = useState(false);
     const [versions, setVersions] = useState({});
 
-    const mainFrameworks = ['baseApp', 'baseApi', 'aspnet'];
+    const mainFrameworks = ['baseApp', 'baseApi', 'dotnet'];
     const additionalFrameworks = ['vuejs', 'angular', 'laravel', 'django'];
 
     useEffect(() => {
@@ -115,13 +115,13 @@ export function CreateProject() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <TabsContent value="nextjs">
+                    <TabsContent value="baseApp">
                         <FormNewProjectNextJS />
                     </TabsContent>
-                    <TabsContent value="springboot">
+                    <TabsContent value="baseApi">
                         <FormNewProjectSpring versions={versions} />
                     </TabsContent>
-                    <TabsContent value="aspnet">
+                    <TabsContent value="dotnet">
                         <FormNewProjectAspent versions={versions} />
                     </TabsContent>
                 </Tabs>

@@ -16,4 +16,5 @@ export interface IConnenctionRepository {
 
 export interface BaseEngine {
     createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void>;
+    createResponse(config: ResponseConfig, basePath: string): Promise<void>
 }
