@@ -34,7 +34,7 @@ import { CreateEndpointDialog } from './create-endpoint-dialog';
 import { TextInput } from '../../components/inputs-form';
 import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
-import { httpMethods } from '@renderer/constants/appConstants';
+import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
 import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 
 interface ControllerProps {
@@ -42,7 +42,7 @@ interface ControllerProps {
     selectors: Array<any>;
     currentItem: any;
     modules: Array<any>;
-    responses: Array<any>
+    responses: Array<any>;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
@@ -54,7 +54,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     modules,
     onCloseTab,
     onUpdateTab,
-    responses
+    responses,
 }: ControllerProps) => {
     const { t } = useTranslation();
 
@@ -154,7 +154,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const getValuesToSubmit = async () => {
         const values = { ...formik.values };
 
-        if(!values.requestBody) delete values.requestBody
+        if (!values.requestBody) delete values.requestBody;
 
         getJsonData();
 
@@ -233,7 +233,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     value: values.name,
                 })
             );
-        } catch (error: unknown) { 
+        } catch (error: unknown) {
             showErrorToast(error);
         }
     };
@@ -244,9 +244,15 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             const countActions = values.actions.length;
 
             if (countActions === 1) {
-                // Delete the entire controller if there's only one action
-                const { error } = await window.api.deleteController(
-                    values,
+                const config = {
+                    name: formik.values.name,
+                    type: 'controller',
+                    module: currentItem.module,
+                };
+
+                const { error } = await window.engine.delete(
+                    config,
+                    ENV_TYPES.SPRING,
                     basePath
                 );
 

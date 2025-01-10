@@ -19,6 +19,7 @@ import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
 import { ContainerScrollArea } from '../../components/ContainerScrollArea';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface DtoProps {
     basePath: string;
@@ -66,9 +67,6 @@ const DtoLayout = ({
             try {
                 const data = await window.api.getJsonContent(currentItem.path);
                 setData(data);
-                //setOption(currentItem.subType || currentItem.type)
-                //setModule(currentItem.module)
-                //dispatch(setCurrentItem(null))
             } catch (error) {
                 console.error('Failed to load JSON content:', error);
             }
@@ -123,14 +121,18 @@ const DtoLayout = ({
 
     const handleDelete = async (): Promise<void> => {
         try {
-            const { error } = await window.api.deleteDTO(
-                {
-                    type: 'dto',
-                    name: formik.values.name,
-                    module: currentItem.module,
-                },
+            const config = {
+                name: formik.values.name,
+                type: 'dto',
+                module: currentItem.module,
+            };
+
+            const { error } = await window.engine.delete(
+                config,
+                ENV_TYPES.SPRING,
                 basePath
             );
+
             if (error) return showErrorToast(error);
 
             dispatch(onSetChangeStatus(true));

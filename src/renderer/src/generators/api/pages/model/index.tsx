@@ -29,6 +29,7 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
 import { ContainerScrollArea } from '../../components/ContainerScrollArea';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface ModelProps {
     basePath: string;
@@ -47,7 +48,6 @@ const ModelLayout = ({
     onCloseTab,
     onUpdateTab,
 }: ModelProps): JSX.Element => {
-
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const [tablesColumns, setTableColumns] = useState<{
@@ -196,14 +196,19 @@ const ModelLayout = ({
 
     const deleteModel = async (): Promise<void> => {
         try {
-            const values = getValuesToSubmit(formik.values, currentItem.module);
+            const config = {
+                name: formik.values.name,
+                type: 'model',
+                module: currentItem.module,
+            };
 
-            const { error } = await window.api.deleteModel(values, basePath);
+            const { error } = await window.engine.delete(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
 
-            if (error) {
-                showErrorToast(error);
-                return;
-            }
+            if (error) return showErrorToast(error);
 
             dispatch(onSetChangeStatus(true));
 

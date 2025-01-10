@@ -4,12 +4,9 @@ import { EngineFactory } from '../engines/EngineFactory';
 import { handleWithCustomErrors } from '../helpers';
 import {
     ControllerConfig,
-    DTOBaseConfig,
-    DTOConfig,
-    ModelConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
+    DTOConfig} from '@igrp/spring-engine/dist/interfaces/types'
 
-import { addController, addDTO, addModel, addModule, deleteController, deleteDTO, deleteModel, engineTypes } from '@igrp/spring-engine'
+import { addController, addDTO, addModel, addModule, engineTypes } from '@igrp/spring-engine'
 import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
 
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
@@ -47,27 +44,6 @@ handleWithCustomErrors('spring-engine:create-module', async (_event, moduleConfi
 handleWithCustomErrors('spring-engine:create-model', async (_event, modelConfig, basePath) => {
     await addModel(modelConfig, basePath)
 })
-
-handleWithCustomErrors(
-    'spring-engine:delete-model',
-    async (_event, modelConfig: ModelConfig, basePath: string) => {
-        await deleteModel(modelConfig, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'spring-engine:delete-dto',
-    async (_event, config: DTOBaseConfig, basePath: string) => {
-        await deleteDTO(config, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'spring-engine:delete-controller',
-    async (_event, config: ControllerConfig, basePath: string) => {
-        await deleteController(config, basePath)
-    }
-)
 
 handleWithCustomErrors(
     'spring-engine:create-dto',
