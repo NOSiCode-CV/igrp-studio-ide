@@ -46,6 +46,7 @@ interface CustomAPI {
 interface BaseEngine {
     createApi: (apiConfig: any, basePath: string) => Promise<HandlerResponse>;
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
 interface CustomMenu {

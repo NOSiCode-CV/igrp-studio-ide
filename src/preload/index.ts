@@ -165,6 +165,13 @@ const engine = {
 			return handleError(error)
 		}
 	},
+	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {

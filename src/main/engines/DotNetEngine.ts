@@ -5,6 +5,11 @@ import { ProjectRepository } from '../repo/projects';
 import { BaseApiConfig, ResponseConfig } from '@igrp/dotnet-engine/dist/interfaces/types';
 
 export class DotNetEngine implements BaseEngine {
+
+  async delete(config: any, basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   createResponse(config: ResponseConfig, basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }

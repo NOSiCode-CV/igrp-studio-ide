@@ -97,9 +97,7 @@ export const ResponseLayout = ({
 
     useEffect(() => {
         if (data) {
-            setDataSchema(
-                (data.content[contentType]?.schema as JSONSchema)
-            );
+            setDataSchema(data.content[contentType]?.schema as JSONSchema);
             setTitle(data.name);
             formik.setValues(data);
         }
@@ -152,10 +150,14 @@ export const ResponseLayout = ({
 
     const handleDelete = async (): Promise<void> => {
         try {
-            const values = { ...formik.values, module: currentItem.module };
+            const config = {
+                name: formik.values.name,
+                type: "response",
+                module: currentItem.module,
+            };
 
-            const { error } = await window.engine.createResponse(
-                values,
+            const { error } = await window.engine.delete(
+                config,
                 ENV_TYPES.SPRING,
                 basePath
             );

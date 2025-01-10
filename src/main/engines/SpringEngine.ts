@@ -1,10 +1,14 @@
 // engines/SpringEngine.ts
-import { addResponse, newApi } from '@igrp/spring-engine';
+import { addResponse, deleteElement, newApi } from '@igrp/spring-engine';
 import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
-import { BaseApiConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { BaseApiConfig, DeleteConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
 
 export class SpringEngine implements BaseEngine {
+
+  async delete(config: DeleteConfig, basePath: string): Promise<void> {
+    await deleteElement(config, basePath)
+  }
 
   async createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void> {
 

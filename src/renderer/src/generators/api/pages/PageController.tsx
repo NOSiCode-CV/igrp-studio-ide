@@ -51,12 +51,13 @@ const PageController = ({
             models: extractByType(moduleData, OPTION_TYPE.MODELS),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
+            responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
             modules: getModulesArray(studio.folderFiles),
             folderFiles: studio.folderFiles,
         };
     });
 
-    const { basePath, models, dto, modules } = useSelector(selectProperties);
+    const { basePath, models, dto, modules, responses } = useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -122,6 +123,7 @@ const PageController = ({
                     selectors={selectors}
                     currentItem={tab.item}
                     modules={modules}
+                    responses={responses}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
                 />

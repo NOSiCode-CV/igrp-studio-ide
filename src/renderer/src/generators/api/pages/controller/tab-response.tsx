@@ -22,12 +22,14 @@ interface TabResponseProps {
     formik: any;
     schemaTypes?: { label: string; value: string }[];
     contentTypes: any;
+    responseTypes: Array<any>
 }
 
 export const TabResponse: React.FC<TabResponseProps> = ({
     formik,
     contentTypes,
     schemaTypes,
+    responseTypes
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
@@ -142,7 +144,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     onSave={handleAddResponse}
                     contentTypes={contentTypes}
                 />
-                <AddResponseMenu onAddBlankResponse={handleAddBlankResponse} />
+                <AddResponseMenu onAddBlankResponse={handleAddBlankResponse} responseTypes={responseTypes} onSave={handleAddResponse}/>
             </div>
 
             {/* Response Tab Content */}

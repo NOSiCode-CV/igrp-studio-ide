@@ -42,6 +42,7 @@ interface ControllerProps {
     selectors: Array<any>;
     currentItem: any;
     modules: Array<any>;
+    responses: Array<any>
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
@@ -53,6 +54,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     modules,
     onCloseTab,
     onUpdateTab,
+    responses
 }: ControllerProps) => {
     const { t } = useTranslation();
 
@@ -414,6 +416,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 formik={formik}
                                 schemaTypes={schemaTypes}
                                 contentTypes={typesData}
+                                responseTypes={responses}
                             />
                         </TabsContent>
                     </Tabs>

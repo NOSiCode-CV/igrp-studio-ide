@@ -33,10 +33,10 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
-    'engine:create-response',
-    async (_event, response: any, engineType: string, basePath: string) => {
+    'engine:delete-element',
+    async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.createResponse(response, basePath);
+        await engine.delete(config, basePath);
     }
 );
 
