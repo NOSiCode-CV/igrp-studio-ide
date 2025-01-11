@@ -1,15 +1,33 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
-import { createMenuHeader, getBadgeColor } from '@renderer/utils/helpers';
+import {
+    createMenuHeader,
+    getBadgeColor,
+    getIcon,
+} from '@renderer/utils/helpers';
 import { MenuItem } from 'src/main/types';
-import { Boxes, Layers } from 'lucide-react';
+import {
+    Boxes,
+    DatabaseZap,
+    FileJson2,
+    Layers,
+    LucideIcon,
+    Trash,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { lazy } from 'react';
+import { lazy, ReactNode } from 'react';
 const DatabaseManagerModal = lazy(
     () => import('@renderer/generators/api/components/DatabaseManager')
 );
+
+export interface dropdownItem {
+    label: string;
+    actionType: OPTION_TYPE;
+    icon?: LucideIcon;
+    componentName?: ReactNode;
+}
 
 const Navdata = (folders: any) => {
     const dispatch: any = useDispatch();
@@ -18,37 +36,51 @@ const Navdata = (folders: any) => {
 
     const { t } = useTranslation();
 
-    const dropdownSchemas = [
+    const menuDelete: dropdownItem = {
+        label: t('delete'),
+        actionType: OPTION_TYPE.DELETE,
+        icon: Trash,
+    };
+
+    const dropdownSchemas: dropdownItem[] = [
         {
             label: t('newModels'),
-            type: OPTION_TYPE.MODELS,
+            actionType: OPTION_TYPE.MODELS,
+            icon: getIcon(OPTION_TYPE.MODELS),
         },
         {
             label: t('Import data table from database'),
-            type: OPTION_TYPE.IMPORT_TABLE_DB,
+            actionType: OPTION_TYPE.IMPORT_TABLE_DB,
             componentName: <DatabaseManagerModal />,
+            icon: DatabaseZap,
         },
         {
             label: t('Import JSON Schema Files'),
-            type: OPTION_TYPE.MODELS,
+            actionType: OPTION_TYPE.MODELS,
+            icon: FileJson2,
         },
     ];
 
-    const dropdownSubMenus = [
+    const dropdownSubMenus: dropdownItem[] = [
         {
             label: t('newAction'),
-            type: OPTION_TYPE.ACTION,
+            actionType: OPTION_TYPE.ACTION,
+            icon: getIcon(OPTION_TYPE.ACTION),
         },
     ];
 
-    let dropdownMenus = [
+    dropdownSubMenus.push(menuDelete);
+
+    let dropdownMenus: dropdownItem[] = [
         {
             label: t(`newDto`),
-            type: OPTION_TYPE.DATA_OBJECTS,
+            actionType: OPTION_TYPE.DATA_OBJECTS,
+            icon: getIcon(OPTION_TYPE.DATA_OBJECTS),
         },
         {
             label: t('newModels'),
-            type: OPTION_TYPE.MODELS,
+            actionType: OPTION_TYPE.MODELS,
+            icon: getIcon(OPTION_TYPE.MODELS),
         },
     ];
 
@@ -56,42 +88,47 @@ const Navdata = (folders: any) => {
         delete item.icon;
         delete item.click;
         delete item.subItems;
+        delete item.dropdownMenus;
         delete item.dropdownclick;
         dispatch(onSetCurrentItem(item));
     };
 
     Object.keys(folders).forEach((folderName: string) => {
-
         dropdownMenus = dropdownMenus.filter(
-            (menu) => menu.type !== OPTION_TYPE.RESPONSE && menu.type !== OPTION_TYPE.ACTION
+            (menu) =>
+                menu.actionType !== OPTION_TYPE.RESPONSE &&
+                menu.actionType !== OPTION_TYPE.ACTION &&
+                menu.actionType !== OPTION_TYPE.DELETE
         );
-        
+
         if (folderName === 'shared') {
             dropdownMenus.unshift({
                 label: t('newResponses'),
-                type: OPTION_TYPE.RESPONSE,
+                actionType: OPTION_TYPE.RESPONSE,
             });
         } else {
             dropdownMenus.unshift({
                 label: t('newControllers'),
-                type: OPTION_TYPE.ACTION,
+                actionType: OPTION_TYPE.ACTION,
+                icon: getIcon(OPTION_TYPE.ACTION),
             });
+            dropdownMenus.push(menuDelete);
         }
-        
+
         const folderMenuItem: MenuItem = {
             icon: folderName === 'shared' ? Layers : Boxes,
-            label: folderName,
+            label: folderName === 'shared' ? t(folderName) : folderName,
             module: folderName,
             subItems: [],
             dropdownclick: function (item) {
                 onClickItem(item);
             },
             dropdownMenus,
+            type: "module"
         };
 
         // Process each folder's content
         folders[folderName].files.forEach((folder) => {
-            // Iterate through the categories (e.g., "dto", "controller") within the folder
             Object.keys(folder).forEach((categoryName: string) => {
                 const getDropdownMenus = (category: string): MenuItem[] => {
                     switch (category) {
@@ -104,7 +141,7 @@ const Navdata = (folders: any) => {
 
                 // Create a category menu item
                 const categoryMenuItem: MenuItem = createMenuHeader(
-                    categoryName,
+                    t(categoryName),
                     categoryName
                 );
 
@@ -124,10 +161,10 @@ const Navdata = (folders: any) => {
                             label: file.name,
                             path: file.path,
                             module: folderName,
-                            type: categoryName,
+                            type: file?.content?.type,
                             link: ROUTES.PATH_PAGE_BUILDER_API,
                             subItems: getSubItems(
-                                categoryName,
+                                file?.content?.type,
                                 file,
                                 file.path,
                                 folderName,
@@ -140,7 +177,7 @@ const Navdata = (folders: any) => {
                             dropdownMenus:
                                 categoryName === OPTION_TYPE.CONTROLLERS
                                     ? dropdownSubMenus
-                                    : [],
+                                    : [menuDelete],
                             content: file?.content,
                         })
                     ),
@@ -166,13 +203,12 @@ function getSubItems(
     onClickItem: (subItem: any) => void
 ) {
     const actions = file?.content?.actions;
-    if (categoryName === OPTION_TYPE.CONTROLLERS && actions) {
+    if (categoryName === OPTION_TYPE.CONTROLLER && actions) {
         return actions.map((action) => ({
             id: action.actionName,
             label: action.actionName,
             path: path,
-            type: OPTION_TYPE.CONTROLLERS,
-            subType: OPTION_TYPE.ACTION,
+            type: OPTION_TYPE.ACTION,
             click: (subItem) => onClickItem(subItem),
             badgeColor: getBadgeColor(action.method),
             badgeName: action.method,

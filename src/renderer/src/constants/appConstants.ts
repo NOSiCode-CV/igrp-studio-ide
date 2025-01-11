@@ -18,13 +18,15 @@ export const PATTERNS = {
 export enum OPTION_TYPE {
     MODELS = "models",
     CONTROLLERS = "controllers",
+    CONTROLLER = "controller",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
     IMPORT_TABLE_DB = 'import_table_db',
-    RESPONSE = 'responses'
+    RESPONSE = 'responses',
+    DELETE = 'delete'
 };
 
-export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'responses' | 'none';
+export type OptionType = 'models' | 'controller' | 'dto' | 'action' | 'responses' | 'none';
 
 export const projectIcons = {
     baseApp: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',

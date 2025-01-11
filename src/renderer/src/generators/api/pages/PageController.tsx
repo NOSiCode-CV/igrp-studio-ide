@@ -128,7 +128,7 @@ const PageController = ({
                     onUpdateTab={handleUpdate}
                 />
             )}
-            {option === OPTION_TYPE.CONTROLLERS && (
+            {option === OPTION_TYPE.CONTROLLER && (
                 <ControllerOverview
                     basePath={basePath}
                     currentItem={tab.item}

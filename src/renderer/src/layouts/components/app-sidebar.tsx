@@ -134,7 +134,7 @@ export function AppSidebar({
                                         <SidebarMenuItem key={index}>
                                             <SidebarMenuButton
                                                 tooltip={{
-                                                    children: t(item.label),
+                                                    children: item.label,
                                                     hidden: false,
                                                 }}
                                                 onClick={() => {
@@ -142,7 +142,10 @@ export function AppSidebar({
                                                     handleClickMenu(item);
                                                 }}
                                                 className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
-                                                isActive={item.label === activeMenuGroup}
+                                                isActive={
+                                                    item.label ===
+                                                    activeMenuGroup
+                                                }
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
                                                     {item.icon && (
@@ -221,7 +224,6 @@ function Three({
         setOpen(newState);
     };
 
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const handleNavigation = (link) => {
         if (link) navigate(link);
@@ -257,7 +259,7 @@ function Three({
                         </span>
                     )}
                     <span>
-                        {t(item.label)}
+                        {item.label}
                         {item.subItems &&
                             item.subItems.length > 0 &&
                             `(${item.subItems.length})`}

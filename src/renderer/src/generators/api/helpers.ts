@@ -43,7 +43,7 @@ export const changeValue = (
 };
 
 
-export const extractByType = (moduleData: any, type: OptionType) => {
+export const extractByType = (moduleData: any, type: string) => {
 
 	const files = moduleData?.files ?? [];
 
