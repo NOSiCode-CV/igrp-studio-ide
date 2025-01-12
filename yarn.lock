@@ -4935,6 +4935,11 @@ globby@^11.1.0:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
+gojs@^3.0.16:
+  version "3.0.16"
+  resolved "https://registry.yarnpkg.com/gojs/-/gojs-3.0.16.tgz#446474c8cd1f2967689e5ae689c858cdd9791333"
+  integrity sha512-eiKaRbOl+4Z8HKHqNH9EGwd5q/8+2O3dxOTN0m9Xdzzrnff7g8BKD6zOahDa8XDZehWISYtLjfRBvUTo+lhggw==
+
 gopd@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/gopd/-/gopd-1.0.1.tgz#29ff76de69dac7489b7c0918a5788e56477c332c"

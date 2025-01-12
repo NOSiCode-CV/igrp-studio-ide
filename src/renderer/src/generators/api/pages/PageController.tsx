@@ -11,6 +11,7 @@ import { TabItem } from '@renderer/generators/api/components/TabManager';
 import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
 import { ResponseLayout } from './response';
+import ERDLayout from './diagram';
 
 interface PageBuilderState {
     basePath: string;
@@ -57,7 +58,8 @@ const PageController = ({
         };
     });
 
-    const { basePath, models, dto, modules, responses } = useSelector(selectProperties);
+    const { basePath, models, dto, modules, responses } =
+        useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -98,6 +100,8 @@ const PageController = ({
         onUpdateTab(tab.id, `tab-${tab.item?.module}-${tabId}`);
     };
 
+    //console.log(tab.item)
+
     return (
         <>
             {option === 'none' && (
@@ -107,7 +111,7 @@ const PageController = ({
                     </div>
                 </div>
             )}
-            {option === OPTION_TYPE.MODELS && (
+            {option === OPTION_TYPE.MODEL && (
                 <ModelLayout
                     basePath={basePath}
                     selectors={selectors}
@@ -117,7 +121,7 @@ const PageController = ({
                     onUpdateTab={handleUpdate}
                 />
             )}
-            {option === OPTION_TYPE.ACTION && (
+            {option === OPTION_TYPE.MODEL && (
                 <ControllerLayout
                     basePath={basePath}
                     selectors={selectors}
@@ -154,6 +158,7 @@ const PageController = ({
                     onUpdateTab={handleUpdate}
                 />
             )}
+            {option === OPTION_TYPE.ERDDiagram && <ERDLayout models={models} />}
         </>
     );
 };

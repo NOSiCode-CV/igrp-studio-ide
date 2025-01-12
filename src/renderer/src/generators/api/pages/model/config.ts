@@ -115,12 +115,10 @@ export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
 export const getTablesColumns = ({
 	selectors,
 	attributes,
-	models,
-	currentModel
+	models
 }): { [value: string]: IColumnsTabelProps[] } => {
 
 	const modelsOptions = (models || [])
-		.filter((model) => model.name !== currentModel) // Exclude the current model
 		.map((model) => ({
 			value: model.name,
 			label: model.name,

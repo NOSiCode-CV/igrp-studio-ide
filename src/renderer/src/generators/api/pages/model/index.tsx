@@ -84,8 +84,7 @@ const ModelLayout = ({
         const res = getTablesColumns({
             selectors,
             attributes: formik.values.attributes,
-            models,
-            currentModel: formik.values.name,
+            models
         });
         setTableColumns(res);
     }, [selectors, formik.values]);

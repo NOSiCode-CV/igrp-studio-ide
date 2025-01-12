@@ -95,37 +95,39 @@ export const DropdownSidebarMenuButton: React.FC<
                     className="min-w-56 rounded-lg"
                 >
                     {menuItem.dropdownMenus.map(
-                        (menu: dropdownItem, idx: number) => (
-                            <>
-                                {menu.actionType === OPTION_TYPE.DELETE && (
-                                    <DropdownMenuSeparator />
-                                )}
-                                <DropdownMenuItem
-                                    key={idx}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDropdownClick({
-                                            ...menu,
-                                            ...menuItem,
-                                            isNew: true,
-                                        });
-                                    }}
-                                    className="cursor-pointer"
-                                >
-                                    {menu.icon ? (
-                                        <menu.icon className={'h-4'} />
-                                    ) : (
-                                        <span className="h-4 me-4"></span>
-                                    )}
-                                    {menu.label}
+                        (menu: dropdownItem, idx: number) => {
+                            return (
+                                <React.Fragment key={idx}>
                                     {menu.actionType === OPTION_TYPE.DELETE && (
-                                        <DropdownMenuShortcut>
-                                            ⌘+D
-                                        </DropdownMenuShortcut>
+                                        <DropdownMenuSeparator />
                                     )}
-                                </DropdownMenuItem>
-                            </>
-                        )
+                                    <DropdownMenuItem
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDropdownClick({
+                                                ...menu,
+                                                ...menuItem,
+                                                isNew: true,
+                                            });
+                                        }}
+                                        className="cursor-pointer"
+                                    >
+                                        {menu.icon ? (
+                                            <menu.icon className={'h-4'} />
+                                        ) : (
+                                            <span className="h-4 me-4"></span>
+                                        )}
+                                        {menu.label}
+                                        {menu.actionType ===
+                                            OPTION_TYPE.DELETE && (
+                                            <DropdownMenuShortcut>
+                                                ⌘+D
+                                            </DropdownMenuShortcut>
+                                        )}
+                                    </DropdownMenuItem>
+                                </React.Fragment>
+                            );
+                        }
                     )}
                 </DropdownMenuContent>
             </DropdownMenu>

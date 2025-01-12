@@ -8,6 +8,7 @@ import {
 import { MenuItem } from 'src/main/types';
 import {
     Boxes,
+    Cable,
     DatabaseZap,
     FileJson2,
     Layers,
@@ -58,6 +59,11 @@ const Navdata = (folders: any) => {
             label: t('Import JSON Schema Files'),
             actionType: OPTION_TYPE.MODELS,
             icon: FileJson2,
+        },
+        {
+            label: t('ERD Diagram'),
+            actionType: OPTION_TYPE.ERDDiagram,
+            icon: Cable,
         },
     ];
 

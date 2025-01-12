@@ -60,6 +60,7 @@
 		"date-fns": "^4.1.0",
 		"electron-updater": "^6.1.7",
 		"formik": "^2.4.6",
+		"gojs": "^3.0.16",
 		"i18next": "^23.16.4",
 		"i18next-browser-languagedetector": "^8.0.0",
 		"i18next-electron-fs-backend": "^3.0.2",
