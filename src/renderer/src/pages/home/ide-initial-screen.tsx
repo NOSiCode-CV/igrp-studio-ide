@@ -41,8 +41,6 @@ const IDEInitialScreen = (): JSX.Element => {
 
         dispatch(setConfig(config));
 
-        console.log(config)
-
         await window.repo.project.save(config);
 
         // Navigate to the next page

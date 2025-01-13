@@ -78,9 +78,9 @@ const RecentsProjects = (): JSX.Element => {
 
     dispatch(setBasePath(p.path))
 
-    dispatch(setConfig(p.config))
+    dispatch(setConfig(p))
 
-    navigateToNextPage(navigate, p.config)
+    navigateToNextPage(navigate, p)
   }
 
   useEffect(() => {
