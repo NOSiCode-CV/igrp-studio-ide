@@ -72,8 +72,8 @@ export const httpMethods = [
 
 
 export enum ENV_TYPES {
-    NEXTJS = "baseApp",
-    SPRING = "baseApi",
+    NEXTJS = "nextjs",
+    SPRING = "springboot",
     DOTNET = "dotnet"
 };
 

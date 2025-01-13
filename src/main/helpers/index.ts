@@ -45,7 +45,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 
 			if (baseApiPath.endsWith('baseApi.json')) {
 				config = {
-					name: parsedConfig.name,
+					name: parsedConfig.apiName,
 					type: 'backend',
 					framework: parsedConfig.type,
 					config: { ...parsedConfig },

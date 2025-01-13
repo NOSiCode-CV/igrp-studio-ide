@@ -94,14 +94,14 @@ const RecentsProjects = (): JSX.Element => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img
-                src={projectIcons[project.config.type]}
-                alt={`${project.config.type} logo`}
+                src={projectIcons[project.framework]}
+                alt={`${project.framework} logo`}
                 width={isCompact ? 16 : 20}
                 height={isCompact ? 16 : 20}
                 className="mr-2"
               />
               <CardTitle className={`${isCompact ? 'text-sm' : 'text-lg'}`}>
-                {project.config.name}
+                {project.name}
               </CardTitle>
             </div>
             <Button variant="ghost" size="sm">
@@ -213,7 +213,7 @@ const RecentsProjects = (): JSX.Element => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortProjects(
                   localProjects.filter((project) =>
-                    project.config.name.toLowerCase().includes(localSearchQuery.toLowerCase())
+                    project.name.toLowerCase().includes(localSearchQuery.toLowerCase())
                   )
                 ).map((project, index) => RenderProjectCard(project, true, index))}
               </div>
