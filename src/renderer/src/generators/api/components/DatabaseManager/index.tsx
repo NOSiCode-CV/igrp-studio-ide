@@ -93,7 +93,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         )
                         .map((column) => ({
                             name: column.name || '',
-                            type: typeMapping[column.data_type] || 'String', // Map types
+                            type: typeMapping[column.data_type] || 'string', // Map types
                             length: column.max_length || null,
                             defaultValue: !column.is_primary_key
                                 ? column.default_value

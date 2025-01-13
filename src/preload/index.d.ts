@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
-import { Connection, IConnenctionRepository } from 'src/main/types';
+import { Connection, IConnenctionRepository, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
 
 
@@ -44,7 +44,7 @@ interface CustomAPI {
 }
 
 interface BaseEngine {
-    createApi: (apiConfig: any, basePath: string) => Promise<HandlerResponse>;
+    createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }

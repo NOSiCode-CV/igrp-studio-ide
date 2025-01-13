@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { PageableProjects, Project } from 'src/main/types'
+import { PageableProjects, ProjectData } from 'src/main/types'
 import {  projectIcons } from '@renderer/constants/appConstants'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import { Calendar, ChevronRight, Clock, FolderOpen, LayoutDashboard, Search } from 'lucide-react'
@@ -32,7 +32,7 @@ const RecentsProjects = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true)
 
   const [allProjects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
-  const [localProjects, setLocalProjects] = useState<Project[]>([])
+  const [localProjects, setLocalProjects] = useState<ProjectData[]>([])
   const [_error, setError] = useState<string | null>(null)
 
   const [projectOrder] = useState<string>('lastModified')
@@ -71,7 +71,7 @@ const RecentsProjects = (): JSX.Element => {
     setLocalProjects(localProjects)
   }, [allProjects])
 
-  const handleOpenProject = async (p: Project): Promise<void> => {
+  const handleOpenProject = async (p: ProjectData): Promise<void> => {
     try {
       await window.repo.project.save(p)
     } catch (err) {}
@@ -87,7 +87,7 @@ const RecentsProjects = (): JSX.Element => {
     setTimeout(() => setIsLoading(false), 1500)
   }, [])
 
-  const RenderProjectCard = (project: Project, isCompact: boolean = false, index: number) => {
+  const RenderProjectCard = (project: ProjectData, isCompact: boolean = false, index: number) => {
     return (
       <Card key={index} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
         <CardHeader className={isCompact ? 'p-2' : ''}>

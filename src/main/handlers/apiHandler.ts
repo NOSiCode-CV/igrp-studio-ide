@@ -1,23 +1,23 @@
 // handlers/apiHandler.ts
-
 import { EngineFactory } from '../engines/EngineFactory';
 import { handleWithCustomErrors } from '../helpers';
 import {
     ControllerConfig,
-    DTOConfig} from '@igrp/spring-engine/dist/interfaces/types'
+    DTOConfig
+} from '@igrp/spring-engine/dist/interfaces/types'
 
 import { addController, addDTO, addModel, addModule, engineTypes } from '@igrp/spring-engine'
-import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
+import { addComponentToPage, deletePage, newPage } from '@igrp/nextjs-engine';
 
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
-import { ProjectRepository } from '../repo/projects';
+import { Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { ipcMain } from 'electron';
+import { ProjectData } from '../types';
 
 handleWithCustomErrors(
-    'engine:create-api',
-    async (_event, apiConfig: any, basePath: string) => {
-        const engine = EngineFactory.getEngine(apiConfig.type);
-        await engine.createApi(apiConfig, basePath);
+    'engine:create-project',
+    async (_event, project: ProjectData, basePath: string) => {
+        const engine = EngineFactory.getEngine(project.framework);
+        await engine.createProject(project, basePath);
     }
 );
 
@@ -74,23 +74,6 @@ handleWithCustomErrors(
     'next-engine:add-component-page',
     async (_event, pageConfig: PageConfig, components: Component[], basePath: string) => {
         await addComponentToPage(pageConfig, components, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:create-app',
-    async (_event, appConfig: AppConfig, basePath: string) => {
-        const repo = new ProjectRepository()
-        await newApp(appConfig, basePath)
-        await repo.save({
-            path: basePath,
-            dt_created: new Date(),
-            location: 'local',
-            config: {
-                type: appConfig.type,
-                name: appConfig.appName
-            }
-        })
     }
 )
 

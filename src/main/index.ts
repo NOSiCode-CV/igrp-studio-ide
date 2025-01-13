@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { FolderFiles, HandlerResponse, IOpenProject, Project } from './types'
+import { FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
 
 import { fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './repo/projects'
@@ -126,16 +126,16 @@ ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<I
 
 ipcMain.handle(
     'igrp-studio:repo:project.findAllRecent',
-    async (_event, page: { page: number; size: number }) => {
-        return await repo.findAllRecent(page)
+    async (_event) => {
+        return await repo.findAllRecent()
     }
 )
 
-ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: Project) => {
+ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: ProjectData) => {
     await repo.save(project)
 })
 
-ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: Project, index: number) => {
+ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: ProjectData, index: number) => {
     await repo.delete(project, index)
 })
 

@@ -1,7 +1,7 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Database, FileCode, Folder, FileText, Circle, LucideIcon, Zap } from 'lucide-react'
+import { Database, FileCode, FileText, Circle, LucideIcon, Zap } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
 

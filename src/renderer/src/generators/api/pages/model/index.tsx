@@ -24,7 +24,6 @@ import {
 import { Label } from '@renderer/components/ui/label';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { TextInput } from '../../components/inputs-form';
-import PrimaryKeyTable from './PrimaryKeyTable';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
@@ -112,12 +111,9 @@ const ModelLayout = ({
                 attributes,
                 crud,
                 primaryKey,
-                relations,
                 uniqueConstraints,
                 indexes,
             } = data;
-
-            const crudValue = crud ? [crud] : [defaultValues.crud];
 
             const firstNonEmptyGenerationType =
                 attributes.find((attr) => attr.generationType)
@@ -154,16 +150,11 @@ const ModelLayout = ({
 
             formik.setFieldValue('name', name || '');
             formik.setFieldValue('tableName', tableName || '');
-            formik.setFieldValue('crud', crudValue);
             formik.setFieldValue('generationType', firstNonEmptyGenerationType);
             formik.setFieldValue('enableCrud', crud?.enabled || false);
             formik.setFieldValue(
                 'attributes',
                 mergedAttributes || [defaultValues.attributes]
-            );
-            formik.setFieldValue(
-                'relations',
-                relations || [defaultValues.relations]
             );
             formik.setFieldValue('uniqueConstraints', constraints);
             formik.setFieldValue('indexes', indexesTable);
@@ -172,7 +163,8 @@ const ModelLayout = ({
 
     const handleSave = async (): Promise<void> => {
         try {
-            const values = getValuesToSubmit(formik.values, currentItem.module);
+            const values = getValuesToSubmit(formik.values, currentItem?.module);
+            console.log(values)
 
             const { error } = await window.api.createModel(values, basePath);
 
@@ -334,7 +326,7 @@ const ModelLayout = ({
                     </Card>
                     <Card className="p-6 rounded-sm">
                         <Tabs defaultValue="attributes">
-                            <TabsList className="grid w-full grid-cols-5">
+                            <TabsList className="grid w-full grid-cols-3">
                                 {TabList.map(({ label, value }, key) => (
                                     <TabsTrigger key={key} value={value}>
                                         {label}
@@ -344,12 +336,6 @@ const ModelLayout = ({
                             {TabList.map(({ value }, key) => (
                                 <TabsContent key={key} value={value}>
                                     <Card className="rounded-sm">
-                                        {value === 'uniqueConstraints' && (
-                                            <PrimaryKeyTable
-                                                validation={formik}
-                                                selectors={selectors}
-                                            />
-                                        )}
                                         {renderFormList(value)}
                                     </Card>
                                 </TabsContent>

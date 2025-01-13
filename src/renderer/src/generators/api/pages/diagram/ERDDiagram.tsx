@@ -175,6 +175,6 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
     }, [models, relations]);
 
     return (
-        <div ref={diagramRef} className="w-full h-[600px] " />
+        <div ref={diagramRef} className="w-full h-[600px] "  style={{ height: 'calc(100vh - 9.5rem)' }}/>
     );
 }

@@ -30,7 +30,7 @@ export function JSONSchemaBuilder({
     schemaTypes,
 }: JSONSchemaBuilderProps) {
     const [newFields, setNewFields] = useState<Record<string, SchemaField>>({});
-    const [alert, setAlert] = useState<string | null>(null);
+    const [_alert, setAlert] = useState<string | null>(null);
 
     const [schema, setSchema] = useState<JSONSchema>(() => {
         if (initialSchema) {
@@ -165,7 +165,7 @@ export function JSONSchemaBuilder({
                                         properties: Object.fromEntries(
                                             Object.entries(
                                                 updatedProperties
-                                            ).map(([key, value]) => {
+                                            ).map(([_key, value]) => {
                                                 const updatedValue =
                                                     checkAndUpdateDuplicateNames(
                                                         value,

@@ -1,6 +1,6 @@
 import logo from '@renderer/assets/images/igrp-blue.svg';
 import { useEffect, useState } from 'react';
-import { ConfigOptions } from 'src/main/types';
+import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
     Bell,
@@ -30,7 +30,7 @@ import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
-    config?: ConfigOptions;
+    config?: ProjectData;
     basePath?: string;
 }
 

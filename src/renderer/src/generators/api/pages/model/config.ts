@@ -1,4 +1,4 @@
-import { ModelConfig, Relation } from '@igrp/spring-engine/dist/interfaces/types'
+import { ModelConfig } from '@igrp/spring-engine/dist/interfaces/types'
 import { formatMethods } from '../../helpers'
 import { IColumnsTabelProps } from '../../types/Interfaces'
 
@@ -12,30 +12,22 @@ export const initialValues = {
 	generationType: 'IDENTITY',
 	attributes: [
 		{
+			name: 'id',
+			type: 'integer',
+			length: null,
+			defaultValue: '',
+			nullable: false,
+			unique: false,
+			primaryKey: true
+		},
+		{
 			name: '',
-			type: 'String',
+			type: 'string',
 			length: null,
 			defaultValue: '',
 			nullable: true,
 			unique: false,
 			primaryKey: false
-		}
-	],
-	relations: [
-		{
-			relationType: '',
-			entity: '',
-			joinColumn: '',
-			mappedBy: '',
-			joinTable: '',
-			inverseJoinColumn: ''
-		}
-	],
-	crud: [
-		{
-			enabled: false,
-			path: '',
-			disabledMethods: []
 		}
 	],
 	indexes: [
@@ -59,25 +51,12 @@ export const initialValues = {
 export const defaultValues: any = {
 	attributes: {
 		name: '',
-		type: 'String',
+		type: 'string',
 		length: 0,
 		defaultValue: '',
 		nullable: false,
 		unique: false,
 		primaryKey: false
-	},
-	relations: {
-		relationType: '',
-		entity: '',
-		joinColumn: '',
-		mappedBy: '',
-		joinTable: '',
-		inverseJoinColumn: ''
-	},
-	crud: {
-		enabled: false,
-		path: '',
-		disabledMethods: []
 	},
 	indexes: {
 		name: '',
@@ -99,14 +78,12 @@ export const btnLabels = {
 }
 
 // SELECT, SELECT-MULTI AND CHECKBOX OPTIONS
-export type TabType = 'attributes' | 'relations' | 'crud' | 'indexes' | 'uniqueConstraints'
+export type TabType = 'attributes' | 'indexes' | 'uniqueConstraints'
 
 export const TabList = [
 	{ label: 'Fields', value: 'attributes' },
-	{ label: 'Relations', value: 'relations' },
-	{ label: 'CRUD', value: 'crud' },
 	{ label: 'Indexes', value: 'indexes' },
-	{ label: 'Constraints', value: 'uniqueConstraints' }
+	{ label: 'Unique Constraints', value: 'uniqueConstraints' }
 ]
 
 export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
@@ -153,16 +130,25 @@ export const getTablesColumns = ({
 			}
 			| undefined
 		)?.ATTRIBUTE_TYPES || []
-	)
 
+
+	)
+	const generateTypes = formatMethods(
+		(
+			selectors.find((selector) => 'GENERATION_TYPES' in selector) as
+			| { GENERATION_TYPES: string[] }
+			| undefined
+		)?.GENERATION_TYPES || []
+	)
 	return {
 		attributes: [
 			{ key: 'name', name: 'Name', type: 'text' },
 			{ key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
 			{
 				key: 'group', name: '', type: 'group', items: [
+					{ key: 'relation', name: 'Relation', type: 'popoverRelation' },
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
-					{ key: 'advanced', name: '', type: 'popoverModel' }
+					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes }
 				]
 			}
 		],
@@ -220,9 +206,6 @@ export const getValuesToSubmit = (values, module) => {
 	delete values.enableCrud;
 	delete values.generationType;
 
-	const relations: Relation[] =
-		values.relations?.filter((rel) => rel.relationType !== '') || [];
-
 	const uniqueConstraints =
 		values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
 
@@ -251,7 +234,6 @@ export const getValuesToSubmit = (values, module) => {
 	const newValues: ModelConfig = {
 		...values,
 		attributes: filteredAttributes,
-		relations,
 		uniqueConstraints,
 		indexes,
 		crud: {
@@ -261,8 +243,6 @@ export const getValuesToSubmit = (values, module) => {
 		primaryKey: hasListPk ? primaryKey : [],
 		module
 	};
-
-	if (!enableCrud && !newValues.crud?.path) delete newValues.crud;
 
 	return newValues;
 };

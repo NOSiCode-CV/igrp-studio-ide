@@ -46,7 +46,7 @@ const Navdata = (folders: any) => {
     const dropdownSchemas: dropdownItem[] = [
         {
             label: t('newModels'),
-            actionType: OPTION_TYPE.MODELS,
+            actionType: OPTION_TYPE.MODEL,
             icon: getIcon(OPTION_TYPE.MODELS),
         },
         {
@@ -85,7 +85,7 @@ const Navdata = (folders: any) => {
         },
         {
             label: t('newModels'),
-            actionType: OPTION_TYPE.MODELS,
+            actionType: OPTION_TYPE.MODEL,
             icon: getIcon(OPTION_TYPE.MODELS),
         },
     ];

@@ -5,30 +5,45 @@ type HandlerResponse<T = any> = {
     error?: string;
 };
 
-export interface IOpenProject {
-    canceled: boolean,
-    folderExists: boolean,
-    config?: ConfigOptions,
-    basePath?: string
+export interface NextConfigData {
+    appName: string
+    description?: string
 }
 
-export type Project = {
-    path: string,
-    config: ConfigOptions
+export interface DotNetConfigData {
+    projectName: string
+    solutionName: string
+    framework: string
+    language: string
+    auth: boolean
+    https: boolean
+    dockerSupport: boolean
+}
+
+export interface SpringConfigData {
+    apiName: string;
+    description: string;
+    group: string;
+    artifact: string;
+    database: string;
+    structureStyle: 'technical' | 'domain';
+    enableObservability: boolean;
+    igrpCoreVersion: string;
+}
+
+export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;
+
+export interface ProjectData {
+    name: string;
+    icon?: File;
+    type?: 'frontend' | 'backend';
+    framework: string;
+    config: ConfigData | undefinedF;
+    path: string;
+    themeColor?: string;
     dt_created?: Date,
     dt_updated?: Date,
     location?: location
-}
-
-export interface ConfigOptions {
-    type: string;
-    name: string;
-    group?: string;
-    artifact?: string;
-    database?: string;
-    description?: string;
-    package?: string;
-    projectStructureStyle?: false
 }
 
 export type Page = {
@@ -36,7 +51,14 @@ export type Page = {
     size: number
 }
 
-export type PageableProjects = { data: Array<Project>, total: number }
+export interface IOpenProject {
+    canceled: boolean,
+    folderExists: boolean,
+    config?: ProjectData,
+    basePath?: string
+}
+
+export type PageableProjects = { data: Array<ProjectData>, total: number }
 
 export interface MenuItem {
     id?: string; // id might be optional

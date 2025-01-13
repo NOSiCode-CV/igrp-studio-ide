@@ -31,8 +31,8 @@ export enum OPTION_TYPE {
 export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram';
 
 export const projectIcons = {
-    baseApp: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-    baseApi: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
+    springboot: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
+    nextjs: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
     dotnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',

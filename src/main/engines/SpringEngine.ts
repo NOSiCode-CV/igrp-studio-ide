@@ -3,6 +3,7 @@ import { addResponse, deleteElement, newApi } from '@igrp/spring-engine';
 import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
 import { BaseApiConfig, DeleteConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ProjectData } from '../types';
 
 export class SpringEngine implements BaseEngine {
 
@@ -10,12 +11,12 @@ export class SpringEngine implements BaseEngine {
     await deleteElement(config, basePath)
   }
 
-  async createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void> {
+  async createProject(project: ProjectData, basePath: string): Promise<void> {
 
     const repo = new ProjectRepository()
 
-    const config = {
-      ...apiConfig,
+    const config: BaseApiConfig = {
+      ...project.config,
       type: 'baseApi'
     }
 
@@ -23,10 +24,10 @@ export class SpringEngine implements BaseEngine {
     await newApi(config, basePath);
 
     await repo.save({
+      ...project,
       path: basePath,
       dt_created: new Date(),
-      location: 'local',
-      config: { ...config, name: config.apiName },
+      location: 'local'
     });
   }
 

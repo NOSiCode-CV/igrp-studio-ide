@@ -121,7 +121,7 @@ const PageController = ({
                     onUpdateTab={handleUpdate}
                 />
             )}
-            {option === OPTION_TYPE.MODEL && (
+            {option === OPTION_TYPE.ACTION && (
                 <ControllerLayout
                     basePath={basePath}
                     selectors={selectors}

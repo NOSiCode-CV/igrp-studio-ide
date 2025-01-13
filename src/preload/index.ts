@@ -7,7 +7,7 @@ import {
 	ModelConfig
 } from '@igrp/spring-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
-import { Connection, DatabaseResponse, HandlerResponse, Page, Project } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -79,14 +79,6 @@ const api = {
 		}
 	},
 
-	createAppNext: async (apiConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:create-app', apiConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
 	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
@@ -151,9 +143,9 @@ const api = {
 }
 
 const engine = {
-	createApi: async (apiConfig: any, basePath: string): Promise<HandlerResponse> => {
+	createProject: async (project: ProjectData, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-api', apiConfig, basePath)
+			return await ipcRenderer.invoke('engine:create-project', project, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -179,10 +171,10 @@ const repo = {
 		findAllRecent: (page: Page) => {
 			return ipcRenderer.invoke('igrp-studio:repo:project.findAllRecent', page)
 		},
-		save: (p: Project) => {
+		save: (p: ProjectData) => {
 			return ipcRenderer.invoke('igrp-studio:repo:project.save', p)
 		},
-		delete: (p: Project, index: number) => {
+		delete: (p: ProjectData, index: number) => {
 			return ipcRenderer.invoke('igrp-studio:repo:project.delete', p, index)
 		}
 	},

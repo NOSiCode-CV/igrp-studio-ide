@@ -6,7 +6,7 @@ import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { FieldOptionsPopover } from './FieldOptionsPopover';
 import { SchemaField } from '../../types/schema';
-import { TypeSelectorPopover } from './TypeSelectorPopover';
+import { TypeSelectorPopover } from '../../../../components/TypeSelectorPopover';
 
 interface SchemaFieldRowProps {
     id: string;
@@ -157,10 +157,10 @@ export function SchemaFieldRow({
                             );
                         }}
                         onDelete={() => {
-                            const { [subId]: _, ...newProperties } =
-                                field.properties;
+                           /*  const { [subId]: _, ...newProperties } =
+                                field.properties; */
                             onUpdate(
-                                { ...field, properties: newProperties },
+                                { ...field, properties: field.properties },
                                 index
                             );
                         }}

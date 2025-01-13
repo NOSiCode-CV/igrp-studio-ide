@@ -23,7 +23,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
-import { ConfigOptions, MenuItem } from 'src/main/types';
+import { ProjectData, MenuItem } from 'src/main/types';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
@@ -32,7 +32,7 @@ import { useNavigate } from 'react-router-dom';
 interface AppSidebarProps {
     className?: string;
     menuItems: MenuItem[];
-    config?: ConfigOptions;
+    config?: ProjectData;
     basePath: string;
     header?: boolean;
 }

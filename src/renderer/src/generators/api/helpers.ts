@@ -1,4 +1,3 @@
-import { OptionType } from '@renderer/constants/appConstants';
 import { FormikValues } from 'formik';
 
 export function formatMethods(elements: string[]): { label: string; value: string }[] {

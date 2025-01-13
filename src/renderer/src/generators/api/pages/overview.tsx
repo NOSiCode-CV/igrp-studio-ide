@@ -8,7 +8,6 @@ import DashboardOverview from '../components/dashboard-overview';
 
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { ContainerScrollArea } from '../components/ContainerScrollArea';
 
 interface NewProps {
