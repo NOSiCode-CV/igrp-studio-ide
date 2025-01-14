@@ -49,7 +49,7 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
 
         const folderArray = Object.values(folders);
 
-        newStats.modules = folderArray.length - 1;
+        newStats.modules = folderArray.length > 1 ? folderArray.length - 1 : 0;
 
         folderArray.forEach((module: any) => {
             if (module.files) {

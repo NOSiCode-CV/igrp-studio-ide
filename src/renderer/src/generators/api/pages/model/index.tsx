@@ -83,7 +83,7 @@ const ModelLayout = ({
         const res = getTablesColumns({
             selectors,
             attributes: formik.values.attributes,
-            models
+            models,
         });
         setTableColumns(res);
     }, [selectors, formik.values]);
@@ -114,10 +114,6 @@ const ModelLayout = ({
                 uniqueConstraints,
                 indexes,
             } = data;
-
-            const firstNonEmptyGenerationType =
-                attributes.find((attr) => attr.generationType)
-                    ?.generationType || null;
 
             const primaryKeyAttributes =
                 primaryKey && Array.isArray(primaryKey)
@@ -150,8 +146,7 @@ const ModelLayout = ({
 
             formik.setFieldValue('name', name || '');
             formik.setFieldValue('tableName', tableName || '');
-            formik.setFieldValue('generationType', firstNonEmptyGenerationType);
-            formik.setFieldValue('enableCrud', crud?.enabled || false);
+            formik.setFieldValue('crud', crud || false);
             formik.setFieldValue(
                 'attributes',
                 mergedAttributes || [defaultValues.attributes]
@@ -163,8 +158,11 @@ const ModelLayout = ({
 
     const handleSave = async (): Promise<void> => {
         try {
-            const values = getValuesToSubmit(formik.values, currentItem?.module);
-            console.log(values)
+            const values = getValuesToSubmit(
+                formik.values,
+                currentItem?.module
+            );
+            console.log(values);
 
             const { error } = await window.api.createModel(values, basePath);
 
@@ -309,14 +307,14 @@ const ModelLayout = ({
 
                                     <div className="flex items-center space-x-2">
                                         <Checkbox
-                                            id="enableCrud"
+                                            id="crud"
                                             onCheckedChange={(checked) =>
                                                 formik.setFieldValue(
-                                                    'enableCrud',
+                                                    'crud',
                                                     checked
                                                 )
                                             }
-                                            checked={formik.values.enableCrud}
+                                            checked={formik.values.crud}
                                         />
                                         <Label htmlFor="Crud">Crud</Label>
                                     </div>

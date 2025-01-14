@@ -8,7 +8,8 @@ export const initialValues = {
     requestBody: "",
     responses: {
         '200': {
-            description: "OK",
+            description: null,
+            name: "OK",
             content: {
                 "application/json": {
                     schema: {

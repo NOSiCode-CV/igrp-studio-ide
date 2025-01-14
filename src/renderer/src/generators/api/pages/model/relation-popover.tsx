@@ -19,6 +19,7 @@ import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { RelationTypeSelector } from './relation-type-selector';
 import { Switch } from '@renderer/components/ui/Switch';
+import { Relation } from '@igrp/spring-engine/dist/interfaces/types';
 
 const tables = [
     { name: 'Users', columns: ['id', 'name', 'email'] },
@@ -34,27 +35,28 @@ interface RelationPopoverProps {
 export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
     const [open, setOpen] = useState(false);
 
-    const [localRelation, setLocalRelation] = useState(
+    const [localRelation, setLocalRelation] = useState<Relation>(
         field.relation || {
             type: 'OneToOne',
-            target: '',
-            targetColumn: '',
+            entity: '',
+            referencedColumnName: '',
             cardinality: 'oneWay',
-            inversedBy: '',
+            inverseJoinColumn: '',
+            joinTable: '', //Name of the intermediate table
         }
     );
     const [availableColumns, setAvailableColumns] = useState<string[]>([]);
 
     useEffect(() => {
-        if (localRelation.target) {
+        if (localRelation.entity) {
             const targetTable = tables.find(
-                (t) => t.name === localRelation.target
+                (t) => t.name === localRelation.entity
             );
             setAvailableColumns(targetTable?.columns || []);
         } else {
             setAvailableColumns([]);
         }
-    }, [localRelation.target, tables]);
+    }, [localRelation.entity, tables]);
 
     const handleUpdate = () => {
         changeValue('relation', localRelation);
@@ -65,13 +67,13 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
                 <Button variant="link" className="w-full justify-start">
-                    {field.relation && field.relation.target
-                        ? `${field.relation.type} with ${field.relation.target}.${field.relation.targetColumn}`
+                    {field.relation && field.relation.entity
+                        ? `${field.relation.type} with ${field.relation.entity}.${field.relation.referencedColumnName}`
                         : 'Set Relation'}
                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-96">
+            <PopoverContent className="w-100">
                 <div className="space-y-5">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">
@@ -90,22 +92,42 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                             })
                         }
                         sourceField={field.name}
-                        targetField={localRelation.target || 'Target'}
+                        targetField={localRelation.entity || 'entity'}
                     />
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-2 space-y-5">
+                        {localRelation.type === 'ManyToMany' && (
+                            <div className="col-span-2 gap-2">
+                                <Label htmlFor="joinTable">Entity Name</Label>
+                                <Input
+                                    id="joinTable"
+                                    value={localRelation.joinTable || ''}
+                                    onChange={(e) =>
+                                        setLocalRelation({
+                                            ...localRelation,
+                                            joinTable: e.target.value,
+                                        })
+                                    }
+                                    placeholder="e.g., UserRole"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Name of the intermediate table, for example
+                                    "UserRole".
+                                </p>
+                            </div>
+                        )}
                         <div className="grid gap-2">
-                            <Label htmlFor="target">Target Table</Label>
+                            <Label htmlFor="entity">Entity</Label>
                             <Select
-                                value={localRelation.target}
+                                value={localRelation.entity}
                                 onValueChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
-                                        target: value,
-                                        targetColumn: '',
+                                        entity: value,
+                                        referencedColumnName: '',
                                     })
                                 }
                             >
-                                <SelectTrigger id="target">
+                                <SelectTrigger id="entity">
                                     <SelectValue placeholder="Select target table" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -121,18 +143,20 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="targetColumn">Target Column</Label>
+                            <Label htmlFor="referencedColumnName">
+                                Reference Column Name
+                            </Label>
                             <Select
-                                value={localRelation.targetColumn}
+                                value={localRelation.referencedColumnName}
                                 onValueChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
-                                        targetColumn: value,
+                                        referencedColumnName: value,
                                     })
                                 }
                             >
-                                <SelectTrigger id="targetColumn">
-                                    <SelectValue placeholder="Select target column" />
+                                <SelectTrigger id="referencedColumnName">
+                                    <SelectValue placeholder="Select reference column" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {availableColumns.map((column) => (
@@ -144,6 +168,28 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                             </Select>
                         </div>
                     </div>
+
+                    {(localRelation.cardinality === 'twoWay' ||
+                        localRelation.type === 'ManyToMany') && (
+                        <div className="grid gap-2">
+                            <Label htmlFor="inverseJoinColumn">
+                                Field Name in{' '}
+                                {localRelation.joinTable ||
+                                    localRelation.entity}
+                            </Label>
+                            <Input
+                                id="inverseJoinColumn"
+                                value={localRelation.inverseJoinColumn || ''}
+                                onChange={(e) =>
+                                    setLocalRelation({
+                                        ...localRelation,
+                                        inverseJoinColumn: e.target.value,
+                                    })
+                                }
+                                placeholder="e.g., posts"
+                            />
+                        </div>
+                    )}
                     <div className="flex items-center space-x-2">
                         <Switch
                             id="cardinality"
@@ -159,24 +205,6 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                             Two-way relationship
                         </Label>
                     </div>
-                    {localRelation.cardinality === 'twoWay' && (
-                        <div className="grid gap-2">
-                            <Label htmlFor="inversedBy">
-                                Field Name in {localRelation.target}
-                            </Label>
-                            <Input
-                                id="inversedBy"
-                                value={localRelation.inversedBy || ''}
-                                onChange={(e) =>
-                                    setLocalRelation({
-                                        ...localRelation,
-                                        inversedBy: e.target.value,
-                                    })
-                                }
-                                placeholder="e.g., posts"
-                            />
-                        </div>
-                    )}
                     <div className="flex justify-between">
                         <Button
                             variant="outline"

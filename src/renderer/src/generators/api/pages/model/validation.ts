@@ -62,17 +62,6 @@ export function useModelValidation({t}) {
                 type: Yup.string().required('Type is required')
             })
         ),
-        relations: Yup.array().of(conditionalValidation),
-        crud: Yup.array().of(
-            Yup.object().shape({
-                path: Yup.string().when('$enableCrud', (enableCrud, schema) => {
-                    return enableCrud && enableCrud[0] === true
-                        ? schema.required('Path is required')
-                        : schema.notRequired();
-                }),
-            })
-        ),
-
         indexes: Yup.array().of(
             Yup.object().shape({
                 /* name: Yup.string().required('Name is required') */

@@ -65,5 +65,6 @@
   "newResponses": "New Response",
   "responses": "Responses",
   "documents": "Documents",
-  "apis":"APIs"
+  "apis":"APIs",
+  "schemaCreatedSuccess": "Schema have been successfully added."
 }

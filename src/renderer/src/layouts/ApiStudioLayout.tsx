@@ -15,9 +15,14 @@ import { AppSidebar } from './components/app-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { Navdata } from './components/nav-data';
+import { ProjectData } from 'src/main/types';
 
 interface LayoutProps {
-    children: React.ReactElement<{ basePath: string; currentItem: any }>;
+    children: React.ReactElement<{
+        basePath: string;
+        currentItem: any;
+        project: ProjectData;
+    }>;
 }
 
 const Layout = (props: LayoutProps): JSX.Element => {
@@ -82,6 +87,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
                         {React.cloneElement(props.children, {
                             basePath,
                             currentItem,
+                            project: config,
                         })}
                     </SidebarInset>
                 </div>

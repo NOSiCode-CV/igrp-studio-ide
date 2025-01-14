@@ -17,7 +17,7 @@ export class SpringEngine implements BaseEngine {
 
     const config: BaseApiConfig = {
       ...project.config,
-      type: 'baseApi'
+      type: project.framework
     }
 
     // Lógica específica do Spring

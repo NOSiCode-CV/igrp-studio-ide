@@ -22,14 +22,14 @@ interface TabResponseProps {
     formik: any;
     schemaTypes?: { label: string; value: string }[];
     contentTypes: any;
-    responseTypes: Array<any>
+    responseTypes: Array<any>;
 }
 
 export const TabResponse: React.FC<TabResponseProps> = ({
     formik,
     contentTypes,
     schemaTypes,
-    responseTypes
+    responseTypes,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
@@ -47,7 +47,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         const updatedResponses = {
             ...formik.values.responses,
             [statusCode]: {
-                description: name,
+                name,
+                decription: null,
                 content: {
                     [contentType]: {
                         schema: null,
@@ -134,7 +135,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     : ''
                             }`}
                         >
-                            {`${responses[statusCode].description} (${statusCode})`}
+                            {`${responses[statusCode].name} (${statusCode})`}
                         </button>
                     ))}
                 </div>
@@ -144,13 +145,18 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     onSave={handleAddResponse}
                     contentTypes={contentTypes}
                 />
-                <AddResponseMenu onAddBlankResponse={handleAddBlankResponse} responseTypes={responseTypes} onSave={handleAddResponse}/>
+                <AddResponseMenu
+                    onAddBlankResponse={handleAddBlankResponse}
+                    responseTypes={responseTypes}
+                    onSave={handleAddResponse}
+                />
             </div>
 
             {/* Response Tab Content */}
             <div>
                 {Object.keys(responses).map((statusCode) => {
                     const description = responses[statusCode].description;
+                    const name = responses[statusCode].name;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];
                     const contentData = content[contentType]['schema'];
@@ -189,7 +195,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     </Label>
                                     <Input
                                         name={t('name')}
-                                        value={description}
+                                        value={name}
                                         placeholder=""
                                         onChange={(value) =>
                                             formik.setFieldValue('name', value)
@@ -214,6 +220,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         className="w-full focus:ring-igrp focus:border-igrp h-9"
                                     />
                                 </div>
+
                                 {Object.keys(responses).length > 1 && (
                                     <Button
                                         variant="ghost"
@@ -224,6 +231,23 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         <Trash />
                                     </Button>
                                 )}
+                            </div>
+
+                            {/* Descritpion */}
+                            <div className="space-y-2">
+                                <Label>Descritpion</Label>
+                                <Input
+                                    type="text"
+                                    name="description"
+                                    value={description}
+                                    onChange={(value) =>
+                                        formik.setFieldValue(
+                                            'description',
+                                            value
+                                        )
+                                    }
+                                    className="w-full"
+                                />
                             </div>
 
                             <Card className="rounded">

@@ -276,7 +276,7 @@ export const ResponseLayout = ({
                             />
                         </div>
                     </div>
-                    {/* Name */}
+                    {/* Descritpion */}
                     <div className="space-y-2">
                         <Label>Descritpion</Label>
                         <Input

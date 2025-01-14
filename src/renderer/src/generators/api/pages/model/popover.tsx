@@ -73,7 +73,6 @@ export function PopoverModel({
                         <Tabs defaultValue="dataType">
                             <TabsList className="grid w-full grid-cols-1">
                                 <TabsTrigger value="dataType">
-                                    {' '}
                                     {t('Data Type')}
                                 </TabsTrigger>
                             </TabsList>
@@ -125,7 +124,7 @@ export function PopoverModel({
                                                     value={
                                                         row?.[
                                                             'generationType'
-                                                        ] || ''
+                                                        ] || 'IDENTITY'
                                                     }
                                                     onChange={(value) =>
                                                         changeValue(

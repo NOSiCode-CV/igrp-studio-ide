@@ -8,8 +8,7 @@ export const initialValues = {
 	name: '',
 	tableName: '',
 	audit: true,
-	enableCrud: false,
-	generationType: 'IDENTITY',
+	crud: false,
 	attributes: [
 		{
 			name: 'id',
@@ -18,7 +17,8 @@ export const initialValues = {
 			defaultValue: '',
 			nullable: false,
 			unique: false,
-			primaryKey: true
+			primaryKey: true,
+			generationType: 'IDENTITY'
 		},
 		{
 			name: '',
@@ -106,30 +106,14 @@ export const getTablesColumns = ({
 		label: attribute.name
 	}))
 
-	const disabledOptions = formatMethods(
-		(
-			selectors.find((selector) => 'CRUD_DISABLED_OPTIONS' in selector) as
-			| { CRUD_DISABLED_OPTIONS: string[] }
-			| undefined
-		)?.CRUD_DISABLED_OPTIONS || []
-	)
-
-	const relationTypeOptions = formatMethods(
-		(
-			selectors.find((selector) => 'RELATIONSHIP_TYPES' in selector) as
-			| { RELATIONSHIP_TYPES: string[] }
-			| undefined
-		)?.RELATIONSHIP_TYPES || []
-	)
-
 	const fieldTypeOptions = formatMethods(
 		(
-			selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+			selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
 			| {
-				ATTRIBUTE_TYPES: string[]
+				MODEL_ATTRIBUTE_TYPES: string[]
 			}
 			| undefined
-		)?.ATTRIBUTE_TYPES || []
+		)?.MODEL_ATTRIBUTE_TYPES || []
 
 
 	)
@@ -146,34 +130,10 @@ export const getTablesColumns = ({
 			{ key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
 			{
 				key: 'group', name: '', type: 'group', items: [
-					{ key: 'relation', name: 'Relation', type: 'popoverRelation' },
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
-					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes }
+					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes },
+					{ key: 'relation', name: 'Relation', type: 'popoverRelation' },
 				]
-			}
-		],
-		relations: [
-			{
-				key: 'relationType',
-				name: 'Relation Type',
-				type: 'select',
-				options: relationTypeOptions,
-				width: '16%'
-			},
-			{ key: 'entity', name: 'Entity', type: 'select', options: modelsOptions, width: '16%' },
-			{ key: 'joinColumn', name: 'Join Column', type: 'text', width: '16%' },
-			{ key: 'mappedBy', name: 'Mapped By', type: 'text', width: '16%' },
-			{ key: 'joinTable', name: 'Join Table', type: 'text', options: [], width: '16%' },
-			{ key: 'inverseJoinColumn', name: 'Inverse Join Column', type: 'text', width: '16%' }
-		],
-		crud: [
-			{ key: 'path', name: 'Path', type: 'text', width: '25%' },
-			{
-				key: 'disabledMethods',
-				name: 'Disabled Methods',
-				type: 'multiSelect',
-				options: disabledOptions,
-				width: '75%'
 			}
 		],
 		indexes: [
@@ -200,11 +160,6 @@ export const getTablesColumns = ({
 }
 
 export const getValuesToSubmit = (values, module) => {
-	const enableCrud = values.enableCrud || false;
-	const generationType = values.generationType;
-
-	delete values.enableCrud;
-	delete values.generationType;
 
 	const uniqueConstraints =
 		values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
@@ -214,8 +169,7 @@ export const getValuesToSubmit = (values, module) => {
 	const attributes = values.attributes.map(({ ...field }) => ({
 		...field,
 		length: field.length ? Number(field.length) : 255,
-		nullable: !field.nullable,
-		generationType: field.primaryKey === true ? generationType : '',
+		nullable: !field.nullable
 	}));
 
 	const primaryKey = values.attributes
@@ -236,10 +190,6 @@ export const getValuesToSubmit = (values, module) => {
 		attributes: filteredAttributes,
 		uniqueConstraints,
 		indexes,
-		crud: {
-			...values.crud?.[0],
-			enabled: enableCrud,
-		},
 		primaryKey: hasListPk ? primaryKey : [],
 		module
 	};

@@ -1,136 +1,160 @@
+'use client';
+
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import { Checkbox } from '@renderer/components/ui/checkbox';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
-import { DotNetConfigData } from 'src/main/types';
+    RadioGroup,
+    RadioGroupItem,
+} from '@renderer/components/ui/radio-group';
+import { Checkbox } from '@renderer/components/ui/checkbox';
+import { Textarea } from '@renderer/components/ui/Textarea';
+import { useEffect, useState } from 'react';
+import { HandlerResponse, DotNetConfigData } from 'src/main/types';
+import { Combobox } from '@igrp/igrp-design-system';
+import { DatabaseOptions } from '@renderer/constants/appConstants';
 
 interface DotNetConfigProps {
     data: DotNetConfigData;
     onChange: (data: DotNetConfigData) => void;
 }
 
-const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
-    projectName: '',
-    solutionName: '',
-    framework: 'net7.0',
-    language: 'C#',
-    auth: false,
-    https: true,
-    dockerSupport: false,
+const DEFAULT_SPRING_CONFIG: DotNetConfigData = {
+    apiName: '',
+    description: '',
+    artifact: '',
+    database: 'postgresql',
+    projectStructureStyle: 'technical',
+    enableObservability: false,
+    igrpCoreVersion: 'latest',
 };
 
 export function DotNetConfig({
-    data = DEFAULT_DOTNET_CONFIG,
+    data = DEFAULT_SPRING_CONFIG,
     onChange,
 }: DotNetConfigProps) {
+    const [versions, setVersions] = useState([]);
+
+    useEffect(() => {
+        const getVersions = async () => {
+            const data: HandlerResponse = await window.api.getVersions(
+                'https://sonatype.nosi.cv/service/rest/v1/search?repository=igrp-framework&group=cv.igrp&name=core'
+            );
+
+            const options = data.result.map((value) => {
+                return {
+                    label: value,
+                    value: value,
+                };
+            });
+
+            setVersions(options);
+        };
+        getVersions();
+    }, []);
+
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="project-name">Project Name</Label>
+                <Label htmlFor="apiName">Name of the project</Label>
                 <Input
-                    id="project-name"
-                    value={data.projectName}
+                    id="apiName"
+                    value={data.apiName}
                     onChange={(e) =>
-                        onChange({ ...data, projectName: e.target.value })
+                        onChange({ ...data, apiName: e.target.value })
                     }
-                    placeholder="MyDotNetProject"
+                    placeholder="Name of the project"
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="solution-name">Solution Name</Label>
-                <Input
-                    id="solution-name"
-                    value={data.solutionName}
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                    id="description"
+                    value={data.description}
                     onChange={(e) =>
-                        onChange({ ...data, solutionName: e.target.value })
+                        onChange({ ...data, description: e.target.value })
                     }
-                    placeholder="MyDotNetSolution"
+                    placeholder="Project description"
                 />
             </div>
 
             <div className="space-y-2">
-                <Label>Framework</Label>
-                <Select
-                    value={data.framework}
-                    onValueChange={(value) =>
-                        onChange({ ...data, framework: value })
+                <Label htmlFor="artifact">Artifact</Label>
+                <Input
+                    id="artifact"
+                    value={data.artifact}
+                    onChange={(e) =>
+                        onChange({ ...data, artifact: e.target.value })
                     }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select framework" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="net7.0">.NET 7.0</SelectItem>
-                        <SelectItem value="net6.0">.NET 6.0</SelectItem>
-                        <SelectItem value="net5.0">.NET 5.0</SelectItem>
-                        <SelectItem value="netcoreapp3.1">
-                            .NET Core 3.1
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    placeholder="my-project"
+                />
             </div>
 
-            <div className="space-y-2">
-                <Label>Language</Label>
-                <Select
-                    value={data.language}
-                    onValueChange={(value) =>
-                        onChange({ ...data, language: value })
-                    }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="C#">C#</SelectItem>
-                        <SelectItem value="F#">F#</SelectItem>
-                        <SelectItem value="VB">Visual Basic</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="auth"
-                        checked={data.auth}
-                        onCheckedChange={(checked) =>
-                            onChange({ ...data, auth: checked as boolean })
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2 flex flex-col">
+                    <Label>Choose DB Engine</Label>
+                    <Combobox
+                        name="database"
+                        value={data.database}
+                        onChange={(value) =>
+                            onChange({ ...data, database: value })
                         }
+                        options={DatabaseOptions}
+                        className="w-full"
                     />
-                    <Label htmlFor="auth">Include authentication</Label>
+                </div>
+                <div className="space-y-2 flex flex-col">
+                    <Label>IGRP Core Version</Label>
+                    <Combobox
+                        options={versions || []}
+                        name="igrpCoreVersion"
+                        value={data.igrpCoreVersion}
+                        onChange={(value) =>
+                            onChange({ ...data, igrpCoreVersion: value })
+                        }
+                        className="w-full"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2">
+                <div className="space-y-3">
+                    <Label>Project Structure Style</Label>
+                    <RadioGroup
+                        value={data.projectStructureStyle}
+                        onValueChange={(value) =>
+                            onChange({
+                                ...data,
+                                projectStructureStyle: value as
+                                    | 'technical'
+                                    | 'domain',
+                            })
+                        }
+                        className="flex gap-4"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="technical" id="technical" />
+                            <Label htmlFor="technical">Technical</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="domain" id="domain" />
+                            <Label htmlFor="domain">Domain</Label>
+                        </div>
+                    </RadioGroup>
                 </div>
 
                 <div className="flex items-center space-x-2">
                     <Checkbox
-                        id="https"
-                        checked={data.https}
-                        onCheckedChange={(checked) =>
-                            onChange({ ...data, https: checked as boolean })
-                        }
-                    />
-                    <Label htmlFor="https">Configure for HTTPS</Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="docker"
-                        checked={data.dockerSupport}
+                        id="observability"
+                        checked={data.enableObservability}
                         onCheckedChange={(checked) =>
                             onChange({
                                 ...data,
-                                dockerSupport: checked as boolean,
+                                enableObservability: checked as boolean,
                             })
                         }
                     />
-                    <Label htmlFor="docker">Enable Docker support</Label>
+                    <Label htmlFor="observability">Enable Observability</Label>
                 </div>
             </div>
         </div>

@@ -11,13 +11,15 @@ export interface NextConfigData {
 }
 
 export interface DotNetConfigData {
-    projectName: string
-    solutionName: string
-    framework: string
-    language: string
-    auth: boolean
-    https: boolean
-    dockerSupport: boolean
+    apiName: string;
+    artifact: string;
+    database: DatabaseTypes;
+    description?: string;
+    package?: string;
+    projectStructureStyle: ProjectStructureStyle;
+    name?: string;
+    enableObservability: boolean;
+    igrpCoreVersion: string;
 }
 
 export interface SpringConfigData {
@@ -28,7 +30,7 @@ export interface SpringConfigData {
     database: string;
     structureStyle: 'technical' | 'domain';
     enableObservability: boolean;
-    igrpCoreVersion: string;
+    projectStructureStyle: string;
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;

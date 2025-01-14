@@ -146,7 +146,7 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
                 {
                   textAlign: "center",
                   font: "bold 12px sans-serif",
-                  stroke: "white",
+                  stroke: "gray",
                   segmentIndex: 0,
                   segmentOffset: new go.Point(NaN, NaN),
                   segmentOrientation: go.Link.OrientUpright
@@ -157,7 +157,7 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
                 {
                   textAlign: "center",
                   font: "bold 12px sans-serif",
-                  stroke: "white",
+                  stroke: "gray",
                   segmentIndex: -1,
                   segmentOffset: new go.Point(NaN, NaN),
                   segmentOrientation: go.Link.OrientUpright

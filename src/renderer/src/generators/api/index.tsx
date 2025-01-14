@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 interface PageBuilderProps {
     basePath?: string;
     currentItem?: any;
-    folders?: any;
 }
 
 const Index = ({ basePath, currentItem }: PageBuilderProps) => {

@@ -21,8 +21,8 @@ export class DotNetEngine implements BaseEngine {
     const { config } = project;
 
     const baseConfig: BaseApiConfig = {
-      type: 'dotnet',
-      ...config
+      ...config,
+      type: project.framework
     };
 
     await newApi(baseConfig, basePath);

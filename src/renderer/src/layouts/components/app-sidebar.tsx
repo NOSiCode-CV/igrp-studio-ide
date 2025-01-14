@@ -231,7 +231,7 @@ function Three({
     };
 
     const navigate = useNavigate();
-    const handleNavigation = (link) => {
+    const handleNavigation = (link: string | undefined) => {
         if (link) navigate(link);
     };
 

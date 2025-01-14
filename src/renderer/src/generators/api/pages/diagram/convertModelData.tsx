@@ -25,10 +25,10 @@ export function convertModelData(inputModels: Array<any>): {
     const models: ModelData[] = inputModels.map((inputModel) => {
         const { content: model } = inputModel;
         const regularAttributes = model.attributes.filter(
-            (attr) => !attr.name.endsWith('_fk')
+            (attr) => attr.type !== 'relation'
         );
-        const inheritedAttributes = model.attributes.filter((attr) =>
-            attr.name.endsWith('_fk')
+        const inheritedAttributes = model.attributes.filter(
+            (attr) => attr.type === 'relation'
         );
         return {
             key: model.name,
@@ -39,19 +39,22 @@ export function convertModelData(inputModels: Array<any>): {
     });
 
     const relations: RelationData[] = inputModels.flatMap((inputModel) =>
-        (inputModel.content.relations || []).map((relation) => {
-            const mapping = relationMapping[relation.relationType] || {
-                text: '',
-                toText: '',
-            };
+        (inputModel.content.attributes || [])
+            .filter((attr) => attr.type === 'relation')
+            .map((attr) => {
+                const { relation } = attr;
+                const mapping = relationMapping[relation.type] || {
+                    text: '',
+                    toText: '',
+                };
 
-            return {
-                from: inputModel.name,
-                to: relation.entity,
-                text: mapping.text,
-                toText: mapping.toText,
-            };
-        })
+                return {
+                    from: inputModel.name,
+                    to: relation.entity,
+                    text: mapping.text,
+                    toText: mapping.toText,
+                };
+            })
     );
 
     return { models, relations };

@@ -123,6 +123,7 @@ const Navdata = (folders: any) => {
         }
 
         const folderMenuItem: MenuItem = {
+            id: folderName,
             icon: folderName === 'shared' ? Layers : Boxes,
             label: folderName === 'shared' ? t(folderName) : folderName,
             module: folderName,
@@ -137,7 +138,7 @@ const Navdata = (folders: any) => {
         // Process each folder's content
         folders[folderName].files.forEach((folder) => {
             Object.keys(folder).forEach((categoryName: string) => {
-                const getDropdownMenus = (category: string): MenuItem[] => {
+                const getDropdownMenus = (category: string) => {
                     switch (category) {
                         case OPTION_TYPE.MODELS:
                             return dropdownSchemas;
@@ -237,6 +238,7 @@ const NavSettings = () => {
                 {
                     id: 'BaseSettings',
                     label: 'Base Settings',
+                    link: "/project-settings"
                 },
             ],
         },

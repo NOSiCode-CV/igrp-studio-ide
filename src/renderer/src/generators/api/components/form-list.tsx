@@ -78,7 +78,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Atualiza o estado do formData
         const newFormData = [...formData]
         newFormData[index] = updatedRow
-        setFormData(newFormData)
+        //setFormData(newFormData)
       }
     }
   }
@@ -289,7 +289,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 collectionTypes={itemOptions || []}
                                               />
                                             )}
-                                             {item.type === 'popoverRelation' && (
+                                             {item.type === 'popoverRelation' && row['type'] === 'relation' && (
                                               <RelationPopover
                                                 key={itemIndex}
                                                 field={row}
@@ -304,7 +304,6 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     </div>
                                   ) : (
                                     <>
-                                      {' '}
                                       {['text', 'number'].includes(type) && (
                                         <Input
                                           className={cn(

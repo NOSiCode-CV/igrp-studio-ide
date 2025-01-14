@@ -25,7 +25,7 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     group: '',
     artifact: '',
     database: 'postgresql',
-    structureStyle: 'technical',
+    projectStructureStyle: 'technical',
     enableObservability: false,
     igrpCoreVersion: 'latest',
 };
@@ -150,11 +150,11 @@ export function SpringConfig({
                 <div className="space-y-3">
                     <Label>Project Structure Style</Label>
                     <RadioGroup
-                        value={data.structureStyle}
+                        value={data.projectStructureStyle}
                         onValueChange={(value) =>
                             onChange({
                                 ...data,
-                                structureStyle: value as 'technical' | 'domain',
+                                projectStructureStyle: value as 'technical' | 'domain',
                             })
                         }
                         className="flex gap-4"

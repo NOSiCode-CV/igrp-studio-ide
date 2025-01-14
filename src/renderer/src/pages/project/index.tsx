@@ -200,7 +200,7 @@ export function ProjectWizard() {
 
         window.electron.ipcRenderer.on('file-content', (_e, result) => {
             if (!result.canceled) {
-                formik.setFieldValue('directory', result.filePaths[0]);
+                formik.setFieldValue('path', result.filePaths[0]);
             }
         });
     };

@@ -2,11 +2,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui
 import { cn } from '@renderer/lib/utils';
 import React from 'react';
 
-type RelationType = 'OneToOne' | 'OneToMany' | 'ManyToOne' | 'ManyToMany';
-
 interface RelationTypeSelectorProps {
-    value: RelationType;
-    onChange: (value: RelationType) => void;
+    value: string;
+    onChange: (value: string) => void;
     sourceField?: string;
     targetField?: string;
 }
@@ -84,7 +82,7 @@ export function RelationTypeSelector({
             <div className="flex items-center justify-center">
                 <div className="flex items-center relative">
                     <div className="w-6 h-0.5 bg-igrp" />
-                    {(Object.keys(relationTypeIcons) as RelationType[]).map(
+                    {(Object.keys(relationTypeIcons)).map(
                         (type, index, array) => (
                             <React.Fragment key={type}>
                                 <Tooltip>
