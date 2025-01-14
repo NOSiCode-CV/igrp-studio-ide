@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
 import { BrowserWindow, dialog } from 'electron';
+import * as fs from 'fs/promises';
 import { TokenService } from './token-service';
 
 let Octokit: any = null;
@@ -60,73 +61,64 @@ export const GitHubService = {
     }
   },
 
-  async listIGRPStudioRepositories(window: BrowserWindow ) {
+  async listIGRPStudioRepositories(window: BrowserWindow) {
     if (!octokit) {
       throw new Error('GitHub client not initialized');
     }
 
     try {
       const igrpRepos: any = [];
-      let page = 1;
-      const perPage = 100; // GitHub máximo por página
-      let hasNextPage = true;
+      const batchSize = 10;
+      let processedCount = 0;
 
-      // Interface para rastrear progresso
-      const emitProgress = (progress: number, total: number) => {
-        window.webContents.send('repo-scan-progress', { progress, total });
-      };
+      // Get all repositories in one call
+      const { data: repos } = await octokit.repos.listForAuthenticatedUser({
+        sort: 'updated',
+        per_page: 100,
+        page: 1,
+        visibility: 'all'
+      });
 
-      while (hasNextPage) {
-        const { data: repos } = await octokit.repos.listForAuthenticatedUser({
-          sort: 'updated',
-          per_page: perPage,
-          page,
-          visibility: 'all'
+      const totalRepos = repos.length;
+
+      for (let i = 0; i < repos.length; i += batchSize) {
+        const batch = repos.slice(i, i + batchSize);
+        
+        const promises = batch.map(async (repo) => {
+          try {
+            await octokit.repos.getContent({
+              owner: repo.owner.login,
+              repo: repo.name,
+              path: '.igrpstudio'
+            });
+
+            return {
+              id: repo.id,
+              name: repo.name,
+              full_name: repo.full_name,
+              description: repo.description,
+              private: repo.private,
+              html_url: repo.html_url,
+              clone_url: repo.clone_url,
+              updated_at: repo.updated_at,
+              owner: repo.owner.login
+            };
+          } catch (error) {
+            if ((error as any).status !== 404) {
+              console.log(`Error checking repo ${repo.name}:`, error);
+            }
+            return null;
+          }
         });
 
-        // Verificação em lotes de 10 repositórios por vez
-        const batchSize = 10;
-        for (let i = 0; i < repos.length; i += batchSize) {
-          const batch = repos.slice(i, i + batchSize);
-          
-          const promises = batch.map(async (repo) => {
-            try {
-              await octokit.repos.getContent({
-                owner: repo.owner.login,
-                repo: repo.name,
-                path: '.igrpstudio' // Verifica diretamente a pasta
-              });
+        const results = await Promise.all(promises);
+        igrpRepos.push(...results.filter(r => r !== null));
 
-              // Se não lançou erro, significa que a pasta existe
-              return {
-                id: repo.id,
-                name: repo.name,
-                full_name: repo.full_name,
-                description: repo.description,
-                private: repo.private,
-                html_url: repo.html_url,
-                clone_url: repo.clone_url,
-                updated_at: repo.updated_at,
-                owner: repo.owner.login
-              };
-            } catch (error) {
-              if ((error as any).status !== 404) {
-                console.log(`Error checking repo ${repo.name}:`, error);
-              }
-              return null;
-            }
-          });
-
-          const results = await Promise.all(promises);
-          igrpRepos.push(...results.filter(r => r !== null));
-
-          // Emite progresso
-          emitProgress(page * perPage + i + batchSize, repos.length);
-        }
-
-        // Verifica se tem mais páginas
-        hasNextPage = repos.length === perPage;
-        page++;
+        processedCount = Math.min(i + batchSize, totalRepos);
+        window.webContents.send('repo-scan-progress', {
+          progress: processedCount,
+          total: totalRepos
+        });
       }
 
       return igrpRepos;
@@ -176,14 +168,13 @@ export const GitHubService = {
 
       const targetDir = path.join(filePaths[0], projectName);
 
-      // Emite progresso
       window.webContents.send('clone-progress', {
         status: 'starting',
         message: `Starting to clone into ${targetDir}...`
       });
 
       return new Promise((resolve, reject) => {
-        exec(`git clone ${repoUrl} "${targetDir}"`, (error) => {
+        exec(`git clone ${repoUrl} "${targetDir}"`, async (error) => {
           if (error) {
             window.webContents.send('clone-progress', {
               status: 'error',
@@ -193,12 +184,25 @@ export const GitHubService = {
             return;
           }
 
-          window.webContents.send('clone-progress', {
-            status: 'success',
-            message: `Successfully cloned to ${targetDir}`,
-            path: targetDir
-          });
-          resolve(targetDir);
+          try {
+            // Read the project configuration after successful clone
+            const configPath = path.join(targetDir, '.igrpstudio', 'baseApp.json');
+            const config = JSON.parse(await fs.readFile(configPath, 'utf8'));
+
+            window.webContents.send('clone-progress', {
+              status: 'success',
+              message: `Successfully cloned to ${targetDir}`,
+              path: targetDir,
+              config: config
+            });
+            resolve({ path: targetDir, config });
+          } catch (configError) {
+            window.webContents.send('clone-progress', {
+              status: 'error',
+              message: `Failed to read project configuration: ${(configError as Error).message}`
+            });
+            reject(configError);
+          }
         });
       });
     } catch (error) {
