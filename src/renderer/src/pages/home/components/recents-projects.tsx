@@ -213,7 +213,7 @@ const RecentsProjects = (): JSX.Element => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortProjects(
                   localProjects.filter((project) =>
-                    project.name.toLowerCase().includes(localSearchQuery.toLowerCase())
+                    project?.name?.toLowerCase().includes(localSearchQuery?.toLowerCase())
                   )
                 ).map((project, index) => RenderProjectCard(project, true, index))}
               </div>
