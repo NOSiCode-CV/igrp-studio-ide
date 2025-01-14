@@ -33,7 +33,7 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
             <FormSearch
                 onSearch={handleSearch}
                 className="truncate text-xs"
-                placeholder="Search schemas, data objects..."
+                placeholder={`Search ${description}`}
                 sidebarState={sidebarState}
             />
         </SidebarHeader>

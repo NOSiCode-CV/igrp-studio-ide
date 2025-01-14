@@ -10,11 +10,11 @@ import {
 } from '@renderer/redux/thunks';
 
 import Header from './components/header';
-import Navdata from './components/nav-data';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
+import { Navdata } from './components/nav-data';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string; currentItem: any }>;

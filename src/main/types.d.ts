@@ -61,19 +61,18 @@ export interface IOpenProject {
 export type PageableProjects = { data: Array<ProjectData>, total: number }
 
 export interface MenuItem {
-    id?: string; // id might be optional
+    id?: string; 
     label: string;
-    isHeader?: boolean; // isHeader is optional since not all items have it
-    icon?: any; // optional as some items like headers don't have icons
-    link?: string; // link is optional since headers might not have links
-    stateVariables?: boolean; // this seems to be a boolean related to state
-    click?: (e: any) => void; // function that handles clicks, optional
-    subItems?: MenuItem[]; // subItems is an array of MenuItems, optional
-    parentId?: string; // optional field for subItems
-    badgeColor?: string; // optional field for badges
-    badgeName?: string; // optional field for badges
+    isHeader?: boolean; 
+    icon?: any; 
+    link?: string; 
+    stateVariables?: boolean; 
+    click?: (e: any) => void; 
+    subItems?: MenuItem[]; 
+    parentId?: string;
+    badgeColor?: string;
+    badgeName?: string; 
     type?: string;
-    sutType?: string;
     component?: React.ReactNode,
     path?: string,
     module?: string,

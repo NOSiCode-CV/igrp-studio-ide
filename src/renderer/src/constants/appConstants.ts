@@ -70,7 +70,6 @@ export const httpMethods = [
     { value: "TRACE", label: "TRACE", color: "text-pink-500" },
 ]
 
-
 export enum ENV_TYPES {
     NEXTJS = "nextjs",
     SPRING = "springboot",

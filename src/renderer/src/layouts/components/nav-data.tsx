@@ -13,6 +13,7 @@ import {
     FileJson2,
     Layers,
     LucideIcon,
+    Settings,
     Trash,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -130,7 +131,7 @@ const Navdata = (folders: any) => {
                 onClickItem(item);
             },
             dropdownMenus,
-            type: "module"
+            type: 'module',
         };
 
         // Process each folder's content
@@ -226,4 +227,32 @@ function getSubItems(
     return [];
 }
 
-export default Navdata;
+const NavSettings = () => {
+    const menuItems: MenuItem[] = [
+        {
+            id: 'GeneralSettings',
+            label: 'General Settings',
+            icon: Settings,
+            subItems: [
+                {
+                    id: 'BaseSettings',
+                    label: 'Base Settings',
+                },
+            ],
+        },
+        {
+            id: 'GeneralSettings',
+            label: 'Project Resources',
+            icon: Layers,
+            subItems: [
+                {
+                    id: 'DatabaseConnections',
+                    label: 'Database Connections',
+                },
+            ],
+        },
+    ];
+    return { menuItems };
+};
+
+export { Navdata, NavSettings };

@@ -31,7 +31,11 @@ import { NextConfig } from './components/configurations/next-config';
 import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import { projectIcons } from '@renderer/constants/appConstants';
+import {
+    ENV_TYPES,
+    PATTERNS,
+    projectIcons,
+} from '@renderer/constants/appConstants';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
@@ -47,17 +51,7 @@ import {
     THEME_COLORS,
 } from './data';
 import { ProjectData } from 'src/main/types';
-
-const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Project name is required'),
-    type: Yup.string().oneOf(
-        ['frontend', 'backend'],
-        'Project type is required'
-    ),
-    framework: Yup.string().required('Framework is required'),
-    directory: Yup.string().required('Project directory is required'),
-    // Add moreformiks as needed for specific framework configurations
-});
+import { useTranslation } from 'react-i18next';
 
 export function ProjectWizard() {
     const [open, setOpen] = React.useState(false);
@@ -66,6 +60,7 @@ export function ProjectWizard() {
     const navigate = useNavigate();
     const dispatch: any = useDispatch();
     const { showErrorToast } = useToast();
+    const { t } = useTranslation();
 
     const initialValues: ProjectData = {
         name: '',
@@ -73,8 +68,46 @@ export function ProjectWizard() {
         framework: '',
         config: undefined,
         path: '',
-        themeColor: undefined,
+        themeColor: '#000000',
     };
+
+    const validationSchema = Yup.object().shape({
+        name: Yup.string().required('Project name is required'),
+        type: Yup.string().oneOf(
+            ['frontend', 'backend'],
+            'Project type is required'
+        ),
+        framework: Yup.string().required('Framework is required'),
+        path: Yup.string().required('Project directory is required'),
+        config: Yup.object().shape({
+            appName: Yup.string().when('$framework', (framework, schema) => {
+                return step === 3 &&
+                    framework &&
+                    framework[0] === ENV_TYPES.NEXTJS
+                    ? schema
+                          .required(t('thisFieldRequired', { name: 'Name' }))
+                          .matches(
+                              PATTERNS.NO_SPACE_AND_HYPHEN,
+                              t('msgInfoAccpet')
+                          )
+                          .max(20, t('maxLengthExceeded', { max: 20 }))
+                    : schema.notRequired();
+            }),
+            apiName: Yup.string().when('$framework', (framework, schema) => {
+                return step === 3 &&
+                    framework &&
+                    [ENV_TYPES.SPRING, ENV_TYPES.DOTNET].includes(framework[0])
+                    ? schema
+                          .required(t('thisFieldRequired', { name: 'Name' }))
+                          .matches(
+                              PATTERNS.NO_SPACE_AND_HYPHEN,
+                              t('msgInfoAccpet')
+                          )
+                          .max(20, t('maxLengthExceeded', { max: 20 }))
+                    : schema.notRequired();
+            }),
+        }),
+    });
 
     const formik = useFormik({
         enableReinitialize: true,

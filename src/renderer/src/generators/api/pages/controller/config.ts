@@ -13,18 +13,7 @@ export const initialValues = {
                 "application/json": {
                     schema: {
                         type: 'object',
-                        properties: {
-                            /* name: { type: 'string', description: "Is Description" },
-                            age: { type: 'integer', description: "" },
-                            address: {
-                                type: 'object',
-                                description: "",
-                                properties: {
-                                    street: { type: 'string', description: "" },
-                                    city: { type: 'string', description: "" },
-                                },
-                            }, */
-                        },
+                        properties: {},
                     }
                 }
             }

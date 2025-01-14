@@ -6,6 +6,7 @@ export const STEPS = [
 ];
 
 export const THEME_COLORS = [
+    { name: 'Black', value: '#000000' }, 
     { name: 'Slate', value: '#64748b' }, // Dark grayish-blue
     { name: 'Indigo', value: '#6366f1' }, // Deep bluish-purple
     { name: 'Blue', value: '#3b82f6' }, // Bright blue
@@ -13,7 +14,6 @@ export const THEME_COLORS = [
     { name: 'Teal', value: '#14b8a6' }, // Greenish-blue
     { name: 'Green', value: '#22c55e' }, // Bright green
     { name: 'Yellow', value: '#facc15' }, // Bright yellow
-    { name: 'Amber', value: '#f59e0b' }, // Yellow-orange
     { name: 'Orange', value: '#f97316' }, // Bright orange
     { name: 'Red', value: '#ef4444' }, // Vivid red
     { name: 'Pink', value: '#ec4899' }, // Vibrant pink

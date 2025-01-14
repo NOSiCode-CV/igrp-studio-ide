@@ -59,7 +59,7 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI
+        electron: ElectronAPI | getAppVersion
         api: CustomAPI,
         repo: { project: IProjectRepository, connection: IConnenctionRepository },
         menu: CustomMenu,

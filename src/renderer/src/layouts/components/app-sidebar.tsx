@@ -28,6 +28,7 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
+import { NavSettings } from './nav-data';
 
 interface AppSidebarProps {
     className?: string;
@@ -73,20 +74,22 @@ export function AppSidebar({
     const handleClickMenu = (item: MenuItem) => {
         setActiveMenuGroup(item.label);
         if (item.id === 'apis') setActiveMenu(menuApp);
-        else setActiveMenu([]);
+        else {
+            const menus = NavSettings().menuItems;
+            const menuApp = filterSubItems(menus, searchQuery);
+            setActiveMenu(menuApp);
+        }
     };
 
     const menuIcons: MenuItem[] = [
-        { icon: Server, link: '/app', label: t('apis'), id: 'apis' },
+        { icon: Server, label: t('apis'), id: 'apis' },
         {
             icon: FileText,
-            link: '/documents',
             label: t('documents'),
             id: 'documents',
         },
         {
             icon: Badge,
-            link: '/settings',
             label: t('settings'),
             id: 'settings',
         },
@@ -193,6 +196,7 @@ export function AppSidebar({
                                                     }
                                                     activeItem={activeItem}
                                                     basePath={basePath}
+                                                    activeMenuGroup={activeMenuGroup}
                                                 />
                                             </SidebarMenu>
                                         )
@@ -212,11 +216,13 @@ function Three({
     handleSubItemClick,
     activeItem,
     basePath,
+    activeMenuGroup
 }: {
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
     basePath: string;
+    activeMenuGroup?: string
 }) {
     const [open, setOpen] = React.useState(true);
 
@@ -261,7 +267,7 @@ function Three({
                     <span>
                         {item.label}
                         {item.subItems &&
-                            item.subItems.length > 0 &&
+                            item.subItems.length > 0  && activeMenuGroup === 'APIs' &&
                             `(${item.subItems.length})`}
                     </span>
                 </div>
@@ -299,6 +305,7 @@ function Three({
                                 handleSubItemClick={handleSubItemClick}
                                 activeItem={activeItem}
                                 basePath={basePath}
+                                activeMenuGroup={activeMenuGroup}
                             />
                         ))}
                     </SidebarMenuSub>
