@@ -64,39 +64,52 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
         if (!basePath) return;
 
         const errorMessages: string[] = [];
-        const processedTables = new Set<string>(); 
+        const processedTables = new Set<string>();
+
+        console.log(selectedRows);
 
         const processTable = async (tableName: string) => {
-            if (processedTables.has(tableName)) return; 
+            if (processedTables.has(tableName)) return;
             processedTables.add(tableName);
 
             try {
-          
                 const { success, message, structure } =
                     await window.api.getTableStructure(
                         selectedConnection,
                         tableName
                     );
 
+                if (tableName === 'tbl_profile_type') console.log(structure);
+
                 if (success) {
-                   // console.log(structure);
+                    // console.log(structure);
 
                     // Map the attributes
-                    const attributes = structure.map((column) => ({
-                        name: column.name || '',
-                        type: typeMapping[column.data_type] || 'String', // Map types
-                        length: column.max_length || null,
-                        defaultValue: !column.is_primary_key
-                            ? column.default_value
-                            : '',
-                        nullable: column.is_nullable || true,
-                        unique: column.is_unique || false,
-                        primaryKey: column.is_primary_key || false,
-                    }));
+                    const attributes = structure
+                        .filter(
+                            (column) =>
+                                column.foreign_key_table === null &&
+                                column.foreign_key_column === null
+                        )
+                        .map((column) => ({
+                            name: column.name || '',
+                            type: typeMapping[column.data_type] || 'string', // Map types
+                            length: column.max_length || null,
+                            defaultValue: !column.is_primary_key
+                                ? column.default_value
+                                : '',
+                            nullable: column.is_nullable || true,
+                            unique: column.is_unique || false,
+                            primaryKey: column.is_primary_key || false,
+                        }));
 
                     // Map the relations
                     const relations = structure
-                        .filter((column) => column.foreign_key_table !== null)
+                        .filter(
+                            (column) =>
+                                column.foreign_key_table !== null &&
+                                column.foreign_key_column !== null
+                        )
                         .map((column) => ({
                             relationType: 'ManyToOne',
                             entity: toFullCamelCaseFromSnakeCase(

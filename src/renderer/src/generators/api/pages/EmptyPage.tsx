@@ -12,7 +12,7 @@ const EmptyPage = ({ onClick }) => {
     {
       title: t('newObject', { name: t('model') }),
       icon: <Database className="h-6 w-6" />,
-      onClick: () => onClick(OPTION_TYPE.MODELS)
+      onClick: () => onClick(OPTION_TYPE.MODEL)
     },
     {
       title: t('newObject', { name: t('controller') }),

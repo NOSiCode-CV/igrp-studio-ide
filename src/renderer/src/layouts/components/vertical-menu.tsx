@@ -1,6 +1,6 @@
 import { projectIcons } from '@renderer/constants/appConstants'
 import { FileText, Home, LucideIcon, Settings } from 'lucide-react'
-import { ConfigOptions } from 'src/main/types'
+import { ProjectData } from 'src/main/types'
 
 interface MenuItem {
   href: string
@@ -10,7 +10,7 @@ interface MenuItem {
 
 const defaultIcon = '/path/to/default-icon.png'
 
-export default function VerticalMenu({ config }: { config: ConfigOptions }) {
+export default function VerticalMenu({ config }: { config: ProjectData }) {
   const menuItems: MenuItem[] = [
     { icon: Home, href: '/', label: 'Home' },
     { icon: FileText, href: '/app', label: 'APP' },
@@ -30,7 +30,7 @@ export default function VerticalMenu({ config }: { config: ConfigOptions }) {
             <>
               {' '}
               <img
-                src={projectIcons[config.type] || defaultIcon}
+                src={projectIcons[config.framework] || defaultIcon}
                 alt={`${config.type} logo`}
                 width={24}
                 height={24}

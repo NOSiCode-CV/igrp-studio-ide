@@ -17,18 +17,23 @@ export const PATTERNS = {
 
 export enum OPTION_TYPE {
     MODELS = "models",
+    MODEL = "model",
     CONTROLLERS = "controllers",
+    CONTROLLER = "controller",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
     IMPORT_TABLE_DB = 'import_table_db',
+    RESPONSE = 'responses',
+    DELETE = 'delete',
+    ERDDiagram= "ERDDiagram"
 };
 
-export type OptionType = 'models' | 'controllers' | 'dto' | 'action' | 'none';
+export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram';
 
 export const projectIcons = {
-    baseApp: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-    baseApi: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-    aspnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
+    springboot: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
+    nextjs: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
+    dotnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
     laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
@@ -65,9 +70,19 @@ export const httpMethods = [
     { value: "TRACE", label: "TRACE", color: "text-pink-500" },
 ]
 
-
 export enum ENV_TYPES {
-    NEXTJS = "baseApp",
-    SPRING = "baseApi",
+    NEXTJS = "nextjs",
+    SPRING = "springboot",
     DOTNET = "dotnet"
 };
+
+export const DatabaseOptions = [
+    { value: 'Postgresql', label: 'PostgreSQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'MySQL', label: 'MySQL' },
+];
+
+export const projectStructureStyle = [
+    { value: 'technical', label: 'Technical' },
+    { value: 'domain', label: 'Domain' },
+];

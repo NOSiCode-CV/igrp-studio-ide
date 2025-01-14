@@ -2,13 +2,12 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
-import { Connection, IConnenctionRepository } from 'src/main/types';
+import { Connection, IConnenctionRepository, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
 
 
 interface CustomAPI {
 
-    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
     createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
     createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
@@ -45,7 +44,9 @@ interface CustomAPI {
 }
 
 interface BaseEngine {
-    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
+    createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
+    createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
 interface CustomMenu {
@@ -58,7 +59,7 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI
+        electron: ElectronAPI | getAppVersion
         api: CustomAPI,
         repo: { project: IProjectRepository, connection: IConnenctionRepository },
         menu: CustomMenu,

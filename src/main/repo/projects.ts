@@ -1,7 +1,8 @@
 import { app } from 'electron'
 import fs from 'fs'
 import { readFile, writeFile } from 'fs/promises';
-import { Project, PageableProjects, IProjectRepository  } from '../../types'
+import { PageableProjects, ProjectData } from '../types';
+import { IProjectRepository } from '../interfaces';
 
 const filename = app.getPath('userData') + "/rp-settings.json";
 
@@ -20,13 +21,13 @@ function nvl(a, b): string {
     return a || b;
 }
 
-function newRecentDate(project: Project) {
+function newRecentDate(project: ProjectData) {
     return new Date(nvl(project.dt_updated, project.dt_created));
 }
 export class ProjectRepository implements IProjectRepository {
 
-    async save(project: Project): Promise<Project> {
-        const cfg: {projects: Array<Project>} = await loadCfg();
+    async save(project: ProjectData): Promise<ProjectData> {
+        const cfg: {projects: Array<ProjectData>} = await loadCfg();
 
         project.dt_updated = new Date();
 
@@ -44,7 +45,7 @@ export class ProjectRepository implements IProjectRepository {
         return project;
     }
 
-    async findAllRecent(_page): Promise<PageableProjects> {
+    async findAllRecent(): Promise<PageableProjects> {
        
         const projects = await this.findAll();
         if (!projects) return {data:[], total: 0};
@@ -56,12 +57,12 @@ export class ProjectRepository implements IProjectRepository {
         return {data: sorted.slice(0, projects.length), total: projects.length} ;
     }
 
-    async findAll(): Promise<Array<Project>> {
+    async findAll(): Promise<Array<ProjectData>> {
         const cfg = await loadCfg();
         return cfg.projects;
     }
 
-    async delete(project: Project, index?: number): Promise<void> {
+    async delete(project: ProjectData, index?: number): Promise<void> {
         const cfg = await loadCfg();
     
         // Verifica se o array de projetos existe

@@ -1,16 +1,18 @@
 // engines/EngineFactory.ts
-import { BaseEngine } from '../interfaces';
-import { ENV_TYPES } from '../types';
+import { BaseEngine } from '../interfaces'
 import { DotNetEngine } from './DotNetEngine';
+import { NextjsEngine } from './NextjsEngine';
 import { SpringEngine } from './SpringEngine';
 
 export class EngineFactory {
   static getEngine(type: string): BaseEngine {
-    switch (type.toLowerCase()) {
-      case ENV_TYPES.SPRING:
+    switch (type) {
+      case 'springboot':
         return new SpringEngine();
-      case ENV_TYPES.DOTNET:
+      case "dotnet":
         return new DotNetEngine();
+      case "nextjs":
+        return new NextjsEngine();
       default:
         throw new Error(`Unsupported engine type: ${type}`);
     }

@@ -1,9 +1,8 @@
 import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join, basename } from 'path';
-import { ConfigOptions, IOpenProject, File, FolderFileStructure, FolderFiles, Handler } from '../types';
+import { IOpenProject, File, FolderFileStructure, FolderFiles, Handler, ProjectData } from '../types';
 import { promisify } from 'util';
 const fs = require("fs");
-
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
 	const result = await dialog.showOpenDialog({
@@ -22,7 +21,7 @@ export async function openDirectory(buttonLabel?: string): Promise<IOpenProject>
 	return { canceled: false, folderExists, config, basePath };
 }
 
-export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderExists: boolean; config?: ConfigOptions }> {
+export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderExists: boolean; config?: ProjectData }> {
 
 	const readFile = promisify(fs.readFile);
 
@@ -31,7 +30,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 
 	const folderExists = fs.existsSync(fullFolderPath);
 
-	let config: ConfigOptions | undefined = undefined;
+	let config: ProjectData | undefined = undefined;
 
 	if (folderExists) {
 
@@ -46,21 +45,22 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 
 			if (baseApiPath.endsWith('baseApi.json')) {
 				config = {
-					type: parsedConfig.type,
 					name: parsedConfig.apiName,
-					group: parsedConfig.group,
-					artifact: parsedConfig.artifact,
-					database: parsedConfig.database,
-					description: parsedConfig.description,
-					package: parsedConfig.package,
-					projectStructureStyle: parsedConfig.projectStructureStyle,
+					type: 'backend',
+					framework: parsedConfig.type,
+					config: { ...parsedConfig },
+					path: folderPath
 				}
 			} else if (baseApiPath.endsWith('baseApp.json')) {
 				config = {
-					type: parsedConfig.type,
 					name: parsedConfig.appName,
+					type: 'frontend',
+					framework: parsedConfig.type,
+					config: { ...parsedConfig },
+					path: folderPath
 				}
 			}
+
 		} catch (error) {
 			console.error(`Error reading ${baseApiPath}:`, error);
 		}

@@ -9,6 +9,7 @@ export const buildJsonStructure = (components: HierarchicalComponent[]): Compone
                     id: col.id,
                     colSize: col.colSize,
                     components: col.components.map(({ ...comp }) => comp as any),
+                    colSize: 4
                 })),
             },
         ],

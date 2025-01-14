@@ -43,7 +43,7 @@ export function FieldOptionsPopover({
         onUpdate(updatedField);
     };
 
-    const handleChangeEditor = (value)=>{
+    const handleChangeEditor = (_value)=>{
 
     }
 
@@ -106,7 +106,6 @@ export function FieldOptionsPopover({
                                     />
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    {' '}
                                     <Label
                                         htmlFor="nullable"
                                         className="text-sm"

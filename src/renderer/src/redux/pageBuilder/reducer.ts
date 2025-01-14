@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConfigOptions, FolderFiles } from "src/main/types";
+import { ProjectData, FolderFiles } from "src/main/types";
 
 export interface StudioState {
-    config: ConfigOptions;
+    config: ProjectData | undefined;
     basePath: string;
     folderFiles?: {};
     changeStatus: boolean;
@@ -10,14 +10,7 @@ export interface StudioState {
 }
 
 export const initialState: StudioState = {
-    config: {
-        type: "",
-        name: "",
-        group: "",
-        description: "",
-        artifact: "",
-        database: ""
-    },
+    config: undefined,
     basePath: "",
     folderFiles: {},
     changeStatus: false,
@@ -28,7 +21,7 @@ const StudioSlice = createSlice({
     name: 'Studio',
     initialState,
     reducers: {
-        setConfigAction(state, action: PayloadAction<ConfigOptions>) {
+        setConfigAction(state, action: PayloadAction<ProjectData>) {
             state.config = action.payload;
         },
         setBasePathAction(state, action: PayloadAction<string>) {

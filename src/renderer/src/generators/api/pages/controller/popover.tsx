@@ -43,7 +43,7 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
         setIsBoolean(row?.['type'] === 'boolean');
     }, [row]);
 
-    const handleChangeEditor = (value) => {};
+    const handleChangeEditor = (_value) => {};
 
     return (
         <Popover>

@@ -55,11 +55,15 @@
   "dialogDescription": "Enter the name for your new module. Click save when you're done.",
   "endpointDescription": "Enter the name for your new endpoint. Click save when you're done.",
   "newObject": "New {{name}}",
-  "deletedSuccess" : "{{name}} deleted successfully!",
+  "deletedSuccess": "{{name}} deleted successfully!",
   "createdSuccess": "{{name}} {{value}} have been successfully added.",
   "newDto": "New Data Object",
   "newModels": "New Schema",
   "newControllers": "New Endpoint",
   "newAction": "New Action",
-  "schmeacreatedSuccess": "Schemas have been successfully added."
+  "schmeacreatedSuccess": "Schemas have been successfully added.",
+  "newResponses": "New Response",
+  "responses": "Responses",
+  "documents": "Documents",
+  "apis":"APIs"
 }
