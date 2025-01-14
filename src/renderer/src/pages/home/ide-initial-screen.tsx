@@ -224,7 +224,7 @@ const IDEInitialScreen = (): JSX.Element => {
           Scanning repositories ({Math.min(scanProgress.progress, scanProgress.total)} of {scanProgress.total})
         </p>
       </div>
-      ) : repositories.length > 0 ? (
+      ) : repositories.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {repositories.map(repo => (
             <div key={repo.id} className="border rounded-lg p-4 hover:shadow-lg transition">
@@ -256,9 +256,7 @@ const IDEInitialScreen = (): JSX.Element => {
             </div>
           ))}
         </div>
-      ) : (
-        <RecentsProjects />
-      )}
+      ) }
 
       <RecentsProjects />
 

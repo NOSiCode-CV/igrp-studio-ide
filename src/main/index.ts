@@ -14,7 +14,7 @@ import { handleProtocolCallback, setupGitHubOAuth } from './helpers/github'
 
 import { TokenService } from './services/token-service';
 import { GitHubService } from './services/github-service';
-
+const execAsync = promisify(exec);
 const isDev = process.env.NODE_ENV === 'development';
 if (!isDev) {
   if (process.defaultApp) {
@@ -28,6 +28,7 @@ if (!isDev) {
 
 import './handlers/apiHandler';
 import './handlers/dbHandler';
+import { promisify } from 'util'
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -337,4 +338,13 @@ ipcMain.handle('list-branches', async (_event, projectPath) => {
 ipcMain.handle('checkout-branch', async (_event, { projectPath, branchName }) => {
   return GitHubService.checkoutBranch(projectPath, branchName);
 });
-
+ipcMain.handle('create-branch', async (_event, { projectPath, branchName }) => {
+  try {
+    const { stdout } = await execAsync(`git checkout -b ${branchName}`, {
+      cwd: projectPath
+    });
+    return stdout;
+  } catch (error: any) {
+    throw new Error(error.stderr || 'Failed to create branch');
+  }
+});

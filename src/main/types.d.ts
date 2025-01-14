@@ -121,9 +121,3 @@ export interface BaseApiConfig {
     enableObservability: boolean;
     igrpCoreVersion: string;
 }
-
-export enum ENV_TYPES {
-    NEXTJS = "baseApp",
-    SPRING = "baseApi",
-    DOTNET = "dotnet"
-};
