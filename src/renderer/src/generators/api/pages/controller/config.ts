@@ -8,23 +8,13 @@ export const initialValues = {
     requestBody: "",
     responses: {
         '200': {
-            description: "OK",
+            description: null,
+            name: "OK",
             content: {
                 "application/json": {
                     schema: {
                         type: 'object',
-                        properties: {
-                            /* name: { type: 'string', description: "Is Description" },
-                            age: { type: 'integer', description: "" },
-                            address: {
-                                type: 'object',
-                                description: "",
-                                properties: {
-                                    street: { type: 'string', description: "" },
-                                    city: { type: 'string', description: "" },
-                                },
-                            }, */
-                        },
+                        properties: {},
                     }
                 }
             }

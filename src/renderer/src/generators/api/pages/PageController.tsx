@@ -10,6 +10,8 @@ import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { TabItem } from '@renderer/generators/api/components/TabManager';
 import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
+import { ResponseLayout } from './response';
+import ERDLayout from './diagram';
 
 interface PageBuilderState {
     basePath: string;
@@ -50,12 +52,14 @@ const PageController = ({
             models: extractByType(moduleData, OPTION_TYPE.MODELS),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
+            responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
             modules: getModulesArray(studio.folderFiles),
             folderFiles: studio.folderFiles,
         };
     });
 
-    const { basePath, models, dto, modules } = useSelector(selectProperties);
+    const { basePath, models, dto, modules, responses } =
+        useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -81,8 +85,6 @@ const PageController = ({
 
     const handleOptionClick = (opt: OptionType) => {
         setOption(opt);
-        setModule('shared');
-
         onOpenNew({
             ...tab,
             title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
@@ -98,6 +100,8 @@ const PageController = ({
         onUpdateTab(tab.id, `tab-${tab.item?.module}-${tabId}`);
     };
 
+    //console.log(tab.item)
+
     return (
         <>
             {option === 'none' && (
@@ -107,7 +111,7 @@ const PageController = ({
                     </div>
                 </div>
             )}
-            {option === OPTION_TYPE.MODELS && (
+            {option === OPTION_TYPE.MODEL && (
                 <ModelLayout
                     basePath={basePath}
                     selectors={selectors}
@@ -123,11 +127,13 @@ const PageController = ({
                     selectors={selectors}
                     currentItem={tab.item}
                     modules={modules}
+                    dto={dto}
+                    responses={responses}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
                 />
             )}
-            {option === OPTION_TYPE.CONTROLLERS && (
+            {option === OPTION_TYPE.CONTROLLER && (
                 <ControllerOverview
                     basePath={basePath}
                     currentItem={tab.item}
@@ -144,6 +150,16 @@ const PageController = ({
                     onUpdateTab={handleUpdate}
                 />
             )}
+            {option === OPTION_TYPE.RESPONSE && (
+                <ResponseLayout
+                    basePath={basePath}
+                    selectors={selectors}
+                    currentItem={tab.item}
+                    onCloseTab={hangleClose}
+                    onUpdateTab={handleUpdate}
+                />
+            )}
+            {option === OPTION_TYPE.ERDDiagram && <ERDLayout models={models} />}
         </>
     );
 };

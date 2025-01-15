@@ -1,22 +1,37 @@
 // engines/DotNetEngine.ts
+import { newApi } from '@igrp/dotnet-engine';
 import { BaseEngine } from '../interfaces';
 import { ProjectRepository } from '../repo/projects';
-import { BaseApiConfig } from '../types';
+import { BaseApiConfig, ResponseConfig } from '@igrp/dotnet-engine/dist/interfaces/types';
+import { ProjectData } from '../types';
 
 export class DotNetEngine implements BaseEngine {
-  async createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void> {
+
+  async delete(_config: any, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  createResponse(_config: ResponseConfig, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  async createProject(project: ProjectData, basePath: string): Promise<void> {
 
     const repo = new ProjectRepository()
 
-    //await newApi(apiConfig, basePath);
+    const { config } = project;
 
-    // Lógica específica do .NET
-    console.log('Creating API for .NET');
-    return await repo.save({
+    const baseConfig: BaseApiConfig = {
+      ...config,
+      type: project.framework
+    };
+
+    await newApi(baseConfig, basePath);
+
+    await repo.save({
+      ...project,
       path: basePath,
       dt_created: new Date(),
-      location: 'local',
-      config:apiConfig,
+      location: 'local'
     });
   }
 }

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import TabManager, { TabItem } from '@renderer/generators/api/components/TabManager';
+import TabManager, {
+    TabItem,
+} from '@renderer/generators/api/components/TabManager';
 import { PAGE_DEFAULT } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
 
 interface PageBuilderProps {
     basePath?: string;
     currentItem?: any;
-    folders?: any;
 }
 
 const Index = ({ basePath, currentItem }: PageBuilderProps) => {
@@ -64,17 +65,20 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
     };
 
     useEffect(() => {
-        if (currentItem)
+        if (currentItem) {
+            const actionType = currentItem.actionType || currentItem.type;
             handleNewTab({
                 id: `tab-${currentItem.module}-${currentItem.isNew ? Date.now() : currentItem.label}`,
-                title: currentItem.isHeader
-                    ? t(
-                          `new${currentItem.type.charAt(0).toUpperCase() + currentItem.type.slice(1)}`
-                      )
-                    : currentItem.label,
-                open: currentItem.subType || currentItem.type,
+                title:
+                    currentItem.isNew && actionType
+                        ? t(
+                              `new${actionType.charAt(0).toUpperCase() + actionType.slice(1)}`
+                          )
+                        : currentItem.label,
+                open: actionType,
                 item: currentItem,
             });
+        }
     }, [currentItem]);
 
     return (

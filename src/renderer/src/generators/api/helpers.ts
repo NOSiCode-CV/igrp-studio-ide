@@ -1,4 +1,3 @@
-import { OptionType } from '@renderer/constants/appConstants';
 import { FormikValues } from 'formik';
 
 export function formatMethods(elements: string[]): { label: string; value: string }[] {
@@ -43,7 +42,7 @@ export const changeValue = (
 };
 
 
-export const extractByType = (moduleData: any, type: OptionType) => {
+export const extractByType = (moduleData: any, type: string) => {
 
 	const files = moduleData?.files ?? [];
 

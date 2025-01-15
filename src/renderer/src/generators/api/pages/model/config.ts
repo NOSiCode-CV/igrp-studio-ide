@@ -1,4 +1,4 @@
-import { ModelConfig, Relation } from '@igrp/spring-engine/dist/interfaces/types'
+import { ModelConfig } from '@igrp/spring-engine/dist/interfaces/types'
 import { formatMethods } from '../../helpers'
 import { IColumnsTabelProps } from '../../types/Interfaces'
 
@@ -8,34 +8,26 @@ export const initialValues = {
 	name: '',
 	tableName: '',
 	audit: true,
-	enableCrud: false,
-	generationType: 'IDENTITY',
+	crud: false,
 	attributes: [
 		{
+			name: 'id',
+			type: 'integer',
+			length: null,
+			defaultValue: '',
+			nullable: false,
+			unique: false,
+			primaryKey: true,
+			generationType: 'IDENTITY'
+		},
+		{
 			name: '',
-			type: 'String',
+			type: 'string',
 			length: null,
 			defaultValue: '',
 			nullable: true,
 			unique: false,
 			primaryKey: false
-		}
-	],
-	relations: [
-		{
-			relationType: '',
-			entity: '',
-			joinColumn: '',
-			mappedBy: '',
-			joinTable: '',
-			inverseJoinColumn: ''
-		}
-	],
-	crud: [
-		{
-			enabled: false,
-			path: '',
-			disabledMethods: []
 		}
 	],
 	indexes: [
@@ -59,25 +51,12 @@ export const initialValues = {
 export const defaultValues: any = {
 	attributes: {
 		name: '',
-		type: 'String',
+		type: 'string',
 		length: 0,
 		defaultValue: '',
 		nullable: false,
 		unique: false,
 		primaryKey: false
-	},
-	relations: {
-		relationType: '',
-		entity: '',
-		joinColumn: '',
-		mappedBy: '',
-		joinTable: '',
-		inverseJoinColumn: ''
-	},
-	crud: {
-		enabled: false,
-		path: '',
-		disabledMethods: []
 	},
 	indexes: {
 		name: '',
@@ -99,14 +78,12 @@ export const btnLabels = {
 }
 
 // SELECT, SELECT-MULTI AND CHECKBOX OPTIONS
-export type TabType = 'attributes' | 'relations' | 'crud' | 'indexes' | 'uniqueConstraints'
+export type TabType = 'attributes' | 'indexes' | 'uniqueConstraints'
 
 export const TabList = [
 	{ label: 'Fields', value: 'attributes' },
-	{ label: 'Relations', value: 'relations' },
-	{ label: 'CRUD', value: 'crud' },
 	{ label: 'Indexes', value: 'indexes' },
-	{ label: 'Constraints', value: 'uniqueConstraints' }
+	{ label: 'Unique Constraints', value: 'uniqueConstraints' }
 ]
 
 export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
@@ -115,12 +92,10 @@ export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
 export const getTablesColumns = ({
 	selectors,
 	attributes,
-	models,
-	currentModel
+	models
 }): { [value: string]: IColumnsTabelProps[] } => {
 
 	const modelsOptions = (models || [])
-		.filter((model) => model.name !== currentModel) // Exclude the current model
 		.map((model) => ({
 			value: model.name,
 			label: model.name,
@@ -131,32 +106,24 @@ export const getTablesColumns = ({
 		label: attribute.name
 	}))
 
-	const disabledOptions = formatMethods(
-		(
-			selectors.find((selector) => 'CRUD_DISABLED_OPTIONS' in selector) as
-			| { CRUD_DISABLED_OPTIONS: string[] }
-			| undefined
-		)?.CRUD_DISABLED_OPTIONS || []
-	)
-
-	const relationTypeOptions = formatMethods(
-		(
-			selectors.find((selector) => 'RELATIONSHIP_TYPES' in selector) as
-			| { RELATIONSHIP_TYPES: string[] }
-			| undefined
-		)?.RELATIONSHIP_TYPES || []
-	)
-
 	const fieldTypeOptions = formatMethods(
 		(
-			selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+			selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
 			| {
-				ATTRIBUTE_TYPES: string[]
+				MODEL_ATTRIBUTE_TYPES: string[]
 			}
 			| undefined
-		)?.ATTRIBUTE_TYPES || []
-	)
+		)?.MODEL_ATTRIBUTE_TYPES || []
 
+
+	)
+	const generateTypes = formatMethods(
+		(
+			selectors.find((selector) => 'GENERATION_TYPES' in selector) as
+			| { GENERATION_TYPES: string[] }
+			| undefined
+		)?.GENERATION_TYPES || []
+	)
 	return {
 		attributes: [
 			{ key: 'name', name: 'Name', type: 'text' },
@@ -164,32 +131,9 @@ export const getTablesColumns = ({
 			{
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
-					{ key: 'advanced', name: '', type: 'popoverModel' }
+					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes },
+					{ key: 'relation', name: 'Relation', type: 'popoverRelation', options: { modelsOptions, models } },
 				]
-			}
-		],
-		relations: [
-			{
-				key: 'relationType',
-				name: 'Relation Type',
-				type: 'select',
-				options: relationTypeOptions,
-				width: '16%'
-			},
-			{ key: 'entity', name: 'Entity', type: 'select', options: modelsOptions, width: '16%' },
-			{ key: 'joinColumn', name: 'Join Column', type: 'text', width: '16%' },
-			{ key: 'mappedBy', name: 'Mapped By', type: 'text', width: '16%' },
-			{ key: 'joinTable', name: 'Join Table', type: 'text', options: [], width: '16%' },
-			{ key: 'inverseJoinColumn', name: 'Inverse Join Column', type: 'text', width: '16%' }
-		],
-		crud: [
-			{ key: 'path', name: 'Path', type: 'text', width: '25%' },
-			{
-				key: 'disabledMethods',
-				name: 'Disabled Methods',
-				type: 'multiSelect',
-				options: disabledOptions,
-				width: '75%'
 			}
 		],
 		indexes: [
@@ -216,14 +160,6 @@ export const getTablesColumns = ({
 }
 
 export const getValuesToSubmit = (values, module) => {
-	const enableCrud = values.enableCrud || false;
-	const generationType = values.generationType;
-
-	delete values.enableCrud;
-	delete values.generationType;
-
-	const relations: Relation[] =
-		values.relations?.filter((rel) => rel.relationType !== '') || [];
 
 	const uniqueConstraints =
 		values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
@@ -233,8 +169,7 @@ export const getValuesToSubmit = (values, module) => {
 	const attributes = values.attributes.map(({ ...field }) => ({
 		...field,
 		length: field.length ? Number(field.length) : 255,
-		nullable: !field.nullable,
-		generationType: field.primaryKey === true ? generationType : '',
+		nullable: !field.nullable
 	}));
 
 	const primaryKey = values.attributes
@@ -253,18 +188,11 @@ export const getValuesToSubmit = (values, module) => {
 	const newValues: ModelConfig = {
 		...values,
 		attributes: filteredAttributes,
-		relations,
 		uniqueConstraints,
 		indexes,
-		crud: {
-			...values.crud?.[0],
-			enabled: enableCrud,
-		},
 		primaryKey: hasListPk ? primaryKey : [],
 		module
 	};
-
-	if (!enableCrud && !newValues.crud?.path) delete newValues.crud;
 
 	return newValues;
 };

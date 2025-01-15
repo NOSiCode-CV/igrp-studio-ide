@@ -34,14 +34,17 @@ import { CreateEndpointDialog } from './create-endpoint-dialog';
 import { TextInput } from '../../components/inputs-form';
 import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
-import { httpMethods } from '@renderer/constants/appConstants';
+import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
 import { ContainerScrollArea } from '../../components/ContainerScrollArea';
+import { SchemaTypeItem } from 'src/main/types';
 
 interface ControllerProps {
     basePath: string;
     selectors: Array<any>;
     currentItem: any;
     modules: Array<any>;
+    dto: Array<any>;
+    responses: Array<any>;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
@@ -51,8 +54,10 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     selectors,
     currentItem,
     modules,
+    dto,
     onCloseTab,
     onUpdateTab,
+    responses,
 }: ControllerProps) => {
     const { t } = useTranslation();
 
@@ -62,6 +67,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const [pathController, setPathController] = useState('');
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
+    const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -124,6 +130,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 pathVariables,
                 requestParams,
                 headers,
+                responses,
             } = currentItem.content;
 
             setOldActionName(actionName);
@@ -142,6 +149,10 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 'requestParams',
                 requestParams || initialValues.requestParams
             );
+            formik.setFieldValue(
+                'responses',
+                responses || initialValues.responses
+            );
             formik.setFieldValue('headers', headers || initialValues.headers);
         }
         if (currentItem) {
@@ -152,7 +163,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const getValuesToSubmit = async () => {
         const values = { ...formik.values };
 
-        if(!values.requestBody) delete values.requestBody
+        if (!values.requestBody) delete values.requestBody;
 
         getJsonData();
 
@@ -231,7 +242,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     value: values.name,
                 })
             );
-        } catch (error: unknown) { 
+        } catch (error: unknown) {
             showErrorToast(error);
         }
     };
@@ -242,9 +253,15 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             const countActions = values.actions.length;
 
             if (countActions === 1) {
-                // Delete the entire controller if there's only one action
-                const { error } = await window.api.deleteController(
-                    values,
+                const config = {
+                    name: formik.values.name,
+                    type: 'controller',
+                    module: currentItem.module,
+                };
+
+                const { error } = await window.engine.delete(
+                    config,
+                    ENV_TYPES.SPRING,
                     basePath
                 );
 
@@ -291,13 +308,34 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         )?.MYME_TYPES || []
     );
 
-    const schemaTypes = formatMethods(
-        (
-            selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
-                | { SCHEMA_TYPES: string[] }
-                | undefined
-        )?.SCHEMA_TYPES || []
-    );
+    useEffect(() => {
+        const types = formatMethods(
+            (
+                selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
+                    | { SCHEMA_TYPES: string[] }
+                    | undefined
+            )?.SCHEMA_TYPES || []
+        );
+
+        setSchemaTypes(types);
+
+        // Map DTO into the expected format
+        const targetDto = dto.map((d) => ({
+            value: d.name,
+            label: d.name,
+        }));
+
+        setSchemaTypes((prevSchemaTypes) =>
+            prevSchemaTypes.map((schemaType) =>
+                schemaType.value === 'Reference other schemas'
+                    ? {
+                          ...schemaType,
+                          items: targetDto,
+                      }
+                    : schemaType
+            )
+        );
+    }, [dto]);
 
     const onSubmit = async () => {
         const errors = await formik.validateForm();
@@ -414,6 +452,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 formik={formik}
                                 schemaTypes={schemaTypes}
                                 contentTypes={typesData}
+                                responseTypes={responses}
                             />
                         </TabsContent>
                     </Tabs>

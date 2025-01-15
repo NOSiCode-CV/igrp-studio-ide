@@ -12,7 +12,7 @@ export const initialValues: DTOConfig = {
         {
             name: '',
             ns: 'java',
-            type: 'String',
+            type: 'string',
             required: false,
             before: false,
             after: false,
@@ -38,8 +38,8 @@ export const TemplateOptions = [
 ]
 
 export const NamespacesOptions = [
-    { label: 'DTO', value: 'dto' },
-    { label: 'Model', value: 'models' },
+    { label: 'Data Transfer Object', value: 'dto' },
+    { label: 'Schema', value: 'models' },
     { label: 'Java', value: 'java' }
 ]
 

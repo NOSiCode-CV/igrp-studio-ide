@@ -64,14 +64,15 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
         if (!basePath) return;
 
         const errorMessages: string[] = [];
-        const processedTables = new Set<string>(); 
+        const processedTables = new Set<string>();
+
+        console.log(selectedRows);
 
         const processTable = async (tableName: string) => {
-            if (processedTables.has(tableName)) return; 
+            if (processedTables.has(tableName)) return;
             processedTables.add(tableName);
 
             try {
-          
                 const { success, message, structure } =
                     await window.api.getTableStructure(
                         selectedConnection,
@@ -79,36 +80,44 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                     );
 
                 if (success) {
-                   // console.log(structure);
-
                     // Map the attributes
-                    const attributes = structure.map((column) => ({
-                        name: column.name || '',
-                        type: typeMapping[column.data_type] || 'String', // Map types
-                        length: column.max_length || null,
-                        defaultValue: !column.is_primary_key
-                            ? column.default_value
-                            : '',
-                        nullable: column.is_nullable || true,
-                        unique: column.is_unique || false,
-                        primaryKey: column.is_primary_key || false,
-                    }));
+                    const attributes = structure
+                        .filter(() => true) // Add filter logic here if needed
+                        .map((column) => {
+                            const relation = column.foreign_key_table
+                                ? {
+                                      type: 'ManyToOne',
+                                      entity: toFullCamelCaseFromSnakeCase(
+                                          column.foreign_key_table
+                                      ),
+                                      referencedColumnName: column.foreign_key_column,
+                                      joinTable: '',
+                                      inverseJoinColumn: '',
+                                      cardinality: 'oneWay',
+                                  }
+                                : null;
 
-                    // Map the relations
-                    const relations = structure
-                        .filter((column) => column.foreign_key_table !== null)
-                        .map((column) => ({
-                            relationType: 'ManyToOne',
-                            entity: toFullCamelCaseFromSnakeCase(
-                                column.foreign_key_table
-                            ),
-                            joinColumn: column.foreign_key_column,
-                            mappedBy: '',
-                            joinTable: '',
-                            inverseJoinColumn: '',
-                        }));
+                            return {
+                                name: column.name || '',
+                                type: relation ? 'relation' : typeMapping[column.data_type] || 'string', // Map types
+                                length: column.max_length || null,
+                                defaultValue: !column.is_primary_key
+                                    ? column.default_value
+                                    : '',
+                                nullable: column.is_nullable ?? true, // Use nullish coalescing for better accuracy
+                                unique: column.is_unique || false,
+                                primaryKey: column.is_primary_key || false,
+                                relation, // Add the relation if it exists
+                                generationType: column.is_primary_key
+                                    ? 'IDENTITY'
+                                    : null,
+                            };
+                        });
 
-                    //console.log(`Relations for table ${tableName}:`, relations);
+                    console.log(
+                        `Relations for table ${tableName}:`,
+                        attributes
+                    );
 
                     // Add referenced foreign_key_table to selectedRows dynamically if not present
                     for (const column of structure.filter(
@@ -126,7 +135,6 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         ...initialValues,
                         tableName: tableName,
                         attributes,
-                        relations,
                         name:
                             tableName.charAt(0).toUpperCase() +
                             tableName.slice(1), // Capitalize table name

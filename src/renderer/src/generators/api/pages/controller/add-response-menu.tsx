@@ -16,27 +16,51 @@ import {
 
 interface AddResponseMenuProps {
     onAddBlankResponse: () => void;
+    onSave: (response: {
+        name: string;
+        statusCode: string;
+        contentType: string;
+    }) => void;
+    responseTypes: Array<any>;
 }
 
 export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
     onAddBlankResponse,
+    responseTypes,
+    onSave,
 }) => {
     const [isOpen, setIsOpen] = React.useState(false);
 
+    const handleClick = (resp: any) => {
+        const contentType = Object.keys(resp.content)[0];
+
+        const { name, statusCode } = resp;
+
+        const response = {
+            name,
+            statusCode,
+            contentType,
+        };
+        
+        onSave(response);
+    };
+
     const ErrorList = () => (
         <div className="py-2">
-            <div className="px-4 py-1.5 flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center justify-center w-5 h-5 rounded bg-purple-50 text-igrp">
-                    R
+            {responseTypes.map((response, index) => (
+                <div
+                    key={index}
+                    className="px-4 py-1.5 flex items-center gap-2 text-sm text-muted-foreground cursor-pointer"
+                    onClick={() => {
+                        handleClick(response.content);
+                    }}
+                >
+                    <div className="flex items-center justify-center w-5 h-5 rounded bg-purple-50 text-igrp">
+                        R
+                    </div>
+                    {` ${response.content.name} (${response.content.statusCode})`}
                 </div>
-                Record not found(404)
-            </div>
-            <div className="px-4 py-1.5 flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center justify-center w-5 h-5 rounded bg-purple-50 text-igrp">
-                    R
-                </div>
-                Invalid input(400)
-            </div>
+            ))}
         </div>
     );
 

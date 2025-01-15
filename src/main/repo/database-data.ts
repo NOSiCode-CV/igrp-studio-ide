@@ -1,7 +1,8 @@
 import { app } from 'electron'
 import fs from 'fs'
 import { readFile, writeFile } from 'fs/promises';
-import { Connection, IConnenctionRepository } from '../../types';
+import { IConnenctionRepository } from '../interfaces';
+import { Connection } from '../types';
 
 const filename = app.getPath('userData') + "/rp-connections.json";
 

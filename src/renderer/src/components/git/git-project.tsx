@@ -107,9 +107,11 @@ export default function GitProject() {
                 
                 try {
                     // Save and open project using the clone data
-                    await window.repo.project.save({ 
+                    await window.repo.project.save({
                         config: data.config, 
-                        path: data.path 
+                        path: data.path,
+                        framework: data.config.framework,
+                        name: data.config.name
                     });
                     
                     dispatch(setBasePath(data.path));

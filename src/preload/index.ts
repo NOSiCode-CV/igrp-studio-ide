@@ -7,8 +7,7 @@ import {
 	ModelConfig
 } from '@igrp/spring-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
-import { Connection, DatabaseResponse, HandlerResponse, Page, Project } from '../main/types'
-import { BaseApiConfig } from '../main/engine'
+import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -80,14 +79,6 @@ const api = {
 		}
 	},
 
-	createAppNext: async (apiConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:create-app', apiConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
 	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
@@ -152,9 +143,23 @@ const api = {
 }
 
 const engine = {
-	createApi: async (apiConfig: BaseApiConfig, basePath: string): Promise<HandlerResponse> => {
+	createProject: async (project: ProjectData, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-api', apiConfig, basePath)
+			return await ipcRenderer.invoke('engine:create-project', project, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -166,10 +171,10 @@ const repo = {
 		findAllRecent: (page: Page) => {
 			return ipcRenderer.invoke('igrp-studio:repo:project.findAllRecent', page)
 		},
-		save: (p: Project) => {
+		save: (p: ProjectData) => {
 			return ipcRenderer.invoke('igrp-studio:repo:project.save', p)
 		},
-		delete: (p: Project, index: number) => {
+		delete: (p: ProjectData, index: number) => {
 			return ipcRenderer.invoke('igrp-studio:repo:project.delete', p, index)
 		}
 	},
@@ -199,7 +204,9 @@ const window = {
 // just add to the DOM global.
 if (process.contextIsolated) {
 	try {
-		contextBridge.exposeInMainWorld('electron', electronAPI)
+		contextBridge.exposeInMainWorld('electron', {
+			...electronAPI, getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)
 		contextBridge.exposeInMainWorld('repo', repo)

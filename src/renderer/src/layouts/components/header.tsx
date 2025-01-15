@@ -1,6 +1,6 @@
 import logo from '@renderer/assets/images/igrp-blue.svg';
 import { useEffect, useState } from 'react';
-import { ConfigOptions } from 'src/main/types';
+import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
     Bell,
@@ -35,7 +35,7 @@ import { getPages as onGetPages } from '@renderer/redux/thunks';
 import { GitChangesCount } from '@renderer/components/git/git-changes-count';
 
 interface HeaderProps {
-    config?: ConfigOptions;
+    config?: ProjectData;
     basePath?: string;
 }
 

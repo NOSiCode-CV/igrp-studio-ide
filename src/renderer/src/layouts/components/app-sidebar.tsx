@@ -23,16 +23,17 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
-import { ConfigOptions, MenuItem } from 'src/main/types';
+import { ProjectData, MenuItem } from 'src/main/types';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
+import { NavSettings } from './nav-data';
 
 interface AppSidebarProps {
     className?: string;
     menuItems: MenuItem[];
-    config?: ConfigOptions;
+    config?: ProjectData;
     basePath: string;
     header?: boolean;
 }
@@ -51,6 +52,7 @@ export function AppSidebar({
     const [activeItem, setActiveItem] = useState('');
     const menuApp = filterSubItems(menuItems, searchQuery);
 
+    const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
     const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
     const handleSearch = (value: string) => {
@@ -69,15 +71,28 @@ export function AppSidebar({
         setActiveMenu(menuApp || []);
     }, [menuApp]);
 
-    const handleClickMenu = (id: string) => {
-        if (id === 'app') setActiveMenu(menuApp);
-        else setActiveMenu([]);
+    const handleClickMenu = (item: MenuItem) => {
+        setActiveMenuGroup(item.label);
+        if (item.id === 'apis') setActiveMenu(menuApp);
+        else {
+            const menus = NavSettings().menuItems;
+            const menuApp = filterSubItems(menus, searchQuery);
+            setActiveMenu(menuApp);
+        }
     };
 
     const menuIcons: MenuItem[] = [
-        { icon: Server, link: '/app', label: 'APIs', id: 'app' },
-        { icon: FileText, link: '/documents', label: 'documents' },
-        { icon: Badge, link: '/settings', label: 'settings' },
+        { icon: Server, label: t('apis'), id: 'apis' },
+        {
+            icon: FileText,
+            label: t('documents'),
+            id: 'documents',
+        },
+        {
+            icon: Badge,
+            label: t('settings'),
+            id: 'settings',
+        },
     ];
 
     return (
@@ -122,15 +137,18 @@ export function AppSidebar({
                                         <SidebarMenuItem key={index}>
                                             <SidebarMenuButton
                                                 tooltip={{
-                                                    children: t(item.label),
+                                                    children: item.label,
                                                     hidden: false,
                                                 }}
                                                 onClick={() => {
                                                     setOpen(true);
-                                                    handleClickMenu(item.id);
+                                                    handleClickMenu(item);
                                                 }}
                                                 className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
-                                                isActive={item.id === 'app'}
+                                                isActive={
+                                                    item.label ===
+                                                    activeMenuGroup
+                                                }
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
                                                     {item.icon && (
@@ -156,7 +174,8 @@ export function AppSidebar({
                 <Sidebar collapsible="none" className="hidden flex-1 md:flex">
                     {header && (
                         <AppSidebarHeader
-                            config={config}
+                            name={config?.name}
+                            description={activeMenuGroup}
                             basePath={basePath}
                             sidebarState={sidebarState}
                             handleSearch={handleSearch}
@@ -177,6 +196,7 @@ export function AppSidebar({
                                                     }
                                                     activeItem={activeItem}
                                                     basePath={basePath}
+                                                    activeMenuGroup={activeMenuGroup}
                                                 />
                                             </SidebarMenu>
                                         )
@@ -196,11 +216,13 @@ function Three({
     handleSubItemClick,
     activeItem,
     basePath,
+    activeMenuGroup
 }: {
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
     basePath: string;
+    activeMenuGroup?: string
 }) {
     const [open, setOpen] = React.useState(true);
 
@@ -208,9 +230,8 @@ function Three({
         setOpen(newState);
     };
 
-    const { t } = useTranslation();
     const navigate = useNavigate();
-    const handleNavigation = (link) => {
+    const handleNavigation = (link: string | undefined) => {
         if (link) navigate(link);
     };
 
@@ -244,9 +265,9 @@ function Three({
                         </span>
                     )}
                     <span>
-                        {t(item.label)}
+                        {item.label}
                         {item.subItems &&
-                            item.subItems.length > 0 &&
+                            item.subItems.length > 0  && activeMenuGroup === 'APIs' &&
                             `(${item.subItems.length})`}
                     </span>
                 </div>
@@ -284,6 +305,7 @@ function Three({
                                 handleSubItemClick={handleSubItemClick}
                                 activeItem={activeItem}
                                 basePath={basePath}
+                                activeMenuGroup={activeMenuGroup}
                             />
                         ))}
                     </SidebarMenuSub>

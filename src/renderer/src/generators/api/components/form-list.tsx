@@ -25,6 +25,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { PopoverController } from '../pages/controller/popover'
 import { PopoverModel } from '../pages/model/popover'
 import { PopoverDto } from '../pages/dto/popover-dto'
+import { RelationPopover } from '../pages/model/relation-popover'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
@@ -77,7 +78,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Atualiza o estado do formData
         const newFormData = [...formData]
         newFormData[index] = updatedRow
-        setFormData(newFormData)
+        //setFormData(newFormData)
       }
     }
   }
@@ -274,6 +275,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 changeValue={(element, position, value) =>
                                                   changeValue(element, position, value)
                                                 }
+                                                options={itemOptions || []}
                                               />
                                             )}
                                             {item.type === 'popoverDto' && (
@@ -287,13 +289,22 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 collectionTypes={itemOptions || []}
                                               />
                                             )}
+                                             {item.type === 'popoverRelation' && row['type'] === 'relation' && (
+                                              <RelationPopover
+                                                key={itemIndex}
+                                                field={row}
+                                                changeValue={(element,value) =>
+                                                  changeValue(element, index, value)
+                                                } 
+                                                options={itemOptions || []}
+                                              />
+                                            )}
                                           </div>
                                         )
                                       })}
                                     </div>
                                   ) : (
                                     <>
-                                      {' '}
                                       {['text', 'number'].includes(type) && (
                                         <Input
                                           className={cn(
@@ -357,6 +368,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           changeValue={(element, position, value) =>
                                             changeValue(element, position, value)
                                           }
+                                          options={options}
                                         />
                                       )}
                                       {['popoverDto'].includes(type) && (
@@ -394,18 +406,6 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                   )
                 })}
             </TableBody>
-            {/* {addRow && (
-              <TableFooter>
-                <TableRow>
-                  <TableCell className="text-left !py-1">
-                    <Button variant={'outline'} onClick={addRow} className="text-capitalize">
-                      <Plus />
-                      {`New ${btnLabels}`}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            )} */}
             {provided.placeholder}
           </Table>
         )}

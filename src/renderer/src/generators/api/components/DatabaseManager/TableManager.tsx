@@ -51,7 +51,6 @@ export function TableManager({
     const [selectedTable, setSelectedTable] = useState<string | null>(null);
     const [previewColumns, setPreviewColumns] = useState<Array<any>>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [module, setModule] = useState('');
     const [action, setAction] = useState('overwrite');
 
     useEffect(() => {
@@ -104,6 +103,7 @@ export function TableManager({
             await window.api.getTableStructure(selectedConnection, table);
         if (!success) showErrorToast(message);
         setPreviewColumns(structure);
+        console.log(structure)
     };
 
     const handleChangeRows = (value) => {

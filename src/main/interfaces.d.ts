@@ -1,10 +1,10 @@
-import { Connection, PageableProjects, Project } from "./types";
+import { Connection, PageableProjects, ProjectData } from "./types";
 
 export interface IProjectRepository {
-    async save(project: Project): Promise<Project>;
-    async delete(project: Project, index: number): Promise<void>;
+    async save(project: ProjectData): Promise<ProjectData>;
+    async delete(project: ProjectData, index: number): Promise<void>;
     async findAllRecent(): Promise<PageableProjects>;
-    async findAll(): Promise<Array<Project>>;
+    async findAll(): Promise<Array<ProjectData>>;
 }
 
 export interface IConnenctionRepository {
@@ -15,5 +15,7 @@ export interface IConnenctionRepository {
 }
 
 export interface BaseEngine {
-    createApi(apiConfig: BaseApiConfig, basePath: string): Promise<void>;
+    createProject(project: ProjectData, basePath: string): Promise<void>;
+    createResponse(config: ResponseConfig, basePath: string): Promise<void>
+    delete(config: DeleteConfig, basePath: string): Promise<void>
 }
