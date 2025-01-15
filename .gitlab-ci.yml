@@ -8,7 +8,7 @@ build_packagedev:
   image: node:slim
   stage: build
   only:
-    - master
+    - dev
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
