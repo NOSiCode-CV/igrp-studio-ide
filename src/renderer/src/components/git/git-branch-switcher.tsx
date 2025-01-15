@@ -28,12 +28,13 @@ interface Branch {
 }
 
 interface BranchSwitcherProps {
-  projectPath: string
-  onError?: (message: string) => void
-  onSuccess?: (message: string) => void
+  projectPath: string;
+  onError?: (message: string) => void;
+  onSuccess?: (message: string) => void;
+  onBranchChange?: (branchName: string) => void;
 }
 
-export function BranchSwitcher({ projectPath, onError, onSuccess }: BranchSwitcherProps) {
+export function BranchSwitcher({ projectPath, onError, onSuccess, onBranchChange }: BranchSwitcherProps) {
   const [open, setOpen] = useState(false)
   const [branches, setBranches] = useState<Branch[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -50,7 +51,6 @@ export function BranchSwitcher({ projectPath, onError, onSuccess }: BranchSwitch
       const branchList = await window.electron.ipcRenderer.invoke('list-branches', projectPath)
       setBranches(branchList)
       
-      // Set the initially selected branch to the active one
       const activeBranch = branchList.find(branch => branch.isActive)
       if (activeBranch) {
         setSelectedBranch(activeBranch.name)
@@ -71,7 +71,6 @@ export function BranchSwitcher({ projectPath, onError, onSuccess }: BranchSwitch
         branchName: newBranchName
       });
       
-      // Reset and reload
       setNewBranchName('');
       await loadBranches();
       setOpen(false);
@@ -92,13 +91,12 @@ export function BranchSwitcher({ projectPath, onError, onSuccess }: BranchSwitch
       setSelectedBranch(branchName)
       setOpen(false)
       onSuccess?.(`Switched to branch ${branchName}`)
+      onBranchChange?.(branchName); 
     } catch (error) {
       if (error instanceof Error) {
         onError?.(error.message || 'Failed to switch branch');
-        console.error('Error switching branch:', error);
       } else {
         onError?.('Failed to switch branch');
-        console.error('Error switching branch:', error);
       }
     }
   }
@@ -117,10 +115,10 @@ export function BranchSwitcher({ projectPath, onError, onSuccess }: BranchSwitch
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-[250px] justify-between"
+          className="w-[200px] justify-between"
         >
           <GitBranch className="mr-2 h-4 w-4" />
           {selectedBranch || "Select branch"}

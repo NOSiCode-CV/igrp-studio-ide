@@ -1,30 +1,33 @@
-import { exec } from 'child_process';
-import * as path from 'path';
-import { promisify } from 'util';
-import { BrowserWindow, dialog } from 'electron';
-import * as fs from 'fs/promises';
+import { BrowserWindow } from 'electron';
 import { TokenService } from './token-service';
 
-let Octokit: any = null;
 let octokit: any = null;
-
-const execAsync = promisify(exec);
 
 export const GitHubService = {
   
+  async initializeServices() {
+    try {
+      const token = TokenService.getToken('github');
+      
+      if (token) {
+        await this.initialize(token);
+        return true;
+      } 
+    } catch (error) {
+      console.error('Failed to initialize GitHub service:', error);
+    }
+    return false;
+  },
+
   async initialize(token: string) {
     try {
-      if (!Octokit) {
-        Octokit = (await import('@octokit/rest')).Octokit;
-      }
+      const { Octokit } = await import('@octokit/rest');
       octokit = new Octokit({ auth: token });
-      
-      // Verifica se o token é válido
-      await this.getUserInfo();
+      await octokit.users.getAuthenticated();
       return true;
     } catch (error) {
-      octokit = null;
       console.error('Failed to initialize GitHub client:', error);
+      octokit = null;
       throw error;
     }
   },
@@ -126,141 +129,5 @@ export const GitHubService = {
       console.error('Error listing repositories:', error);
       throw error;
     }
-  },
-
-  async initializeServices() {
-    try {
-      await TokenService.initialize();
-      
-      const savedToken = TokenService.getToken();
-      if (savedToken) {
-        await GitHubService.initialize(savedToken);
-        console.log('GitHub service initialized with saved token');
-      }
-    } catch (error) {
-      console.error('Error initializing services:', error);
-    }
-  },
-
-  async cloneRepository(repoUrl: string, window: BrowserWindow) {
-    try {
-      const { canceled, filePaths } = await dialog.showOpenDialog(window, {
-        title: 'Choose Clone Location',
-        properties: ['openDirectory', 'createDirectory'],
-        buttonLabel: 'Choose Folder'
-      });
-
-      if (canceled) {
-        throw new Error('Operation cancelled');
-      }
-
-      const projectName = await new Promise<string>((resolve, reject) => {
-        window.webContents.send('request-project-name', {
-          defaultName: repoUrl.split('/').pop()?.replace('.git', '')
-        });
-
-        const { ipcMain } = require('electron');
-        ipcMain.once('project-name-response', (_event, name) => {
-          if (!name) reject(new Error('No project name provided'));
-          resolve(name);
-        });
-      });
-
-      const targetDir = path.join(filePaths[0], projectName);
-
-      window.webContents.send('clone-progress', {
-        status: 'starting',
-        message: `Starting to clone into ${targetDir}...`
-      });
-
-      return new Promise((resolve, reject) => {
-        exec(`git clone ${repoUrl} "${targetDir}"`, async (error) => {
-          if (error) {
-            window.webContents.send('clone-progress', {
-              status: 'error',
-              message: `Failed to clone: ${error.message}`
-            });
-            reject(error);
-            return;
-          }
-
-          try {
-            // Read the project configuration after successful clone
-            const configPath = path.join(targetDir, '.igrpstudio', 'baseApp.json');
-            const config = JSON.parse(await fs.readFile(configPath, 'utf8'));
-
-            window.webContents.send('clone-progress', {
-              status: 'success',
-              message: `Successfully cloned to ${targetDir}`,
-              path: targetDir,
-              config: config
-            });
-            resolve({ path: targetDir, config });
-          } catch (configError) {
-            window.webContents.send('clone-progress', {
-              status: 'error',
-              message: `Failed to read project configuration: ${(configError as Error).message}`
-            });
-            reject(configError);
-          }
-        });
-      });
-    } catch (error) {
-      window.webContents.send('clone-progress', {
-        status: 'error',
-        message: `Error: ${(error as Error).message}`
-      });
-      throw error;
-    }
-  },
-
-  async listBranches(projectPath: string) {
-    try {
-      // Lista todos os branches (locais e remotos)
-      const { stdout } = await execAsync('git branch -a', { cwd: projectPath });
-      
-      // Processa a saída para um formato mais amigável
-      const branches = stdout
-        .split('\n')
-        .filter(Boolean)
-        .map(branch => {
-          const isActive = branch.startsWith('*');
-          const name = branch.replace('*', '').trim();
-          const isRemote = name.startsWith('remotes/origin/');
-          const cleanName = isRemote ? name.replace('remotes/origin/', '') : name;
-
-          return {
-            name: cleanName,
-            isActive,
-            isRemote,
-            fullName: name
-          };
-        });
-
-      // Remove duplicatas (branches locais e remotos com mesmo nome)
-      const uniqueBranches = branches.reduce((acc: { name: string }[], current: { name: string }) => {
-        const x = acc.find(item => item.name === current.name);
-        if (!x) {
-          return acc.concat([current]);
-        }
-        return acc;
-      }, []);
-
-      return uniqueBranches;
-    } catch (error) {
-      console.error('Error listing branches:', error);
-      throw error;
-    }
-  },
-
-  async checkoutBranch(projectPath: string, branchName: string) {
-    try {
-      await execAsync(`git checkout ${branchName}`, { cwd: projectPath });
-      return true;
-    } catch (error) {
-      console.error('Error checking out branch:', error);
-      throw error;
-    }
   }
 };
- 

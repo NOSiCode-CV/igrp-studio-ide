@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
 import { TableLayout } from '../components/TableLayout';
 import { NewPageModal } from './new-page-modal';
-import { Component, GitBranch, Trash } from 'lucide-react';
+import { Component, Trash } from 'lucide-react';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 
 interface PageBuilderContentProps {

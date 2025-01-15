@@ -4,19 +4,17 @@ export const TokenService = {
   async initialize() {
     const Store = (await import('electron-store')).default;
     store = new Store({
-      encryptionKey: 'sua_chave_secreta'
+      name: 'igrp-studio-config',
+      clearInvalidConfig: true
     });
   },
 
-  setToken(token: string) {
-    store?.set('github_token', token);
+  setToken(service: 'github' | 'gitlab', token: any) {
+    store?.set(`${service}_token`, token);
   },
 
-  getToken(): string | null {
-    return store?.get('github_token') || null;
+  getToken(service: 'github' | 'gitlab'): string | null {
+    const token = store?.get(`${service}_token`);
+    return token || null;
   },
-
-  clearToken() {
-    store?.delete('github_token');
-  }
 };

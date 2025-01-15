@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Repository } from 'src/main/types';
 import useToast from '../useToast';
-import { ProjectNameDialog } from './DialogProjectName';
-import { CardGitProject } from './CardGitProject';
-import { ProgressDisplay } from './ProgressDisplay';
+import { ProjectNameDialog } from './dialog-project-name';
+import { CardGitProject } from './card-git-project';
+import { ProgressDisplay } from './display-progress';
 import { EmptyState } from '../empty-state';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
+import { RootState } from '@renderer/redux';
+import { setRepositories, setUser } from '@renderer/redux/git/reducer';
 
 export default function GitProject() {
     const { showErrorToast, showSuccessToast } = useToast();
 
     const [isLoading, setIsLoading] = useState(false);
     const [scanProgress, setScanProgress] = useState({ progress: 0, total: 0 });
-    const [repositories, setRepositories] = useState<Repository[]>([]);
     const [isCloning, setIsCloning] = useState(false);
-
-    const [, setUser] = useState<any>(null);
 
     const navigate = useNavigate()
     const dispatch: any = useDispatch()
@@ -27,27 +26,31 @@ export default function GitProject() {
         defaultName: '',
         onConfirm: (name: string) => {},
     });
+    
+    const { repositories, isInitialized } = useSelector((state: RootState) => state.git);
 
     useEffect(() => {
         const loadInitialData = async () => {
-            setIsLoading(true);
-            try {
-                const [userInfo, repos] = await Promise.all([
-                    window.electron.ipcRenderer.invoke('github-user-info'),
-                    window.electron.ipcRenderer.invoke('github-repositories'),
-                ]);
+            if (!isInitialized) {
+                setIsLoading(true);
+                try {
+                    const [userInfo, repos] = await Promise.all([
+                        window.electron.ipcRenderer.invoke('github-user-info'),
+                        window.electron.ipcRenderer.invoke('github-repositories'),
+                    ]);
 
-                setUser(userInfo);
-                setRepositories(repos);
-            } catch (error) {
-                console.log('Not authenticated yet');
-            } finally {
-                setIsLoading(false);
+                    dispatch(setUser(userInfo));
+                    dispatch(setRepositories(repos as Repository[]));
+                } catch (error) {
+                    console.log('Not authenticated yet');
+                } finally {
+                    setIsLoading(false);
+                }
             }
         };
 
         loadInitialData();
-    }, []);
+    }, [isInitialized, dispatch]);
 
     useEffect(() => {
         window.electron.ipcRenderer.on(
@@ -68,7 +71,7 @@ export default function GitProject() {
                     ]);
 
                     setUser(userInfo);
-                    setRepositories(repos);
+                    setRepositories(repos as Repository[]);
                 } catch (error) {
                     console.error('Error loading GitHub data:', error);
                 } finally {
@@ -166,7 +169,7 @@ export default function GitProject() {
             ) : (
                 repositories?.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {repositories.map((repo) => (
+                        {repositories?.map((repo) => (
                             <CardGitProject
                                 repo={repo}
                                 key={repo.id}

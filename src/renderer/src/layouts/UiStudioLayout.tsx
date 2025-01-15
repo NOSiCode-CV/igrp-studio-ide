@@ -5,13 +5,13 @@ import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import useToast from '@renderer/components/useToast';
-import { BranchSwitcher } from './components/branch-switcher';
+import { BranchSwitcher } from '../components/git/git-branch-switcher';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string }>;
 }
 
-interface RootState {
+export interface RootState {
     PageBuilder: {
         config: any; // Define appropriate types
         folderFiles: any; // Define appropriate types
@@ -21,7 +21,7 @@ interface RootState {
 
 
 const Layout = (props: LayoutProps): JSX.Element => {
-    const { showErrorToast, showSuccessToast } = useToast();
+    
     const selectStudioState = (state: RootState) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
@@ -37,11 +37,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         <div className="h-screen flex flex-col">
             <ToastContainer />
             <Header config={config} basePath={basePath} />
-            <BranchSwitcher
-                projectPath={basePath}
-                onError={showErrorToast}
-                onSuccess={showSuccessToast}
-            />
+            
             <div className="overflow-hidden">
                 {React.cloneElement(props.children, { basePath: basePath })}
             </div>

@@ -21,7 +21,7 @@ import {
   SelectValue
 } from '@renderer/components/ui/select'
 import { IGRPContainer } from '@igrp/igrp-design-system'
-import GitProject from '@renderer/components/GIT/GitProject'
+import GitProject from '@renderer/components/git/git-project'
 
 
 const RecentsProjects = (): JSX.Element => {

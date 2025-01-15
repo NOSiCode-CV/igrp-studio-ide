@@ -28,6 +28,11 @@ import {
 } from '@renderer/components/ui/tooltip';
 import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { BranchSwitcher } from '../../components/git/git-branch-switcher';
+import useToast from '@renderer/components/useToast';
+import { useDispatch } from 'react-redux';
+import { getPages as onGetPages } from '@renderer/redux/thunks';
+import { GitChangesCount } from '@renderer/components/git/git-changes-count';
 
 interface HeaderProps {
     config?: ConfigOptions;
@@ -35,6 +40,8 @@ interface HeaderProps {
 }
 
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
+    const dispatch: any = useDispatch();
+    const { showErrorToast, showSuccessToast } = useToast();
     const isMac =
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
@@ -118,6 +125,22 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                             <p className="text-sm font-medium">IGRP Studio</p>
                         </div>
                         <div className="flex items-center space-x-2">
+                            {config?.name && (
+                                <div className="flex justify-center gap-2 items-center">
+                                    <BranchSwitcher
+                                        projectPath={basePath || ''}
+                                        onError={showErrorToast}
+                                        onSuccess={showSuccessToast}
+                                        onBranchChange={() => {
+                                            dispatch(
+                                                onGetPages(basePath || '')
+                                            );
+                                        }}
+                                    />
+                                    <GitChangesCount basePath={basePath || ''} />
+                                </div>
+                            )}
+
                             <ModeToggle />
 
                             {config?.name && (
