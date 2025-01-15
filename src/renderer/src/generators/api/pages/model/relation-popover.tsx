@@ -4,13 +4,6 @@ import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@renderer/components/ui/button';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
-import {
     Popover,
     PopoverContent,
     PopoverTrigger,
@@ -20,21 +13,21 @@ import { Input } from '@renderer/components/ui/input';
 import { RelationTypeSelector } from './relation-type-selector';
 import { Switch } from '@renderer/components/ui/Switch';
 import { Relation } from '@igrp/spring-engine/dist/interfaces/types';
-
-const tables = [
-    { name: 'Users', columns: ['id', 'name', 'email'] },
-    { name: 'Posts', columns: ['id', 'title', 'content', 'author_id'] },
-    { name: 'Comments', columns: ['id', 'content', 'post_id', 'user_id'] },
-];
+import { Combobox } from '@igrp/igrp-design-system';
 
 interface RelationPopoverProps {
     field: any;
     changeValue: (element: string, value: any) => void;
+    options: any;
 }
 
-export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
+export function RelationPopover({
+    field,
+    options,
+    changeValue,
+}: RelationPopoverProps) {
     const [open, setOpen] = useState(false);
-
+    const { modelsOptions, models } = options;
     const [localRelation, setLocalRelation] = useState<Relation>(
         field.relation || {
             type: 'OneToOne',
@@ -45,18 +38,24 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
             joinTable: '', //Name of the intermediate table
         }
     );
-    const [availableColumns, setAvailableColumns] = useState<string[]>([]);
+    const [availableColumns, setAvailableColumns] = useState<{value: string, label: string}[]>([]);
 
     useEffect(() => {
         if (localRelation.entity) {
-            const targetTable = tables.find(
-                (t) => t.name === localRelation.entity
-            );
-            setAvailableColumns(targetTable?.columns || []);
+            const model = models.find((t) => t.name === localRelation.entity);
+            if (model) {
+                const targetTable = model.content.attributes.map((attr) => ({
+                    value: attr.name,
+                    label: attr.name,
+                }));
+                setAvailableColumns(targetTable || []);
+            } else {
+                setAvailableColumns([]);
+            }
         } else {
             setAvailableColumns([]);
         }
-    }, [localRelation.entity, tables]);
+    }, [localRelation.entity, models]);
 
     const handleUpdate = () => {
         changeValue('relation', localRelation);
@@ -74,7 +73,7 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-100">
-                <div className="space-y-5">
+                <div className="space-y-3">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">
                             Relation Settings
@@ -94,7 +93,7 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                         sourceField={field.name}
                         targetField={localRelation.entity || 'entity'}
                     />
-                    <div className="grid grid-cols-2 gap-2 space-y-5">
+                    <div className="grid grid-cols-2 gap-2">
                         {localRelation.type === 'ManyToMany' && (
                             <div className="col-span-2 gap-2">
                                 <Label htmlFor="joinTable">Entity Name</Label>
@@ -115,63 +114,44 @@ export function RelationPopover({ field, changeValue }: RelationPopoverProps) {
                                 </p>
                             </div>
                         )}
-                        <div className="grid gap-2">
+                        <div className="space-y-2 flex flex-col">
                             <Label htmlFor="entity">Entity</Label>
-                            <Select
+                            <Combobox
+                                name="entity"
                                 value={localRelation.entity}
-                                onValueChange={(value) =>
+                                options={modelsOptions}
+                                placeholder="Select target table"
+                                onChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
                                         entity: value,
                                         referencedColumnName: '',
                                     })
                                 }
-                            >
-                                <SelectTrigger id="entity">
-                                    <SelectValue placeholder="Select target table" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {tables.map((table) => (
-                                        <SelectItem
-                                            key={table.name}
-                                            value={table.name}
-                                        >
-                                            {table.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            />
                         </div>
-                        <div className="grid gap-2">
+                        <div className="space-y-2 flex flex-col">
                             <Label htmlFor="referencedColumnName">
                                 Reference Column Name
                             </Label>
-                            <Select
+                            <Combobox
+                                name="entity"
                                 value={localRelation.referencedColumnName}
-                                onValueChange={(value) =>
+                                options={availableColumns}
+                                placeholder="Select reference column"
+                                onChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
                                         referencedColumnName: value,
                                     })
                                 }
-                            >
-                                <SelectTrigger id="referencedColumnName">
-                                    <SelectValue placeholder="Select reference column" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {availableColumns.map((column) => (
-                                        <SelectItem key={column} value={column}>
-                                            {column}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            />
                         </div>
                     </div>
 
                     {(localRelation.cardinality === 'twoWay' ||
                         localRelation.type === 'ManyToMany') && (
-                        <div className="grid gap-2">
+                        <div className="space-y-2">
                             <Label htmlFor="inverseJoinColumn">
                                 Field Name in{' '}
                                 {localRelation.joinTable ||

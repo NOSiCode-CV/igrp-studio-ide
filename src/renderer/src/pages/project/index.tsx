@@ -209,15 +209,21 @@ export function ProjectWizard() {
         ? componentsMap[formik.values?.framework]
         : null;
 
+    React.useEffect(() => {
+        if (open) return;
+        formik.setValues(initialValues);
+        setStep(1)
+    }, [open]);
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={setOpen} >
             <DialogTrigger asChild>
                 <Button variant="outline">
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Create New Project
                 </Button>
             </DialogTrigger>
-            <DialogContent className="md:max-w-[700px] max-w-[800px]">
+            <DialogContent className="md:max-w-[700px] max-w-[800px]" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>New Project</DialogTitle>
                     <DialogDescription />

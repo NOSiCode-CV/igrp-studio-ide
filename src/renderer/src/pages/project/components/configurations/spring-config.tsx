@@ -24,7 +24,7 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     description: '',
     group: '',
     artifact: '',
-    database: 'postgresql',
+    database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
     igrpCoreVersion: 'latest',
@@ -57,7 +57,7 @@ export function SpringConfig({
     const PackageName = () => {
         return (
             <>
-                {data.group && (
+                {data.group && data.artifact && (
                     <p className="w-full text-sm text-muted-foreground italic -mt-2">
                         {`Package Name: ${data.group.replace(/[-\s]/g, '_')}.${data.artifact.replace(/[-\s]/g, '_')}`}
                     </p>

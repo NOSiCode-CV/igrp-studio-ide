@@ -132,7 +132,7 @@ export const getTablesColumns = ({
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
 					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes },
-					{ key: 'relation', name: 'Relation', type: 'popoverRelation' },
+					{ key: 'relation', name: 'Relation', type: 'popoverRelation', options: { modelsOptions, models } },
 				]
 			}
 		],

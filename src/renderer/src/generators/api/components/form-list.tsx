@@ -295,7 +295,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 field={row}
                                                 changeValue={(element,value) =>
                                                   changeValue(element, index, value)
-                                                }
+                                                } 
+                                                options={itemOptions || []}
                                               />
                                             )}
                                           </div>

@@ -28,9 +28,10 @@ export interface SpringConfigData {
     group: string;
     artifact: string;
     database: string;
-    structureStyle: 'technical' | 'domain';
+    projectStructureStyle: 'technical' | 'domain';
     enableObservability: boolean;
     projectStructureStyle: string;
+    igrpCoreVersion: string
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;
