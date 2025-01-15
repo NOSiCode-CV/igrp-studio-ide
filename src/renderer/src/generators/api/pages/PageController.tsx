@@ -127,6 +127,7 @@ const PageController = ({
                     selectors={selectors}
                     currentItem={tab.item}
                     modules={modules}
+                    dto={dto}
                     responses={responses}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}

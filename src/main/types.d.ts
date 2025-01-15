@@ -128,3 +128,10 @@ export interface Connection {
     sshPassword?: string;
     database: string;
 }
+
+
+export interface SchemaTypeItem {
+    label: string;
+    value: string;
+    items?: SchemaTypeItem[]; // Optional submenu items
+}

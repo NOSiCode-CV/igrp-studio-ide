@@ -6,7 +6,7 @@ import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { FieldOptionsPopover } from './FieldOptionsPopover';
 import { SchemaField } from '../../types/schema';
-import { TypeSelectorPopover } from '../../../../components/TypeSelectorPopover';
+import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
 
 interface SchemaFieldRowProps {
     id: string;
@@ -213,7 +213,7 @@ export function SchemaFieldRow({
                 </TableCell>
                 <TableCell className="!py-1">
                     <div className="flex flex-1 items-center">
-                        <TypeSelectorPopover
+                        <TypeSelectorDropdown
                             type={type}
                             onTypeChange={(t) => handleTypeChange(t)}
                             schemaTypes={schemaTypes}

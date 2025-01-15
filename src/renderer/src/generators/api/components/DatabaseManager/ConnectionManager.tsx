@@ -125,7 +125,6 @@ export function ConnectionManager() {
                 <IGRPDataTable
                     data={connections}
                     columns={columns}
-                    pageSize={5}
                 />
             </ScrollArea>
         </div>
