@@ -1,55 +1,6 @@
 import { PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup'
 
-const RelationshipType = {
-    ONE_TO_ONE: 'OneToOne',
-    ONE_TO_MANY: 'OneToMany',
-    MANY_TO_ONE: 'ManyToOne',
-    MANY_TO_MANY: 'ManyToMany',
-}
-
-const conditionalValidation = Yup.object().shape({
-    relationType: Yup.string().nullable(),
-    entity: Yup.string().nullable(),
-    joinColumn: Yup.string().nullable(),
-    mappedBy: Yup.string().nullable(),
-    joinTable: Yup.string().nullable(),
-    inverseJoinColumn: Yup.string().nullable(),
-}).test('relationType-or-entity-or-joinColumn-or-mappedBy-or-joinTable-or-inverseJoinColumn-required', '', function (value) {
-    const { relationType, entity, joinColumn, mappedBy, joinTable, inverseJoinColumn } = value || {};
-
-    if (relationType && !entity) {
-        return this.createError({ path: this.path, message: { entity: 'Entity is required when Relation Type is provided' } });
-    }
-
-    if (relationType && relationType === RelationshipType.ONE_TO_ONE && !joinColumn) {
-        return this.createError({ path: this.path, message: { joinColumn: `Join Column is required when Relation Type is ${RelationshipType.ONE_TO_ONE}` } });
-    }
-
-    if (relationType && relationType === RelationshipType.MANY_TO_ONE && !joinColumn) {
-        return this.createError({ path: this.path, message: { joinColumn: `Join Column is required when Relation Type is ${RelationshipType.MANY_TO_ONE}` } });
-    }
-
-    if (relationType && relationType === RelationshipType.ONE_TO_MANY && !mappedBy) {
-        return this.createError({ path: this.path, message: { mappedBy: `Mapped By is required when Relation Type is ${RelationshipType.ONE_TO_MANY}` } });
-    }
-
-    //MANY TO MANY
-    if (relationType && relationType === RelationshipType.MANY_TO_MANY && !joinColumn) {
-        return this.createError({ path: this.path, message: { joinColumn: `join Column is required when Relation Type is ${RelationshipType.MANY_TO_MANY}` } });
-    }
-
-    if (relationType && relationType === RelationshipType.MANY_TO_MANY && !joinTable) {
-        return this.createError({ path: this.path, message: { joinTable: `Join Table is required when Relation Type is ${RelationshipType.MANY_TO_MANY}` } });
-    }
-
-    if (relationType && relationType === RelationshipType.MANY_TO_MANY && !inverseJoinColumn) {
-        return this.createError({ path: this.path, message: { inverseJoinColumn: `Inverse Join Column is required when Relation Type is ${RelationshipType.MANY_TO_MANY}` } });
-    }
-
-    return true; // If both are valid or both are not present, return true
-});
-
 export function useModelValidation({t}) {
     const validationSchema = Yup.object({
         name: Yup.string().required('Name is required')

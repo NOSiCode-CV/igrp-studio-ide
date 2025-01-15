@@ -21,7 +21,6 @@ import { getValuesToSubmit, initialValues } from '../../pages/model/config';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
-import { Relation } from '@igrp/spring-engine/dist/interfaces/types';
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean;

@@ -59,19 +59,6 @@ export function FieldOptionsPopover({
                     <PackageCheck className="w-4 h-4" /> {/* Settings icon */}
                     <span className="sr-only">{t('Advanced')}</span>
                 </Button>
-                {/*< Tooltip>
-          <TooltipTrigger asChild>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="flex items-center h-6 w-6" size={'icon'}>
-                <PackageCheck className="w-4 h-4" /> 
-                <span className="sr-only">{t('Advanced')}</span>
-              </Button>
-            </PopoverTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="top" align="center">
-            {t('Open advanced settings')}
-          </TooltipContent>
-        </Tooltip> */}
             </PopoverTrigger>
             <PopoverContent className="w-[425px]">
                 <Tabs defaultValue="dataType">

@@ -36,12 +36,14 @@ import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
 import { ContainerScrollArea } from '../../components/ContainerScrollArea';
+import { SchemaTypeItem } from 'src/main/types';
 
 interface ControllerProps {
     basePath: string;
     selectors: Array<any>;
     currentItem: any;
     modules: Array<any>;
+    dto: Array<any>;
     responses: Array<any>;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
@@ -52,6 +54,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     selectors,
     currentItem,
     modules,
+    dto,
     onCloseTab,
     onUpdateTab,
     responses,
@@ -64,6 +67,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const [pathController, setPathController] = useState('');
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
+    const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -126,7 +130,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 pathVariables,
                 requestParams,
                 headers,
-                responses
+                responses,
             } = currentItem.content;
 
             setOldActionName(actionName);
@@ -304,13 +308,34 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         )?.MYME_TYPES || []
     );
 
-    const schemaTypes = formatMethods(
-        (
-            selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
-                | { SCHEMA_TYPES: string[] }
-                | undefined
-        )?.SCHEMA_TYPES || []
-    );
+    useEffect(() => {
+        const types = formatMethods(
+            (
+                selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
+                    | { SCHEMA_TYPES: string[] }
+                    | undefined
+            )?.SCHEMA_TYPES || []
+        );
+
+        setSchemaTypes(types);
+
+        // Map DTO into the expected format
+        const targetDto = dto.map((d) => ({
+            value: d.name,
+            label: d.name,
+        }));
+
+        setSchemaTypes((prevSchemaTypes) =>
+            prevSchemaTypes.map((schemaType) =>
+                schemaType.value === 'Reference other schemas'
+                    ? {
+                          ...schemaType,
+                          items: targetDto,
+                      }
+                    : schemaType
+            )
+        );
+    }, [dto]);
 
     const onSubmit = async () => {
         const errors = await formik.validateForm();

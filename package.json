@@ -27,7 +27,7 @@
 		"@faker-js/faker": "^9.2.0",
 		"@hello-pangea/dnd": "^17.0.0",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
-		"@igrp/igrp-design-system": "^1.0.0-alpha.74",
+		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
 		"@igrp/spring-engine": "^0.3.0-alpha-4.6.6",
 		"@octokit/rest": "^21.1.0",

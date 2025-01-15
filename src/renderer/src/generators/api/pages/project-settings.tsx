@@ -5,7 +5,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@renderer/components/ui/card';
-import { Calendar } from 'lucide-react';
 import { ProjectData } from 'src/main/types';
 import { ContainerScrollArea } from '../components/ContainerScrollArea';
 import { projectIcons } from '@renderer/constants/appConstants';
