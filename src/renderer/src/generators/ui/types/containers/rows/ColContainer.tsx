@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { DroppedComponent } from '@renderer/generators/ui/interfaces';
 import ModalEdition from '@renderer/generators/ui/components/EditComponent/ModalEdition';
 import { COMPONENT } from '@renderer/generators/ui/ComponentTypes';
@@ -41,7 +41,6 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                 id={columnId}
             >
                 <Droppable droppableId={`${rowId}-${columnId}`}
-                    colSize={colSize}
                     type={COMPONENT}
                 >
                     {(provided: any, snapshot: any) => (

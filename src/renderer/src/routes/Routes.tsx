@@ -4,11 +4,12 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import MainLayout from '@renderer/layouts/MainLayout'
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
-import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayoput'
-import Loader from '@renderer/components/loader';
+import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayout'
+import { Loader } from 'lucide-react';
 
 const IDEInitialScreen = lazy(() => import('@renderer/pages/home/ide-initial-screen'))
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'))
+const ProjectSettings = lazy(() => import('@renderer/generators/api/pages/project-settings'))
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'))
 
 const allRoutes = [
@@ -22,6 +23,10 @@ const apiRoutes = [
   {
     path: ROUTES.PATH_PAGE_BUILDER_API,
     component: <PageBuilderApi />
+  },
+  {
+    path: '/project-settings',
+    component: <ProjectSettings />
   }
 ]
 

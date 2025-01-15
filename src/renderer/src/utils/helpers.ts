@@ -1,7 +1,8 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Command, Database, Folder, Puzzle } from 'lucide-react'
+import { Database, FileCode, FileText, Circle, LucideIcon, Zap } from 'lucide-react'
+import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
 
 // Function to convert folders into menuItems
@@ -63,21 +64,8 @@ export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export function createMenuHeader(label: string, folderName?: string): MenuItem {
-	const icon = folderName
-		? (() => {
-			switch (folderName.toLowerCase()) {
-				case 'controllers':
-					return Command
-				case 'models':
-					return Database
-				case 'dto':
-					return Puzzle
-				default:
-					return Folder // Default icon for other folders
-			}
-		})()
-		: ''
+export function createMenuHeader(label: string, folderName: string): MenuItem {
+	const icon = getIcon(folderName);
 
 	return {
 		label,
@@ -168,4 +156,42 @@ export const generateFakeDataForField = (field: any) => {
 		default:
 			return faker.lorem.words(3) // Fallback to text if type is unknown
 	}
+}
+export const getBadgeColor = (method: string): string | undefined => {
+	return httpMethods.find((item) => item.value === method)?.color;
+};
+
+
+export const getStatusLabel = (statusCode: string): string => {
+	const status = httpStatusCodes.find((status) => status.value === statusCode);
+	return status ? status.label.replace(`${status.value} `, '') : `Error (${statusCode})`;
+};
+
+export const toInitCap = (text: string) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
+
+export const getIcon = (folderName: string): LucideIcon => {
+	if (!folderName) return Circle
+	switch (folderName.toLowerCase()) {
+		case 'controllers':
+			return FileCode;
+		case 'models':
+			return Database;
+		case 'dto':
+			return FileText;
+		case 'action':
+			return Zap;
+		default:
+			return Circle;
+	}
+};
+
+
+export function toFullCamelCaseFromSnakeCase(str: string) {
+	if (!str) return '';
+
+	return capitalize(str
+		.toLowerCase()
+		.split('_')
+		.map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+		.join(''));
 }

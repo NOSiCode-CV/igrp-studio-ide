@@ -6,10 +6,16 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "types": ["jest"],
-        "module": "commonjs",
-        "target": "esnext",
-        "esModuleInterop": true,
-        "skipLibCheck": true
+    "skipLibCheck": true,
+    "noImplicitAny": false, // Adicione isto
+    "strictNullChecks": false, // E isto
+    "strict": false, // Mude para false
+    "allowJs": true, // Adicione isto
   }
 }

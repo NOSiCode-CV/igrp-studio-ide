@@ -1,0 +1,349 @@
+import { useEffect, useState } from 'react';
+import useToast from '@renderer/components/useToast';
+import { useFormik } from 'formik';
+import {
+    btnLabels,
+    defaultValues,
+    getTablesColumns,
+    TabList,
+    initialValues,
+    getValuesToSubmit,
+} from './config';
+import { IColumnsTabelProps } from '../../types/Interfaces';
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
+import { useDispatch } from 'react-redux';
+import { useModelValidation } from './validation';
+import { useTranslation } from 'react-i18next';
+import { Card } from '@renderer/components/ui/card';
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from '@renderer/components/ui/tabs';
+import { Label } from '@renderer/components/ui/label';
+import { addNewRow, changeValue, removeRow } from '../../helpers';
+import { TextInput } from '../../components/inputs-form';
+import { Checkbox } from '@renderer/components/ui/checkbox';
+import NavigationBar from '../../components/navigation-bar';
+import { FormList } from '../../components/form-list';
+import { ContainerScrollArea } from '../../components/ContainerScrollArea';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+
+interface ModelProps {
+    basePath: string;
+    selectors: Array<any>;
+    models?: Array<any>;
+    currentItem: any;
+    onCloseTab: () => void;
+    onUpdateTab: (tabId: string) => void;
+}
+
+const ModelLayout = ({
+    basePath,
+    selectors,
+    models,
+    currentItem,
+    onCloseTab,
+    onUpdateTab,
+}: ModelProps): JSX.Element => {
+    const { t } = useTranslation();
+    const dispatch: any = useDispatch();
+    const [tablesColumns, setTableColumns] = useState<{
+        [value: string]: IColumnsTabelProps[];
+    }>({});
+    const { showErrorToast, showSuccessToast } = useToast();
+    const [data, setData] = useState<any>(null);
+
+    const validationSchema = useModelValidation({ t });
+
+    const formik: any = useFormik({
+        enableReinitialize: true,
+        initialValues,
+        validationSchema,
+        onSubmit: (_values, actions) => {
+            actions.setSubmitting(false);
+            handleSave();
+        },
+    });
+
+    const suggestTableName = (name) => {
+        return `t_${name.trim().toLowerCase().replace(/\s+/g, '_')}`;
+    };
+
+    const handleNameBlur = (e) => {
+        formik.handleBlur(e);
+        const name = e.target.value;
+        if (!formik.values.tableName) {
+            formik.setFieldValue('tableName', suggestTableName(name));
+        }
+    };
+
+    useEffect(() => {
+        const res = getTablesColumns({
+            selectors,
+            attributes: formik.values.attributes,
+            models,
+        });
+        setTableColumns(res);
+    }, [selectors, formik.values]);
+
+    useEffect(() => {
+        const getJsonData = async () => {
+            if (!currentItem) return;
+
+            try {
+                const data = await window.api.getJsonContent(currentItem.path);
+                setData(data);
+            } catch (error) {
+                console.error('Failed to load JSON content:', error);
+            }
+        };
+
+        getJsonData();
+    }, [currentItem]);
+
+    useEffect(() => {
+        if (data) {
+            const {
+                name,
+                tableName,
+                attributes,
+                crud,
+                primaryKey,
+                uniqueConstraints,
+                indexes,
+            } = data;
+
+            const primaryKeyAttributes =
+                primaryKey && Array.isArray(primaryKey)
+                    ? primaryKey.map((pk) => ({
+                          ...defaultValues.attributes,
+                          ...pk,
+                          primaryKey: true,
+                      }))
+                    : [];
+
+            const attributesTransf = attributes.map(({ ...field }) => ({
+                ...field,
+                nullable: !field.nullable,
+            }));
+
+            const mergedAttributes = [
+                ...attributesTransf,
+                ...primaryKeyAttributes,
+            ];
+
+            const constraints =
+                uniqueConstraints && uniqueConstraints.length > 0
+                    ? uniqueConstraints
+                    : [defaultValues.uniqueConstraints];
+
+            const indexesTable =
+                indexes && indexes.length > 0
+                    ? indexes
+                    : [defaultValues.indexes];
+
+            formik.setFieldValue('name', name || '');
+            formik.setFieldValue('tableName', tableName || '');
+            formik.setFieldValue('crud', crud || false);
+            formik.setFieldValue(
+                'attributes',
+                mergedAttributes || [defaultValues.attributes]
+            );
+            formik.setFieldValue('uniqueConstraints', constraints);
+            formik.setFieldValue('indexes', indexesTable);
+        } else formik.resetForm();
+    }, [data]);
+
+    const handleSave = async (): Promise<void> => {
+        try {
+            const values = getValuesToSubmit(
+                formik.values,
+                currentItem?.module
+            );
+            console.log(values);
+
+            const { error } = await window.api.createModel(values, basePath);
+
+            if (error) {
+                showErrorToast(error);
+                return;
+            }
+
+            dispatch(onSetChangeStatus(true));
+
+            onUpdateTab(formik.values.name);
+
+            showSuccessToast(
+                t('createdSuccess', { name: t('model'), value: values.name })
+            );
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+    const deleteModel = async (): Promise<void> => {
+        try {
+            const config = {
+                name: formik.values.name,
+                type: 'model',
+                module: currentItem.module,
+            };
+
+            const { error } = await window.engine.delete(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
+
+            if (error) return showErrorToast(error);
+
+            dispatch(onSetChangeStatus(true));
+
+            onCloseTab();
+
+            showSuccessToast(t('deletedSuccess', { name: t('model') }));
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+    const renderFormList = (value: string) => {
+        const columns = tablesColumns?.[value];
+        const errors = formik?.errors?.[value];
+
+        return (
+            <>
+                {columns && formik?.values?.[value] && (
+                    <FormList
+                        columns={columns}
+                        formik={formik}
+                        data={formik.values[value]}
+                        changeValue={(element, position, result) =>
+                            changeValue(
+                                formik,
+                                element,
+                                position,
+                                result,
+                                value
+                            )
+                        }
+                        errors={errors}
+                        addRow={() =>
+                            addNewRow(formik, value, defaultValues[value])
+                        }
+                        removeRow={(position) =>
+                            removeRow(formik, value, position)
+                        }
+                        btnLabels={btnLabels[value]}
+                        name={value}
+                    />
+                )}
+            </>
+        );
+    };
+
+    return (
+        <>
+            <NavigationBar
+                onDelete={deleteModel}
+                onSubmit={formik.handleSubmit}
+                isNew={data === null}
+                title="model"
+            />
+            <ContainerScrollArea>
+                <div className="space-y-4 p-4">
+                    <Card className="p-6 rounded-sm">
+                        <div className="space-y-6">
+                            <div className="flex gap-4">
+                                <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                                    <TextInput
+                                        label={t('Name')}
+                                        id="name"
+                                        placeholder={t('Name of the model')}
+                                        value={formik.values.name}
+                                        onChange={formik.handleChange}
+                                        onBlur={handleNameBlur}
+                                        error={
+                                            formik.touched.name
+                                                ? formik.errors.name
+                                                : undefined
+                                        }
+                                    />
+
+                                    <TextInput
+                                        label={t('Table Name')}
+                                        id="tableName"
+                                        placeholder={t('Enter Table Name')}
+                                        value={formik.values.tableName}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        error={
+                                            formik.touched.tableName
+                                                ? formik.errors.tableName
+                                                : undefined
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex">
+                                <div className="grid grid-cols-4 gap-5 mb-4">
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="audit"
+                                            onCheckedChange={(checked) =>
+                                                formik.setFieldValue(
+                                                    'audit',
+                                                    checked
+                                                )
+                                            }
+                                            checked={formik.values.audit}
+                                        />
+                                        <Label htmlFor="audit">
+                                            Audit Model
+                                        </Label>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="crud"
+                                            onCheckedChange={(checked) =>
+                                                formik.setFieldValue(
+                                                    'crud',
+                                                    checked
+                                                )
+                                            }
+                                            checked={formik.values.crud}
+                                        />
+                                        <Label htmlFor="Crud">Crud</Label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                    <Card className="p-6 rounded-sm">
+                        <Tabs defaultValue="attributes">
+                            <TabsList className="grid w-full grid-cols-3">
+                                {TabList.map(({ label, value }, key) => (
+                                    <TabsTrigger key={key} value={value}>
+                                        {label}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                            {TabList.map(({ value }, key) => (
+                                <TabsContent key={key} value={value}>
+                                    <Card className="rounded-sm">
+                                        {renderFormList(value)}
+                                    </Card>
+                                </TabsContent>
+                            ))}
+                        </Tabs>
+                    </Card>
+                </div>
+            </ContainerScrollArea>
+        </>
+    );
+};
+
+export default ModelLayout;

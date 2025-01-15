@@ -1,326 +1,343 @@
-import { app, shell, BrowserWindow, ipcMain, IpcMainInvokeEvent, dialog, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { FolderFiles, Handler, IOpenProject, Project } from './types'
-import { addController, addDTO, addModel, addModule, deleteController, deleteDTO, deleteModel, engineTypes, newApi } from '@igrp/spring-engine'
-import { addComponentToPage, deletePage, newApp, newPage } from '@igrp/nextjs-engine';
+import { FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
+
 import { fetchFiles, getJsonContent, openDirectory } from './helpers'
-import { ProjectRepository } from './helpers/repo/projects'
-import {
-  BaseApiConfig,
-  ControllerConfig,
-  DTOBaseConfig,
-  DTOConfig,
-  ModelConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
+import { ProjectRepository } from './repo/projects'
+
 import { exec } from 'child_process'
+import { handleProtocolCallback, setupGitHubOAuth } from './helpers/github'
+
+import { TokenService } from './services/token-service';
+import { GitHubService } from './services/github-service';
+
+const isDev = process.env.NODE_ENV === 'development';
+if (!isDev) {
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient('igrp-studio');
+  }
+}
+
+import './handlers/apiHandler';
+import './handlers/dbHandler';
 
 const backend = require('i18next-electron-fs-backend')
 
 let mainWindow: BrowserWindow
 
+const repo = new ProjectRepository()
+
+
 function createWindow(): void {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 1160, //900,
-    height: 650, //670,
-    minWidth: 768,
-    minHeight: 620,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      //nodeIntegration: true, // Enable Node.js in the renderer process
-     // contextIsolation: false // Allow the `process` global
-    },
-    titleBarStyle: "hidden",
-  })
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        width: 1160, //900,
+        height: 650, //670,
+        minWidth: 960, //768,
+        minHeight: 620,
+        show: false,
+        autoHideMenuBar: true,
+        ...(process.platform === 'linux' ? { icon } : {}),
+        webPreferences: {
+            preload: join(__dirname, '../preload/index.js'),
+            sandbox: false,
+            //nodeIntegration: true, // Enable Node.js in the renderer process
+            // contextIsolation: false // Allow the `process` global
+        },
+        titleBarStyle: "hidden",
+    })
 
-  mainWindow.maximize()
+    mainWindow.maximize()
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+    mainWindow.on('ready-to-show', () => {
+        mainWindow.show()
+    })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    mainWindow.webContents.setWindowOpenHandler((details) => {
+        shell.openExternal(details.url)
+        return { action: 'deny' }
+    })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  const startUrl =
-    is.dev && process.env['ELECTRON_RENDERER_URL']
-      ? process.env['ELECTRON_RENDERER_URL']
-      : `file://${join(__dirname, '../renderer/index.html')}#/ide-initial-screen`
+    // HMR for renderer base on electron-vite cli.
+    // Load the remote URL for development or the local html file for production.
+    const startUrl =
+        is.dev && process.env['ELECTRON_RENDERER_URL']
+            ? process.env['ELECTRON_RENDERER_URL']
+            : `file://${join(__dirname, '../renderer/index.html')}#/ide-initial-screen`
 
-  mainWindow.loadURL(startUrl)
+    mainWindow.loadURL(startUrl)
 
-  backend.mainBindings(ipcMain, mainWindow, fs) // <- configures the backend
+    backend.mainBindings(ipcMain, mainWindow, fs) // <- configures the backend
 
-  closeApp(mainWindow)
+    closeApp(mainWindow)
 
-  installExtensions(mainWindow)
+    installExtensions(mainWindow)
+}
+
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]])
+  }
+} else {
+  app.setAsDefaultProtocolClient('igrp-studio')
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+app.whenReady().then(async () => {
+    // Set app user model id for windows
+    electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+    // Default open or close DevTools by F12 in development
+    // and ignore CommandOrControl + R in production.
+    // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+    app.on('browser-window-created', (_, window) => {
+        optimizer.watchWindowShortcuts(window)
+    })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+    // IPC test
+    ipcMain.on('ping', () => console.log('pong'))
+    await GitHubService.initializeServices();
+    createWindow()
 
-  createWindow()
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+    app.on('activate', function () {
+        // On macOS it's common to re-create a window in the app when the
+        // dock icon is clicked and there are no other windows open.
+        if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
 })
+
+
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-const handleWithCustomErrors = (channel: string, handler: Handler) => {
-  ipcMain.handle(channel, async (event: IpcMainInvokeEvent, ...args: any[]) => {
-    try {
-      return { result: await Promise.resolve(handler(event, ...args)) }
-    } catch (e) {
-      return { error: e }
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+});
+
+// Handler para o protocolo personalizado AUTH
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  const mainWindow = BrowserWindow.getFocusedWindow();
+  if (mainWindow && url.startsWith('igrp-studio://')) {
+    handleProtocolCallback(url, mainWindow);
+  }
+});
+
+// Suporte para Windows em produção
+app.on('second-instance', (_event, commandLine) => {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+  if (mainWindow) {
+    const url = commandLine.find(arg => arg.startsWith('igrp-studio://'));
+    if (url) {
+      handleProtocolCallback(url, mainWindow);
     }
-  })
-}
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
+ipcMain.on('github-oauth', async () => {
+  const mainWindow = BrowserWindow.getFocusedWindow();
+  if (!mainWindow) return;
+
+  try {
+    await setupGitHubOAuth(mainWindow, isDev);
+  } catch (error) {
+    console.error('OAuth setup failed:', error);
+  }
+});
+
+// Handler para o protocolo personalizado
+app.on('open-url', (event) => {
+  event.preventDefault();
+  // O app será focado automaticamente quando receber o protocolo
+});
 
 ipcMain.on('open-directory-dialog', async (event) => {
-  await dialog
-    .showOpenDialog(mainWindow, {
-      properties: ['openDirectory'],
-      buttonLabel: 'Select Destination Folder'
-    })
-    .then((result) => {
-      event.sender.send('file-content', result)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+    await dialog
+        .showOpenDialog(mainWindow, {
+            properties: ['openDirectory'],
+            buttonLabel: 'Select Destination Folder'
+        })
+        .then((result) => {
+            event.sender.send('file-content', result)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 })
 
 ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<IOpenProject> => {
-  return await openDirectory(buttonLabel)
+    return await openDirectory(buttonLabel)
 })
-
-const repo = new ProjectRepository()
-
-handleWithCustomErrors(
-  'spring-engine:create-api',
-  async (_event, apiConfig: BaseApiConfig, basePath: string) => {
-    await newApi(apiConfig, basePath)
-
-    await repo.save({
-      path: basePath,
-      dt_created: new Date(),
-      location: 'local',
-      config: {
-        type: apiConfig.type,
-        name: apiConfig.apiName,
-        group: apiConfig.group,
-        artifact: apiConfig.artifact,
-        database: apiConfig.database,
-        description: apiConfig.description,
-        package: apiConfig.package
-      }
-    })
-  }
-)
-
-handleWithCustomErrors('spring-engine:create-module', async (_event, moduleConfig, basePath) => {
-  await addModule(moduleConfig, basePath)
-})
-
-handleWithCustomErrors('spring-engine:create-model', async (_event, modelConfig, basePath) => {
-  await addModel(modelConfig, basePath)
-})
-
-handleWithCustomErrors(
-  'spring-engine:delete-model',
-  async (_event, modelConfig: ModelConfig, basePath: string) => {
-    await deleteModel(modelConfig, basePath)
-  }
-)
-
-handleWithCustomErrors(
-  'spring-engine:delete-dto',
-  async (_event, config: DTOBaseConfig, basePath: string) => {
-    await deleteDTO(config, basePath)
-  }
-)
-
-handleWithCustomErrors(
-  'spring-engine:delete-controller',
-  async (_event, config: ControllerConfig, basePath: string) => {
-    await deleteController(config, basePath)
-  }
-)
-
-handleWithCustomErrors(
-  'spring-engine:create-dto',
-  async (_event, dtoConfig: DTOConfig, basePath: string) => {
-    await addDTO(dtoConfig, basePath)
-  }
-)
-
-handleWithCustomErrors(
-  'spring-engine:create-controller',
-  async (_event, controllerConfig: ControllerConfig, basePath: string) => {
-    await addController(controllerConfig, basePath)
-  }
-)
-
-ipcMain.handle('spring-engine:fetch-selectors', async (_event, module: string, basePath: string) => {
-  return await engineTypes(module, basePath)
-})
-
-handleWithCustomErrors(
-  'next-engine:create-page',
-  async (_event, pageConfig: PageConfig, basePath: string) => {
-    await newPage(pageConfig, basePath)
-  }
-)
-
-handleWithCustomErrors(
-  'next-engine:add-component-page',
-  async (_event, pageConfig: PageConfig, components: Component[], basePath: string) => {
-    await addComponentToPage(pageConfig, components, basePath)
-  }
-)
 
 ipcMain.handle(
-  'igrp-studio:repo:project.findAllRecent',
-  async (_event, page: { page: number; size: number }) => {
-    return await repo.findAllRecent(page)
-  }
+    'igrp-studio:repo:project.findAllRecent',
+    async (_event) => {
+        return await repo.findAllRecent()
+    }
 )
 
-ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: Project) => {
-  await repo.save(project)
+ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: ProjectData) => {
+    await repo.save(project)
 })
 
-ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: Project, index: number) => {
-  await repo.delete(project, index)
+ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: ProjectData, index: number) => {
+    await repo.delete(project, index)
 })
-
-
-handleWithCustomErrors(
-  'next-engine:create-app',
-  async (_event, appConfig: AppConfig, basePath: string) => {
-    await newApp(appConfig, basePath)
-    await repo.save({
-      path: basePath,
-      dt_created: new Date(),
-      location: 'local',
-      config: {
-        type: appConfig.type,
-        name: appConfig.appName
-      }
-    })
-  }
-)
-
-handleWithCustomErrors(
-  'next-engine:delete-page',
-  async (_event, pageConfig: PageConfig, basePath: string) => {
-    await deletePage(pageConfig, basePath)
-  }
-)
 
 ipcMain.handle(
-  'igrp-studio:fetch-files',
-  async (_event, basePath: string): Promise<FolderFiles> => {
-    return await fetchFiles(basePath)
-  }
+    'igrp-studio:fetch-files',
+    async (_event, basePath: string): Promise<FolderFiles> => {
+        return await fetchFiles(basePath)
+    }
 )
 
 ipcMain.handle('igrp-studio:get-json-content', async (_event, filePath: string): Promise<any> => {
-  return await getJsonContent(filePath)
+    return await getJsonContent(filePath)
 })
 
 ipcMain.handle('igrp-studio:open-vs-code', async (_event, basePath: string) => {
-  if (basePath) {
-    exec(`code "${basePath}"`, (err, _stdout, _stderr) => {
-      if (err) {
-        console.error(`Error: ${err}`)
-        return
-      }
-    })
-  }
+    if (basePath) {
+        exec(`code "${basePath}"`, (err, _stdout, _stderr) => {
+            if (err) {
+                console.error(`Error: ${err}`)
+                return
+            }
+        })
+    }
 })
 
 // Handle IPC events
 ipcMain.on('minimize-window', () => {
-  mainWindow.minimize()
+    mainWindow.minimize()
 })
 
 ipcMain.on('maximize-window', () => {
-  if (mainWindow.isMaximized()) {
-    mainWindow.unmaximize()
-  } else {
-    mainWindow.maximize()
-  }
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize()
+    } else {
+        mainWindow.maximize()
+    }
 })
 
 ipcMain.on('close-window', () => {
-  mainWindow.close()
+    mainWindow.close()
 })
 
 ipcMain.on('is-window-maximized', () => {
-  return mainWindow.isMaximized()
+    return mainWindow.isMaximized()
 })
 
 ipcMain.on('restore-window', () => {
-  mainWindow.unmaximize()
+    mainWindow.unmaximize()
 })
 
 ipcMain.on('start-drag', (_event) => {
-  mainWindow.on('move', () => {
-    const windowBounds = mainWindow.getBounds()
-    const displayBounds = screen.getDisplayMatching(windowBounds).bounds
+    mainWindow.on('move', () => {
+        const windowBounds = mainWindow.getBounds()
+        const displayBounds = screen.getDisplayMatching(windowBounds).bounds
 
-    // Snap to top-left corner
-    if (windowBounds.x <= displayBounds.x + 10 && windowBounds.y <= displayBounds.y + 10) {
-      mainWindow.setBounds({
-        x: displayBounds.x,
-        y: displayBounds.y,
-        width: displayBounds.width / 2,
-        height: displayBounds.height / 2
-      })
-    }
+        // Snap to top-left corner
+        if (windowBounds.x <= displayBounds.x + 10 && windowBounds.y <= displayBounds.y + 10) {
+            mainWindow.setBounds({
+                x: displayBounds.x,
+                y: displayBounds.y,
+                width: displayBounds.width / 2,
+                height: displayBounds.height / 2
+            })
+        }
 
-    // Add other snapping conditions for top-right, bottom-left, and bottom-right
-  })
+        // Add other snapping conditions for top-right, bottom-left, and bottom-right
+    })
 })
+
+
+// Handler para buscar versões
+ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<HandlerResponse> => {
+    try {
+        const response = await fetch(endpoint);
+
+        if (!response.ok) {
+            throw new Error(`Erro na API: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.items || !Array.isArray(data.items)) {
+            throw new Error("Formato de resposta inesperado");
+        }
+
+        // Retorna somente os números de versão
+        return {
+            result: data.items.map((item: { version: string }) => item.version),
+        };
+    } catch (error) {
+        console.error("Erro ao buscar versões:", error);
+
+        // Retorna o erro no formato definido
+        return {
+            error: error instanceof Error ? error.message : "Erro desconhecido",
+        };
+    }
+});
+
+
+ipcMain.on('save-token', async (_event, token) => {
+  TokenService.setToken(token);
+  await GitHubService.initialize(token);
+});
+
+// IGRP Studio github handlers
+ipcMain.handle('github-initialize', async (_event, token) => {
+  await GitHubService.initialize(token);
+  TokenService.setToken(token);
+  return true;
+});
+
+ipcMain.handle('github-user-info', async () => {
+  return GitHubService.getUserInfo();
+});
+
+// ipcMain.handle('github-repositories', async () => {
+//   return GitHubService.listRepositories();
+// });
+
+ipcMain.handle('github-repositories', async (event) => {
+  const mainWindow = BrowserWindow.fromWebContents(event.sender);
+  return GitHubService.listIGRPStudioRepositories(mainWindow as BrowserWindow);
+});
+
+ipcMain.handle('clone-repository', async (event, repoUrl) => {
+  const mainWindow = BrowserWindow.fromWebContents(event.sender);
+  return GitHubService.cloneRepository(repoUrl, mainWindow as BrowserWindow);
+});
+
+ipcMain.handle('list-branches', async (_event, projectPath) => {
+  return GitHubService.listBranches(projectPath);
+});
+ipcMain.handle('checkout-branch', async (_event, { projectPath, branchName }) => {
+  return GitHubService.checkoutBranch(projectPath, branchName);
+});
+

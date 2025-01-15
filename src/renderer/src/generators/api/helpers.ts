@@ -1,4 +1,3 @@
-import { OptionType } from '@renderer/constants/appConstants';
 import { FormikValues } from 'formik';
 
 export function formatMethods(elements: string[]): { label: string; value: string }[] {
@@ -43,7 +42,7 @@ export const changeValue = (
 };
 
 
-export const extractByType = (moduleData: any, type: OptionType) => {
+export const extractByType = (moduleData: any, type: string) => {
 
 	const files = moduleData?.files ?? [];
 
@@ -72,13 +71,21 @@ export const mergeFilesByType = (files: any[]) => {
 	return mergedFiles;
 };
 
+export const getModulesArray = (modulesObject) => {
+	return Object.keys(modulesObject).map((key) => ({
+		label: modulesObject[key].name,
+		value: key
+	}));
+};
+
+
 export const getMergedFiles = (studio: any, module: string) => {
 
 	const currentModuleData = studio.folderFiles[module] || {};
 	const sharedModuleData = studio.folderFiles["shared"] || {};
 
 	let mergedFiles: any[] = [];
-	
+
 	if (module !== "shared") {
 
 		const currentFiles = currentModuleData.files || [];
@@ -94,3 +101,4 @@ export const getMergedFiles = (studio: any, module: string) => {
 
 	return { ...currentModuleData, files: mergedFiles };
 };
+

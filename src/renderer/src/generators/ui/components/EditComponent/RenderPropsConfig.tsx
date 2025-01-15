@@ -1,4 +1,4 @@
-import { Combobox } from "@renderer/components/combobox";
+import { Combobox } from "@igrp/igrp-design-system";
 import { Checkbox } from "@renderer/components/ui/checkbox";
 import { Input } from "@renderer/components/ui/input";
 import { Label } from "@renderer/components/ui/label";

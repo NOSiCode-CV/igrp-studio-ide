@@ -1,4 +1,4 @@
-import { Combobox } from "@renderer/components/combobox";
+import { Combobox } from "@igrp/igrp-design-system";
 import { Label } from "@renderer/components/ui/label";
 
 const Copy = () => {

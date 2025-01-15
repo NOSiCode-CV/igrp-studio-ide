@@ -1,12 +1,13 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
-import { IProjectRepository } from '@renderer/interfaces/types'
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { Connection, IConnenctionRepository, ProjectData } from 'src/main/types';
+import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
+
 
 interface CustomAPI {
 
-    createApi: (apiConfig: BaseApiConfig, basePath: string) => Promise<HandlerResponse>;
     createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
     createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
@@ -15,7 +16,6 @@ interface CustomAPI {
     deleteDTO: (config: DTOBaseConfig, basePath: string) => Promise<HandlerResponse>;
     deleteModel: (config: ModelConfig, basePath: string) => Promise<HandlerResponse>;
     deleteController: (config: ControllerConfig, basePath: string) => Promise<HandlerResponse>;
-
 
     createPage: (modelConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     deletePage: (pageConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
@@ -31,7 +31,22 @@ interface CustomAPI {
 
     openVSCode: (basePath: string | undefined) => Promise<void>;
 
+    getVersions: (endpoint: string) => Promise<HandlerResponse>,
+
+    //Database
+    connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
+
+    getTables: (connectionName: string) => Promise<DatabaseResponse>,
+
+    getTableStructure: (connectionName: string, tableName: string) => Promise<DatabaseResponse>,
+
     i18nextElectronBackend: any
+}
+
+interface BaseEngine {
+    createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
+    createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
 interface CustomMenu {
@@ -44,9 +59,10 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI
+        electron: ElectronAPI | getAppVersion
         api: CustomAPI,
-        repo: { project: IProjectRepository },
-        menu: CustomMenu
+        repo: { project: IProjectRepository, connection: IConnenctionRepository },
+        menu: CustomMenu,
+        engine: BaseEngine
     }
 }

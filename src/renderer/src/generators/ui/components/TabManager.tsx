@@ -50,6 +50,8 @@ export default function Component({
         }));
     };
 
+    console.log("tabs", tabs)
+
     return (
         <>
             <nav className="flex justify-between border-t border-gray-200 pr-6">

@@ -1,15 +1,15 @@
+import { Combobox } from '@igrp/igrp-design-system'
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
-import Select from 'react-select'
 
 // Helper Component: TextInput
 export const TextInput = ({ label, id, placeholder, value, onChange, onBlur, error }) => (
 	<div className="space-y-2">
-		<Label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</Label>
+		<Label htmlFor={id} className="">{label}</Label>
 		<Input
 			type="text"
 			id={id}
-			className={`block w-full px-3 py-1 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300`}
+			className={` w-full  ${error ? 'border-red-500' : ''}`}
 			placeholder={placeholder}
 			value={value}
 			onChange={onChange}
@@ -22,14 +22,14 @@ export const TextInput = ({ label, id, placeholder, value, onChange, onBlur, err
 // Helper Component: SelectInput
 export const SelectInput = ({ label, id, options, value, onChange, error }) => (
 	<div className="space-y-2">
-		<label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
-		<Select
-			id={id}
+		<Label htmlFor={id} className=" text-sm">{label}</Label>
+		<Combobox
+			name={id}
 			options={options}
 			value={value}
 			onChange={onChange}
-			classNamePrefix="select"
-			className={`w-full text-sm ${error ? 'border-red-500' : 'border-gray-300'}`}
+			placeholder={`Select ${label}`}
+			className={`w-full h-9 ${error ? 'border-red-500' : ''}`}
 		/>
 		{error && <p className="text-sm text-red-600">{error}</p>}
 	</div>

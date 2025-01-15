@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { PageableProjects, Project } from 'src/main/types'
-import { ENV_TYPES } from '@renderer/constants/appConstants'
+import { PageableProjects, ProjectData } from 'src/main/types'
+import {  projectIcons } from '@renderer/constants/appConstants'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import { Calendar, ChevronRight, Clock, FolderOpen, LayoutDashboard, Search } from 'lucide-react'
 import { LoadingSpinner } from '@renderer/components/loading-spinner'
@@ -22,10 +22,6 @@ import {
 } from '@renderer/components/ui/select'
 import { IGRPContainer } from '@igrp/igrp-design-system'
 
-const projectIcons = {
-  [ENV_TYPES.NEXTJS]: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-  [ENV_TYPES.SPRING]: 'https://www.svgrepo.com/show/354380/spring-icon.svg'
-}
 
 const RecentsProjects = (): JSX.Element => {
   const navigate = useNavigate()
@@ -36,7 +32,7 @@ const RecentsProjects = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true)
 
   const [allProjects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
-  const [localProjects, setLocalProjects] = useState<Project[]>([])
+  const [localProjects, setLocalProjects] = useState<ProjectData[]>([])
   const [_error, setError] = useState<string | null>(null)
 
   const [projectOrder] = useState<string>('lastModified')
@@ -70,42 +66,42 @@ const RecentsProjects = (): JSX.Element => {
 
   useEffect(() => {
     const localProjects = allProjects.data.filter(
-      (project) => project?.location === undefined //|| project?.location === 'local'
+      (project) => project?.location === undefined || project?.location === 'local'
     )
     setLocalProjects(localProjects)
   }, [allProjects])
 
-  const handleOpenProject = async (p: Project): Promise<void> => {
+  const handleOpenProject = async (p: ProjectData): Promise<void> => {
     try {
       await window.repo.project.save(p)
     } catch (err) {}
 
     dispatch(setBasePath(p.path))
 
-    dispatch(setConfig(p.config))
+    dispatch(setConfig(p))
 
-    navigateToNextPage(navigate, p.config)
+    navigateToNextPage(navigate, p)
   }
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1500)
   }, [])
 
-  const RenderProjectCard = (project: Project, isCompact: boolean = false, index: number) => {
+  const RenderProjectCard = (project: ProjectData, isCompact: boolean = false, index: number) => {
     return (
       <Card key={index} className={`flex flex-col ${isCompact ? 'p-2' : ''}`}>
         <CardHeader className={isCompact ? 'p-2' : ''}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img
-                src={projectIcons[project.config.type]}
-                alt={`${project.config.type} logo`}
+                src={projectIcons[project.framework]}
+                alt={`${project.framework} logo`}
                 width={isCompact ? 16 : 20}
                 height={isCompact ? 16 : 20}
                 className="mr-2"
               />
               <CardTitle className={`${isCompact ? 'text-sm' : 'text-lg'}`}>
-                {project.config.name}
+                {project.name}
               </CardTitle>
             </div>
             <Button variant="ghost" size="sm">
@@ -217,7 +213,7 @@ const RecentsProjects = (): JSX.Element => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortProjects(
                   localProjects.filter((project) =>
-                    project.config.name.toLowerCase().includes(localSearchQuery.toLowerCase())
+                    project?.name?.toLowerCase().includes(localSearchQuery?.toLowerCase())
                   )
                 ).map((project, index) => RenderProjectCard(project, true, index))}
               </div>

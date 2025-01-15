@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { Plus } from 'lucide-react'
-import * as Yup from "yup";
+import * as React from 'react';
+import { Plus } from 'lucide-react';
+import * as Yup from 'yup';
 
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -13,31 +13,35 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@renderer/components/ui/dialog'
-import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@renderer/components/ui/tooltip'
-import { ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types'
+} from '@renderer/components/ui/dialog';
+import { Input } from '@renderer/components/ui/input';
+import { Label } from '@renderer/components/ui/label';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
-import { setChangeStatus as onSetChangeStatus } from "@renderer/redux/thunks";
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 
 interface CreateModuleDialogProps {
-    basePath: string
+    basePath: string;
 }
 
 const initialValues: ModuleConfig = {
     type: 'module',
-    name: ""
+    name: '',
 };
 
-
 export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
-    const [isOpen, setIsOpen] = React.useState(false)
+    const [isOpen, setIsOpen] = React.useState(false);
 
     const { t } = useTranslation();
 
@@ -46,11 +50,11 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
     const { showErrorToast, showSuccessToast } = useToast();
 
     const validationSchema = Yup.object({
-        name: Yup.string().required(t("thisFieldRequired", { name: "Name" }))
+        name: Yup.string()
+            .required(t('thisFieldRequired', { name: 'Name' }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
-            .max(20, t("maxLengthExceeded", { max: 20 }))
+            .max(20, t('maxLengthExceeded', { max: 20 })),
     });
-
 
     const formik: any = useFormik({
         enableReinitialize: true,
@@ -58,19 +62,22 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
         validationSchema,
         onSubmit: (_values, actions) => {
             actions.setSubmitting(false);
-            handleCreateModule()
+            handleCreateModule();
         },
     });
 
     const handleCreateModule = () => {
-        onCreateModule()
+        onCreateModule();
         formik.resetForm();
-        setIsOpen(false)
-    }
+        setIsOpen(false);
+    };
 
     const onCreateModule = async (): Promise<void> => {
         try {
-            const { error } = await window.api.createModule(formik.values, basePath);
+            const { error } = await window.api.createModule(
+                formik.values,
+                basePath
+            );
 
             if (error) {
                 showErrorToast(error);
@@ -81,27 +88,26 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
             dispatch(onSetChangeStatus(true));
 
-            showSuccessToast(`Module ${formik.values.name} have been successfully added.`);
-
+            showSuccessToast(
+                `Module ${formik.values.name} have been successfully added.`
+            );
         } catch (error) {
-            showErrorToast(error)
+            showErrorToast(error);
         }
-    }
-
+    };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <TooltipProvider>
+        <TooltipProvider>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <DialogTrigger asChild>
                             <Button
                                 variant="outline"
                                 size="icon"
-                                className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200 bg-primary text-primary-foreground"
+                                className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200 bg-igrp text-primary-foreground"
                             >
                                 <Plus className="h-4 w-4" />
-                                <span className="sr-only">Create new module</span>
                             </Button>
                         </DialogTrigger>
                     </TooltipTrigger>
@@ -109,38 +115,52 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                         <p>Create new module</p>
                     </TooltipContent>
                 </Tooltip>
-            </TooltipProvider>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Create New Module</DialogTitle>
-                    <DialogDescription>
-                        {t('dialogDescription')}
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={(e) => { e.preventDefault(); formik.handleSubmit(); }}>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                                Module Name
-                            </Label>
-                            <div className='col-span-3'>
-                                <Input
-                                    id="name"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.name || ""}
-                                    className={cn("", formik.touched.name && formik.errors.name ? 'border-red-500' : '')}
-                                />
-                                {formik.errors.name && <p className="text-sm text-red-600">{formik.errors.name}</p>}
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Create New Module</DialogTitle>
+                        <DialogDescription>
+                            {t('dialogDescription')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            formik.handleSubmit();
+                        }}
+                    >
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="name" className="text-right">
+                                    Module Name
+                                </Label>
+                                <div className="col-span-3">
+                                    <Input
+                                        id="name"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.name || ''}
+                                        className={cn(
+                                            '',
+                                            formik.touched.name &&
+                                                formik.errors.name
+                                                ? 'border-red-500'
+                                                : ''
+                                        )}
+                                    />
+                                    {formik.errors.name && (
+                                        <p className="text-sm text-red-600">
+                                            {formik.errors.name}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit">Save Module</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    )
+                        <DialogFooter>
+                            <Button type="submit">Save Module</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </TooltipProvider>
+    );
 }
-

@@ -1,5 +1,4 @@
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { ConfigOptions, FolderFiles } from '../../../../main/types';
 
 import {
   setConfigAction,
@@ -10,6 +9,7 @@ import {
 } from './reducer';
 import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
+import { ProjectData, FolderFiles } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 /**
  * set BasePath
@@ -25,7 +25,7 @@ export const setBasePath = (basePath: string) => async (dispatch: any) => {
  * set BasePath
  * @param {*} param0
  */
-export const setConfig = (appConfig: ConfigOptions) => async (dispatch: any) => {
+export const setConfig = (appConfig: ProjectData) => async (dispatch: any) => {
   try {
     dispatch(setConfigAction(appConfig));
   } catch (error) { }
@@ -56,11 +56,11 @@ export const setCurrentItem = (item: any) => async (dispatch: any) => {
  * set BasePath
  * @param {*} param0
  */
-export const navigateToNextPage = (navigate, appConfig: ConfigOptions) => {
+export const navigateToNextPage = (navigate, appConfig: ProjectData) => {
   try {
-    if (appConfig.type === ENV_TYPES.NEXTJS) {
+    if (appConfig.framework === ENV_TYPES.NEXTJS) {
       navigate(ROUTES.PATH_PAGE_BUILDER_UI);
-    } else if (appConfig.type === ENV_TYPES.SPRING) {
+    } else if (appConfig.framework === ENV_TYPES.SPRING) {
       navigate(ROUTES.PATH_PAGE_BUILDER_API);
     }
   } catch (error) {

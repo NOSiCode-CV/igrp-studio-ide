@@ -9,7 +9,7 @@ import { Component, PageConfig } from "@igrp/nextjs-engine/dist/interfaces/types
 import useToast from "@renderer/components/useToast";
 import { HierarchicalComponent } from "./interfaces";
 
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext } from '@hello-pangea/dnd';
 import { handleDragEnd } from "./dnd/DraggableItemManager";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
 import { AppSidebar } from "@renderer/layouts/components/app-ui-sidebar";

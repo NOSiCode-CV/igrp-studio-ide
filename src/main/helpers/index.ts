@@ -1,9 +1,8 @@
-import { dialog } from 'electron';
+import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join, basename } from 'path';
-import { ConfigOptions, IOpenProject, File, FolderFileStructure, FolderFiles } from '../types';
+import { IOpenProject, File, FolderFileStructure, FolderFiles, Handler, ProjectData } from '../types';
 import { promisify } from 'util';
 const fs = require("fs");
-
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
 	const result = await dialog.showOpenDialog({
@@ -22,7 +21,7 @@ export async function openDirectory(buttonLabel?: string): Promise<IOpenProject>
 	return { canceled: false, folderExists, config, basePath };
 }
 
-export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderExists: boolean; config?: ConfigOptions }> {
+export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderExists: boolean; config?: ProjectData }> {
 
 	const readFile = promisify(fs.readFile);
 
@@ -31,7 +30,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 
 	const folderExists = fs.existsSync(fullFolderPath);
 
-	let config: ConfigOptions | undefined = undefined;
+	let config: ProjectData | undefined = undefined;
 
 	if (folderExists) {
 
@@ -46,21 +45,22 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 
 			if (baseApiPath.endsWith('baseApi.json')) {
 				config = {
-					type: parsedConfig.type,
 					name: parsedConfig.apiName,
-					group: parsedConfig.group,
-					artifact: parsedConfig.artifact,
-					database: parsedConfig.database,
-					description: parsedConfig.description,
-					package: parsedConfig.package,
-					projectStructureStyle: parsedConfig.projectStructureStyle,
+					type: 'backend',
+					framework: parsedConfig.type,
+					config: { ...parsedConfig },
+					path: folderPath
 				}
 			} else if (baseApiPath.endsWith('baseApp.json')) {
 				config = {
-					type: parsedConfig.type,
 					name: parsedConfig.appName,
+					type: 'frontend',
+					framework: parsedConfig.type,
+					config: { ...parsedConfig },
+					path: folderPath
 				}
 			}
+
 		} catch (error) {
 			console.error(`Error reading ${baseApiPath}:`, error);
 		}
@@ -72,7 +72,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
 // Helper function to recursively read files from directories and group them by subfolder
 async function readDirectoryFiles(directoryPath: string): Promise<Record<string, File[]>> {
 	let groupedFiles: Record<string, File[]> = {};
-
+	const readFile = promisify(fs.readFile);
 	try {
 		// Read entries in the directory
 		const entries = await fs.promises.readdir(directoryPath, { withFileTypes: true });
@@ -96,7 +96,9 @@ async function readDirectoryFiles(directoryPath: string): Promise<Record<string,
 				if (!groupedFiles[folderName]) {
 					groupedFiles[folderName] = [];
 				}
-				groupedFiles[folderName].push({ name: entry.name.split('.')[0], path: fullPath });
+				const data = await readFile(fullPath, 'utf8');
+				const parsedConfig = JSON.parse(data);
+				groupedFiles[folderName].push({ name: entry.name.split('.')[0], path: fullPath, content: parsedConfig });
 			}
 		}
 	} catch (error) {
@@ -134,7 +136,7 @@ export async function fetchFiles(basePath: string): Promise<FolderFiles> {
 					for (const entry of directoryContents) {
 
 						isDirectory = entry.isDirectory()
-						
+
 						const fullPath = join(directory, entry.name);
 						// If the directory contains any files or subdirectories, process them
 						if (isDirectory) {
@@ -190,4 +192,14 @@ export async function getJsonContent(filePath: string): Promise<any> {
 
 export function addNumbers(a: number, b: number) {
 	return a + b;
+}
+
+export const handleWithCustomErrors = (channel: string, handler: Handler) => {
+	ipcMain.handle(channel, async (event: IpcMainInvokeEvent, ...args: any[]) => {
+		try {
+			return { result: await Promise.resolve(handler(event, ...args)) }
+		} catch (e) {
+			return { error: e }
+		}
+	})
 }

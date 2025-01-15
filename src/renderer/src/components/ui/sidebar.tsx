@@ -5,8 +5,6 @@ import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 
-//import { useIsMobile } from "@/components/hooks/use-mobile"
-import { cn } from "@renderer/lib/utils"
 import { Button } from "@renderer/components/ui/button"
 import { Input } from "@renderer/components/ui/input"
 import { Separator } from "@renderer/components/ui/separator"
@@ -18,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@renderer/components/ui/tooltip"
+import { cn } from "@renderer/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -67,7 +66,7 @@ const SidebarProvider = React.forwardRef<
     },
     ref
   ) => {
-    const isMobile = false;//useIsMobile()
+    const isMobile = false;
     const [openMobile, setOpenMobile] = React.useState(false)
 
     // This is the internal state of the sidebar.
