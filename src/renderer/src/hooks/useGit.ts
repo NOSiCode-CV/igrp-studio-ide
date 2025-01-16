@@ -78,8 +78,6 @@ export const useGit = () => {
             } catch (error) {
                 if (error instanceof Error) {
                     showErrorToast(error.message || 'Failed to sync changes');
-                } else {
-                    showErrorToast('Failed to sync changes');
                 }
                 return false;
             }
@@ -91,7 +89,6 @@ export const useGit = () => {
         try {
           return await window.electron.ipcRenderer.invoke('get-changes-count', projectPath);
         } catch (error) {
-          console.error('Failed to get changes count:', error);
           return { ahead: 0, behind: 0, modified: 0 };
         }
     }, []);

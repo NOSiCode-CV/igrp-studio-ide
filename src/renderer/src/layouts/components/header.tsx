@@ -30,9 +30,11 @@ import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
 import useToast from '@renderer/components/useToast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getPages as onGetPages } from '@renderer/redux/thunks';
 import { GitChangesCount } from '@renderer/components/git/git-changes-count';
+import SyncButton from '@renderer/components/git/git-sync';
+import { RootState } from '@renderer/redux';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -44,6 +46,8 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const { showErrorToast, showSuccessToast } = useToast();
     const isMac =
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
+
+    const activeBranch = useSelector((state: RootState) => state.git.activeBranch);
 
     const navigate = useNavigate();
 
@@ -137,7 +141,8 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                             );
                                         }}
                                     />
-                                    <GitChangesCount basePath={basePath || ''} />
+                                    <SyncButton activeBranch={activeBranch} basePath={basePath || ''} />
+                                    {/* <GitChangesCount basePath={basePath || ''} /> */}
                                 </div>
                             )}
 

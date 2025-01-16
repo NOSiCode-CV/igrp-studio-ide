@@ -338,8 +338,8 @@ ipcMain.handle('create-branch', async (_event, { projectPath, branchName }) => {
 ipcMain.handle('create-commit', async (_event, { projectPath, message }) => {
   return GitService.createCommit(projectPath, message);
 });
-ipcMain.handle('pull-changes', async (_event, { projectPath }) => {
-  return GitService.pull(projectPath);
+ipcMain.handle('pull-changes', async (_event, { projectPath, branch }) => {
+  return GitService.pull(projectPath, branch);
 });
 ipcMain.handle('push-changes', async (_event, { projectPath, branch }) => {
   return GitService.push(projectPath, branch);

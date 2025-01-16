@@ -17,6 +17,9 @@ import {
 } from "@renderer/components/ui/popover"
 import { Button } from "@renderer/components/ui/button"
 import { cn } from "@renderer/lib/utils"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "@renderer/redux"
+import { setActiveBranch } from '@renderer/redux/git/reducer';
 
 interface Branch {
   name: string
@@ -35,6 +38,9 @@ interface BranchSwitcherProps {
 }
 
 export function BranchSwitcher({ projectPath, onError, onSuccess, onBranchChange }: BranchSwitcherProps) {
+
+  const dispatch = useDispatch();
+  
   const [open, setOpen] = useState(false)
   const [branches, setBranches] = useState<Branch[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -43,25 +49,26 @@ export function BranchSwitcher({ projectPath, onError, onSuccess, onBranchChange
   const [newBranchName, setNewBranchName] = useState('');
 
   useEffect(() => {
-    loadBranches()
-  }, [projectPath])
-
+    loadBranches();
+  }, [dispatch, projectPath]);
+  
   const loadBranches = async () => {
     try {
+      setIsLoading(true);
       const branchList = await window.electron.ipcRenderer.invoke('list-branches', projectPath)
       setBranches(branchList)
       
       const activeBranch = branchList.find(branch => branch.isActive)
       if (activeBranch) {
-        setSelectedBranch(activeBranch.name)
+        setSelectedBranch(activeBranch.name);
+        dispatch(setActiveBranch(activeBranch.name));
       }
+
+      setIsLoading(false);
     } catch (error) {
       onError?.('Failed to load branches')
-      console.error('Error loading branches:', error)
-    } finally {
-      setIsLoading(false)
     }
-  }
+  };
 
   const handleCreateBranch = async () => {
     try {

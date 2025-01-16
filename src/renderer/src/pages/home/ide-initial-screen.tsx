@@ -15,12 +15,14 @@ import { ProjectWizard } from '../project';
 import { IOpenProject } from 'src/main/types';
 import UserDialog from '@renderer/components/user-dialog';
 import { RootState } from '@renderer/redux';
+import { useEffect } from 'react';
+import { setRepositories, setUser } from '@renderer/redux/git/reducer';
 
 const IDEInitialScreen = (): JSX.Element => {
     const { t } = useTranslation();
 
     const navigate = useNavigate();
-
+    const { isInitialized } = useSelector((state: RootState) => state.git);
     const dispatch: any = useDispatch();
     const { user } = useSelector((state: RootState) => state.git);
 
@@ -53,6 +55,25 @@ const IDEInitialScreen = (): JSX.Element => {
     const handleGitHubLogin = () => {
       window.electron.ipcRenderer.send('github-oauth');
     };
+
+    
+    useEffect(() => {
+        const loadInitialData = async () => {
+            if (!isInitialized) {
+                try {
+                    const [userInfo] = await Promise.all([
+                        window.electron.ipcRenderer.invoke('github-user-info'),
+                    ]);
+
+                    dispatch(setUser(userInfo));
+                } catch (error) {
+                    console.log('Not authenticated yet');
+                } 
+            }
+        };
+
+        loadInitialData();
+    }, [isInitialized, dispatch]);
 
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">

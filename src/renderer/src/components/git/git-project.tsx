@@ -13,10 +13,9 @@ import { setRepositories, setUser } from '@renderer/redux/git/reducer';
 
 export default function GitProject() {
     const { showErrorToast, showSuccessToast } = useToast();
-
+    const [cloningRepoId, setCloningRepoId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [scanProgress, setScanProgress] = useState({ progress: 0, total: 0 });
-    const [isCloning, setIsCloning] = useState(false);
 
     const navigate = useNavigate()
     const dispatch: any = useDispatch()
@@ -101,30 +100,30 @@ export default function GitProject() {
 
     useEffect(() => {
         window.electron.ipcRenderer.on('clone-progress', async (_event, data) => {
+            if (data.status === 'success' || data.status === 'error') {
+                setCloningRepoId(null); // Reseta o estado
+            } 
             if (data.status === 'success') {
-                setIsCloning(false);
                 showSuccessToast(`Repository successfully cloned to ${data.path}`);
-                
                 try {
-                    // Save and open project using the clone data
                     await window.repo.project.save({
-                        config: data.config, 
-                        path: data.path,
-                        framework: data.config.framework,
-                        name: data.config.name
+                        name: data.config.name,
+                        type: 'frontend', //data.config.type,
+                        framework: "nextjs", //data.config.framework,
+                        config: data.config.config,
+                        path: data.path
                     });
+
+                    data.config.framework = "nextjs"
                     
                     dispatch(setBasePath(data.path));
                     dispatch(setConfig(data.config));
-                    
-                    // Navigate to the next page
                     navigateToNextPage(navigate, data.config);
                 } catch (error) {
                     showErrorToast('Failed to open project after cloning');
                     console.error('Error opening project:', error);
                 }
             } else if (data.status === 'error') {
-                setIsCloning(false);
                 showErrorToast(`Failed to clone repository: ${data.message}`);
             }
         });
@@ -153,14 +152,14 @@ export default function GitProject() {
     }, [dispatch, navigate, showSuccessToast, showErrorToast]);
 
     const handleClone = async (repo: Repository) => {
-        setIsCloning(true);
+        setCloningRepoId(repo.id);
         try {
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',
                 repo.clone_url
             );
         } catch (error) {
-            setIsCloning(false);
+            setCloningRepoId(null);
         }
     };
 
@@ -176,7 +175,7 @@ export default function GitProject() {
                                 repo={repo}
                                 key={repo.id}
                                 handleClone={handleClone}
-                                isCloning={isCloning}
+                                isCloning={cloningRepoId === repo.id}
                             />
                         ))}
                     </div>

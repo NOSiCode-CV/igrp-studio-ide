@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { BrowserWindow, dialog } from 'electron';
 import { promisify } from 'util';
+import { checkAndReadBaseApi } from '../helpers';
 
 const execAsync = promisify(exec);
 
@@ -69,38 +70,35 @@ export const GitService = {
 
     async cloneRepository(repoUrl: string, window: BrowserWindow) {
         try {
-            const { canceled, filePaths } = await dialog.showOpenDialog(
-                window,
-                {
-                    title: 'Choose Clone Location',
-                    properties: ['openDirectory', 'createDirectory'],
-                    buttonLabel: 'Choose Folder',
-                }
-            );
-
+            const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+                title: 'Choose Clone Location',
+                properties: ['openDirectory', 'createDirectory'],
+                buttonLabel: 'Choose Folder',
+            });
+    
             if (canceled) {
                 throw new Error('Operation cancelled');
             }
-
+    
             const projectName = await new Promise<string>((resolve, reject) => {
                 window.webContents.send('request-project-name', {
                     defaultName: repoUrl.split('/').pop()?.replace('.git', ''),
                 });
-
+    
                 const { ipcMain } = require('electron');
                 ipcMain.once('project-name-response', (_event, name) => {
                     if (!name) reject(new Error('No project name provided'));
                     resolve(name);
                 });
             });
-
+    
             const targetDir = path.join(filePaths[0], projectName);
-
+    
             window.webContents.send('clone-progress', {
                 status: 'starting',
                 message: `Starting to clone into ${targetDir}...`,
             });
-
+    
             return new Promise((resolve, reject) => {
                 exec(`git clone ${repoUrl} "${targetDir}"`, async (error) => {
                     if (error) {
@@ -111,16 +109,14 @@ export const GitService = {
                         reject(error);
                         return;
                     }
-
+    
                     try {
-                        const configPath = path.join(
-                            targetDir,
-                            '.igrpstudio',
-                            'baseApp.json'
-                        );
-                        const config = JSON.parse(
-                            await fs.readFile(configPath, 'utf8')
-                        );
+                        // Usa a nova função checkAndReadBaseApi
+                        const { folderExists, config } = await checkAndReadBaseApi(targetDir);
+    
+                        if (!folderExists || !config) {
+                            throw new Error('Invalid IGRP Studio project structure');
+                        }
 
                         window.webContents.send('clone-progress', {
                             status: 'success',
@@ -128,7 +124,9 @@ export const GitService = {
                             path: targetDir,
                             config: {
                                 type: config.type,
-                                name: config.appName,
+                                name: config.name,
+                                framework: config.framework,
+                                config: config.config
                             },
                         });
                         resolve({ path: targetDir, config });
@@ -170,10 +168,17 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to create commit');
         }
     },
-
-    async pull(projectPath: string) {
+    
+    async pull(projectPath: string, branch: string) {
         try {
-            const { stdout } = await execAsync('git pull', {
+            const remoteBranchExists = await this.isRemoteBranchExists(projectPath, branch);
+            
+            if (!remoteBranchExists) {
+                await this.publishBranch(projectPath, branch);
+                return "Branch published successfully"; // Não há nada para pull ainda
+            }
+    
+            const { stdout } = await execAsync(`git pull origin ${branch}`, {
                 cwd: projectPath,
             });
             return stdout;
@@ -181,9 +186,16 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to pull changes');
         }
     },
-
+    
     async push(projectPath: string, branch: string) {
         try {
+            const remoteBranchExists = await this.isRemoteBranchExists(projectPath, branch);
+            
+            if (!remoteBranchExists) {
+                await this.publishBranch(projectPath, branch);
+                return "Branch published successfully";
+            }
+    
             const { stdout } = await execAsync(`git push origin ${branch}`, {
                 cwd: projectPath,
             });
@@ -192,13 +204,47 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to push changes');
         }
     },
-
+    
+    async isRemoteBranchExists(projectPath: string, branch: string) {
+        try {
+            await execAsync(`git ls-remote --heads origin ${branch}`, {
+                cwd: projectPath,
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    },
+    
+    async publishBranch(projectPath: string, branch: string) {
+        try {
+            const { stdout } = await execAsync(
+                `git push --set-upstream origin ${branch}`,
+                { cwd: projectPath }
+            );
+            return stdout;
+        } catch (error: any) {
+            throw new Error(error.stderr || 'Failed to publish branch');
+        }
+    },
+    
     async sync(projectPath: string, branch: string) {
         try {
-            await this.pull(projectPath);
+            try {
+                await execAsync(
+                    `git push -u origin ${branch}`,
+                    { cwd: projectPath }
+                );
+            } catch (pushError) {
+                console.log('Push initial result:', pushError);
+            }
+    
+            await this.pull(projectPath, branch);
             await this.push(projectPath, branch);
+            
             return true;
         } catch (error: any) {
+            console.error('Sync error:', error);
             throw error;
         }
     },

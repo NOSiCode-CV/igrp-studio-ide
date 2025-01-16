@@ -17,6 +17,8 @@ export const GitChangesCount = ({ basePath }: { basePath: string }) => {
     loadCounts();
   }, []);
 
+  console.log("Counts:", counts);
+
   return (
     <div className="w-fit">
       <div className="flex">
