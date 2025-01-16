@@ -27,7 +27,6 @@ import { PopoverModel } from '../pages/model/popover'
 import { PopoverDto } from '../pages/dto/popover-dto'
 import { RelationPopover } from '../pages/model/relation-popover'
 import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown'
-import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
@@ -385,22 +384,15 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                         />
                                       )}
                                         {['typeSelectorDropdown'].includes(type) && (
-										<TypeSelectorDropdown
-											type={row?.[key] || ''}
-											onTypeChange={(t: any) => {
+                                        <TypeSelectorDropdown
+                                          type={row?.[key] || ''}
+                                          onTypeChange={(dataType: any) => {
 
-												const isValueObject = typeof t === 'object' && t !== null;
+                                            changeValue(key, index, dataType)
 
-												const typeValue = isValueObject ? t.value : t;
-												const typeType = isValueObject ? t.type : '';
-
-												changeValue('type', index, typeValue)
-
-												if(isValueObject)
-													changeValue('objectType"', index, typeType)
-											}}
-											schemaTypes={options}
-										/>)}
+                                          }}
+                                          schemaTypes={options}
+                                        />)}
                                     </>
                                   )}
                                 </div>

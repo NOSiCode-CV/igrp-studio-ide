@@ -37,12 +37,6 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
-export const NamespacesOptions = [
-    { label: 'Data Transfer Object', value: 'dto' },
-    { label: 'Schema', value: 'models' },
-    { label: 'Java', value: 'java' }
-]
-
 export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [value: string]: IColumnsTabelProps[] } => {
 
     const paramsTypesData = formatMethods(
@@ -74,7 +68,7 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
 
     const namespacesOptions: SchemaTypeItem[] = [
         { label: 'Data Transfer Object', value: 'dto', items: getOptions(dto) },
-        { label: 'Schema', value: 'models', items: getOptions(models) },
+        { label: 'Schema', value: 'model', items: getOptions(models) },
         { label: 'Java', value: 'java', items: paramsTypesData }
     ]
 
