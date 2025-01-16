@@ -309,7 +309,7 @@ export const ResponseLayout = ({
                             />
                         </CardContent>
                     </Card>
-                </div>Í
+                </div>
         </>
     );
 };
