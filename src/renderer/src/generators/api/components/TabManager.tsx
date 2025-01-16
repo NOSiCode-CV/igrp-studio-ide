@@ -16,6 +16,7 @@ import {
     ContextMenuShortcut,
     ContextMenuTrigger,
 } from '@renderer/components/ui/context-menu';
+import { ContainerScrollArea } from './ContainerScrollArea';
 
 const TAB_DEFAULT = 'tab-0';
 
@@ -234,30 +235,32 @@ const TabManager = ({
 
             <Separator />
 
-            {/* Tab Content */}
-            {tabs.map((tab) => {
-                return (
-                    <div
-                        key={tab.id}
-                        className={activeTab === tab.id ? 'block' : 'hidden'}
-                    >
-                        {tab.id === TAB_DEFAULT ? (
-                            <Overview
-                                onOpenNew={handleOpenNew}
-                                open={tab.open}
-                            />
-                        ) : (
-                            <PageController
-                                onOpenNew={handleOpenNew}
-                                open={tab.open}
-                                tab={tab}
-                                onCloseTab={onCloseTab}
-                                onUpdateTab={onUpdateTab}
-                            />
-                        )}
-                    </div>
-                );
-            })}
+            <ContainerScrollArea>
+                {/* Tab Content */}
+                {tabs.map((tab) => {
+                    return (
+                        <div
+                            key={tab.id}
+                            className={activeTab === tab.id ? 'block' : 'hidden'}
+                        >
+                            {tab.id === TAB_DEFAULT ? (
+                                <Overview
+                                    onOpenNew={handleOpenNew}
+                                    open={tab.open}
+                                />
+                            ) : (
+                                <PageController
+                                    onOpenNew={handleOpenNew}
+                                    open={tab.open}
+                                    tab={tab}
+                                    onCloseTab={onCloseTab}
+                                    onUpdateTab={onUpdateTab}
+                                />
+                            )}
+                        </div>
+                    );
+                })}
+            </ContainerScrollArea>
         </>
     );
 };

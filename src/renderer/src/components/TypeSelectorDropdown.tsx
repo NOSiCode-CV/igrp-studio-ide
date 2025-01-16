@@ -45,7 +45,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                                 key={subItem.value}
                                                 onClick={() =>
                                                     onTypeChange({
-                                                        type: 'dto',
+                                                        type: value,
                                                         value: subItem.value,
                                                     } as any)
                                                 }

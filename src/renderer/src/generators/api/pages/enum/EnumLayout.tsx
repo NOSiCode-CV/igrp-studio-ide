@@ -6,7 +6,6 @@ import * as Yup from 'yup';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
-import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +60,7 @@ export const EnumLayout = ({
 
         try {
             const data = await window.api.getJsonContent(currentItem.path);
-            console.log(data)
+            console.log(data);
             setData(data);
         } catch (error) {
             console.error('Failed to load JSON content:', error);
@@ -74,7 +73,7 @@ export const EnumLayout = ({
 
     useEffect(() => {
         if (data) {
-            setTitle(data.name)
+            setTitle(data.name);
             formik.setValues(data);
         }
     }, [data]);
@@ -180,52 +179,48 @@ export const EnumLayout = ({
                 isNew={!data}
                 title={title || 'Create a new Enum'}
             />
-            <ContainerScrollArea size="lg">
-                <div className="space-y-4 p-4">
-                    {/* name */}
-                    <div className="space-y-2">
-                        <Label>Name</Label>
-                        <Input
-                            type="text"
-                            name="name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                            className={`w-full  focus:ring-igrp focus:border-igrp ${
-                                formik.errors.name && formik.touched.name
-                                    ? 'border-red-500'
-                                    : 'border-gray-300'
-                            }`}
-                        />
-                        {formik.errors.name && formik.touched.name && (
-                            <div className="text-red-500 text-sm">
-                                {formik.errors.name}
-                            </div>
-                        )}
-                    </div>
-                    <FormList
-                        columns={tablesColumns.values || []}
-                        formik={formik}
-                        data={formik.values.values}
-                        changeValue={(element, position, result) =>
-                            changeValue(
-                                formik,
-                                element,
-                                position,
-                                result,
-                                tableName
-                            )
-                        }
-                        addRow={() =>
-                            addNewRow(formik, tableName, defaultValue)
-                        }
-                        removeRow={(position) =>
-                            removeRow(formik, tableName, position)
-                        }
-                        btnLabels={'Enum'}
-                        name={tableName}
+            <div className="space-y-4 p-4">
+                {/* name */}
+                <div className="space-y-2">
+                    <Label>Name</Label>
+                    <Input
+                        type="text"
+                        name="name"
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        className={`w-full  focus:ring-igrp focus:border-igrp ${
+                            formik.errors.name && formik.touched.name
+                                ? 'border-red-500'
+                                : 'border-gray-300'
+                        }`}
                     />
+                    {formik.errors.name && formik.touched.name && (
+                        <div className="text-red-500 text-sm">
+                            {formik.errors.name}
+                        </div>
+                    )}
                 </div>
-            </ContainerScrollArea>
+                <FormList
+                    columns={tablesColumns.values || []}
+                    formik={formik}
+                    data={formik.values.values}
+                    changeValue={(element, position, result) =>
+                        changeValue(
+                            formik,
+                            element,
+                            position,
+                            result,
+                            tableName
+                        )
+                    }
+                    addRow={() => addNewRow(formik, tableName, defaultValue)}
+                    removeRow={(position) =>
+                        removeRow(formik, tableName, position)
+                    }
+                    btnLabels={'Enum'}
+                    name={tableName}
+                />
+            </div>
         </>
     );
 };
