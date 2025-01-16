@@ -6,14 +6,18 @@ import { BaseApiConfig, ResponseConfig } from '@igrp/dotnet-engine/dist/interfac
 import { ProjectData } from '../types';
 
 export class DotNetEngine implements BaseEngine {
-
-  async delete(_config: any, _basePath: string): Promise<void> {
+  createEnum(_data: any, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
   createResponse(_config: ResponseConfig, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
+  async delete(_config: any, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
     const repo = new ProjectRepository()

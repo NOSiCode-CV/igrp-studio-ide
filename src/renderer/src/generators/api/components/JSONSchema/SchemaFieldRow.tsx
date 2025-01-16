@@ -4,9 +4,9 @@ import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
 import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
-import { FieldOptionsPopover } from './FieldOptionsPopover';
 import { SchemaField } from '../../types/schema';
 import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
+import { PopoverController } from '../../pages/controller/popover';
 
 interface SchemaFieldRowProps {
     id: string;
@@ -19,7 +19,7 @@ interface SchemaFieldRowProps {
     isNew?: boolean;
     index?: number;
     schemaTypes?: { label: string; value: string }[];
-
+    enumTypes?: { label: string; value: string }[];
 }
 
 export function SchemaFieldRow({
@@ -32,7 +32,8 @@ export function SchemaFieldRow({
     onAlert,
     isNew = false,
     index,
-    schemaTypes
+    schemaTypes,
+    enumTypes,
 }: SchemaFieldRowProps) {
     if (!field) return;
 
@@ -97,21 +98,34 @@ export function SchemaFieldRow({
         }
     };
 
-    const handleTypeChange = (newType: SchemaType) => {
-        setType(newType);
-        const updatedField = { ...field, type: newType, name };
-        if (newType === 'object') {
+    const handleTypeChange = (newType: any) => {
+        // Check if the field's value is an object
+        const isValueObject = typeof newType === 'object' && newType !== null;
+
+        const type = isValueObject ? newType.value : newType;
+
+        const objectType = isValueObject ? newType.type : '';
+
+        const updatedField = {
+            ...field,
+            type,
+            objectType
+        };
+
+        if (type === 'object') {
             updatedField.properties = updatedField.properties || {};
             setIsExpanded(true);
-        } else if (newType === 'array') {
+        } else if (type === 'array') {
             updatedField.properties = updatedField.properties || {
                 ['Items']: { type: 'string', name: 'Item 1', description: '' },
             };
-
             setIsExpanded(true);
-        } else {
+        }else {
             delete updatedField.properties;
         }
+
+        setType(type);
+
         onUpdate(updatedField, index);
     };
 
@@ -157,7 +171,7 @@ export function SchemaFieldRow({
                             );
                         }}
                         onDelete={() => {
-                           /*  const { [subId]: _, ...newProperties } =
+                            /*  const { [subId]: _, ...newProperties } =
                                 field.properties; */
                             onUpdate(
                                 { ...field, properties: field.properties },
@@ -218,11 +232,19 @@ export function SchemaFieldRow({
                             onTypeChange={(t) => handleTypeChange(t)}
                             schemaTypes={schemaTypes}
                         />
-                        <FieldOptionsPopover
-                            field={field}
-                            onUpdate={(updatedField) =>
-                                onUpdate(updatedField, index)
-                            }
+                        <PopoverController
+                            row={field}
+                            changeValue={(element, value) => {
+                                // Create a new updated field object
+                                const updatedField = {
+                                    ...field,
+                                    [element]: value,
+                                };
+
+                                // Pass the updated field and its index to the onUpdate function
+                                onUpdate(updatedField, index);
+                            }}
+                            options={{ enumTypes }}
                         />
                     </div>
                 </TableCell>

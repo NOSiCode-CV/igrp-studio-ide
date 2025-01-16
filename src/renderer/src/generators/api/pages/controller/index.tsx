@@ -45,6 +45,7 @@ interface ControllerProps {
     modules: Array<any>;
     dto: Array<any>;
     responses: Array<any>;
+    enums: Array<any>;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
@@ -58,6 +59,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     onCloseTab,
     onUpdateTab,
     responses,
+    enums
 }: ControllerProps) => {
     const { t } = useTranslation();
 
@@ -68,6 +70,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
     const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
+    const [enumTypes, setEnumTypes] = useState<SchemaTypeItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -107,7 +110,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     }, [currentItem]);
 
     useEffect(() => {
-        const res = getTablesColumns(selectors);
+        const res = getTablesColumns(selectors, enumTypes);
         setTableColumns(res);
     }, [selectors]);
 
@@ -308,6 +311,16 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         )?.MYME_TYPES || []
     );
 
+    useEffect(()=>{
+        const enumTypes = enums.map((enumItem) => {
+            return {
+                label: enumItem.name,
+                value: enumItem.name,
+            };
+        });
+        setEnumTypes(enumTypes)
+    })
+
     useEffect(() => {
         const types = formatMethods(
             (
@@ -453,6 +466,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 schemaTypes={schemaTypes}
                                 contentTypes={typesData}
                                 responseTypes={responses}
+                                enumTypes={enumTypes}
                             />
                         </TabsContent>
                     </Tabs>

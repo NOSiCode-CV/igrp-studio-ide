@@ -1,8 +1,8 @@
 // engines/SpringEngine.ts
-import { addResponse, deleteElement, newApi } from '@igrp/spring-engine';
+import { addEnum, addResponse, deleteElement, newApi } from '@igrp/spring-engine';
 import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
-import { BaseApiConfig, DeleteConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { BaseApiConfig, DeleteConfig, EnumConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
 
 export class SpringEngine implements BaseEngine {
@@ -34,4 +34,9 @@ export class SpringEngine implements BaseEngine {
   async createResponse(config: ResponseConfig, basePath: string): Promise<void> {
     await addResponse(config, basePath);
   }
+
+  async createEnum(data: EnumConfig, basePath: string): Promise<void> {
+    await addEnum(data, basePath);
+  }
+
 }

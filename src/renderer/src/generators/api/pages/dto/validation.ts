@@ -13,7 +13,6 @@ export function useDtoValidation({ t }) {
                 name: Yup.string().required('Field name is required')
                     .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
                     .max(20, t("maxLengthExceeded", { max: 20 })),
-                ns: Yup.string().required('Field Namespace is required'),
                 type: Yup.string().required('Field type is required')
             })
         )

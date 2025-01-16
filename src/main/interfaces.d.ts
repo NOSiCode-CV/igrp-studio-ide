@@ -16,6 +16,7 @@ export interface IConnenctionRepository {
 
 export interface BaseEngine {
     createProject(project: ProjectData, basePath: string): Promise<void>;
-    createResponse(config: ResponseConfig, basePath: string): Promise<void>
-    delete(config: DeleteConfig, basePath: string): Promise<void>
+    delete(config: DeleteConfig, basePath: string): Promise<void>;
+    createResponse(config: ResponseConfig, basePath: string): Promise<void>;
+    createEnum(data: EnumConfig, basePath: string): Promise<void>;
 }

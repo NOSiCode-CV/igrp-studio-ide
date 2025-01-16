@@ -66,5 +66,7 @@
   "responses": "Responses",
   "documents": "Documents",
   "apis":"APIs",
-  "schemaCreatedSuccess": "Schema have been successfully added."
+  "schemaCreatedSuccess": "Schema have been successfully added.",
+  "newEnum":"New Enum",
+  "enum":"Enum"
 }

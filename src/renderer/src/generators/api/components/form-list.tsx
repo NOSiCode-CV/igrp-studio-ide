@@ -26,6 +26,8 @@ import { PopoverController } from '../pages/controller/popover'
 import { PopoverModel } from '../pages/model/popover'
 import { PopoverDto } from '../pages/dto/popover-dto'
 import { RelationPopover } from '../pages/model/relation-popover'
+import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown'
+import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
@@ -260,11 +262,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                             {item.type === 'popoverController' && (
                                               <PopoverController
                                                 key={itemIndex}
-                                                index={index}
                                                 row={row}
-                                                changeValue={(element, position, value) =>
-                                                  changeValue(element, position, value)
+                                                changeValue={(element, value) =>
+                                                  changeValue(element, index, value)
                                                 }
+                                                options={itemOptions || []}
                                               />
                                             )}
                                             {item.type === 'popoverModel' && (
@@ -353,11 +355,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                       {['popover'].includes(type) && (
                                         <PopoverController
                                           key={index}
-                                          index={index}
                                           row={row}
-                                          changeValue={(element, position, value) =>
-                                            changeValue(element, position, value)
+                                          changeValue={(element, value) =>
+                                            changeValue(element, index, value)
                                           }
+                                          options={options || []}
                                         />
                                       )}
                                       {['popoverModel'].includes(type) && (
@@ -382,6 +384,23 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           collectionTypes={options}
                                         />
                                       )}
+                                        {['typeSelectorDropdown'].includes(type) && (
+										<TypeSelectorDropdown
+											type={row?.[key] || ''}
+											onTypeChange={(t: any) => {
+
+												const isValueObject = typeof t === 'object' && t !== null;
+
+												const typeValue = isValueObject ? t.value : t;
+												const typeType = isValueObject ? t.type : '';
+
+												changeValue('type', index, typeValue)
+
+												if(isValueObject)
+													changeValue('objectType"', index, typeType)
+											}}
+											schemaTypes={options}
+										/>)}
                                     </>
                                   )}
                                 </div>

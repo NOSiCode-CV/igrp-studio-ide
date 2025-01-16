@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
 import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
+import { EnumLayout } from './enum/EnumLayout';
 
 interface PageBuilderState {
     basePath: string;
@@ -53,12 +54,13 @@ const PageController = ({
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
             responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
+            enums:  extractByType(moduleData, OPTION_TYPE.ENUM),
             modules: getModulesArray(studio.folderFiles),
             folderFiles: studio.folderFiles,
         };
     });
 
-    const { basePath, models, dto, modules, responses } =
+    const { basePath, models, dto, modules, responses, enums } =
         useSelector(selectProperties);
 
     useEffect(() => {
@@ -100,8 +102,6 @@ const PageController = ({
         onUpdateTab(tab.id, `tab-${tab.item?.module}-${tabId}`);
     };
 
-    //console.log(tab.item)
-
     return (
         <>
             {option === 'none' && (
@@ -129,6 +129,7 @@ const PageController = ({
                     modules={modules}
                     dto={dto}
                     responses={responses}
+                    enums={enums}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
                 />
@@ -157,6 +158,15 @@ const PageController = ({
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
+                />
+            )}
+            {option === OPTION_TYPE.ENUM && (
+                <EnumLayout
+                    basePath={basePath}
+                    selectors={selectors}
+                    currentItem={tab.item}
+                  
+                    onCloseTab={hangleClose}
                 />
             )}
             {option === OPTION_TYPE.ERDDiagram && <ERDLayout models={models} />}

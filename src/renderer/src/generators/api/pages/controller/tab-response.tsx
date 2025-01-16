@@ -23,6 +23,7 @@ interface TabResponseProps {
     schemaTypes?: { label: string; value: string }[];
     contentTypes: any;
     responseTypes: Array<any>;
+    enumTypes: Array<any>;
 }
 
 export const TabResponse: React.FC<TabResponseProps> = ({
@@ -30,6 +31,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
     contentTypes,
     schemaTypes,
     responseTypes,
+    enumTypes
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
@@ -257,6 +259,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 <CardContent>
                                     <JSONSchemaBuilder
                                         schemaTypes={schemaTypes}
+                                        enumTypes={enumTypes}
                                         initialSchema={contentData}
                                         onSchemaChange={(value) => {
                                             handleSchemaChange(
