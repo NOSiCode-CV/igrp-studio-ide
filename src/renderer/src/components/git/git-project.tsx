@@ -26,30 +26,8 @@ export default function GitProject() {
         onConfirm: (name: string) => {},
     });
     
-    const { repositories, isInitialized } = useSelector((state: RootState) => state.git);
+    const { repositories } = useSelector((state: RootState) => state.git);
 
-    useEffect(() => {
-        const loadInitialData = async () => {
-            if (!isInitialized) {
-                setIsLoading(true);
-                try {
-                    const [userInfo, repos] = await Promise.all([
-                        window.electron.ipcRenderer.invoke('github-user-info'),
-                        window.electron.ipcRenderer.invoke('github-repositories'),
-                    ]);
-
-                    dispatch(setUser(userInfo));
-                    dispatch(setRepositories(repos as Repository[]));
-                } catch (error) {
-                    console.log('Not authenticated yet');
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        loadInitialData();
-    }, [isInitialized, dispatch]);
 
     useEffect(() => {
         window.electron.ipcRenderer.on(
