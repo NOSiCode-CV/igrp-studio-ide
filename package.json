@@ -25,6 +25,7 @@
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/utils": "^3.0.0",
 		"@faker-js/faker": "^9.2.0",
+		"@gitbeaker/node": "^35.8.1",
 		"@hello-pangea/dnd": "^17.0.0",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",

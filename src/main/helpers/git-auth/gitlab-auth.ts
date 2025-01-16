@@ -1,21 +1,22 @@
-
 import { BrowserWindow, shell } from 'electron';
 import express from 'express';
+import { TokenService } from '../../services/token-service';
+import { GitLabService } from '../../services/gitlab-service';
 
-const GITHUB_CLIENT_ID = 'Ov23lic9e0U4Ffd3kBc1';
-const GITHUB_CLIENT_SECRET = '056d96948e4f453b0190b5a0261122846260ee28'; // Adicione o client secret
-const DEV_PORT  = 3333
+const GITLAB_CLIENT_ID = '7a0b38edcf3d7aae9b491432bbc88aa0a2392c0dfaa19805cf826d3d476509c1';
+const GITLAB_CLIENT_SECRET = 'gloas-9f42545e2609a93e88b815956deaa4dfecf4c76a6978c6b8ed2b48a492ed66ef';
+const DEV_PORT = 3333;
 
-export const getAuthUrl = (isDev: boolean) => {
-  const scopes = ['repo', 'read:user', 'read:org'].join(' ');
+export const getGitLabAuthUrl = (isDev: boolean) => {
+  const scopes = ['api', 'read_user', 'read_repository'].join(' ');
   const redirectUri = isDev 
     ? `http://localhost:${DEV_PORT}/oauth/callback`
     : 'igrp-studio://oauth/callback';
 
-  return `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${scopes}`;
+  return `https://gitlab.com/oauth/authorize?client_id=${GITLAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}`;
 };
 
-export async function setupGitHubOAuth(mainWindow: BrowserWindow, isDev: boolean) {
+export async function setupGitLabOAuth(mainWindow: BrowserWindow, isDev: boolean) {
   if (isDev) {
     return setupDevOAuth(mainWindow);
   } else {
@@ -27,7 +28,7 @@ async function setupDevOAuth(mainWindow: BrowserWindow) {
   return new Promise((resolve, reject) => {
     const app = express();
     const server = app.listen(DEV_PORT, () => {
-      const authUrl = getAuthUrl(true);
+      const authUrl = getGitLabAuthUrl(true);
       shell.openExternal(authUrl);
     });
 
@@ -42,8 +43,8 @@ async function setupDevOAuth(mainWindow: BrowserWindow) {
           res.send(`
             <html>
               <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
-                <h2>✅ Autenticação realizada com sucesso!</h2>
-                <p>Você pode fechar esta janela e voltar ao aplicativo.</p>
+                <h2>✅ GitLab authentication successful!</h2>
+                <p>You can close this window and return to the application.</p>
                 <script>setTimeout(() => window.close(), 2000);</script>
               </body>
             </html>
@@ -60,7 +61,7 @@ async function setupDevOAuth(mainWindow: BrowserWindow) {
 }
 
 async function setupProdOAuth(_mainWindow: BrowserWindow) {
-  const authUrl = getAuthUrl(false);
+  const authUrl = getGitLabAuthUrl(false);
   shell.openExternal(authUrl);
   return Promise.resolve();
 }
@@ -76,7 +77,7 @@ export async function handleProtocolCallback(url: string, mainWindow: BrowserWin
     }
   } catch (error) {
     console.error('Error handling protocol callback:', error);
-    mainWindow.webContents.send('github-oauth-error', {
+    mainWindow.webContents.send('gitlab-oauth-error', {
       message: 'Failed to authenticate'
     });
   }
@@ -87,16 +88,17 @@ async function exchangeCodeForToken(code: string, isDev: boolean) {
     ? `http://localhost:${DEV_PORT}/oauth/callback`
     : 'igrp-studio://oauth/callback';
 
-  const response = await fetch('https://github.com/login/oauth/access_token', {
+  const response = await fetch('https://gitlab.com/oauth/token', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      client_id: GITHUB_CLIENT_ID,
-      client_secret: GITHUB_CLIENT_SECRET,
+      client_id: GITLAB_CLIENT_ID,
+      client_secret: GITLAB_CLIENT_SECRET,
       code,
+      grant_type: 'authorization_code',
       redirect_uri: redirectUri
     })
   });
@@ -108,7 +110,11 @@ async function exchangeCodeForToken(code: string, isDev: boolean) {
 
 function handleAuthSuccess(data: any, mainWindow: BrowserWindow) {
   if (data.access_token) {
-    mainWindow.webContents.send('github-oauth-success', {
+    TokenService.setToken('gitlab', data.access_token);
+    
+    GitLabService.initialize(data.access_token);
+
+    mainWindow.webContents.send('gitlab-oauth-success', {
       access_token: data.access_token,
       scope: data.scope
     });
@@ -118,17 +124,16 @@ function handleAuthSuccess(data: any, mainWindow: BrowserWindow) {
 }
 
 function handleAuthError(error: any, mainWindow: BrowserWindow, res?: any, reject?: any) {
-  console.error('Error during GitHub authentication:', error);
-  mainWindow.webContents.send('github-oauth-error', {
-    message: error.message || 'Failed to authenticate with GitHub'
+  mainWindow.webContents.send('gitlab-oauth-error', {
+    message: error.message || 'Failed to authenticate with GitLab'
   });
   
   if (res) {
     res.status(500).send(`
       <html>
         <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
-          <h2>❌ Erro na autenticação</h2>
-          <p>Por favor, tente novamente.</p>
+          <h2>❌ Authentication Error</h2>
+          <p>Please try again.</p>
         </body>
       </html>
     `);

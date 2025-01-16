@@ -50,8 +50,6 @@ export default function Component({
         }));
     };
 
-    console.log("tabs", tabs)
-
     return (
         <>
             <nav className="flex justify-between border-t border-gray-200 pr-6">
@@ -91,6 +89,7 @@ export default function Component({
                 {activeTab !== 'PageBuilder' && <NavigationBar isDesign={isDesignStates[activeTab] ?? true} onSave={handleSave} onSwitch={handleSwitchClick} />}
             </nav>
             <Separator />
+
             {tabs.map((tab) => (
                 <div key={tab} className={activeTab === tab ? 'block' : 'hidden'}>
                     {tab === 'PageBuilder' ? (

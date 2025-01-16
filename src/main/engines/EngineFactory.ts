@@ -4,6 +4,12 @@ import { DotNetEngine } from './DotNetEngine';
 import { NextjsEngine } from './NextjsEngine';
 import { SpringEngine } from './SpringEngine';
 
+export enum ENV_TYPES {
+  NEXTJS = "baseApp",
+  SPRING = "baseApi",
+  DOTNET = "dotnet"
+};
+
 export class EngineFactory {
   static getEngine(type: string): BaseEngine {
     switch (type) {

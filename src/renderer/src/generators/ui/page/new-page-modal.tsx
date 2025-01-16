@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useFormik } from "formik";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@renderer/components/ui/dialog'
 import { PATTERNS } from '@renderer/constants/appConstants';
+import { useGit } from '@renderer/hooks/useGit';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -26,6 +27,8 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
 
     const { t } = useTranslation();
 
+    const {createGitCommit} = useGit();
+
     const { showErrorToast, showSuccessToast } = useToast();
 
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
@@ -38,7 +41,8 @@ export function NewPageModal({ isOpen, basePath, onClose, onConfirm }: NewPageMo
             }
 
             showSuccessToast(`Page ${pageConfig.pageName} has been successfully added.`);
-
+            // commit after creating the page
+            createGitCommit(basePath, `Add page ${pageConfig.pageName}`);
             if (onConfirm) onConfirm();
 
             formik.resetForm();

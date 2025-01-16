@@ -21,6 +21,7 @@ import {
   SelectValue
 } from '@renderer/components/ui/select'
 import { IGRPContainer } from '@igrp/igrp-design-system'
+import GitProject from '@renderer/components/git/git-project'
 
 
 const RecentsProjects = (): JSX.Element => {
@@ -30,6 +31,7 @@ const RecentsProjects = (): JSX.Element => {
 
   const [localSearchQuery, setLocalSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('local')
 
   const [allProjects, setProjects] = useState<PageableProjects>({ data: [], total: 0 })
   const [localProjects, setLocalProjects] = useState<ProjectData[]>([])
@@ -149,9 +151,9 @@ const RecentsProjects = (): JSX.Element => {
         </div>
         {isLoading ? (
           <LoadingSpinner />
-        ) : allProjects.data.length > 0 ? (
+        ) : allProjects?.data?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {allProjects.data.slice(0, 3).map((project, index) => RenderProjectCard(project, true, index))}
+            {allProjects?.data?.slice(0, 3).map((project, index) => RenderProjectCard(project, true, index))}
           </div>
         ) : (
           <EmptyState
@@ -162,12 +164,12 @@ const RecentsProjects = (): JSX.Element => {
       </IGRPContainer>
       {/* All Projects Section */}
       <IGRPContainer>
-        <div className="flex justify-between items-center">
-		  <div className="flex items-center text-foreground">
-          <LayoutDashboard className="w-5 h-5 mr-2" />
-          {t('All Projects')}
-        </div>
-          <Tabs defaultValue="local">
+      <div className="flex justify-between items-center">
+          <div className="flex items-center text-foreground">
+            <LayoutDashboard className="w-5 h-5 mr-2" />
+            {t('All Projects')}
+          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger
                 value="local"
@@ -184,7 +186,7 @@ const RecentsProjects = (): JSX.Element => {
             </TabsList>
           </Tabs>
         </div>
-        <Tabs defaultValue="local">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="local">
             <div className="flex items-center space-x-4 mb-4">
               <div className="flex-1 relative">
@@ -247,14 +249,7 @@ const RecentsProjects = (): JSX.Element => {
                 </SelectContent>
               </Select>
             </div>
-            {isLoading ? (
-              <LoadingSpinner />
-            ) : (
-              <EmptyState
-                message="No remote projects found. Start by cloning a project from GitHub or GitLab!"
-                className="text-muted-foreground"
-              />
-            )}
+            <GitProject />
           </TabsContent>
         </Tabs>
       </IGRPContainer>
