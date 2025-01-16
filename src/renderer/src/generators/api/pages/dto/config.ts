@@ -1,7 +1,7 @@
 import { DTOConfig } from "@igrp/spring-engine/dist/interfaces/types"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
-import { OPTION_TYPE } from "@renderer/constants/appConstants"
+import { SchemaTypeItem } from "src/main/types"
 
 export const initialValues: DTOConfig = {
     type: 'dto',
@@ -11,7 +11,7 @@ export const initialValues: DTOConfig = {
     attributes: [
         {
             name: '',
-            ns: 'java',
+            objectType: 'java',
             type: 'string',
             required: false,
             before: false,
@@ -72,25 +72,20 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
             : []
     }
 
-    const getUpdatedTypesForNamespace = (selectedValue) => {
-        if (selectedValue === OPTION_TYPE.DATA_OBJECTS) return getOptions(dto)
-
-        if (selectedValue === OPTION_TYPE.MODELS) return getOptions(models)
-
-        return paramsTypesData
-    }
+    const namespacesOptions: SchemaTypeItem[] = [
+        { label: 'Data Transfer Object', value: 'dto', items: getOptions(dto) },
+        { label: 'Schema', value: 'models', items: getOptions(models) },
+        { label: 'Java', value: 'java', items: paramsTypesData }
+    ]
 
     return {
         attributes: [
-            { key: 'name', name: 'Name', type: 'text'},
-            { key: 'ns', name: 'Namespace', type: 'select', options: NamespacesOptions},
+            { key: 'name', name: 'Name', type: 'text' },
             {
                 key: 'type',
                 name: 'Type',
-                type: 'select',
-                options: paramsTypesData,
-                dependsOn: 'ns',
-                getOptions: (selectedValue) => getUpdatedTypesForNamespace(selectedValue),
+                type: 'typeSelectorDropdown',
+                options: namespacesOptions
             },
             {
                 key: 'group', name: '', type: 'group', items: [

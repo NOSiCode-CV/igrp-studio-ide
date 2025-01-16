@@ -105,7 +105,12 @@ const DtoLayout = ({
                 { ...newValues, module: currentItem.module },
                 basePath
             );
-            if (error) return showErrorToast(error);
+
+            console.log(newValues,error);
+
+            if (error) {
+                return showErrorToast(error);
+            }
 
             dispatch(onSetChangeStatus(true));
 

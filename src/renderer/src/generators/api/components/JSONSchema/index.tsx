@@ -20,6 +20,7 @@ import { TooltipContent } from '@radix-ui/react-tooltip';
 
 interface JSONSchemaBuilderProps {
     schemaTypes?: { label: string; value: string }[];
+    enumTypes?: { label: string; value: string }[];
     initialSchema?: JSONSchema | null;
     onSchemaChange?: (schema: JSONSchema) => void;
 }
@@ -28,6 +29,7 @@ export function JSONSchemaBuilder({
     initialSchema,
     onSchemaChange,
     schemaTypes,
+    enumTypes,
 }: JSONSchemaBuilderProps) {
     const [newFields, setNewFields] = useState<Record<string, SchemaField>>({});
     const [_alert, setAlert] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export function JSONSchemaBuilder({
                 ...initialSchema,
                 properties: Object.fromEntries(
                     Object.entries(initialSchema.properties || {}).map(
-                        ([key, value]) => [key, { ...value, name: key }]
+                        ([key, value]) => [key, { ...value }]
                     )
                 ),
             };
@@ -224,7 +226,6 @@ export function JSONSchemaBuilder({
                         ...rest,
                         [updatedField.name]: {
                             ...updatedField,
-                            name: updatedField.name,
                         },
                     };
                 }
@@ -239,7 +240,6 @@ export function JSONSchemaBuilder({
                                 key,
                                 {
                                     ...field,
-                                    name: key,
                                     properties: updateProperties(
                                         field.properties
                                     ),
@@ -247,7 +247,7 @@ export function JSONSchemaBuilder({
                             ];
                         }
 
-                        return [key, { ...field, name: key }];
+                        return [key, { ...field }];
                     })
                 );
             };
@@ -364,7 +364,7 @@ export function JSONSchemaBuilder({
                 ...Object.fromEntries(
                     Object.entries(newFields)
                         .filter(([_, field]) => field.name.trim() !== '')
-                        .map(([_, field]) => [field.name, field])
+                        .map(([_, field]) => [field])
                 ),
             },
         });
@@ -397,7 +397,7 @@ export function JSONSchemaBuilder({
                                 <TooltipContent>Add new field</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
-                       
+
                         <JSONSchemaModal
                             generateJSONSchema={generateJSONSchema}
                         />
@@ -418,6 +418,7 @@ export function JSONSchemaBuilder({
                         onAddSubfield={handleAddNewField}
                         onAlert={setAlert}
                         schemaTypes={schemaTypes}
+                        enumTypes={enumTypes}
                     />
                 ))}
                 {Object.entries(newFields).map(([id, field]) => (
@@ -434,6 +435,7 @@ export function JSONSchemaBuilder({
                         onAlert={setAlert}
                         isNew={true}
                         schemaTypes={schemaTypes}
+                        enumTypes={enumTypes}
                     />
                 ))}
             </TableBody>

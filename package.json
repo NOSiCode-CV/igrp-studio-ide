@@ -29,7 +29,7 @@
 		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
-		"@igrp/spring-engine": "^0.3.0-alpha-4.6.6",
+		"@igrp/spring-engine": "^0.3.0-alpha-4.7.2",
 		"@octokit/rest": "^21.1.0",
 		"@radix-ui/react-accordion": "^1.2.1",
 		"@radix-ui/react-alert-dialog": "^1.1.2",
