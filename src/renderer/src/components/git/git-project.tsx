@@ -5,18 +5,16 @@ import { ProjectNameDialog } from './dialog-project-name';
 import { CardGitProject } from './card-git-project';
 import { ProgressDisplay } from './display-progress';
 import { EmptyState } from '../empty-state';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
-import { RootState } from '@renderer/redux';
-import { setRepositories, setUser } from '@renderer/redux/git/reducer';
+import useGithubAuth from '@renderer/hooks/useGithubAuth';
 
 export default function GitProject() {
     const { showErrorToast, showSuccessToast } = useToast();
     const [cloningRepoId, setCloningRepoId] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
     const [scanProgress, setScanProgress] = useState({ progress: 0, total: 0 });
-
+    
     const navigate = useNavigate()
     const dispatch: any = useDispatch()
 
@@ -25,44 +23,9 @@ export default function GitProject() {
         defaultName: '',
         onConfirm: (name: string) => {},
     });
+
+    const { repositories, isLoading,  } = useGithubAuth();
     
-    const { repositories } = useSelector((state: RootState) => state.git);
-
-
-    useEffect(() => {
-        window.electron.ipcRenderer.on(
-            'github-oauth-success',
-            async (_event, data) => {
-                setIsLoading(true);
-                try {
-                    await window.electron.ipcRenderer.invoke(
-                        'github-initialize',
-                        data.access_token
-                    );
-
-                    const [userInfo, repos] = await Promise.all([
-                        window.electron.ipcRenderer.invoke('github-user-info'),
-                        window.electron.ipcRenderer.invoke(
-                            'github-repositories'
-                        ),
-                    ]);
-
-                    setUser(userInfo);
-                    setRepositories(repos as Repository[]);
-                } catch (error) {
-                    console.error('Error loading GitHub data:', error);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        );
-
-        return () => {
-            window.electron.ipcRenderer.removeAllListeners(
-                'github-oauth-success'
-            );
-        };
-    }, []);
 
     useEffect(() => {
         window.electron.ipcRenderer.on('repo-scan-progress', (_event, data) => {
@@ -79,20 +42,17 @@ export default function GitProject() {
     useEffect(() => {
         window.electron.ipcRenderer.on('clone-progress', async (_event, data) => {
             if (data.status === 'success' || data.status === 'error') {
-                setCloningRepoId(null); // Reseta o estado
+                setCloningRepoId(null);
             } 
             if (data.status === 'success') {
                 showSuccessToast(`Repository successfully cloned to ${data.path}`);
                 try {
                     await window.repo.project.save({
                         name: data.config.name,
-                        type: 'frontend', //data.config.type,
-                        framework: "nextjs", //data.config.framework,
+                        framework: data.config.type,
                         config: data.config.config,
                         path: data.path
                     });
-
-                    data.config.framework = "nextjs"
                     
                     dispatch(setBasePath(data.path));
                     dispatch(setConfig(data.config));

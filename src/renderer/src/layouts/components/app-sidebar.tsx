@@ -12,7 +12,7 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@renderer/components/ui/sidebar';
-import { Badge, ChevronRight, FileText, Home, Server } from 'lucide-react';
+import { Badge, ChevronRight, FileText, GitBranch, GitBranchIcon, GitCommit, GitCommitIcon, GitGraph, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -29,6 +29,7 @@ import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { NavSettings } from './nav-data';
+import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
 
 interface AppSidebarProps {
     className?: string;
@@ -93,6 +94,11 @@ export function AppSidebar({
             label: t('settings'),
             id: 'settings',
         },
+        {
+            icon: GitBranch,
+            label: t('git'),
+            id: 'git',
+        }
     ];
 
     return (
@@ -183,6 +189,7 @@ export function AppSidebar({
                     )}
                     <SidebarContent className="mb-10">
                         <ScrollArea>
+                        {activeMenuGroup !== 'Git' ? (
                             <SidebarGroup>
                                 <SidebarGroupContent>
                                     {activeMenu.map(
@@ -203,6 +210,15 @@ export function AppSidebar({
                                     )}
                                 </SidebarGroupContent>
                             </SidebarGroup>
+                            ) : (
+                                <GitCommitsSidebar
+                                    basePath={basePath}
+                                    onSelectCommit={(commit) => { 
+                                        // Optional: Handle commit selection
+                                        console.log('Selected Commit:', commit); 
+                                    }} 
+                                />
+                            )}
                         </ScrollArea>
                     </SidebarContent>
                 </Sidebar>

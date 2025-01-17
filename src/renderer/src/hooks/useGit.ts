@@ -1,6 +1,25 @@
 import useToast from '@renderer/components/useToast';
 import { useCallback } from 'react';
 
+type GitErrorType = 
+ | 'INVALID_REMOTE_URL'
+ | 'PERMISSION_DENIED' 
+ | 'NOT_GIT_REPOSITORY'
+ | 'NO_REMOTE_CONFIGURED';
+
+const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = {
+ INVALID_REMOTE_URL: 'Invalid remote URL. Please provide a valid remote URL.',
+ PERMISSION_DENIED: 'Permission denied. Please check repository access.',
+ NOT_GIT_REPOSITORY: 'Not a git repository. Please check repository access.',
+ NO_REMOTE_CONFIGURED: 'No remote configured for this repository.',
+};
+
+const getGitErrorType = (error: Error): GitErrorType | null => {
+ const message = error.message.toUpperCase();
+ return (Object.keys(GIT_ERROR_MESSAGES) as GitErrorType[])
+   .find(type => message.includes(type)) || null;
+};
+
 export const useGit = () => {
     const { showErrorToast, showSuccessToast } = useToast();
 
@@ -24,6 +43,20 @@ export const useGit = () => {
         },
         [showErrorToast, showSuccessToast]
     );
+
+    const listCommits = useCallback(async (projectPath: string, branch?: string) => {
+        try {
+          const commits = await window.electron.ipcRenderer.invoke('list-commits', {
+            projectPath,
+            branch
+          });
+
+          return commits;
+        } catch (error) {
+          console.error('Failed to list commits:', error);
+          throw error;
+        }
+      }, []);
 
     const pullChanges = useCallback(
         async (projectPath: string) => {
@@ -75,10 +108,18 @@ export const useGit = () => {
                 });
                 showSuccessToast('Changes synced successfully');
                 return true;
-            } catch (error) {
-                if (error instanceof Error) {
+            } catch (error: any) {
+                const errorType = getGitErrorType(error);
+                if (!errorType) {
                     showErrorToast(error.message || 'Failed to sync changes');
+                    return false;
                 }
+                
+                if (errorType === 'NO_REMOTE_CONFIGURED') {
+                    error.name = errorType;
+                    throw error;
+                }
+                showErrorToast(GIT_ERROR_MESSAGES[errorType]);
                 return false;
             }
         },
@@ -98,6 +139,7 @@ export const useGit = () => {
         pullChanges,
         pushChanges,
         syncChanges,
-        getChangesCount
+        getChangesCount,
+        listCommits
     };
 };

@@ -65,6 +65,7 @@
   "newResponses": "New Response",
   "responses": "Responses",
   "documents": "Documents",
+  "git": "Git",
   "apis":"APIs",
   "schemaCreatedSuccess": "Schema have been successfully added.",
   "newEnum":"New Enum",
