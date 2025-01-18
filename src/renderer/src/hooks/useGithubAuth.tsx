@@ -29,11 +29,11 @@ const useGithubAuth = () => {
     useEffect(() => {
         window.electron.ipcRenderer.on('github-oauth-success', async (_event, data) => {
             await window.electron.ipcRenderer.invoke('github-initialize', data.access_token);
-            //await loadGithubData();
+            await loadGithubData();
         });
 
         if (!isInitialized) {
-            //loadGithubData();
+            loadGithubData();
         }
 
         return () => {
