@@ -10,8 +10,10 @@ import { fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
-import { handleProtocolCallback, setupGitHubOAuth } from './helpers/git-auth/github-auth'
-
+import { setupGitHubOAuth } from './helpers/git-auth/github-auth'
+import { GitLabService } from './services/gitlab-service'
+import { setupGitLabOAuth } from './helpers/git-auth/gitlab-auth'
+import { GitService } from './services/git-service'
 import { TokenService } from './services/token-service';
 import { GitHubService } from './services/github-service';
 
@@ -29,9 +31,7 @@ if (!isDev) {
 import './handlers/apiHandler';
 import './handlers/dbHandler';
 
-import { GitLabService } from './services/gitlab-service'
-import { setupGitLabOAuth } from './helpers/git-auth/gitlab-auth'
-import { GitService } from './services/git-service'
+
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -299,9 +299,17 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
 
 // GitHub
 ipcMain.handle('github-initialize', async (_event, token) => {
-  await GitHubService.initialize(token);
-  TokenService.setToken('github', token);
-  return true;
+  try {
+    await GitHubService.initialize(token);
+    TokenService.setToken('github', token);
+    return true;
+  } catch (error) {
+    console.error('GitHub initialization failed:', error);
+    throw error;
+  }
+});
+ipcMain.handle('logout-github', async () => {
+  return TokenService.logoutGithub();
 });
 ipcMain.handle('gitlab-initialize', async (_event, token) => {
   try {
@@ -349,6 +357,18 @@ ipcMain.handle('sync-changes', async (_event, { projectPath, branch }) => {
 });
 ipcMain.handle('get-changes-count', async (_event, projectPath: string) => {
   return GitService.getChangesCount(projectPath);
+});
+ipcMain.handle('is-git-initialized', async (_event, projectPath: string) => {
+  return GitService.isGitInitialized(projectPath);
+});
+ipcMain.handle('initialize-git', async (_event, projectPath: string) => {
+  return GitService.initializeGit(projectPath);
+});
+ipcMain.handle('add-git-remote', async (_event, { projectPath, remoteUrl }) => {
+  return GitService.addRemote(projectPath, remoteUrl);
+});
+ipcMain.handle('list-commits', async (_event, { projectPath, branch, limit }) => {
+  return GitService.listCommits(projectPath, branch, limit);
 });
 
 // GitLab

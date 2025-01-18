@@ -16,11 +16,6 @@ import { HelpDialog } from '@renderer/components/help-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
 import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from '@renderer/components/ui/avatar';
-import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
@@ -32,9 +27,9 @@ import { BranchSwitcher } from '../../components/git/git-branch-switcher';
 import useToast from '@renderer/components/useToast';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPages as onGetPages } from '@renderer/redux/thunks';
-import { GitChangesCount } from '@renderer/components/git/git-changes-count';
 import SyncButton from '@renderer/components/git/git-sync';
 import { RootState } from '@renderer/redux';
+import GitConnectionMenu from '@renderer/components/user-auth';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -43,11 +38,10 @@ interface HeaderProps {
 
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const dispatch: any = useDispatch();
+    const { isGitEnabled } = useSelector((state: RootState) => state.git);
     const { showErrorToast, showSuccessToast } = useToast();
     const isMac =
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
-
-    const activeBranch = useSelector((state: RootState) => state.git.activeBranch);
 
     const navigate = useNavigate();
 
@@ -84,7 +78,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     };
 
     useEffect(() => {
-        // Check if window is maximized on mount
         const checkMaximized = async () => {
             const maximized = window.menu.isMaximized();
             setIsMaximized(maximized);
@@ -121,14 +114,12 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
             <TooltipProvider>
                 <header className="sticky h-10 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="flex items-center justify-between px-4">
-                        <div
-                            className="flex items-center space-x-2 home cursor-pointer"
-                            onClick={openPage}
-                        >
-                            <img src={logo} alt="Logo" className="h-6 w-auto" />
-                            <p className="text-sm font-medium">IGRP Studio</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 home cursor-pointer">
+                            <div onClick={openPage} className='flex items-center gap-2'>
+                                <img src={logo} alt="Logo" className="h-6 w-auto" />
+                                <p className="text-sm font-medium">IGRP Studio</p>
+                            </div>
+                            <div>
                             {config?.name && (
                                 <div className="flex justify-center gap-2 items-center">
                                     <BranchSwitcher
@@ -141,11 +132,13 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                             );
                                         }}
                                     />
-                                    <SyncButton activeBranch={activeBranch} basePath={basePath || ''} />
-                                    {/* <GitChangesCount basePath={basePath || ''} /> */}
+                                    {isGitEnabled && <SyncButton basePath={basePath || ''} /> }
                                 </div>
                             )}
-
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                        
                             <ModeToggle />
 
                             {config?.name && (
@@ -183,13 +176,8 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     <p>Notifications</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <Avatar className="size-8">
-                                <AvatarImage
-                                    src="https://github.com/shadcn.png"
-                                    alt="@shadcn"
-                                />
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+                            
+                            <GitConnectionMenu />
 
                             {!isMac && (
                                 <>

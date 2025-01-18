@@ -4,7 +4,7 @@ export const TokenService = {
   async initialize() {
     const Store = (await import('electron-store')).default;
     store = new Store({
-      name: 'igrp-studio-config',
+      name: 'igrp-studio-auth',
       clearInvalidConfig: true
     });
   },
@@ -17,4 +17,12 @@ export const TokenService = {
     const token = store?.get(`${service}_token`);
     return token || null;
   },
+
+  logoutGithub() {
+    store?.delete('github_token');
+  },
+
+  logoutGitlab() {
+    store?.delete('gitlab_token');
+  }
 };

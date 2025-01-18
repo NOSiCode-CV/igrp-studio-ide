@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          keyframes: {
+            bounce: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '40%': { transform: 'translateY(-20px)' },
+              '60%': { transform: 'translateY(-10px)' }
+            }
+          },
+          animation: {
+            bounce: 'bounce 1s ease-in-out'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="flex h-screen items-center justify-center bg-[#0d1117] text-[#c9d1d9] font-sans m-0">
+  <div class="text-center p-8 bg-white/5 rounded-xl shadow-lg backdrop-blur-lg border border-white/10">
+    <div class="text-5xl mb-4 text-green-500 animate-bounce">✅</div>
+    <h2 class="text-2xl font-semibold text-[#58a6ff] m-0">Authentication Successful!</h2>
+    <p class="my-4 text-[#8b949e] leading-relaxed">
+      You have successfully connected your account.
+    </p>
+    <div class="text-sm text-[#6e7681]">
+      This window will close automatically in 2 seconds...
+    </div>
+  </div>
+
+  <script>
+    let seconds = 2;
+    const countdownEl = document.querySelector('.text-sm');
+    
+    const countdown = setInterval(() => {
+      seconds--;
+      countdownEl.textContent = `This window will close automatically in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
+      if (seconds === 0) {
+        clearInterval(countdown);
+        window.close();
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

@@ -131,6 +131,9 @@
 		},
 		"linux": {
 			"icon": "build/icons/icon.png"
-		}
+		},
+		"files": [
+		"resources/**/*"
+		]
 	}
 }
