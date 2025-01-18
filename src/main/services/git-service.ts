@@ -360,14 +360,15 @@ export const GitService = {
     },
     async listCommits(projectPath: string, branch: string = 'HEAD', limit: number = 50): Promise<Commit[]> {
         try {
-            // Passar argumentos como array para evitar problemas de escape
-            const { stdout } = await execAsync(
-                'git log ' + branch + ' -n ' + limit.toString() + ' --pretty=format:%h - %an, %ar : %s',
-                { 
-                    cwd: projectPath,
-                    env: { ...process.env, LANG: 'en_US.UTF-8' }
-                }
-            );
+            // Formato que funciona em todos os sistemas
+            const command = process.platform === 'win32'
+                ? `git log ${branch} --pretty=format:"%h - %an, %ar : %s"`
+                : `git log ${branch} --pretty=format:'%h - %an, %ar : %s'`;
+            
+            const { stdout } = await execAsync(command, { 
+                cwd: projectPath,
+                env: { ...process.env, LANG: 'en_US.UTF-8' }
+            });
     
             return stdout
                 .split('\n')
