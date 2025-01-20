@@ -4,12 +4,7 @@ import {
     ChevronsUpDown,
     PlusCircle,
     GitBranch,
-    GitBranchIcon,
-    GitBranchPlusIcon,
     GitFork,
-    GitCommit,
-    GitGraph,
-    GitMerge,
 } from 'lucide-react';
 
 import {

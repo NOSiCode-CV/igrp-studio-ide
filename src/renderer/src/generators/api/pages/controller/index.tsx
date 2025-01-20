@@ -35,7 +35,6 @@ import { TextInput } from '../../components/inputs-form';
 import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
-import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 import { SchemaTypeItem } from 'src/main/types';
 
 interface ControllerProps {

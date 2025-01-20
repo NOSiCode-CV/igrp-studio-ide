@@ -1,5 +1,6 @@
 import useToast from '@renderer/components/useToast';
 import { useCallback } from 'react';
+import { Repository } from 'src/main/types';
 
 type GitErrorType = 
  | 'INVALID_REMOTE_URL'
@@ -56,7 +57,7 @@ export const useGit = () => {
           console.error('Failed to list commits:', error);
           throw error;
         }
-      }, []);
+    }, []);
 
     const pullChanges = useCallback(
         async (projectPath: string) => {
@@ -134,12 +135,23 @@ export const useGit = () => {
         }
     }, []);
 
+    const checkLocalProjects = useCallback(async (githubRepos: Repository[]) => {
+        const localProjects = await window.repo.project.findAllRecent();
+        const results = await window.electron.ipcRenderer.invoke(
+            'check-git-remotes',
+            { projects: localProjects, githubRepos }
+        );
+
+        return results;
+    }, []);
+
     return {
         createGitCommit,
         pullChanges,
         pushChanges,
         syncChanges,
         getChangesCount,
-        listCommits
+        listCommits,
+        checkLocalProjects
     };
 };

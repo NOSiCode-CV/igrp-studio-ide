@@ -3,17 +3,19 @@ import { Repository } from 'src/main/types';
 import useToast from '../useToast';
 import { ProjectNameDialog } from './dialog-project-name';
 import { CardGitProject } from './card-git-project';
-import { ProgressDisplay } from './display-progress';
 import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
 import useGithubAuth from '@renderer/hooks/useGithubAuth';
+import { LoadingSpinner } from '../loading-spinner';
+import { useGit } from '@renderer/hooks/useGit';
 
 export default function GitProject() {
     const { showErrorToast, showSuccessToast } = useToast();
     const [cloningRepoId, setCloningRepoId] = useState<number | null>(null);
-    const [scanProgress, setScanProgress] = useState({ progress: 0, total: 0 });
+    const [clonedRepos, setClonedRepos] = useState<number[]>([]);
+    const [projectPaths, setProjectPaths] = useState<Record<number, string>>({});
     
     const navigate = useNavigate()
     const dispatch: any = useDispatch()
@@ -21,23 +23,11 @@ export default function GitProject() {
     const [nameDialog, setNameDialog] = useState({
         isOpen: false,
         defaultName: '',
-        onConfirm: (name: string) => {},
+        onConfirm: (_name: string) => {},
     });
 
     const { repositories, isLoading,  } = useGithubAuth();
-    
-
-    useEffect(() => {
-        window.electron.ipcRenderer.on('repo-scan-progress', (_event, data) => {
-            setScanProgress(data);
-        });
-
-        return () => {
-            window.electron.ipcRenderer.removeAllListeners(
-                'repo-scan-progress'
-            );
-        };
-    }, []);
+    const {checkLocalProjects} = useGit();
 
     useEffect(() => {
         window.electron.ipcRenderer.on('clone-progress', async (_event, data) => {
@@ -53,6 +43,19 @@ export default function GitProject() {
                         config: data.config.config,
                         path: data.path
                     });
+
+                    await window.electron.ipcRenderer.invoke('add-cloned-repo', cloningRepoId);
+                    await window.electron.ipcRenderer.invoke('set-project-path', {
+                        repoId: cloningRepoId,
+                        path: data.path
+                    });
+
+                    // Atualiza os estados locais
+                    setClonedRepos(prevRepos => [...prevRepos, cloningRepoId!]);
+                    setProjectPaths(prevPaths => ({
+                        ...prevPaths,
+                        [cloningRepoId!]: data.path
+                    }));
                     
                     dispatch(setBasePath(data.path));
                     dispatch(setConfig(data.config));
@@ -101,10 +104,41 @@ export default function GitProject() {
         }
     };
 
+    useEffect(() => {
+        const loadClonedReposData = async () => {
+            try {
+                const [cloned, paths] = await Promise.all([
+                    window.electron.ipcRenderer.invoke('get-cloned-repos'),
+                    window.electron.ipcRenderer.invoke('get-project-paths')
+                ]);
+                setClonedRepos(cloned);
+                setProjectPaths(paths);
+            } catch (error) {
+                console.error('Error loading cloned repos data:', error);
+                showErrorToast('Failed to load repository data');
+            }
+        };
+        
+        loadClonedReposData();
+    }, []);
+
+    useEffect(() => {
+        const checkLocalProjectsExist = async () => {
+            if (!repositories) return;
+            
+            const results = await checkLocalProjects(repositories);
+            
+            setClonedRepos(prev => [...prev, ...Object.keys(results).map(Number)]);
+            setProjectPaths(prev => ({ ...prev, ...results }));
+        };
+    
+        checkLocalProjectsExist();
+    }, [repositories]);
+
     return (
         <div>
             {isLoading ? (
-                <ProgressDisplay scanProgress={scanProgress} />
+                <LoadingSpinner />
             ) : (
                 repositories?.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -113,6 +147,8 @@ export default function GitProject() {
                                 repo={repo}
                                 key={repo.id}
                                 handleClone={handleClone}
+                                clonedRepos={clonedRepos}
+                                projectPaths={projectPaths}
                                 isCloning={cloningRepoId === repo.id}
                             />
                         ))}

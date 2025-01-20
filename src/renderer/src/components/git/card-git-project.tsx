@@ -2,18 +2,61 @@ import { Repository } from 'src/main/types';
 import { Button } from '../ui/button';
 import { GitFork } from 'lucide-react';
 import { Card } from '../ui/card';
+import { useNavigate } from 'react-router-dom';
+import useToast from '../useToast';
+import { navigateToNextPage } from '@renderer/redux/thunks';
 
 type CardGitProjectProps = {
     repo: Repository;
     handleClone: (repo: Repository) => void;
+    clonedRepos: number[];
+    projectPaths: Record<number, string>;
     isCloning: boolean;
 };
 
 export function CardGitProject({
     repo,
     handleClone,
+    clonedRepos,
+    projectPaths,
     isCloning,
 }: CardGitProjectProps) {
+    const navigate = useNavigate();
+    const { showErrorToast } = useToast();
+    
+    const isCloned = clonedRepos.includes(repo.id);
+    const projectPath = projectPaths[repo.id];
+
+    const handleOpen = async () => {
+        if (!projectPath) {
+            showErrorToast('Project path not found');
+            return;
+        }
+
+        try {
+            const { folderExists, config } = await window.electron.ipcRenderer.invoke(
+                'check-project-config',
+                projectPath
+            );
+
+            if (!folderExists || !config) {
+                throw new Error('Invalid project structure');
+            }
+
+            const projectData = {
+                name: config.name,
+                path: projectPath,
+                framework: config.framework,
+                config: config.config
+            };
+
+            navigateToNextPage(navigate, projectData);
+        } catch (error) {
+            showErrorToast('Failed to open project: Invalid project structure');
+            console.error('Failed to open project:', error);
+        }
+    };
+
     return (
         <Card
             key={repo.id}
@@ -39,6 +82,11 @@ export function CardGitProject({
                     >
                         View
                     </Button>
+                    {isCloned ? (
+                        <Button size="sm" variant="outline" onClick={handleOpen}>
+                            Open
+                        </Button>
+                    ) : (
                     <Button
                         size="sm"
                         variant="outline"
@@ -48,6 +96,7 @@ export function CardGitProject({
                         <GitFork className="w-4 h-4 mr-2" />
                         {isCloning ? 'Cloning...' : 'Clone'}
                     </Button>
+                    )}
                 </div>
             </div>
         </Card>

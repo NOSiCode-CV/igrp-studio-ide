@@ -12,7 +12,7 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@renderer/components/ui/sidebar';
-import { Badge, ChevronRight, FileText, GitBranch, GitBranchIcon, GitCommit, GitCommitIcon, GitGraph, Home, Server } from 'lucide-react';
+import { Badge, ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';

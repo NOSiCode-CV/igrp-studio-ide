@@ -1,4 +1,4 @@
-import { GitBranch, Github, GitlabIcon, LogOut, User2Icon } from 'lucide-react';
+import { Github, GitlabIcon, LogOut, User2Icon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
     DropdownMenu,
@@ -74,8 +74,13 @@ function GitConnectionMenu() {
                     )}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {}}>
-                    <GitlabIcon className="mr-2 h-4 w-4" />
-                    <span>Connect GitLab</span>
+                    <div
+                        className="flex items-center"
+                        onClick={() => {}}
+                    >
+                        <GitlabIcon className="mr-2 h-4 w-4" />
+                        <span>Connect GitLab</span>
+                    </div>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

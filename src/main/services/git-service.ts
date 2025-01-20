@@ -3,7 +3,7 @@ import * as path from 'path';
 import { BrowserWindow, dialog } from 'electron';
 import { promisify } from 'util';
 import { checkAndReadBaseApi } from '../helpers';
-import { Commit } from '../types';
+import { Commit, Repository } from '../types';
 
 const execAsync = promisify(exec);
 
@@ -358,12 +358,40 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to add remote url');
         }
     },
+    async getRemoteUrl(projectPath: string): Promise<string | null> {
+        try {
+            const { stdout } = await execAsync('git remote get-url origin', { cwd: projectPath });
+            return stdout.trim();
+        } catch {
+            return null;
+        }
+    },
+    async isGitRepository(path: string): Promise<boolean> {
+        try {
+            await execAsync('git rev-parse --git-dir', { cwd: path });
+            return true;
+        } catch {
+            return false;
+        }
+    },
+    async hasCommits(path: string): Promise<boolean> {
+        try {
+            await execAsync('git rev-parse HEAD', { cwd: path });
+            return true;
+        } catch {
+            return false;
+        }
+    },
     async listCommits(projectPath: string, branch: string = 'HEAD', limit: number = 50): Promise<Commit[]> {
         try {
-            // Formato que funciona em todos os sistemas
+            const isRepo = await this.isGitRepository(projectPath);
+            if (!isRepo) return [];
+
+            const hasAnyCommits = await this.hasCommits(projectPath);
+            if (!hasAnyCommits) return [];
             const command = process.platform === 'win32'
-                ? `git log ${branch} --pretty=format:"%h - %an, %ar : %s"`
-                : `git log ${branch} --pretty=format:'%h - %an, %ar : %s'`;
+                ? `git log ${branch} -n ${limit} --pretty=format:"%h - %an, %ar : %s"`
+                : `git log ${branch} -n ${limit} --pretty=format:'%h - %an, %ar : %s'`;
             
             const { stdout } = await execAsync(command, { 
                 cwd: projectPath,
@@ -390,6 +418,31 @@ export const GitService = {
         } catch (error: any) {
             console.error('Error listing commits:', error);
             throw new Error(error.stderr || 'Failed to list commits');
+        }
+    },
+
+    async checkGitRemotes(projects: { data: any[] }, githubRepos: Repository[]): Promise<Record<number, string>> {
+        try {
+            const results = {};
+
+            for (const project of projects.data) {
+                const remoteUrl = await this.getRemoteUrl(project.path);
+                if (remoteUrl) {
+                    const matchingRepo = githubRepos.find(repo => 
+                        repo.clone_url === remoteUrl || 
+                        repo.html_url === remoteUrl
+                    );
+
+                    if (matchingRepo) {
+                        results[matchingRepo.id] = project.path;
+                    }
+                }
+            }
+
+            return results;
+        } catch (error) {
+            console.error('Error checking git remotes:', error);
+            return {};
         }
     }
 };
