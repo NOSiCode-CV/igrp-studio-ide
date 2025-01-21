@@ -5,24 +5,24 @@ import { Label } from '@renderer/components/ui/label'
 // Helper Component: TextInput
 export const TextInput = ({ label, id, placeholder, value, onChange, onBlur, error }) => (
 	<div className="space-y-2">
-		<Label htmlFor={id} className="">{label}</Label>
+		<Label htmlFor={id}>{label}</Label>
 		<Input
-			type="text"
 			id={id}
-			className={` w-full  ${error ? 'border-red-500' : ''}`}
+			type='text'
+			className={`w-full  ${error ? 'border-red-500' : ''}`}
 			placeholder={placeholder}
 			value={value}
 			onChange={onChange}
 			onBlur={onBlur}
 		/>
-		{error && <p className="text-sm text-red-600">{error}</p>}
+		{error && <p className="text-xs text-red-500">{error}</p>}
 	</div>
 )
 
 // Helper Component: SelectInput
 export const SelectInput = ({ label, id, options, value, onChange, error }) => (
 	<div className="space-y-2">
-		<Label htmlFor={id} className=" text-sm">{label}</Label>
+		<Label htmlFor={id}>{label}</Label>
 		<Combobox
 			name={id}
 			options={options}
@@ -31,6 +31,6 @@ export const SelectInput = ({ label, id, options, value, onChange, error }) => (
 			placeholder={`Select ${label}`}
 			className={`w-full h-9 ${error ? 'border-red-500' : ''}`}
 		/>
-		{error && <p className="text-sm text-red-600">{error}</p>}
+		{error && <p className="text-xs text-red-500">{error}</p>}
 	</div>
 )
