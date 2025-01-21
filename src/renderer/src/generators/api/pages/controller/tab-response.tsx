@@ -31,7 +31,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
     contentTypes,
     schemaTypes,
     responseTypes,
-    enumTypes
+    enumTypes,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
@@ -161,7 +161,11 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const name = responses[statusCode].name;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];
-                    const contentData = content[contentType]?.['schema'] ?? null;
+                    const contentData =
+                        content?.[contentType]?.['schema'] &&
+                        Object.keys(content[contentType]['schema']).length > 0
+                            ? content[contentType]['schema']
+                            : null;
                     return (
                         <div
                             key={statusCode}
