@@ -15,12 +15,11 @@ import { TableLayout } from '../components/TableLayout';
 import { NewPageModal } from './new-page-modal';
 import { Component, Trash } from 'lucide-react';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
+import { PageHeader } from "@igrp/igrp-design-system";
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: File) => void
 }
-
-
 
 const MainPageBuilder = ({
     onPageClick = (): void => { }
@@ -118,6 +117,7 @@ const MainPageBuilder = ({
 
     return (
         <div className='container mt-4'>
+            <PageHeader title={"IGRP UI"}/>
             <Card>
                 <CardHeader className="flex flex-1 flex-row justify-between">
                     <h4 className="text-lg font-semibold">{t("pageLists")}</h4>

@@ -14,8 +14,10 @@ import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 
 interface BodyRequestProps {
-    bodyType: 'none' | 'multipart/form-data' | 'json';
-    setBodyType: (type: 'none' | 'multipart/form-data' | 'json') => void;
+    bodyType: 'none' | 'multipart/form-data' | 'application/json' | undefined;
+    setBodyType: (
+        type: 'none' | 'multipart/form-data' | 'application/json'
+    ) => void;
     contentType: string;
     setContentType: (value: string) => void;
     formik: any;
@@ -66,18 +68,20 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
             const properties =
                 schema?.properties && Object.keys(schema.properties).length > 0
-                    ? schema.properties
+                    ? Object.values(schema.properties)
                     : [defaultValue];
 
             setData(properties);
+
             setLocalSchema(schema);
 
-            if ( schema?.properties && Object.keys(schema.properties).length === 0)
+            if (
+                schema?.properties &&
+                Object.keys(schema.properties).length === 0
+            )
                 formik.setFieldValue(routeFormData, defaultValue);
         }
     }, [bodyType, formik.values.requestBody]);
-
-    console.log(data);
 
     return (
         <div>
@@ -102,8 +106,12 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         Form Data
                     </Badge>
                     <Badge
-                        onClick={() => setBodyType('json')}
-                        variant={bodyType === 'json' ? 'default' : 'outline'}
+                        onClick={() => setBodyType('application/json')}
+                        variant={
+                            bodyType === 'application/json'
+                                ? 'default'
+                                : 'outline'
+                        }
                         className="cursor-pointer"
                     >
                         JSON
@@ -117,7 +125,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     </p>
                 </div>
             )}
-            {bodyType === 'multipart/form-data' && (
+            {bodyType === 'multipart/form-data' && data && columnsBody && (
                 <FormList
                     columns={columnsBody}
                     data={data}
@@ -144,7 +152,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     btnLabels="Field"
                 />
             )}
-            {bodyType === 'json' && (
+            {bodyType === 'application/json' && (
                 <div className="space-y-3">
                     <Combobox
                         name="contentType"

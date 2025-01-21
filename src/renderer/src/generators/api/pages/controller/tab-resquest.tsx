@@ -9,6 +9,7 @@ import {
 } from '@renderer/components/tabs';
 import { JSONSchema } from '../../types/schema';
 import { BodyRequest } from './body-request';
+import { _ } from '@faker-js/faker/dist/airline-BLb3y-7w';
 
 interface TabRequestProps {
     formik: any;
@@ -24,8 +25,8 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     schemaTypes,
 }) => {
     const [bodyType, setBodyType] = useState<
-        'none' | 'multipart/form-data' | 'json'
-    >('none');
+        'none' | 'multipart/form-data' | 'application/json'
+    >();
 
     const [contentType, setContentType] = useState('application/json');
 
@@ -43,25 +44,39 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     });
 
     useEffect(() => {
+        const type =
+            formik.values.requestBody?.content &&
+            Object.keys(formik.values.requestBody.content)?.[0];
+        setBodyType(type || 'none');
+    }, [formik.values.requestBody]);
+
+    useEffect(() => {
         // Clear formik values for body content when type changes
         if (bodyType === 'none') {
             formik.setFieldValue('requestBody', '');
         } else if (bodyType === 'multipart/form-data') {
+            const data =
+                formik.values.requestBody?.content?.[bodyType]?.schema ||
+                localSchema;
             const content = {
                 'multipart/form-data': {
-                    schema: localSchema,
+                    schema: data,
                 },
             };
 
             formik.setFieldValue('requestBody', { content });
-        } else
+        } else if (bodyType === 'application/json') {
+            const data =
+                formik.values.requestBody?.content?.[bodyType]?.schema ||
+                localSchema;
             formik.setFieldValue('requestBody', {
                 content: {
                     [contentType]: {
-                        schema: localSchema,
+                        schema: data,
                     },
                 },
             });
+        }
     }, [bodyType]);
 
     const handleSchemaChange = (newSchema: JSONSchema) => {
@@ -83,7 +98,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
             },
         };
 
-        setLocalSchema(newSchema)
+        setLocalSchema(newSchema);
 
         formik.setFieldValue('requestBody', { content });
     };
