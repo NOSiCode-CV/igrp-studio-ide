@@ -73,6 +73,9 @@ export function TableManager({
 
         setSelectedTable(null);
         setPreviewColumns([]);
+
+        if(!connectionName) return
+
         setIsLoading(true);
 
         try {

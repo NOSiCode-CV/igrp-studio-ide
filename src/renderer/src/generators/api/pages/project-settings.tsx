@@ -72,7 +72,6 @@ export default function ProjectSettings({ project }: PageProps) {
                             value={name}
                             onEdit={() => console.log('Edit project name')}
                         />
-                        <SettingsRow label="Project ID" value="764391" />
                         <SettingsRow
                             label="Icon"
                             value={

@@ -42,15 +42,6 @@ export const TabRequest: React.FC<TabRequestProps> = ({
         properties: {},
     });
 
-    const properties = [
-        {
-            type: '',
-            name: '',
-            value: '',
-            isRequired: true,
-        },
-    ];
-
     useEffect(() => {
         // Clear formik values for body content when type changes
         if (bodyType === 'none') {
@@ -184,16 +175,16 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                 <IGRPTabsContent value="body">
                     <BodyRequest
                         bodyType={bodyType}
-                        setBodyType={setBodyType}
                         contentType={contentType}
-                        setContentType={setContentType}
                         formik={formik}
                         contentTypes={contentTypes}
                         schemaTypes={schemaTypes}
-                        properties={properties}
                         columnsBody={tablesColumns['requestBody']}
                         handleSchemaChange={handleSchemaChange}
                         handleChangeEditor={handleChangeEditor}
+                        setLocalSchema={setLocalSchema}
+                        setContentType={setContentType}
+                        setBodyType={setBodyType}
                     />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">

@@ -23,15 +23,19 @@ export default function Component({
     activeTab,
     setActiveTab,
     onPageClick,
-    onCloseTab
+    onCloseTab,
 }: ContentProps) {
     const [currentPage, setCurrentPage] = useState<File | null>(null);
 
     // Track the isDesign state for each tab
-    const [isDesignStates, setIsDesignStates] = useState<{ [key: string]: boolean }>({});
+    const [isDesignStates, setIsDesignStates] = useState<{
+        [key: string]: boolean;
+    }>({});
 
     // Ref to hold the handleSave function from FormEngine
-    const formEngineRefs = useRef<{ [key: string]: { handleSave: () => void } | null }>({});
+    const formEngineRefs = useRef<{
+        [key: string]: { handleSave: () => void } | null;
+    }>({});
 
     const handleClickOpenGerador = (pageFile: File) => {
         onPageClick(pageFile.name);
@@ -55,17 +59,19 @@ export default function Component({
             <nav className="flex justify-between border-t border-gray-200 pr-6">
                 <div className="flex">
                     {tabs.map((tab) => (
-
-                        <div key={tab}
+                        <div
+                            key={tab}
                             className={classnames(
                                 'px-4 py-2 text-sm font-medium focus:outline-none cursor-pointer',
                                 {
-                                    'bg-white text-[#3AA0D9] border-t-2 border-[#3AA0D9]': activeTab === tab,
-                                    'text-gray-500 hover:text-gray-700 bg-gray-100': activeTab !== tab
+                                    'bg-white text-igrp border-t-2 border-igrp':
+                                        activeTab === tab,
+                                    'text-gray-500 hover:text-gray-700 bg-gray-100':
+                                        activeTab !== tab,
                                 }
                             )}
                             onClick={() => setActiveTab(tab)}
-                            >
+                        >
                             {tab !== 'PageBuilder' ? (
                                 <div className="flex items-center">
                                     <span>{tab}</span>
@@ -76,28 +82,40 @@ export default function Component({
                                         }}
                                         className="text-gray-400 hover:text-gray-600 focus:outline-none"
                                     >
-                                        <X className='h-3' />
+                                        <X className="h-3" />
                                     </button>
                                 </div>
                             ) : (
-                                <button>
-                                    <Layers2 className="w-4 h-4" /></button>
+                                <button className='w-12 text-center items-center flex flex-1 justify-center'>
+                                    <Layers2 className="w-4 h-4" />
+                                </button>
                             )}
                         </div>
                     ))}
                 </div>
-                {activeTab !== 'PageBuilder' && <NavigationBar isDesign={isDesignStates[activeTab] ?? true} onSave={handleSave} onSwitch={handleSwitchClick} />}
+                {activeTab !== 'PageBuilder' && (
+                    <NavigationBar
+                        isDesign={isDesignStates[activeTab] ?? true}
+                        onSave={handleSave}
+                        onSwitch={handleSwitchClick}
+                    />
+                )}
             </nav>
             <Separator />
 
             {tabs.map((tab) => (
-                <div key={tab} className={activeTab === tab ? 'block' : 'hidden'}>
+                <div
+                    key={tab}
+                    className={activeTab === tab ? 'block' : 'hidden'}
+                >
                     {tab === 'PageBuilder' ? (
                         <MainPageBuilder onPageClick={handleClickOpenGerador} />
                     ) : (
                         <DroppedComponentsProvider>
                             <FormEngine
-                                ref={(ref) => (formEngineRefs.current[tab] = ref)}
+                                ref={(ref) =>
+                                    (formEngineRefs.current[tab] = ref)
+                                }
                                 basePath={basePath}
                                 page={tab}
                                 pagePath={currentPage?.path}

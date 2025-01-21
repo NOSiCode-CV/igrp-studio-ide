@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Header from './components/header';
 import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import useToast from '@renderer/components/useToast';
-import { BranchSwitcher } from '../components/git/git-branch-switcher';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string }>;

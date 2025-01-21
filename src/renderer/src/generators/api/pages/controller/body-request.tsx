@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@renderer/components/ui/badge';
 import { FormList } from '../../components/form-list';
 import {
@@ -21,30 +21,64 @@ interface BodyRequestProps {
     formik: any;
     contentTypes: { label: string; value: string }[];
     schemaTypes?: { label: string; value: string }[];
-    properties: any[];
     columnsBody: any;
     handleSchemaChange: (schema: JSONSchema) => void;
     handleChangeEditor: (value: string) => void;
+    setLocalSchema: (schema: any) => void;
 }
 
 export const BodyRequest: React.FC<BodyRequestProps> = ({
     bodyType,
-    setBodyType,
     contentType,
-    setContentType,
     formik,
     contentTypes,
     schemaTypes,
-    properties,
     columnsBody,
     handleSchemaChange,
     handleChangeEditor,
+    setLocalSchema,
+    setContentType,
+    setBodyType,
 }) => {
+    const routeFormData =
+        'requestBody.content.multipart/form-data.schema.properties';
+
+    const defaultValue = [
+        {
+            type: '',
+            name: '',
+            value: '',
+            isRequired: true,
+        },
+    ];
+
+    const [data, setData] = useState([]);
 
     const content = useMemo(() => {
         return formik.values.requestBody?.content?.[contentType]?.schema;
     }, [formik.values.requestBody, contentType]);
-    
+
+    useEffect(() => {
+        if (bodyType === 'multipart/form-data') {
+            const schema =
+                formik.values.requestBody?.content?.['multipart/form-data']
+                    ?.schema;
+
+            const properties =
+                schema?.properties && Object.keys(schema.properties).length > 0
+                    ? schema.properties
+                    : [defaultValue];
+
+            setData(properties);
+            setLocalSchema(schema);
+
+            if ( schema?.properties && Object.keys(schema.properties).length === 0)
+                formik.setFieldValue(routeFormData, defaultValue);
+        }
+    }, [bodyType, formik.values.requestBody]);
+
+    console.log(data);
+
     return (
         <div>
             <div className="mb-4">
@@ -86,36 +120,28 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             {bodyType === 'multipart/form-data' && (
                 <FormList
                     columns={columnsBody}
-                    data={
-                        formik.values['requestBody']?.['multipart/form-data']
-                            ?.['properties'] || properties
-                    }
+                    data={data}
                     formik={formik}
                     changeValue={(element, position, value) =>
                         formik.setFieldValue(
-                            `requestBody.multipart/form-data.properties[${position}].${element}`,
+                            `${routeFormData}[${position}].${element}`,
                             value
                         )
                     }
                     addRow={() => {
-                        const newProperties = [...properties, { name: '', value: '' }];
-                        formik.setFieldValue(
-                            'requestBody.multipart/form-data.properties',
-                            newProperties
-                        );
+                        formik.setFieldValue(routeFormData, [
+                            ...data,
+                            defaultValue,
+                        ]);
                     }}
                     removeRow={(position) => {
-                        const updatedProperties = properties.filter(
+                        const updatedProperties = data.filter(
                             (_, index) => index !== position
                         );
-                        formik.setFieldValue(
-                            'requestBody.multipart/form-data.properties',
-                            updatedProperties
-                        );
+                        formik.setFieldValue(routeFormData, updatedProperties);
                     }}
-                    errors={formik.errors['requestBody']}
-                    name={'requestBody.multipart/form-data.properties'}
-                    btnLabels=""
+                    name={routeFormData}
+                    btnLabels="Field"
                 />
             )}
             {bodyType === 'json' && (
@@ -132,18 +158,19 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         <CardContent className="p-3">
                             <Tabs defaultValue="value">
                                 <TabsList>
-                                    <TabsTrigger value="value">Value</TabsTrigger>
+                                    <TabsTrigger value="value">
+                                        Value
+                                    </TabsTrigger>
                                     <TabsTrigger value="schema">
                                         Data Schema
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="value">
                                     <CodeEditor
-                                        value={
-                                            JSON.stringify(
-                                                formik.values.requestBody?.content?.[contentType]?.schema
-                                            )
-                                        }
+                                        value={JSON.stringify(
+                                            formik.values.requestBody
+                                                ?.content?.[contentType]?.schema
+                                        )}
                                         onChange={handleChangeEditor}
                                     />
                                 </TabsContent>
