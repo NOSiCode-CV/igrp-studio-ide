@@ -33,56 +33,21 @@ export const GitHubService = {
   },
 
   async getUserInfo() {
-    if (!octokit) {
-      throw new Error('GitHub client not initialized');
-    }
-
-    try {
-      const { data } = await octokit.users.getAuthenticated();
-      return data;
-    } catch (error) {
-      octokit = null;
-      throw error;
-    }
+    const { data } = await octokit.users.getAuthenticated();
+    return data;
   },
 
-  async listRepositories() {
-    if (!octokit) {
-      throw new Error('GitHub client not initialized');
-    }
-
-    try {
-      const { data } = await octokit.repos.listForAuthenticatedUser({
-        sort: 'updated',
-        per_page: 100,
-        visibility: 'all'
-      });
-      return data;
-    } catch (error) {
-      octokit = null;
-      throw error;
-    }
-  },
-
-  async listIGRPStudioRepositories(window: BrowserWindow) {
-    if (!octokit) {
-      throw new Error('GitHub client not initialized');
-    }
-
+  async listIGRPStudioRepositories(_window: BrowserWindow) {
     try {
       const igrpRepos: any = [];
       const batchSize = 10;
-      let processedCount = 0;
 
-      // Get all repositories in one call
       const { data: repos } = await octokit.repos.listForAuthenticatedUser({
         sort: 'updated',
         per_page: 100,
         page: 1,
         visibility: 'all'
       });
-
-      const totalRepos = repos.length;
 
       for (let i = 0; i < repos.length; i += batchSize) {
         const batch = repos.slice(i, i + batchSize);
@@ -116,17 +81,10 @@ export const GitHubService = {
 
         const results = await Promise.all(promises);
         igrpRepos.push(...results.filter(r => r !== null));
-
-        processedCount = Math.min(i + batchSize, totalRepos);
-        window.webContents.send('repo-scan-progress', {
-          progress: processedCount,
-          total: totalRepos
-        });
       }
 
       return igrpRepos;
     } catch (error) {
-      console.error('Error listing repositories:', error);
       throw error;
     }
   }

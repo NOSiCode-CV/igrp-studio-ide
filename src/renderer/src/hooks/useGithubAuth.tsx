@@ -22,7 +22,6 @@ const useGithubAuth = () => {
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
-            console.error('Failed to load GitHub data:', error);
         }
     };
 

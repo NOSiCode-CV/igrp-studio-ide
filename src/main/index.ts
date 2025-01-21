@@ -6,7 +6,7 @@ import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
 import { FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
 
-import { fetchFiles, getJsonContent, openDirectory } from './helpers'
+import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
@@ -321,6 +321,17 @@ ipcMain.handle('gitlab-initialize', async (_event, token) => {
     throw error;
   }
 });
+ipcMain.handle('add-cloned-repo', (_event, repoId: number) => {
+  TokenService.addClonedRepo(repoId);
+});
+
+ipcMain.handle('set-project-path', (_event, { repoId, path }: { repoId: number; path: string }) => {
+  TokenService.setProjectPath(repoId, path);
+});
+ipcMain.handle('check-git-remotes', async (_event, { projects, githubRepos }) => {
+  return GitService.checkGitRemotes(projects, githubRepos);
+});
+
 ipcMain.handle('github-user-info', async () => {
   return GitHubService.getUserInfo();
 });
@@ -369,6 +380,24 @@ ipcMain.handle('add-git-remote', async (_event, { projectPath, remoteUrl }) => {
 });
 ipcMain.handle('list-commits', async (_event, { projectPath, branch, limit }) => {
   return GitService.listCommits(projectPath, branch, limit);
+});
+ipcMain.handle('get-cloned-repos', () => {
+  const repos = TokenService.getClonedRepos();
+  return repos;
+});
+
+ipcMain.handle('get-project-paths', () => {
+  return TokenService.getProjectPaths();
+});
+
+ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
+  try {
+    const { folderExists, config } = await checkAndReadBaseApi(targetDir);
+    return { folderExists, config };
+  } catch (error) {
+    console.error('Error checking project config:', error);
+    return { folderExists: false, config: null };
+  }
 });
 
 // GitLab

@@ -1,10 +1,12 @@
 import useToast from '@renderer/components/useToast';
 import { useCallback } from 'react';
+import { Repository } from 'src/main/types';
 
 type GitErrorType = 
  | 'INVALID_REMOTE_URL'
  | 'PERMISSION_DENIED' 
  | 'NOT_GIT_REPOSITORY'
+ | 'COMMITS_PENDING'
  | 'NO_REMOTE_CONFIGURED';
 
 const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = {
@@ -12,6 +14,7 @@ const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = {
  PERMISSION_DENIED: 'Permission denied. Please check repository access.',
  NOT_GIT_REPOSITORY: 'Not a git repository. Please check repository access.',
  NO_REMOTE_CONFIGURED: 'No remote configured for this repository.',
+ COMMITS_PENDING: 'Commits pending. Please commit changes before syncing.',
 };
 
 const getGitErrorType = (error: Error): GitErrorType | null => {
@@ -56,7 +59,7 @@ export const useGit = () => {
           console.error('Failed to list commits:', error);
           throw error;
         }
-      }, []);
+    }, []);
 
     const pullChanges = useCallback(
         async (projectPath: string) => {
@@ -134,12 +137,23 @@ export const useGit = () => {
         }
     }, []);
 
+    const checkLocalProjects = useCallback(async (githubRepos: Repository[]) => {
+        const localProjects = await window.repo.project.findAllRecent();
+        const results = await window.electron.ipcRenderer.invoke(
+            'check-git-remotes',
+            { projects: localProjects, githubRepos }
+        );
+
+        return results;
+    }, []);
+
     return {
         createGitCommit,
         pullChanges,
         pushChanges,
         syncChanges,
         getChangesCount,
-        listCommits
+        listCommits,
+        checkLocalProjects
     };
 };

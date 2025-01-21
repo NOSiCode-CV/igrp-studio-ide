@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { GitCommit, GitBranch, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useGit } from '@renderer/hooks/useGit';
 import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 
 interface Commit {
