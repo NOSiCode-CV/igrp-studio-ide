@@ -211,6 +211,7 @@ const ModelLayout = ({
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
         const errors = formik?.errors?.[value];
+        const touched = formik?.touched?.[value];
 
         return (
             <>
@@ -229,6 +230,7 @@ const ModelLayout = ({
                             )
                         }
                         errors={errors}
+                        touched={touched}
                         addRow={() =>
                             addNewRow(formik, value, defaultValues[value])
                         }

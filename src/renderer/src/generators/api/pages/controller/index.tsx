@@ -318,7 +318,6 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             };
         });
         setEnumTypes(enumTypes);
-
     }, [enums]);
 
     useEffect(() => {
@@ -407,7 +406,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 </Label>
                                 <Combobox
                                     name={t('method')}
-                                    placeholder={t('Enter Method')}
+                                    placeholder={t('enterMethod')}
                                     value={formik.values.method}
                                     onChange={(value) =>
                                         formik.setFieldValue('method', value)
@@ -418,22 +417,32 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                             </div>
 
                             <TextInput
-                                label={'Path'}
-                                id={t('path')}
+                                id="path"
+                                label={t('path')}
                                 placeholder={'/posts/[id]'}
                                 value={formik.values.path}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                error={formik.errors['path']}
+                                error={
+                                    formik.errors.path && formik.touched.path
+                                        ? formik.errors.path
+                                        : ''
+                                }
                             />
+
                             <TextInput
                                 id={'actionName'}
-                                label={t('Action Name')}
+                                label={t('actionName')}
                                 placeholder={'getPosts'}
                                 value={formik.values.actionName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                error={formik.errors['actionName']}
+                                error={
+                                    formik.errors.actionName &&
+                                    formik.touched.actionName
+                                        ? formik.errors.actionName
+                                        : ''
+                                }
                             />
                         </div>
                     </CardContent>
