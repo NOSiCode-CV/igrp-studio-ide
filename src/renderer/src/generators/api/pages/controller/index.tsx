@@ -419,7 +419,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                             <TextInput
                                 id="path"
                                 label={t('path')}
-                                placeholder={'/posts/[id]'}
+                                placeholder={'posts'}
                                 value={formik.values.path}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}

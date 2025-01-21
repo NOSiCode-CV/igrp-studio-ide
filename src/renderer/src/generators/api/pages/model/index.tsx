@@ -159,7 +159,7 @@ const ModelLayout = ({
         try {
             const values = getValuesToSubmit(
                 formik.values,
-                currentItem?.module
+                currentItem?.module || 'shared'
             );
             console.log(values);
 
@@ -288,7 +288,7 @@ const ModelLayout = ({
                             </div>
                         </div>
                         <div className="flex">
-                            <div className="grid grid-cols-4 gap-5 mb-4">
+                            <div className="grid grid-cols-4 md:grid-cols-2 gap-5 mb-4">
                                 <div className="flex items-center space-x-2">
                                     <Checkbox
                                         id="audit"
@@ -314,7 +314,28 @@ const ModelLayout = ({
                                         }
                                         checked={formik.values.crud}
                                     />
-                                    <Label htmlFor="Crud">Crud</Label>
+                                    <Label htmlFor="Crud">{t('crud')}</Label>
+                                </div>
+                                {/* New GraphQL Option (Coming Soon) */}
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="graphql" disabled />
+                                    <Label htmlFor="graphql">
+                                        GraphQL
+                                        <span className="ml-2 text-xs text-muted-foreground">
+                                            (Coming Soon)
+                                        </span>
+                                    </Label>
+                                </div>
+
+                                {/* New OData Option (Coming Soon) */}
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="odata" disabled />
+                                    <Label htmlFor="odata">
+                                        OData
+                                        <span className="ml-2 text-xs text-muted-foreground">
+                                            (Coming Soon)
+                                        </span>
+                                    </Label>
                                 </div>
                             </div>
                         </div>

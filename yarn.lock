@@ -885,10 +885,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.3.0-alpha-4.7.5":
-  version "0.3.0-alpha-4.7.5"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.7.5.tgz#1e00239d449174f2c8a2793caff970b9fa5539a0"
-  integrity sha512-5H4om3xDwCa9ngccbHCLDlxVDTPjJw5jKC7ySz/6y38gjd81Z69D4/j8XylMbyX5ATssOfT90PYvUKgtYn42HQ==
+"@igrp/spring-engine@^0.3.0-alpha-4.7.6":
+  version "0.3.0-alpha-4.7.6"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.7.6.tgz#f850791e1c48755770016d5316534a6d5ad7110c"
+  integrity sha512-K2GJaNT+f6BPIZO7Yx2R/Pf3ymA/baMcB0OdDAJeww/Qn/jEIUkXOQcQVreBr0I9lzCp9DfQfXbJudGY+LOjgw==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"

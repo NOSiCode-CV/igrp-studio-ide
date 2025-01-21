@@ -28,6 +28,7 @@ export const frontendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '164K',
         views: '5.6K',
+        availableSupport: true
     },
     {
         id: 'vuejs',
@@ -36,6 +37,7 @@ export const frontendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '91K',
         views: '4K',
+        availableSupport: false
     },
     {
         id: 'angular',
@@ -44,6 +46,7 @@ export const frontendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '87K',
         views: '4.7K',
+        availableSupport: false
     },
 ];
 
@@ -55,6 +58,7 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '75K',
         views: '1.3K',
+        availableSupport: true
     },
     {
         id: 'dotnet',
@@ -63,6 +67,7 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '74K',
         views: '2K',
+        availableSupport: true
     },
     {
         id: 'django',
@@ -71,5 +76,6 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '72K',
         views: '2.3K',
+        availableSupport: false
     },
 ];

@@ -72,7 +72,7 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
 
     return (
         <ContainerScrollArea>
-            <div className="w-full max-w-4xl space-y-8 p-6">
+            <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
                 <PageHeader
                     title="API Overview"
                     description="Manage your API endpoints"

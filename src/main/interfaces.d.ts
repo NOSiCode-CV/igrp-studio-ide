@@ -2,7 +2,7 @@ import { Connection, PageableProjects, ProjectData } from "./types";
 
 export interface IProjectRepository {
     async save(project: ProjectData): Promise<ProjectData>;
-    async delete(project: ProjectData, index: number): Promise<void>;
+    async delete(project: ProjectData): Promise<void>;
     async findAllRecent(): Promise<PageableProjects>;
     async findAll(): Promise<Array<ProjectData>>;
 }

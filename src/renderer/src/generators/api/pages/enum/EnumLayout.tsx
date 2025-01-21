@@ -110,8 +110,6 @@ export const EnumLayout = ({
                 attributes,
             };
 
-            console.log(values);
-
             const { error } = await window.engine.createEnum(
                 values,
                 ENV_TYPES.SPRING,

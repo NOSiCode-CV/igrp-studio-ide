@@ -33,7 +33,7 @@ export const TabList = [
 ]
 
 export const TemplateOptions = [
-    { label: 'Classic', value: 'classic' },
+    { label: 'Default', value: 'classic' },
     { label: 'Record', value: 'record' }
 ]
 
@@ -69,7 +69,7 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
     const namespacesOptions: SchemaTypeItem[] = [
         { label: 'Data Transfer Object', value: 'dto', items: getOptions(dto) },
         { label: 'Schema', value: 'model', items: getOptions(models) },
-        { label: 'Java', value: 'java', items: paramsTypesData }
+        { label: 'Data Type', value: 'java', items: paramsTypesData }
     ]
 
     return {

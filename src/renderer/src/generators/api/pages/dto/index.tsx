@@ -101,7 +101,7 @@ const DtoLayout = ({
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
             const { error } = await window.api.createDto(
-                { ...newValues, module: currentItem.module },
+                { ...newValues, module: currentItem?.module || 'shared'},
                 basePath
             );
 

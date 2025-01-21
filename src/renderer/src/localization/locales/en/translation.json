@@ -57,8 +57,8 @@
   "newObject": "New {{name}}",
   "deletedSuccess": "{{name}} deleted successfully!",
   "createdSuccess": "{{name}} {{value}} have been successfully added.",
-  "newDto": "New Data Object",
-  "newModels": "New Schema",
+  "newDto": "New Data Transfer Object",
+  "newModels": "New Schema Object",
   "newControllers": "New Endpoint",
   "newAction": "New Action",
   "schmeacreatedSuccess": "Schemas have been successfully added.",
@@ -73,6 +73,6 @@
   "actionName":"Action Name",
   "path":"Path",
   "enterMethod":"Enter Method",
-  "response":"Response"
-
+  "response":"Response",
+  "crud":"CRUD Generate APIs"
 }
