@@ -6,6 +6,7 @@ type GitErrorType =
  | 'INVALID_REMOTE_URL'
  | 'PERMISSION_DENIED' 
  | 'NOT_GIT_REPOSITORY'
+ | 'COMMITS_PENDING'
  | 'NO_REMOTE_CONFIGURED';
 
 const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = {
@@ -13,6 +14,7 @@ const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = {
  PERMISSION_DENIED: 'Permission denied. Please check repository access.',
  NOT_GIT_REPOSITORY: 'Not a git repository. Please check repository access.',
  NO_REMOTE_CONFIGURED: 'No remote configured for this repository.',
+ COMMITS_PENDING: 'Commits pending. Please commit changes before syncing.',
 };
 
 const getGitErrorType = (error: Error): GitErrorType | null => {

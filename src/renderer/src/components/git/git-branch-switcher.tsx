@@ -167,7 +167,7 @@ export function BranchSwitcher({
             onBranchChange?.(branchName);
         } catch (error) {
             if (error instanceof Error) {
-                onError?.(error.message || 'Failed to switch branch');
+                onError?.('Commits pending. Please commit changes before switch branch.');
             } else {
                 onError?.('Failed to switch branch');
             }

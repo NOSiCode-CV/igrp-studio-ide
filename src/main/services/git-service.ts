@@ -181,9 +181,11 @@ export const GitService = {
         try {
             await execAsync(`git checkout ${branchName}`, { cwd: projectPath });
             return true;
-        } catch (error) {
-            console.error('Error checking out branch:', error);
-            throw error;
+        } catch (error: any) {
+            if (error.stderr?.includes('Please commit your changes or stash')) {
+                throw new Error('Commits pending. Please commit changes before syncing.');
+            }
+            return false;
         }
     },
 
