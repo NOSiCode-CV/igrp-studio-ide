@@ -164,7 +164,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const contentType = Object.keys(content)[0];
                     const contentData =
                         content?.[contentType]?.['schema'] &&
-                        Object.keys(content[contentType]['schema']).length > 0
+                        Object.keys(content[contentType]['schema']?.properties).length > 0
                             ? content[contentType]['schema']
                             : null;
                     return (
