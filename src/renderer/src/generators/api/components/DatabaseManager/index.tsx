@@ -21,6 +21,8 @@ import { getValuesToSubmit, initialValues } from '../../pages/model/config';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
+import { useDispatch } from 'react-redux';
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean;
@@ -59,14 +61,13 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     const [selectedConnection, setSelectedConnection] = useState<string>('');
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+    const dispatch: any = useDispatch();
 
     const handleClickSubmit = async () => {
         if (!basePath) return;
 
         const errorMessages: string[] = [];
         const processedTables = new Set<string>();
-
-        console.log(selectedRows);
 
         const processTable = async (tableName: string) => {
             if (processedTables.has(tableName)) return;
@@ -90,7 +91,8 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                                       entity: toFullCamelCaseFromSnakeCase(
                                           column.foreign_key_table
                                       ),
-                                      referencedColumnName: column.foreign_key_column,
+                                      referencedColumnName:
+                                          column.foreign_key_column,
                                       joinTable: '',
                                       inverseJoinColumn: '',
                                       cardinality: 'oneWay',
@@ -99,7 +101,9 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
 
                             return {
                                 name: column.name || '',
-                                type: relation ? 'relation' : typeMapping[column.data_type] || 'string', // Map types
+                                type: relation
+                                    ? 'relation'
+                                    : typeMapping[column.data_type] || 'string', // Map types
                                 length: column.max_length || null,
                                 defaultValue: !column.is_primary_key
                                     ? column.default_value
@@ -174,6 +178,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 showErrorToast(errMsg);
             });
         } else {
+            dispatch(onSetChangeStatus(true));
             showSuccessToast(t('schemaCreatedSuccess'));
         }
     };

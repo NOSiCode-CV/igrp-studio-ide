@@ -161,7 +161,6 @@ const ModelLayout = ({
                 formik.values,
                 currentItem?.module || 'shared'
             );
-            console.log(values);
 
             const { error } = await window.api.createModel(values, basePath);
 
@@ -288,7 +287,7 @@ const ModelLayout = ({
                             </div>
                         </div>
                         <div className="flex">
-                            <div className="grid grid-cols-4 md:grid-cols-2 gap-5 mb-4">
+                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
                                 <div className="flex items-center space-x-2">
                                     <Checkbox
                                         id="audit"
