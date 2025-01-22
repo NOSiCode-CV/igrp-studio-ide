@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "1.0.0-alpha",
 	"description": "IGRP Studio for dev",
-	"main": "out/main/index.js",
+	"main": "./out/main/index.js",
 	"author": "nosi.cv",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -97,10 +97,7 @@
 		"@types/react-dom": "^18.3.0",
 		"@vitejs/plugin-react": "^4.3.1",
 		"autoprefixer": "^10.4.20",
-		"electron": "^31.0.2",
-		"electron-builder": "^25.1.8",
 		"electron-devtools-installer": "^3.2.0",
-		"electron-vite": "^2.3.0",
 		"eslint": "^8.57.0",
 		"eslint-plugin-react": "^7.34.3",
 		"jest": "^29.7.0",
@@ -111,17 +108,12 @@
 		"tailwindcss": "^3.4.14",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.6.3",
-		"vite": "^5.3.1"
+		"vite": "^5.3.1",
+		"electron": "^31.0.2",
+		"electron-builder": "^24.13.3",
+		"electron-vite": "^2.3.0"
 	},
 	"build": {
-		"protocols": [
-			{
-				"name": "IGRP Studio",
-				"schemes": [
-					"igrp-studio"
-				]
-			}
-		],
 		"productName": "IGRP Studio",
 		"appId": "cv.nosi.igrp.studio",
 		"win": {

@@ -26,7 +26,7 @@ export function closeApp(mainWindow: BrowserWindow) {
 }
 
 export function installExtensions(mainWindow: BrowserWindow): void {
-    if (is.dev) {
+    //if (is.dev) {
         // Open the DevTools.
         mainWindow.webContents.openDevTools();
         // Install extensions
@@ -36,5 +36,5 @@ export function installExtensions(mainWindow: BrowserWindow): void {
         installExtension(REDUX_DEVTOOLS)
             .then(name => console.log(`Added Extension:  ${name}`))
             .catch(err => console.log('An error occurred: ', err));
-    }
+    //}
 }
