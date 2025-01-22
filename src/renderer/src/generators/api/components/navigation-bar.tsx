@@ -25,7 +25,7 @@ const NavigationBar = ({ onSubmit, onDelete, title, isNew }: ActionProps) => {
   const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
   return (
-    <div className="flex flex-row h-16 shrink-0 items-center gap-2 border-b px-4">
+    <div className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
       <AlertDialogDelete
         isOpen={deleteModal}
         onClose={() => setDeleteModal(false)}

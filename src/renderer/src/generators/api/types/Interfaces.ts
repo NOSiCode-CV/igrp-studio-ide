@@ -13,6 +13,7 @@ export interface ITabelContainer {
   data: any[]
   formik: any
   errors?: any
+  touched?: any
   changeValue: (element: string, position: number, value: any) => void
   addRow?: () => void
   removeRow?: (value: number) => void

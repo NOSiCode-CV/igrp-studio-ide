@@ -26,11 +26,13 @@ import { PopoverController } from '../pages/controller/popover'
 import { PopoverModel } from '../pages/model/popover'
 import { PopoverDto } from '../pages/dto/popover-dto'
 import { RelationPopover } from '../pages/model/relation-popover'
+import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown'
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
   data,
   formik,
   errors,
+  touched,
   changeValue,
   addRow,
   removeRow,
@@ -260,13 +262,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                             {item.type === 'popoverController' && (
                                               <PopoverController
                                                 key={itemIndex}
-                                                index={index}
                                                 row={row}
-                                                changeValue={(element, position, value) =>
-                                                  changeValue(element, position, value)
+                                                changeValue={(element, value) =>
+                                                  changeValue(element, index, value)
                                                 }
+                                                options={itemOptions || []}
                                               />
                                             )}
+
                                             {item.type === 'popoverModel' && (
                                               <PopoverModel
                                                 key={itemIndex}
@@ -278,6 +281,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 options={itemOptions || []}
                                               />
                                             )}
+
                                             {item.type === 'popoverDto' && (
                                               <PopoverDto
                                                 key={itemIndex}
@@ -289,6 +293,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 collectionTypes={itemOptions || []}
                                               />
                                             )}
+
                                              {item.type === 'popoverRelation' && row['type'] === 'relation' && (
                                               <RelationPopover
                                                 key={itemIndex}
@@ -309,7 +314,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                         <Input
                                           className={cn(
                                             'h-8 text-sm',
-                                            errors?.[index]?.[key] ? 'border-red-500' : ''
+                                            errors?.[index]?.[key] && touched?.[index]?.[key] ? 'border-red-500' : ''
                                           )}
                                           type={type}
                                           value={row?.[key] || ''}
@@ -318,6 +323,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           }
                                         />
                                       )}
+
                                       {['select'].includes(type) && (
                                         <Combobox
                                           key={`${index}-${index2}`}
@@ -331,6 +337,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           className="w-full h-8"
                                         />
                                       )}
+
                                       {['multiSelect'].includes(type) && (
                                         <MultipleSelector
                                           placeholder={`Select ${name}`}
@@ -341,6 +348,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           }}
                                         />
                                       )}
+
                                       {['checkbox'].includes(type) && (
                                         <Checkbox
                                           id={`${key}_${index2}`}
@@ -350,16 +358,18 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           checked={row?.[key] || false}
                                         />
                                       )}
+
                                       {['popover'].includes(type) && (
                                         <PopoverController
                                           key={index}
-                                          index={index}
                                           row={row}
-                                          changeValue={(element, position, value) =>
-                                            changeValue(element, position, value)
+                                          changeValue={(element, value) =>
+                                            changeValue(element, index, value)
                                           }
+                                          options={options || []}
                                         />
                                       )}
+
                                       {['popoverModel'].includes(type) && (
                                         <PopoverModel
                                           key={index}
@@ -371,6 +381,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           options={options}
                                         />
                                       )}
+
                                       {['popoverDto'].includes(type) && (
                                         <PopoverDto
                                           key={index}
@@ -380,6 +391,18 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                             changeValue(element, position, value)
                                           }
                                           collectionTypes={options}
+                                        />
+                                      )}
+
+                                      {['typeSelectorDropdown'].includes(type) && (
+                                        <TypeSelectorDropdown
+                                          type={row?.[key] || ''}
+                                          onTypeChange={(dataType: any) => {
+
+                                            changeValue(key, index, dataType)
+
+                                          }}
+                                          schemaTypes={options}
                                         />
                                       )}
                                     </>

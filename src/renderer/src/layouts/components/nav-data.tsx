@@ -109,9 +109,13 @@ const Navdata = (folders: any) => {
         );
 
         if (folderName === 'shared') {
-            dropdownMenus.unshift({
+            dropdownMenus.push({
                 label: t('newResponses'),
                 actionType: OPTION_TYPE.RESPONSE,
+            });
+            dropdownMenus.push({
+                label: t('newEnum'),
+                actionType: OPTION_TYPE.ENUM,
             });
         } else {
             dropdownMenus.unshift({

@@ -35,7 +35,6 @@ import { TextInput } from '../../components/inputs-form';
 import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
-import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 import { SchemaTypeItem } from 'src/main/types';
 
 interface ControllerProps {
@@ -45,6 +44,7 @@ interface ControllerProps {
     modules: Array<any>;
     dto: Array<any>;
     responses: Array<any>;
+    enums: Array<any>;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
@@ -58,6 +58,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     onCloseTab,
     onUpdateTab,
     responses,
+    enums,
 }: ControllerProps) => {
     const { t } = useTranslation();
 
@@ -68,6 +69,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
     const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
+    const [enumTypes, setEnumTypes] = useState<SchemaTypeItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -107,7 +109,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     }, [currentItem]);
 
     useEffect(() => {
-        const res = getTablesColumns(selectors);
+        const res = getTablesColumns(selectors, enumTypes);
         setTableColumns(res);
     }, [selectors]);
 
@@ -309,6 +311,16 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     );
 
     useEffect(() => {
+        const enumTypes = enums.map((enumItem) => {
+            return {
+                label: enumItem.name,
+                value: enumItem.name,
+            };
+        });
+        setEnumTypes(enumTypes);
+    }, [enums]);
+
+    useEffect(() => {
         const types = formatMethods(
             (
                 selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
@@ -330,17 +342,17 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 schemaType.value === 'Reference other schemas'
                     ? {
                           ...schemaType,
+                          value: 'dto',
                           items: targetDto,
                       }
                     : schemaType
             )
         );
-    }, [dto]);
+    }, [dto, selectors]);
 
     const onSubmit = async () => {
         const errors = await formik.validateForm();
         if (Object.keys(errors).length === 0) {
-            // No validation errors, proceed with submit
             if (name && module && module !== 'shared') {
                 formik.handleSubmit();
             } else {
@@ -369,95 +381,99 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     setName(values.name);
                     setPathController(values.basePath);
                     setModule(values.module);
-
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
                 modules={modules}
                 defaultModule={module}
             />
-            <ContainerScrollArea size="lg">
-                <div className="space-y-4 p-4">
-                    <Card className="rounded">
-                        <CardHeader>
-                            <CardTitle>Definition</CardTitle>
-                            <CardDescription>
-                                Provide the name and configuration for this
-                                action
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <div className="space-y-3">
-                                    <Label
-                                        htmlFor={'method'}
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        {'Method Type'}
-                                    </Label>
-                                    <Combobox
-                                        name={t('method')}
-                                        placeholder={t('Enter Method')}
-                                        value={formik.values.method}
-                                        onChange={(value) =>
-                                            formik.setFieldValue(
-                                                'method',
-                                                value
-                                            )
-                                        }
-                                        options={httpMethods}
-                                        className="h-9 w-full"
-                                    />
-                                </div>
-
-                                <TextInput
-                                    label={'Path'}
-                                    id={t('path')}
-                                    placeholder={t('/posts/[id]')}
-                                    value={formik.values.path}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={formik.errors['path']}
-                                />
-                                <TextInput
-                                    id={'actionName'}
-                                    label={t('Action Name')}
-                                    placeholder={t('getPosts')}
-                                    value={formik.values.actionName}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={formik.errors['actionName']}
+            <div className="space-y-4 p-4">
+                <Card className="rounded">
+                    <CardHeader>
+                        <CardTitle>Definition</CardTitle>
+                        <CardDescription>
+                            Provide the name and configuration for this action
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                            <div className="space-y-3">
+                                <Label
+                                    htmlFor={'method'}
+                                    className="block text-sm"
+                                >
+                                    {'Method Type'}
+                                </Label>
+                                <Combobox
+                                    name={t('method')}
+                                    placeholder={t('enterMethod')}
+                                    value={formik.values.method}
+                                    onChange={(value) =>
+                                        formik.setFieldValue('method', value)
+                                    }
+                                    options={httpMethods}
+                                    className="h-9 w-full"
                                 />
                             </div>
-                        </CardContent>
-                    </Card>
-                    <Tabs defaultValue={'request'}>
-                        <TabsList className="grid w-full grid-cols-4">
-                            {TabList.map(({ label, tabId }, key) => (
-                                <TabsTrigger key={key} value={tabId}>
-                                    {label}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                        <TabsContent value={'request'}>
-                            <TabRequest
-                                formik={formik}
-                                tablesColumns={tablesColumns}
-                                contentTypes={typesData}
-                                schemaTypes={schemaTypes}
+
+                            <TextInput
+                                id="path"
+                                label={t('path')}
+                                placeholder={'posts'}
+                                value={formik.values.path}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.errors.path && formik.touched.path
+                                        ? formik.errors.path
+                                        : ''
+                                }
                             />
-                        </TabsContent>
-                        <TabsContent value={'response'}>
-                            <TabResponse
-                                formik={formik}
-                                schemaTypes={schemaTypes}
-                                contentTypes={typesData}
-                                responseTypes={responses}
+
+                            <TextInput
+                                id={'actionName'}
+                                label={t('actionName')}
+                                placeholder={'getPosts'}
+                                value={formik.values.actionName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.errors.actionName &&
+                                    formik.touched.actionName
+                                        ? formik.errors.actionName
+                                        : ''
+                                }
                             />
-                        </TabsContent>
-                    </Tabs>
-                </div>
-            </ContainerScrollArea>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Tabs defaultValue={'request'}>
+                    <TabsList className="grid w-full grid-cols-4">
+                        {TabList.map(({ label, tabId }, key) => (
+                            <TabsTrigger key={key} value={tabId}>
+                                {label}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                    <TabsContent value={'request'}>
+                        <TabRequest
+                            formik={formik}
+                            tablesColumns={tablesColumns}
+                            contentTypes={typesData}
+                            schemaTypes={schemaTypes}
+                        />
+                    </TabsContent>
+                    <TabsContent value={'response'}>
+                        <TabResponse
+                            formik={formik}
+                            schemaTypes={schemaTypes}
+                            contentTypes={typesData}
+                            responseTypes={responses}
+                            enumTypes={enumTypes}
+                        />
+                    </TabsContent>
+                </Tabs>
+            </div>
         </React.Fragment>
     );
 };

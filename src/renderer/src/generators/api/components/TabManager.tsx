@@ -16,6 +16,7 @@ import {
     ContextMenuShortcut,
     ContextMenuTrigger,
 } from '@renderer/components/ui/context-menu';
+import { ContainerScrollArea } from './ContainerScrollArea';
 
 const TAB_DEFAULT = 'tab-0';
 
@@ -113,35 +114,27 @@ const TabManager = ({
                                                     }
                                                 >
                                                     <div className="flex items-center space-x-1 group/tab">
-                                                        <Button
-                                                            size={'sm'}
-                                                            variant="ghost"
-                                                            className="size-4"
-                                                        >
-                                                            {/* Badge Rendering (Condition First) */}
-                                                            {tab.item &&
-                                                            tab.item
-                                                                .badgeName ? (
-                                                                <span
-                                                                    className={classnames(
-                                                                        'text-orange-500',
-                                                                        tab.item
-                                                                            .badgeColor
-                                                                    )}
-                                                                >
-                                                                    {
-                                                                        tab.item
-                                                                            .badgeName
-                                                                    }
-                                                                </span>
-                                                            ) : // Icon Rendering Based on Tab ID (Condition Second)
-                                                            tab.id ===
-                                                              TAB_DEFAULT ? (
-                                                                <Book className="h-3" />
-                                                            ) : (
-                                                                <Icon className="h-3" />
-                                                            )}
-                                                        </Button>
+                                                        {/* Badge Rendering (Condition First) */}
+                                                        {tab.item &&
+                                                        tab.item.badgeName ? (
+                                                            <span
+                                                                className={classnames(
+                                                                    'text-orange-500',
+                                                                    tab.item
+                                                                        .badgeColor
+                                                                )}
+                                                            >
+                                                                {
+                                                                    tab.item
+                                                                        .badgeName
+                                                                }
+                                                            </span>
+                                                        ) : tab.id ===
+                                                          TAB_DEFAULT ? (
+                                                            <Book className="h-3" />
+                                                        ) : (
+                                                            <Icon className="h-3" />
+                                                        )}
                                                         <span>{tab.title}</span>
                                                         {tab.id !==
                                                             TAB_DEFAULT && (
@@ -157,11 +150,7 @@ const TabManager = ({
                                                                 variant="ghost"
                                                                 size="sm"
                                                                 className={cn(
-                                                                    'opacity-0 group-hover/tab:opacity-100 size-4',
-                                                                    tab.id ===
-                                                                        'tab-0'
-                                                                        ? 'invisible'
-                                                                        : ''
+                                                                    'opacity-0 group-hover/tab:opacity-100 size-5'
                                                                 )}
                                                             >
                                                                 <X className="h-3" />
@@ -210,7 +199,7 @@ const TabManager = ({
                                         </ContextMenu>
                                         <Separator
                                             orientation="vertical"
-                                            className="mr-2 h-4"
+                                            className="h-4"
                                         />
                                     </React.Fragment>
                                 );
@@ -234,30 +223,34 @@ const TabManager = ({
 
             <Separator />
 
-            {/* Tab Content */}
-            {tabs.map((tab) => {
-                return (
-                    <div
-                        key={tab.id}
-                        className={activeTab === tab.id ? 'block' : 'hidden'}
-                    >
-                        {tab.id === TAB_DEFAULT ? (
-                            <Overview
-                                onOpenNew={handleOpenNew}
-                                open={tab.open}
-                            />
-                        ) : (
-                            <PageController
-                                onOpenNew={handleOpenNew}
-                                open={tab.open}
-                                tab={tab}
-                                onCloseTab={onCloseTab}
-                                onUpdateTab={onUpdateTab}
-                            />
-                        )}
-                    </div>
-                );
-            })}
+            <ContainerScrollArea>
+                {/* Tab Content */}
+                {tabs.map((tab) => {
+                    return (
+                        <div
+                            key={tab.id}
+                            className={
+                                activeTab === tab.id ? 'block' : 'hidden'
+                            }
+                        >
+                            {tab.id === TAB_DEFAULT ? (
+                                <Overview
+                                    onOpenNew={handleOpenNew}
+                                    open={tab.open}
+                                />
+                            ) : (
+                                <PageController
+                                    onOpenNew={handleOpenNew}
+                                    open={tab.open}
+                                    tab={tab}
+                                    onCloseTab={onCloseTab}
+                                    onUpdateTab={onUpdateTab}
+                                />
+                            )}
+                        </div>
+                    );
+                })}
+            </ContainerScrollArea>
         </>
     );
 };

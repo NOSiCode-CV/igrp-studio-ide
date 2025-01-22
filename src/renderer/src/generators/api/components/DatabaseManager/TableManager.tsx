@@ -27,6 +27,8 @@ const actions = [
     },
 ];
 
+const ignoreTables = ['flyway_schema_history'];
+
 export type Database = {
     id: string;
     tableName: string;
@@ -73,19 +75,24 @@ export function TableManager({
 
         setSelectedTable(null);
         setPreviewColumns([]);
+
+        if (!connectionName) return;
+
         setIsLoading(true);
 
         try {
             const { success, tables, message } =
                 await window.api.getTables(connectionName);
             if (success) {
-                const tablesArr = tables.map((table) => {
-                    return {
-                        tableName: table,
-                        id: table,
-                        schemaName: toFullCamelCaseFromSnakeCase(table),
-                    };
-                });
+                const tablesArr = tables
+                    .filter((table) => !ignoreTables.includes(table))
+                    .map((table) => {
+                        return {
+                            tableName: table,
+                            id: table,
+                            schemaName: toFullCamelCaseFromSnakeCase(table),
+                        };
+                    });
                 setTables(tablesArr);
             }
 
@@ -103,7 +110,6 @@ export function TableManager({
             await window.api.getTableStructure(selectedConnection, table);
         if (!success) showErrorToast(message);
         setPreviewColumns(structure);
-        console.log(structure)
     };
 
     const handleChangeRows = (value) => {

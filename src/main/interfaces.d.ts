@@ -2,7 +2,7 @@ import { Connection, PageableProjects, ProjectData } from "./types";
 
 export interface IProjectRepository {
     async save(project: ProjectData): Promise<ProjectData>;
-    async delete(project: ProjectData, index: number): Promise<void>;
+    async delete(project: ProjectData): Promise<void>;
     async findAllRecent(): Promise<PageableProjects>;
     async findAll(): Promise<Array<ProjectData>>;
 }
@@ -16,6 +16,7 @@ export interface IConnenctionRepository {
 
 export interface BaseEngine {
     createProject(project: ProjectData, basePath: string): Promise<void>;
-    createResponse(config: ResponseConfig, basePath: string): Promise<void>
-    delete(config: DeleteConfig, basePath: string): Promise<void>
+    delete(config: DeleteConfig, basePath: string): Promise<void>;
+    createResponse(config: ResponseConfig, basePath: string): Promise<void>;
+    createEnum(data: EnumConfig, basePath: string): Promise<void>;
 }

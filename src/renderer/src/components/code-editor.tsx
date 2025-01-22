@@ -22,10 +22,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     return (
         <ReactCodeMirror
             value={value}
-            height="auto"
-            extensions={[json()]}
+            extensions={[
+                json()
+            ]}
             onChange={handleChange}
-            className={`border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp ${className}`}
+            className={`w-full h-full min-h-[4vh] border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp ${className}`}
             {...props}
         />
     );

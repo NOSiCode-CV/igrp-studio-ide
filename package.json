@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "1.0.0-alpha",
 	"description": "IGRP Studio for dev",
-	"main": "./out/main/index.js",
+	"main": "out/main/index.js",
 	"author": "nosi.cv",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -25,13 +25,14 @@
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/utils": "^3.0.0",
 		"@faker-js/faker": "^9.2.0",
+		"@gitbeaker/node": "^35.8.1",
 		"@hello-pangea/dnd": "^17.0.0",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
-		"@igrp/spring-engine": "^0.3.0-alpha-4.6.6",
+		"@igrp/spring-engine": "^0.3.0-alpha-4.7.8",
 		"@octokit/rest": "^21.1.0",
-		"@radix-ui/react-accordion": "^1.2.1",
+		"@radix-ui/react-accordion": "^1.2.2",
 		"@radix-ui/react-alert-dialog": "^1.1.2",
 		"@radix-ui/react-avatar": "^1.1.1",
 		"@radix-ui/react-checkbox": "^1.1.2",
@@ -72,8 +73,6 @@
 		"knex": "^3.1.0",
 		"knex-schema-inspector": "^3.1.0",
 		"lucide-react": "^0.454.0",
-		"mongodb": "^6.12.0",
-		"mssql": "^11.0.1",
 		"mysql2": "^3.12.0",
 		"oracledb": "^6.7.1",
 		"pg": "^8.13.1",
@@ -99,7 +98,7 @@
 		"@vitejs/plugin-react": "^4.3.1",
 		"autoprefixer": "^10.4.20",
 		"electron": "^31.0.2",
-		"electron-builder": "^24.13.3",
+		"electron-builder": "^25.1.8",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-vite": "^2.3.0",
 		"eslint": "^8.57.0",
@@ -115,16 +114,14 @@
 		"vite": "^5.3.1"
 	},
 	"build": {
-		"build": {
-			"protocols": [
-				{
-					"name": "IGRP Studio",
-					"schemes": [
-						"igrp-studio"
-					]
-				}
-			]
-		},
+		"protocols": [
+			{
+				"name": "IGRP Studio",
+				"schemes": [
+					"igrp-studio"
+				]
+			}
+		],
 		"productName": "IGRP Studio",
 		"appId": "cv.nosi.igrp.studio",
 		"win": {
@@ -135,6 +132,9 @@
 		},
 		"linux": {
 			"icon": "build/icons/icon.png"
-		}
+		},
+		"files": [
+			"resources/**/*"
+		]
 	}
 }

@@ -1,10 +1,13 @@
-
 import { BrowserWindow, shell } from 'electron';
 import express from 'express';
-
+import * as path from 'path';
+import * as fs from 'fs/promises';
+import { TokenService } from '../../services/token-service';
+import { GitHubService } from '../../services/github-service';
+import { app as electronApp } from 'electron';
 const GITHUB_CLIENT_ID = 'Ov23lic9e0U4Ffd3kBc1';
-const GITHUB_CLIENT_SECRET = '056d96948e4f453b0190b5a0261122846260ee28'; // Adicione o client secret
-const DEV_PORT  = 3333
+const GITHUB_CLIENT_SECRET = '056d96948e4f453b0190b5a0261122846260ee28';
+const DEV_PORT = 3333
 
 export const getAuthUrl = (isDev: boolean) => {
   const scopes = ['repo', 'read:user', 'read:org'].join(' ');
@@ -38,16 +41,21 @@ async function setupDevOAuth(mainWindow: BrowserWindow) {
         try {
           const token = await exchangeCodeForToken(code as string, true);
           handleAuthSuccess(token, mainWindow);
+
+          const templatePath = path.join(electronApp.getAppPath(), 'resources', 'templates', 'oauth-success.html');
           
-          res.send(`
-            <html>
-              <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
-                <h2>✅ Autenticação realizada com sucesso!</h2>
-                <p>Você pode fechar esta janela e voltar ao aplicativo.</p>
-                <script>setTimeout(() => window.close(), 2000);</script>
-              </body>
-            </html>
-          `);
+          try {
+            const template = await fs.readFile(templatePath, 'utf-8');
+            res.send(template);
+          } catch (readError) {
+            res.send(`
+              <html>
+                <body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+                  <h2>Authentication Successful!</h2>
+                </body>
+              </html>
+            `);
+          }
           
           server.close();
           resolve(token);
@@ -108,6 +116,10 @@ async function exchangeCodeForToken(code: string, isDev: boolean) {
 
 function handleAuthSuccess(data: any, mainWindow: BrowserWindow) {
   if (data.access_token) {
+    TokenService.setToken('github', data);
+    
+    GitHubService.initialize(data.access_token);
+
     mainWindow.webContents.send('github-oauth-success', {
       access_token: data.access_token,
       scope: data.scope
@@ -117,21 +129,29 @@ function handleAuthSuccess(data: any, mainWindow: BrowserWindow) {
   }
 }
 
-function handleAuthError(error: any, mainWindow: BrowserWindow, res?: any, reject?: any) {
-  console.error('Error during GitHub authentication:', error);
+async function handleAuthError(error: any, mainWindow: BrowserWindow, res?: any, reject?: any) {
   mainWindow.webContents.send('github-oauth-error', {
     message: error.message || 'Failed to authenticate with GitHub'
   });
   
   if (res) {
-    res.status(500).send(`
-      <html>
-        <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
-          <h2>❌ Erro na autenticação</h2>
-          <p>Por favor, tente novamente.</p>
-        </body>
-      </html>
-    `);
+    try {
+      const templatePath = path.join(electronApp.getAppPath(), 'resources', 'templates', 'oauth-error.html');
+      let template = await fs.readFile(templatePath, 'utf-8');
+      
+      template = template.replace('${error}', error.message || 'An error occurred during authentication');
+      
+      res.status(500).send(template);
+    } catch (readError) {
+      res.status(500).send(`
+        <html>
+          <body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+            <h2>Authentication Failed</h2>
+          </body>
+        </html>
+      `);
+    }
   }
+  
   if (reject) reject(error);
 }

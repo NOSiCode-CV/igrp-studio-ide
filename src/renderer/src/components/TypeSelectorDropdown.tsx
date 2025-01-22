@@ -27,7 +27,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-6 px-2 text-sm">
-                    {type}
+                    {type || 'Set Type'}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
@@ -44,7 +44,10 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                             <DropdownMenuItem
                                                 key={subItem.value}
                                                 onClick={() =>
-                                                    onTypeChange(subItem.value as SchemaType)
+                                                    onTypeChange({
+                                                        type: value,
+                                                        value: subItem.value,
+                                                    } as any)
                                                 }
                                             >
                                                 {subItem.label}
@@ -54,7 +57,9 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                 </DropdownMenuSub>
                             ) : (
                                 <DropdownMenuItem
-                                    onClick={() => onTypeChange(value as SchemaType)}
+                                    onClick={() =>
+                                        onTypeChange(value as SchemaType)
+                                    }
                                 >
                                     {label}
                                 </DropdownMenuItem>

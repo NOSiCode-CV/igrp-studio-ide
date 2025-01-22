@@ -149,9 +149,9 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
     }
 
     return (
-        <div className="flex flex-col md:flex-row gap-4 max-h-[370px]">
+        <div className="flex flex-1 md:flex-row gap-4 max-h-[370px]">
             {/* Sidebar */}
-            <div className="bg-gray-100 p-4 rounded md:w-1/3 space-y-2">
+            <div className="bg-gray-100 p-4 rounded w-1/3 space-y-2">
                 <Input onChange={handleInputChange} placeholder="Type to search" />
                 <div className="flex flex-col">
                     <small className="text-gray-800">{t("availableFields")}</small>
@@ -187,7 +187,7 @@ const FieldContainer = ({ componentName, componentId, fields }) => {
             </div>
 
             {/* Fields Section */}
-            <div className="md:w-2/3">
+            <div className="w-2/3">
                 <ScrollArea id="fields-added" className="h-full">
                     {/* Render Other Fields */}
                     {renderFieldsByType("others", otherFields, "currentFields")}

@@ -18,7 +18,6 @@ import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
-import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface DtoProps {
@@ -102,10 +101,15 @@ const DtoLayout = ({
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
             const { error } = await window.api.createDto(
-                { ...newValues, module: currentItem.module },
+                { ...newValues, module: currentItem?.module || 'shared'},
                 basePath
             );
-            if (error) return showErrorToast(error);
+
+            console.log(newValues, error);
+
+            if (error) {
+                return showErrorToast(error);
+            }
 
             dispatch(onSetChangeStatus(true));
 
@@ -163,9 +167,36 @@ const DtoLayout = ({
                     errors={errors}
                     addRow={() => addNewRow(formik, value, dValues)}
                     removeRow={(position) => removeRow(formik, value, position)}
-                    changeValue={(element, position, result) =>
-                        changeValue(formik, element, position, result, value)
-                    }
+                    changeValue={(element, position, result) => {
+                        const isType = element === 'type';
+
+                        const typeValue = isType ? result.value : result;
+
+                        const typeType = isType ? result.type : '';
+
+                        if (isType)
+                            formik.setFieldValue(
+                                value,
+                                formik.values[value].map(
+                                    (row: any, index: number) =>
+                                        index === position
+                                            ? {
+                                                  ...row,
+                                                  ['objectType']: typeType,
+                                                  [element]: typeValue,
+                                              }
+                                            : row
+                                )
+                            );
+                        else
+                            changeValue(
+                                formik,
+                                element,
+                                position,
+                                typeValue,
+                                value
+                            );
+                    }}
                 />
             );
         }
@@ -180,44 +211,42 @@ const DtoLayout = ({
                 isNew={!data}
                 title="dto"
             />
-            <ContainerScrollArea size="lg">
-                <div className="space-y-4 p-4">
-                    <Card className="rounded-sm p-6">
-                        <div className="flex flex-col gap-4">
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <TextInput
-                                    label={t('Name')}
-                                    id="name"
-                                    placeholder={t('Enter name')}
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={
-                                        formik.touched.name
-                                            ? formik.errors.name
-                                            : undefined
-                                    }
-                                />
-                                <SelectInput
-                                    label={t('Template')}
-                                    id="template"
-                                    options={TemplateOptions}
-                                    value={formik.values.template}
-                                    onChange={(option) =>
-                                        formik.setFieldValue('template', option)
-                                    }
-                                    error={formik.errors.template}
-                                />
-                            </div>
-                            {TabList.map(({ value }) => (
-                                <Card className="rounded-sm" key={value}>
-                                    {renderFormList(value)}
-                                </Card>
-                            ))}
+            <div className="space-y-4 p-4">
+                <Card className="rounded-sm p-6">
+                    <div className="flex flex-col gap-4">
+                        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                            <TextInput
+                                label={t('Name')}
+                                id="name"
+                                placeholder={t('Enter name')}
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.name
+                                        ? formik.errors.name
+                                        : undefined
+                                }
+                            />
+                            <SelectInput
+                                label={t('Template')}
+                                id="template"
+                                options={TemplateOptions}
+                                value={formik.values.template}
+                                onChange={(option) =>
+                                    formik.setFieldValue('template', option)
+                                }
+                                error={formik.errors.template}
+                            />
                         </div>
-                    </Card>
-                </div>
-            </ContainerScrollArea>
+                        {TabList.map(({ value }) => (
+                            <Card className="rounded-sm" key={value}>
+                                {renderFormList(value)}
+                            </Card>
+                        ))}
+                    </div>
+                </Card>
+            </div>
         </React.Fragment>
     );
 };

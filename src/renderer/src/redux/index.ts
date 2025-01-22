@@ -1,8 +1,14 @@
-import { combineReducers } from 'redux'
+import { combineReducers, Reducer } from 'redux'
+import gitSlice, { GitState } from './git/reducer';
+import PageBuilderReducer, { StudioState } from "./pageBuilder/reducer";
 
-import PageBuilderReducer from "./pageBuilder/reducer";
+export type RootState = {
+  PageBuilder: StudioState;
+  git: GitState;
+}
 
-const rootReducer = combineReducers({
-  PageBuilder: PageBuilderReducer
+const rootReducer: Reducer<RootState> =  combineReducers({
+  PageBuilder: PageBuilderReducer,
+  git: gitSlice
 })
 export default rootReducer

@@ -212,18 +212,22 @@ export function ProjectWizard() {
     React.useEffect(() => {
         if (open) return;
         formik.setValues(initialValues);
-        setStep(1)
+        setStep(1);
     }, [open]);
 
     return (
-        <Dialog open={open} onOpenChange={setOpen} >
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline">
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Create New Project
                 </Button>
             </DialogTrigger>
-            <DialogContent className="md:max-w-[700px] max-w-[800px]" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+            <DialogContent
+                className="md:max-w-[700px] max-w-[800px]"
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+            >
                 <DialogHeader>
                     <DialogTitle>New Project</DialogTitle>
                     <DialogDescription />
@@ -375,12 +379,13 @@ export function ProjectWizard() {
                                                 fw.id
                                                     ? 'border-primary'
                                                     : ''
-                                            }`}
+                                            } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
                                         >
                                             <RadioGroupItem
                                                 value={fw.id}
                                                 id={fw.id}
                                                 className="sr-only"
+                                                disabled={!fw.availableSupport}
                                             />
                                             <Label
                                                 htmlFor={fw.id}
@@ -402,6 +407,11 @@ export function ProjectWizard() {
                                                     <div className="text-sm text-muted-foreground">
                                                         {fw.description}
                                                     </div>
+                                                    {!fw.availableSupport && (
+                                                        <span className="ml-auto text-xs text-muted-foreground">
+                                                            Coming soon
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </Label>
                                         </div>

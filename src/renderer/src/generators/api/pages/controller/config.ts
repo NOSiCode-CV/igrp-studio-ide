@@ -12,10 +12,7 @@ export const initialValues = {
             name: "OK",
             content: {
                 "application/json": {
-                    schema: {
-                        type: 'object',
-                        properties: {},
-                    }
+                    schema: null
                 }
             }
         },
@@ -51,7 +48,7 @@ export const TabList = [
     { label: 'Response', tabId: 'response' }
 ]
 
-export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = (selectors: any, enumTypes: any): { [value: string]: IColumnsTabelProps[] } => {
     const headersTypes = formatMethods(
         (
             selectors.find((selector) => 'HTTP_HEADER_TYPES' in selector) as
@@ -67,6 +64,7 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
             | undefined
         )?.REQUEST_PARAMS || []
     )
+
     return {
         requestParams: [
             { key: 'name', name: 'Name', type: 'text' },
@@ -109,7 +107,7 @@ export const getTablesColumns = (selectors: any): { [value: string]: IColumnsTab
                 key: 'group', name: '', type: 'group', items: [
 
                     { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
+                    { key: 'advanced', name: '', type: 'popoverController', width: '25%', options: { enumTypes } }
                 ]
             }
         ],

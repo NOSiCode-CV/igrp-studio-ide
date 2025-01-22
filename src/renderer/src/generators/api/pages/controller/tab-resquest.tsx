@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
-import { Badge } from '@renderer/components/ui/badge';
 import { FormList } from '../../components/form-list';
 import {
     IGRPTabs,
@@ -8,14 +7,9 @@ import {
     IGRPTabsList,
     IGRPTabsTrigger,
 } from '@renderer/components/tabs';
-import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
-import { TabsContent } from '@radix-ui/react-tabs';
-import { Combobox } from '@igrp/igrp-design-system';
-import { useTranslation } from 'react-i18next';
-import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
-import { Card, CardContent } from '@renderer/components/ui/card';
-import CodeEditor from '@renderer/components/code-editor';
+import { BodyRequest } from './body-request';
+import { _ } from '@faker-js/faker/dist/airline-BLb3y-7w';
 
 interface TabRequestProps {
     formik: any;
@@ -30,60 +24,70 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     contentTypes,
     schemaTypes,
 }) => {
-    const { t } = useTranslation();
-
     const [bodyType, setBodyType] = useState<
-        'none' | 'multipart/form-data' | 'json'
-    >('none');
+        'none' | 'multipart/form-data' | 'application/json'
+    >();
 
     const [contentType, setContentType] = useState('application/json');
 
     const tabQueryParams = 'requestParams';
     const tabPathVariables = 'pathVariables';
     const tabHeaders = 'headers';
-    const tabBody = 'requestBody';
 
     const columnsQuery = tablesColumns[tabQueryParams];
     const columnsVariables = tablesColumns[tabPathVariables];
     const columnsHeaders = tablesColumns[tabHeaders];
-    const columnsBody = tablesColumns[tabBody];
 
-    const properties = [
-        {
-            type: '',
-            name: '',
-            value: '',
-            isRequired: true,
-        },
-    ];
+    const [localSchema, setLocalSchema] = useState({
+        type: 'Object',
+        properties: {},
+    });
 
-    const handleBodyTypeChange = (
-        type: 'none' | 'multipart/form-data' | 'json'
-    ) => {
-        setBodyType(type);
+    useEffect(() => {
+        const type =
+            formik.values.requestBody?.content &&
+            Object.keys(formik.values.requestBody.content)?.[0];
+        setBodyType(type || 'none');
+    }, [formik.values.requestBody]);
 
+    useEffect(() => {
         // Clear formik values for body content when type changes
-        if (type === 'none') {
+        if (bodyType === 'none') {
             formik.setFieldValue('requestBody', '');
-        } else if (type === 'multipart/form-data') {
+        } else if (bodyType === 'multipart/form-data') {
+            const data =
+                formik.values.requestBody?.content?.[bodyType]?.schema ||
+                localSchema;
             const content = {
                 'multipart/form-data': {
-                    type: 'Object',
-                    properties,
+                    schema: data,
                 },
             };
 
             formik.setFieldValue('requestBody', { content });
-        } else formik.setFieldValue('requestBody', { content: {} });
-    };
+        } else if (bodyType === 'application/json') {
+            const data =
+                formik.values.requestBody?.content?.[bodyType]?.schema ||
+                localSchema;
+            formik.setFieldValue('requestBody', {
+                content: {
+                    [contentType]: {
+                        schema: data,
+                    },
+                },
+            });
+        }
+    }, [bodyType]);
 
     const handleSchemaChange = (newSchema: JSONSchema) => {
         const currentSchema = formik.values.requestBody?.content[contentType];
 
         // Se o schema for o mesmo, não faça nada
         if (
-            currentSchema &&
-            JSON.stringify(currentSchema.schema) === JSON.stringify(newSchema)
+            (currentSchema &&
+                JSON.stringify(currentSchema.schema) ===
+                    JSON.stringify(newSchema)) ||
+            bodyType === 'none'
         ) {
             return; // Não há mudanças, então não faça nada
         }
@@ -93,6 +97,8 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                 schema: newSchema,
             },
         };
+
+        setLocalSchema(newSchema);
 
         formik.setFieldValue('requestBody', { content });
     };
@@ -182,135 +188,19 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                     )}
                 </IGRPTabsContent>
                 <IGRPTabsContent value="body">
-                    <div className="mb-4">
-                        <div className="flex space-x-4 text-sm">
-                            <Badge
-                                onClick={() => handleBodyTypeChange('none')}
-                                variant={
-                                    bodyType === 'none' ? 'default' : 'outline'
-                                }
-                                className="cursor-pointer"
-                            >
-                                None
-                            </Badge>
-                            <Badge
-                                onClick={() =>
-                                    handleBodyTypeChange('multipart/form-data')
-                                }
-                                variant={
-                                    bodyType === 'multipart/form-data'
-                                        ? 'default'
-                                        : 'outline'
-                                }
-                                className="cursor-pointer"
-                            >
-                                Form Data
-                            </Badge>
-                            <Badge
-                                onClick={() => handleBodyTypeChange('json')}
-                                variant={
-                                    bodyType === 'json' ? 'default' : 'outline'
-                                }
-                                className="cursor-pointer"
-                            >
-                                JSON
-                            </Badge>
-                        </div>
-                    </div>
-
-                    {bodyType === 'none' && columnsBody && (
-                        <div className="text-center rounded p-8 border">
-                            <p className="text-muted-foreground text-xs">
-                                This request has no body parameters
-                            </p>
-                        </div>
-                    )}
-
-                    {bodyType === 'multipart/form-data' && columnsBody && (
-                        <>
-                            <FormList
-                                columns={columnsBody}
-                                data={
-                                    formik.values[tabBody][
-                                        'multipart/form-data'
-                                    ]?.['properties'] || properties
-                                }
-                                formik={formik}
-                                changeValue={(element, position, value) =>
-                                    changeValue(
-                                        formik,
-                                        element,
-                                        position,
-                                        value,
-                                        tabBody
-                                    )
-                                }
-                                addRow={() =>
-                                    addNewRow(formik, tabBody, 'formData')
-                                }
-                                removeRow={(position) =>
-                                    removeRow(formik, tabBody, position)
-                                }
-                                errors={formik.errors[tabBody]}
-                                name={
-                                    'requestBody.multipart/form-data.properties'
-                                }
-                                btnLabels=""
-                            />
-                        </>
-                    )}
-
-                    {bodyType === 'json' && (
-                        <div className="space-y-3">
-                            <Combobox
-                                name={t('contentType')}
-                                value={contentType}
-                                placeholder="Select Content Type"
-                                onChange={(value) => setContentType(value)}
-                                options={contentTypes}
-                                className="w-1/3 focus:ring-igrp focus:border-igrp h-8"
-                            />
-                            <Card className="rounded">
-                                <CardContent className="p-3">
-                                    <Tabs defaultValue="value">
-                                        <TabsList>
-                                            <TabsTrigger value="value">
-                                                Value
-                                            </TabsTrigger>
-                                            <TabsTrigger value="schema">
-                                                Data Schema
-                                            </TabsTrigger>
-                                        </TabsList>
-                                        <TabsContent value="value">
-                                            <div className="mt-3">
-                                                <CodeEditor
-                                                    value={
-                                                        formik.values
-                                                            .bodyContent?.[
-                                                            'content'
-                                                        ] || ''
-                                                    }
-                                                    onChange={
-                                                        handleChangeEditor
-                                                    }
-                                                    className="my-custom-class"
-                                                />
-                                            </div>
-                                        </TabsContent>
-                                        <TabsContent value="schema">
-                                            <JSONSchemaBuilder
-                                                schemaTypes={schemaTypes}
-                                                initialSchema={null}
-                                                onSchemaChange={(value) => {
-                                                    handleSchemaChange(value);
-                                                }}
-                                            />
-                                        </TabsContent>
-                                    </Tabs>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
+                    <BodyRequest
+                        bodyType={bodyType}
+                        contentType={contentType}
+                        formik={formik}
+                        contentTypes={contentTypes}
+                        schemaTypes={schemaTypes}
+                        columnsBody={tablesColumns['requestBody']}
+                        handleSchemaChange={handleSchemaChange}
+                        handleChangeEditor={handleChangeEditor}
+                        setLocalSchema={setLocalSchema}
+                        setContentType={setContentType}
+                        setBodyType={setBodyType}
+                    />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">
                     {columnsHeaders && (

@@ -109,6 +109,14 @@ export interface Repository {
   clone_url: string;
   updated_at: string | null;
 }
+
+interface Commit {
+    hash: string;
+    author: string;
+    date: string;
+    message: string;
+    branch?: string;
+}
 export interface DatabaseResponse {
     success: boolean, message?: string, tables?: any, structure?: any
 }

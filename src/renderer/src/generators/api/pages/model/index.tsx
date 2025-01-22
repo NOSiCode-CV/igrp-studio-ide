@@ -27,7 +27,6 @@ import { TextInput } from '../../components/inputs-form';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
-import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface ModelProps {
@@ -160,9 +159,8 @@ const ModelLayout = ({
         try {
             const values = getValuesToSubmit(
                 formik.values,
-                currentItem?.module
+                currentItem?.module || 'shared'
             );
-            console.log(values);
 
             const { error } = await window.api.createModel(values, basePath);
 
@@ -212,6 +210,7 @@ const ModelLayout = ({
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
         const errors = formik?.errors?.[value];
+        const touched = formik?.touched?.[value];
 
         return (
             <>
@@ -230,6 +229,7 @@ const ModelLayout = ({
                             )
                         }
                         errors={errors}
+                        touched={touched}
                         addRow={() =>
                             addNewRow(formik, value, defaultValues[value])
                         }
@@ -252,96 +252,113 @@ const ModelLayout = ({
                 isNew={data === null}
                 title="model"
             />
-            <ContainerScrollArea>
-                <div className="space-y-4 p-4">
-                    <Card className="p-6 rounded-sm">
-                        <div className="space-y-6">
-                            <div className="flex gap-4">
-                                <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                    <TextInput
-                                        label={t('Name')}
-                                        id="name"
-                                        placeholder={t('Name of the model')}
-                                        value={formik.values.name}
-                                        onChange={formik.handleChange}
-                                        onBlur={handleNameBlur}
-                                        error={
-                                            formik.touched.name
-                                                ? formik.errors.name
-                                                : undefined
-                                        }
-                                    />
+            <div className="space-y-4 p-4">
+                <Card className="p-6 rounded-sm">
+                    <div className="space-y-6">
+                        <div className="flex gap-4">
+                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                                <TextInput
+                                    label={t('Name')}
+                                    id="name"
+                                    placeholder={t('Name of the model')}
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    onBlur={handleNameBlur}
+                                    error={
+                                        formik.touched.name
+                                            ? formik.errors.name
+                                            : undefined
+                                    }
+                                />
 
-                                    <TextInput
-                                        label={t('Table Name')}
-                                        id="tableName"
-                                        placeholder={t('Enter Table Name')}
-                                        value={formik.values.tableName}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        error={
-                                            formik.touched.tableName
-                                                ? formik.errors.tableName
-                                                : undefined
-                                        }
-                                    />
-                                </div>
+                                <TextInput
+                                    label={t('Table Name')}
+                                    id="tableName"
+                                    placeholder={t('Enter Table Name')}
+                                    value={formik.values.tableName}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={
+                                        formik.touched.tableName
+                                            ? formik.errors.tableName
+                                            : undefined
+                                    }
+                                />
                             </div>
-                            <div className="flex">
-                                <div className="grid grid-cols-4 gap-5 mb-4">
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="audit"
-                                            onCheckedChange={(checked) =>
-                                                formik.setFieldValue(
-                                                    'audit',
-                                                    checked
-                                                )
-                                            }
-                                            checked={formik.values.audit}
-                                        />
-                                        <Label htmlFor="audit">
-                                            Audit Model
-                                        </Label>
-                                    </div>
+                        </div>
+                        <div className="flex">
+                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="audit"
+                                        onCheckedChange={(checked) =>
+                                            formik.setFieldValue(
+                                                'audit',
+                                                checked
+                                            )
+                                        }
+                                        checked={formik.values.audit}
+                                    />
+                                    <Label htmlFor="audit">Audit Model</Label>
+                                </div>
 
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="crud"
-                                            onCheckedChange={(checked) =>
-                                                formik.setFieldValue(
-                                                    'crud',
-                                                    checked
-                                                )
-                                            }
-                                            checked={formik.values.crud}
-                                        />
-                                        <Label htmlFor="Crud">Crud</Label>
-                                    </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="crud"
+                                        onCheckedChange={(checked) =>
+                                            formik.setFieldValue(
+                                                'crud',
+                                                checked
+                                            )
+                                        }
+                                        checked={formik.values.crud}
+                                    />
+                                    <Label htmlFor="Crud">{t('crud')}</Label>
+                                </div>
+                                {/* New GraphQL Option (Coming Soon) */}
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="graphql" disabled />
+                                    <Label htmlFor="graphql">
+                                        GraphQL
+                                        <span className="ml-2 text-xs text-muted-foreground">
+                                            (Coming Soon)
+                                        </span>
+                                    </Label>
+                                </div>
+
+                                {/* New OData Option (Coming Soon) */}
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="odata" disabled />
+                                    <Label htmlFor="odata">
+                                        OData
+                                        <span className="ml-2 text-xs text-muted-foreground">
+                                            (Coming Soon)
+                                        </span>
+                                    </Label>
                                 </div>
                             </div>
                         </div>
-                    </Card>
-                    <Card className="p-6 rounded-sm">
-                        <Tabs defaultValue="attributes">
-                            <TabsList className="grid w-full grid-cols-3">
-                                {TabList.map(({ label, value }, key) => (
-                                    <TabsTrigger key={key} value={value}>
-                                        {label}
-                                    </TabsTrigger>
-                                ))}
-                            </TabsList>
-                            {TabList.map(({ value }, key) => (
-                                <TabsContent key={key} value={value}>
-                                    <Card className="rounded-sm">
-                                        {renderFormList(value)}
-                                    </Card>
-                                </TabsContent>
+                    </div>
+                </Card>
+                <Card className="p-6 rounded-sm">
+                    <Tabs defaultValue="attributes">
+                        <TabsList className="grid w-full grid-cols-3">
+                            {TabList.map(({ label, value }, key) => (
+                                <TabsTrigger key={key} value={value}>
+                                    {label}
+                                </TabsTrigger>
                             ))}
-                        </Tabs>
-                    </Card>
-                </div>
-            </ContainerScrollArea>
+                        </TabsList>
+                        {TabList.map(({ value }, key) => (
+                            <TabsContent key={key} value={value}>
+                                <Card className="rounded-sm">
+                                    {renderFormList(value)}
+                                </Card>
+                            </TabsContent>
+                        ))}
+                    </Tabs>
+                </Card>
+            </div>
         </>
     );
 };

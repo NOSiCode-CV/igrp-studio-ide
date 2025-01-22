@@ -24,11 +24,12 @@ export enum OPTION_TYPE {
     ACTION = 'action',
     IMPORT_TABLE_DB = 'import_table_db',
     RESPONSE = 'responses',
+    ENUM = 'enum',
     DELETE = 'delete',
     ERDDiagram= "ERDDiagram"
 };
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram';
+export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum';
 
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',

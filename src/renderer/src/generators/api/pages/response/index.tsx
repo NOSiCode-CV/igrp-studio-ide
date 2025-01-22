@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 import { formatMethods } from '../../helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
-import { ContainerScrollArea } from '../../components/ContainerScrollArea';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
@@ -214,8 +213,7 @@ export const ResponseLayout = ({
                 isNew={!data}
                 title={title || 'Create a new Response'}
             />
-            <ContainerScrollArea size="lg">
-                <div className="space-y-4 p-4">
+            <div className="space-y-4 p-4">
                     <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                         {/* HTTP Status Code */}
                         <div className="space-y-2">
@@ -312,7 +310,6 @@ export const ResponseLayout = ({
                         </CardContent>
                     </Card>
                 </div>
-            </ContainerScrollArea>
         </>
     );
 };

@@ -19,14 +19,14 @@ interface DeleteModalProps {
     onConfirm?: () => void;
     onClose: (open: boolean) => void;
     recordId?: string;
-    hasTrigger: false;
+    hasTrigger?: boolean;
 }
 
 const AlertDialogDelete: React.FC<DeleteModalProps> = ({
     isOpen,
     onConfirm,
     onClose,
-    hasTrigger,
+    hasTrigger = false,
     recordId,
 }) => {
     const { t } = useTranslation();

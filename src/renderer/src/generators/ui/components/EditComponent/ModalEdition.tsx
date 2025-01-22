@@ -19,6 +19,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@renderer/components/ui/dialog"
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface ModalEditionProps {
     show: boolean;
@@ -93,9 +94,10 @@ const ModalEdition = ({ show, onConfirmClick, onCloseClick }: ModalEditionProps)
 
     return (
         <Dialog open={editionModal} onOpenChange={handleClose}>
-            <DialogContent className="md:max-h-[680px] md:max-w-[700px] lg:max-w-[800px]">
+            <DialogContent className="md:max-h-[680px] md:max-w-[700px] max-w-[800px]">
                 <DialogHeader>
                     <DialogTitle>{t('settings')}</DialogTitle>
+                    <DialogDescription/>
                 </DialogHeader>
 
                 <div className="py-4">

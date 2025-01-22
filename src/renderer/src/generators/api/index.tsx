@@ -47,21 +47,6 @@ const Index = ({ basePath, currentItem }: PageBuilderProps) => {
     };
 
     const handleUpdateTab = (_oldId: string, _newId: string) => {
-        /*  setTabs((prevTabs) =>
-      prevTabs.map((t) =>
-        t.id === oldId
-          ? {
-              ...t,
-              id: newId,
-              item
-            }
-          : t
-      )
-    );
-
-    setActiveTab(newId);
-
-    console.log(tabs) */
     };
 
     useEffect(() => {

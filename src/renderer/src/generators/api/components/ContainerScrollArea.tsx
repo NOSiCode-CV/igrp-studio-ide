@@ -7,16 +7,7 @@ interface ContainerScrollAreaProps {
 }
 
 export const ContainerScrollArea: React.FC<ContainerScrollAreaProps> = ({
-    children,
-    size = 'sm',
+    children
 }) => {
-    const height =
-        size === 'lg'
-            ? 'calc(100vh - 12rem)' // Adjust height for lg size
-            : 'calc(100vh - 6rem)'; // Default height for sm size
-    return (
-        <div className="overflow-y-auto">
-            <ScrollArea style={{ height }}>{children}</ScrollArea>
-        </div>
-    );
+    return <ScrollArea className="h-100 mb-6">{children}</ScrollArea>;
 };

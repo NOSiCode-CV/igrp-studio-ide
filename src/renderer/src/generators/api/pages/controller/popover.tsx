@@ -17,26 +17,30 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { PackageCheck } from 'lucide-react';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@renderer/components/ui/Switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
 import { toInitCap } from '@renderer/utils/helpers';
 import CodeEditor from '@renderer/components/code-editor';
+import { Combobox } from '@igrp/igrp-design-system';
 
 interface PopoverProps {
-    children?: ReactNode;
-    index: number;
     row: any;
-    changeValue: (element: string, position: number, value: any) => void;
+    changeValue: (element: string, value: any) => void;
+    options: any;
 }
 
-export function PopoverController({ index, row, changeValue }: PopoverProps) {
+export function PopoverController({ options, row, changeValue }: PopoverProps) {
     const { t } = useTranslation();
 
     const [isInteger, setIsInteger] = useState(false);
     const [isBoolean, setIsBoolean] = useState(false);
+    const [isConst, setIsConst] = useState(false);
+    const [isEnum, setIsEnum] = useState(false);
+
+    const { enumTypes } = options;
 
     useEffect(() => {
         setIsInteger(row?.['type'] === 'integer' || row?.['type'] === 'long');
@@ -44,6 +48,11 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
     }, [row]);
 
     const handleChangeEditor = (_value) => {};
+
+    const changeConst = (key, value) => {
+        setIsConst(key === 'const' && value);
+        setIsEnum(key === 'enum' && value);
+    };
 
     return (
         <Popover>
@@ -56,7 +65,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                             size={'icon'}
                         >
                             <PackageCheck className="w-4 h-4" />{' '}
-                            {/* Settings icon */}
                             <span className="sr-only">{t('Advanced')}</span>
                         </Button>
                     </PopoverTrigger>
@@ -85,20 +93,16 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                             {['isRequired', 'nullable', 'deprecated'].map(
                                 (field) => (
                                     <div
-                                        key={`${field}-${index}`}
+                                        key={`${field}`}
                                         className="flex flex-1 items-center gap-4"
                                     >
-                                        <Label htmlFor={`${field}-${index}`}>
+                                        <Label htmlFor={`${field}`}>
                                             {toInitCap(field)}
                                         </Label>
                                         <Switch
-                                            id={`${field}-${index}`}
+                                            id={`${field}`}
                                             onCheckedChange={(checked) =>
-                                                changeValue(
-                                                    field,
-                                                    index,
-                                                    checked
-                                                )
+                                                changeValue(field, checked)
                                             }
                                             checked={row?.[field] || false}
                                         />
@@ -109,27 +113,54 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                         <Separator orientation="horizontal" />
                         {!isBoolean && (
                             <div className="flex flex-1 gap-2">
-                                {['emun', 'const'].map((field) => (
+                                {['enum', 'const'].map((field) => (
                                     <div
-                                        key={`${field}-${index}`}
+                                        key={`${field}`}
                                         className="flex items-center gap-4"
                                     >
-                                        <Label htmlFor={`${field}-${index}`}>
+                                        <Label htmlFor={`${field}`}>
                                             {toInitCap(field)}
                                         </Label>
                                         <Switch
-                                            id={`${field}-${index}`}
+                                            id={`${field}`}
                                             onCheckedChange={(checked) =>
-                                                changeValue(
-                                                    field,
-                                                    index,
-                                                    checked
-                                                )
+                                                changeConst(field, checked)
                                             }
-                                            checked={row?.[field] || false}
+                                            checked={
+                                                field === 'const'
+                                                    ? isConst
+                                                    : isEnum
+                                            }
                                         />
                                     </div>
                                 ))}
+                                {isConst && (
+                                    <Input
+                                        id="const"
+                                        className="h-8"
+                                        value={row?.['const'] || ''}
+                                        onChange={(ev) =>
+                                            changeValue(
+                                                'const',
+                                                ev.target.value
+                                            )
+                                        }
+                                    />
+                                )}
+                                 {isEnum && (
+                                    <Combobox
+                                        name="enum"
+                                        className="h-8"
+                                        value={row?.['enum'] || ''}
+                                        onChange={(ev) =>
+                                            changeValue(
+                                                'enum',
+                                                ev
+                                            )
+                                        }
+                                        options={enumTypes}
+                                    />
+                                )}
                             </div>
                         )}
                         {isInteger && (
@@ -145,7 +176,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                         onChange={(ev) =>
                                             changeValue(
                                                 'minimunm',
-                                                index,
                                                 ev.target.value
                                             )
                                         }
@@ -162,7 +192,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                         onChange={(ev) =>
                                             changeValue(
                                                 'maximum',
-                                                index,
                                                 ev.target.value
                                             )
                                         }
@@ -179,7 +208,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                         onChange={(ev) =>
                                             changeValue(
                                                 'multipleOf',
-                                                index,
                                                 ev.target.value
                                             )
                                         }
@@ -201,7 +229,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                             onChange={(ev) =>
                                                 changeValue(
                                                     'minLength',
-                                                    index,
                                                     ev.target.value
                                                 )
                                             }
@@ -218,7 +245,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                             onChange={(ev) =>
                                                 changeValue(
                                                     'maxLength',
-                                                    index,
                                                     ev.target.value
                                                 )
                                             }
@@ -233,11 +259,7 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                     className="h-8"
                                     value={row?.['default'] || ''}
                                     onChange={(ev) =>
-                                        changeValue(
-                                            'default',
-                                            index,
-                                            ev.target.value
-                                        )
+                                        changeValue('default', ev.target.value)
                                     }
                                 />
                             </div>
@@ -252,7 +274,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                             onChange={(ev) =>
                                                 changeValue(
                                                     'pattern',
-                                                    index,
                                                     ev.target.value
                                                 )
                                             }
@@ -270,7 +291,6 @@ export function PopoverController({ index, row, changeValue }: PopoverProps) {
                                             onChange={(ev) =>
                                                 changeValue(
                                                     'examples',
-                                                    index,
                                                     ev.target.value
                                                 )
                                             }

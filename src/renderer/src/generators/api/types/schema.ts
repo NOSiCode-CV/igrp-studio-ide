@@ -23,7 +23,7 @@ export interface SchemaField {
 }
 
 export interface JSONSchema {
-  type: 'object';
+  type: SchemaType;
   properties: Record<string, SchemaField>
   required?: string[];
 }

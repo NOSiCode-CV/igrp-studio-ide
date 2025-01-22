@@ -150,13 +150,6 @@ const engine = {
 			return handleError(error)
 		}
 	},
-	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
 	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
@@ -164,6 +157,21 @@ const engine = {
 			return handleError(error)
 		}
 	},
+	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createEnum: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:create-enum', data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	
 }
 
 const repo = {

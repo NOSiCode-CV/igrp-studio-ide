@@ -30,6 +30,14 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
+    'engine:create-enum',
+    async (_event, data: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createEnum(data, basePath);
+    }
+);
+
+handleWithCustomErrors(
     'engine:delete-element',
     async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);

@@ -165,7 +165,7 @@ export function SpringConfig({
                         </div>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">Domain</Label>
+                            <Label htmlFor="domain">Domain driven</Label>
                         </div>
                     </RadioGroup>
                 </div>

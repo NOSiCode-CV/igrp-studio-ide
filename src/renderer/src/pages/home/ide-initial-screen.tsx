@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
-import { FolderOpen, GitFork } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
@@ -18,9 +18,7 @@ const IDEInitialScreen = (): JSX.Element => {
     const { t } = useTranslation();
 
     const navigate = useNavigate();
-
     const dispatch: any = useDispatch();
-
     const { showErrorToast } = useToast();
 
     const onHandleOpenProjectClick = async (): Promise<void> => {
@@ -29,7 +27,7 @@ const IDEInitialScreen = (): JSX.Element => {
         const { canceled, basePath, config, folderExists } = result;
 
         if (canceled || !basePath || !config) {
-            return; // User canceled the directory selection
+            return;
         }
 
         if (!folderExists || !config.framework) {
@@ -52,10 +50,7 @@ const IDEInitialScreen = (): JSX.Element => {
             <PageHeader title="Welcome to IGRP Studio">
                 <div className="flex justify-end space-x-3 ">
                     <ProjectWizard />
-                    <Button variant="outline">
-                        <GitFork className="w-4 h-4 mr-2" />
-                        {t('Clone Project')}
-                    </Button>
+                    
                     <Button
                         variant="outline"
                         onClick={onHandleOpenProjectClick}
@@ -63,6 +58,7 @@ const IDEInitialScreen = (): JSX.Element => {
                         <FolderOpen className="w-4 h-4 mr-2" />
                         {t('Open Project')}
                     </Button>
+                    
                 </div>
             </PageHeader>
 

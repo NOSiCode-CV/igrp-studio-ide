@@ -23,6 +23,7 @@ interface TabResponseProps {
     schemaTypes?: { label: string; value: string }[];
     contentTypes: any;
     responseTypes: Array<any>;
+    enumTypes: Array<any>;
 }
 
 export const TabResponse: React.FC<TabResponseProps> = ({
@@ -30,6 +31,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
     contentTypes,
     schemaTypes,
     responseTypes,
+    enumTypes,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
@@ -41,14 +43,15 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         name: string;
         statusCode: string;
         contentType: string;
+        description?: string;
     }) => {
-        const { name, statusCode, contentType } = response;
+        const { name, description, statusCode, contentType } = response;
 
         const updatedResponses = {
             ...formik.values.responses,
             [statusCode]: {
                 name,
-                decription: null,
+                description,
                 content: {
                     [contentType]: {
                         schema: null,
@@ -159,7 +162,17 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const name = responses[statusCode].name;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];
-                    const contentData = content[contentType]['schema'];
+
+                    const schema = content?.[contentType]?.['schema'];
+                    const properties = schema?.properties;
+                    
+                    const contentData =
+                        properties && Object.keys(properties).length > 0
+                            ? schema
+                            : null;
+
+                    console.log(contentData)
+
                     return (
                         <div
                             key={statusCode}
@@ -180,10 +193,12 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         name="statusCode"
                                         value={statusCode}
                                         onChange={(value) =>
-                                            formik.setFieldValue(
-                                                'contentType',
-                                                value
-                                            )
+                                            handleAddResponse({
+                                                statusCode: value,
+                                                description,
+                                                name,
+                                                contentType,
+                                            })
                                         }
                                         className="w-full focus:ring-igrp focus:border-igrp h-9"
                                         placeholder="e.g., 200, 400"
@@ -197,8 +212,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         name={t('name')}
                                         value={name}
                                         placeholder=""
-                                        onChange={(value) =>
-                                            formik.setFieldValue('name', value)
+                                        onChange={(e) =>
+                                            handleAddResponse({
+                                                statusCode,
+                                                description,
+                                                name: e.target.value,
+                                                contentType,
+                                            })
                                         }
                                     />
                                 </div>
@@ -211,10 +231,12 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         value={contentType}
                                         placeholder="Select Content Type"
                                         onChange={(value) =>
-                                            formik.setFieldValue(
-                                                'contentType',
-                                                value
-                                            )
+                                            handleAddResponse({
+                                                statusCode,
+                                                description,
+                                                name,
+                                                contentType: value,
+                                            })
                                         }
                                         options={contentTypes}
                                         className="w-full focus:ring-igrp focus:border-igrp h-9"
@@ -240,11 +262,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     type="text"
                                     name="description"
                                     value={description}
-                                    onChange={(value) =>
-                                        formik.setFieldValue(
-                                            'description',
-                                            value
-                                        )
+                                    onChange={(e) =>
+                                        handleAddResponse({
+                                            statusCode,
+                                            description: e.target.value,
+                                            name,
+                                            contentType,
+                                        })
                                     }
                                     className="w-full"
                                 />
@@ -257,6 +281,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 <CardContent>
                                     <JSONSchemaBuilder
                                         schemaTypes={schemaTypes}
+                                        enumTypes={enumTypes}
                                         initialSchema={contentData}
                                         onSchemaChange={(value) => {
                                             handleSchemaChange(
