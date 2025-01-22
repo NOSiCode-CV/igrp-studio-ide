@@ -342,17 +342,17 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 schemaType.value === 'Reference other schemas'
                     ? {
                           ...schemaType,
+                          value: 'dto',
                           items: targetDto,
                       }
                     : schemaType
             )
         );
-    }, [dto]);
+    }, [dto, selectors]);
 
     const onSubmit = async () => {
         const errors = await formik.validateForm();
         if (Object.keys(errors).length === 0) {
-            // No validation errors, proceed with submit
             if (name && module && module !== 'shared') {
                 formik.handleSubmit();
             } else {
