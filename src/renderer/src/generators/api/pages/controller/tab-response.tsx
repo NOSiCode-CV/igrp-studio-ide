@@ -162,11 +162,15 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const name = responses[statusCode].name;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];
+
+                    const schema = content?.[contentType]?.['schema'];
+                    const properties = schema?.properties;
+                    
                     const contentData =
-                        content?.[contentType]?.['schema'] &&
-                        Object.keys(content[contentType]['schema']?.properties).length > 0
-                            ? content[contentType]['schema']
+                        properties && Object.keys(properties).length > 0
+                            ? schema
                             : null;
+                            
                     return (
                         <div
                             key={statusCode}
