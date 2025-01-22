@@ -115,7 +115,7 @@ export function PopoverDto({ index, row, collectionTypes, changeValue }: Popover
                 </p>
                 {['primaryKey'].map((field) => (
                   <div key={`${field}-${index}`} className="flex flex-1 items-center gap-4">
-                    <Label htmlFor={`${field}-${index}`}>{toInitCap(field)}</Label>
+                    <Label htmlFor={`${field}-${index}`}>Identifier</Label>
                     <Switch
                       id={`${field}-${index}`}
                       onCheckedChange={(checked) => changeValue(field, index, checked)}

@@ -66,7 +66,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 formik.values.requestBody?.content?.['multipart/form-data']
                     ?.schema;
 
-            const properties =
+            const properties: any =
                 schema?.properties && Object.keys(schema.properties).length > 0
                     ? Object.values(schema.properties)
                     : [defaultValue];

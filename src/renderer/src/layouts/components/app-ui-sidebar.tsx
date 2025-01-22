@@ -13,7 +13,7 @@ import {
     useSidebar,
 } from '@renderer/components/ui/sidebar';
 import { cn } from '@renderer/lib/utils';
-import { Command, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
 import React, { useEffect, useState } from 'react';

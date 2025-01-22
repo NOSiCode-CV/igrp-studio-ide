@@ -12,10 +12,7 @@ export const initialValues = {
             name: "OK",
             content: {
                 "application/json": {
-                    schema: {
-                        type: 'object',
-                        properties: {},
-                    }
+                    schema: null
                 }
             }
         },

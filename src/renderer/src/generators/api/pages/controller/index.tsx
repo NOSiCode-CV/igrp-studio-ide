@@ -400,7 +400,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                             <div className="space-y-3">
                                 <Label
                                     htmlFor={'method'}
-                                    className="block text-sm font-medium text-gray-700"
+                                    className="block text-sm"
                                 >
                                     {'Method Type'}
                                 </Label>
