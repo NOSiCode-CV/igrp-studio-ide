@@ -20,7 +20,7 @@ build_packagedev:
     - yarn build:win
   artifacts:
     paths:
-      - dist/
+      - dist/*
     expire_in: 4 week
 
 release:
