@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "1.0.0-alpha",
 	"description": "IGRP Studio for dev",
-	"main": "./out/main/index.js",
+	"main": "./dist/main/index.js",
 	"author": "nosi.cv",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -11,14 +11,16 @@
 		"typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
 		"typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
 		"typecheck": "npm run typecheck:node && npm run typecheck:web",
-		"start": "electron-vite preview",
-		"dev": "electron-vite dev",
+		"start": "electron-vite preview --outDir=dist",
+		"dev": "electron-vite dev --outDir=dist",
+		"package": "electron-vite build --outDir=dist && electron-forge package",
+		"make": "electron-vite build --outDir=dist && electron-forge make",
 		"build": "npm run typecheck && electron-vite build",
 		"postinstall": "electron-builder install-app-deps",
 		"build:unpack": "npm run build && electron-builder --dir",
-		"build:win": "npm run build && electron-builder --win",
-		"build:mac": "electron-vite build && electron-builder --mac",
-		"build:linux": "electron-vite build && electron-builder --linux"
+		"build:win": "npm run build && electron-builder --win --config",
+		"build:mac": "electron-vite build && electron-builder --mac --config",
+		"build:linux": "electron-vite build && electron-builder --linux --config"
 	},
 	"dependencies": {
 		"@codemirror/lang-json": "^6.0.1",
@@ -97,7 +99,10 @@
 		"@types/react-dom": "^18.3.0",
 		"@vitejs/plugin-react": "^4.3.1",
 		"autoprefixer": "^10.4.20",
+		"electron": "^31.0.2",
+		"electron-builder": "^24.13.3",
 		"electron-devtools-installer": "^3.2.0",
+		"electron-vite": "^2.3.0",
 		"eslint": "^8.57.0",
 		"eslint-plugin-react": "^7.34.3",
 		"jest": "^29.7.0",
@@ -109,33 +114,31 @@
 		"ts-node": "^10.9.2",
 		"typescript": "^5.6.3",
 		"vite": "^5.3.1",
-		"electron": "^31.0.2",
-		"electron-builder": "^24.13.3",
-		"electron-vite": "^2.3.0"
+		"@electron-forge/cli": "^6.2.1",
+		"@electron-forge/maker-deb": "^6.2.1",
+		"@electron-forge/maker-rpm": "^6.2.1",
+		"@electron-forge/maker-squirrel": "^6.2.1",
+		"@electron-forge/maker-zip": "^6.2.1"
 	},
 	"build": {
 		"productName": "IGRP Studio",
 		"appId": "cv.nosi.igrp.studio",
 		"win": {
-			"icon": "build/icon.ico",
-			"target": [
-				"nsis"
-			]
+			"icon": "build/icon.ico"
 		},
 		"mac": {
-			"icon": "build/icons/icon.icns",
-			"target": [
-				"dmg"
-			]
+			"icon": "build/icons/icon.icns"
 		},
 		"linux": {
 			"icon": "build/icons/icon.png"
 		},
-		"files": [
-			"out/main/**/*"
-		],
-		"directories": {
-			"output": "dist"
-		}
+		"protocols": [
+			{
+				"name": "IGRP Studio",
+				"schemes": [
+					"igrp-studio"
+				]
+			}
+		]
 	}
 }
