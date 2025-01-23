@@ -48,7 +48,7 @@ const typeMapping = {
     'time without time zone': 'time',
     'time with time zone': 'time',
     uuid: 'uuid',
-    bytea: 'binary',
+    bytea: 'file',
 };
 
 const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
@@ -117,11 +117,6 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                                     : null,
                             };
                         });
-
-                    console.log(
-                        `Relations for table ${tableName}:`,
-                        attributes
-                    );
 
                     // Add referenced foreign_key_table to selectedRows dynamically if not present
                     for (const column of structure.filter(

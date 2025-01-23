@@ -1,9 +1,12 @@
+const { config } = require("process");
+
 module.exports = {
     packagerConfig: {
       ignore: [
         /^\/src/,
         /(.eslintrc.json)|(.gitignore)|(electron.vite.config.ts)|(forge.config.cjs)|(tsconfig.*)/,
       ],
+      icon: 'resources/icons/icon',
     },
     rebuildConfig: {},
     makers: [
@@ -14,6 +17,8 @@ module.exports = {
       {
         name: '@electron-forge/maker-zip',
         platforms: ['darwin'],
+        config:{
+        }
       },
       {
         name: '@electron-forge/maker-deb',

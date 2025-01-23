@@ -32,7 +32,7 @@
 		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
-		"@igrp/spring-engine": "^0.3.0-alpha-4.7.8",
+		"@igrp/spring-engine": "^0.3.0-alpha-4.8.6",
 		"@octokit/rest": "^21.1.0",
 		"@radix-ui/react-accordion": "^1.2.2",
 		"@radix-ui/react-alert-dialog": "^1.1.2",
@@ -91,6 +91,11 @@
 		"yup": "^1.4.0"
 	},
 	"devDependencies": {
+		"@electron-forge/cli": "^6.2.1",
+		"@electron-forge/maker-deb": "^6.2.1",
+		"@electron-forge/maker-rpm": "^6.2.1",
+		"@electron-forge/maker-squirrel": "^6.2.1",
+		"@electron-forge/maker-zip": "^6.2.1",
 		"@electron-toolkit/eslint-config-prettier": "^2.0.0",
 		"@electron-toolkit/eslint-config-ts": "^2.0.0",
 		"@electron-toolkit/tsconfig": "^1.0.1",
@@ -113,12 +118,7 @@
 		"tailwindcss": "^3.4.14",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.6.3",
-		"vite": "^5.3.1",
-		"@electron-forge/cli": "^6.2.1",
-		"@electron-forge/maker-deb": "^6.2.1",
-		"@electron-forge/maker-rpm": "^6.2.1",
-		"@electron-forge/maker-squirrel": "^6.2.1",
-		"@electron-forge/maker-zip": "^6.2.1"
+		"vite": "^5.3.1"
 	},
 	"build": {
 		"productName": "IGRP Studio",
@@ -127,7 +127,7 @@
 			"icon": "build/icon.ico"
 		},
 		"mac": {
-			"icon": "build/icons/icon.icns"
+			"icon": "build/icon.icns"
 		},
 		"linux": {
 			"icon": "build/icons/icon.png"

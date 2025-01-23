@@ -38,9 +38,7 @@ export function SpringConfig({
 
     useEffect(() => {
         const getVersions = async () => {
-            const data: HandlerResponse = await window.api.getVersions(
-                'https://sonatype.nosi.cv/service/rest/v1/search?repository=igrp-framework&group=cv.igrp&name=core'
-            );
+            const data: HandlerResponse = await window.api.getVersions(import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS );
 
             const options = data.result.map((value) => {
                 return {

@@ -660,9 +660,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -1148,10 +1148,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.3.0-alpha-4.7.8":
-  version "0.3.0-alpha-4.7.8"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.7.8.tgz#8a3fb36aaade6f0c0c0dccd6d8ad604a789dbc6b"
-  integrity sha512-abukLglE4+bPFpWLhHQSIBnSjHdRGsFP2uM3s9zNDGvOoHlNSsY6Rua1w8vWgjpJA/4WobSYwVWLXpmr+SONOA==
+"@igrp/spring-engine@^0.3.0-alpha-4.8.6":
+  version "0.3.0-alpha-4.8.6"
+  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.8.6.tgz#a99876721965173d00516213a99273f9eacaf36c"
+  integrity sha512-q8zslSLlnyiVV6XTp2DoXtMM1r1eEFLgmLF6pty06pAA9SOSyycD4ZBElNobBXXTkW2nucwrgsPiXa7d3mGDCw==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
