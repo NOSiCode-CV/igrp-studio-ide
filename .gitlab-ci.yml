@@ -1,54 +1,56 @@
-stages:
-  - build
-  - release
-cache:
-  paths:
-    - node_modules/
-build_packagedev:
-  image: node:slim
-  stage: build
-  only:
-    - master
-  before_script:
-    - apt-get update
-    - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
-    - dpkg --add-architecture i386
-    - apt-get update
-    - apt-get install -y wine64 wine32
-  script:
-    - yarn install
-    - yarn build:win
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 4 week
+name: Build/release Electron app
 
-release:
-  stage: release
-  image: curlimages/curl:latest
-  script:
-    - echo "Creating a new release on GitLab..."
-    - |
-      curl --request POST \
-        --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-        --header "Content-Type: application/json" \
-        --data '{
-          "name": "Release $CI_COMMIT_TAG",
-          "tag_name": "$CI_COMMIT_TAG",
-          "description": "Release for commit $CI_COMMIT_SHA",
-          "assets": {
-            "links": [
-              {
-                "name": "Download",
-                "url": "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
-              }
-            ]
-          }
-        }' \
-        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
-  #only:
-   # - tags
-  dependencies:
-    - build_packagedev
-  needs:
-    - build_packagedev
+on:
+  push:
+    tags:
+      - v*.*.*
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: build-linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run build:linux
+
+      - name: build-mac
+        if: matrix.os == 'macos-latest'
+        run: npm run build:mac
+
+      - name: build-win
+        if: matrix.os == 'windows-latest'
+        run: npm run build:win
+
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            dist/*.exe
+            dist/*.zip
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.snap
+            dist/*.deb
+            dist/*.rpm
+            dist/*.tar.gz
+            dist/*.yml
+            dist/*.blockmap
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
