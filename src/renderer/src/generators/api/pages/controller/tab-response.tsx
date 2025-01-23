@@ -171,8 +171,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             ? schema
                             : null;
 
-                    console.log(contentData)
-
                     return (
                         <div
                             key={statusCode}
