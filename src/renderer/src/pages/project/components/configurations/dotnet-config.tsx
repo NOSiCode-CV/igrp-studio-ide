@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { HandlerResponse, DotNetConfigData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
+import useCore from '@renderer/hooks/useCore';
 
 interface DotNetConfigProps {
     data: DotNetConfigData;
@@ -33,22 +34,23 @@ export function DotNetConfig({
     onChange,
 }: DotNetConfigProps) {
     const [versions, setVersions] = useState([]);
+    const { getVersions } = useCore();
 
     useEffect(() => {
-        const getVersions = async () => {
-            const data: HandlerResponse = await window.api.getVersions(import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS );
+        const fetchVersions = async () => {
+            const versionsData = await getVersions();
+            setVersions(versionsData);
 
-            const options = data.result.map((value) => {
-                return {
-                    label: value,
-                    value: value,
-                };
-            });
-
-            setVersions(options);
+            if (versionsData.length > 0) {
+                const latestVersion = versionsData[0]?.value;
+                if (!data.igrpCoreVersion) {
+                    onChange({ ...data, igrpCoreVersion: latestVersion });
+                }
+            }
         };
-        getVersions();
-    }, []);
+
+        fetchVersions();
+    }, [getVersions]);
 
     return (
         <div className="space-y-6">

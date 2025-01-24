@@ -205,6 +205,18 @@ export function ProjectWizard() {
         });
     };
 
+    const handleChangeType = (value: string) => {
+        if (formik.values.framework !== value)
+            formik.setFieldValue('framework', '');
+        formik.setFieldValue('type', value)
+    };
+
+    const handleChangeFramework = (value: string) => {
+        if (formik.values.framework !== value)
+            formik.setFieldValue('config', undefined);
+        formik.setFieldValue('framework', value);
+    };
+
     const SelectedComponent = formik.values?.framework
         ? componentsMap[formik.values?.framework]
         : null;
@@ -291,8 +303,7 @@ export function ProjectWizard() {
                                     <RadioGroup
                                         name="type"
                                         value={formik.values.type}
-                                        onValueChange={(value) =>
-                                            formik.setFieldValue('type', value)
+                                        onValueChange={(value) =>handleChangeType(value)
                                         }
                                         className="grid grid-cols-2 gap-4"
                                     >
@@ -367,7 +378,7 @@ export function ProjectWizard() {
                                     name="framework"
                                     value={formik.values.framework}
                                     onValueChange={(value) =>
-                                        formik.setFieldValue('framework', value)
+                                        handleChangeFramework(value)
                                     }
                                     className="grid gap-4"
                                 >
@@ -492,9 +503,10 @@ export function ProjectWizard() {
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={
-                                                        handleOpenDirectory
-                                                    }
+                                                    onClick={(e)=>{
+                                                        e.preventDefault();
+                                                        handleOpenDirectory()
+                                                    }}
                                                 >
                                                     <FolderOpen className="h-4 w-4" />
                                                 </Button>

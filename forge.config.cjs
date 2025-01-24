@@ -4,7 +4,7 @@ module.exports = {
     packagerConfig: {
       ignore: [
         /^\/src/,
-        /(.eslintrc.json)|(.gitignore)|(electron.vite.config.ts)|(forge.config.cjs)|(tsconfig.*)/,
+        /(.eslintrc.json)|(electron.vite.config.ts)|(forge.config.cjs)|(tsconfig.*)/,
       ],
       icon: 'resources/icons/icon',
     },
