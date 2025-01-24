@@ -183,7 +183,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                         >
                             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor={'statusCode'} className="">
+                                    <Label htmlFor={'statusCode'}>
                                         {'HTTP Status Code'}
                                     </Label>
                                     <Combobox
@@ -203,13 +203,12 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor={'name'} className="">
+                                    <Label htmlFor={'name'}>
                                         {'Name'}
                                     </Label>
                                     <Input
                                         name={t('name')}
                                         value={name}
-                                        placeholder=""
                                         onChange={(e) =>
                                             handleAddResponse({
                                                 statusCode,
@@ -221,7 +220,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor={'contentType'} className="">
+                                    <Label htmlFor={'contentType'}>
                                         {'Content Type'}
                                     </Label>
                                     <Combobox

@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { dropdownItem } from './nav-data';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;
@@ -36,6 +37,8 @@ export const DropdownSidebarMenuButton: React.FC<
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
+
+    const {createGitCommit} =useGit()
 
     const handleDropdownClick = (item: any) => {
         setItem(item);
@@ -69,6 +72,8 @@ export const DropdownSidebarMenuButton: React.FC<
         if (error) {
             showErrorToast(error);
         } else showSuccessToast(t('deletedSuccess', { name: item.label }));
+        
+        createGitCommit(basePath, `Delete ${item.label}`);
 
         dispatch(onSetChangeStatus(true));
     };

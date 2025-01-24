@@ -30,6 +30,7 @@ import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface CreateModuleDialogProps {
     basePath: string;
@@ -44,6 +45,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
     const [isOpen, setIsOpen] = React.useState(false);
 
     const { t } = useTranslation();
+    const { createGitCommit } = useGit();
 
     const dispatch: any = useDispatch();
 
@@ -85,6 +87,8 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
             }
 
             formik.resetForm();
+
+            createGitCommit(basePath, `Add module ${formik.values.name}`);
 
             dispatch(onSetChangeStatus(true));
 

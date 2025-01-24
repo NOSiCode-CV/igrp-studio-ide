@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, screen, autoUpdater } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -84,6 +84,15 @@ function createWindow(): void {
   closeApp(mainWindow)
 
   installExtensions(mainWindow)
+
+  /* const server = 'https://your-deployment-url.com'
+  const url = `${server}/update/${process.platform}/${app.getVersion()}`
+
+  autoUpdater.setFeedURL({ url })
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates()
+  }, 60000) */
 }
 
 
@@ -164,7 +173,7 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 ipcMain.handle('get-app-version', () => {
-    return app.getVersion();
+  return app.getVersion();
 });
 
 ipcMain.on('open-directory-dialog', async (event) => {
@@ -186,18 +195,18 @@ ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<I
 })
 
 ipcMain.handle(
-    'igrp-studio:repo:project.findAllRecent',
-    async (_event) => {
-        return await repo.findAllRecent()
-    }
+  'igrp-studio:repo:project.findAllRecent',
+  async (_event) => {
+    return await repo.findAllRecent()
+  }
 )
 
 ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: ProjectData) => {
-    await repo.save(project)
+  await repo.save(project)
 })
 
 ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: ProjectData, index: number) => {
-    await repo.delete(project, index)
+  await repo.delete(project, index)
 })
 
 ipcMain.handle(

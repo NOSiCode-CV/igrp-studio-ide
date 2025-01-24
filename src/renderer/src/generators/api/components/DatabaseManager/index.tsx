@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean;
@@ -61,6 +62,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     const [selectedConnection, setSelectedConnection] = useState<string>('');
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+    const { createGitCommit } = useGit();
     const dispatch: any = useDispatch();
 
     const handleClickSubmit = async () => {
@@ -173,6 +175,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 showErrorToast(errMsg);
             });
         } else {
+            createGitCommit(basePath, `Import data tables`);
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('schemaCreatedSuccess'));
         }

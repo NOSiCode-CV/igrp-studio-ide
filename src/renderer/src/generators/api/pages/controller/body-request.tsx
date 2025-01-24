@@ -174,13 +174,11 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="value">
-                                    <CodeEditor
-                                        value={JSON.stringify(
-                                            formik.values.requestBody
-                                                ?.content?.[contentType]?.schema
-                                        )}
+                                   {/*  <CodeEditor
+                                        value={formik.values.requestBody
+                                            ?.content?.[contentType]?.schema}
                                         onChange={handleChangeEditor}
-                                    />
+                                    /> */}
                                 </TabsContent>
                                 <TabsContent value="schema">
                                     <JSONSchemaBuilder
