@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, screen, autoUpdater, MessageBoxOptions } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -16,6 +16,8 @@ import { setupGitLabOAuth } from './helpers/git-auth/gitlab-auth'
 import { GitService } from './services/git-service'
 import { TokenService } from './services/token-service';
 import { GitHubService } from './services/github-service';
+
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 
 const isDev = process.env.NODE_ENV === 'development';
 if (!isDev) {
@@ -85,14 +87,6 @@ function createWindow(): void {
 
   installExtensions(mainWindow)
 
-  /* const server = 'https://your-deployment-url.com'
-  const url = `${server}/update/${process.platform}/${app.getVersion()}`
-
-  autoUpdater.setFeedURL({ url })
-
-  setInterval(() => {
-    autoUpdater.checkForUpdates()
-  }, 60000) */
 }
 
 
@@ -156,6 +150,47 @@ app.whenReady().then(async () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  updateElectronApp({
+    updateSource: {
+      type: UpdateSourceType.StaticStorage,
+      baseUrl: `${import.meta.env.ELECTRON_RENDERER_UPDATE_SERVER}/${process.platform}/${process.arch}`
+    }
+  })
+
+
+  const url = `${import.meta.env.ELECTRON_RENDERER_UPDATE_SERVER}/${process.platform}/${app.getVersion()}`
+
+  autoUpdater.setFeedURL({ url })
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates()
+  }, 60000)
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates()
+  }, 60000)
+
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts: MessageBoxOptions = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      detail:
+        'A new version has been downloaded. Restart the application to apply the updates.'
+    }
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+  })
+
+  autoUpdater.on('error', (message) => {
+    console.error('There was a problem updating the application')
+    console.error(message)
+  })
+
 })
 
 
