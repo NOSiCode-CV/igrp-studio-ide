@@ -6,11 +6,12 @@ import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
 import { FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
 
+
 import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
-import { setupGitHubOAuth } from './helpers/git-auth/github-auth'
+import { handleProtocolCallback, setupGitHubOAuth } from './helpers/git-auth/github-auth'
 import { GitLabService } from './services/gitlab-service'
 import { setupGitLabOAuth } from './helpers/git-auth/gitlab-auth'
 import { GitService } from './services/git-service'
@@ -19,21 +20,8 @@ import { GitHubService } from './services/github-service';
 
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 
-const isDev = process.env.NODE_ENV === 'development';
-if (!isDev) {
-  if (process.defaultApp) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]]);
-    }
-  } else {
-    app.setAsDefaultProtocolClient('igrp-studio');
-  }
-}
-
 import './handlers/apiHandler';
 import './handlers/dbHandler';
-
-
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -89,21 +77,47 @@ function createWindow(): void {
 
 }
 
-
-if (process.defaultApp) {
-  if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]])
-  }
-} else {
-  app.setAsDefaultProtocolClient('igrp-studio')
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient('igrp-studio');
+  }
+
+  if (process.platform === 'win32') {
+    app.setAsDefaultProtocolClient('igrp-studio');
+    
+    const gotTheLock = app.requestSingleInstanceLock();
+    
+    if (!gotTheLock) {
+      app.quit();
+    } else {
+      app.on('second-instance', (_event, argv) => {
+        const url = argv[argv.length - 1];
+        
+        if (url.startsWith('igrp-studio://') && mainWindow) {
+          if (mainWindow.isMinimized()) mainWindow.restore();
+          mainWindow.focus();
+          handleProtocolCallback(url, mainWindow);
+        }
+      });
+      
+      if (process.argv.length > 1) {
+        const url = process.argv[process.argv.length - 1];
+        if (url.startsWith('igrp-studio://')) {
+          handleProtocolCallback(url, mainWindow);
+        }
+      }
+    }
+  }
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -171,7 +185,7 @@ app.whenReady().then(async () => {
     autoUpdater.checkForUpdates()
   }, 60000)
 
-  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  autoUpdater.on('update-downloaded', (_event, releaseNotes, releaseName) => {
     const dialogOpts: MessageBoxOptions = {
       type: 'info',
       buttons: ['Restart', 'Later'],
