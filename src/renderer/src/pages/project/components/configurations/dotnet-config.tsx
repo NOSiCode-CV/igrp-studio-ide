@@ -9,7 +9,7 @@ import {
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
-import { HandlerResponse, DotNetConfigData } from 'src/main/types';
+import { DotNetConfigData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
