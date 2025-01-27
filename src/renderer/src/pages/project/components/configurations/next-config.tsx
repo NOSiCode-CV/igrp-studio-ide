@@ -22,14 +22,14 @@ export function NextConfig({
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="app-name">Application Name</Label>
+                <Label htmlFor="appName">Application Name</Label>
                 <Input
-                    id="app-name"
+                    id="appName"
                     value={data.appName}
                     onChange={(e) =>
                         onChange({ ...data, appName: e.target.value })
                     }
-                    placeholder="my-next-app"
+                    placeholder="mynextapp"
                 />
             </div>
 
