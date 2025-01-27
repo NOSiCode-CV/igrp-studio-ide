@@ -105,7 +105,7 @@ const RecentsProjects = (): JSX.Element => {
                 project?.location === undefined || project?.location === 'local'
         );
         setLocalProjects(localProjects);
-    }, [allProjects]);
+    }, [allProjects, isDelete]);
 
     const handleOpenProject = async (p: ProjectData): Promise<void> => {
         try {
