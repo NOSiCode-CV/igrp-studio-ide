@@ -151,23 +151,21 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
+  const path = 'https://storage-api.nosi.cv/igrp-package'
+
   updateElectronApp({
     updateSource: {
       type: UpdateSourceType.StaticStorage,
-      baseUrl: `${import.meta.env.ELECTRON_RENDERER_UPDATE_SERVER}/${process.platform}/${process.arch}`
+      baseUrl: `${path}/${process.platform}/${process.arch}`
     }
   })
 
-
-  const url = `${import.meta.env.ELECTRON_RENDERER_UPDATE_SERVER}/${process.platform}/${app.getVersion()}`
+  const url = `${path}/${process.platform}/${app.getVersion()}`
 
   autoUpdater.setFeedURL({ url })
 
   setInterval(() => {
-    autoUpdater.checkForUpdates()
-  }, 60000)
-
-  setInterval(() => {
+    console.log(url )
     autoUpdater.checkForUpdates()
   }, 60000)
 
