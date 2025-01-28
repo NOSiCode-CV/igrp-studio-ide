@@ -3,9 +3,9 @@
 import { Button } from '@renderer/components/ui/button';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Separator } from '@renderer/components/ui/separator';
-import { Download } from 'lucide-react';
+import { CircleArrowUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import logo from '@renderer/assets/images/igrp-blue.svg';
+import logo from '@renderer/assets/images/igrp-green.svg';
 
 export function AboutSettings() {
     const [appVersion, setAppVersion] = useState('');
@@ -45,9 +45,13 @@ export function AboutSettings() {
                         </p>
                         <div className="flex items-center gap-2 pt-1">
                             <Button className="gap-2">
+                                <CircleArrowUp className="h-4 w-4" />
+                                Check Update
+                            </Button>
+                           {/*  <Button className="gap-2">
                                 <Download className="h-4 w-4" />
                                 Install and Restart
-                            </Button>
+                            </Button> */}
                             <Button variant="link" className="h-8">
                                 Changelog
                             </Button>
