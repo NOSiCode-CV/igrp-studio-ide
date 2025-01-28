@@ -11,7 +11,7 @@ import {
     Square,
     X,
 } from 'lucide-react';
-import { SettingsDialog } from '@renderer/components/settings-dialog';
+import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { HelpDialog } from '@renderer/components/help-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
