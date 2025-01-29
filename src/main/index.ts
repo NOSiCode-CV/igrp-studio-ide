@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, screen, autoUpdater, MessageBoxOptions } from 'electron'
-import { join } from 'path'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
@@ -47,6 +47,7 @@ function createWindow(): void {
       // contextIsolation: false // Allow the `process` global
     },
     titleBarStyle: "hidden",
+    icon: path.join(__dirname, 'resources/icons', 'icon.icns'), // Set icon for the window
   })
 
   mainWindow.maximize()

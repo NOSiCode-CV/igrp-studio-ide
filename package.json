@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "1.0.0-alpha",
 	"description": "IGRP Studio for dev",
-	"main": "./dist/main/index.js",
+	"main": "dist/main/index.js",
 	"author": "nosi.cv",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -15,7 +15,7 @@
 		"dev": "electron-vite dev --outDir=dist",
 		"package": "electron-vite build --outDir=dist && electron-forge package",
 		"make": "electron-vite build --outDir=dist && electron-forge make",
-		"build": "npm run typecheck && electron-vite build",
+		"build": "npm run typecheck && electron-vite build --outDir=dist",
 		"postinstall": "electron-builder install-app-deps",
 		"build:unpack": "npm run build && electron-builder --dir",
 		"build:win": "npm run build && electron-builder --win --config",
@@ -122,15 +122,15 @@
 	},
 	"build": {
 		"productName": "IGRP Studio",
-		"appId": "cv.nosi.igrpstudio",
+		"appId": "cv.nosi.igrpstudio.beta",
 		"win": {
-			"icon": "build/icon.ico"
+			"icon": "resources/icons/icon.ico"
 		},
 		"mac": {
-			"icon": "build/icon.icns"
+			"icon": "resources/icons/icon.icns"
 		},
 		"linux": {
-			"icon": "build/icons/icon.png"
+			"icon": "resources/icons/icon.png"
 		},
 		"protocols": [
 			{
@@ -139,6 +139,13 @@
 					"igrp-studio"
 				]
 			}
-		]
+		],
+		"files": [
+			"dist/**/*",
+			"!dist/**/*.map"
+		],
+		"directories": {
+			"output": "out"
+		}
 	}
 }
