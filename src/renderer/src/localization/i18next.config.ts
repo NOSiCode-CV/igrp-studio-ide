@@ -1,21 +1,19 @@
-import i18n from 'i18next';
+import i18n, { Module } from 'i18next';
 import { initReactI18next } from 'react-i18next';
-
-import backend from "i18next-electron-fs-backend";
+import i18nextElectronFsBackend from 'i18next-electron-fs-backend';
 import { LNG } from '@renderer/constants/appConstants';
-
-//const isMac = window.api.i18nextElectronBackend.clientOptions.platform === "darwin";
-//const isDev = window.api.i18nextElectronBackend.clientOptions.environment === "development";
-//const prependPath = isMac && !isDev ? window.api.i18nextElectronBackend.clientOptions.resourcesPath : ".";
 
 // @ts-ignore
 import enCommon from '/src/localization/locales/en/translation.json';
+// @ts-ignore
+import ptCommon from '/src/localization/locales/pt/translation.json';
 
-if (!backend) {
-  console.error('i18nextElectronBackend is not defined');
-} else {
+// Fetch the initial language from the main process
+const initializeI18n = async () => {
+  const currentLanguage = await window.electron.getLanguage();
+
   i18n
-    .use(backend)
+    .use(i18nextElectronFsBackend as Module)
     .use(initReactI18next)
     .init({
       fallbackLng: LNG.DEFAULT_LANGUAGE,
@@ -23,16 +21,21 @@ if (!backend) {
       resources: {
         en: {
           translation: enCommon,
-        }
+        },
+        pt: {
+          translation: ptCommon,
+        },
       },
       interpolation: {
         escapeValue: false,
       },
       saveMissing: true,
-      saveMissingTo: "current",
-      lng: "en",
-      supportedLngs: LNG.SUPPORTED_LANGUAGES
+      saveMissingTo: 'current',
+      lng: currentLanguage, // Use the language fetched from the main process
+      supportedLngs: LNG.SUPPORTED_LANGUAGES,
     });
-}
+};
+
+initializeI18n();
 
 export default i18n;

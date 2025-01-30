@@ -126,7 +126,7 @@ export function AppSidebar({
                                     asChild
                                     className="md:h-8 md:p-0 items-center justify-center"
                                 >
-                                    <a href="/">
+                                    <a href="#/">
                                         <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-igrp text-sidebar-primary-foreground">
                                             <Home className="size-4" />
                                         </div>

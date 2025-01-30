@@ -28,7 +28,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
 }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { showErrorToast, showSuccessToast } = useToast();
-    const { t } = useTranslation();
+    const { t } = useTranslation(); // Hook for translations
 
     const handleDelete = async () => {
         setIsDialogOpen(false);
@@ -57,25 +57,25 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
                             disabled
                         >
                             <Repeat className="mr-2 h-4 w-4 text-gray-500" />
-                            Convert to Spring Boot
+                            {t('convertToSpringBoot')}
                             <span className="ml-auto text-xs text-muted-foreground">
-                                Coming soon
+                                {t('comingSoon')}
                             </span>
                         </DropdownMenuItem>
                     )}
                     {project.framework === ENV_TYPES.SPRING && (
                         <DropdownMenuItem onClick={onConvertToDotNet} disabled>
                             <Repeat className="mr-2 h-4 w-4 text-gray-500" />
-                            Convert to .NET
+                            {t('convertToDotNet')}
                             <span className="ml-auto text-xs text-muted-foreground">
-                                Coming soon
+                                {t('comingSoon')}
                             </span>
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
                         <Trash className="mr-2 h-4 w-4 text-red-500" />
-                        Remove Project
+                        {t('removeProject')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

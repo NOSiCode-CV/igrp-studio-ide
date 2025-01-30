@@ -28,6 +28,7 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface ModelProps {
     basePath: string;
@@ -46,6 +47,7 @@ const ModelLayout = ({
     onCloseTab,
     onUpdateTab,
 }: ModelProps): JSX.Element => {
+    const { createGitCommit } = useGit();
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const [tablesColumns, setTableColumns] = useState<{
@@ -197,9 +199,13 @@ const ModelLayout = ({
 
             if (error) return showErrorToast(error);
 
+            createGitCommit(basePath, `Add schema ${formik.values.name}`);
+
             dispatch(onSetChangeStatus(true));
 
             onCloseTab();
+
+            createGitCommit(basePath, `Delete schema ${formik.values.name}`);
 
             showSuccessToast(t('deletedSuccess', { name: t('model') }));
         } catch (error) {

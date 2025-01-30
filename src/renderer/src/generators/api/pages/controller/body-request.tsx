@@ -9,7 +9,6 @@ import {
 } from '@renderer/components/ui/tabs';
 import { Combobox } from '@igrp/igrp-design-system';
 import { Card, CardContent } from '@renderer/components/ui/card';
-import CodeEditor from '@renderer/components/code-editor';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 
@@ -37,7 +36,6 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     schemaTypes,
     columnsBody,
     handleSchemaChange,
-    handleChangeEditor,
     setLocalSchema,
     setContentType,
     setBodyType,
@@ -174,13 +172,11 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="value">
-                                    <CodeEditor
-                                        value={JSON.stringify(
-                                            formik.values.requestBody
-                                                ?.content?.[contentType]?.schema
-                                        )}
+                                   {/*  <CodeEditor
+                                        value={formik.values.requestBody
+                                            ?.content?.[contentType]?.schema}
                                         onChange={handleChangeEditor}
-                                    />
+                                    /> */}
                                 </TabsContent>
                                 <TabsContent value="schema">
                                     <JSONSchemaBuilder

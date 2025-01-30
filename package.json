@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "1.0.0-alpha",
 	"description": "IGRP Studio for dev",
-	"main": "./dist/main/index.js",
+	"main": "dist/main/index.js",
 	"author": "nosi.cv",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -15,24 +15,27 @@
 		"dev": "electron-vite dev --outDir=dist",
 		"package": "electron-vite build --outDir=dist && electron-forge package",
 		"make": "electron-vite build --outDir=dist && electron-forge make",
-		"build": "npm run typecheck && electron-vite build",
+		"build": "npm run typecheck && electron-vite build --outDir=dist",
 		"postinstall": "electron-builder install-app-deps",
 		"build:unpack": "npm run build && electron-builder --dir",
 		"build:win": "npm run build && electron-builder --win --config",
 		"build:mac": "electron-vite build && electron-builder --mac --config",
+		"build:mac:x64": "electron-vite build && electron-builder --mac --x64 --config",
+		"build:mac:arm64": "electron-vite build && electron-builder --mac --arm64 --config",
 		"build:linux": "electron-vite build && electron-builder --linux --config"
 	},
 	"dependencies": {
 		"@codemirror/lang-json": "^6.0.1",
+		"@codemirror/state": "^6.5.1",
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/utils": "^3.0.0",
 		"@faker-js/faker": "^9.2.0",
 		"@gitbeaker/node": "^35.8.1",
 		"@hello-pangea/dnd": "^17.0.0",
-		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
+		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
-		"@igrp/spring-engine": "^0.3.0-alpha-4.7.8",
+		"@igrp/spring-engine": "^0.3.0-alpha-4.9.0",
 		"@octokit/rest": "^21.1.0",
 		"@radix-ui/react-accordion": "^1.2.2",
 		"@radix-ui/react-alert-dialog": "^1.1.2",
@@ -57,12 +60,11 @@
 		"@shadcn/ui": "^0.0.4",
 		"@types/express": "^5.0.0",
 		"@types/jest": "^29.5.14",
-		"@uiw/react-codemirror": "^4.23.6",
+		"@uiw/react-codemirror": "^4.23.7",
 		"axios": "^1.7.9",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.4",
-		"codemirror": "^6.0.1",
 		"date-fns": "^4.1.0",
 		"electron-store": "^10.0.0",
 		"electron-updater": "^6.1.7",
@@ -79,7 +81,6 @@
 		"oracledb": "^6.7.1",
 		"pg": "^8.13.1",
 		"process": "^0.11.10",
-		"react-codemirror2": "^8.0.0",
 		"react-day-picker": "^9.3.2",
 		"react-i18next": "^15.1.1",
 		"react-redux": "^9.1.2",
@@ -88,9 +89,15 @@
 		"tailwind-merge": "^2.5.4",
 		"tailwindcss-animate": "^1.0.7",
 		"ts-jest": "^29.2.5",
+		"update-electron-app": "^3.1.0",
 		"yup": "^1.4.0"
 	},
 	"devDependencies": {
+		"@electron-forge/cli": "^6.2.1",
+		"@electron-forge/maker-deb": "^6.2.1",
+		"@electron-forge/maker-rpm": "^6.2.1",
+		"@electron-forge/maker-squirrel": "^6.2.1",
+		"@electron-forge/maker-zip": "^6.2.1",
 		"@electron-toolkit/eslint-config-prettier": "^2.0.0",
 		"@electron-toolkit/eslint-config-ts": "^2.0.0",
 		"@electron-toolkit/tsconfig": "^1.0.1",
@@ -113,24 +120,19 @@
 		"tailwindcss": "^3.4.14",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.6.3",
-		"vite": "^5.3.1",
-		"@electron-forge/cli": "^6.2.1",
-		"@electron-forge/maker-deb": "^6.2.1",
-		"@electron-forge/maker-rpm": "^6.2.1",
-		"@electron-forge/maker-squirrel": "^6.2.1",
-		"@electron-forge/maker-zip": "^6.2.1"
+		"vite": "^5.3.1"
 	},
 	"build": {
 		"productName": "IGRP Studio",
-		"appId": "cv.nosi.igrp.studio",
+		"appId": "cv.nosi.igrpstudio.beta",
 		"win": {
-			"icon": "build/icon.ico"
+			"icon": "resources/icons/icon.ico"
 		},
 		"mac": {
-			"icon": "build/icons/icon.icns"
+			"icon": "resources/icons/icon.icns"
 		},
 		"linux": {
-			"icon": "build/icons/icon.png"
+			"icon": "resources/icons/icon.png"
 		},
 		"protocols": [
 			{
@@ -139,6 +141,13 @@
 					"igrp-studio"
 				]
 			}
-		]
+		],
+		"files": [
+			"dist/**/*",
+			"!dist/**/*.map"
+		],
+		"directories": {
+			"output": "out"
+		}
 	}
 }

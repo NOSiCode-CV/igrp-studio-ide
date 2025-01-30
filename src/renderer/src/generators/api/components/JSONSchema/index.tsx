@@ -131,7 +131,7 @@ export function JSONSchemaBuilder({
     };
 
     const handleAddNewField = (parentId?: string) => {
-        const newFieldName = `New Field ${Object.keys(schema.properties).length + Object.keys(newFields).length + 1}`;
+        const newFieldName = `field${Object.keys(schema.properties).length + Object.keys(newFields).length + 1}`;
 
         const newFieldId = `new_field_${Date.now()}`;
 
@@ -211,6 +211,7 @@ export function JSONSchemaBuilder({
             });
         }
     };
+
     const handleUpdateField = useCallback(
         (
             id: string,
@@ -220,12 +221,24 @@ export function JSONSchemaBuilder({
             const updateProperties = (
                 properties: Record<string, SchemaField>
             ): Record<string, SchemaField> => {
+
                 if (id in properties) {
-                    const { [id]: _, ...rest } = properties;
+                    const { [id]: oldField, ...rest } = properties; // Remove the old field
                     return {
-                        ...rest,
-                        [updatedField.name]: {
-                            ...updatedField,
+                        ...rest, // Keep the rest of the properties
+                        [updatedField.name]: { // Add the updated field with the new key
+                            ...oldField, // Preserve the old field's properties
+                            ...updatedField, // Apply updates
+                            properties: updatedField.properties
+                                ? Object.fromEntries(
+                                      Object.entries(updatedField.properties).map(([_key, field]) => [
+                                        field.name,
+                                          {
+                                              ...field,
+                                          },
+                                      ])
+                                  )
+                                : undefined, // Update nested properties if they exist
                         },
                     };
                 }
@@ -278,13 +291,11 @@ export function JSONSchemaBuilder({
                     properties: updateProperties(prev.properties),
                 }));
 
-                if (id !== updatedField.name) {
-                    setFieldOrder((prev) =>
-                        prev.map((field) =>
-                            field === id ? updatedField.name : field
-                        )
-                    );
-                }
+                setFieldOrder((prev) =>
+                    prev.map((field) =>
+                        field === id ? updatedField.name : field
+                    )
+                );
             }
         },
         []

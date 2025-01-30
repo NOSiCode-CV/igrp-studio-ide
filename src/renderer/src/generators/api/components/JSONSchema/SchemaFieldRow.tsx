@@ -171,10 +171,10 @@ export function SchemaFieldRow({
                             );
                         }}
                         onDelete={() => {
-                            /*  const { [subId]: _, ...newProperties } =
-                                field.properties; */
+                              const { [subId]: _, ...newProperties } =
+                                field.properties; 
                             onUpdate(
-                                { ...field, properties: field.properties },
+                                { ...field, properties: newProperties },
                                 index
                             );
                         }}

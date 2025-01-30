@@ -21,12 +21,12 @@ interface LayoutProps {
 const navData: SidebarProps[] = [
     {
         name: 'Home',
-        href: '#',
+        href: '#/',
         icon: Home,
     },
     {
         name: 'Settings',
-        href: '#',
+        href: '#/',
         icon: Settings,
     },
 ];

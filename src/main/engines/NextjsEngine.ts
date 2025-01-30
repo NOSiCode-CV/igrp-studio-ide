@@ -12,7 +12,7 @@ export class NextjsEngine implements BaseEngine {
     throw new Error('Method not implemented.');
   }
 
-  
+
   createResponse(_config: ResponseConfig, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -26,7 +26,7 @@ export class NextjsEngine implements BaseEngine {
     const repo = new ProjectRepository()
 
     const nextConfig: AppConfig = {
-      appName: project.name,
+      ...project.config,
       type: 'baseApp'
     }
 

@@ -36,6 +36,7 @@ import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
 import { SchemaTypeItem } from 'src/main/types';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface ControllerProps {
     basePath: string;
@@ -61,6 +62,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     enums,
 }: ControllerProps) => {
     const { t } = useTranslation();
+    const { createGitCommit } = useGit();
 
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
@@ -236,6 +238,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 return;
             }
 
+            createGitCommit(basePath, `Add action ${formik.values.name}`);
+
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
@@ -292,6 +296,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     return;
                 }
             }
+
+            createGitCommit(basePath, `Delete action ${formik.values.name}`);
 
             // Notify of successful deletion or update
             dispatch(onSetChangeStatus(true));

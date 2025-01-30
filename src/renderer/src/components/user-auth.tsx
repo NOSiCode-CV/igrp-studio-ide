@@ -15,7 +15,7 @@ function GitConnectionMenu() {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
             {user ? (
                 <Button variant="ghost" size="icon" className="p-0">
                     <Avatar className="h-8 w-8">

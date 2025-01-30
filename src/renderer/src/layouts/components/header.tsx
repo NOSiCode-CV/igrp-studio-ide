@@ -1,4 +1,4 @@
-import logo from '@renderer/assets/images/igrp-blue.svg';
+import logo from '@renderer/assets/images/igrp-green.svg';
 import { useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
@@ -11,7 +11,7 @@ import {
     Square,
     X,
 } from 'lucide-react';
-import { SettingsDialog } from '@renderer/components/settings-dialog';
+import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { HelpDialog } from '@renderer/components/help-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
@@ -115,7 +115,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                 <header className="sticky h-10 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="flex items-center justify-between px-4">
                         <div className="flex items-center space-x-2 home cursor-pointer">
-                            <div onClick={openPage} className='flex items-center gap-2'>
+                            <div onClick={openPage} className={cn('flex items-center gap-2', isMac ? 'pl-12': '')}>
                                 <img src={logo} alt="Logo" className="h-6 w-auto" />
                                 <p className="text-sm font-medium">IGRP Studio</p>
                             </div>
@@ -212,7 +212,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                 </header>
                 <SettingsDialog
                     isOpen={openSettings}
-                    onClose={() => setOpenSettings(!openSettings)}
+                    onClose={() => setOpenSettings(false)}
                 />
                 <HelpDialog
                     isOpen={openHelp}

@@ -19,6 +19,7 @@ import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface DtoProps {
     basePath: string;
@@ -40,6 +41,8 @@ const DtoLayout = ({
     onUpdateTab,
 }: DtoProps): JSX.Element => {
     const dispatch: any = useDispatch();
+
+    const {createGitCommit} = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -111,6 +114,8 @@ const DtoLayout = ({
                 return showErrorToast(error);
             }
 
+            createGitCommit(basePath, `Add dto ${newValues.name}`)
+
             dispatch(onSetChangeStatus(true));
 
             onUpdateTab(formik.values.name);
@@ -138,6 +143,8 @@ const DtoLayout = ({
             );
 
             if (error) return showErrorToast(error);
+
+            createGitCommit(basePath, `Delete dto ${formik.values.name}`);
 
             dispatch(onSetChangeStatus(true));
             onCloseTab();

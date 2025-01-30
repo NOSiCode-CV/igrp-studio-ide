@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
-import { join } from 'path'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
@@ -10,28 +10,18 @@ import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory } from '
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
-import { setupGitHubOAuth } from './helpers/git-auth/github-auth'
+import { handleProtocolCallback, setupGitHubOAuth } from './helpers/git-auth/github-auth'
 import { GitLabService } from './services/gitlab-service'
 import { setupGitLabOAuth } from './helpers/git-auth/gitlab-auth'
 import { GitService } from './services/git-service'
 import { TokenService } from './services/token-service';
 import { GitHubService } from './services/github-service';
 
-const isDev = process.env.NODE_ENV === 'development';
-if (!isDev) {
-  if (process.defaultApp) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]]);
-    }
-  } else {
-    app.setAsDefaultProtocolClient('igrp-studio');
-  }
-}
-
 import './handlers/apiHandler';
 import './handlers/dbHandler';
-
-
+import { updateApp } from './helpers/update'
+import { buildTaskbar } from './helpers/taskbar'
+import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -39,6 +29,8 @@ let mainWindow: BrowserWindow
 
 const repo = new ProjectRepository()
 
+// Load the initial language configuration
+loadConfig();
 
 function createWindow(): void {
   // Create the browser window.
@@ -57,6 +49,7 @@ function createWindow(): void {
       // contextIsolation: false // Allow the `process` global
     },
     titleBarStyle: "hidden",
+    icon: path.join(__dirname, 'resources/icons', 'icon.icns'), // Set icon for the window
   })
 
   mainWindow.maximize()
@@ -84,15 +77,9 @@ function createWindow(): void {
   closeApp(mainWindow)
 
   installExtensions(mainWindow)
-}
 
+  app.setUserTasks([])
 
-if (process.defaultApp) {
-  if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]])
-  }
-} else {
-  app.setAsDefaultProtocolClient('igrp-studio')
 }
 
 // This method will be called when Electron has finished
@@ -101,6 +88,44 @@ if (process.defaultApp) {
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient('igrp-studio');
+  }
+
+  if (process.platform === 'win32') {
+    app.setAsDefaultProtocolClient('igrp-studio');
+    
+    const gotTheLock = app.requestSingleInstanceLock();
+    
+    if (!gotTheLock) {
+      app.quit();
+    } else {
+      app.on('second-instance', (_event, argv) => {
+        const url = argv[argv.length - 1];
+        
+        if (url.startsWith('igrp-studio://') && mainWindow) {
+          if (mainWindow.isMinimized()) mainWindow.restore();
+          mainWindow.focus();
+          handleProtocolCallback(url, mainWindow);
+        }
+      });
+      
+      if (process.argv.length > 1) {
+        const url = process.argv[process.argv.length - 1];
+        if (url.startsWith('igrp-studio://')) {
+          handleProtocolCallback(url, mainWindow);
+        }
+      }
+    }
+
+    buildTaskbar()
+    
+  }
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -147,6 +172,9 @@ app.whenReady().then(async () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  updateApp()
+
 })
 
 
@@ -164,7 +192,7 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 ipcMain.handle('get-app-version', () => {
-    return app.getVersion();
+  return app.getVersion();
 });
 
 ipcMain.on('open-directory-dialog', async (event) => {
@@ -186,18 +214,18 @@ ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<I
 })
 
 ipcMain.handle(
-    'igrp-studio:repo:project.findAllRecent',
-    async (_event) => {
-        return await repo.findAllRecent()
-    }
+  'igrp-studio:repo:project.findAllRecent',
+  async (_event) => {
+    return await repo.findAllRecent()
+  }
 )
 
 ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: ProjectData) => {
-    await repo.save(project)
+  await repo.save(project)
 })
 
 ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: ProjectData, index: number) => {
-    await repo.delete(project, index)
+  await repo.delete(project, index)
 })
 
 ipcMain.handle(
@@ -398,6 +426,17 @@ ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
     console.error('Error checking project config:', error);
     return { folderExists: false, config: null };
   }
+});
+
+
+// IPC handlers for language management
+ipcMain.handle('get-language', () => {
+  return getCurrentLanguage();
+});
+
+ipcMain.handle('set-language', (_, lang: string) => {
+  setCurrentLanguage(lang);
+  return lang; // Return the new language for confirmation
 });
 
 // GitLab
