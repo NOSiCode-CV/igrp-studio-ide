@@ -26,14 +26,7 @@ module.exports = {
             CompanyName: 'NOSI',
             FileDescription: 'IGRP Studio for dev',
             ProductName: 'IGRP Studio',
-        },
-        osxUniversal: {
-            x64ArchFiles: 'x64/**/*', // Path to x64 files (if needed)
-            arm64ArchFiles: 'arm64/**/*', // Path to arm64 files (if needed)
-        },
-    },
-    rebuildConfig: {
-        buildType: 'default',
+        }
     },
     makers: [
         {
