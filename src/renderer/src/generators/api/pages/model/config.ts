@@ -41,9 +41,7 @@ export const initialValues = {
 	uniqueConstraints: [
 		{
 			name: '',
-			type: '',
-			length: '',
-			default: ''
+			columns:[]
 		}
 	]
 }
