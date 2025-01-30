@@ -4,6 +4,7 @@ import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { NextConfigData } from 'src/main/types';
 import { Textarea } from '@renderer/components/ui/Textarea';
+import { useTranslation } from 'react-i18next';
 
 interface NextConfigProps {
     data: NextConfigData;
@@ -19,22 +20,23 @@ export function NextConfig({
     data = DEFAULT_NEXT_CONFIG,
     onChange,
 }: NextConfigProps) {
+    const { t } = useTranslation();
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="app-name">Application Name</Label>
+                <Label htmlFor="appName">{t('applicationName')}</Label>
                 <Input
-                    id="app-name"
+                    id="appName"
                     value={data.appName}
                     onChange={(e) =>
                         onChange({ ...data, appName: e.target.value })
                     }
-                    placeholder="my-next-app"
+                    placeholder="mynextapp"
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                     id="description"
                     value={data.description}

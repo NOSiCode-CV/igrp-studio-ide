@@ -14,6 +14,7 @@ import { FormList } from '../../components/form-list';
 import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
+import { useGit } from '@renderer/hooks/useGit';
 
 interface EnumProps {
     basePath: string;
@@ -37,6 +38,7 @@ export const EnumLayout = ({
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+    const { createGitCommit } = useGit();
 
     const [title, setTitle] = useState('');
 
@@ -121,6 +123,8 @@ export const EnumLayout = ({
                 return;
             }
 
+            createGitCommit(basePath, `Add enum ${formik.values.name}`);
+
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
@@ -152,6 +156,8 @@ export const EnumLayout = ({
                 showErrorToast(error);
                 return;
             }
+
+            createGitCommit(basePath, `Delete enum ${formik.values.name}`);
 
             // Notify of successful deletion or update
             dispatch(onSetChangeStatus(true));

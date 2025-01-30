@@ -51,18 +51,18 @@ const Navdata = (folders: any) => {
             icon: getIcon(OPTION_TYPE.MODELS),
         },
         {
-            label: t('Import data table from database'),
+            label: t('importDataTableFromDatabase'),
             actionType: OPTION_TYPE.IMPORT_TABLE_DB,
             componentName: <DatabaseManagerModal />,
             icon: DatabaseZap,
         },
         {
-            label: t('Import JSON Schema Files'),
+            label: t('importJsonSchemaFiles'),
             actionType: OPTION_TYPE.MODELS,
             icon: FileJson2,
         },
         {
-            label: t('ERD Diagram'),
+            label: t('erdDiagram'),
             actionType: OPTION_TYPE.ERDDiagram,
             icon: Cable,
         },

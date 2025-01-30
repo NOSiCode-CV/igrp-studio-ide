@@ -87,7 +87,7 @@ export function RelationPopover({
                         onChange={(value) =>
                             setLocalRelation({
                                 ...localRelation,
-                                type: value,
+                                type: value as 'OneToOne' | 'OneToMany' | 'ManyToOne' | 'ManyToMany',
                             })
                         }
                         sourceField={field.name}

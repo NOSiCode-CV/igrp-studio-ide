@@ -49,7 +49,7 @@ const RecentsProjects = (): JSX.Element => {
 
     const navigate = useNavigate();
     const dispatch: any = useDispatch();
-    const { t } = useTranslation();
+    const { t } = useTranslation(); // Hook for translations
 
     const [localSearchQuery, setLocalSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -86,7 +86,7 @@ const RecentsProjects = (): JSX.Element => {
             const res = await window.repo.project.findAllRecent();
             setProjects(res);
         } catch (err) {
-            setError('Failed to fetch projects');
+            setError(t('fetchProjectsError')); // Translated error message
         } finally {
         }
     };
@@ -105,7 +105,7 @@ const RecentsProjects = (): JSX.Element => {
                 project?.location === undefined || project?.location === 'local'
         );
         setLocalProjects(localProjects);
-    }, [allProjects]);
+    }, [allProjects, isDelete]);
 
     const handleOpenProject = async (p: ProjectData): Promise<void> => {
         try {
@@ -166,7 +166,7 @@ const RecentsProjects = (): JSX.Element => {
                             <>
                                 <Calendar className="w-3 h-3 mr-1" />
                                 <span>
-                                    Last modified:{' '}
+                                    {t('lastModified')}:{' '}
                                     {formatDistance(
                                         project.dt_updated,
                                         new Date(),
@@ -185,7 +185,7 @@ const RecentsProjects = (): JSX.Element => {
                         onClick={() => handleOpenProject(project)}
                     >
                         <FolderOpen className="w-3 h-3 mr-1" />
-                        <span className="text-xs">Open</span>
+                        <span className="text-xs">{t('open')}</span>
                     </Button>
                 </CardContent>
             </Card>
@@ -211,7 +211,7 @@ const RecentsProjects = (): JSX.Element => {
                     </div>
                 ) : (
                     <EmptyState
-                        message="No recent projects found. Start by creating a new project!"
+                        message={t('noRecentProjects')}
                         className="text-muted-foreground"
                     />
                 )}
@@ -221,7 +221,7 @@ const RecentsProjects = (): JSX.Element => {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center text-foreground">
                         <LayoutDashboard className="w-5 h-5 mr-2" />
-                        {t('All Projects')}
+                        {t('allProjects')}
                     </div>
                     <Tabs value={activeTab} onValueChange={setActiveTab}>
                         <TabsList>
@@ -229,13 +229,13 @@ const RecentsProjects = (): JSX.Element => {
                                 value="local"
                                 className="data-[state=active]:bg-background data-[state=active]:text-foreground"
                             >
-                                Local Projects
+                                {t('localProjects')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="remote"
                                 className="data-[state=active]:bg-background data-[state=active]:text-foreground"
                             >
-                                Remote Projects
+                                {t('remoteProjects')}
                             </TabsTrigger>
                         </TabsList>
                     </Tabs>
@@ -247,7 +247,7 @@ const RecentsProjects = (): JSX.Element => {
                                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5" />
                                 <Input
                                     type="text"
-                                    placeholder="Search local projects..."
+                                    placeholder={t('searchLocalProjects')}
                                     value={localSearchQuery}
                                     onChange={(e) =>
                                         setLocalSearchQuery(e.target.value)
@@ -260,13 +260,15 @@ const RecentsProjects = (): JSX.Element => {
                                 onValueChange={setLocalProjectOrder}
                             >
                                 <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Order by" />
+                                    <SelectValue placeholder={t('orderBy')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="lastModified">
-                                        Last Modified
+                                        {t('lastModified')}
                                     </SelectItem>
-                                    <SelectItem value="name">Name</SelectItem>
+                                    <SelectItem value="name">
+                                        {t('name')}
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -288,7 +290,7 @@ const RecentsProjects = (): JSX.Element => {
                             </div>
                         ) : (
                             <EmptyState
-                                message="No local projects found. Start by creating a new project!"
+                                message={t('noLocalProjects')}
                                 className="text-muted-foreground"
                             />
                         )}
@@ -296,25 +298,23 @@ const RecentsProjects = (): JSX.Element => {
                     <TabsContent value="remote">
                         <div className="flex items-center space-x-4 mb-4">
                             <div className="flex-1 relative">
-                                {/*  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" /> */}
                                 <Input
                                     type="text"
-                                    placeholder="Search remote projects..."
-                                    // value={remoteSearchQuery}
-                                    // onChange={(e) => setRemoteSearchQuery(e.target.value)}
+                                    placeholder={t('searchRemoteProjects')}
                                     className="pl-8 placeholder-muted-foreground"
                                 />
                             </div>
-                            <Select //value={remoteProjectOrder} onValueChange={setRemoteProjectOrder}
-                            >
+                            <Select>
                                 <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Order by" />
+                                    <SelectValue placeholder={t('orderBy')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="lastModified">
-                                        Last Modified
+                                        {t('lastModified')}
                                     </SelectItem>
-                                    <SelectItem value="name">Name</SelectItem>
+                                    <SelectItem value="name">
+                                        {t('name')}
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

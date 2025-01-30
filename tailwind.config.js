@@ -23,8 +23,8 @@ module.exports = {
   	extend: {
   		colors: {
   			igrp: {
-  				light: '#3AA0D9',
-  				DEFAULT: '#3AA0D9',
+  				light: '#008054',
+  				DEFAULT: '#008054',
   				dark: '#3AA0D9'
   			},
   			border: 'hsl(var(--border))',

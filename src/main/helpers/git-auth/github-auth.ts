@@ -67,10 +67,35 @@ async function setupDevOAuth(mainWindow: BrowserWindow) {
   });
 }
 
-async function setupProdOAuth(_mainWindow: BrowserWindow) {
-  const authUrl = getAuthUrl(false);
-  shell.openExternal(authUrl);
-  return Promise.resolve();
+async function setupProdOAuth(mainWindow: BrowserWindow) {
+  return new Promise((resolve, reject) => {
+    const handleUrl = async (url: string) => {
+      try {
+        const urlObj = new URL(url);
+        const code = urlObj.searchParams.get('code');
+        
+        if (code) {
+          const token = await exchangeCodeForToken(code, false);
+          handleAuthSuccess(token, mainWindow);
+          resolve(token);
+          electronApp.removeListener('open-url', urlHandler);
+        }
+      } catch (error) {
+        reject(error);
+        electronApp.removeListener('open-url', urlHandler);
+      }
+    };
+
+    const urlHandler = (event: Electron.Event, url: string) => {
+      event.preventDefault();
+      handleUrl(url);
+    };
+
+    electronApp.on('open-url', urlHandler);
+    
+    const authUrl = getAuthUrl(false);
+    shell.openExternal(authUrl);
+  });
 }
 
 export async function handleProtocolCallback(url: string, mainWindow: BrowserWindow) {
@@ -83,7 +108,6 @@ export async function handleProtocolCallback(url: string, mainWindow: BrowserWin
       handleAuthSuccess(token, mainWindow);
     }
   } catch (error) {
-    console.error('Error handling protocol callback:', error);
     mainWindow.webContents.send('github-oauth-error', {
       message: 'Failed to authenticate'
     });

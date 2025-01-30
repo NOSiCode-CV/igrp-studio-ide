@@ -31,7 +31,7 @@ class ErrorBoundary extends Component<Props, State> {
     // Function to navigate to another page
     openPage = () => {
         const navigate = useNavigate(); // Hook must be used inside a component, so use it here
-        navigate(ROUTES.PATH_PAGE_BUILDER_UI);
+        navigate(ROUTES.HOME);
     }
 
     render() {

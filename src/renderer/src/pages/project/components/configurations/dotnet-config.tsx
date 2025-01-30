@@ -9,90 +9,92 @@ import {
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
-import { HandlerResponse, DotNetConfigData } from 'src/main/types';
+import { DotNetConfigData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
+import useCore from '@renderer/hooks/useCore';
+import { useTranslation } from 'react-i18next'; 
 
 interface DotNetConfigProps {
     data: DotNetConfigData;
     onChange: (data: DotNetConfigData) => void;
 }
 
-const DEFAULT_SPRING_CONFIG: DotNetConfigData = {
+const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
     apiName: '',
     description: '',
     artifact: '',
-    database: 'postgresql',
+    database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
-    igrpCoreVersion: 'latest',
+    igrpCoreVersion: '',
 };
 
 export function DotNetConfig({
-    data = DEFAULT_SPRING_CONFIG,
+    data = DEFAULT_DOTNET_CONFIG,
     onChange,
 }: DotNetConfigProps) {
     const [versions, setVersions] = useState([]);
+    const { getVersions } = useCore();
+    const { t } = useTranslation();
 
     useEffect(() => {
-        const getVersions = async () => {
-            const data: HandlerResponse = await window.api.getVersions(
-                'https://sonatype.nosi.cv/service/rest/v1/search?repository=igrp-framework&group=cv.igrp&name=core'
-            );
+        const fetchVersions = async () => {
+            const versionsData = await getVersions();
+            setVersions(versionsData);
 
-            const options = data.result.map((value) => {
-                return {
-                    label: value,
-                    value: value,
-                };
-            });
-
-            setVersions(options);
+            if (versionsData.length > 0) {
+                const latestVersion = versionsData[0]?.value;
+                if (!data.igrpCoreVersion) {
+                    onChange({ ...data, igrpCoreVersion: latestVersion });
+                }
+            }
         };
-        getVersions();
-    }, []);
+
+        fetchVersions();
+    }, [getVersions]);
 
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="apiName">Name of the project</Label>
+                <Label htmlFor="apiName">{t('projectName')}</Label>
                 <Input
                     id="apiName"
                     value={data.apiName}
                     onChange={(e) =>
                         onChange({ ...data, apiName: e.target.value })
                     }
-                    placeholder="Name of the project"
+                    placeholder={t('enterProjectName')}
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                     id="description"
                     value={data.description}
                     onChange={(e) =>
                         onChange({ ...data, description: e.target.value })
                     }
-                    placeholder="Project description"
+                    placeholder={t('enterDescription')}
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="artifact">Artifact</Label>
+                <Label htmlFor="artifact">{t('artifact')}</Label>
                 <Input
                     id="artifact"
                     value={data.artifact}
                     onChange={(e) =>
                         onChange({ ...data, artifact: e.target.value })
                     }
-                    placeholder="my-project"
+                    placeholder={t('enterArtifact')}
                 />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label>Choose DB Engine</Label>
+                    <Label>{t('chooseDbEngine')}</Label>
                     <Combobox
                         name="database"
                         value={data.database}
@@ -104,7 +106,7 @@ export function DotNetConfig({
                     />
                 </div>
                 <div className="space-y-2 flex flex-col">
-                    <Label>IGRP Core Version</Label>
+                    <Label>{t('igrpCoreVersion')}</Label>
                     <Combobox
                         options={versions || []}
                         name="igrpCoreVersion"
@@ -119,7 +121,7 @@ export function DotNetConfig({
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
-                    <Label>Project Structure Style</Label>
+                    <Label>{t('projectStructureStyle')}</Label>
                     <RadioGroup
                         value={data.projectStructureStyle}
                         onValueChange={(value) =>
@@ -134,11 +136,11 @@ export function DotNetConfig({
                     >
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="technical" id="technical" />
-                            <Label htmlFor="technical">Technical</Label>
+                            <Label htmlFor="technical">{t('technical')}</Label>
                         </div>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">Domain</Label>
+                            <Label htmlFor="domain">{t('domainDriven')}</Label>
                         </div>
                     </RadioGroup>
                 </div>
@@ -154,7 +156,9 @@ export function DotNetConfig({
                             })
                         }
                     />
-                    <Label htmlFor="observability">Enable Observability</Label>
+                    <Label htmlFor="observability">
+                        {t('enableObservability')}
+                    </Label>
                 </div>
             </div>
         </div>

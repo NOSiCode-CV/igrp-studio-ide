@@ -15,7 +15,10 @@ export function StepButton({
 }: StepButtonProps) {
     return (
         <button
-            onClick={onClick}
+            onClick={(e) => {
+                e.preventDefault();
+                onClick();
+            }}
             disabled={disabled}
             className={`
           flex flex-col items-center gap-2 group disabled:opacity-50
