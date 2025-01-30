@@ -30,7 +30,7 @@
 		"@faker-js/faker": "^9.2.0",
 		"@gitbeaker/node": "^35.8.1",
 		"@hello-pangea/dnd": "^17.0.0",
-		"@igrp/dotnet-engine": "^0.0.1-alpha.7",
+		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
 		"@igrp/spring-engine": "^0.3.0-alpha-4.8.9",
@@ -127,6 +127,7 @@
 			"icon": "resources/icons/icon.ico"
 		},
 		"mac": {
+			"target": "universal",
 			"icon": "resources/icons/icon.icns"
 		},
 		"linux": {

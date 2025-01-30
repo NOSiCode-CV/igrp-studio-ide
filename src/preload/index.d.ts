@@ -46,7 +46,7 @@ interface CustomAPI {
 interface BaseEngine {
     createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createEnum: (data: any, engineType: string, basePath: string)=> Promise<HandlerResponse>;
+    createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
@@ -60,7 +60,7 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI | getAppVersion
+        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage | applyLanguage
         api: CustomAPI,
         repo: { project: IProjectRepository, connection: IConnenctionRepository },
         menu: CustomMenu,

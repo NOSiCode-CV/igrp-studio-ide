@@ -171,7 +171,7 @@ const engine = {
 			return handleError(error)
 		}
 	},
-	
+
 }
 
 const repo = {
@@ -213,7 +213,10 @@ const window = {
 if (process.contextIsolated) {
 	try {
 		contextBridge.exposeInMainWorld('electron', {
-			...electronAPI, getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+			...electronAPI,
+			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+			getLanguage: () => ipcRenderer.invoke("get-language"),
+			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)

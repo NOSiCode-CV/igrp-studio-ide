@@ -60,7 +60,7 @@ export function ProjectWizard() {
     const navigate = useNavigate();
     const dispatch: any = useDispatch();
     const { showErrorToast } = useToast();
-    const { t } = useTranslation();
+    const { t } = useTranslation(); // Hook for translations
 
     const initialValues: ProjectData = {
         name: '',
@@ -72,20 +72,20 @@ export function ProjectWizard() {
     };
 
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required('Project name is required'),
+        name: Yup.string().required(t('fieldRequired', { name: t('projectName') })),
         type: Yup.string().oneOf(
             ['frontend', 'backend'],
-            'Project type is required'
+            t('fieldRequired', { name: t('projectType') })
         ),
-        framework: Yup.string().required('Framework is required'),
-        path: Yup.string().required('Project directory is required'),
+        framework: Yup.string().required(t('fieldRequired', { name: t('framework') })),
+        path: Yup.string().required(t('fieldRequired', { name: t('projectDirectory') })),
         config: Yup.object().shape({
             appName: Yup.string().when('$framework', (framework, schema) => {
                 return step === 3 &&
                     framework &&
                     framework[0] === ENV_TYPES.NEXTJS
                     ? schema
-                          .required(t('thisFieldRequired', { name: 'Name' }))
+                          .required(t('thisFieldRequired', { name: t('name') }))
                           .matches(
                               PATTERNS.NO_SPACE_AND_HYPHEN,
                               t('msgInfoAccpet')
@@ -98,7 +98,7 @@ export function ProjectWizard() {
                     framework &&
                     [ENV_TYPES.SPRING, ENV_TYPES.DOTNET].includes(framework[0])
                     ? schema
-                          .required(t('thisFieldRequired', { name: 'Name' }))
+                          .required(t('thisFieldRequired', { name: t('name') }))
                           .matches(
                               PATTERNS.NO_SPACE_AND_HYPHEN,
                               t('msgInfoAccpet')
@@ -119,6 +119,7 @@ export function ProjectWizard() {
             createProject();
         },
     });
+
     const createProject = async (): Promise<void> => {
         try {
             const { error } = await window.engine.createProject(
@@ -208,7 +209,7 @@ export function ProjectWizard() {
     const handleChangeType = (value: string) => {
         if (formik.values.framework !== value)
             formik.setFieldValue('framework', '');
-        formik.setFieldValue('type', value)
+        formik.setFieldValue('type', value);
     };
 
     const handleChangeFramework = (value: string) => {
@@ -232,7 +233,7 @@ export function ProjectWizard() {
             <DialogTrigger asChild>
                 <Button variant="outline">
                     <PlusCircle className="w-4 h-4 mr-2" />
-                    Create New Project
+                    {t('createNewProject')}
                 </Button>
             </DialogTrigger>
             <DialogContent
@@ -241,7 +242,7 @@ export function ProjectWizard() {
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
                 <DialogHeader>
-                    <DialogTitle>New Project</DialogTitle>
+                    <DialogTitle>{t('newProject')}</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
                 <form onSubmit={formik.handleSubmit}>
@@ -256,7 +257,7 @@ export function ProjectWizard() {
                                     onClick={() => handleStepClick(s.id)}
                                     disabled={!canNavigateToStep(s.id)}
                                 >
-                                    {s.label}
+                                    {t(s.label)}
                                 </StepButton>
                             ))}
                         </div>
@@ -265,11 +266,13 @@ export function ProjectWizard() {
                         {step === 1 && (
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Project Name</Label>
+                                    <Label htmlFor="name">
+                                        {t('projectName')}
+                                    </Label>
                                     <Input
                                         id="name"
                                         name="name"
-                                        placeholder="Enter project name"
+                                        placeholder={t('enterProjectName')}
                                         value={formik.values.name}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -283,27 +286,28 @@ export function ProjectWizard() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Project Icon</Label>
+                                    <Label>{t('projectIcon')}</Label>
                                     <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2">
                                         <Upload className="w-8 h-8 mx-auto text-gray-400" />
                                         <div className="text-sm text-gray-600">
-                                            Click or drag to upload icon
+                                            {t('clickOrDragToUploadIcon')}
                                             <div className="text-xs text-gray-400">
-                                                Recommended size: 512x512px
+                                                {t('recommendedSize')}
                                             </div>
                                         </div>
                                         <Button variant="outline" size="sm">
-                                            Upload...
+                                            {t('upload')}...
                                         </Button>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Project Type</Label>
+                                    <Label>{t('projectType')}</Label>
                                     <RadioGroup
                                         name="type"
                                         value={formik.values.type}
-                                        onValueChange={(value) =>handleChangeType(value)
+                                        onValueChange={(value) =>
+                                            handleChangeType(value)
                                         }
                                         className="grid grid-cols-2 gap-4"
                                     >
@@ -326,10 +330,9 @@ export function ProjectWizard() {
                                             >
                                                 <Monitor className="w-5 h-5" />
                                                 <div>
-                                                    <div>Frontend</div>
+                                                    <div>{t('frontend')}</div>
                                                     <div className="text-sm text-gray-500">
-                                                        Create a standalone
-                                                        frontend application
+                                                        {t('frontendDescription')}
                                                     </div>
                                                 </div>
                                             </Label>
@@ -352,10 +355,9 @@ export function ProjectWizard() {
                                             >
                                                 <Server className="w-5 h-5" />
                                                 <div>
-                                                    <div>Backend</div>
+                                                    <div>{t('backend')}</div>
                                                     <div className="text-sm text-gray-500">
-                                                        Create a API or Backend
-                                                        Service
+                                                        {t('backendDescription')}
                                                     </div>
                                                 </div>
                                             </Label>
@@ -373,7 +375,7 @@ export function ProjectWizard() {
 
                         {step === 2 && (
                             <div className="space-y-6">
-                                <Label>Select Framework</Label>
+                                <Label>{t('selectFramework')}</Label>
                                 <RadioGroup
                                     name="framework"
                                     value={formik.values.framework}
@@ -420,7 +422,7 @@ export function ProjectWizard() {
                                                     </div>
                                                     {!fw.availableSupport && (
                                                         <span className="ml-auto text-xs text-muted-foreground">
-                                                            Coming soon
+                                                            {t('comingSoon')}
                                                         </span>
                                                     )}
                                                 </div>
@@ -441,7 +443,7 @@ export function ProjectWizard() {
                             <div className="space-y-6">
                                 {SelectedComponent ? (
                                     <>
-                                        <Label>Framework Configuration</Label>
+                                        <Label>{t('frameworkConfiguration')}</Label>
                                         <SelectedComponent
                                             data={formik.values.config}
                                             onChange={(config) =>
@@ -454,9 +456,9 @@ export function ProjectWizard() {
                                     </>
                                 ) : (
                                     <div className="text-center text-muted-foreground pb-8">
-                                        Configuration options for{' '}
-                                        {formik.values.framework} will be
-                                        available soon
+                                        {t('configurationComingSoon', {
+                                            framework: formik.values.framework,
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -468,7 +470,7 @@ export function ProjectWizard() {
                                     <div className="space-y-4">
                                         <div>
                                             <Label htmlFor="name">
-                                                Project Name
+                                                {t('projectName')}
                                             </Label>
                                             <Input
                                                 id="name"
@@ -487,7 +489,7 @@ export function ProjectWizard() {
 
                                         <div>
                                             <Label htmlFor="path">
-                                                Project Directory
+                                                {t('projectDirectory')}
                                             </Label>
                                             <div className="flex gap-2">
                                                 <Input
@@ -498,14 +500,14 @@ export function ProjectWizard() {
                                                         formik.handleChange
                                                     }
                                                     onBlur={formik.handleBlur}
-                                                    placeholder="/path/to/project"
+                                                    placeholder={t('enterProjectDirectory')}
                                                 />
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={(e)=>{
+                                                    onClick={(e) => {
                                                         e.preventDefault();
-                                                        handleOpenDirectory()
+                                                        handleOpenDirectory();
                                                     }}
                                                 >
                                                     <FolderOpen className="h-4 w-4" />
@@ -520,7 +522,7 @@ export function ProjectWizard() {
                                         </div>
 
                                         <div>
-                                            <Label>Theme Color</Label>
+                                            <Label>{t('themeColor')}</Label>
                                             <div className="grid grid-cols-12 gap-2 mt-2">
                                                 {THEME_COLORS.map((color) => (
                                                     <button
@@ -559,7 +561,7 @@ export function ProjectWizard() {
                                     variant="outline"
                                     onClick={handleBack}
                                 >
-                                    <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                                    <ArrowLeft className="w-4 h-4 mr-2" /> {t('back')}
                                 </Button>
                             ) : (
                                 <div />
@@ -570,14 +572,14 @@ export function ProjectWizard() {
                                     onClick={handleNext}
                                     disabled={!canNavigateToStep(step + 1)}
                                 >
-                                    Next <ArrowRight className="w-4 h-4 ml-2" />
+                                    {t('next')} <ArrowRight className="w-4 h-4 ml-2" />
                                 </Button>
                             ) : (
                                 <Button
                                     type="submit"
                                     disabled={formik.isSubmitting}
                                 >
-                                    Create Project
+                                    {t('createProject')}
                                 </Button>
                             )}
                         </div>

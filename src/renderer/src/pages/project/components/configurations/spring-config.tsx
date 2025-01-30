@@ -13,6 +13,7 @@ import { SpringConfigData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -36,6 +37,7 @@ export function SpringConfig({
 }: SpringConfigProps) {
     const [versions, setVersions] = useState([]);
     const { getVersions } = useCore();
+    const { t } = useTranslation(); // Hook for translations
 
     useEffect(() => {
         const fetchVersions = async () => {
@@ -58,7 +60,10 @@ export function SpringConfig({
             <>
                 {data.group && data.artifact && (
                     <p className="w-full text-sm text-muted-foreground italic -mt-2">
-                        {`Package Name: ${data.group.replace(/[-\s]/g, '_')}.${data.artifact.replace(/[-\s]/g, '_')}`}
+                        {t('packageName', {
+                            group: data.group.replace(/[-\s]/g, '_'),
+                            artifact: data.artifact.replace(/[-\s]/g, '_'),
+                        })}
                     </p>
                 )}
             </>
@@ -68,51 +73,51 @@ export function SpringConfig({
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="apiName">Name of the project</Label>
+                <Label htmlFor="apiName">{t('projectName')}</Label>
                 <Input
                     id="apiName"
                     value={data.apiName}
                     onChange={(e) =>
                         onChange({ ...data, apiName: e.target.value })
                     }
-                    placeholder="projectName"
+                    placeholder={t('enterProjectName')}
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                     id="description"
                     value={data.description}
                     onChange={(e) =>
                         onChange({ ...data, description: e.target.value })
                     }
-                    placeholder="Project description"
+                    placeholder={t('enterDescription')}
                 />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="group">Group</Label>
+                    <Label htmlFor="group">{t('group')}</Label>
                     <Input
                         id="group"
                         value={data.group}
                         onChange={(e) =>
                             onChange({ ...data, group: e.target.value })
                         }
-                        placeholder="com.example"
+                        placeholder={t('enterGroup')}
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="artifact">Artifact</Label>
+                    <Label htmlFor="artifact">{t('artifact')}</Label>
                     <Input
                         id="artifact"
                         value={data.artifact}
                         onChange={(e) =>
                             onChange({ ...data, artifact: e.target.value })
                         }
-                        placeholder="my-project"
+                        placeholder={t('enterArtifact')}
                     />
                 </div>
                 <PackageName />
@@ -120,7 +125,7 @@ export function SpringConfig({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label>Choose DB Engine</Label>
+                    <Label>{t('chooseDbEngine')}</Label>
                     <Combobox
                         name="database"
                         value={data.database}
@@ -132,7 +137,7 @@ export function SpringConfig({
                     />
                 </div>
                 <div className="space-y-2 flex flex-col">
-                    <Label>IGRP Core Version</Label>
+                    <Label>{t('igrpCoreVersion')}</Label>
                     <Combobox
                         options={versions || []}
                         name="igrpCoreVersion"
@@ -147,7 +152,7 @@ export function SpringConfig({
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
-                    <Label>Project Structure Style</Label>
+                    <Label>{t('projectStructureStyle')}</Label>
                     <RadioGroup
                         value={data.projectStructureStyle}
                         onValueChange={(value) =>
@@ -162,11 +167,11 @@ export function SpringConfig({
                     >
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="technical" id="technical" />
-                            <Label htmlFor="technical">Technical</Label>
+                            <Label htmlFor="technical">{t('technical')}</Label>
                         </div>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">Domain driven</Label>
+                            <Label htmlFor="domain">{t('domainDriven')}</Label>
                         </div>
                     </RadioGroup>
                 </div>
@@ -182,7 +187,9 @@ export function SpringConfig({
                             })
                         }
                     />
-                    <Label htmlFor="observability">Enable Observability</Label>
+                    <Label htmlFor="observability">
+                        {t('enableObservability')}
+                    </Label>
                 </div>
             </div>
         </div>

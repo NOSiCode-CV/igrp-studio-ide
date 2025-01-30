@@ -1,11 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, screen, autoUpdater, MessageBoxOptions } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
 import { FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
-
 
 import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory } from './helpers'
 import { ProjectRepository } from './repo/projects'
@@ -18,10 +17,11 @@ import { GitService } from './services/git-service'
 import { TokenService } from './services/token-service';
 import { GitHubService } from './services/github-service';
 
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
-
 import './handlers/apiHandler';
 import './handlers/dbHandler';
+import { updateApp } from './helpers/update'
+import { buildTaskbar } from './helpers/taskbar'
+import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -29,6 +29,8 @@ let mainWindow: BrowserWindow
 
 const repo = new ProjectRepository()
 
+// Load the initial language configuration
+loadConfig();
 
 function createWindow(): void {
   // Create the browser window.
@@ -76,6 +78,8 @@ function createWindow(): void {
 
   installExtensions(mainWindow)
 
+  app.setUserTasks([])
+
 }
 
 // This method will be called when Electron has finished
@@ -118,6 +122,9 @@ app.whenReady().then(async () => {
         }
       }
     }
+
+    buildTaskbar()
+    
   }
 
   // Default open or close DevTools by F12 in development
@@ -166,43 +173,7 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  const path = 'https://storage-api.nosi.cv/igrp-package'
-
-  updateElectronApp({
-    updateSource: {
-      type: UpdateSourceType.StaticStorage,
-      baseUrl: `${path}/${process.platform}/${process.arch}`
-    }
-  })
-
-  const url = `${path}/${process.platform}/${app.getVersion()}`
-
-  autoUpdater.setFeedURL({ url })
-
-  setInterval(() => {
-    console.log(url )
-    autoUpdater.checkForUpdates()
-  }, 60000)
-
-  autoUpdater.on('update-downloaded', (_event, releaseNotes, releaseName) => {
-    const dialogOpts: MessageBoxOptions = {
-      type: 'info',
-      buttons: ['Restart', 'Later'],
-      title: 'Application Update',
-      message: process.platform === 'win32' ? releaseNotes : releaseName,
-      detail:
-        'A new version has been downloaded. Restart the application to apply the updates.'
-    }
-
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      if (returnValue.response === 0) autoUpdater.quitAndInstall()
-    })
-  })
-
-  autoUpdater.on('error', (message) => {
-    console.error('There was a problem updating the application')
-    console.error(message)
-  })
+  updateApp()
 
 })
 
@@ -455,6 +426,17 @@ ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
     console.error('Error checking project config:', error);
     return { folderExists: false, config: null };
   }
+});
+
+
+// IPC handlers for language management
+ipcMain.handle('get-language', () => {
+  return getCurrentLanguage();
+});
+
+ipcMain.handle('set-language', (_, lang: string) => {
+  setCurrentLanguage(lang);
+  return lang; // Return the new language for confirmation
 });
 
 // GitLab
