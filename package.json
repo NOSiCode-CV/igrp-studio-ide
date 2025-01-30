@@ -1,6 +1,6 @@
 {
 	"name": "igrp-studio",
-	"version": "1.0.0-alpha",
+	"version": "0.0.1",
 	"description": "IGRP Studio for dev",
 	"main": "dist/main/index.js",
 	"author": "nosi.cv",
