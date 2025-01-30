@@ -171,6 +171,7 @@ export function SchemaFieldRow({
                             );
                         }}
                         onDelete={() => {
+                                // @ts-ignore - Suppress TypeScript error for subId
                               const { [subId]: _, ...newProperties } =
                                 field.properties; 
                             onUpdate(

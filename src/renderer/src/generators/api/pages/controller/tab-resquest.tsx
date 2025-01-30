@@ -9,7 +9,6 @@ import {
 } from '@renderer/components/tabs';
 import { JSONSchema } from '../../types/schema';
 import { BodyRequest } from './body-request';
-import { _ } from '@faker-js/faker/dist/airline-BLb3y-7w';
 
 interface TabRequestProps {
     formik: any;
