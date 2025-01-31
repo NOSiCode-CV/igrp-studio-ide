@@ -72,13 +72,19 @@ export function ProjectWizard() {
     };
 
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required(t('fieldRequired', { name: t('projectName') })),
+        name: Yup.string().required(
+            t('fieldRequired', { name: t('projectName') })
+        ),
         type: Yup.string().oneOf(
             ['frontend', 'backend'],
             t('fieldRequired', { name: t('projectType') })
         ),
-        framework: Yup.string().required(t('fieldRequired', { name: t('framework') })),
-        path: Yup.string().required(t('fieldRequired', { name: t('projectDirectory') })),
+        framework: Yup.string().required(
+            t('fieldRequired', { name: t('framework') })
+        ),
+        path: Yup.string().required(
+            t('fieldRequired', { name: t('projectDirectory') })
+        ),
         config: Yup.object().shape({
             appName: Yup.string().when('$framework', (framework, schema) => {
                 return step === 3 &&
@@ -119,6 +125,16 @@ export function ProjectWizard() {
             createProject();
         },
     });
+
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    React.useEffect(() => {
+        // Focus the input when the component mounts
+        if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, []);
 
     const createProject = async (): Promise<void> => {
         try {
@@ -177,11 +193,21 @@ export function ProjectWizard() {
     };
 
     const handleNext = () => {
-        if (step < STEPS.length && canNavigateToStep(step + 1)) {
-            setStep(step + 1);
+        if (step < STEPS.length) {
+            // Validate the form before proceeding to the next step
+            const errors = formik.validateForm();
+            if (Object.keys(errors).length === 0) {
+                setStep(step + 1);
+            } else {
+                // Display validation errors
+                formik.setTouched({
+                    name: true,
+                    type: true,
+                    framework: true,
+                    config: true,
+                });
+            }
         }
-
-        formik.validateForm();
     };
 
     const handleBack = () => {
@@ -227,6 +253,10 @@ export function ProjectWizard() {
         formik.setValues(initialValues);
         setStep(1);
     }, [open]);
+
+    React.useEffect(() => {
+        formik.handleBlur('projectName');
+    }, []);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -276,10 +306,12 @@ export function ProjectWizard() {
                                         value={formik.values.name}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
+                                        ref={inputRef}
+                                        autoFocus
                                     />
                                     {formik.touched.name &&
                                         formik.errors.name && (
-                                            <p className="text-sm text-destructive">
+                                            <p className="text-xs text-destructive">
                                                 {formik.errors.name}
                                             </p>
                                         )}
@@ -332,7 +364,9 @@ export function ProjectWizard() {
                                                 <div>
                                                     <div>{t('frontend')}</div>
                                                     <div className="text-sm text-gray-500">
-                                                        {t('frontendDescription')}
+                                                        {t(
+                                                            'frontendDescription'
+                                                        )}
                                                     </div>
                                                 </div>
                                             </Label>
@@ -357,7 +391,9 @@ export function ProjectWizard() {
                                                 <div>
                                                     <div>{t('backend')}</div>
                                                     <div className="text-sm text-gray-500">
-                                                        {t('backendDescription')}
+                                                        {t(
+                                                            'backendDescription'
+                                                        )}
                                                     </div>
                                                 </div>
                                             </Label>
@@ -365,7 +401,7 @@ export function ProjectWizard() {
                                     </RadioGroup>
                                     {formik.touched.type &&
                                         formik.errors.type && (
-                                            <p className="text-sm text-destructive">
+                                            <p className="text-xs text-destructive">
                                                 {formik.errors.type}
                                             </p>
                                         )}
@@ -432,7 +468,7 @@ export function ProjectWizard() {
                                 </RadioGroup>
                                 {formik.touched.framework &&
                                     formik.errors.framework && (
-                                        <p className="text-sm text-destructive">
+                                        <p className="text-xs text-destructive">
                                             {formik.errors.framework}
                                         </p>
                                     )}
@@ -443,7 +479,9 @@ export function ProjectWizard() {
                             <div className="space-y-6">
                                 {SelectedComponent ? (
                                     <>
-                                        <Label>{t('frameworkConfiguration')}</Label>
+                                        <Label>
+                                            {t('frameworkConfiguration')}
+                                        </Label>
                                         <SelectedComponent
                                             data={formik.values.config}
                                             onChange={(config) =>
@@ -481,7 +519,7 @@ export function ProjectWizard() {
                                             />
                                             {formik.touched.name &&
                                                 formik.errors.name && (
-                                                    <p className="text-sm text-destructive">
+                                                    <p className="text-xs text-destructive">
                                                         {formik.errors.name}
                                                     </p>
                                                 )}
@@ -500,7 +538,9 @@ export function ProjectWizard() {
                                                         formik.handleChange
                                                     }
                                                     onBlur={formik.handleBlur}
-                                                    placeholder={t('enterProjectDirectory')}
+                                                    placeholder={t(
+                                                        'enterProjectDirectory'
+                                                    )}
                                                 />
                                                 <Button
                                                     variant="outline"
@@ -515,7 +555,7 @@ export function ProjectWizard() {
                                             </div>
                                             {formik.touched.path &&
                                                 formik.errors.path && (
-                                                    <p className="text-sm text-destructive">
+                                                    <p className="text-xs text-destructive">
                                                         {formik.errors.path}
                                                     </p>
                                                 )}
@@ -561,7 +601,8 @@ export function ProjectWizard() {
                                     variant="outline"
                                     onClick={handleBack}
                                 >
-                                    <ArrowLeft className="w-4 h-4 mr-2" /> {t('back')}
+                                    <ArrowLeft className="w-4 h-4 mr-2" />{' '}
+                                    {t('back')}
                                 </Button>
                             ) : (
                                 <div />
@@ -572,7 +613,8 @@ export function ProjectWizard() {
                                     onClick={handleNext}
                                     disabled={!canNavigateToStep(step + 1)}
                                 >
-                                    {t('next')} <ArrowRight className="w-4 h-4 ml-2" />
+                                    {t('next')}{' '}
+                                    <ArrowRight className="w-4 h-4 ml-2" />
                                 </Button>
                             ) : (
                                 <Button

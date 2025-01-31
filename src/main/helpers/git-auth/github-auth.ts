@@ -5,8 +5,8 @@ import * as fs from 'fs/promises';
 import { TokenService } from '../../services/token-service';
 import { GitHubService } from '../../services/github-service';
 import { app as electronApp } from 'electron';
-const GITHUB_CLIENT_ID = 'Ov23lic9e0U4Ffd3kBc1';
-const GITHUB_CLIENT_SECRET = '056d96948e4f453b0190b5a0261122846260ee28';
+const GITHUB_CLIENT_ID = 'Ov23li025TPMBGbaLfOS';
+const GITHUB_CLIENT_SECRET = 'e38aa4c18b6c3086d51221b7b634b35e9a2e13e1';
 const DEV_PORT = 3333
 
 export const getAuthUrl = (isDev: boolean) => {

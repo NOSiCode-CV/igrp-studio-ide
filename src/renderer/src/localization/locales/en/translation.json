@@ -130,5 +130,11 @@
   "removeProject": "Remove Project",
   "importDataTableFromDatabase": "Import data table from database",
   "importJsonSchemaFiles": "Import JSON Schema Files",
-  "erdDiagram": "ERD Diagram"
+  "erdDiagram": "ERD Diagram",
+  "nameOfTheModel": "Name of the model",
+  "tableName": "Table Name",
+  "enterTableName": "Enter Table Name",
+  "auditModel": "Audit Model",
+  "graphql": "GraphQL",
+  "odata": "OData"
 }

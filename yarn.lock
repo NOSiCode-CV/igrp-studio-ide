@@ -1150,10 +1150,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.3.0-alpha-4.9.0":
-  version "0.3.0-alpha-4.9.0"
-  resolved "https://sonatype.nosi.cv/repository/npm-group/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.9.0.tgz#f0b6de24b321455c5f3c1a8557f79676f29ec740"
-  integrity sha512-uZDQVy5vE+jFCLeUxjzAZS0Vuc1NJ5R+vRHgLwycrs66R6iou9tviTVMCrQI52LLXV0kndTXPdv78K8JVvs2eg==
+"@igrp/spring-engine@0.3.0-alpha-4.9.1-cg-1":
+  version "0.3.0-alpha-4.9.1-cg-1"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.9.1-cg-1.tgz#2657daecb3f7bfe01b56db917558460e9dc25fe1"
+  integrity sha512-pA6CmIVQqH/fq8g53NpKrgsY/2PReeCRs00a+ehzYaOwRd1agYhDc/WZBCVBGdR12l4Th/mSvKLclcSY8IHURQ==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -4314,7 +4314,7 @@ dmg-builder@24.13.3:
   optionalDependencies:
     dmg-license "^1.0.11"
 
-dmg-license@^1.0.11:
+dmg-license@^1.0.0, dmg-license@^1.0.11:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/dmg-license/-/dmg-license-1.0.11.tgz#7b3bc3745d1b52be7506b4ee80cb61df6e4cd79a"
   integrity sha512-ZdzmqwKmECOWJpqefloC5OJy1+WZBBse5+MR88z9g9Zn4VY+WYUkAyojmhzJckH5YbbZGcYIuGAkY5/Ys5OM2Q==
