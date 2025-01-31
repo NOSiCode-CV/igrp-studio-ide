@@ -20,7 +20,7 @@ build_packagedev:
     - yarn build:win
   artifacts:
     paths:
-      - dist/*
+      - dist/
     expire_in: 4 week
 
 release:
@@ -45,9 +45,10 @@ release:
             ]
           }
         }' \
-        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
-  #only:
-   # - tags
+        "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/releases" 
+        # $CI_API_V4_URL equals http://git.nosi.cv/api/v4. As per the curl standard, this results in a redirection from POST (http) to GET (https). Therefore, cannot be used here.
+  # only:
+    # - tags
   dependencies:
     - build_packagedev
   needs:
