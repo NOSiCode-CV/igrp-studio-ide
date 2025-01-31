@@ -2,12 +2,14 @@
 
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import { NextConfigData } from 'src/main/types';
+import { NextConfigData, ProjectData } from 'src/main/types';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useTranslation } from 'react-i18next';
+import { FormikErrors } from 'formik';
 
 interface NextConfigProps {
     data: NextConfigData;
+    errors?: FormikErrors<ProjectData>;
     onChange: (data: NextConfigData) => void;
 }
 
@@ -18,6 +20,7 @@ const DEFAULT_NEXT_CONFIG: NextConfigData = {
 
 export function NextConfig({
     data = DEFAULT_NEXT_CONFIG,
+    errors,
     onChange,
 }: NextConfigProps) {
     const { t } = useTranslation();
@@ -33,6 +36,11 @@ export function NextConfig({
                     }
                     placeholder="mynextapp"
                 />
+                {errors?.config && errors.config.appName && (
+                    <p className="text-xs text-destructive">
+                        {errors.config.appName}
+                    </p>
+                )}
             </div>
 
             <div className="space-y-2">

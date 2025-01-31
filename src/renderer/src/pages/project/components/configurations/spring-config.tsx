@@ -9,14 +9,16 @@ import {
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
-import { SpringConfigData } from 'src/main/types';
+import { ProjectData, SpringConfigData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { FormikErrors } from 'formik';
 
 interface SpringConfigProps {
     data: SpringConfigData;
+    errors?: FormikErrors<ProjectData> | null;
     onChange: (data: SpringConfigData) => void;
 }
 
@@ -33,6 +35,7 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
 
 export function SpringConfig({
     data = DEFAULT_SPRING_CONFIG,
+    errors,
     onChange,
 }: SpringConfigProps) {
     const [versions, setVersions] = useState([]);
@@ -82,6 +85,11 @@ export function SpringConfig({
                     }
                     placeholder={t('enterProjectName')}
                 />
+                {errors?.config && errors.config.apiName && (
+                    <p className="text-xs text-destructive">
+                        {errors.config.apiName}
+                    </p>
+                )}
             </div>
 
             <div className="space-y-2">
@@ -107,6 +115,11 @@ export function SpringConfig({
                         }
                         placeholder={t('enterGroup')}
                     />
+                    {errors?.config && errors.config.group && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.group}
+                        </p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -119,6 +132,11 @@ export function SpringConfig({
                         }
                         placeholder={t('enterArtifact')}
                     />
+                     {errors?.config && errors.config.artifact && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.artifact}
+                        </p>
+                    )}
                 </div>
                 <PackageName />
             </div>
@@ -135,6 +153,11 @@ export function SpringConfig({
                         options={DatabaseOptions}
                         className="w-full"
                     />
+                    {errors?.config && errors.config.database && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.database}
+                        </p>
+                    )}
                 </div>
                 <div className="space-y-2 flex flex-col">
                     <Label>{t('igrpCoreVersion')}</Label>
@@ -147,6 +170,11 @@ export function SpringConfig({
                         }
                         className="w-full"
                     />
+                    {errors?.config && errors.config.igrpCoreVersion && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.igrpCoreVersion}
+                        </p>
+                    )}
                 </div>
             </div>
 
