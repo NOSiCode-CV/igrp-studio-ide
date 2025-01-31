@@ -256,7 +256,7 @@ const ModelLayout = ({
                 onDelete={deleteModel}
                 onSubmit={formik.handleSubmit}
                 isNew={data === null}
-                title="model"
+                title={t('model')}
             />
             <div className="space-y-4 p-4">
                 <Card className="p-6 rounded-sm">
@@ -264,9 +264,9 @@ const ModelLayout = ({
                         <div className="flex gap-4">
                             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                                 <TextInput
-                                    label={t('Name')}
+                                    label={t('name')}
                                     id="name"
-                                    placeholder={t('Name of the model')}
+                                    placeholder={t('nameOfTheModel')}
                                     value={formik.values.name}
                                     onChange={formik.handleChange}
                                     onBlur={handleNameBlur}
@@ -278,9 +278,9 @@ const ModelLayout = ({
                                 />
 
                                 <TextInput
-                                    label={t('Table Name')}
+                                    label={t('tableName')}
                                     id="tableName"
-                                    placeholder={t('Enter Table Name')}
+                                    placeholder={t('enterTableName')}
                                     value={formik.values.tableName}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -305,7 +305,9 @@ const ModelLayout = ({
                                         }
                                         checked={formik.values.audit}
                                     />
-                                    <Label htmlFor="audit">Audit Model</Label>
+                                    <Label htmlFor="audit">
+                                        {t('auditModel')}
+                                    </Label>
                                 </div>
 
                                 <div className="flex items-center space-x-2">
@@ -325,9 +327,9 @@ const ModelLayout = ({
                                 <div className="flex items-center space-x-2">
                                     <Checkbox id="graphql" disabled />
                                     <Label htmlFor="graphql">
-                                        GraphQL
+                                        {t('graphql')}
                                         <span className="ml-2 text-xs text-muted-foreground">
-                                            (Coming Soon)
+                                            ({t('comingSoon')})
                                         </span>
                                     </Label>
                                 </div>
@@ -336,9 +338,9 @@ const ModelLayout = ({
                                 <div className="flex items-center space-x-2">
                                     <Checkbox id="odata" disabled />
                                     <Label htmlFor="odata">
-                                        OData
+                                        {t('odata')}
                                         <span className="ml-2 text-xs text-muted-foreground">
-                                            (Coming Soon)
+                                            ({t('comingSoon')})
                                         </span>
                                     </Label>
                                 </div>
@@ -351,7 +353,7 @@ const ModelLayout = ({
                         <TabsList className="grid w-full grid-cols-3">
                             {TabList.map(({ label, value }, key) => (
                                 <TabsTrigger key={key} value={value}>
-                                    {label}
+                                    {t(label)}
                                 </TabsTrigger>
                             ))}
                         </TabsList>

@@ -25,6 +25,7 @@
 		"build:linux": "electron-vite build && electron-builder --linux --config"
 	},
 	"dependencies": {
+		"dmg-license": "^1.0.0",
 		"@codemirror/lang-json": "^6.0.1",
 		"@codemirror/state": "^6.5.1",
 		"@electron-toolkit/preload": "^3.0.1",
@@ -35,7 +36,7 @@
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
-		"@igrp/spring-engine": "^0.3.0-alpha-4.9.0",
+		"@igrp/spring-engine": "0.3.0-alpha-4.9.1-cg-1",
 		"@octokit/rest": "^21.1.0",
 		"@radix-ui/react-accordion": "^1.2.2",
 		"@radix-ui/react-alert-dialog": "^1.1.2",

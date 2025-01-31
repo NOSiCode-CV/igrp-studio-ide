@@ -57,10 +57,9 @@ const MainPageBuilder = ({
     const handleDeletePage = () => {
         const pageConfig: PageConfig = {
             type: 'page',
-            pageName: page.pageName,
+            pageName: page.name,
             path: page.path
         }
-
         dispatch(onDeletePage(pageConfig, basePath));
         setDeleteModal(false);
         isLoadingTable(true);

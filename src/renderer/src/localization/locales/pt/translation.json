@@ -131,5 +131,11 @@
   "importDataTableFromDatabase": "Importar tabela de dados do banco de dados",
   "importJsonSchemaFiles": "Importar arquivos de esquema JSON",
   "erdDiagram": "Diagrama ERD",
-  "method": "Metodo"
+  "method": "Metodo",
+  "nameOfTheModel": "Nome do modelo",
+  "tableName": "Nome da Tabela",
+  "enterTableName": "Digite o nome da tabela",
+  "auditModel": "Auditoria",
+  "graphql": "GraphQL",
+  "odata": "OData"
 }

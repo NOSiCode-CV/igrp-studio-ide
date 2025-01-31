@@ -92,6 +92,7 @@ export const deletePage = (pageConfig: PageConfig, basePath: string) => async ()
 
     if (error) {
       showErrorToast(error);
+      return;
     }
 
     showSuccessToast('Page removed successfully');
