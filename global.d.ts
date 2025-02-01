@@ -3,3 +3,5 @@ declare module 'i18next-electron-fs-backend' {
     const backend: BackendModule;
     export default backend;
 }
+
+declare module 'vite-plugin-monaco-editor';

@@ -1,6 +1,6 @@
 import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { join, basename } from 'path';
-import { IOpenProject, File, FolderFileStructure, FolderFiles, Handler, ProjectData } from '../types';
+import path, { join, basename } from 'path';
+import { IOpenProject, File, FolderFileStructure, FolderFiles, Handler, ProjectData, FileTree } from '../types';
 import { promisify } from 'util';
 const fs = require("fs");
 
@@ -202,4 +202,39 @@ export const handleWithCustomErrors = (channel: string, handler: Handler) => {
 			return { error: e }
 		}
 	})
+}
+
+// Lista de pastas/arquivos a serem ignorados
+const IGNORED_PATHS = ['.vscode', '.git', 'node_modules', 'logs'];
+
+export const readDirectory = (dirPath: string): FileTree[] => {
+	try {
+		const files = fs.readdirSync(dirPath);
+
+		return files
+			.filter((file) => !IGNORED_PATHS.includes(file)) // Filtra os arquivos/pastas ignorados
+			.map((file) => {
+				const filePath = path.join(dirPath, file);
+				const isDirectory = fs.statSync(filePath).isDirectory();
+
+				return {
+					name: file,
+					path: filePath,
+					isDirectory,
+					children: isDirectory ? readDirectory(filePath) : [],
+				};
+			});
+	} catch (error) {
+		console.error('Error reading directory:', error);
+		return [];
+	}
+}
+
+export async function readProjectFile(filePath: string): Promise<any> {
+	try {
+		return fs.readFileSync(filePath, 'utf-8');
+	} catch (err) {
+		console.error('Error reading file:', err);
+		return null;
+	}
 }

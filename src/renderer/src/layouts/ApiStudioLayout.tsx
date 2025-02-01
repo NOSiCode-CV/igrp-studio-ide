@@ -14,7 +14,7 @@ import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { Navdata } from './components/nav-data';
+import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 
 interface LayoutProps {
@@ -55,7 +55,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         }
     }, [changeStatus, basePath, dispatch]);
 
-    const menuItems = Navdata(folders).menuItems;
+    const { menuItems } = useNavdata(folders);
 
     useEffect(() => {
         if (!basePath) {

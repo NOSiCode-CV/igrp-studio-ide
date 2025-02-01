@@ -137,5 +137,15 @@
   "enterTableName": "Digite o nome da tabela",
   "auditModel": "Auditoria",
   "graphql": "GraphQL",
-  "odata": "OData"
+  "odata": "OData",
+  "explorer": "Explorer",
+  "overview": "Visão Geral",
+  "modules": "Módulos",
+  "modulesDescription": "Total de módulos da aplicação",
+  "endpoints": "Endpoints",
+  "endpointsDescription": "Controladores de endpoints da API",
+  "schemas": "Schemas",
+  "schemasDescription": "Modelos e esquemas de dados",
+  "dtos": "DTOs",
+  "dtosDescription": "Objetos de transferência de dados"
 }

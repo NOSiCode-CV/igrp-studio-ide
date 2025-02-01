@@ -12,7 +12,14 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@renderer/components/ui/sidebar';
-import { Badge, ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
+import {
+    Badge,
+    ChevronRight,
+    FileText,
+    GitBranch,
+    Home,
+    Server,
+} from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -28,8 +35,9 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
-import { NavSettings } from './nav-data';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
+import FileExplorerSidebar from '@renderer/components/FileExplorer';
+import { useNavSettings } from './nav-data';
 
 interface AppSidebarProps {
     className?: string;
@@ -52,6 +60,8 @@ export function AppSidebar({
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
     const menuApp = filterSubItems(menuItems, searchQuery);
+
+    const { menuItems: othersMenus } = useNavSettings();
 
     const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
     const [activeMenu, setActiveMenu] = useState(menuApp || []);
@@ -76,14 +86,14 @@ export function AppSidebar({
         setActiveMenuGroup(item.label);
         if (item.id === 'apis') setActiveMenu(menuApp);
         else {
-            const menus = NavSettings().menuItems;
-            const menuApp = filterSubItems(menus, searchQuery);
+            const menuApp = filterSubItems(othersMenus, searchQuery);
             setActiveMenu(menuApp);
         }
     };
 
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
+        { icon: FileText, label: t('explorer'), id: 'explorer' },
         {
             icon: FileText,
             label: t('documents'),
@@ -98,7 +108,7 @@ export function AppSidebar({
             icon: GitBranch,
             label: t('git'),
             id: 'git',
-        }
+        },
     ];
 
     return (
@@ -150,7 +160,7 @@ export function AppSidebar({
                                                     setOpen(true);
                                                     handleClickMenu(item);
                                                 }}
-                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
+                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
                                                 isActive={
                                                     item.label ===
                                                     activeMenuGroup
@@ -161,7 +171,7 @@ export function AppSidebar({
                                                         <item.icon size={20} />
                                                     )}
                                                 </div>
-                                                <span className="text-xs text-center">
+                                                <span className="text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap">
                                                     {item.label}
                                                 </span>
                                             </SidebarMenuButton>
@@ -187,37 +197,41 @@ export function AppSidebar({
                             handleSearch={handleSearch}
                         />
                     )}
-                    <SidebarContent className="mb-10">
+                    <SidebarContent className="mb-20">
                         <ScrollArea>
-                        {activeMenuGroup !== 'Git' ? (
-                            <SidebarGroup>
-                                <SidebarGroupContent>
-                                    {activeMenu.map(
-                                        (item: MenuItem, index: number) => (
-                                            <SidebarMenu key={index}>
-                                                <Three
-                                                    key={index}
-                                                    item={item}
-                                                    handleSubItemClick={
-                                                        handleSubItemClick
-                                                    }
-                                                    activeItem={activeItem}
-                                                    basePath={basePath}
-                                                    activeMenuGroup={activeMenuGroup}
-                                                />
-                                            </SidebarMenu>
-                                        )
-                                    )}
-                                </SidebarGroupContent>
-                            </SidebarGroup>
-                            ) : (
+                            {activeMenuGroup === 'Explorer' ? (
+                                <FileExplorerSidebar basePath={basePath} />
+                            ) : activeMenuGroup === 'Git' ? (
                                 <GitCommitsSidebar
                                     basePath={basePath}
-                                    onSelectCommit={(commit) => { 
+                                    onSelectCommit={(commit) => {
+                                        console.log('Selected Commit:', commit);
                                         // Optional: Handle commit selection
-                                        console.log('Selected Commit:', commit); 
-                                    }} 
+                                    }}
                                 />
+                            ) : (
+                                <SidebarGroup>
+                                    <SidebarGroupContent>
+                                        {activeMenu.map(
+                                            (item: MenuItem, index: number) => (
+                                                <SidebarMenu key={index}>
+                                                    <Three
+                                                        key={index}
+                                                        item={item}
+                                                        handleSubItemClick={
+                                                            handleSubItemClick
+                                                        }
+                                                        activeItem={activeItem}
+                                                        basePath={basePath}
+                                                        activeMenuGroup={
+                                                            activeMenuGroup
+                                                        }
+                                                    />
+                                                </SidebarMenu>
+                                            )
+                                        )}
+                                    </SidebarGroupContent>
+                                </SidebarGroup>
                             )}
                         </ScrollArea>
                     </SidebarContent>
@@ -232,13 +246,13 @@ function Three({
     handleSubItemClick,
     activeItem,
     basePath,
-    activeMenuGroup
+    activeMenuGroup,
 }: {
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
     basePath: string;
-    activeMenuGroup?: string
+    activeMenuGroup?: string;
 }) {
     const [open, setOpen] = React.useState(true);
 
@@ -283,7 +297,8 @@ function Three({
                     <span>
                         {item.label}
                         {item.subItems &&
-                            item.subItems.length > 0  && activeMenuGroup === 'APIs' &&
+                            item.subItems.length > 0 &&
+                            activeMenuGroup === 'APIs' &&
                             `(${item.subItems.length})`}
                     </span>
                 </div>

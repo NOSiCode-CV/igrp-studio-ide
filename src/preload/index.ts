@@ -52,33 +52,6 @@ const api = {
 		}
 	},
 
-	deleteDTO: async (config: DTOBaseConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:delete-dto', config, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deleteModel: async (config: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:delete-model', config, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deleteController: async (
-		config: ControllerConfig,
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:delete-controller', config, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
 	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
@@ -121,6 +94,10 @@ const api = {
 
 	getJsonContent: (filePath: string) =>
 		ipcRenderer.invoke('igrp-studio:get-json-content', filePath),
+
+	readDirectory: (basePath: string) => ipcRenderer.invoke("read-directory", basePath),
+
+	readProjectFile: (filePath: string) => ipcRenderer.invoke("read-file", filePath),
 
 	openVSCode: (basePath: string) => ipcRenderer.invoke('igrp-studio:open-vs-code', basePath),
 
@@ -216,7 +193,7 @@ if (process.contextIsolated) {
 			...electronAPI,
 			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 			getLanguage: () => ipcRenderer.invoke("get-language"),
-			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
+			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang)
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)

@@ -1,12 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, screen, IpcMainInvokeEvent } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
+import { FileTree, FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
 
-import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory } from './helpers'
+import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory, readDirectory, readProjectFile } from './helpers'
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
@@ -78,8 +78,6 @@ function createWindow(): void {
 
   installExtensions(mainWindow)
 
-  app.setUserTasks([])
-
 }
 
 // This method will be called when Electron has finished
@@ -99,22 +97,22 @@ app.whenReady().then(async () => {
 
   if (process.platform === 'win32') {
     app.setAsDefaultProtocolClient('igrp-studio');
-    
+
     const gotTheLock = app.requestSingleInstanceLock();
-    
+
     if (!gotTheLock) {
       app.quit();
     } else {
       app.on('second-instance', (_event, argv) => {
         const url = argv[argv.length - 1];
-        
+
         if (url.startsWith('igrp-studio://') && mainWindow) {
           if (mainWindow.isMinimized()) mainWindow.restore();
           mainWindow.focus();
           handleProtocolCallback(url, mainWindow);
         }
       });
-      
+
       if (process.argv.length > 1) {
         const url = process.argv[process.argv.length - 1];
         if (url.startsWith('igrp-studio://')) {
@@ -124,7 +122,7 @@ app.whenReady().then(async () => {
     }
 
     buildTaskbar()
-    
+
   }
 
   // Default open or close DevTools by F12 in development
@@ -190,6 +188,25 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.handle('read-directory', async (_event: IpcMainInvokeEvent, dirPath: string): Promise<FileTree[] | { error: string }> => {
+  try {
+    const fileTree = await readDirectory(dirPath);
+    return fileTree;
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    return { error: error instanceof Error ? error.message : 'Failed to read directory' };
+  }
+});
+
+ipcMain.handle('read-file', async (_event: IpcMainInvokeEvent, filePath: string): Promise<FileTree[] | { error: string }> => {
+  try {
+    return await readProjectFile(filePath);
+  } catch (error) {
+    console.error('Error reading file:', error);
+    return { error: error instanceof Error ? error.message : 'Failed to read file' };
+  }
+});
 
 ipcMain.handle('get-app-version', () => {
   return app.getVersion();

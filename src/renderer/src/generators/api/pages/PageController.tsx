@@ -13,6 +13,7 @@ import ControllerOverview from './controller/overview';
 import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
 import { EnumLayout } from './enum/EnumLayout';
+import { EditorLayout } from './EditorLayout';
 
 interface PageBuilderState {
     basePath: string;
@@ -165,7 +166,13 @@ const PageController = ({
                     basePath={basePath}
                     selectors={selectors}
                     currentItem={tab.item}
-                  
+                    onCloseTab={hangleClose}
+                />
+            )}
+            {option === OPTION_TYPE.FILE_THREE && (
+                <EditorLayout
+                    basePath={basePath}
+                    currentItem={tab.item}
                     onCloseTab={hangleClose}
                 />
             )}

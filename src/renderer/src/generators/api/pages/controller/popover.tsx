@@ -23,8 +23,8 @@ import { Switch } from '@renderer/components/ui/Switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
 import { toInitCap } from '@renderer/utils/helpers';
-import CodeEditor from '@renderer/components/code-editor';
 import { Combobox } from '@igrp/igrp-design-system';
+import MonacoEditor from '@renderer/components/MonacoEditor';
 
 interface PopoverProps {
     row: any;
@@ -147,16 +147,13 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                         }
                                     />
                                 )}
-                                 {isEnum && (
+                                {isEnum && (
                                     <Combobox
                                         name="enum"
                                         className="h-8"
                                         value={row?.['enum'] || ''}
                                         onChange={(ev) =>
-                                            changeValue(
-                                                'enum',
-                                                ev
-                                            )
+                                            changeValue('enum', ev)
                                         }
                                         options={enumTypes}
                                     />
@@ -301,10 +298,11 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         </div>
                     </TabsContent>
                     <TabsContent value="jsonSchema">
-                        <CodeEditor
-                            value={JSON.stringify(row, null, 2)}
+                        <MonacoEditor
+                            content={JSON.stringify(row, null, 2)}
+                            filePath=""
                             onChange={handleChangeEditor}
-                            className="w-100"
+                            height="20vh"
                         />
                     </TabsContent>
                 </Tabs>

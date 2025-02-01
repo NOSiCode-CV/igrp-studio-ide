@@ -64,17 +64,17 @@ export interface IOpenProject {
 export type PageableProjects = { data: Array<ProjectData>, total: number }
 
 export interface MenuItem {
-    id?: string; 
+    id?: string;
     label: string;
-    isHeader?: boolean; 
-    icon?: any; 
-    link?: string; 
-    stateVariables?: boolean; 
-    click?: (e: any) => void; 
-    subItems?: MenuItem[]; 
+    isHeader?: boolean;
+    icon?: any;
+    link?: string;
+    stateVariables?: boolean;
+    click?: (e: any) => void;
+    subItems?: MenuItem[];
     parentId?: string;
     badgeColor?: string;
-    badgeName?: string; 
+    badgeName?: string;
     type?: string;
     component?: React.ReactNode,
     path?: string,
@@ -99,15 +99,22 @@ export interface FolderFileStructure {
     path: string;
 }
 
+export interface FileTree {
+    name: string; // Name of the file or folder
+    path: string; // Full path of the file or folder
+    isDirectory: boolean; // Whether it's a directory
+    children?: FileTree[]; // Array of children (only for directories)
+}
+
 export interface Repository {
-  id: number;
-  name: string;
-  full_name: string;
-  description: string | null;
-  private: boolean;
-  html_url: string;
-  clone_url: string;
-  updated_at: string | null;
+    id: number;
+    name: string;
+    full_name: string;
+    description: string | null;
+    private: boolean;
+    html_url: string;
+    clone_url: string;
+    updated_at: string | null;
 }
 
 interface Commit {

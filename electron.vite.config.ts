@@ -6,10 +6,10 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      outDir: 'dist/main', // Output directory for the main process
+      outDir: 'dist/main',
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'src/main/index.ts'), // Entry file for the main process
+          index: resolve(__dirname, 'src/main/index.ts'),
         },
       },
     },
@@ -17,7 +17,7 @@ export default defineConfig({
   preload: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      outDir: 'dist/preload', // Output directory for the preload script
+      outDir: 'dist/preload', 
     },
   },
   renderer: {
@@ -27,11 +27,23 @@ export default defineConfig({
       },
     },
     define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'), // Define the `process.env`
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'), 
     },
     plugins: [react()],
     build: {
-      outDir: 'dist/renderer', // Output directory for the renderer process
+      outDir: 'dist/renderer',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            monaco: ['monaco-editor'],
+          },
+        },
+      },
+    },
+    server: {
+      fs: {
+        strict: false, 
+      },
     },
   },
 });
