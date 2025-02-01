@@ -14,14 +14,12 @@ import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
 import { EnumLayout } from './enum/EnumLayout';
 import { EditorLayout } from './EditorLayout';
+import { FileTree } from 'src/main/types';
 
 interface PageBuilderState {
     basePath: string;
     currentItem: any;
-    folderFiles: {
-        models?: any[];
-        dto?: any[];
-    };
+    filesThree: FileTree[];
 }
 
 interface NewProps {
@@ -41,7 +39,7 @@ const PageController = ({
 }: NewProps): JSX.Element => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
-    const [module, setModule] = useState<string>('');
+    const [module, setModule] = useState<string>('shared');
 
     const { t } = useTranslation();
 
@@ -49,15 +47,16 @@ const PageController = ({
 
     const selectProperties = createSelector(selectState, (studio) => {
         const moduleData = getMergedFiles(studio, module);
+
         return {
             basePath: studio.basePath,
             models: extractByType(moduleData, OPTION_TYPE.MODELS),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
             responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
-            enums:  extractByType(moduleData, OPTION_TYPE.ENUM),
-            modules: getModulesArray(studio.folderFiles),
-            folderFiles: studio.folderFiles,
+            enums: extractByType(moduleData, OPTION_TYPE.ENUM),
+            modules: getModulesArray(studio.filesThree),
+            filesThree: studio.filesThree,
         };
     });
 
@@ -112,63 +111,65 @@ const PageController = ({
                     </div>
                 </div>
             )}
-            {option === OPTION_TYPE.MODEL && (
-                <ModelLayout
-                    basePath={basePath}
-                    selectors={selectors}
-                    models={models}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.ACTION && (
-                <ControllerLayout
-                    basePath={basePath}
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    modules={modules}
-                    dto={dto}
-                    responses={responses}
-                    enums={enums}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.CONTROLLER && (
-                <ControllerOverview
-                    basePath={basePath}
-                    currentItem={tab.item}
-                />
-            )}
-            {option === OPTION_TYPE.DATA_OBJECTS && (
-                <DtoLayout
-                    basePath={basePath}
-                    selectors={selectors}
-                    dto={dto}
-                    models={models}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.RESPONSE && (
-                <ResponseLayout
-                    basePath={basePath}
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.ENUM && (
-                <EnumLayout
-                    basePath={basePath}
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                />
-            )}
+            <div className="mb-12">
+                {option === OPTION_TYPE.MODEL && (
+                    <ModelLayout
+                        basePath={basePath}
+                        selectors={selectors}
+                        models={models}
+                        currentItem={tab.item}
+                        onCloseTab={hangleClose}
+                        onUpdateTab={handleUpdate}
+                    />
+                )}
+                {option === OPTION_TYPE.ACTION && (
+                    <ControllerLayout
+                        basePath={basePath}
+                        selectors={selectors}
+                        currentItem={tab.item}
+                        modules={modules}
+                        dto={dto}
+                        responses={responses}
+                        enums={enums}
+                        onCloseTab={hangleClose}
+                        onUpdateTab={handleUpdate}
+                    />
+                )}
+                {option === OPTION_TYPE.CONTROLLER && (
+                    <ControllerOverview
+                        basePath={basePath}
+                        currentItem={tab.item}
+                    />
+                )}
+                {option === OPTION_TYPE.DATA_OBJECTS && (
+                    <DtoLayout
+                        basePath={basePath}
+                        selectors={selectors}
+                        dto={dto}
+                        models={models}
+                        currentItem={tab.item}
+                        onCloseTab={hangleClose}
+                        onUpdateTab={handleUpdate}
+                    />
+                )}
+                {option === OPTION_TYPE.RESPONSE && (
+                    <ResponseLayout
+                        basePath={basePath}
+                        selectors={selectors}
+                        currentItem={tab.item}
+                        onCloseTab={hangleClose}
+                        onUpdateTab={handleUpdate}
+                    />
+                )}
+                {option === OPTION_TYPE.ENUM && (
+                    <EnumLayout
+                        basePath={basePath}
+                        selectors={selectors}
+                        currentItem={tab.item}
+                        onCloseTab={hangleClose}
+                    />
+                )}
+            </div>
             {option === OPTION_TYPE.FILE_THREE && (
                 <EditorLayout
                     basePath={basePath}

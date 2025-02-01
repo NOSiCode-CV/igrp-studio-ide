@@ -28,7 +28,7 @@ export interface DropdownItem {
     componentName?: ReactNode;
 }
 
-const useNavdata = (folders: FileTree[]) => {
+const useNavdata = (filesThree: FileTree[]) => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
@@ -133,7 +133,7 @@ const useNavdata = (folders: FileTree[]) => {
     const IGNORED_PATHS = ['baseApi.json', 'permissions.json', '.DS_store'];
     //console.log(folders)
     const menuItems: MenuItem[] = useMemo(() => {
-        return folders
+        return filesThree
             .filter((folder) => !IGNORED_PATHS.includes(folder.name))
             .map((folder) => {
                 let dropdownMenus: DropdownItem[] = [
@@ -270,7 +270,7 @@ const useNavdata = (folders: FileTree[]) => {
                 return folderMenuItem;
             });
     }, [
-        folders,
+        filesThree,
         t,
         menuDelete,
         dropdownSubMenus,

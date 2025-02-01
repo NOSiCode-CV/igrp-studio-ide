@@ -3,7 +3,7 @@ import { ROUTES } from '@renderer/routes/routeConstants';
 import {
   setConfigAction,
   setBasePathAction,
-  setFolderFilesAction,
+  setFilesThreeAction,
   setChangeStatusAction,
   setCurrentItemAction
 } from './reducer';
@@ -74,8 +74,8 @@ export const navigateToNextPage = (navigate, appConfig: ProjectData) => {
 */
 export const getFileThree = (basePath: string) => async (dispatch: any) => {
   try {
-    let folderFiles: FileTree[] = await window.api.fetchFiles(`${basePath}/.igrpstudio`)
-    dispatch(setFolderFilesAction(folderFiles));
+    let filesThree: FileTree[] = await window.api.fetchFiles(`${basePath}/.igrpstudio`)
+    dispatch(setFilesThreeAction(filesThree));
   } catch (error) {
     console.error('error:', error);
   }

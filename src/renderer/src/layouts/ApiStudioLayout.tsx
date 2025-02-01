@@ -34,14 +34,14 @@ const Layout = (props: LayoutProps): JSX.Element => {
         selectStudioState,
         (studio) => ({
             config: studio.config,
-            folders: studio.folderFiles,
+            filesThree: studio.filesThree,
             basePath: studio.basePath,
             changeStatus: studio.changeStatus,
             currentItem: studio.currentItem,
         })
     );
 
-    const { currentItem, changeStatus, config, basePath, folders } =
+    const { currentItem, changeStatus, config, basePath, filesThree } =
         useSelector(selectStudioProperties);
 
     useEffect(() => {
@@ -55,7 +55,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         }
     }, [changeStatus, basePath, dispatch]);
 
-    const { menuItems } = useNavdata(folders);
+    const { menuItems } = useNavdata(filesThree);
 
     useEffect(() => {
         if (!basePath) {

@@ -95,8 +95,8 @@ export const getTablesColumns = ({
 
 	const modelsOptions = (models || [])
 		.map((model) => ({
-			value: model.name,
-			label: model.name,
+			value: model.content?.name || model.name,
+			label: model.content?.name || model.name,
 		}));
 
 	const columns = attributes.map((attribute) => ({

@@ -60,8 +60,8 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
             ? objects
                 .filter((m) => m.name !== currentDto)
                 .map((item) => ({
-                    label: item.name,
-                    value: item.name
+                    value: item.content?.name || item.name,
+                    label: item.content?.name || item.name,
                 }))
             : []
     }

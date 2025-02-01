@@ -38,16 +38,16 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     const selectStudioProperties = createSelector(
         selectStudioState,
         (studio) => ({
-            folders: studio.folderFiles,
+            filesThree: studio.filesThree,
         })
     );
 
-    const { folders } = useSelector(selectStudioProperties);
+    const { filesThree } = useSelector(selectStudioProperties);
 
     useEffect(() => {
         const newStats = { modules: 0, controllers: 0, schemas: 0, dtos: 0 };
 
-        const folderArray = Object.values(folders);
+        const folderArray = Object.values(filesThree);
 
         newStats.modules = folderArray.length > 1 ? folderArray.length - 1 : 0;
 
@@ -68,7 +68,7 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
         });
 
         setStats(newStats);
-    }, [folders]);
+    }, [filesThree]);
 
     return (
         <ContainerScrollArea>

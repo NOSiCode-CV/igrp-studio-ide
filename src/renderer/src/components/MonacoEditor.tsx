@@ -12,7 +12,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
     filePath,
     content,
     onChange,
-    height = '90vh',
+    height = '100vh',
 }) => {
     const editorRef = useRef<any>(null);
 

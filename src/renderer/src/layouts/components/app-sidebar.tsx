@@ -171,7 +171,7 @@ export function AppSidebar({
                                                         <item.icon size={20} />
                                                     )}
                                                 </div>
-                                                <span className="text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap">
+                                                <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
                                                     {item.label}
                                                 </span>
                                             </SidebarMenuButton>

@@ -42,7 +42,7 @@ const MainPageBuilder = ({
         (studio) => ({
             basePath: studio.basePath,
             config: studio.config,
-            pages: studio.folderFiles
+            pages: studio.filesThree
         })
     );
 

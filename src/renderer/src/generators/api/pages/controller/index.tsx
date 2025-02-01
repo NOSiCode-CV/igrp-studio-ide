@@ -339,8 +339,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
         // Map DTO into the expected format
         const targetDto = dto.map((d) => ({
-            value: d.name,
-            label: d.name,
+            value: d.content?.name || d.name,
+			label: d.content?.name || d.name,
         }));
 
         setSchemaTypes((prevSchemaTypes) =>

@@ -142,28 +142,30 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
                 stroke: '#00FFFF',
                 fill: '#00FFFF',
             }),
-            $(go.TextBlock, // the "from" label
+            $(
+                go.TextBlock, // the "from" label
                 {
-                  textAlign: "center",
-                  font: "bold 12px sans-serif",
-                  stroke: "gray",
-                  segmentIndex: 0,
-                  segmentOffset: new go.Point(NaN, NaN),
-                  segmentOrientation: go.Link.OrientUpright
+                    textAlign: 'center',
+                    font: 'bold 12px sans-serif',
+                    stroke: 'gray',
+                    segmentIndex: 0,
+                    segmentOffset: new go.Point(NaN, NaN),
+                    segmentOrientation: go.Link.OrientUpright,
                 },
-                new go.Binding("text", "text")
-              ),
-              $(go.TextBlock, // the "to" label
+                new go.Binding('text', 'text')
+            ),
+            $(
+                go.TextBlock, // the "to" label
                 {
-                  textAlign: "center",
-                  font: "bold 12px sans-serif",
-                  stroke: "gray",
-                  segmentIndex: -1,
-                  segmentOffset: new go.Point(NaN, NaN),
-                  segmentOrientation: go.Link.OrientUpright
+                    textAlign: 'center',
+                    font: 'bold 12px sans-serif',
+                    stroke: 'gray',
+                    segmentIndex: -1,
+                    segmentOffset: new go.Point(NaN, NaN),
+                    segmentOrientation: go.Link.OrientUpright,
                 },
-                new go.Binding("text", "toText")
-              )
+                new go.Binding('text', 'toText')
+            )
         );
 
         // Initialize the model data
@@ -174,7 +176,5 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
         };
     }, [models, relations]);
 
-    return (
-        <div ref={diagramRef} className="w-full h-[600px] "  style={{ height: 'calc(100vh - 9.5rem)' }}/>
-    );
+    return <div ref={diagramRef} style={{ height: '100vh' }} />;
 }
