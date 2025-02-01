@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
 import useToast from '@renderer/components/useToast';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPages as onGetPages } from '@renderer/redux/thunks';
+import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import SyncButton from '@renderer/components/git/git-sync';
 import { RootState } from '@renderer/redux';
 import GitConnectionMenu from '@renderer/components/user-auth';

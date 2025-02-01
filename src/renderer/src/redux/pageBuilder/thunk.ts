@@ -9,7 +9,7 @@ import {
 } from './reducer';
 import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
-import { ProjectData, FolderFiles } from 'src/main/types';
+import { ProjectData, FileTree } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 /**
  * set BasePath
@@ -72,9 +72,9 @@ export const navigateToNextPage = (navigate, appConfig: ProjectData) => {
 *  fetch  pages
 * @param {*} param0
 */
-export const getPages = (basePath: string) => async (dispatch: any) => {
+export const getFileThree = (basePath: string) => async (dispatch: any) => {
   try {
-    let folderFiles: FolderFiles = await window.api.fetchFiles(basePath)
+    let folderFiles: FileTree[] = await window.api.fetchFiles(`${basePath}/.igrpstudio`)
     dispatch(setFolderFilesAction(folderFiles));
   } catch (error) {
     console.error('error:', error);

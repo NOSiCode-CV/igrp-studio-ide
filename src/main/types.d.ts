@@ -104,6 +104,7 @@ export interface FileTree {
     path: string; // Full path of the file or folder
     isDirectory: boolean; // Whether it's a directory
     children?: FileTree[]; // Array of children (only for directories)
+    content?: any
 }
 
 export interface Repository {

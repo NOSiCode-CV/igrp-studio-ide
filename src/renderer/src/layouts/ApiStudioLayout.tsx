@@ -5,7 +5,7 @@ import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-    getPages as onGetFolderFiles,
+    getFileThree as onGetFolderFiles,
     setChangeStatus as onSetChangeStatus,
 } from '@renderer/redux/thunks';
 

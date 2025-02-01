@@ -128,7 +128,7 @@
   "convertToSpringBoot": "Converter para Spring Boot",
   "convertToDotNet": "Converter para .NET",
   "removeProject": "Remover Projeto",
-  "importDataTableFromDatabase": "Importar tabela de dados do banco de dados",
+  "importDataTableFromDatabase": "Importar tabela de base de dados",
   "importJsonSchemaFiles": "Importar arquivos de esquema JSON",
   "erdDiagram": "Diagrama ERD",
   "method": "Metodo",

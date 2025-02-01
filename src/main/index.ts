@@ -6,7 +6,7 @@ import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
 import { FileTree, FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
 
-import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory, readDirectory, readProjectFile } from './helpers'
+import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory, readDirectory, readIgrpStudioDirectory, readProjectFile } from './helpers'
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
@@ -247,8 +247,15 @@ ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: Projec
 
 ipcMain.handle(
   'igrp-studio:fetch-files',
-  async (_event, basePath: string): Promise<FolderFiles> => {
-    return await fetchFiles(basePath)
+  async (_event, basePath: string): Promise<FileTree[] | { error: string }> => {
+
+    try {
+      return readIgrpStudioDirectory(basePath);
+    } catch (error) {
+      console.error('Error reading directory:', error);
+      return { error: error instanceof Error ? error.message : 'Failed to read directory' };
+    }
+
   }
 )
 

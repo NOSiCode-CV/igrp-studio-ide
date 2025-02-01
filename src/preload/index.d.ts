@@ -20,7 +20,7 @@ interface CustomAPI {
     fetchSelectors: (module: string, basePath: string) => Promise<[]>
 
     openDirectory: (buttonLabel: string) => Promise<IOpenProject>;
-    fetchFiles: (basePath: string) => Promise<FolderFiles>;
+    fetchFiles: (basePath: string) => Promise<FileTree[]>;
     getJsonContent: (filePath: string) => Promise<any>;
     readDirectory: (basePath: string) => Promise<FileTree[]>;
     readProjectFile(filePath: string): Promise<any>;
