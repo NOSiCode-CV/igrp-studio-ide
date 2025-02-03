@@ -4,9 +4,9 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { FileTree, FolderFiles, HandlerResponse, IOpenProject, ProjectData } from './types'
+import { FileTree, HandlerResponse, IOpenProject, ProjectData } from './types'
 
-import { checkAndReadBaseApi, fetchFiles, getJsonContent, openDirectory, readDirectory, readIgrpStudioDirectory, readProjectFile } from './helpers'
+import { checkAndReadBaseApi, getJsonContent, openDirectory, readDirectory, readIgrpStudioDirectory, readProjectFile } from './helpers'
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
@@ -185,6 +185,15 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+ipcMain.on('open-external-url', (_event, url) => {
+  if (url) {
+    // Open the provided URL in the default browser
+    shell.openExternal(url);
+  } else {
+    console.error('No URL provided');
+  }
+});
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

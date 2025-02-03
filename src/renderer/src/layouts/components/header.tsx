@@ -4,8 +4,11 @@ import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
     Bell,
+    Book,
     Code,
+    Github,
     Maximize2,
+    MessageCircle,
     Minus,
     Settings,
     Square,
@@ -109,36 +112,71 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         </button>
     );
 
+    const handleDiscord = () => {
+        window.electron.ipcRenderer.send(
+            'open-external-url',
+            'https://discord.com/invite/dywFBFaCQr'
+        );
+    };
+    const handleGithub = () => {
+        window.electron.ipcRenderer.send(
+            'open-external-url',
+            'https://github.com/NOSiCode-CV/igrp-studio-ide'
+        );
+    };
+
+    const handleDocumentation = () => {
+        window.electron.ipcRenderer.send(
+            'open-external-url',
+            'https://docs.igrp.cv'
+        );
+    };
+
     return (
         <>
             <TooltipProvider>
                 <header className="sticky h-10 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="flex items-center justify-between px-4">
                         <div className="flex items-center space-x-2 home cursor-pointer">
-                            <div onClick={openPage} className={cn('flex items-center gap-2', isMac ? 'pl-12': '')}>
-                                <img src={logo} alt="Logo" className="h-6 w-auto" />
-                                <p className="text-sm font-medium">IGRP Studio</p>
+                            <div
+                                onClick={openPage}
+                                className={cn(
+                                    'flex items-center gap-2',
+                                    isMac ? 'pl-12' : ''
+                                )}
+                            >
+                                <img
+                                    src={logo}
+                                    alt="Logo"
+                                    className="h-6 w-auto"
+                                />
+                                <p className="text-sm font-medium">
+                                    IGRP Studio
+                                </p>
                             </div>
                             <div>
-                            {config?.name && (
-                                <div className="flex justify-center gap-2 items-center">
-                                    <BranchSwitcher
-                                        projectPath={basePath || ''}
-                                        onError={showErrorToast}
-                                        onSuccess={showSuccessToast}
-                                        onBranchChange={() => {
-                                            dispatch(
-                                                onGetPages(basePath || '')
-                                            );
-                                        }}
-                                    />
-                                    {isGitEnabled && <SyncButton basePath={basePath || ''} /> }
-                                </div>
-                            )}
+                                {config?.name && (
+                                    <div className="flex justify-center gap-2 items-center">
+                                        <BranchSwitcher
+                                            projectPath={basePath || ''}
+                                            onError={showErrorToast}
+                                            onSuccess={showSuccessToast}
+                                            onBranchChange={() => {
+                                                dispatch(
+                                                    onGetPages(basePath || '')
+                                                );
+                                            }}
+                                        />
+                                        {isGitEnabled && (
+                                            <SyncButton
+                                                basePath={basePath || ''}
+                                            />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                        
                             <ModeToggle />
 
                             {config?.name && (
@@ -154,6 +192,63 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 </Button>
                             )}
 
+                            {!config?.name && (
+                                <>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleGithub}
+                                            >
+                                                <Github className="w-5 h-5" />
+                                                <span className="sr-only">
+                                                    GitHub
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>GitHub</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleDiscord}
+                                            >
+                                                <MessageCircle className="w-5 h-5" />
+                                                <span className="sr-only">
+                                                    Discord
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Discord</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleDocumentation}
+                                            >
+                                                <Book className="w-5 h-5" />
+                                                <span className="sr-only">
+                                                    Documentation
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Documentation</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </>
+                            )}
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -176,7 +271,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     <p>Notifications</p>
                                 </TooltipContent>
                             </Tooltip>
-                            
+
                             <GitConnectionMenu />
 
                             {!isMac && (
