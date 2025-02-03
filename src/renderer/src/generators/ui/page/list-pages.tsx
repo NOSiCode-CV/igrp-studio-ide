@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { createSelector } from "reselect";
+import { useEffect, useState } from 'react';
+import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
     getFileThree as onGetPages,
-    deletePage as onDeletePage
-} from "@renderer/redux/thunks";
-import { PageConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
+    deletePage as onDeletePage,
+} from '@renderer/redux/thunks';
+import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { File } from 'src/main/types';
 import { Card, CardContent, CardHeader } from '@renderer/components/ui/card';
@@ -15,16 +15,15 @@ import { TableLayout } from '../components/TableLayout';
 import { NewPageModal } from './new-page-modal';
 import { Component, Trash } from 'lucide-react';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
-import { PageHeader } from "@igrp/igrp-design-system";
+import { PageHeader } from '@igrp/igrp-design-system';
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: File) => void
+    onPageClick?: (pageFile: File) => void;
 }
 
 const MainPageBuilder = ({
-    onPageClick = (): void => { }
+    onPageClick = (): void => {},
 }: PageBuilderContentProps): JSX.Element => {
-
     const { t } = useTranslation();
 
     const dispatch: any = useDispatch();
@@ -37,33 +36,36 @@ const MainPageBuilder = ({
 
     const selectState = (state: any) => state.PageBuilder;
 
-    const selectProperties = createSelector(
-        selectState,
-        (studio) => ({
-            basePath: studio.basePath,
-            config: studio.config,
-            pages: studio.filesThree
-        })
-    );
+    const selectProperties = createSelector(selectState, (studio) => ({
+        basePath: studio.basePath,
+        config: studio.config,
+        pages: studio.filesThree,
+    }));
 
     const { basePath, pages } = useSelector(selectProperties);
 
     const tableColumns = [
-        { header: 'Page Name', accessorKey: 'name', enableSorting: true, enableColumnFilter: true },
+        {
+            header: 'Page Name',
+            accessorKey: 'name',
+            enableSorting: true,
+            enableColumnFilter: true,
+        },
+        { header: 'URL', accessorKey: 'url' },
         { header: 'Status', accessorKey: 'status' },
-        { header: 'Created', accessorKey: 'created' }
+        { header: 'Created', accessorKey: 'created' },
     ];
 
     const handleDeletePage = () => {
         const pageConfig: PageConfig = {
             type: 'page',
             pageName: page.name,
-            path: page.path
-        }
+            path: page.path,
+        };
         dispatch(onDeletePage(pageConfig, basePath));
         setDeleteModal(false);
         isLoadingTable(true);
-        setPage(null)
+        setPage(null);
     };
 
     const handleNewPage = () => {
@@ -81,56 +83,68 @@ const MainPageBuilder = ({
     };
 
     const onClickBtnGerador = (item: File) => {
-        if (onPageClick)
-            onPageClick(item);
+        if (onPageClick) onPageClick(item);
     };
 
     useEffect(() => {
         if (loadingTable) {
             dispatch(onGetPages(basePath));
-            isLoadingTable(false)
+            isLoadingTable(false);
         }
     }, [loadingTable]);
 
     useEffect(() => {
-        if (pages?.files) {
-            // Transform the pages structure into a flat array
-            const flattenedPages = pages.files.flatMap(page =>
-                Object.values(page).flat()
-            );
+        console.log(pages);
 
-            setContent(flattenedPages);
+        if (pages) {
+            const page = pages.find((page) => page.name === 'pagesMeta.json');
+
+            if (page && page.content && page.content.resourceItems) {
+                const resourceItems = page.content.resourceItems;
+                setContent(resourceItems);
+            }
         }
-    }, [pages])
+    }, [pages]); 
 
     const actions = (cell: any) => (
-        <div className="flex space-x-2" >
-            <Button title='Add Components' variant="ghost" size="icon" onClick={() => onClickBtnGerador(cell.row.original)}>
-                <Component className='h-4' />
+        <div className="flex space-x-2">
+            <Button
+                title="Add Components"
+                variant="ghost"
+                size="icon"
+                onClick={() => onClickBtnGerador(cell.row.original)}
+            >
+                <Component className="h-4" />
             </Button>
-            <Button title='Delete Page' variant="ghost" size="icon" onClick={() => onClickDelete(cell.row.original)}>
-                <Trash className='h-4 text-red-500' />
+            <Button
+                title="Delete Page"
+                variant="ghost"
+                size="icon"
+                onClick={() => onClickDelete(cell.row.original)}
+            >
+                <Trash className="h-4 text-red-500" />
             </Button>
         </div>
     );
 
     return (
-        <div className='container mt-4'>
-            <PageHeader title={"IGRP UI"}/>
+        <div className="container mt-4">
+            <PageHeader title={'IGRP UI'} />
             <Card>
                 <CardHeader className="flex flex-1 flex-row justify-between">
-                    <h4 className="text-lg font-semibold">{t("pageLists")}</h4>
+                    <h4 className="text-lg font-semibold">{t('pageLists')}</h4>
                     <div className="ml-auto">
-                    
-                        <Button
-                            size="sm"
-                            onClick={onClickNewPage}>
-                            {t("create")}
+                        <Button size="sm" onClick={onClickNewPage}>
+                            {t('create')}
                         </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <TableLayout content={content || []} columns={tableColumns} actions={actions} />
+                    <TableLayout
+                        content={content || []}
+                        columns={tableColumns}
+                        actions={actions}
+                    />
                 </CardContent>
             </Card>
 
@@ -148,7 +162,7 @@ const MainPageBuilder = ({
                 hasTrigger={false}
             />
         </div>
-    )
-}
+    );
+};
 
-export default MainPageBuilder; 
+export default MainPageBuilder;

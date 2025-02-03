@@ -2,7 +2,6 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
 	ControllerConfig,
-	DTOBaseConfig,
 	DTOConfig,
 	ModelConfig
 } from '@igrp/spring-engine/dist/interfaces/types'

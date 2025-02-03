@@ -1,7 +1,7 @@
 import { Combobox } from '@igrp/igrp-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { ENV_TYPES, httpStatusCodes } from '@renderer/constants/appConstants';
+import { ENV_TYPES, httpStatusCodes, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import { formatMethods } from '../../helpers';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ import {
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
+import { useTabs } from '@renderer/components/TabContext';
 
 const contentType = 'application/json';
 
@@ -51,6 +52,7 @@ export const ResponseLayout = ({
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+     const { initializeTabFromCurrentItem } = useTabs();
 
     const [title, setTitle] = useState('');
 
@@ -196,6 +198,14 @@ export const ResponseLayout = ({
         formik.setFieldValue('content', updatedResponses);
     };
 
+    const onClickSourceCode = () => {
+            initializeTabFromCurrentItem({
+                path: `${currentItem.path}`,
+                type: OPTION_TYPE.FILE_THREE,
+                label: `${currentItem.label}.json`,
+            });
+        };
+
     return (
         <>
             <NavigationBar
@@ -203,6 +213,7 @@ export const ResponseLayout = ({
                 onSubmit={onSubmit}
                 isNew={!data}
                 title={title || t('createNewResponse')}
+                showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
