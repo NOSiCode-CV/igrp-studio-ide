@@ -183,5 +183,15 @@
   "with": "with",
   "entityRequired": "Entity is required.",
   "referencedColumnNameRequired": "Referenced column name is required.",
-  "joinTableRequired": "Join table is required for ManyToMany relationships."
+  "joinTableRequired": "Join table is required for ManyToMany relationships.",
+  "httpStatusCodeRequired": "HTTP Status Code is required",
+  "invalidHttpStatusCode": "Invalid HTTP Status Code",
+  "nameRequired": "Name is required",
+  "nameMaxLength": "Name must be less than 50 characters",
+  "httpStatusCode": "HTTP Status Code",
+  "httpStatusCodePlaceholder": "e.g., 200, 400",
+  "responseNamePlaceholder": "Response Name",
+  "contentType": "Content Type",
+  "dataSchema": "Data Schema",
+  "createNewResponse": "Create a new Response"
 }

@@ -25,6 +25,7 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogHeader,
     DialogTitle,
 } from '@renderer/components/ui/dialog';
 import {
@@ -72,10 +73,12 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[800px] max-w-[900px]">
-                <DialogTitle className="sr-only">Settings</DialogTitle>
-                <DialogDescription className="sr-only">
-                    Customize your settings here.
-                </DialogDescription>
+                <DialogHeader>
+                    <DialogTitle>Settings</DialogTitle>
+                    <DialogDescription>
+                        Customize your settings here.
+                    </DialogDescription>
+                </DialogHeader>
                 <SidebarProvider className="items-start">
                     <Sidebar collapsible="none" className="hidden md:flex">
                         <SidebarContent>

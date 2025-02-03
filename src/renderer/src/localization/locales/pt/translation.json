@@ -184,5 +184,15 @@
   "with": "com",
   "entityRequired": "Entidade é obrigatória",
   "referencedColumnNameRequired": "Nome da coluna referenciada é obrigatório",
-  "joinTableRequired": "A tabela de junção é obrigatória para relacionamentos ManyToMany"
+  "joinTableRequired": "A tabela de junção é obrigatória para relacionamentos ManyToMany",
+  "httpStatusCodeRequired": "Código de status HTTP é obrigatório",
+  "invalidHttpStatusCode": "Código de status HTTP inválido",
+  "nameRequired": "Nome é obrigatório",
+  "nameMaxLength": "O nome deve ter menos de 50 caracteres",
+  "httpStatusCode": "Código de Status HTTP",
+  "httpStatusCodePlaceholder": "ex: 200, 400",
+  "responseNamePlaceholder": "Nome da Resposta",
+  "contentType": "Tipo de Conteúdo",
+  "dataSchema": "Esquema de Dados",
+  "createNewResponse": "Criar uma nova Resposta"
 }

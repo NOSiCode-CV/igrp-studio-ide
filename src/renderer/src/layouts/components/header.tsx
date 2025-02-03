@@ -15,7 +15,6 @@ import {
     X,
 } from 'lucide-react';
 import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
-import { HelpDialog } from '@renderer/components/help-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
 import {
@@ -49,8 +48,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const navigate = useNavigate();
 
     const [openSettings, setOpenSettings] = useState(false);
-
-    const [openHelp, setOpenHelp] = useState(false);
 
     const [isMaximized, setIsMaximized] = useState(false); // New state to track maximize status
 
@@ -308,10 +305,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                 <SettingsDialog
                     isOpen={openSettings}
                     onClose={() => setOpenSettings(false)}
-                />
-                <HelpDialog
-                    isOpen={openHelp}
-                    onClose={() => setOpenHelp(!openHelp)}
                 />
             </TooltipProvider>
         </>
