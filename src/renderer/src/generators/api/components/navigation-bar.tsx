@@ -55,7 +55,7 @@ const NavigationBar = ({ onSubmit, onDelete, title, isNew }: ActionProps) => {
             size={'sm'}
             className="outline outline-1 outline-red-500 text-red-500"
           >
-            <Trash /> {t('delete')}
+            <Trash /> <span className='sr-only'>{t('delete')}</span>
           </Button>
         )}
         

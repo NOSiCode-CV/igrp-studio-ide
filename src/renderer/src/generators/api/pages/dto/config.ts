@@ -52,7 +52,8 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
             selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
             | { COLLECTION_TYPES: string[] }
             | undefined
-        )?.COLLECTION_TYPES || []
+        )?.COLLECTION_TYPES || [],
+        true
     )
 
     const getOptions = (objects) => {

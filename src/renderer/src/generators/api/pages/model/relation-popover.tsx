@@ -14,6 +14,7 @@ import { RelationTypeSelector } from './relation-type-selector';
 import { Switch } from '@renderer/components/ui/Switch';
 import { Relation } from '@igrp/spring-engine/dist/interfaces/types';
 import { Combobox } from '@igrp/igrp-design-system';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 interface RelationPopoverProps {
     field: any;
@@ -26,6 +27,7 @@ export function RelationPopover({
     options,
     changeValue,
 }: RelationPopoverProps) {
+    const { t } = useTranslation(); // Hook for translations
     const [open, setOpen] = useState(false);
     const { modelsOptions, models } = options;
     const [localRelation, setLocalRelation] = useState<Relation>(
@@ -35,14 +37,19 @@ export function RelationPopover({
             referencedColumnName: '',
             cardinality: 'oneWay',
             inverseJoinColumn: '',
-            joinTable: '', //Name of the intermediate table
+            joinTable: '', // Name of the intermediate table
         }
     );
-    const [availableColumns, setAvailableColumns] = useState<{value: string, label: string}[]>([]);
+    const [availableColumns, setAvailableColumns] = useState<
+        { value: string; label: string }[]
+    >([]);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (localRelation.entity) {
-            const model = models.find((t) => t.name === localRelation.entity);
+            const model = models.find(
+                (t) => t.content.name === localRelation.entity
+            );
             if (model) {
                 const targetTable = model.content.attributes.map((attr) => ({
                     value: attr.name,
@@ -58,6 +65,26 @@ export function RelationPopover({
     }, [localRelation.entity, models]);
 
     const handleUpdate = () => {
+        // Validate required fields
+        if (!localRelation.entity) {
+            setErrors({ ['entity']: t('entityRequired') });
+            return;
+        }
+        if (!localRelation.referencedColumnName) {
+            setErrors({
+                ['referencedColumnName']: t('referencedColumnNameRequired'),
+            });
+            return;
+        }
+        if (localRelation.type === 'ManyToMany' && !localRelation.joinTable) {
+            setErrors({ ['joinTable']: t('joinTableRequired') });
+            return;
+        }
+
+        // Clear any previous errors
+        setErrors({});
+
+        // Update the relation
         changeValue('relation', localRelation);
         setOpen(false);
     };
@@ -67,19 +94,19 @@ export function RelationPopover({
             <PopoverTrigger asChild>
                 <Button variant="link" className="w-full justify-start">
                     {field.relation && field.relation.entity
-                        ? `${field.relation.type} with ${field.relation.entity}.${field.relation.referencedColumnName}`
-                        : 'Set Relation'}
+                        ? `${field.relation.type} ${t('with')} ${field.relation.entity}.${field.relation.referencedColumnName}`
+                        : t('setRelation')}
                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-100">
-                <div className="space-y-3">
+                <div className="space-y-4">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">
-                            Relation Settings
+                            {t('relationSettings')}
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                            Configure the relation for this field.
+                            {t('configureRelationForField')}
                         </p>
                     </div>
                     <RelationTypeSelector
@@ -87,7 +114,11 @@ export function RelationPopover({
                         onChange={(value) =>
                             setLocalRelation({
                                 ...localRelation,
-                                type: value as 'OneToOne' | 'OneToMany' | 'ManyToOne' | 'ManyToMany',
+                                type: value as
+                                    | 'OneToOne'
+                                    | 'OneToMany'
+                                    | 'ManyToOne'
+                                    | 'ManyToMany',
                             })
                         }
                         sourceField={field.name}
@@ -96,7 +127,9 @@ export function RelationPopover({
                     <div className="grid grid-cols-2 gap-2">
                         {localRelation.type === 'ManyToMany' && (
                             <div className="col-span-2 gap-2">
-                                <Label htmlFor="joinTable">Entity Name</Label>
+                                <Label htmlFor="joinTable">
+                                    {t('entityName')}
+                                </Label>
                                 <Input
                                     id="joinTable"
                                     value={localRelation.joinTable || ''}
@@ -106,21 +139,25 @@ export function RelationPopover({
                                             joinTable: e.target.value,
                                         })
                                     }
-                                    placeholder="e.g., UserRole"
+                                    placeholder={t('entityNamePlaceholder')}
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                    Name of the intermediate table, for example
-                                    "UserRole".
+                                <p className="text-xs text-muted-foreground ">
+                                    {t('entityNameDescription')}
                                 </p>
+                                {errors.joinTable && (
+                                    <p className="text-xs text-foreground text-red-500">
+                                        {errors.joinTable}
+                                    </p>
+                                )}
                             </div>
                         )}
                         <div className="space-y-2 flex flex-col">
-                            <Label htmlFor="entity">Entity</Label>
+                            <Label htmlFor="entity">{t('entity')}</Label>
                             <Combobox
                                 name="entity"
                                 value={localRelation.entity}
                                 options={modelsOptions}
-                                placeholder="Select target table"
+                                placeholder={t('selectTargetTable')}
                                 onChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
@@ -129,16 +166,21 @@ export function RelationPopover({
                                     })
                                 }
                             />
+                            {errors.entity && (
+                                <p className="text-xs text-foreground text-red-500">
+                                    {errors.entity}
+                                </p>
+                            )}
                         </div>
                         <div className="space-y-2 flex flex-col">
                             <Label htmlFor="referencedColumnName">
-                                Reference Column Name
+                                {t('referenceColumnName')}
                             </Label>
                             <Combobox
                                 name="entity"
                                 value={localRelation.referencedColumnName}
                                 options={availableColumns}
-                                placeholder="Select reference column"
+                                placeholder={t('selectReferenceColumn')}
                                 onChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
@@ -146,6 +188,11 @@ export function RelationPopover({
                                     })
                                 }
                             />
+                            {errors.referencedColumnName && (
+                                <p className="text-xs text-foreground text-red-500">
+                                    {errors.referencedColumnName}
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -153,7 +200,7 @@ export function RelationPopover({
                         localRelation.type === 'ManyToMany') && (
                         <div className="space-y-2">
                             <Label htmlFor="inverseJoinColumn">
-                                Field Name in{' '}
+                                {t('fieldNameIn')}{' '}
                                 {localRelation.joinTable ||
                                     localRelation.entity}
                             </Label>
@@ -166,7 +213,7 @@ export function RelationPopover({
                                         inverseJoinColumn: e.target.value,
                                     })
                                 }
-                                placeholder="e.g., posts"
+                                placeholder={t('fieldNamePlaceholder')}
                             />
                         </div>
                     )}
@@ -182,7 +229,7 @@ export function RelationPopover({
                             }
                         />
                         <Label htmlFor="cardinality">
-                            Two-way relationship
+                            {t('twoWayRelationship')}
                         </Label>
                     </div>
                     <div className="flex justify-between">
@@ -190,9 +237,9 @@ export function RelationPopover({
                             variant="outline"
                             onClick={() => changeValue('relation', undefined)}
                         >
-                            Remove Relation
+                            {t('removeRelation')}
                         </Button>
-                        <Button onClick={handleUpdate}>Apply</Button>
+                        <Button onClick={handleUpdate}>{t('apply')}</Button>
                     </div>
                 </div>
             </PopoverContent>

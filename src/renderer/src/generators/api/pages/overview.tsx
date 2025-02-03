@@ -22,8 +22,8 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     const [stats, setStats] = useState({
         modules: 0,
         controllers: 0,
-        schemas: 0,
-        dtos: 0,
+        models: 0,
+        dto: 0,
     });
 
     const handleOptionClick = (opt: OptionType) => {
@@ -45,26 +45,18 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     const { filesThree } = useSelector(selectStudioProperties);
 
     useEffect(() => {
-        const newStats = { modules: 0, controllers: 0, schemas: 0, dtos: 0 };
+        const newStats = { modules: 0, controllers: 0, models: 0, dto: 0 };
 
-        const folderArray = Object.values(filesThree);
+        newStats.modules = filesThree.filter((file) => file.name !== 'shared').length;
 
-        newStats.modules = folderArray.length > 1 ? folderArray.length - 1 : 0;
-
-        folderArray.forEach((module: any) => {
-            if (module.files) {
-                module.files.forEach((file: any) => {
-                    if (file.controllers) {
-                        newStats.controllers += file.controllers.length;
-                    }
-                    if (file.models) {
-                        newStats.schemas += file.models.length;
-                    }
-                    if (file.dto) {
-                        newStats.dtos += file.dto.length;
-                    }
-                });
-            }
+        filesThree.forEach((file: any) => {
+            if (!file.children) return;
+            file.children.forEach((child: any) => {
+                const { name, children } = child;
+                if (name in newStats) {
+                    newStats[name] += children?.length || 0;
+                }
+            });
         });
 
         setStats(newStats);
@@ -72,7 +64,7 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
 
     return (
         <ContainerScrollArea>
-            <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
+            <div className="w-full max-w-4xl mx-auto space-y-8 p-6 mb-10">
                 <PageHeader
                     title="API Overview"
                     description="Manage your API endpoints"

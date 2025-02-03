@@ -408,7 +408,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                     htmlFor={'method'}
                                     className="block text-sm"
                                 >
-                                    {'Method Type'}
+                                    {t('methodType')}
                                 </Label>
                                 <Combobox
                                     name={t('method')}
