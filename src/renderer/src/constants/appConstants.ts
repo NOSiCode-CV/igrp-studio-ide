@@ -26,10 +26,11 @@ export enum OPTION_TYPE {
     RESPONSE = 'responses',
     ENUM = 'enum',
     DELETE = 'delete',
-    ERDDiagram= "ERDDiagram"
+    ERDDiagram = "ERDDiagram",
+    FILE_THREE = "filethree"
 };
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum';
+export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree';
 
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
@@ -78,9 +79,9 @@ export enum ENV_TYPES {
 };
 
 export const DatabaseOptions = [
-    { value: 'Postgresql', label: 'PostgreSQL' },
-    { value: 'Oracle', label: 'Oracle' },
     { value: 'MySQL', label: 'MySQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'Postgresql', label: 'PostgreSQL' },
 ];
 
 export const projectStructureStyle = [

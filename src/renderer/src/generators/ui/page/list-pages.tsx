@@ -3,7 +3,7 @@ import { createSelector } from "reselect";
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-    getPages as onGetPages,
+    getFileThree as onGetPages,
     deletePage as onDeletePage
 } from "@renderer/redux/thunks";
 import { PageConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
@@ -42,7 +42,7 @@ const MainPageBuilder = ({
         (studio) => ({
             basePath: studio.basePath,
             config: studio.config,
-            pages: studio.folderFiles?.pages
+            pages: studio.filesThree
         })
     );
 

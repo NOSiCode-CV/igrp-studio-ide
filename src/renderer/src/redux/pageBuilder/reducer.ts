@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProjectData, FolderFiles } from "src/main/types";
+import { ProjectData, FileTree } from "src/main/types";
 
 export interface StudioState {
     config: ProjectData | undefined;
     basePath: string;
-    folderFiles?: {};
+    filesThree?: FileTree[];
     changeStatus: boolean;
     currentItem: null
 }
@@ -12,7 +12,7 @@ export interface StudioState {
 export const initialState: StudioState = {
     config: undefined,
     basePath: "",
-    folderFiles: {},
+    filesThree: [],
     changeStatus: false,
     currentItem: null
 }
@@ -27,8 +27,8 @@ const StudioSlice = createSlice({
         setBasePathAction(state, action: PayloadAction<string>) {
             state.basePath = action.payload;
         },
-        setFolderFilesAction(state, action: PayloadAction<FolderFiles>) {
-            state.folderFiles = action.payload;
+        setFilesThreeAction(state, action: PayloadAction<FileTree[]>) {
+            state.filesThree = action.payload;
         },
         setChangeStatusAction(state, action: PayloadAction<boolean>) {
             state.changeStatus = action.payload;
@@ -42,7 +42,7 @@ const StudioSlice = createSlice({
 export const {
     setConfigAction,
     setBasePathAction,
-    setFolderFilesAction,
+    setFilesThreeAction,
     setChangeStatusAction,
     setCurrentItemAction
 } = StudioSlice.actions;

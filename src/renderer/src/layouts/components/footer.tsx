@@ -14,7 +14,7 @@ const Footer = () => {
 
     return (
         <>
-            <p>IGRPStudio &copy; {new Date().getFullYear()}</p>
+            <p>IGRP Studio &copy; {new Date().getFullYear()}</p>
             {appVersion && <p>{appVersion}</p>}
         </>
     );

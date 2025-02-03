@@ -5,7 +5,7 @@ import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-    getPages as onGetFolderFiles,
+    getFileThree as onGetFolderFiles,
     setChangeStatus as onSetChangeStatus,
 } from '@renderer/redux/thunks';
 
@@ -14,7 +14,7 @@ import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { Navdata } from './components/nav-data';
+import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 
 interface LayoutProps {
@@ -34,14 +34,14 @@ const Layout = (props: LayoutProps): JSX.Element => {
         selectStudioState,
         (studio) => ({
             config: studio.config,
-            folders: studio.folderFiles,
+            filesThree: studio.filesThree,
             basePath: studio.basePath,
             changeStatus: studio.changeStatus,
             currentItem: studio.currentItem,
         })
     );
 
-    const { currentItem, changeStatus, config, basePath, folders } =
+    const { currentItem, changeStatus, config, basePath, filesThree } =
         useSelector(selectStudioProperties);
 
     useEffect(() => {
@@ -55,7 +55,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         }
     }, [changeStatus, basePath, dispatch]);
 
-    const menuItems = Navdata(folders).menuItems;
+    const { menuItems } = useNavdata(filesThree);
 
     useEffect(() => {
         if (!basePath) {

@@ -11,6 +11,7 @@ import { Combobox } from '@igrp/igrp-design-system';
 import { Card, CardContent } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
+import MonacoEditor from '@renderer/components/MonacoEditor';
 
 interface BodyRequestProps {
     bodyType: 'none' | 'multipart/form-data' | 'application/json' | undefined;
@@ -80,6 +81,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 formik.setFieldValue(routeFormData, defaultValue);
         }
     }, [bodyType, formik.values.requestBody]);
+
+    const handleChangeEditor = (value: string) => {};
 
     return (
         <div>
@@ -172,11 +175,18 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="value">
-                                   {/*  <CodeEditor
-                                        value={formik.values.requestBody
-                                            ?.content?.[contentType]?.schema}
+                                    <MonacoEditor
+                                        content={JSON.stringify(
+                                            formik.values.requestBody
+                                                ?.content?.[contentType]
+                                                ?.schema,
+                                            null,
+                                            2
+                                        )}
+                                        filePath=""
                                         onChange={handleChangeEditor}
-                                    /> */}
+                                        height='20vh'
+                                    />
                                 </TabsContent>
                                 <TabsContent value="schema">
                                     <JSONSchemaBuilder

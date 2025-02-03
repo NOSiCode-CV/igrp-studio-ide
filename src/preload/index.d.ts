@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
-import { Connection, IConnenctionRepository, ProjectData } from 'src/main/types';
+import { Connection, FileTree, IConnenctionRepository, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
 
 
@@ -13,10 +13,6 @@ interface CustomAPI {
     createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
     createController: (controllerConfig: ControllerConfig, basePath: string) => Promise<HandlerResponse>;
 
-    deleteDTO: (config: DTOBaseConfig, basePath: string) => Promise<HandlerResponse>;
-    deleteModel: (config: ModelConfig, basePath: string) => Promise<HandlerResponse>;
-    deleteController: (config: ControllerConfig, basePath: string) => Promise<HandlerResponse>;
-
     createPage: (modelConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     deletePage: (pageConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     addComponentToPage: (pageConfig: PageConfig, components: Component[], basePath: string) => Promise<HandlerResponse>;
@@ -24,8 +20,10 @@ interface CustomAPI {
     fetchSelectors: (module: string, basePath: string) => Promise<[]>
 
     openDirectory: (buttonLabel: string) => Promise<IOpenProject>;
-    fetchFiles: (basePath: string) => Promise<FolderFiles>;
+    fetchFiles: (basePath: string) => Promise<FileTree[]>;
     getJsonContent: (filePath: string) => Promise<any>;
+    readDirectory: (basePath: string) => Promise<FileTree[]>;
+    readProjectFile(filePath: string): Promise<any>;
 
     createAppNext: (appConfig: AppConfig, basePath: string) => Promise<HandlerResponse>;
 
@@ -60,7 +58,7 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage | applyLanguage
+        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage
         api: CustomAPI,
         repo: { project: IProjectRepository, connection: IConnenctionRepository },
         menu: CustomMenu,

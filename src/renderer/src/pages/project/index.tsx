@@ -19,7 +19,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { useFormik } from 'formik';
+import { FormikErrors, useFormik } from 'formik';
 import * as Yup from 'yup';
 import {
     RadioGroup,
@@ -52,6 +52,7 @@ import {
 } from './data';
 import { ProjectData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
+import { useProjectValidation } from './validation';
 
 export function ProjectWizard() {
     const [open, setOpen] = React.useState(false);
@@ -71,49 +72,7 @@ export function ProjectWizard() {
         themeColor: '#000000',
     };
 
-    const validationSchema = Yup.object().shape({
-        name: Yup.string().required(
-            t('fieldRequired', { name: t('projectName') })
-        ),
-        type: Yup.string().oneOf(
-            ['frontend', 'backend'],
-            t('fieldRequired', { name: t('projectType') })
-        ),
-        framework: Yup.string().required(
-            t('fieldRequired', { name: t('framework') })
-        ),
-        path: Yup.string().required(
-            t('fieldRequired', { name: t('projectDirectory') })
-        ),
-        config: Yup.object().shape({
-            appName: Yup.string().when('$framework', (framework, schema) => {
-                return step === 3 &&
-                    framework &&
-                    framework[0] === ENV_TYPES.NEXTJS
-                    ? schema
-                          .required(t('thisFieldRequired', { name: t('name') }))
-                          .matches(
-                              PATTERNS.NO_SPACE_AND_HYPHEN,
-                              t('msgInfoAccpet')
-                          )
-                          .max(20, t('maxLengthExceeded', { max: 20 }))
-                    : schema.notRequired();
-            }),
-            apiName: Yup.string().when('$framework', (framework, schema) => {
-                return step === 3 &&
-                    framework &&
-                    [ENV_TYPES.SPRING, ENV_TYPES.DOTNET].includes(framework[0])
-                    ? schema
-                          .required(t('thisFieldRequired', { name: t('name') }))
-                          .matches(
-                              PATTERNS.NO_SPACE_AND_HYPHEN,
-                              t('msgInfoAccpet')
-                          )
-                          .max(20, t('maxLengthExceeded', { max: 20 }))
-                    : schema.notRequired();
-            }),
-        }),
-    });
+    const validationSchema = useProjectValidation({ t, step });
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -162,7 +121,11 @@ export function ProjectWizard() {
 
     const componentsMap: Record<
         string,
-        React.FC<{ data: any; onChange: (config: any) => void }>
+        React.FC<{
+            data: any;
+            errors?: FormikErrors<ProjectData>;
+            onChange: (config: any) => void;
+        }>
     > = {
         springboot: SpringConfig,
         nextjs: NextConfig,
@@ -192,21 +155,18 @@ export function ProjectWizard() {
         }
     };
 
-    const handleNext = () => {
-        if (step < STEPS.length) {
-            // Validate the form before proceeding to the next step
-            const errors = formik.validateForm();
-            if (Object.keys(errors).length === 0) {
-                setStep(step + 1);
-            } else {
-                // Display validation errors
-                formik.setTouched({
-                    name: true,
-                    type: true,
-                    framework: true,
-                    config: true,
-                });
-            }
+    const handleNext = async () => {
+        const errors = await formik.validateForm();
+
+        if (
+            step === 3 &&
+            Object.keys(errors).length !== 0 &&
+            errors.config !== undefined
+        ) {
+            return;
+        }
+        if (step < STEPS.length && canNavigateToStep(step + 1)) {
+            setStep(step + 1);
         }
     };
 
@@ -308,6 +268,7 @@ export function ProjectWizard() {
                                         onBlur={formik.handleBlur}
                                         ref={inputRef}
                                         autoFocus
+                                        maxLength={20}
                                     />
                                     {formik.touched.name &&
                                         formik.errors.name && (
@@ -484,6 +445,7 @@ export function ProjectWizard() {
                                         </Label>
                                         <SelectedComponent
                                             data={formik.values.config}
+                                            errors={formik.errors}
                                             onChange={(config) =>
                                                 formik.setFieldValue(
                                                     'config',
