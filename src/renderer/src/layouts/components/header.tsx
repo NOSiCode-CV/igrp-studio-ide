@@ -17,12 +17,6 @@ import {
 import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
 import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
@@ -32,6 +26,12 @@ import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import SyncButton from '@renderer/components/git/git-sync';
 import { RootState } from '@renderer/redux';
 import GitConnectionMenu from '@renderer/components/user-auth';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -246,14 +246,24 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     </Tooltip>
                                 </>
                             )}
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setOpenSettings(true)}
-                            >
-                                <Settings className="w-5 h-5" />
-                                <span className="sr-only">Settings</span>
-                            </Button>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setOpenSettings(true)}
+                                    >
+                                        <Settings className="w-5 h-5" />
+                                        <span className="sr-only">
+                                            Settings
+                                        </span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Settings</p>
+                                </TooltipContent>
+                            </Tooltip>
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
