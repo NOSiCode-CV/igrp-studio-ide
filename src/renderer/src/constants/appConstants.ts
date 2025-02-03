@@ -79,9 +79,9 @@ export enum ENV_TYPES {
 };
 
 export const DatabaseOptions = [
-    { value: 'Postgresql', label: 'PostgreSQL' },
-    { value: 'Oracle', label: 'Oracle' },
     { value: 'MySQL', label: 'MySQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'Postgresql', label: 'PostgreSQL' },
 ];
 
 export const projectStructureStyle = [

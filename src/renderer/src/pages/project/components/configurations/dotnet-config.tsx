@@ -67,6 +67,7 @@ export function DotNetConfig({
                         onChange({ ...data, apiName: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
+                    maxLength={20}
                 />
             </div>
 
@@ -91,6 +92,7 @@ export function DotNetConfig({
                         onChange({ ...data, artifact: e.target.value })
                     }
                     placeholder={t('enterArtifact')}
+                    maxLength={20}
                 />
             </div>
 

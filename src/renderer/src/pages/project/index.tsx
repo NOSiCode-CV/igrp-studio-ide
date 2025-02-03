@@ -268,6 +268,7 @@ export function ProjectWizard() {
                                         onBlur={formik.handleBlur}
                                         ref={inputRef}
                                         autoFocus
+                                        maxLength={20}
                                     />
                                     {formik.touched.name &&
                                         formik.errors.name && (

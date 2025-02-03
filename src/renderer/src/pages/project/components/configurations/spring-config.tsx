@@ -84,6 +84,7 @@ export function SpringConfig({
                         onChange({ ...data, apiName: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
+                    maxLength={20}
                 />
                 {errors?.config && errors.config.apiName && (
                     <p className="text-xs text-destructive">
@@ -114,6 +115,7 @@ export function SpringConfig({
                             onChange({ ...data, group: e.target.value })
                         }
                         placeholder={t('enterGroup')}
+                        maxLength={20}
                     />
                     {errors?.config && errors.config.group && (
                         <p className="text-xs text-destructive">
@@ -131,6 +133,7 @@ export function SpringConfig({
                             onChange({ ...data, artifact: e.target.value })
                         }
                         placeholder={t('enterArtifact')}
+                        maxLength={20}
                     />
                      {errors?.config && errors.config.artifact && (
                         <p className="text-xs text-destructive">
