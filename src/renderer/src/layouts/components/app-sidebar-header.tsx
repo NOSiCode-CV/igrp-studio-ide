@@ -3,6 +3,7 @@ import { SidebarHeader } from '@renderer/components/ui/sidebar';
 import FormSearch from '../components/app-search';
 import { CreateModuleDialog } from '@renderer/generators/api/components/create-module-dialog';
 import { cn } from '@renderer/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface AppSidebarHeaderProps {
     basePath: string;
@@ -21,6 +22,7 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
     handleSearch,
     className,
 }) => {
+    const { t } = useTranslation();
     return (
         <SidebarHeader className={cn('flex flex-col', className)}>
             <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 flex flex-1 justify-between">
@@ -33,7 +35,7 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
             <FormSearch
                 onSearch={handleSearch}
                 className="truncate text-xs"
-                placeholder={`Search ${description}`}
+                placeholder={`${t('search')} ${description}`}
                 sidebarState={sidebarState}
             />
         </SidebarHeader>

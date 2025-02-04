@@ -1,6 +1,6 @@
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
@@ -15,6 +15,7 @@ import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTabs } from '@renderer/components/TabContext';
 
 interface EnumProps {
     basePath: string;
@@ -39,7 +40,7 @@ export const EnumLayout = ({
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
-
+    const { initializeTabFromCurrentItem } = useTabs();
     const [title, setTitle] = useState('');
 
     const [data, setData] = useState<any>(null);
@@ -173,6 +174,14 @@ export const EnumLayout = ({
         setTableColumns(columns);
     }, [selectors]);
 
+    const onClickSourceCode = () => {
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
+    };
+
     const tableName = 'values';
 
     return (
@@ -181,7 +190,8 @@ export const EnumLayout = ({
                 onDelete={handleDelete}
                 onSubmit={onSubmit}
                 isNew={!data}
-                title={title || 'Create a new Enum'}
+                title={title || t('createNewEnum')}
+                showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
                 {/* name */}

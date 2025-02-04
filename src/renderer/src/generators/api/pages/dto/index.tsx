@@ -18,8 +18,9 @@ import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTabs } from '@renderer/components/TabContext';
 
 interface DtoProps {
     basePath: string;
@@ -40,9 +41,11 @@ const DtoLayout = ({
     onCloseTab,
     onUpdateTab,
 }: DtoProps): JSX.Element => {
+    const { initializeTabFromCurrentItem } = useTabs();
+
     const dispatch: any = useDispatch();
 
-    const {createGitCommit} = useGit();
+    const { createGitCommit } = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -104,7 +107,7 @@ const DtoLayout = ({
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
             const { error } = await window.api.createDto(
-                { ...newValues, module: currentItem?.module || 'shared'},
+                { ...newValues, module: currentItem?.module || 'shared' },
                 basePath
             );
 
@@ -114,7 +117,7 @@ const DtoLayout = ({
                 return showErrorToast(error);
             }
 
-            createGitCommit(basePath, `Add dto ${newValues.name}`)
+            createGitCommit(basePath, `Add dto ${newValues.name}`);
 
             dispatch(onSetChangeStatus(true));
 
@@ -152,6 +155,14 @@ const DtoLayout = ({
         } catch (error) {
             showErrorToast(error);
         }
+    };
+
+    const onClickSourceCode = () => {
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
     };
 
     const renderFormList = (value: string) => {
@@ -215,6 +226,7 @@ const DtoLayout = ({
             <NavigationBar
                 onDelete={handleDelete}
                 onSubmit={formik.handleSubmit}
+                showSourceCode={onClickSourceCode}
                 isNew={!data}
                 title="dto"
             />

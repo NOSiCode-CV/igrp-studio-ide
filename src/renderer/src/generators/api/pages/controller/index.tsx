@@ -34,9 +34,14 @@ import { CreateEndpointDialog } from './create-endpoint-dialog';
 import { TextInput } from '../../components/inputs-form';
 import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
-import { ENV_TYPES, httpMethods } from '@renderer/constants/appConstants';
+import {
+    ENV_TYPES,
+    httpMethods,
+    OPTION_TYPE,
+} from '@renderer/constants/appConstants';
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTabs } from '@renderer/components/TabContext';
 
 interface ControllerProps {
     basePath: string;
@@ -63,6 +68,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 }: ControllerProps) => {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
+    const { initializeTabFromCurrentItem } = useTabs();
 
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
@@ -340,7 +346,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         // Map DTO into the expected format
         const targetDto = dto.map((d) => ({
             value: d.content?.name || d.name,
-			label: d.content?.name || d.name,
+            label: d.content?.name || d.name,
         }));
 
         setSchemaTypes((prevSchemaTypes) =>
@@ -370,13 +376,22 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         }
     };
 
+    const onClickSourceCode = () => {
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
+    };
+
     return (
         <React.Fragment>
             <NavigationBar
                 onDelete={handleDelete}
                 onSubmit={onSubmit}
                 isNew={!data}
-                title={title || 'Create a new Action'}
+                title={title || t('createNewAction')}
+                showSourceCode={onClickSourceCode}
             />
 
             <CreateEndpointDialog

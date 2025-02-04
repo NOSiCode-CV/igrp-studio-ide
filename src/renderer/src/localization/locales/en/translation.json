@@ -68,8 +68,10 @@
   "documents": "Documents",
   "git": "Git",
   "apis": "APIs",
+  "createNewAction": "Create a new Action",
   "schemaCreatedSuccess": "Schema have been successfully added.",
   "newEnum": "New Enum",
+  "createNewEnum": "Create a new Enum",
   "enum": "Enum",
   "actionName": "Action Name",
   "path": "Path",
@@ -193,5 +195,7 @@
   "responseNamePlaceholder": "Response Name",
   "contentType": "Content Type",
   "dataSchema": "Data Schema",
-  "createNewResponse": "Create a new Response"
+  "createNewResponse": "Create a new Response",
+  "sourceCode": "Source Code",
+  "search": "Search"
 }

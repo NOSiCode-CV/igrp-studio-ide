@@ -27,8 +27,9 @@ import { TextInput } from '../../components/inputs-form';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTabs } from '@renderer/components/TabContext';
 
 interface ModelProps {
     basePath: string;
@@ -48,6 +49,7 @@ const ModelLayout = ({
     onUpdateTab,
 }: ModelProps): JSX.Element => {
     const { createGitCommit } = useGit();
+     const { initializeTabFromCurrentItem } = useTabs();
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const [tablesColumns, setTableColumns] = useState<{
@@ -69,8 +71,12 @@ const ModelLayout = ({
     });
 
     const suggestTableName = (name) => {
-        return `t_${name.trim().toLowerCase().replace(/\s+/g, '_')}`;
-    };
+        return `t_${name
+        .replace(/([a-z])([A-Z])/g, "$1_$2") 
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+    }`;    };
 
     const handleNameBlur = (e) => {
         formik.handleBlur(e);
@@ -213,6 +219,14 @@ const ModelLayout = ({
         }
     };
 
+    const onClickSourceCode = () => {
+            initializeTabFromCurrentItem({
+                path: `${currentItem.path}`,
+                type: OPTION_TYPE.FILE_THREE,
+                label: `${currentItem.label}.json`,
+            });
+        };
+
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
         const errors = formik?.errors?.[value];
@@ -257,6 +271,7 @@ const ModelLayout = ({
                 onSubmit={formik.handleSubmit}
                 isNew={data === null}
                 title={t('model')}
+                showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
                 <Card className="p-6 rounded-sm">
