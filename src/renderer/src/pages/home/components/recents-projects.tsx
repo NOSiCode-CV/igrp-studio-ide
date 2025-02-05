@@ -43,9 +43,22 @@ import {
 import { IGRPContainer } from '@igrp/igrp-design-system';
 import GitProject from '@renderer/components/git/git-project';
 import { ProjectDropdown } from './project-dropdown';
+import { enUS, pt } from 'date-fns/locale';
 
 const RecentsProjects = (): JSX.Element => {
     const [isDelete, setIdDelete] = useState(false);
+
+    const { i18n } = useTranslation();
+
+    // Dynamically set the locale based on the current language in i18n
+    const getLocale = () => {
+        switch (i18n.language) {
+            case 'pt':
+                return pt;
+            default:
+                return enUS;
+        }
+    };
 
     const navigate = useNavigate();
     const dispatch: any = useDispatch();
@@ -170,7 +183,7 @@ const RecentsProjects = (): JSX.Element => {
                                     {formatDistance(
                                         project.dt_updated,
                                         new Date(),
-                                        { addSuffix: true }
+                                        { addSuffix: true, locale: getLocale() }
                                     )}
                                 </span>
                             </>
