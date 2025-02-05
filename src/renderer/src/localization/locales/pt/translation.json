@@ -228,9 +228,16 @@
   "add_new_connection": "Adicionar Nova Conexão",
   "fill_details_to_add_connection": "Preencha os detalhes para adicionar uma nova conexão de banco de dados",
   "connection_manager": "Gerenciar Conexões",
-    "basic_settings": "Configurações Básicas",
-    "general_info": "Informações Gerais",
-    "project_name": "Nome do Projeto",
-    "icon": "Ícone",
-    "notifications": "Notificações"
+  "basic_settings": "Configurações Básicas",
+  "general_info": "Informações Gerais",
+  "project_name": "Nome do Projeto",
+  "icon": "Ícone",
+  "notifications": "Notificações",
+  "uniqueConstraints": "Restrições Únicas",
+  "indexes": "Índices",
+  "attributes": "Campos",
+  "dataType": "Tipo de dado",
+  "dataTypes": "Tipo de dados",
+  "enterName": "Digite o nome",
+  "type": "Tipo"
 }

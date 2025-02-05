@@ -1,7 +1,11 @@
 import { Combobox } from '@igrp/igrp-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { ENV_TYPES, httpStatusCodes, OPTION_TYPE } from '@renderer/constants/appConstants';
+import {
+    ENV_TYPES,
+    httpStatusCodes,
+    OPTION_TYPE,
+} from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import { formatMethods } from '../../helpers';
 import { useEffect, useState } from 'react';
@@ -21,6 +25,7 @@ import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import { useTabs } from '@renderer/components/TabContext';
+import { LabelRequired } from '@renderer/components/required';
 
 const contentType = 'application/json';
 
@@ -31,7 +36,6 @@ interface ResponseProps {
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
-
 
 const initialValues = {
     statusCode: '',
@@ -52,7 +56,7 @@ export const ResponseLayout = ({
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
-     const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem } = useTabs();
 
     const [title, setTitle] = useState('');
 
@@ -60,7 +64,7 @@ export const ResponseLayout = ({
 
     const [data, setData] = useState<any>(null);
 
-    const validationSchema = useResponseValidation({t})
+    const validationSchema = useResponseValidation({ t });
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -199,12 +203,12 @@ export const ResponseLayout = ({
     };
 
     const onClickSourceCode = () => {
-            initializeTabFromCurrentItem({
-                path: `${currentItem.path}`,
-                type: OPTION_TYPE.FILE_THREE,
-                label: `${currentItem.label}.json`,
-            });
-        };
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
+    };
 
     return (
         <>
@@ -219,7 +223,7 @@ export const ResponseLayout = ({
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                     {/* HTTP Status Code */}
                     <div className="space-y-2">
-                        <Label>{t('httpStatusCode')}</Label>
+                        <LabelRequired>{t('httpStatusCode')}</LabelRequired>
                         <Combobox
                             options={httpStatusCodes}
                             name="statusCode"
@@ -246,7 +250,7 @@ export const ResponseLayout = ({
 
                     {/* Name */}
                     <div className="space-y-2">
-                        <Label>{t('name')}</Label>
+                        <LabelRequired>{t('name')}</LabelRequired>
                         <Input
                             type="text"
                             name="name"
@@ -268,7 +272,7 @@ export const ResponseLayout = ({
 
                     {/* Content Type */}
                     <div className="space-y-2">
-                        <Label>{t('contentType')}</Label>
+                        <LabelRequired>{t('contentType')}</LabelRequired>
                         <Input
                             name="contentType"
                             value={'application/json'}

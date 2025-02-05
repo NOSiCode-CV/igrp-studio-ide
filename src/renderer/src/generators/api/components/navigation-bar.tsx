@@ -33,14 +33,13 @@ const NavigationBar = ({
     title,
     isNew,
 }: ActionProps) => {
-    const { t } = useTranslation();
-
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const handleSourceCode = () => {
         if (showSourceCode) showSourceCode();
     };
 
+    const { t } = useTranslation();
     return (
         <TooltipProvider>
             <div className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
@@ -58,10 +57,8 @@ const NavigationBar = ({
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="#">
-                                <span className="font-semibold ">
-                                    {title && t(title)}
-                                </span>
+                            <BreadcrumbLink href="#/">
+                                <span className="font-semibold ">{title}</span>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>

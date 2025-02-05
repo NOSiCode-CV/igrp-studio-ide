@@ -231,5 +231,12 @@
   "general_info": "General Info",
   "project_name": "Project Name",
   "icon": "Icon",
-  "notifications": "Notifications"
+  "notifications": "Notifications",
+  "uniqueConstraints": "Unique Constraints",
+  "indexes": "Indexes",
+  "attributes": "Fields",
+  "dataType": "Data Type",
+  "dataTypes": "Data Type",
+  "enterName":"Enter Name",
+  "type": "Type"
 }

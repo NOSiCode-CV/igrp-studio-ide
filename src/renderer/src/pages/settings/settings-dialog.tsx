@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Globe, Home, Link, Settings, X } from 'lucide-react';
+import { Bell, Globe, Home, Link, Settings } from 'lucide-react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -30,7 +30,7 @@ import {
 import { AboutSettings } from './about-settings';
 import { LanguageSettings } from './language-settings';
 import { ConnectedAccountsSettings } from './connected-accounts-settings';
-import React, { useEffect, useRef } from 'react';
+import React, {  } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {

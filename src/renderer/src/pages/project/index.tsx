@@ -255,6 +255,7 @@ export function ProjectWizard() {
                                 <div className="space-y-2">
                                     <Label htmlFor="name">
                                         {t('projectName')}
+                                        <span className="text-red-500"> *</span>
                                     </Label>
                                     <Input
                                         id="name"

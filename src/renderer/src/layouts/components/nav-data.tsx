@@ -159,8 +159,13 @@ const useNavdata = (filesThree: FileTree[]) => {
                         {
                             label: t('newResponses'),
                             actionType: OPTION_TYPE.RESPONSE,
+                            icon: getIcon(OPTION_TYPE.RESPONSE),
                         },
-                        { label: t('newEnum'), actionType: OPTION_TYPE.ENUM }
+                        {
+                            label: t('newEnum'),
+                            actionType: OPTION_TYPE.ENUM,
+                            icon: getIcon(OPTION_TYPE.ENUM),
+                        }
                     );
                 } else {
                     dropdownMenus.unshift({

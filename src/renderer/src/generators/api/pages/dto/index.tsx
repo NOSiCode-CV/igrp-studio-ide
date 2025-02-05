@@ -100,6 +100,7 @@ const DtoLayout = ({
             dto,
             models,
             currentDto: data?.name,
+            t
         });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
@@ -228,16 +229,16 @@ const DtoLayout = ({
                 onSubmit={formik.handleSubmit}
                 showSourceCode={onClickSourceCode}
                 isNew={!data}
-                title="dto"
+                title={t('dto')}
             />
             <div className="space-y-4 p-4">
                 <Card className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                             <TextInput
-                                label={t('Name')}
+                                label={t('name')}
                                 id="name"
-                                placeholder={t('Enter name')}
+                                placeholder={t('enterName')}
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -246,9 +247,10 @@ const DtoLayout = ({
                                         ? formik.errors.name
                                         : undefined
                                 }
+                                isRequired
                             />
                             <SelectInput
-                                label={t('Template')}
+                                label={'Template'}
                                 id="template"
                                 options={TemplateOptions}
                                 value={formik.values.template}
@@ -256,6 +258,7 @@ const DtoLayout = ({
                                     formik.setFieldValue('template', option)
                                 }
                                 error={formik.errors.template}
+                                isRequired
                             />
                         </div>
                         {TabList.map(({ value }) => (
