@@ -9,7 +9,8 @@ import { Loader } from 'lucide-react';
 
 const IDEInitialScreen = lazy(() => import('@renderer/pages/home/ide-initial-screen'))
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'))
-const ProjectSettings = lazy(() => import('@renderer/generators/api/pages/project-settings'))
+const ProjectSettings = lazy(() => import('@renderer/pages/project-settings'))
+const Connections = lazy(() => import('@renderer/pages/connections'))
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'))
 
 const allRoutes = [
@@ -27,6 +28,10 @@ const apiRoutes = [
   {
     path: '/project-settings',
     component: <ProjectSettings />
+  },
+  {
+    path: '/connections',
+    component: <Connections />
   }
 ]
 

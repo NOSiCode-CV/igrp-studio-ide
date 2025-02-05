@@ -217,5 +217,14 @@
   "other_information": "Other Information",
   "get_latest_version": "Get Latest Version",
   "terms_of_service": "Terms of Service",
-  "privacy_policy": "Privacy Policy"
+  "privacy_policy": "Privacy Policy",
+  "connection_name": "Connection Name",
+  "database_type": "Database Type",
+  "host": "Host",
+  "port": "Port",
+  "actions": "Actions",
+  "new": "New",
+  "add_new_connection": "Add New Connection",
+  "fill_details_to_add_connection": "Fill out the details to add a new database connection",
+  "connection_manager": "Connection Manager"
 }

@@ -305,6 +305,7 @@ const useNavSettings = () => {
                     {
                         id: 'DatabaseConnections',
                         label: 'Database Connections',
+                        link: '/connections',
                     },
                 ],
             },

@@ -6,8 +6,8 @@ import {
     CardTitle,
 } from '@renderer/components/ui/card';
 import { ProjectData } from 'src/main/types';
-import { ContainerScrollArea } from '../components/ContainerScrollArea';
 import { projectIcons } from '@renderer/constants/appConstants';
+import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 
 interface PageProps {
     basePath?: string;

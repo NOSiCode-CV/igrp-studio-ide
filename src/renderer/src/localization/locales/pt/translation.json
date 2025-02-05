@@ -218,5 +218,14 @@
   "other_information": "Outras Informações",
   "get_latest_version": "Obter a Versão Mais Recente",
   "terms_of_service": "Termos de Serviço",
-  "privacy_policy": "Política de Privacidade"
+  "privacy_policy": "Política de Privacidade",
+  "connection_name": "Nome da Conexão",
+  "database_type": "Tipo de Banco de Dados",
+  "host": "Host",
+  "port": "Porta",
+  "actions": "Ações",
+  "new": "Novo",
+  "add_new_connection": "Adicionar Nova Conexão",
+  "fill_details_to_add_connection": "Preencha os detalhes para adicionar uma nova conexão de banco de dados",
+  "connection_manager": "Gerenciar Conexões"
 }
