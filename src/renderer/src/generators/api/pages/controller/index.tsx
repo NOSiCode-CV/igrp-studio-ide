@@ -244,7 +244,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 return;
             }
 
-            createGitCommit(basePath, `Add action ${formik.values.name}`);
+            createGitCommit(basePath, `Add action ${formik.values.actionName}`);
 
             dispatch(onSetChangeStatus(true));
 

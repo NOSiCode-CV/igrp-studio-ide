@@ -85,10 +85,10 @@ export function AppSidebar({
     const handleClickMenu = (item: MenuItem) => {
         setActiveMenuGroup(item.label);
         if (item.id === 'apis') setActiveMenu(menuApp);
-        else {
+        else if (item.id === 'settings') {
             const menuApp = filterSubItems(othersMenus, searchQuery);
             setActiveMenu(menuApp);
-        }
+        } else setActiveMenu([]);
     };
 
     const menuIcons: MenuItem[] = [

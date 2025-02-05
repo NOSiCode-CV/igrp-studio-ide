@@ -10,7 +10,6 @@ import {
     Maximize2,
     MessageCircle,
     Minus,
-    Settings,
     Square,
     X,
 } from 'lucide-react';
@@ -46,8 +45,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
     const navigate = useNavigate();
-
-    const [openSettings, setOpenSettings] = useState(false);
 
     const [isMaximized, setIsMaximized] = useState(false); // New state to track maximize status
 
@@ -148,7 +145,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     className="h-6 w-auto"
                                 />
                                 <p className="text-sm font-medium">
-                                    IGRP Studio
+                                    {import.meta.env.VITE_APP_TITLE}
                                 </p>
                             </div>
                             <div>
@@ -247,23 +244,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 </>
                             )}
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setOpenSettings(true)}
-                                    >
-                                        <Settings className="w-5 h-5" />
-                                        <span className="sr-only">
-                                            Settings
-                                        </span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Settings</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <SettingsDialog />
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -312,10 +293,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                         </div>
                     </div>
                 </header>
-                <SettingsDialog
-                    isOpen={openSettings}
-                    onClose={() => setOpenSettings(false)}
-                />
             </TooltipProvider>
         </>
     );
