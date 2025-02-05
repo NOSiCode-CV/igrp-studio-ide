@@ -1066,14 +1066,15 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.3.0-alpha-4.9.3":
-  version "0.3.0-alpha-4.9.3"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.9.3.tgz#df06dd1bc23cd6ad7c14bf92c48a1160c032910d"
-  integrity sha512-oZ7BM24eqU6XFcg3LBg1NW3PfxCvASW/RK+kVqIso9OheCfC9YBW0sOO7/I/HcoIzLV6c57Q5FQ9i05PkBaSow==
+"@igrp/spring-engine@^0.3.0-alpha-4.9.6":
+  version "0.3.0-alpha-4.9.6"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/spring-engine/-/spring-engine-0.3.0-alpha-4.9.6.tgz#708f9859b50ffa7685600fdc7aa595d5b54f1dcf"
+  integrity sha512-dRsplPxFsZNqQiB7t/IyTSBBiz9tqb/edQJ9ZgA2wtxuhQ679XYADt63oLw751rGKe5sc5mFLC14biYOSNeDYQ==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
     ajv-formats "^3.0.1"
+    fast-xml-parser "^4.3.2"
     fs-extra "^11.2.0"
     sass "^1.77.8"
     source-map-loader "^5.0.0"
@@ -4973,6 +4974,13 @@ fast-uri@^3.0.1:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/fast-uri/-/fast-uri-3.0.6.tgz#88f130b77cfaea2378d56bf970dea21257a68748"
   integrity sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==
+
+fast-xml-parser@^4.3.2:
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.5.1.tgz#a7e665ff79b7919100a5202f23984b6150f9b31e"
+  integrity sha512-y655CeyUQ+jj7KBbYMc4FG01V8ZQqjN+gDYGJ50RtfsUB8iG9AmwmwoAgeKLJdmueKKMrH1RJ7yXHTSoczdv5w==
+  dependencies:
+    strnum "^1.0.5"
 
 fastq@^1.6.0:
   version "1.18.0"
@@ -9176,6 +9184,11 @@ strip-outer@^1.0.1:
   integrity sha512-k55yxKHwaXnpYGsOzg4Vl8+tDrWylxDEpknGjhTiZB8dFRU5rTo9CAzeycivxV3s+zlTKwrs6WxMxR95n26kwg==
   dependencies:
     escape-string-regexp "^1.0.2"
+
+strnum@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/strnum/-/strnum-1.0.5.tgz#5c4e829fe15ad4ff0d20c3db5ac97b73c9b072db"
+  integrity sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==
 
 stubborn-fs@^1.2.5:
   version "1.2.5"

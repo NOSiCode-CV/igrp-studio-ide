@@ -15,8 +15,8 @@ import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { dropdownItem } from './nav-data';
 import { useGit } from '@renderer/hooks/useGit';
+import { DropdownItem } from './nav-data';
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;
@@ -100,7 +100,7 @@ export const DropdownSidebarMenuButton: React.FC<
                     className="min-w-56 rounded-lg"
                 >
                     {menuItem.dropdownMenus.map(
-                        (menu: dropdownItem, idx: number) => {
+                        (menu: DropdownItem, idx: number) => {
                             return (
                                 <React.Fragment key={idx}>
                                     {menu.actionType === OPTION_TYPE.DELETE && (

@@ -5,11 +5,10 @@ import {
     PopoverTrigger,
     PopoverContent,
 } from '@renderer/components/ui/popover';
-import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
 
 interface TypeSelectorPopoverProps {
-    type: SchemaType;
-    onTypeChange: (type: SchemaType) => void;
+    type: string;
+    onTypeChange: (type: string) => void;
     schemaTypes?: { label: string; value: string }[];
 }
 
@@ -33,7 +32,7 @@ export const TypeSelectorPopover: React.FC<TypeSelectorPopoverProps> = ({
                                 key={value}
                                 variant={value === type ? 'secondary' : 'ghost'}
                                 className="justify-start h-8 px-2 text-sm rounded-none"
-                                onClick={() => onTypeChange(value as SchemaType)}
+                                onClick={() => onTypeChange(value as string)}
                             >
                                 {label}
                             </Button>
