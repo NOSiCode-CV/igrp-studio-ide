@@ -226,5 +226,9 @@
   "new": "New",
   "add_new_connection": "Add New Connection",
   "fill_details_to_add_connection": "Fill out the details to add a new database connection",
-  "connection_manager": "Connection Manager"
+  "connection_manager": "Connection Manager",
+  "basic_settings": "Basic Settings",
+  "general_info": "General Info",
+  "project_name": "Project Name",
+  "icon": "Icon"
 }

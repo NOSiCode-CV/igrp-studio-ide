@@ -14,7 +14,7 @@
   "goBack": "Voltar",
   "newProjectInformatin": "Crie um novo projeto preenchendo as informações abaixo.",
   "nameOfProject": "Nome do projeto",
-  "database": "Escolha o mecanismo de banco de dados",
+  "database": "Banco de dados",
   "artifact": "Artefato",
   "group": "Grupo",
   "description": "Descrição",
@@ -227,5 +227,9 @@
   "new": "Novo",
   "add_new_connection": "Adicionar Nova Conexão",
   "fill_details_to_add_connection": "Preencha os detalhes para adicionar uma nova conexão de banco de dados",
-  "connection_manager": "Gerenciar Conexões"
+  "connection_manager": "Gerenciar Conexões",
+    "basic_settings": "Configurações Básicas",
+    "general_info": "Informações Gerais",
+    "project_name": "Nome do Projeto",
+    "icon": "Ícone"
 }

@@ -8,6 +8,7 @@ import {
 import { ProjectData } from 'src/main/types';
 import { projectIcons } from '@renderer/constants/appConstants';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
+import { useTranslation } from 'react-i18next';
 
 interface PageProps {
     basePath?: string;
@@ -21,18 +22,14 @@ interface SettingsRowProps {
     onEdit?: () => void;
 }
 
-function formatKey(key) {
-    return key
-        .replace(/([A-Z])/g, ' $1') // Insert a space before uppercase letters
-        .replace(/^./, (str) => str.toUpperCase()); // Capitalize the first letter
-}
-
 function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
+    const { t } = useTranslation();
+    
     return (
         <div className="flex items-start justify-between py-4">
             <div className="space-x-6 flex flex-1 items-center">
                 <p className="text-sm font-medium leading-none">
-                    {formatKey(label)}
+                    {t(label)}
                 </p>
                 <div className="flex items-center gap-2 text-muted-foreground">
                     {value}
@@ -44,8 +41,8 @@ function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
                 )}
             </div>
             {onEdit && (
-                <Button variant="outline" size="sm" onClick={onEdit}>
-                    Edit
+                <Button variant="outline" size="sm" onClick={onEdit} className='hidden'>
+                    {t('edit')}
                 </Button>
             )}
         </div>
@@ -53,27 +50,29 @@ function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
 }
 
 export default function ProjectSettings({ project }: PageProps) {
-    if (!project) return;
+    const { t } = useTranslation();
+
+    if (!project) return null;
     const { name, framework, config } = project;
     return (
         <ContainerScrollArea>
-            <div className="w-full max-w-3xl mx-auto space-y-8 p-6">
+            <div className="w-full max-w-3xl mx-auto space-y-8 p-6 mb-10">
                 <div>
-                    <h1 className="text-3xl font-semibold">Basic Settings</h1>
+                    <h1 className="text-3xl font-semibold">{t('basic_settings')}</h1>
                 </div>
 
                 <Card className="border-border/50">
                     <CardHeader>
-                        <CardTitle>General Info</CardTitle>
+                        <CardTitle>{t('general_info')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-0 divide-y divide-border/50">
                         <SettingsRow
-                            label="Project Name"
+                            label="project_name"
                             value={name}
-                            onEdit={() => console.log('Edit project name')}
+                            onEdit={() => console.log(t('edit', { context: 'project_name' }))}
                         />
                         <SettingsRow
-                            label="Icon"
+                            label="icon"
                             value={
                                 <div className="h-12 w-12 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-500">
                                     <img
@@ -85,12 +84,12 @@ export default function ProjectSettings({ project }: PageProps) {
                                     />
                                 </div>
                             }
-                            onEdit={() => console.log('Edit icon')}
+                            onEdit={() => console.log(t('edit', { context: 'icon' }))}
                         />
                         <SettingsRow
-                            label="Framework"
+                            label="framework"
                             value={framework}
-                            onEdit={() => console.log('Edit project name')}
+                            onEdit={() => console.log(t('edit', { context: 'framework' }))}
                         />
                         {Object.keys(config).map((key) => {
                             return (
@@ -98,7 +97,7 @@ export default function ProjectSettings({ project }: PageProps) {
                                     key={key}
                                     label={key}
                                     value={config[key]} // Access the value using the key
-                                    onEdit={() => console.log(`Edit ${key}`)}
+                                    onEdit={() => console.log(t('edit', { context: key }))}
                                 />
                             );
                         })}
