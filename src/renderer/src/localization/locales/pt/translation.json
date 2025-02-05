@@ -199,9 +199,9 @@
   "createNewResponse": "Criar uma nova Resposta",
   "sourceCode": "Código fonte",
   "search": "Pesquisa",
-  "language_title": "Idioma",
+  "language": "Idioma",
   "language_description": "Gerencie suas preferências de idioma",
-  "language": "Idioma de Exibição",
+  "language_label": "Idioma de Exibição",
   "error_change_language": "Falha ao alterar o idioma",
   "connected_accounts": "Contas Conectadas",
   "connected_accounts_description": "Gerencie suas contas e serviços conectados",
@@ -231,5 +231,6 @@
     "basic_settings": "Configurações Básicas",
     "general_info": "Informações Gerais",
     "project_name": "Nome do Projeto",
-    "icon": "Ícone"
+    "icon": "Ícone",
+    "notifications": "Notificações"
 }

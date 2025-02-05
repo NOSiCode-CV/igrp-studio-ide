@@ -230,5 +230,6 @@
   "basic_settings": "Basic Settings",
   "general_info": "General Info",
   "project_name": "Project Name",
-  "icon": "Icon"
+  "icon": "Icon",
+  "notifications": "Notifications"
 }
