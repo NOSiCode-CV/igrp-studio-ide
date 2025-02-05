@@ -18,7 +18,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Separator } from '@renderer/components/ui/separator';
-import CodeEditor from '@renderer/components/code-editor';
+import MonacoEditor from '@renderer/components/MonacoEditor';
 
 interface FieldOptionsPopoverProps {
     field: SchemaField;
@@ -320,8 +320,8 @@ export function FieldOptionsPopover({
                         </div>
                     </TabsContent>
                     <TabsContent value="jsonSchema">
-                        <CodeEditor
-                            value={JSON.stringify(field, null, 2)}
+                        <MonacoEditor
+                            content={JSON.stringify(field, null, 2)}
                             onChange={handleChangeEditor}
                         />
                     </TabsContent>

@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import Editor, { Monaco } from '@monaco-editor/react';
 
 interface MonacoEditorProps {
-    filePath: string;
+    filePath?: string;
     content: string;
     onChange?: (value: string) => void;
     height?: string;
@@ -16,7 +16,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
 }) => {
     const editorRef = useRef<any>(null);
 
-    const handleEditorDidMount = (editor: any, monaco: Monaco) => {
+    const handleEditorDidMount = (editor: any, _monaco: Monaco) => {
         editorRef.current = editor;
     };
 

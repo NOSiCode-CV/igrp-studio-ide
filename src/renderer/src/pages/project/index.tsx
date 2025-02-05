@@ -20,7 +20,6 @@ import {
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { FormikErrors, useFormik } from 'formik';
-import * as Yup from 'yup';
 import {
     RadioGroup,
     RadioGroupItem,
@@ -32,8 +31,6 @@ import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import {
-    ENV_TYPES,
-    PATTERNS,
     projectIcons,
 } from '@renderer/constants/appConstants';
 import { useNavigate } from 'react-router-dom';

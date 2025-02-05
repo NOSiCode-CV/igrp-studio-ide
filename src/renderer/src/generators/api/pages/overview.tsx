@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import EmptyPage from './EmptyPage';
 import { OptionType } from '@renderer/constants/appConstants';
-import { TabItem } from '@renderer/generators/api/components/TabManager';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@igrp/igrp-design-system';
 import DashboardOverview from '../components/dashboard-overview';
@@ -9,6 +8,7 @@ import DashboardOverview from '../components/dashboard-overview';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { ContainerScrollArea } from '../components/ContainerScrollArea';
+import { TabItem } from '@renderer/components/TabContext';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;

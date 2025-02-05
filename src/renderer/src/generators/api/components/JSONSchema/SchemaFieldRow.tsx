@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
-import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { SchemaField } from '../../types/schema';
 import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
@@ -41,7 +40,7 @@ export function SchemaFieldRow({
         field.type === 'object' || field.type === 'array'
     );
     const [name, setName] = useState(field.name || '');
-    const [type, setType] = useState<SchemaType>(field.type);
+    const [type, setType] = useState<string>(field.type);
     const [description, setDescrition] = useState(field.description || '');
 
     const nameInputRef = useRef<HTMLInputElement>(null);
