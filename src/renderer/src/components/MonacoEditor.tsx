@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import Editor, { Monaco } from '@monaco-editor/react';
+import React, { useRef, useEffect, useState } from 'react';
+import Editor, { Monaco, OnChange, Theme } from '@monaco-editor/react';
+import { useTheme } from './theme-provider';
 
 interface MonacoEditorProps {
     filePath?: string;
@@ -16,28 +17,50 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
 }) => {
     const editorRef = useRef<any>(null);
 
+    const { theme } = useTheme();
+
+    const [editorTheme, setEditorTheme] = useState<Theme>('vs-dark');
+
+    useEffect(() => {
+        if (theme === 'light') setEditorTheme('light');
+        else setEditorTheme('vs-dark');
+    }, [theme]);
+
     const handleEditorDidMount = (editor: any, _monaco: Monaco) => {
         editorRef.current = editor;
     };
 
-    const handleChange = (value) => {
-        if (onChange) onChange(value);
+    const handleChange: OnChange = (value) => {
+        if (onChange) onChange(value || '');
     };
+
+    useEffect(() => {
+        return () => {
+            if (editorRef.current) {
+                editorRef.current.dispose();
+            }
+        };
+    }, []);
+
+    if (process.env.NODE_ENV === 'development') {
+        console.log(filePath);
+    }
 
     return (
         <Editor
             height={height}
-            theme="vs-dark"
+            theme={editorTheme}
             path={filePath}
-            defaultValue={content}
-            onChange={(value) => handleChange(value || '')}
+            value={content}
+            onChange={handleChange}
             onMount={handleEditorDidMount}
             options={{
                 minimap: { enabled: false },
                 wordWrap: 'on',
+                autoIndent: 'full',
             }}
         />
     );
 };
 
-export default MonacoEditor;
+export default React.memo(MonacoEditor);

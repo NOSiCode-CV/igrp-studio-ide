@@ -192,6 +192,7 @@
   "nameMaxLength": "Name must be less than 50 characters",
   "httpStatusCode": "HTTP Status Code",
   "httpStatusCodePlaceholder": "e.g., 200, 400",
+  "selectContenttype": "Select Content Type",
   "responseNamePlaceholder": "Response Name",
   "contentType": "Content Type",
   "dataSchema": "Data Schema",
@@ -237,6 +238,14 @@
   "attributes": "Fields",
   "dataType": "Data Type",
   "dataTypes": "Data Type",
-  "enterName":"Enter Name",
-  "type": "Type"
+  "enterName": "Enter Name",
+  "type": "Type",
+  "addNewField": "Add new Field",
+  "jsonSchemaPreview": "JSON Schema Preview",
+  "jsonSchemaDescription": "This is a preview of your generated JSON schema.",
+  "definition": "Definition",
+  "controllerDefintion": "Provide the name and configuration for this action",
+  "supportTitle": "Need support?",
+  "supportDescription": "Contact us to get support.",
+  "supportContactVia": "Contact support via {{channel}}"
 }

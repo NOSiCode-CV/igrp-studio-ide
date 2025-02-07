@@ -17,6 +17,7 @@ import {
 import { AddResponseMenu } from './add-response-menu';
 import { Button } from '@renderer/components/ui/button';
 import { Trash } from 'lucide-react';
+import { LabelRequired } from '@renderer/components/required';
 
 interface TabResponseProps {
     formik: any;
@@ -78,15 +79,22 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         const currentSchema =
             formik.values.responses[statusCode]?.content[contentType];
 
-        // Se o schema for o mesmo, não faça nada
+        // Garantir que há propriedades antes de acessar
+        const properties = newSchema.properties || {};
+        const firstKey = Object.keys(properties)[0];
+
+        // Se houver pelo menos uma propriedade, extraia o schema, senão mantenha o original
+        const extractedSchema = firstKey ? properties[firstKey] : newSchema;
+
         if (
             currentSchema &&
-            JSON.stringify(currentSchema.schema) === JSON.stringify(newSchema)
+            JSON.stringify(currentSchema.schema) ===
+                JSON.stringify(extractedSchema)
         ) {
             return; // Não há mudanças, então não faça nada
         }
 
-        // Update the content for the given statusCode
+        // Atualizar os responses
         const updatedResponses = {
             ...formik.values.responses,
             [statusCode]: {
@@ -97,7 +105,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                         ...formik.values.responses[statusCode]?.content[
                             contentType
                         ],
-                        schema: newSchema,
+                        schema: extractedSchema,
                     },
                 },
             },
@@ -164,12 +172,15 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const contentType = Object.keys(content)[0];
 
                     const schema = content?.[contentType]?.['schema'];
-                    const properties = schema?.properties;
-                    
-                    const contentData =
-                        properties && Object.keys(properties).length > 0
-                            ? schema
-                            : null;
+
+                    const contentData = schema
+                        ? {
+                              type: '',
+                              properties: {
+                                  [schema.name]: schema,
+                              },
+                          }
+                        : null;
 
                     return (
                         <div
@@ -183,9 +194,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                         >
                             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor={'statusCode'}>
-                                        {'HTTP Status Code'}
-                                    </Label>
+                                    <LabelRequired>
+                                        {t('httpStatusCode')}
+                                    </LabelRequired>
                                     <Combobox
                                         options={httpStatusCodes}
                                         name="statusCode"
@@ -199,13 +210,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                             })
                                         }
                                         className="w-full focus:ring-igrp focus:border-igrp h-9"
-                                        placeholder="e.g., 200, 400"
+                                        placeholder={t(
+                                            'httpStatusCodePlaceholder'
+                                        )}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor={'name'}>
-                                        {'Name'}
-                                    </Label>
+                                    <LabelRequired>{t('name')}</LabelRequired>
                                     <Input
                                         name={t('name')}
                                         value={name}
@@ -220,13 +231,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor={'contentType'}>
-                                        {'Content Type'}
-                                    </Label>
+                                    <LabelRequired>
+                                        {t('contentType')}
+                                    </LabelRequired>
                                     <Combobox
                                         name={t('contentType')}
                                         value={contentType}
-                                        placeholder="Select Content Type"
+                                        placeholder={t('selectContentType')}
                                         onChange={(value) =>
                                             handleAddResponse({
                                                 statusCode,
@@ -254,7 +265,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                             {/* Descritpion */}
                             <div className="space-y-2">
-                                <Label>Descritpion</Label>
+                                <Label>{t('description')}</Label>
                                 <Input
                                     type="text"
                                     name="description"
@@ -273,7 +284,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                             <Card className="rounded">
                                 <CardHeader>
-                                    <CardTitle>Data Schema</CardTitle>
+                                    <CardTitle>{t('dataSchema')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <JSONSchemaBuilder

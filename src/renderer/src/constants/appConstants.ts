@@ -35,7 +35,7 @@ export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses'
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
     springboot: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-    dotnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
+    dotnet: 'https://www.svgrepo.com/show/376369/dotnet.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
     laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',

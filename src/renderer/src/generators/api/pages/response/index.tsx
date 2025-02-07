@@ -116,7 +116,11 @@ export const ResponseLayout = ({
 
     const handleSave = async (): Promise<void> => {
         try {
-            const values = { ...formik.values, module: currentItem.module };
+            const values = {
+                ...formik.values,
+                module: currentItem.module,
+                id: currentItem.id,
+            };
 
             const { error } = await window.engine.createResponse(
                 values,

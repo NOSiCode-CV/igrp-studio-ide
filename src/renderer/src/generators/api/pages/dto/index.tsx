@@ -100,19 +100,22 @@ const DtoLayout = ({
             dto,
             models,
             currentDto: data?.name,
-            t
+            t,
         });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
-            const { error } = await window.api.createDto(
-                { ...newValues, module: currentItem?.module || 'shared' },
-                basePath
-            );
+            const config = {
+                ...newValues,
+                module: currentItem?.module || 'shared',
+                id: currentItem.id,
+            };
 
-            console.log(newValues, error);
+            const { error } = await window.api.createDto(config, basePath);
+
+            console.log(config, error);
 
             if (error) {
                 return showErrorToast(error);

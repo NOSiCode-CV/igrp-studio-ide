@@ -177,7 +177,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                 }
 
                 const folderMenuItem: MenuItem = {
-                    id: folder.name,
                     icon: folder.name === 'shared' ? Layers : Boxes,
                     label:
                         folder.name === 'shared' ? t(folder.name) : folder.name,
@@ -200,7 +199,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                         if (child.isDirectory) {
                             // Processa subpastas
                             const subFolderMenuItem: MenuItem = {
-                                id: child.name,
                                 icon: getIcon(child.name),
                                 label: t(child.name),
                                 module: folder.name,
@@ -213,7 +211,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                 child.children.forEach((file) => {
                                     if (!file.isDirectory) {
                                         const fileMenuItem: MenuItem = {
-                                            id: file.name,
+                                            id: file.content?.id || file.name,
                                             label:
                                                 file.content?.name || file.name,
                                             path: file.path,
@@ -246,7 +244,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                         } else {
                             // Processa arquivos na raiz
                             const fileMenuItem: MenuItem = {
-                                id: folder.name,
+                                id: folder.content?.id || folder.name,
                                 label: folder.name,
                                 path: folder.path,
                                 module: folder.name,

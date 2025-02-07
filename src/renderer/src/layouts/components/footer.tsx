@@ -1,3 +1,4 @@
+import SupportContent from '@renderer/components/support-content';
 import { useEffect, useState } from 'react';
 
 const Footer = () => {
@@ -14,7 +15,11 @@ const Footer = () => {
 
     return (
         <>
-            <p>IGRP Studio &copy; {new Date().getFullYear()}</p>
+            <SupportContent />
+            <p>
+                {`${import.meta.env.VITE_APP_TITLE}`} &copy;{' '}
+                {new Date().getFullYear()}
+            </p>
             {appVersion && <p>{appVersion}</p>}
         </>
     );

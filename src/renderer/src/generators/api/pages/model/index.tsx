@@ -195,6 +195,7 @@ const ModelLayout = ({
                 name: formik.values.name,
                 type: 'model',
                 module: currentItem.module,
+                id: currentItem.id
             };
 
             const { error } = await window.engine.delete(

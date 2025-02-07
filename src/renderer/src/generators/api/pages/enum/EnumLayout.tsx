@@ -146,6 +146,7 @@ export const EnumLayout = ({
                 name: formik.values.name,
                 type: 'response',
                 module: currentItem.module,
+                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(

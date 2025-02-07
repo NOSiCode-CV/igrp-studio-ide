@@ -195,6 +195,7 @@
   "httpStatusCodePlaceholder": "ex: 200, 400",
   "responseNamePlaceholder": "Nome da Resposta",
   "contentType": "Tipo de Conteúdo",
+  "selectContenttype": "Select Tipo de Conteúdo",
   "dataSchema": "Esquema de Dados",
   "createNewResponse": "Criar uma nova Resposta",
   "sourceCode": "Código fonte",
@@ -239,5 +240,12 @@
   "dataType": "Tipo de dado",
   "dataTypes": "Tipo de dados",
   "enterName": "Digite o nome",
-  "type": "Tipo"
+  "type": "Tipo",
+  "addNewField": "Adcionar novo campo",
+  "jsonSchemaPreview": "Visualização do JSON Schema",
+  "jsonSchemaDescription": "Esta é uma prévia do seu JSON schema gerado.",
+  "jsonSchema":"JSON Schema",
+  "suporteTtitle": "Precisa de suporte?",
+  "suporteDescription": "Entre em contato conosco para obter suporte.",
+  "suporteContactVia": "Entre em contato com o suporte via {{channel}}"
 }

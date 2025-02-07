@@ -1,4 +1,5 @@
 import { OptionType } from '@renderer/constants/appConstants';
+import { getId } from '@renderer/utils/helpers';
 import React, { createContext, useContext, useState } from 'react';
 
 export interface TabItem {
@@ -19,7 +20,7 @@ interface TabContextType {
     handleMoveTab: (fromIndex: number, toIndex: number) => void;
     tabExists: (tabId: string) => void;
     newTab: () => void; // Add newTab function
-    initializeTabFromCurrentItem: (currentItem: any) => void; 
+    initializeTabFromCurrentItem: (currentItem: any) => void;
 }
 
 const TabContext = createContext<TabContextType | undefined>(undefined);
@@ -84,21 +85,28 @@ export const TabProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     const newTab = () => {
-        const newTabId = `tab-${tabs.length + 1}`;
-        handleNewTab({ id: newTabId, title: `New...`, open: 'none' });
+        const newTabId = getId();
+        handleNewTab({
+            id: newTabId,
+            title: `New...`,
+            open: 'none',
+            item: { id: newTabId },
+        });
     };
 
     const initializeTabFromCurrentItem = (currentItem: any) => {
+        console.log(currentItem)
         if (currentItem) {
+            const newTabId = currentItem.id || getId();
             const actionType = currentItem.actionType || currentItem.type;
             handleNewTab({
-                id: `tab-${currentItem.module}-${currentItem.isNew ? Date.now() : currentItem.label}`,
+                id: newTabId,
                 title:
                     currentItem.isNew && actionType
                         ? `new${actionType.charAt(0).toUpperCase() + actionType.slice(1)}`
                         : currentItem.label,
                 open: actionType,
-                item: currentItem,
+                item: { ...currentItem, id: newTabId },
             });
         }
     };
