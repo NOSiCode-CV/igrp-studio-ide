@@ -13,12 +13,13 @@ import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
-import { useTranslation } from 'react-i18next'; 
+import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
+import { LabelRequired } from '@renderer/components/required';
 
 interface DotNetConfigProps {
     data: DotNetConfigData;
-    errors?: FormikErrors<ProjectData>
+    errors?: FormikErrors<ProjectData>;
     onChange: (data: DotNetConfigData) => void;
 }
 
@@ -59,7 +60,7 @@ export function DotNetConfig({
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="apiName">{t('projectName')}</Label>
+                <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
                     id="apiName"
                     value={data.apiName}
@@ -84,7 +85,7 @@ export function DotNetConfig({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="artifact">{t('artifact')}</Label>
+                <LabelRequired>{t('artifact')}</LabelRequired>
                 <Input
                     id="artifact"
                     value={data.artifact}
@@ -98,7 +99,7 @@ export function DotNetConfig({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label>{t('chooseDbEngine')}</Label>
+                    <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
                     <Combobox
                         name="database"
                         value={data.database}
@@ -110,7 +111,7 @@ export function DotNetConfig({
                     />
                 </div>
                 <div className="space-y-2 flex flex-col">
-                    <Label>{t('igrpCoreVersion')}</Label>
+                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
                     <Combobox
                         options={versions || []}
                         name="igrpCoreVersion"

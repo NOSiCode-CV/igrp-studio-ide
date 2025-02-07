@@ -16,6 +16,7 @@ import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/TabContext';
+import { LabelRequired } from '@renderer/components/required';
 
 interface EnumProps {
     basePath: string;
@@ -196,7 +197,7 @@ export const EnumLayout = ({
             <div className="space-y-4 p-4">
                 {/* name */}
                 <div className="space-y-2">
-                    <Label>Name</Label>
+                    <LabelRequired>{t('name')}</LabelRequired>
                     <Input
                         type="text"
                         name="name"

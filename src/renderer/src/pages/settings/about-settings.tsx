@@ -6,12 +6,13 @@ import { Separator } from '@renderer/components/ui/separator';
 import { CircleArrowUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from '@renderer/assets/images/igrp-green.svg';
+import { useTranslation } from 'react-i18next';
 
 export function AboutSettings() {
+    const { t } = useTranslation();
     const [appVersion, setAppVersion] = useState('');
 
     useEffect(() => {
-        // Fetch app version from Electron
         if (window.electron && window.electron.getAppVersion) {
             window.electron.getAppVersion().then((version) => {
                 setAppVersion(version);
@@ -22,7 +23,7 @@ export function AboutSettings() {
     return (
         <div>
             <div className="pb-4">
-                <h2 className="text-lg font-semibold">About</h2>
+                <h2 className="text-lg font-semibold">{t('about')}</h2>
             </div>
             <div className="space-y-6">
                 {/* App Info */}
@@ -38,22 +39,18 @@ export function AboutSettings() {
                     </div>
                     <div className="space-y-1">
                         <h2 className="text-xl font-semibold">
-                            IGRP Studio {appVersion}
+                            {import.meta.env.VITE_APP_TITLE} {appVersion}
                         </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Found a new version 1.0.1
-                        </p>
+                     {/*    <p className="text-sm text-muted-foreground">
+                            {t('found_new_version')} 1.0.1
+                        </p> */}
                         <div className="flex items-center gap-2 pt-1">
                             <Button className="gap-2">
                                 <CircleArrowUp className="h-4 w-4" />
-                                Check Update
+                                {t('check_update')}
                             </Button>
-                           {/*  <Button className="gap-2">
-                                <Download className="h-4 w-4" />
-                                Install and Restart
-                            </Button> */}
                             <Button variant="link" className="h-8">
-                                Changelog
+                                {t('changelog')}
                             </Button>
                         </div>
                     </div>
@@ -63,15 +60,14 @@ export function AboutSettings() {
 
                 {/* Software Update */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Software Update</h3>
+                    <h3 className="text-sm font-medium">{t('software_update')}</h3>
                     <div className="flex items-center space-x-2">
                         <Checkbox id="notifications" />
                         <label
                             htmlFor="notifications"
                             className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                            Remind me when a new version is available for
-                            download
+                            {t('remind_me')}
                         </label>
                     </div>
                 </div>
@@ -80,18 +76,18 @@ export function AboutSettings() {
 
                 {/* Other Information */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Other Information</h3>
+                    <h3 className="text-sm font-medium">{t('other_information')}</h3>
                     <div className="space-y-2">
                         <Button variant="link" className="h-8 p-0" size={'sm'}>
-                            Get Latest Version
+                            {t('get_latest_version')}
                         </Button>
                         <br />
                         <Button variant="link" className="h-8 p-0" size={'sm'}>
-                            Terms of Service
+                            {t('terms_of_service')}
                         </Button>
                         <br />
                         <Button variant="link" className="h-8 p-0" size={'sm'}>
-                            Privacy Policy
+                            {t('privacy_policy')}
                         </Button>
                     </div>
                 </div>

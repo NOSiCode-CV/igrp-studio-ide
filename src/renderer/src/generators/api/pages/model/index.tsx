@@ -49,7 +49,7 @@ const ModelLayout = ({
     onUpdateTab,
 }: ModelProps): JSX.Element => {
     const { createGitCommit } = useGit();
-     const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem } = useTabs();
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const [tablesColumns, setTableColumns] = useState<{
@@ -72,11 +72,11 @@ const ModelLayout = ({
 
     const suggestTableName = (name) => {
         return `t_${name
-        .replace(/([a-z])([A-Z])/g, "$1_$2") 
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '_')
-    }`;    };
+            .replace(/([a-z])([A-Z])/g, '$1_$2')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '_')}`;
+    };
 
     const handleNameBlur = (e) => {
         formik.handleBlur(e);
@@ -220,12 +220,12 @@ const ModelLayout = ({
     };
 
     const onClickSourceCode = () => {
-            initializeTabFromCurrentItem({
-                path: `${currentItem.path}`,
-                type: OPTION_TYPE.FILE_THREE,
-                label: `${currentItem.label}.json`,
-            });
-        };
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
+    };
 
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
@@ -290,6 +290,7 @@ const ModelLayout = ({
                                             ? formik.errors.name
                                             : undefined
                                     }
+                                    isRequired
                                 />
 
                                 <TextInput
@@ -304,6 +305,7 @@ const ModelLayout = ({
                                             ? formik.errors.tableName
                                             : undefined
                                     }
+                                    isRequired
                                 />
                             </div>
                         </div>
@@ -366,9 +368,9 @@ const ModelLayout = ({
                 <Card className="p-6 rounded-sm">
                     <Tabs defaultValue="attributes">
                         <TabsList className="grid w-full grid-cols-3">
-                            {TabList.map(({ label, value }, key) => (
+                            {TabList.map(({ value }, key) => (
                                 <TabsTrigger key={key} value={value}>
-                                    {t(label)}
+                                    {t(value)}
                                 </TabsTrigger>
                             ))}
                         </TabsList>

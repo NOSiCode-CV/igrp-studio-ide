@@ -1,18 +1,6 @@
 'use client';
 
-import {
-    Bell,
-    Globe,
-    Home,
-    Keyboard,
-    Link,
-    Lock,
-    MessageCircle,
-    Paintbrush,
-    Settings,
-    Video,
-} from 'lucide-react';
-
+import { Bell, Globe, Home, Link, Settings } from 'lucide-react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -27,6 +15,7 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from '@renderer/components/ui/dialog';
 import {
     Sidebar,
@@ -41,41 +30,53 @@ import {
 import { AboutSettings } from './about-settings';
 import { LanguageSettings } from './language-settings';
 import { ConnectedAccountsSettings } from './connected-accounts-settings';
-import React from 'react';
+import React, {  } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@renderer/components/ui/button';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 const data = {
     nav: [
-        { name: 'About', icon: Home, component: AboutSettings },
-        { name: 'Language & region', icon: Globe, component: LanguageSettings },
+        { name: 'about', icon: Home, component: AboutSettings },
+        { name: 'language', icon: Globe, component: LanguageSettings },
         {
-            name: 'Connected accounts',
+            name: 'connected_accounts',
             icon: Link,
             component: ConnectedAccountsSettings,
         },
-        { name: 'Notifications', icon: Bell },
-        { name: 'Appearance', icon: Paintbrush },
-        { name: 'Messages & media', icon: MessageCircle },
-        { name: 'Accessibility', icon: Keyboard },
-        { name: 'Audio & video', icon: Video },
-        { name: 'Privacy & visibility', icon: Lock },
-        { name: 'Advanced', icon: Settings },
+        { name: 'notifications', icon: Bell },
     ],
 };
 
-interface SettingsDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
-
-export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
-    const [activeItem, setActiveItem] = React.useState('About');
+export function SettingsDialog() {
+    const [activeItem, setActiveItem] = React.useState('about');
+    const { t } = useTranslation();
+    const [open, setOpen] = React.useState(false);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                            <Settings className="w-5 h-5" />
+                            <span className="sr-only">{t('settings')}</span>
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{t('settings')}</TooltipContent>
+            </Tooltip>
             <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[800px] max-w-[900px]">
-                <DialogHeader>
-                    <DialogTitle>Settings</DialogTitle>
-                    <DialogDescription>
+                <DialogHeader className='pb-3'>
+                    <DialogTitle className="sr-only">
+                        {t('settings')}
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
                         Customize your settings here.
                     </DialogDescription>
                 </DialogHeader>
@@ -98,7 +99,9 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                                                 >
                                                     <button>
                                                         <item.icon />
-                                                        <span>{item.name}</span>
+                                                        <span>
+                                                            {t(item.name)}
+                                                        </span>
                                                     </button>
                                                 </SidebarMenuButton>
                                             </SidebarMenuItem>
@@ -108,42 +111,46 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                             </SidebarGroup>
                         </SidebarContent>
                     </Sidebar>
-                    <main className="flex h-[480px] flex-1 flex-col overflow-hidden">
+
+                    <main className="flex h-[480px] flex-1 flex-col">
                         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                             <div className="flex items-center gap-2 px-4">
                                 <Breadcrumb>
                                     <BreadcrumbList>
                                         <BreadcrumbItem className="hidden md:block">
-                                            <BreadcrumbLink href="#">
-                                                Settings
+                                            <BreadcrumbLink href="#/">
+                                                {t('settings')}
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator className="hidden md:block" />
                                         <BreadcrumbItem>
                                             <BreadcrumbPage>
-                                                {activeItem}
+                                                {t(activeItem)}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                     </BreadcrumbList>
                                 </Breadcrumb>
                             </div>
                         </header>
-                        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
-                            {data.nav.find((item) => item.name === activeItem)
-                                ?.component ? (
-                                React.createElement(
-                                    data.nav.find(
-                                        (item) => item.name === activeItem
-                                    )!.component!
-                                )
-                            ) : (
-                                <div className="flex items-center justify-center h-full">
-                                    <p className="text-muted-foreground">
-                                        Select a setting to view
-                                    </p>
-                                </div>
-                            )}
-                        </div>
+                        <ScrollArea>
+                            <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
+                                {data.nav.find(
+                                    (item) => item.name === activeItem
+                                )?.component ? (
+                                    React.createElement(
+                                        data.nav.find(
+                                            (item) => item.name === activeItem
+                                        )!.component!
+                                    )
+                                ) : (
+                                    <div className="flex items-center justify-center h-full">
+                                        <p className="text-muted-foreground">
+                                            Select a setting to view
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </ScrollArea>
                     </main>
                 </SidebarProvider>
             </DialogContent>

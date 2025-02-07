@@ -213,7 +213,6 @@ export function PopoverDto({
                                         </Label>
                                         <Input
                                             id="regex"
-                                            defaultValue="10"
                                             className="col-span-2 h-8"
                                             value={row?.['regex'] || ''}
                                             onChange={(ev) =>

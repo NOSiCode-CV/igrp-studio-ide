@@ -42,6 +42,7 @@ import {
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/TabContext';
+import { LabelRequired } from '@renderer/components/required';
 
 interface ControllerProps {
     basePath: string;
@@ -244,7 +245,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 return;
             }
 
-            createGitCommit(basePath, `Add action ${formik.values.name}`);
+            createGitCommit(basePath, `Add action ${formik.values.actionName}`);
 
             dispatch(onSetChangeStatus(true));
 
@@ -419,12 +420,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                             <div className="space-y-3">
-                                <Label
-                                    htmlFor={'method'}
-                                    className="block text-sm"
-                                >
-                                    {t('methodType')}
-                                </Label>
+                                <LabelRequired>{t('methodType')}</LabelRequired>
                                 <Combobox
                                     name={t('method')}
                                     placeholder={t('enterMethod')}
@@ -464,6 +460,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                         ? formik.errors.actionName
                                         : ''
                                 }
+                                isRequired
                             />
                         </div>
                     </CardContent>

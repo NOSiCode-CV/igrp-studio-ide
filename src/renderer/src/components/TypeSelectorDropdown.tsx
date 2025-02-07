@@ -33,7 +33,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                 {schemaTypes &&
                     schemaTypes.map(({ label, value, items }) => (
                         <React.Fragment key={value}>
-                            {items ? (
+                            {items && items.length  > 0 ? (
                                 <DropdownMenuSub>
                                     <DropdownMenuSubTrigger>
                                         {label}
@@ -57,7 +57,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                             ) : (
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        onTypeChange(value)
+                                        onTypeChange(value as string)
                                     }
                                 >
                                     {label}

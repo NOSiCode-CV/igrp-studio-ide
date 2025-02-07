@@ -64,24 +64,23 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             className="flex items-center"
                             size={'icon'}
                         >
-                            <PackageCheck className="w-4 h-4" />{' '}
-                            <span className="sr-only">{t('Advanced')}</span>
+                            <PackageCheck className="w-4 h-4" />
+                            <span className="sr-only">{t('advanced')}</span>
                         </Button>
                     </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top" align="center">
-                    {t('Open advanced settings')}
+                    {t('openAdvancedSettings')}
                 </TooltipContent>
             </Tooltip>
             <PopoverContent className="w-[425px]" align="end" side="bottom">
                 <Tabs defaultValue="dataType">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="dataType">
-                            {' '}
-                            {t('Data Type')}
+                            {t('dataType')}
                         </TabsTrigger>
                         <TabsTrigger value="jsonSchema">
-                            {t('JSON Schema')}
+                            {t('jsonSchema')}
                         </TabsTrigger>
                     </TabsList>
 
