@@ -8,7 +8,7 @@ export default function Connections() {
         <ContainerScrollArea>
             <div className="w-full mx-auto space-y-8 p-6">
                 <ConnectionManager
-                    title={t('connection_manager')}
+                    title={t('manageConnections')}
                 ></ConnectionManager>
             </div>
         </ContainerScrollArea>

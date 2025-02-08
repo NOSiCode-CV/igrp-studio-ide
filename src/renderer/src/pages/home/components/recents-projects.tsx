@@ -169,7 +169,7 @@ const RecentsProjects = (): JSX.Element => {
                     </div>
                 </CardHeader>
                 <CardContent className={`flex-grow ${isCompact ? 'p-2' : ''}`}>
-                    {!isCompact && (
+                    {project.config?.description && (
                         <p className="text-sm text-muted-foreground mb-2">
                             {project.config.description}
                         </p>

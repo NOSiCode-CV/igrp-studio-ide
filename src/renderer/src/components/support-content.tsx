@@ -51,7 +51,7 @@ export default function SupportContent({}: SupportContentProps) {
 
     return (
         <TooltipProvider>
-            <div className="space-y-2 mb-4 rounded p-2 shadow border-1 border-foreground w-full">
+            <div className="space-y-2 mb-4 rounded-lg p-2 shadow-lg border w-full">
                 <div className="flex items-center gap-2">
                     <span className="h-6 w-6">
                         <Headset />

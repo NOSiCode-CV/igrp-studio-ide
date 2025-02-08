@@ -200,7 +200,7 @@ export function CreateEndpointDialog({
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Save</Button>
+                        <Button type="submit">{t('save')}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

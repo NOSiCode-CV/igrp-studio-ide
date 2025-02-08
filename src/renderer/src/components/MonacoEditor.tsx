@@ -7,6 +7,8 @@ interface MonacoEditorProps {
     content: string;
     onChange?: (value: string) => void;
     height?: string;
+    options?: any;
+    language?: string
 }
 
 const MonacoEditor: React.FC<MonacoEditorProps> = ({
@@ -14,6 +16,8 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
     content,
     onChange,
     height = '100vh',
+    options,
+    language
 }) => {
     const editorRef = useRef<any>(null);
 
@@ -52,9 +56,11 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
             theme={editorTheme}
             path={filePath}
             value={content}
+            language={language}
             onChange={handleChange}
             onMount={handleEditorDidMount}
             options={{
+                ...options,
                 minimap: { enabled: false },
                 wordWrap: 'on',
                 autoIndent: 'full',

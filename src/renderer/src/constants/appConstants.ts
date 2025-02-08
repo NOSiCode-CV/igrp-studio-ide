@@ -22,7 +22,7 @@ export enum OPTION_TYPE {
     CONTROLLER = "controller",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
-    IMPORT_TABLE_DB = 'import_table_db',
+    MODAL = 'modal',
     RESPONSE = 'responses',
     ENUM = 'enum',
     DELETE = 'delete',

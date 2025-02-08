@@ -21,6 +21,10 @@ const DatabaseManagerModal = lazy(
     () => import('@renderer/generators/api/components/DatabaseManager')
 );
 
+const SerializationConfigModal = lazy(
+    () => import('@renderer/generators/api/components/serialization-config')
+);
+
 export interface DropdownItem {
     label: string;
     actionType: OPTION_TYPE;
@@ -50,19 +54,37 @@ const useNavdata = (filesThree: FileTree[]) => {
             },
             {
                 label: t('importDataTableFromDatabase'),
-                actionType: OPTION_TYPE.IMPORT_TABLE_DB,
+                actionType: OPTION_TYPE.MODAL,
                 componentName: <DatabaseManagerModal />,
                 icon: DatabaseZap,
             },
             {
                 label: t('importJsonSchemaFiles'),
-                actionType: OPTION_TYPE.MODELS,
+                actionType: OPTION_TYPE.MODAL,
+                componentName: <SerializationConfigModal />,
                 icon: FileJson2,
             },
             {
                 label: t('erdDiagram'),
                 actionType: OPTION_TYPE.ERDDiagram,
                 icon: Cable,
+            },
+        ],
+        [t]
+    );
+
+    const dropdownDto: DropdownItem[] = useMemo(
+        () => [
+            {
+                label: t('newDto'),
+                actionType: OPTION_TYPE.DATA_OBJECTS,
+                icon: getIcon(OPTION_TYPE.DATA_OBJECTS),
+            },
+            {
+                label: t('importJsonSchemaFiles'),
+                actionType: OPTION_TYPE.MODAL,
+                componentName: <SerializationConfigModal />,
+                icon: FileJson2,
             },
         ],
         [t]
@@ -85,6 +107,8 @@ const useNavdata = (filesThree: FileTree[]) => {
             switch (category) {
                 case OPTION_TYPE.MODELS:
                     return dropdownSchemas;
+                case OPTION_TYPE.DATA_OBJECTS:
+                    return dropdownDto;
                 default:
                     return [];
             }
