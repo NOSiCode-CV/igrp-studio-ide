@@ -22,7 +22,6 @@ import './handlers/dbHandler';
 import { updateApp } from './helpers/update'
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
-import { Gitlab } from '@gitbeaker/node'
 
 const backend = require('i18next-electron-fs-backend')
 
