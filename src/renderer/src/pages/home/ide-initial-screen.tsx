@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
-import { FolderOpen } from 'lucide-react';
+import { FolderOpen, GitFork } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
@@ -13,6 +13,7 @@ import RecentsProjects from './components/recents-projects';
 import { PageHeader } from '@igrp/igrp-design-system';
 import { ProjectWizard } from '../project';
 import { IOpenProject } from 'src/main/types';
+import { CloneProjectModal } from './components/clone-project-modal';
 
 const IDEInitialScreen = (): JSX.Element => {
     const { t } = useTranslation();
@@ -45,12 +46,40 @@ const IDEInitialScreen = (): JSX.Element => {
         navigateToNextPage(navigate, config);
     };
 
+    const handleCloneProject = (
+        url: string,
+        name: string,
+        location: string,
+        auth: {
+            type: string;
+            username?: string;
+            password?: string;
+            token?: string;
+        }
+    ) => {
+        console.log(`Cloning project: ${name} from ${url} to ${location}`);
+        console.log(`Authentication type: ${auth.type}`);
+        if (auth.type === 'basic') {
+            console.log(`Using basic auth with username: ${auth.username}`);
+        } else if (auth.type === 'token') {
+            console.log('Using token authentication');
+        }
+        // Implement the logic to clone the project with authentication
+    };
+
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
             <PageHeader title={t('welcome')}>
                 <div className="flex justify-end space-x-3 ">
                     <ProjectWizard />
-                    
+
+                    <CloneProjectModal handleCloneProject={handleCloneProject}>
+                        <Button variant="outline">
+                            <GitFork className="w-4 h-4 mr-2" />
+                            Clone Project
+                        </Button>
+                    </CloneProjectModal>
+
                     <Button
                         variant="outline"
                         onClick={onHandleOpenProjectClick}
@@ -58,7 +87,6 @@ const IDEInitialScreen = (): JSX.Element => {
                         <FolderOpen className="w-4 h-4 mr-2" />
                         {t('openProject')}
                     </Button>
-                    
                 </div>
             </PageHeader>
 

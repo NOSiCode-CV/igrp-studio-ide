@@ -20,7 +20,7 @@ import { Button } from '@renderer/components/ui/button';
 import { getValuesToSubmit, initialValues } from '../../pages/model/config';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
-import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
+import { getId, toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 import { useGit } from '@renderer/hooks/useGit';
@@ -134,6 +134,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                     // Final table object
                     const tableJson = {
                         ...initialValues,
+                        id: getId(),
                         tableName: tableName,
                         attributes,
                         name:
@@ -192,18 +193,20 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 onClick={(e) => e.stopPropagation()}
             >
                 <DialogHeader>
-                    <DialogTitle>Import data table from database</DialogTitle>
+                    <DialogTitle>
+                        {t('importDataTableFromDatabase')}
+                    </DialogTitle>
                     <DialogDescription>
-                        Manage your database connections and import data tables.
+                        {t('manageDatabaseConnections')}
                     </DialogDescription>
                 </DialogHeader>
                 <Tabs defaultValue="tables" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="tables">
-                            Import Data Tables
+                            {t('importDataTables')}
                         </TabsTrigger>
                         <TabsTrigger value="connections">
-                            Manage Connections
+                            {t('manageConnections')}
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="tables">
@@ -223,11 +226,11 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                             variant="secondary"
                             onClick={() => handleClose}
                         >
-                            Close
+                            {t('close')}
                         </Button>
                     </DialogClose>
                     <Button type="submit" onClick={handleClickSubmit}>
-                        OK
+                        {t('save')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

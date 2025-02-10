@@ -59,12 +59,12 @@ export function PopoverModel({
                         >
                             <PackageCheck className="w-4 h-4" />
                             {/* Settings icon */}
-                            <span className="sr-only">{t('Advanced')}</span>
+                            <span className="sr-only">{t('advanced')}</span>
                         </Button>
                     </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top" align="center">
-                    {t('Open advanced settings')}
+                    {t('openAdvancedSettings')}
                 </TooltipContent>
             </Tooltip>
             <PopoverContent className="w-100" align="end" side="bottom">
@@ -73,7 +73,7 @@ export function PopoverModel({
                         <Tabs defaultValue="dataType">
                             <TabsList className="grid w-full grid-cols-1">
                                 <TabsTrigger value="dataType">
-                                    {t('Data Type')}
+                                    {t('dataType')}
                                 </TabsTrigger>
                             </TabsList>
 

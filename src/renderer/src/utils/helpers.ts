@@ -1,7 +1,7 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Database, FileCode, FileText, Circle, LucideIcon, Zap } from 'lucide-react'
+import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
 
@@ -130,6 +130,10 @@ export function generateRowId() {
 	return `row-${randomStr}`
 }
 
+export function getId() {
+	return Math.random().toString(36).slice(2, 12)
+}
+
 export function generateId(componentName: string) {
 	// Generate a random string with 8 characters
 	const randomStr = Math.random().toString(36).slice(2, 8)
@@ -180,6 +184,8 @@ export const getIcon = (folderName: string): LucideIcon => {
 			return FileText;
 		case 'action':
 			return Zap;
+		case 'responses':
+			return TextQuote;
 		default:
 			return Circle;
 	}

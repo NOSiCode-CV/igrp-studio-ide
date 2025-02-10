@@ -21,6 +21,10 @@ const DatabaseManagerModal = lazy(
     () => import('@renderer/generators/api/components/DatabaseManager')
 );
 
+const SerializationConfigModal = lazy(
+    () => import('@renderer/generators/api/components/serialization-config')
+);
+
 export interface DropdownItem {
     label: string;
     actionType: OPTION_TYPE;
@@ -50,19 +54,37 @@ const useNavdata = (filesThree: FileTree[]) => {
             },
             {
                 label: t('importDataTableFromDatabase'),
-                actionType: OPTION_TYPE.IMPORT_TABLE_DB,
+                actionType: OPTION_TYPE.MODAL,
                 componentName: <DatabaseManagerModal />,
                 icon: DatabaseZap,
             },
             {
                 label: t('importJsonSchemaFiles'),
-                actionType: OPTION_TYPE.MODELS,
+                actionType: OPTION_TYPE.MODAL,
+                componentName: <SerializationConfigModal />,
                 icon: FileJson2,
             },
             {
                 label: t('erdDiagram'),
                 actionType: OPTION_TYPE.ERDDiagram,
                 icon: Cable,
+            },
+        ],
+        [t]
+    );
+
+    const dropdownDto: DropdownItem[] = useMemo(
+        () => [
+            {
+                label: t('newDto'),
+                actionType: OPTION_TYPE.DATA_OBJECTS,
+                icon: getIcon(OPTION_TYPE.DATA_OBJECTS),
+            },
+            {
+                label: t('importJsonSchemaFiles'),
+                actionType: OPTION_TYPE.MODAL,
+                componentName: <SerializationConfigModal />,
+                icon: FileJson2,
             },
         ],
         [t]
@@ -85,6 +107,8 @@ const useNavdata = (filesThree: FileTree[]) => {
             switch (category) {
                 case OPTION_TYPE.MODELS:
                     return dropdownSchemas;
+                case OPTION_TYPE.DATA_OBJECTS:
+                    return dropdownDto;
                 default:
                     return [];
             }
@@ -159,8 +183,13 @@ const useNavdata = (filesThree: FileTree[]) => {
                         {
                             label: t('newResponses'),
                             actionType: OPTION_TYPE.RESPONSE,
+                            icon: getIcon(OPTION_TYPE.RESPONSE),
                         },
-                        { label: t('newEnum'), actionType: OPTION_TYPE.ENUM }
+                        {
+                            label: t('newEnum'),
+                            actionType: OPTION_TYPE.ENUM,
+                            icon: getIcon(OPTION_TYPE.ENUM),
+                        }
                     );
                 } else {
                     dropdownMenus.unshift({
@@ -172,7 +201,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                 }
 
                 const folderMenuItem: MenuItem = {
-                    id: folder.name,
                     icon: folder.name === 'shared' ? Layers : Boxes,
                     label:
                         folder.name === 'shared' ? t(folder.name) : folder.name,
@@ -195,7 +223,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                         if (child.isDirectory) {
                             // Processa subpastas
                             const subFolderMenuItem: MenuItem = {
-                                id: child.name,
                                 icon: getIcon(child.name),
                                 label: t(child.name),
                                 module: folder.name,
@@ -208,7 +235,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                 child.children.forEach((file) => {
                                     if (!file.isDirectory) {
                                         const fileMenuItem: MenuItem = {
-                                            id: file.name,
+                                            id: file.content?.id || file.name,
                                             label:
                                                 file.content?.name || file.name,
                                             path: file.path,
@@ -241,7 +268,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                         } else {
                             // Processa arquivos na raiz
                             const fileMenuItem: MenuItem = {
-                                id: folder.name,
+                                id: folder.content?.id || folder.name,
                                 label: folder.name,
                                 path: folder.path,
                                 module: folder.name,
@@ -305,6 +332,7 @@ const useNavSettings = () => {
                     {
                         id: 'DatabaseConnections',
                         label: 'Database Connections',
+                        link: '/connections',
                     },
                 ],
             },

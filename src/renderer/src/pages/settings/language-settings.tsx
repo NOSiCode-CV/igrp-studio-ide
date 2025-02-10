@@ -9,10 +9,8 @@ const languages = [
 ];
 
 export function LanguageSettings() {
-    const { i18n } = useTranslation();
-    const [currentLanguage, setCurrentLanguage] = useState<string>(
-        i18n.language
-    );
+    const { t, i18n } = useTranslation();
+    const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
     const [_isPending, setIsPending] = useState<boolean>(false);
 
     // Atualizar o idioma dinamicamente
@@ -28,7 +26,7 @@ export function LanguageSettings() {
             // Atualizar o estado local
             setCurrentLanguage(newLang);
         } catch (error) {
-            console.error('Falha ao alterar o idioma:', error);
+            console.error(t('error_change_language'), error);
         } finally {
             setIsPending(false);
         }
@@ -37,14 +35,14 @@ export function LanguageSettings() {
     return (
         <div>
             <div className="pb-4">
-                <h2 className="text-lg font-semibold">Idioma e Região</h2>
+                <h2 className="text-lg font-semibold">{t('language')}</h2>
                 <p className="text-sm text-muted-foreground">
-                    Gerencie suas preferências de idioma e região
+                    {t('language_description')}
                 </p>
             </div>
             <div className="space-y-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="language">Idioma de Exibição</Label>
+                    <Label htmlFor="language">{t('language_label')}</Label>
                     <Combobox
                         name="language"
                         value={currentLanguage}

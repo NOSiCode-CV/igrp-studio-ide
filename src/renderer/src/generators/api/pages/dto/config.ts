@@ -37,7 +37,7 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
-export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = ({ selectors, dto, models, currentDto, t }): { [value: string]: IColumnsTabelProps[] } => {
 
     const paramsTypesData = formatMethods(
         (
@@ -52,7 +52,8 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
             selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
             | { COLLECTION_TYPES: string[] }
             | undefined
-        )?.COLLECTION_TYPES || []
+        )?.COLLECTION_TYPES || [],
+        true
     )
 
     const getOptions = (objects) => {
@@ -67,17 +68,17 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [val
     }
 
     const namespacesOptions: SchemaTypeItem[] = [
-        { label: 'Data Transfer Object', value: 'dto', items: getOptions(dto) },
-        { label: 'Schema', value: 'model', items: getOptions(models) },
-        { label: 'Data Type', value: 'java', items: paramsTypesData }
+        { label: t('dto'), value: 'dto', items: getOptions(dto) },
+        { label: t('model'), value: 'model', items: getOptions(models) },
+        { label: t('dataTypes'), value: 'java', items: paramsTypesData }
     ]
 
     return {
         attributes: [
-            { key: 'name', name: 'Name', type: 'text' },
+            { key: 'name', name: t('name'), type: 'text' },
             {
                 key: 'type',
-                name: 'Type',
+                name: t('type'),
                 type: 'typeSelectorDropdown',
                 options: namespacesOptions
             },

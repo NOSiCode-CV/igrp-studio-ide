@@ -31,8 +31,8 @@ interface DashboardOverviewProps {
   stats: {
     modules: number;
     controllers: number;
-    schemas: number;
-    dtos: number;
+    models: number;
+    dto: number;
   };
 }
 
@@ -54,13 +54,13 @@ export default function DashboardOverview({ stats }: DashboardOverviewProps) {
     },
     {
       title: t('schemas'),
-      value: stats.schemas,
+      value: stats.models,
       icon: <Database className="h-4 w-4 text-muted-foreground" />,
       description: t('schemasDescription'),
     },
     {
       title: t('dtos'),
-      value: stats.dtos,
+      value: stats.dto,
       icon: <FileText className="h-4 w-4 text-muted-foreground" />,
       description: t('dtosDescription'),
     },

@@ -6,6 +6,7 @@ import { NextConfigData, ProjectData } from 'src/main/types';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
+import { LabelRequired } from '@renderer/components/required';
 
 interface NextConfigProps {
     data: NextConfigData;
@@ -27,7 +28,7 @@ export function NextConfig({
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="appName">{t('applicationName')}</Label>
+                <LabelRequired>{t('applicationName')}</LabelRequired>
                 <Input
                     id="appName"
                     value={data.appName}
@@ -35,6 +36,7 @@ export function NextConfig({
                         onChange({ ...data, appName: e.target.value })
                     }
                     placeholder="mynextapp"
+                    maxLength={20}
                 />
                 {errors?.config && errors.config.appName && (
                     <p className="text-xs text-destructive">

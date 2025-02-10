@@ -1,9 +1,12 @@
 import { Combobox } from '@igrp/igrp-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { ENV_TYPES, httpStatusCodes } from '@renderer/constants/appConstants';
+import {
+    ENV_TYPES,
+    httpStatusCodes,
+    OPTION_TYPE,
+} from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { formatMethods } from '../../helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
@@ -20,6 +23,9 @@ import {
 } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
+import { useResponseValidation } from './validation';
+import { useTabs } from '@renderer/components/TabContext';
+import { LabelRequired } from '@renderer/components/required';
 
 const contentType = 'application/json';
 
@@ -30,18 +36,6 @@ interface ResponseProps {
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
-
-const validationSchema = Yup.object({
-    statusCode: Yup.string()
-        .required('HTTP Status Code is required')
-        .oneOf(
-            httpStatusCodes.map((code) => code.value),
-            'Invalid HTTP Status Code'
-        ),
-    name: Yup.string()
-        .required('Name is required')
-        .max(50, 'Name must be less than 50 characters'),
-});
 
 const initialValues = {
     statusCode: '',
@@ -62,12 +56,15 @@ export const ResponseLayout = ({
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+    const { initializeTabFromCurrentItem } = useTabs();
 
     const [title, setTitle] = useState('');
 
     const [dataSchema, setDataSchema] = useState<null | JSONSchema>(null);
 
     const [data, setData] = useState<any>(null);
+
+    const validationSchema = useResponseValidation({ t });
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -119,7 +116,11 @@ export const ResponseLayout = ({
 
     const handleSave = async (): Promise<void> => {
         try {
-            const values = { ...formik.values, module: currentItem.module };
+            const values = {
+                ...formik.values,
+                module: currentItem.module,
+                id: currentItem.id,
+            };
 
             const { error } = await window.engine.createResponse(
                 values,
@@ -151,7 +152,7 @@ export const ResponseLayout = ({
         try {
             const config = {
                 name: formik.values.name,
-                type: "response",
+                type: 'response',
                 module: currentItem.module,
             };
 
@@ -205,111 +206,120 @@ export const ResponseLayout = ({
         formik.setFieldValue('content', updatedResponses);
     };
 
+    const onClickSourceCode = () => {
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
+    };
+
     return (
         <>
             <NavigationBar
                 onDelete={handleDelete}
                 onSubmit={onSubmit}
                 isNew={!data}
-                title={title || 'Create a new Response'}
+                title={title || t('createNewResponse')}
+                showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                    <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                        {/* HTTP Status Code */}
-                        <div className="space-y-2">
-                            <Label>HTTP Status Code</Label>
-                            <Combobox
-                                options={httpStatusCodes}
-                                name="statusCode"
-                                value={formik.values.statusCode}
-                                onChange={(value) => {
-                                    formik.setFieldValue('statusCode', value),
-                                        handleChangeCode(value);
-                                }}
-                                className={`w-full h-9 focus:ring-igrp focus:border-igrp ${
-                                    formik.errors.statusCode &&
-                                    formik.touched.statusCode
-                                        ? 'border-red-500'
-                                        : 'border-gray-300'
-                                }`}
-                                placeholder="e.g., 200, 400"
-                            />
-                            {formik.errors.statusCode &&
-                                formik.touched.statusCode && (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.statusCode}
-                                    </div>
-                                )}
-                        </div>
-
-                        {/* Name */}
-                        <div className="space-y-2">
-                            <Label>Name</Label>
-                            <Input
-                                type="text"
-                                name="name"
-                                value={formik.values.name}
-                                onChange={formik.handleChange}
-                                className={`w-full  focus:ring-igrp focus:border-igrp ${
-                                    formik.errors.name && formik.touched.name
-                                        ? 'border-red-500'
-                                        : 'border-gray-300'
-                                }`}
-                                placeholder="Response Name"
-                            />
-                            {formik.errors.name && formik.touched.name && (
-                                <div className="text-red-500 text-sm">
-                                    {formik.errors.name}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Content Type */}
-                        <div className="space-y-2">
-                            <Label>Content Type</Label>
-                            <Input
-                                name="contentType"
-                                value={'application/json'}
-                                onChange={() => {}}
-                            />
-                        </div>
-                    </div>
-                    {/* Descritpion */}
+                <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                    {/* HTTP Status Code */}
                     <div className="space-y-2">
-                        <Label>Descritpion</Label>
-                        <Input
-                            type="text"
-                            name="description"
-                            value={formik.values.description}
-                            onChange={formik.handleChange}
-                            className={`w-full  focus:ring-igrp focus:border-igrp ${
-                                formik.errors.description &&
-                                formik.touched.description
+                        <LabelRequired>{t('httpStatusCode')}</LabelRequired>
+                        <Combobox
+                            options={httpStatusCodes}
+                            name="statusCode"
+                            value={formik.values.statusCode}
+                            onChange={(value) => {
+                                formik.setFieldValue('statusCode', value),
+                                    handleChangeCode(value);
+                            }}
+                            className={`w-full h-9 focus:ring-igrp focus:border-igrp ${
+                                formik.errors.statusCode &&
+                                formik.touched.statusCode
                                     ? 'border-red-500'
                                     : 'border-gray-300'
                             }`}
+                            placeholder={t('httpStatusCodePlaceholder')}
                         />
-                        {formik.errors.name && formik.touched.description && (
+                        {formik.errors.statusCode &&
+                            formik.touched.statusCode && (
+                                <div className="text-red-500 text-sm">
+                                    {formik.errors.statusCode}
+                                </div>
+                            )}
+                    </div>
+
+                    {/* Name */}
+                    <div className="space-y-2">
+                        <LabelRequired>{t('name')}</LabelRequired>
+                        <Input
+                            type="text"
+                            name="name"
+                            value={formik.values.name}
+                            onChange={formik.handleChange}
+                            className={`w-full  focus:ring-igrp focus:border-igrp ${
+                                formik.errors.name && formik.touched.name
+                                    ? 'border-red-500'
+                                    : 'border-gray-300'
+                            }`}
+                            placeholder={t('responseNamePlaceholder')}
+                        />
+                        {formik.errors.name && formik.touched.name && (
                             <div className="text-red-500 text-sm">
-                                {formik.errors.description}
+                                {formik.errors.name}
                             </div>
                         )}
                     </div>
-                    <Card className="rounded">
-                        <CardHeader>
-                            <CardTitle>Data Schema</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <JSONSchemaBuilder
-                                schemaTypes={schemaTypes}
-                                initialSchema={dataSchema}
-                                onSchemaChange={(value) => {
-                                    handleSchemaChange(value);
-                                }}
-                            />
-                        </CardContent>
-                    </Card>
+
+                    {/* Content Type */}
+                    <div className="space-y-2">
+                        <LabelRequired>{t('contentType')}</LabelRequired>
+                        <Input
+                            name="contentType"
+                            value={'application/json'}
+                            onChange={() => {}}
+                        />
+                    </div>
                 </div>
+                {/* Description */}
+                <div className="space-y-2">
+                    <Label>{t('description')}</Label>
+                    <Input
+                        type="text"
+                        name="description"
+                        value={formik.values.description}
+                        onChange={formik.handleChange}
+                        className={`w-full  focus:ring-igrp focus:border-igrp ${
+                            formik.errors.description &&
+                            formik.touched.description
+                                ? 'border-red-500'
+                                : 'border-gray-300'
+                        }`}
+                    />
+                    {formik.errors.name && formik.touched.description && (
+                        <div className="text-red-500 text-sm">
+                            {formik.errors.description}
+                        </div>
+                    )}
+                </div>
+                <Card className="rounded">
+                    <CardHeader>
+                        <CardTitle>{t('dataSchema')}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <JSONSchemaBuilder
+                            schemaTypes={schemaTypes}
+                            initialSchema={dataSchema}
+                            onSchemaChange={(value) => {
+                                handleSchemaChange(value);
+                            }}
+                        />
+                    </CardContent>
+                </Card>
+            </div>
         </>
     );
 };

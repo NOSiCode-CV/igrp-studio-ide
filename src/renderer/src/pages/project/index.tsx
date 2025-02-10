@@ -20,7 +20,6 @@ import {
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { FormikErrors, useFormik } from 'formik';
-import * as Yup from 'yup';
 import {
     RadioGroup,
     RadioGroupItem,
@@ -32,8 +31,6 @@ import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import {
-    ENV_TYPES,
-    PATTERNS,
     projectIcons,
 } from '@renderer/constants/appConstants';
 import { useNavigate } from 'react-router-dom';
@@ -258,6 +255,7 @@ export function ProjectWizard() {
                                 <div className="space-y-2">
                                     <Label htmlFor="name">
                                         {t('projectName')}
+                                        <span className="text-red-500"> *</span>
                                     </Label>
                                     <Input
                                         id="name"
@@ -268,6 +266,7 @@ export function ProjectWizard() {
                                         onBlur={formik.handleBlur}
                                         ref={inputRef}
                                         autoFocus
+                                        maxLength={20}
                                     />
                                     {formik.touched.name &&
                                         formik.errors.name && (

@@ -14,8 +14,10 @@ import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
 import { ConnectionForm } from './ConnectionForm';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Connection } from 'src/main/types';
+import { useTranslation } from 'react-i18next';
 
-export function ConnectionManager() {
+export function ConnectionManager({ title }: { title?: string }) {
+    const { t } = useTranslation(); // Initialize translation hook
     const [connections, setConnections] = useState<Connection[]>([]);
     const [newConnection, setNewConnection] = useState<Connection>({
         name: '',
@@ -38,7 +40,6 @@ export function ConnectionManager() {
     }, []);
 
     const handleAddConnection = async (values: Connection) => {
-
         await window.repo.connection.save(values);
 
         setConnections((prev) => [...prev, { ...values } as Connection]);
@@ -56,30 +57,30 @@ export function ConnectionManager() {
         setIsAddModalOpen(false);
     };
 
-    const handleDeleteConnection = async(name: string) => {
+    const handleDeleteConnection = async (name: string) => {
         setConnections((prev) => prev.filter((conn) => conn.name !== name));
         await window.repo.connection.delete(name);
     };
 
     const columns: ColumnDef<Connection>[] = [
         {
-            header: 'Connection Name',
+            header: t('connection_name'), // Use translation for header
             accessorKey: 'name',
         },
         {
-            header: 'Database Type',
+            header: t('database_type'), // Use translation for header
             accessorKey: 'databaseType',
         },
         {
-            header: 'Host',
+            header: t('host'), // Use translation for header
             accessorKey: 'host',
         },
         {
-            header: 'Port',
+            header: t('port'), // Use translation for header
             accessorKey: 'port',
         },
         {
-            header: 'Actions',
+            header: t('actions'), // Use translation for actions
             cell: ({ row }) => (
                 <div>
                     <Button
@@ -88,7 +89,7 @@ export function ConnectionManager() {
                             handleDeleteConnection(row.original.name)
                         }
                     >
-                        Delete
+                        {t('delete')} {/* Use translation for button text */}
                     </Button>
                 </div>
             ),
@@ -97,35 +98,38 @@ export function ConnectionManager() {
 
     return (
         <div className="space-y-6">
-            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                <DialogTrigger asChild>
-                    <Button>
-                        <Plus className="h-4" />
-                        New
-                    </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add New Connection</DialogTitle>
-                        <DialogDescription>
-                            Fill out the details to add a new database
-                            connection.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <ConnectionForm
-                        connection={newConnection}
-                        onSubmit={handleAddConnection}
-                        onCancel={() => setIsAddModalOpen(false)}
-                    />
-                </DialogContent>
-            </Dialog>
+            <div className="flex justify-between">
+                {title && (
+                    <div>
+                        <h1 className="text-3xl font-semibold">{title}</h1>
+                    </div>
+                )}
+                <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <Plus className="h-4" />
+                            {t('new')} {/* Use translation for button text */}
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{t('add_new_connection')}</DialogTitle>
+                            <DialogDescription>
+                                {t('fill_details_to_add_connection')}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <ConnectionForm
+                            connection={newConnection}
+                            onSubmit={handleAddConnection}
+                            onCancel={() => setIsAddModalOpen(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+            </div>
 
             {/* Render connections table here */}
             <ScrollArea>
-                <IGRPDataTable
-                    data={connections}
-                    columns={columns}
-                />
+                <IGRPDataTable data={connections} columns={columns} />
             </ScrollArea>
         </div>
     );

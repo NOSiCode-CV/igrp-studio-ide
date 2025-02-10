@@ -18,8 +18,9 @@ import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTabs } from '@renderer/components/TabContext';
 
 interface DtoProps {
     basePath: string;
@@ -40,9 +41,11 @@ const DtoLayout = ({
     onCloseTab,
     onUpdateTab,
 }: DtoProps): JSX.Element => {
+    const { initializeTabFromCurrentItem } = useTabs();
+
     const dispatch: any = useDispatch();
 
-    const {createGitCommit} = useGit();
+    const { createGitCommit } = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -97,24 +100,28 @@ const DtoLayout = ({
             dto,
             models,
             currentDto: data?.name,
+            t,
         });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
-            const { error } = await window.api.createDto(
-                { ...newValues, module: currentItem?.module || 'shared'},
-                basePath
-            );
+            const config = {
+                ...newValues,
+                module: currentItem?.module || 'shared',
+                id: currentItem.id,
+            };
 
-            console.log(newValues, error);
+            const { error } = await window.api.createDto(config, basePath);
+
+            console.log(config, error);
 
             if (error) {
                 return showErrorToast(error);
             }
 
-            createGitCommit(basePath, `Add dto ${newValues.name}`)
+            createGitCommit(basePath, `Add dto ${newValues.name}`);
 
             dispatch(onSetChangeStatus(true));
 
@@ -152,6 +159,14 @@ const DtoLayout = ({
         } catch (error) {
             showErrorToast(error);
         }
+    };
+
+    const onClickSourceCode = () => {
+        initializeTabFromCurrentItem({
+            path: `${currentItem.path}`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${currentItem.label}.json`,
+        });
     };
 
     const renderFormList = (value: string) => {
@@ -215,17 +230,18 @@ const DtoLayout = ({
             <NavigationBar
                 onDelete={handleDelete}
                 onSubmit={formik.handleSubmit}
+                showSourceCode={onClickSourceCode}
                 isNew={!data}
-                title="dto"
+                title={t('dto')}
             />
             <div className="space-y-4 p-4">
                 <Card className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                             <TextInput
-                                label={t('Name')}
+                                label={t('name')}
                                 id="name"
-                                placeholder={t('Enter name')}
+                                placeholder={t('enterName')}
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -234,9 +250,10 @@ const DtoLayout = ({
                                         ? formik.errors.name
                                         : undefined
                                 }
+                                isRequired
                             />
                             <SelectInput
-                                label={t('Template')}
+                                label={'Template'}
                                 id="template"
                                 options={TemplateOptions}
                                 value={formik.values.template}
@@ -244,6 +261,7 @@ const DtoLayout = ({
                                     formik.setFieldValue('template', option)
                                 }
                                 error={formik.errors.template}
+                                isRequired
                             />
                         </div>
                         {TabList.map(({ value }) => (

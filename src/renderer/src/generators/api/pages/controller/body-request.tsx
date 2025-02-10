@@ -82,7 +82,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         }
     }, [bodyType, formik.values.requestBody]);
 
-    const handleChangeEditor = (value: string) => {};
+    const handleChangeEditor = (_value: string) => {};
 
     return (
         <div>

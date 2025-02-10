@@ -15,6 +15,7 @@ import { Separator } from '@renderer/components/ui/separator';
 import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 const actions = [
     {
@@ -43,6 +44,7 @@ export function TableManager({
     onRowsSubmit,
     onSelectedConnection,
 }: TableManagerProps) {
+    const { t } = useTranslation();
     const { showErrorToast } = useToast();
 
     const [connections, setConnections] = useState<
@@ -129,7 +131,7 @@ export function TableManager({
                     onCheckedChange={(value) =>
                         table.toggleAllPageRowsSelected(!!value)
                     }
-                    aria-label="Select all"
+                    aria-label={t('selectAll')}
                 />
             ),
             cell: ({ row }) => (
@@ -139,14 +141,14 @@ export function TableManager({
                         row.toggleSelected(!!value);
                         handleTableSelect(row.original.tableName);
                     }}
-                    aria-label="Select row"
+                    aria-label={t('selectRow')}
                 />
             ),
             enableSorting: false,
             enableHiding: false,
         },
         {
-            header: 'Data table name',
+            header: t('dataTableName'),
             accessorKey: 'tableName',
             cell: ({ row }) => (
                 <div onClick={() => handleTableSelect(row.original.tableName)}>
@@ -155,7 +157,7 @@ export function TableManager({
             ),
         },
         {
-            header: 'Modified schema name',
+            header: t('modifiedSchemaName'),
             accessorKey: 'schemaName',
         },
     ];
@@ -164,25 +166,25 @@ export function TableManager({
         <>
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
-                    <Label>Database Connections</Label>
+                    <Label>{t('databaseConnections')}</Label>
                     <Combobox
                         value={selectedConnection}
                         name="connection"
                         onChange={handleConnectionSelect}
-                        placeholder="Select a connection"
+                        placeholder={t('selectConnection')}
                         options={connections}
                         className="w-full"
                     />
                 </div>
                 <div className="space-y-2">
                     <Label className="text-xs">
-                        While matching the same shcema
+                        {t('whileMatchingSchema')}
                     </Label>
                     <Combobox
                         value={action}
                         name="action"
                         onChange={(value) => setAction(value)}
-                        placeholder="Select a action"
+                        placeholder={t('selectAction')}
                         options={actions}
                         className="w-full"
                     />
@@ -191,12 +193,12 @@ export function TableManager({
             <div className="flex mt-3 space-x-3">
                 <div className="w-1/2 space-y-4">
                     <div className="rounded border">
-                        <h4 className="p-2 text-sm">Database table</h4>
+                        <h4 className="p-2 text-sm">{t('databaseTable')}</h4>
                         <Separator />
                         <ScrollArea className="h-[450px] w-full px-2">
                             {isLoading ? (
                                 <div className="text-center">
-                                    Loading tables...
+                                    {t('loadingTables')}
                                 </div>
                             ) : (
                                 <IGRPDataTable
@@ -213,15 +215,15 @@ export function TableManager({
                     {selectedTable ? (
                         <>
                             <h3 className="text-sm text-muted-foreground">
-                                Preview - {selectedTable}
+                                {t('previewTable', { tableName: selectedTable })}
                             </h3>
                             <ScrollArea className="h-[450px] w-full rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Columnn</TableHead>
-                                            <TableHead>Data Type</TableHead>
-                                            <TableHead>IsNullable</TableHead>
+                                            <TableHead>{t('column')}</TableHead>
+                                            <TableHead>{t('dataType')}</TableHead>
+                                            <TableHead>{t('isNullable')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -235,8 +237,8 @@ export function TableManager({
                                                 </TableCell>
                                                 <TableCell>
                                                     {column?.is_nullable
-                                                        ? 'Yes'
-                                                        : 'NO'}
+                                                        ? t('yes')
+                                                        : t('no')}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -246,7 +248,7 @@ export function TableManager({
                         </>
                     ) : (
                         <div className="h-[500px] flex items-center justify-center text-muted-foreground text-sm">
-                            Select a table to preview
+                            {t('selectTableToPreview')}
                         </div>
                     )}
                 </div>

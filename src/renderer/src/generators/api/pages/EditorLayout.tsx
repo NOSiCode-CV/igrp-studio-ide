@@ -1,19 +1,12 @@
 import { useEffect, useState } from 'react';
 import MonacoEditor from '@renderer/components/MonacoEditor';
 
-interface EnumProps {
-    basePath: string;
-    currentItem: any;
-    onCloseTab: () => void;
-}
-
-export const EditorLayout = ({ currentItem }: EnumProps) => {
+export const EditorLayout = ({ currentItem }) => {
     const [data, setData] = useState<any>(null);
     const [filePath, setFilePath] = useState<string>('');
 
-    const getJsonData = async () => {
+    const getData = async () => {
         if (!currentItem) return;
-        console.log(currentItem.path);
         try {
             const data = await window.api.readProjectFile(currentItem.path);
             setData(data);
@@ -24,13 +17,8 @@ export const EditorLayout = ({ currentItem }: EnumProps) => {
     };
 
     useEffect(() => {
-        getJsonData();
-    }, []);
-
-    useEffect(() => {
-        if (data) {
-        }
-    }, [data]);
+        getData();
+    }, [currentItem]);
 
     return (
         <div className="flex-1 bg-gray-50">

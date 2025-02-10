@@ -147,6 +147,13 @@ const engine = {
 			return handleError(error)
 		}
 	},
+	serializeElement: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:serialize-element', data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	}
 
 }
 

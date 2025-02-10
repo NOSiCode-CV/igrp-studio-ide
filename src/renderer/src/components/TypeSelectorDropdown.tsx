@@ -9,12 +9,11 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
 } from '@renderer/components/ui/dropdown-menu';
-import { SchemaType } from '@igrp/spring-engine/dist/interfaces/types';
 import { SchemaTypeItem } from 'src/main/types';
 
 interface TypeSelectorDropdownProps {
-    type: SchemaType;
-    onTypeChange: (type: SchemaType) => void;
+    type: string;
+    onTypeChange: (type: string) => void;
     schemaTypes?: SchemaTypeItem[];
 }
 
@@ -34,7 +33,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                 {schemaTypes &&
                     schemaTypes.map(({ label, value, items }) => (
                         <React.Fragment key={value}>
-                            {items ? (
+                            {items && items.length  > 0 ? (
                                 <DropdownMenuSub>
                                     <DropdownMenuSubTrigger>
                                         {label}
@@ -58,7 +57,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                             ) : (
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        onTypeChange(value as SchemaType)
+                                        onTypeChange(value as string)
                                     }
                                 >
                                     {label}

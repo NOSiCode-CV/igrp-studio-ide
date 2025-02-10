@@ -22,7 +22,7 @@ export enum OPTION_TYPE {
     CONTROLLER = "controller",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
-    IMPORT_TABLE_DB = 'import_table_db',
+    MODAL = 'modal',
     RESPONSE = 'responses',
     ENUM = 'enum',
     DELETE = 'delete',
@@ -35,7 +35,7 @@ export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses'
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
     springboot: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-    dotnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
+    dotnet: 'https://www.svgrepo.com/show/376369/dotnet.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
     laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
@@ -79,9 +79,9 @@ export enum ENV_TYPES {
 };
 
 export const DatabaseOptions = [
-    { value: 'Postgresql', label: 'PostgreSQL' },
-    { value: 'Oracle', label: 'Oracle' },
     { value: 'MySQL', label: 'MySQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'Postgresql', label: 'PostgreSQL' },
 ];
 
 export const projectStructureStyle = [

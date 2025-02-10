@@ -15,6 +15,7 @@ import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { FormikErrors } from 'formik';
+import { LabelRequired } from '@renderer/components/required';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -76,7 +77,7 @@ export function SpringConfig({
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="apiName">{t('projectName')}</Label>
+                <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
                     id="apiName"
                     value={data.apiName}
@@ -84,6 +85,7 @@ export function SpringConfig({
                         onChange({ ...data, apiName: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
+                    maxLength={20}
                 />
                 {errors?.config && errors.config.apiName && (
                     <p className="text-xs text-destructive">
@@ -106,7 +108,7 @@ export function SpringConfig({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="group">{t('group')}</Label>
+                    <LabelRequired>{t('group')}</LabelRequired>
                     <Input
                         id="group"
                         value={data.group}
@@ -114,6 +116,7 @@ export function SpringConfig({
                             onChange({ ...data, group: e.target.value })
                         }
                         placeholder={t('enterGroup')}
+                        maxLength={20}
                     />
                     {errors?.config && errors.config.group && (
                         <p className="text-xs text-destructive">
@@ -123,7 +126,7 @@ export function SpringConfig({
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="artifact">{t('artifact')}</Label>
+                    <LabelRequired>{t('artifact')}</LabelRequired>
                     <Input
                         id="artifact"
                         value={data.artifact}
@@ -131,8 +134,9 @@ export function SpringConfig({
                             onChange({ ...data, artifact: e.target.value })
                         }
                         placeholder={t('enterArtifact')}
+                        maxLength={20}
                     />
-                     {errors?.config && errors.config.artifact && (
+                    {errors?.config && errors.config.artifact && (
                         <p className="text-xs text-destructive">
                             {errors.config.artifact}
                         </p>
@@ -143,7 +147,7 @@ export function SpringConfig({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label>{t('chooseDbEngine')}</Label>
+                    <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
                     <Combobox
                         name="database"
                         value={data.database}
@@ -160,7 +164,9 @@ export function SpringConfig({
                     )}
                 </div>
                 <div className="space-y-2 flex flex-col">
-                    <Label>{t('igrpCoreVersion')}</Label>
+                    <LabelRequired>
+                        {t('igrpCoreVersion')}
+                    </LabelRequired>
                     <Combobox
                         options={versions || []}
                         name="igrpCoreVersion"

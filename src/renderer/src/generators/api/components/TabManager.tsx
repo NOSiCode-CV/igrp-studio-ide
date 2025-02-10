@@ -1,12 +1,8 @@
-import React, { useRef } from 'react';
-import classnames from 'classnames';
+import React, { useEffect, useRef } from 'react';
 import { Book, Plus, X } from 'lucide-react';
 import { Separator } from '@renderer/components/ui/separator';
 import { Button } from '../../../components/ui/button';
-import PageController from '@renderer/generators/api/pages/PageController';
-import { OptionType } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
-import Overview from '@renderer/generators/api/pages/overview';
 import { ScrollArea, ScrollBar } from '../../../components/ui/scroll-area';
 import { getIcon } from '@renderer/utils/helpers';
 import {
@@ -17,40 +13,62 @@ import {
     ContextMenuTrigger,
 } from '@renderer/components/ui/context-menu';
 import { ContainerScrollArea } from './ContainerScrollArea';
+import { TabItem, useTabs } from '@renderer/components/TabContext';
+import PageController from '../pages/PageController';
+import Overview from '../pages/overview';
 
 const TAB_DEFAULT = 'tab-0';
 
-export interface TabItem {
-    id: string;
-    title: string;
-    open: OptionType;
-    item?: any;
-}
-
 interface ContentProps {
     basePath?: string;
-    tabs: TabItem[];
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
-    setNewTab: (tab: TabItem) => void;
-    onCloseTab: (tab: string) => void;
-    onUpdateTab: (oldId: string, newId: string) => void;
+    currentItem?: any;
 }
 
-const TabManager = ({
-    tabs,
-    activeTab,
-    setActiveTab,
-    setNewTab,
-    onCloseTab,
-    onUpdateTab,
-}: ContentProps) => {
+const TabManager = ({ currentItem }: ContentProps) => {
+    const {
+        tabs,
+        activeTab,
+        newTab,
+        setActiveTab,
+        handleNewTab,
+        handleCloseTab,
+        initializeTabFromCurrentItem,
+    } = useTabs();
+
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    // Handle opening a new tab
-    const handleNewTab = () => {
-        const newTabId = `tab-${tabs.length + 1}`;
-        setNewTab({ id: newTabId, title: `New...`, open: 'none' });
+    const handleOpenNew = (tab: TabItem) => {
+        handleNewTab(tab);
+    };
+
+    const handleCloseRight = (tabId: string) => {
+        const tabIndex = tabs.findIndex((tab) => tab.id === tabId);
+        const tabsToClose = tabs.slice(tabIndex + 1);
+        tabsToClose.forEach((tab) => handleCloseTab(tab.id));
+    };
+
+    const handleCloseOthers = (tabId: string) => {
+        tabs.forEach((tab) => {
+            if (tab.id !== tabId && tab.id !== TAB_DEFAULT) {
+                handleCloseTab(tab.id);
+            }
+        });
+    };
+
+    const handleCloseAll = () => {
+        tabs.forEach((tab) => {
+            if (tab.id !== TAB_DEFAULT) {
+                handleCloseTab(tab.id);
+            }
+        });
+    };
+
+    useEffect(() => {
+        initializeTabFromCurrentItem(currentItem);
+    }, [currentItem]);
+
+    const onClickNewTab = () => {
+        newTab();
         setTimeout(() => {
             scrollAreaRef.current?.scrollTo({
                 left: scrollAreaRef.current.scrollWidth,
@@ -59,41 +77,13 @@ const TabManager = ({
         }, 0);
     };
 
-    const handleOpenNew = (tab: TabItem) => {
-        setNewTab({
-            ...tab,
-        });
-    };
-
-    const handleCloseRight = (tabId: string) => {
-        const tabIndex = tabs.findIndex((tab) => tab.id === tabId);
-        const tabsToClose = tabs.slice(tabIndex + 1);
-        tabsToClose.forEach((tab) => onCloseTab(tab.id));
-    };
-
-    const handleCloseOthers = (tabId: string) => {
-        tabs.forEach((tab) => {
-            if (tab.id !== tabId && tab.id !== TAB_DEFAULT) {
-                onCloseTab(tab.id);
-            }
-        });
-    };
-
-    const handleCloseAll = () => {
-        tabs.forEach((tab) => {
-            if (tab.id !== TAB_DEFAULT) {
-                onCloseTab(tab.id);
-            }
-        });
-    };
-
     return (
         <>
             {/* Tabs Navigation */}
             <nav className="flex justify-between">
                 <div className="flex flex-1 w-[100px]">
                     <ScrollArea ref={scrollAreaRef}>
-                        <div className="flex items-center  whitespace-nowrap">
+                        <div className="flex items-center whitespace-nowrap">
                             {tabs.map((tab) => {
                                 const Icon = getIcon(tab.open);
                                 return (
@@ -101,7 +91,7 @@ const TabManager = ({
                                         <ContextMenu>
                                             <ContextMenuTrigger>
                                                 <div
-                                                    className={classnames(
+                                                    className={cn(
                                                         'px-4 h-10 text-sm font-medium focus:outline-none cursor-pointer align-middle flex',
                                                         {
                                                             'text-igrp border-t-2 border-igrp':
@@ -114,11 +104,10 @@ const TabManager = ({
                                                     }
                                                 >
                                                     <div className="flex items-center space-x-1 group/tab">
-                                                        {/* Badge Rendering (Condition First) */}
                                                         {tab.item &&
                                                         tab.item.badgeName ? (
                                                             <span
-                                                                className={classnames(
+                                                                className={cn(
                                                                     'text-orange-500',
                                                                     tab.item
                                                                         .badgeColor
@@ -143,7 +132,7 @@ const TabManager = ({
                                                                     e
                                                                 ) => {
                                                                     e.stopPropagation();
-                                                                    onCloseTab(
+                                                                    handleCloseTab(
                                                                         tab.id
                                                                     );
                                                                 }}
@@ -163,7 +152,9 @@ const TabManager = ({
                                                 <ContextMenuContent className="w-64">
                                                     <ContextMenuItem
                                                         onClick={() =>
-                                                            onCloseTab(tab.id)
+                                                            handleCloseTab(
+                                                                tab.id
+                                                            )
                                                         }
                                                     >
                                                         Close Selected Tab
@@ -212,7 +203,7 @@ const TabManager = ({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={handleNewTab}
+                            onClick={onClickNewTab}
                         >
                             <Plus className="h-4 w-4" />
                             <span className="sr-only">New Endpoint</span>
@@ -225,31 +216,25 @@ const TabManager = ({
 
             <ContainerScrollArea>
                 {/* Tab Content */}
-                {tabs.map((tab) => {
-                    return (
-                        <div
-                            key={tab.id}
-                            className={
-                                activeTab === tab.id ? 'block' : 'hidden'
-                            }
-                        >
-                            {tab.id === TAB_DEFAULT ? (
-                                <Overview
-                                    onOpenNew={handleOpenNew}
-                                    open={tab.open}
-                                />
-                            ) : (
-                                <PageController
-                                    onOpenNew={handleOpenNew}
-                                    open={tab.open}
-                                    tab={tab}
-                                    onCloseTab={onCloseTab}
-                                    onUpdateTab={onUpdateTab}
-                                />
-                            )}
-                        </div>
-                    );
-                })}
+                {tabs.map((tab) => (
+                    <div
+                        key={tab.id}
+                        className={activeTab === tab.id ? 'block' : 'hidden'}
+                    >
+                        {tab.id === TAB_DEFAULT ? (
+                            <Overview
+                                onOpenNew={handleOpenNew}
+                                open={tab.open}
+                            />
+                        ) : (
+                            <PageController
+                                onOpenNew={handleOpenNew}
+                                open={tab.open}
+                                tab={tab}
+                            />
+                        )}
+                    </div>
+                ))}
             </ContainerScrollArea>
         </>
     );

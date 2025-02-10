@@ -45,6 +45,14 @@ handleWithCustomErrors(
     }
 );
 
+handleWithCustomErrors(
+    'engine:serialize-element',
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.serializeElement(config, basePath);
+    }
+)
+
 handleWithCustomErrors('spring-engine:create-module', async (_event, moduleConfig, basePath) => {
     await addModule(moduleConfig, basePath)
 })
@@ -91,3 +99,4 @@ handleWithCustomErrors(
         await deletePage(pageConfig, basePath)
     }
 )
+

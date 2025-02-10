@@ -4,23 +4,18 @@ import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
     Bell,
+    Book,
     Code,
+    Github,
     Maximize2,
+    MessageCircle,
     Minus,
-    Settings,
     Square,
     X,
 } from 'lucide-react';
 import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
-import { HelpDialog } from '@renderer/components/help-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
 import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
@@ -30,6 +25,12 @@ import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import SyncButton from '@renderer/components/git/git-sync';
 import { RootState } from '@renderer/redux';
 import GitConnectionMenu from '@renderer/components/user-auth';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -44,10 +45,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
     const navigate = useNavigate();
-
-    const [openSettings, setOpenSettings] = useState(false);
-
-    const [openHelp, setOpenHelp] = useState(false);
 
     const [isMaximized, setIsMaximized] = useState(false); // New state to track maximize status
 
@@ -109,36 +106,71 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         </button>
     );
 
+    const handleDiscord = () => {
+        window.electron.ipcRenderer.send(
+            'open-external-url',
+            'https://discord.com/invite/dywFBFaCQr'
+        );
+    };
+    const handleGithub = () => {
+        window.electron.ipcRenderer.send(
+            'open-external-url',
+            'https://github.com/NOSiCode-CV/igrp-studio-ide'
+        );
+    };
+
+    const handleDocumentation = () => {
+        window.electron.ipcRenderer.send(
+            'open-external-url',
+            'https://docs.igrp.cv'
+        );
+    };
+
     return (
         <>
             <TooltipProvider>
                 <header className="sticky h-10 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="flex items-center justify-between px-4">
                         <div className="flex items-center space-x-2 home cursor-pointer">
-                            <div onClick={openPage} className={cn('flex items-center gap-2', isMac ? 'pl-12': '')}>
-                                <img src={logo} alt="Logo" className="h-6 w-auto" />
-                                <p className="text-sm font-medium">IGRP Studio</p>
+                            <div
+                                onClick={openPage}
+                                className={cn(
+                                    'flex items-center gap-2',
+                                    isMac ? 'pl-12' : ''
+                                )}
+                            >
+                                <img
+                                    src={logo}
+                                    alt="Logo"
+                                    className="h-6 w-auto"
+                                />
+                                <p className="text-sm font-medium">
+                                    {import.meta.env.VITE_APP_TITLE}
+                                </p>
                             </div>
                             <div>
-                            {config?.name && (
-                                <div className="flex justify-center gap-2 items-center">
-                                    <BranchSwitcher
-                                        projectPath={basePath || ''}
-                                        onError={showErrorToast}
-                                        onSuccess={showSuccessToast}
-                                        onBranchChange={() => {
-                                            dispatch(
-                                                onGetPages(basePath || '')
-                                            );
-                                        }}
-                                    />
-                                    {isGitEnabled && <SyncButton basePath={basePath || ''} /> }
-                                </div>
-                            )}
+                                {config?.name && (
+                                    <div className="flex justify-center gap-2 items-center">
+                                        <BranchSwitcher
+                                            projectPath={basePath || ''}
+                                            onError={showErrorToast}
+                                            onSuccess={showSuccessToast}
+                                            onBranchChange={() => {
+                                                dispatch(
+                                                    onGetPages(basePath || '')
+                                                );
+                                            }}
+                                        />
+                                        {isGitEnabled && (
+                                            <SyncButton
+                                                basePath={basePath || ''}
+                                            />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                        
                             <ModeToggle />
 
                             {config?.name && (
@@ -154,14 +186,65 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 </Button>
                             )}
 
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setOpenSettings(true)}
-                            >
-                                <Settings className="w-5 h-5" />
-                                <span className="sr-only">Settings</span>
-                            </Button>
+                            {!config?.name && (
+                                <>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleGithub}
+                                            >
+                                                <Github className="w-5 h-5" />
+                                                <span className="sr-only">
+                                                    GitHub
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>GitHub</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleDiscord}
+                                            >
+                                                <MessageCircle className="w-5 h-5" />
+                                                <span className="sr-only">
+                                                    Discord
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Discord</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleDocumentation}
+                                            >
+                                                <Book className="w-5 h-5" />
+                                                <span className="sr-only">
+                                                    Documentation
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Documentation</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </>
+                            )}
+
+                            <SettingsDialog />
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -176,7 +259,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     <p>Notifications</p>
                                 </TooltipContent>
                             </Tooltip>
-                            
+
                             <GitConnectionMenu />
 
                             {!isMac && (
@@ -210,14 +293,6 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                         </div>
                     </div>
                 </header>
-                <SettingsDialog
-                    isOpen={openSettings}
-                    onClose={() => setOpenSettings(false)}
-                />
-                <HelpDialog
-                    isOpen={openHelp}
-                    onClose={() => setOpenHelp(!openHelp)}
-                />
             </TooltipProvider>
         </>
     );

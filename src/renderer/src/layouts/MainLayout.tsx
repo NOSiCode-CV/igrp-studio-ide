@@ -10,7 +10,7 @@ import {
     SidebarProvider,
 } from '@igrp/igrp-design-system';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { Home, Settings } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { SidebarProps } from '@igrp/igrp-design-system/dist/types';
 import Footer from './components/footer';
 
@@ -23,12 +23,7 @@ const navData: SidebarProps[] = [
         name: 'Home',
         href: '#/',
         icon: Home,
-    },
-    {
-        name: 'Settings',
-        href: '#/',
-        icon: Settings,
-    },
+    }
 ];
 
 const MainLayout = (props: LayoutProps): JSX.Element => {

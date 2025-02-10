@@ -194,6 +194,15 @@ app.on('window-all-closed', () => {
   }
 })
 
+ipcMain.on('open-external-url', (_event, url) => {
+  if (url) {
+    // Open the provided URL in the default browser
+    shell.openExternal(url);
+  } else {
+    console.error('No URL provided');
+  }
+});
+
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 

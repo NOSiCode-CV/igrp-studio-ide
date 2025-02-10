@@ -11,12 +11,6 @@ import ErrorBoundary from './components/error-boundary'
 import '@renderer/localization/i18next.config'
 import LoaderComponent from './components/loader'
 
-/* loader.config({
-  paths: {
-    vs: '/src/plugins/monaco-editor', // Caminho relativo aos arquivos do Monaco
-  },
-}); */
-
 loader.config({ monaco });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
