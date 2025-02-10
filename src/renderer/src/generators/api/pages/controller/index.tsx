@@ -32,7 +32,6 @@ import useToast from '@renderer/components/useToast';
 import NavigationBar from '../../components/navigation-bar';
 import { CreateEndpointDialog } from './create-endpoint-dialog';
 import { TextInput } from '../../components/inputs-form';
-import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import {
     ENV_TYPES,

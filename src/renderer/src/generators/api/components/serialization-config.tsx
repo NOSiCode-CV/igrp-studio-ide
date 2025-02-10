@@ -10,7 +10,6 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -44,7 +43,6 @@ export default function SerializationConfigModal({
     basePath,
 }: SerializationConfigModalProps) {
     const [config, setConfig] = useState<SerializationConfig>({
-        id:'',
         name: '',
         type: 'dto',
         template: 'classic',
@@ -66,7 +64,7 @@ export default function SerializationConfigModal({
             ...prev,
             module,
             type: type === 'models' ? 'model' : type,
-            id: getId()
+            id: getId(),
         }));
     }, [item]);
 
@@ -85,6 +83,17 @@ export default function SerializationConfigModal({
         }
     };
 
+    // Função para limpar espaços extras
+    const cleanSQL = (sql: string): string => {
+        return sql
+            .split('\n') // Quebra em linhas
+            .map((line) => line.trim()) // Aplica trim em cada linha
+            .filter((line) => line !== '') // Remove linhas vazias
+            .join('\n')
+            .replace(/\s+/g, ' ') // Substitui múltiplos espaços e quebras de linha por um único espaço
+            .trim();
+    }   
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -92,7 +101,7 @@ export default function SerializationConfigModal({
 
         const values = {
             ...config,
-            [contentType]: content,
+            [contentType]: contentType === 'sql' ? cleanSQL(content) : content,
         };
 
         const { error } = await window.engine.serializeElement(

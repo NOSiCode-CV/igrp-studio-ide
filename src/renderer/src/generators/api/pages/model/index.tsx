@@ -166,7 +166,7 @@ const ModelLayout = ({
     const handleSave = async (): Promise<void> => {
         try {
             const values = getValuesToSubmit(
-                formik.values,
+                { ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
 
@@ -195,7 +195,7 @@ const ModelLayout = ({
                 name: formik.values.name,
                 type: 'model',
                 module: currentItem.module,
-                id: currentItem.id
+                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(

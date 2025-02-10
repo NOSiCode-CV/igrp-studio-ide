@@ -7,9 +7,9 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogFooter,
 } from '@renderer/components/ui/dialog';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -51,12 +51,10 @@ export function CreateEndpointDialog({
 
     const validationSchema = Yup.object({
         name: Yup.string()
-            .required(t('thisFieldRequired', { name: 'Name' }))
-            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+            .required(t('thisFieldRequired'))
+            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccept'))
             .max(20, t('maxLengthExceeded', { max: 20 })),
-        module: Yup.string().required(
-            t('thisFieldRequired', { name: 'Module' })
-        ),
+        module: Yup.string().required(t('thisFieldRequired')),
     });
 
     const formik = useFormik({
@@ -97,7 +95,9 @@ export function CreateEndpointDialog({
                 return;
             }
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(`Endpoint ${values.name} successfully created.`);
+            showSuccessToast(
+                t('endpointCreatedSuccess', { name: values.name })
+            );
             actions.setSubmitting(false);
             formik.resetForm();
             onClose();
@@ -115,7 +115,7 @@ export function CreateEndpointDialog({
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Endpoint</DialogTitle>
+                    <DialogTitle>{t('createNewEndpoint')}</DialogTitle>
                     <DialogDescription>
                         {t('endpointDescription')}
                     </DialogDescription>
@@ -125,7 +125,7 @@ export function CreateEndpointDialog({
                         <div className="grid grid-cols-4 items-center gap-4">
                             <div className="col-span-12 space-y-3">
                                 <Label htmlFor="name" className="text-right">
-                                    Endpoint Name
+                                    {t('endpointName')}
                                 </Label>
                                 <Input
                                     id="name"
@@ -150,7 +150,7 @@ export function CreateEndpointDialog({
                                     htmlFor="basePath"
                                     className="text-right"
                                 >
-                                    Base path
+                                    {t('basePath')}
                                 </Label>
                                 <Input
                                     id="basePath"
@@ -172,7 +172,7 @@ export function CreateEndpointDialog({
                             </div>
                             <div className="col-span-12 space-y-3">
                                 <Label htmlFor="module" className="text-right">
-                                    Module Name
+                                    {t('moduleName')}
                                 </Label>
                                 <Combobox
                                     name="module"

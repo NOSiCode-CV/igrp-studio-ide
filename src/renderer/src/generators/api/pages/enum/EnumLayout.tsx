@@ -1,5 +1,4 @@
 import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';

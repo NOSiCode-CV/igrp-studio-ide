@@ -31,6 +31,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -38,6 +39,7 @@ interface HeaderProps {
 }
 
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
+    const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const { isGitEnabled } = useSelector((state: RootState) => state.git);
     const { showErrorToast, showSuccessToast } = useToast();
@@ -181,7 +183,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 >
                                     <Code className="w-5 h-5" />
                                     <span className="sr-only">
-                                        Open VS Code
+                                        {t('openVSCode')}
                                     </span>
                                 </Button>
                             )}
@@ -197,12 +199,12 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                             >
                                                 <Github className="w-5 h-5" />
                                                 <span className="sr-only">
-                                                    GitHub
+                                                    {t('github')}
                                                 </span>
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>GitHub</p>
+                                            <p>{t('github')}</p>
                                         </TooltipContent>
                                     </Tooltip>
 
@@ -215,12 +217,12 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                             >
                                                 <MessageCircle className="w-5 h-5" />
                                                 <span className="sr-only">
-                                                    Discord
+                                                    {t('discord')}
                                                 </span>
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>Discord</p>
+                                            <p>{t('discord')}</p>
                                         </TooltipContent>
                                     </Tooltip>
 
@@ -233,12 +235,12 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                             >
                                                 <Book className="w-5 h-5" />
                                                 <span className="sr-only">
-                                                    Documentation
+                                                    {t('documentation')}
                                                 </span>
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>Documentation</p>
+                                            <p>{t('documentation')}</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </>
@@ -251,12 +253,12 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     <Button variant="ghost" size="sm">
                                         <Bell className="w-5 h-5" />
                                         <span className="sr-only">
-                                            Notifications
+                                            {t('notifications')}
                                         </span>
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Notifications</p>
+                                    <p>{t('notifications')}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -267,7 +269,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     <WindowButton
                                         onClick={handleMinimize}
                                         icon={<Minus className="h-4 w-4" />}
-                                        label="Minimize"
+                                        label={t('minimize')}
                                     />
                                     <WindowButton
                                         onClick={handleMaximize}
@@ -279,13 +281,15 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                             )
                                         }
                                         label={
-                                            isMaximized ? 'Restore' : 'Maximize'
+                                            isMaximized
+                                                ? t('restore')
+                                                : t('maximize')
                                         }
                                     />
                                     <WindowButton
                                         onClick={handleClose}
                                         icon={<X className="h-4 w-4" />}
-                                        label="Close"
+                                        label={t('close')}
                                         className="hover:bg-red-500 hover:text-white"
                                     />
                                 </>
