@@ -12,6 +12,7 @@ import { Card, CardContent } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import MonacoEditor from '@renderer/components/MonacoEditor';
+import { useTranslation } from 'react-i18next';
 
 interface BodyRequestProps {
     bodyType: 'none' | 'multipart/form-data' | 'application/json' | undefined;
@@ -41,6 +42,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     setContentType,
     setBodyType,
 }) => {
+    const { t } = useTranslation();
+
     const routeFormData =
         'requestBody.content.multipart/form-data.schema.properties';
 
@@ -93,7 +96,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         variant={bodyType === 'none' ? 'default' : 'outline'}
                         className="cursor-pointer"
                     >
-                        None
+                        {t('none')}
                     </Badge>
                     <Badge
                         onClick={() => setBodyType('multipart/form-data')}
@@ -104,7 +107,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         }
                         className="cursor-pointer"
                     >
-                        Form Data
+                        {t('formData')}
                     </Badge>
                     <Badge
                         onClick={() => setBodyType('application/json')}
@@ -115,14 +118,14 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         }
                         className="cursor-pointer"
                     >
-                        JSON
+                        {t('json')}
                     </Badge>
                 </div>
             </div>
             {bodyType === 'none' && (
                 <div className="text-center rounded p-8 border">
                     <p className="text-muted-foreground text-xs">
-                        This request has no body parameters
+                        {t('noBodyParameters')}
                     </p>
                 </div>
             )}
@@ -150,7 +153,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         formik.setFieldValue(routeFormData, updatedProperties);
                     }}
                     name={routeFormData}
-                    btnLabels="Field"
+                    btnLabels={t('field')}
                 />
             )}
             {bodyType === 'application/json' && (
@@ -158,7 +161,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     <Combobox
                         name="contentType"
                         value={contentType}
-                        placeholder="Select Content Type"
+                        placeholder={t('selectContentType')}
                         onChange={(value) => setContentType(value)}
                         options={contentTypes}
                         className="w-1/3 focus:ring-igrp focus:border-igrp h-8"
@@ -168,10 +171,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                             <Tabs defaultValue="value">
                                 <TabsList>
                                     <TabsTrigger value="value">
-                                        Value
+                                        {t('value')}
                                     </TabsTrigger>
                                     <TabsTrigger value="schema">
-                                        Data Schema
+                                        {t('dataSchema')}
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="value">
@@ -185,7 +188,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                         )}
                                         filePath=""
                                         onChange={handleChangeEditor}
-                                        height='20vh'
+                                        height="20vh"
                                     />
                                 </TabsContent>
                                 <TabsContent value="schema">

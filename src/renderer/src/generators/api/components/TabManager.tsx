@@ -16,6 +16,7 @@ import { ContainerScrollArea } from './ContainerScrollArea';
 import { TabItem, useTabs } from '@renderer/components/TabContext';
 import PageController from '../pages/PageController';
 import Overview from '../pages/overview';
+import { useTranslation } from 'react-i18next';
 
 const TAB_DEFAULT = 'tab-0';
 
@@ -25,6 +26,7 @@ interface ContentProps {
 }
 
 const TabManager = ({ currentItem }: ContentProps) => {
+    const { t } = useTranslation();
     const {
         tabs,
         activeTab,
@@ -157,7 +159,7 @@ const TabManager = ({ currentItem }: ContentProps) => {
                                                             )
                                                         }
                                                     >
-                                                        Close Selected Tab
+                                                        {t('closeSelectedTab')}
                                                         <ContextMenuShortcut>
                                                             ⌘W
                                                         </ContextMenuShortcut>
@@ -169,7 +171,7 @@ const TabManager = ({ currentItem }: ContentProps) => {
                                                             )
                                                         }
                                                     >
-                                                        Close Right
+                                                        {t('closeRight')}
                                                     </ContextMenuItem>
                                                     <ContextMenuItem
                                                         onClick={() =>
@@ -178,12 +180,12 @@ const TabManager = ({ currentItem }: ContentProps) => {
                                                             )
                                                         }
                                                     >
-                                                        Close Others
+                                                        {t('closeOthers')}
                                                     </ContextMenuItem>
                                                     <ContextMenuItem
                                                         onClick={handleCloseAll}
                                                     >
-                                                        Close All
+                                                        {t('closeAll')}
                                                     </ContextMenuItem>
                                                 </ContextMenuContent>
                                             )}
@@ -206,7 +208,7 @@ const TabManager = ({ currentItem }: ContentProps) => {
                             onClick={onClickNewTab}
                         >
                             <Plus className="h-4 w-4" />
-                            <span className="sr-only">New Endpoint</span>
+                            <span className="sr-only">{t('newEndpoint')}</span>
                         </Button>
                     </div>
                 </div>

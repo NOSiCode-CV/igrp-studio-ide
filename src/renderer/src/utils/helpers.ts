@@ -130,6 +130,10 @@ export function generateRowId() {
 	return `row-${randomStr}`
 }
 
+export function getId() {
+	return Math.random().toString(36).slice(2, 12)
+}
+
 export function generateId(componentName: string) {
 	// Generate a random string with 8 characters
 	const randomStr = Math.random().toString(36).slice(2, 8)

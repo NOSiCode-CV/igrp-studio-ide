@@ -6,6 +6,9 @@ import { BaseApiConfig, ResponseConfig } from '@igrp/dotnet-engine/dist/interfac
 import { ProjectData } from '../types';
 
 export class DotNetEngine implements BaseEngine {
+  serializeElement(_data: any, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   createEnum(_data: any, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -38,4 +41,6 @@ export class DotNetEngine implements BaseEngine {
       location: 'local'
     });
   }
+
+
 }

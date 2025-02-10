@@ -32,7 +32,6 @@ import useToast from '@renderer/components/useToast';
 import NavigationBar from '../../components/navigation-bar';
 import { CreateEndpointDialog } from './create-endpoint-dialog';
 import { TextInput } from '../../components/inputs-form';
-import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import {
     ENV_TYPES,
@@ -412,9 +411,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             <div className="space-y-4 p-4">
                 <Card className="rounded">
                     <CardHeader>
-                        <CardTitle>Definition</CardTitle>
+                        <CardTitle>{t('definition')}</CardTitle>
                         <CardDescription>
-                            Provide the name and configuration for this action
+                            {t('controllerDefintion')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

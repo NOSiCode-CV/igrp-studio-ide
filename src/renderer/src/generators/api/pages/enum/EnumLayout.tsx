@@ -1,5 +1,4 @@
 import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -146,6 +145,7 @@ export const EnumLayout = ({
                 name: formik.values.name,
                 type: 'response',
                 module: currentItem.module,
+                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(

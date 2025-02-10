@@ -19,4 +19,5 @@ export interface BaseEngine {
     delete(config: DeleteConfig, basePath: string): Promise<void>;
     createResponse(config: ResponseConfig, basePath: string): Promise<void>;
     createEnum(data: EnumConfig, basePath: string): Promise<void>;
+    serializeElement: (data: any, basePath: string) => Promise<void>;
 }

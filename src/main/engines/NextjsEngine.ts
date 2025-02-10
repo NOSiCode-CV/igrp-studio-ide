@@ -7,11 +7,13 @@ import { ProjectData } from '../types';
 import { ResponseConfig } from '@igrp/dotnet-engine/dist/interfaces/types';
 
 export class NextjsEngine implements BaseEngine {
+  serializeElement(_data: any, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
 
   createEnum(_data: any, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
-
 
   createResponse(_config: ResponseConfig, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');

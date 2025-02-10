@@ -5,17 +5,11 @@ import { Label } from '@renderer/components/ui/label';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@renderer/components/ui/dialog';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
 import {
     Tabs,
     TabsContent,
@@ -23,13 +17,10 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { GitFork, Key, User } from 'lucide-react';
-import { DialogDescription } from '@radix-ui/react-dialog';
 
 interface CloneProjectModalProps {
     handleCloneProject: (
         url: string,
-        name: string,
-        location: string,
         auth: {
             type: string;
             username?: string;
@@ -46,8 +37,6 @@ export function CloneProjectModal({
 }: CloneProjectModalProps) {
     const [open, setOpen] = useState(false);
     const [projectUrl, setProjectUrl] = useState('');
-    const [projectName, setProjectName] = useState('');
-    const [cloneLocation, setCloneLocation] = useState('local');
     const [authType, setAuthType] = useState('none');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -59,15 +48,14 @@ export function CloneProjectModal({
             ...(authType === 'basic' && { username, password }),
             ...(authType === 'token' && { token }),
         };
-        handleCloneProject(projectUrl, projectName, cloneLocation, auth);
+        handleCloneProject(projectUrl, auth);
+
         setOpen(false);
         resetForm();
     };
 
     const resetForm = () => {
         setProjectUrl('');
-        setProjectName('');
-        setCloneLocation('local');
         setAuthType('none');
         setUsername('');
         setPassword('');
@@ -100,46 +88,6 @@ export function CloneProjectModal({
                                 onChange={(e) => setProjectUrl(e.target.value)}
                                 className="bg-background text-foreground placeholder-muted-foreground"
                             />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label
-                                htmlFor="project-name"
-                                className="text-muted-foreground"
-                            >
-                                Project Name
-                            </Label>
-                            <Input
-                                id="project-name"
-                                placeholder="My Awesome Project"
-                                value={projectName}
-                                onChange={(e) => setProjectName(e.target.value)}
-                                className="bg-background text-foreground placeholder-muted-foreground"
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label
-                                htmlFor="clone-location"
-                                className="text-muted-foreground"
-                            >
-                                Clone Location
-                            </Label>
-                            <Select
-                                value={cloneLocation}
-                                onValueChange={setCloneLocation}
-                            >
-                                <SelectTrigger
-                                    id="clone-location"
-                                    className="bg-background text-foreground"
-                                >
-                                    <SelectValue placeholder="Select location" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="local">Local</SelectItem>
-                                    <SelectItem value="remote">
-                                        Remote
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
                         </div>
                     </div>
                     <div className="grid gap-2">

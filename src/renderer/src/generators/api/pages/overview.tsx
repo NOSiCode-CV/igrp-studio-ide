@@ -47,7 +47,9 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     useEffect(() => {
         const newStats = { modules: 0, controllers: 0, models: 0, dto: 0 };
 
-        newStats.modules = filesThree.filter((file) => file.name !== 'shared').length;
+        newStats.modules = filesThree.filter(
+            (file) => file.name !== 'shared'
+        ).length;
 
         filesThree.forEach((file: any) => {
             if (!file.children) return;
@@ -66,8 +68,8 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
         <ContainerScrollArea>
             <div className="w-full max-w-4xl mx-auto space-y-8 p-6 mb-10">
                 <PageHeader
-                    title="API Overview"
-                    description="Manage your API endpoints"
+                    title={t('apiOverview')}
+                    description={t('manageApiEndpoints')}
                 />
                 <DashboardOverview stats={stats} />
                 <EmptyPage onClick={handleOptionClick} />

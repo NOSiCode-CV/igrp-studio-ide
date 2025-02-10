@@ -9,6 +9,7 @@ import {
 } from '@renderer/components/tabs';
 import { JSONSchema } from '../../types/schema';
 import { BodyRequest } from './body-request';
+import { useTranslation } from 'react-i18next';
 
 interface TabRequestProps {
     formik: any;
@@ -23,6 +24,8 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     contentTypes,
     schemaTypes,
 }) => {
+    const { t } = useTranslation();
+
     const [bodyType, setBodyType] = useState<
         'none' | 'multipart/form-data' | 'application/json'
     >();
@@ -116,14 +119,20 @@ export const TabRequest: React.FC<TabRequestProps> = ({
         <>
             <IGRPTabs defaultValue="params">
                 <IGRPTabsList className="w-full">
-                    <IGRPTabsTrigger value="params">Params</IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="body">Body</IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="headers">Headers</IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="params">
+                        {t('params')}
+                    </IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="body">
+                        {t('body')}
+                    </IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="headers">
+                        {t('headers')}
+                    </IGRPTabsTrigger>
                 </IGRPTabsList>
                 <IGRPTabsContent value="params">
                     {columnsQuery && (
                         <div className="space-y-3">
-                            <p className="text-sm">Query Parameters</p>
+                            <p className="text-sm">{t('queryParameters')}</p>
                             <FormList
                                 formik={formik}
                                 columns={columnsQuery}
@@ -148,10 +157,10 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                     removeRow(formik, tabQueryParams, position)
                                 }
                                 errors={formik.errors[tabQueryParams]}
-                                btnLabels={'Query Parameter'}
+                                btnLabels={t('queryParameter')}
                                 name={tabQueryParams}
                             />
-                            <p className="text-sm">Variables</p>
+                            <p className="text-sm">{t('variables')}</p>
                             <FormList
                                 formik={formik}
                                 columns={columnsVariables}
@@ -180,7 +189,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                     )
                                 }
                                 errors={formik.errors[tabPathVariables]}
-                                btnLabels={'Variable'}
+                                btnLabels={t('variable')}
                                 name={tabPathVariables}
                             />
                         </div>
@@ -223,7 +232,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                 removeRow(formik, tabQueryParams, position)
                             }
                             errors={formik.errors[tabHeaders]}
-                            btnLabels={tabHeaders}
+                            btnLabels={t('headers')}
                             name={tabHeaders}
                         />
                     )}

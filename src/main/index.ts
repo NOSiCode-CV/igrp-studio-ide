@@ -224,7 +224,7 @@ ipcMain.handle('get-app-version', () => {
 ipcMain.on('open-directory-dialog', async (event) => {
   await dialog
     .showOpenDialog(mainWindow, {
-      properties: ['openDirectory'],
+      properties: ['openDirectory', 'createDirectory'],
       buttonLabel: 'Select Destination Folder'
     })
     .then((result) => {

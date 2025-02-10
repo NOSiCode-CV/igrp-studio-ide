@@ -33,7 +33,7 @@
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-design-system": "^1.0.0-alpha.75",
 		"@igrp/nextjs-engine": "^0.1.5",
-		"@igrp/spring-engine": "^0.3.0-alpha-4.9.6",
+		"@igrp/spring-engine": "^0.3.0-alpha-5.0.3",
 		"@monaco-editor/react": "^4.6.0",
 		"@octokit/rest": "^21.1.0",
 		"@radix-ui/react-accordion": "^1.2.2",

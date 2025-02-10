@@ -13,6 +13,7 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from '@renderer/components/ui/hover-card';
+import { useTranslation } from 'react-i18next';
 
 interface AddResponseMenuProps {
     onAddBlankResponse: () => void;
@@ -29,6 +30,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
     responseTypes,
     onSave,
 }) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = React.useState(false);
 
     const handleClick = (resp: any) => {
@@ -70,7 +72,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                 <PopoverTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-8 px-2">
                         <Plus className="h-4 w-4" />
-                        Add
+                        {t('add')}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="p-0" align="end">
@@ -83,7 +85,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                 setIsOpen(false);
                             }}
                         >
-                            Add Blank Response
+                            {t('addBlankResponse')}
                         </Button>
                         <HoverCard openDelay={0} closeDelay={0}>
                             <HoverCardTrigger asChild>
@@ -91,7 +93,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                     variant="ghost"
                                     className="justify-between px-4 py-2 text-sm font-normal hover:bg-muted group"
                                 >
-                                    Reference Response Component
+                                    {t('referenceResponseComponent')}
                                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                 </Button>
                             </HoverCardTrigger>
