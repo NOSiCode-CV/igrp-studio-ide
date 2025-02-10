@@ -15,6 +15,8 @@ build_packagedev:
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine64 wine32
+    - yarn add dmg-license --dev
+
   script:
     - yarn install
     - yarn build:win
