@@ -7,7 +7,7 @@ import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
-import useGithubAuth from '@renderer/hooks/useGithubAuth';
+import useGitAuth from '@renderer/hooks/useGitAuth';
 import { LoadingSpinner } from '../loading-spinner';
 import { useGit } from '@renderer/hooks/useGit';
 
@@ -26,7 +26,7 @@ export default function GitProject() {
         onConfirm: (_name: string) => {},
     });
 
-    const { repositories, isLoading,  } = useGithubAuth();
+    const { repositoriesGitHub, isLoading,  } = useGitAuth();
     const {checkLocalProjects} = useGit();
 
     useEffect(() => {
@@ -124,25 +124,25 @@ export default function GitProject() {
 
     useEffect(() => {
         const checkLocalProjectsExist = async () => {
-            if (!repositories) return;
+            if (!repositoriesGitHub) return;
             
-            const results = await checkLocalProjects(repositories);
+            const results = await checkLocalProjects(repositoriesGitHub);
             
             setClonedRepos(prev => [...prev, ...Object.keys(results).map(Number)]);
             setProjectPaths(prev => ({ ...prev, ...results }));
         };
     
         checkLocalProjectsExist();
-    }, [repositories]);
+    }, [repositoriesGitHub]);
 
     return (
         <div>
             {isLoading ? (
                 <LoadingSpinner />
             ) : (
-                repositories?.length > 0 ? (
+                repositoriesGitHub?.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {repositories?.map((repo) => (
+                        {repositoriesGitHub?.map((repo) => (
                             <CardGitProject
                                 repo={repo}
                                 key={repo.id}

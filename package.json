@@ -64,7 +64,6 @@
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.4",
 		"date-fns": "^4.1.0",
-		"dmg-license": "^1.0.0",
 		"electron-store": "^10.0.0",
 		"electron-updater": "^6.1.7",
 		"express": "^4.21.2",
