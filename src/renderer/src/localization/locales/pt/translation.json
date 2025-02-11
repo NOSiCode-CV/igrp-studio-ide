@@ -132,7 +132,7 @@
   "convertToDotNet": "Converter para .NET",
   "removeProject": "Remover Projeto",
   "importDataTableFromDatabase": "Importar tabela de base de dados",
-  "importJsonSchemaFiles": "Importar Ficheiro Schema",
+  "importJsonSchemaFiles": "Importar",
   "erdDiagram": "Diagrama ERD",
   "method": "Metodo",
   "nameOfTheModel": "Nome do schema",
@@ -303,5 +303,8 @@
   "maximize": "Maximizar",
   "restore": "Restaurar",
   "projectNamePlaceholder": "Nome do projeto",
-  "confirm": "Confirmar"
+  "confirm": "Confirmar",
+  "cloneProject":"Clonar Projeto",
+  "newPermissions":"Nova Permissião",
+  "createNewPermission":"Criar uma Nova Permissião"
 }

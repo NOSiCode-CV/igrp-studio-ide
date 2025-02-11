@@ -189,6 +189,11 @@ const useNavdata = (filesThree: FileTree[]) => {
                             label: t('newEnum'),
                             actionType: OPTION_TYPE.ENUM,
                             icon: getIcon(OPTION_TYPE.ENUM),
+                        },
+                        {
+                            label: t('newPermission'),
+                            actionType: OPTION_TYPE.PERMISSIONS,
+                            icon: getIcon(OPTION_TYPE.PERMISSIONS),
                         }
                     );
                 } else {

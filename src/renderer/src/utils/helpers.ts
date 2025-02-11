@@ -1,7 +1,7 @@
 import { FolderFiles, MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote } from 'lucide-react'
+import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
 
@@ -186,6 +186,8 @@ export const getIcon = (folderName: string): LucideIcon => {
 			return Zap;
 		case 'responses':
 			return TextQuote;
+		case 'permissions':
+			return FileKey;
 		default:
 			return Circle;
 	}

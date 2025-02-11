@@ -70,13 +70,13 @@ const IDEInitialScreen = () => {
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
             <PageHeader title={t('welcome')}>
-                <div className="flex justify-end space-x-3 ">
+                <div className="flex justify-end space-x-3">
                     <ProjectWizard />
 
                     <CloneProjectModal handleCloneProject={handleCloneProject}>
                         <Button variant="outline">
                             <GitFork className="w-4 h-4 mr-2" />
-                            Clone Project
+                            {t('cloneProject')}
                         </Button>
                     </CloneProjectModal>
 

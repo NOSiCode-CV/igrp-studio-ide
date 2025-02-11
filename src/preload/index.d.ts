@@ -45,6 +45,7 @@ interface BaseEngine {
     createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }

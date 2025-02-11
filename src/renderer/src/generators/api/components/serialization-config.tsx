@@ -27,7 +27,6 @@ import { useDispatch } from 'react-redux';
 import { useGit } from '@renderer/hooks/useGit';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { LabelRequired } from '@renderer/components/required';
-import { getId } from '@renderer/utils/helpers';
 
 interface SerializationConfigModalProps {
     isOpen?: boolean;
@@ -63,8 +62,7 @@ export default function SerializationConfigModal({
         setConfig((prev) => ({
             ...prev,
             module,
-            type: type === 'models' ? 'model' : type,
-            id: getId(),
+            type: type === 'models' ? 'model' : type
         }));
     }, [item]);
 
@@ -101,7 +99,7 @@ export default function SerializationConfigModal({
 
         const values = {
             ...config,
-            [contentType]: contentType === 'sql' ? cleanSQL(content) : content,
+            [contentType]:  cleanSQL(content) ,
         };
 
         const { error } = await window.engine.serializeElement(
@@ -150,7 +148,7 @@ export default function SerializationConfigModal({
                 onClick={(e) => e.stopPropagation()}
             >
                 <DialogHeader>
-                    <DialogTitle>Serialization Configuration</DialogTitle>
+                    <DialogTitle>{t('import')}</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
                 <form
