@@ -15,11 +15,11 @@ export interface ColProps {
 }
 
 const getListStyle = isDraggingOver => ({
-    border: isDraggingOver ? '2px dashed blue' : 'none',
+    border: isDraggingOver ? '2px dashed bg-igrp' : 'none',
 });
 
 const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
-    const { getComponents, setEditingComponent, currentComponent } = useDroppedComponents();
+    const { getComponents, setEditingComponent } = useDroppedComponents();
     const components: DroppedComponent[] = getComponents(rowId, columnId);
 
     const handleEditClick = (component: Partial<DroppedComponent>) => {
@@ -30,11 +30,11 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
 
         <div className={`col-span-${colSize}`}
             style={{ width: `${(colSize / 12) * 100}%` }}>
-            {currentComponent &&
+          {/*   {currentComponent &&
                 <ModalEdition
                     show={currentComponent !== null}
                 />
-            }
+            } */}
 
             <div
                 className={`gen-column`}

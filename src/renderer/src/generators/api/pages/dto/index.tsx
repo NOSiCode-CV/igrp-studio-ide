@@ -20,7 +20,7 @@ import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 
 interface DtoProps {
     basePath: string;

@@ -40,7 +40,7 @@ import {
 } from '@renderer/constants/appConstants';
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
 
 interface ControllerProps {

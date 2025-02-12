@@ -14,7 +14,7 @@ import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
 
 interface EnumProps {

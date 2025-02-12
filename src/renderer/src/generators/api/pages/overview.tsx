@@ -8,7 +8,7 @@ import DashboardOverview from '../components/dashboard-overview';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { ContainerScrollArea } from '../components/ContainerScrollArea';
-import { TabItem } from '@renderer/components/TabContext';
+import { TabItem } from '@renderer/components/navigation/TabContext';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
+import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import RowContainer from './types/containers/rows';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { generateId } from '@renderer/utils/helpers';
@@ -13,11 +13,11 @@ import { HierarchicalComponent } from './interfaces';
 
 import { DragDropContext } from '@hello-pangea/dnd';
 import { handleDragEnd } from './dnd/DraggableItemManager';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { AppSidebar } from '@renderer/layouts/components/app-ui-sidebar';
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
+import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
+import { SidebarRight } from './components/sidebar-right';
 
 const addRow = () => {
     const newRowId = generateId('row');
@@ -54,11 +54,11 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             getComponent,
             setEditingComponent,
             updateComponent,
+            clearEditingComponent,
+            currentComponent
         } = useDroppedComponents();
 
         const components = getAllComponents();
-
-        //const [isDesign, setIsDesign] = useState(true);
 
         const { showErrorToast, showSuccessToast } = useToast();
 
@@ -101,6 +101,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 setInitComponents([newRow]);
             }
         }, [components]);
+
+        useEffect(()=>{
+            clearEditingComponent()
+        },[isDesign])
 
         const handleSave = async (jsonStructure: Component[]) => {
             try {
@@ -184,42 +188,26 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         return (
             <DragDropContext onDragEnd={onDragEnd}>
-                <SidebarProvider
-                    style={
-                        {
-                            '--sidebar-width': '350px',
-                        } as React.CSSProperties
-                    }
-                >
-                    <AppSidebar data={navData} />
-                    <SidebarInset>
-                        {isDesign ? (
-                            <div className="flex flex-1 flex-col gap-4 px-4">
-                                <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto pr-3">
-                                    <>
-                                        <div className="igrp-page-header"></div>
-                                        <div className="space-y-6 my-6">
-                                            {components.map((row) => (
-                                                <RowContainer
-                                                    key={row.id}
-                                                    id={row.id}
-                                                    onClickAddControl={
-                                                        handleClickAddControl
-                                                    }
-                                                    onClickDeleteSection={
-                                                        handleClickDeleteSection
-                                                    }
-                                                />
-                                            ))}
-                                        </div>
-                                    </>
-                                </ScrollArea>
-                            </div>
-                        ) : (
-                            pagePath && <CodeContent pagePath={pagePath} />
-                        )}
-                    </SidebarInset>
-                </SidebarProvider>
+                <AppSidebar data={navData} />
+                <SidebarInset>
+                    {isDesign ? (
+                        <div className="space-y-6 p-4">
+                            {components.map((row) => (
+                                <RowContainer
+                                    key={row.id}
+                                    id={row.id}
+                                    onClickAddControl={handleClickAddControl}
+                                    onClickDeleteSection={
+                                        handleClickDeleteSection
+                                    }
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <CodeContent pagePath={pagePath} />
+                    )}
+                </SidebarInset>
+               {currentComponent && <SidebarRight />}
             </DragDropContext>
         );
     }

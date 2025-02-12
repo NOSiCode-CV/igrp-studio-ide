@@ -36,7 +36,7 @@ import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
-import FileExplorerSidebar from '@renderer/components/FileExplorer';
+import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { useNavSettings } from './nav-data';
 
 interface AppSidebarProps {

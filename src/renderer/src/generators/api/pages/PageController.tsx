@@ -14,7 +14,7 @@ import ERDLayout from './diagram';
 import { EnumLayout } from './enum/EnumLayout';
 import { EditorLayout } from './EditorLayout';
 import { FileTree } from 'src/main/types';
-import { TabItem, useTabs } from '@renderer/components/TabContext';
+import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import { PermissionsLayout } from './permissions';
 
 interface PageBuilderState {

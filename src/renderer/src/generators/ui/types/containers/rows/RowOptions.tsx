@@ -22,7 +22,7 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
         <div id="row-tools">
             {/* Top-aligned button */}
             <Button
-                className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-[#26678C] text-white z-50 cursor-pointer"
+                className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
                 title="Add New Row at Top"
                 onClick={() => onClickAddControl("top")}
             >
@@ -31,7 +31,7 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
 
             {/* Bottom-aligned button */}
             <Button
-                className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-[#26678C] text-white z-50 cursor-pointer"
+                className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
                 title="Add New Row at Bottom"
                 onClick={() => onClickAddControl("bottom")}
             >
@@ -73,7 +73,7 @@ const RowOptions = ({ onClickAddControl, onClickStructure, onClickDeleteSection 
                                                 {structure.map((col, i) => (
                                                     <div
                                                         key={i}
-                                                        className="bg-muted bg-[#0AB39C] hover:bg-[#26678C] transition-colors"
+                                                        className="bg-muted bg-[#0AB39C] hover:bg-igrp transition-colors"
                                                         style={{ width: `${(col / 12) * 100}%`, height: '20px' }}
                                                     >
                                                     </div>

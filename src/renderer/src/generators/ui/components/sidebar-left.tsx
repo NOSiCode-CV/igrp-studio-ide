@@ -54,7 +54,7 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
         <Sidebar
             collapsible="icon"
             className={cn(
-                'overflow-hidden [&>[data-sidebar=sidebar]]:flex-row mt-20',
+                'overflow-hidden [&>[data-sidebar=sidebar]]:flex-row !top-[--header-height-two] !h-[calc(100svh-var(--header-height-two))]',
                 props.className
             )}
             {...props}
@@ -120,7 +120,7 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                     </SidebarGroup>
                 </SidebarContent>
                 <SidebarFooter>
-                    <SidebarTrigger className="mb-20" />
+                    <SidebarTrigger/>
                 </SidebarFooter>
             </Sidebar>
 

@@ -131,8 +131,8 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     return (
         <>
             <TooltipProvider>
-                <header className="sticky h-10 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="flex items-center justify-between px-4">
+                <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
+                    <div className="flex h-[--header-height] w-full items-center gap-2 px-4 justify-between">
                         <div className="flex items-center space-x-2 home cursor-pointer">
                             <div
                                 onClick={openPage}
@@ -172,7 +172,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 " >
                             <ModeToggle />
 
                             {config?.name && (

@@ -9,6 +9,8 @@ export interface TabItem {
     item?: any;
 }
 
+export const TAB_DEFAULT = 'tab-0';
+
 interface TabContextType {
     tabs: TabItem[];
     activeTab: string;
@@ -19,7 +21,7 @@ interface TabContextType {
     handleRenameTab: (tabId: string, newTitle: string) => void;
     handleMoveTab: (fromIndex: number, toIndex: number) => void;
     tabExists: (tabId: string) => void;
-    newTab: () => void; // Add newTab function
+    newTab: (title?: string) => void; // Add newTab function
     initializeTabFromCurrentItem: (currentItem: any) => void;
 }
 
@@ -84,18 +86,17 @@ export const TabProvider: React.FC<{ children: React.ReactNode }> = ({
         return tabs.some((tab) => tab.id === tabId);
     };
 
-    const newTab = () => {
+    const newTab = (title?: string) => {
         const newTabId = getId();
         handleNewTab({
             id: newTabId,
-            title: `New...`,
+            title: title || `New...`,
             open: 'none',
             item: { id: newTabId },
         });
     };
 
     const initializeTabFromCurrentItem = (currentItem: any) => {
-        console.log(currentItem)
         if (currentItem) {
             const newTabId = currentItem.id || getId();
             const actionType = currentItem.actionType || currentItem.type;

@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { usePermisisonValidation } from './validation';
 import { FormList } from '../../components/form-list';
 import { getTablesColumns, defaultInitialValues } from './config';

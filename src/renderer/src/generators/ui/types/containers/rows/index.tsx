@@ -61,18 +61,15 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
         onClickAddControl(id, type);
     };
 
-
-    
-
     return (
-        <div id={id} className="group/row relative hover:border-2 hover:border-[#26678C] hover:rounded-sm">
+        <div id={id} className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm">
             {/* RowOptions only visible on hover */}
             <RowOptions
                 onClickAddControl={handleClickAddControl}
                 onClickStructure={handleClickStructure}
                 onClickDeleteSection={() => onClickDeleteSection(id)}
             />
-            <div className='w-full p-3 flex flex-1'>
+            <div className='w-full p-3 flex flex-1 grip gap-4'>
                 {columns.map((column, index) => {
                     return (
                         <ColContainer key={index} rowId={id} columnId={column.id} colSize={column.colSize} />

@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string }>;
@@ -11,36 +12,37 @@ interface LayoutProps {
 
 export interface RootState {
     PageBuilder: {
-        config: any; // Define appropriate types
-        folderFiles: any; // Define appropriate types
+        config: any;
         basePath: string;
     };
 }
 
-
 const Layout = (props: LayoutProps): JSX.Element => {
-    
     const selectStudioState = (state: RootState) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
         (studio) => ({
             config: studio.config,
-            folders: studio.folderFiles,
-            basePath: studio.basePath
+            basePath: studio.basePath,
         })
     );
 
     const { config, basePath } = useSelector(selectStudioProperties);
-    return (
-        <div className="h-screen flex flex-col">
-            <ToastContainer />
-            <Header config={config} basePath={basePath} />
-            
-            <div className="overflow-hidden">
-                {React.cloneElement(props.children, { basePath: basePath })}
-            </div>
-        </div>
-    )
-}
 
-export default withRouter(Layout)
+    return (
+        <div className="[--header-height:calc(theme(spacing.10))] [--header-height-two:calc(theme(spacing.20))] overflow-hidden h-screen">
+            <SidebarProvider
+                className="flex flex-col"
+                style={{ height: '100%' }}
+            >
+                <ToastContainer />
+                <Header config={config} basePath={basePath} />
+                {React.cloneElement(props.children, {
+                    basePath: basePath,
+                })}
+            </SidebarProvider>
+        </div>
+    );
+};
+
+export default withRouter(Layout);
