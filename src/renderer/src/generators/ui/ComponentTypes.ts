@@ -17,7 +17,8 @@ export const COMPONENTS = {
     VERTICAL_MENU: 'verticalmenu',
     TREEMENU: 'treemenu',
     TREELIST: 'treelist',
-    TOOLSBAR: 'toolsbar'
+    TOOLSBAR: 'toolsbar',
+    PAGE_HEADER: 'pageheader'
 }
 
 export const FIELDS = {

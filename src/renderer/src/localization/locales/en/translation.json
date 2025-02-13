@@ -306,5 +306,7 @@
   "confirm": "Confirm",
   "cloneProject":"Clone Project",
   "newPermission":"New Permission",
-  "createNewPermission":"Create a new Permission"
+  "createNewPermission":"Create a new Permission",
+  "textProperties":"Text Properties",
+  "buttonAppearance":"Button Appearance"
 }

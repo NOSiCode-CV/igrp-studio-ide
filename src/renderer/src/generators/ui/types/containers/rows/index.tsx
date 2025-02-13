@@ -69,7 +69,7 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
                 onClickStructure={handleClickStructure}
                 onClickDeleteSection={() => onClickDeleteSection(id)}
             />
-            <div className='w-full p-3 flex flex-1 grip gap-4'>
+            <div className='w-full p-3 flex flex-1'>
                 {columns.map((column, index) => {
                     return (
                         <ColContainer key={index} rowId={id} columnId={column.id} colSize={column.colSize} />

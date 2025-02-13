@@ -36,7 +36,7 @@ export default function TabManager({ basePath }: ContentProps) {
     }>({});
 
     const handleClickOpenGerador = (page: any) => {
-        newTab(page.name);
+        newTab(page.content.pageName);
         setCurrentPage(page);
     };
 

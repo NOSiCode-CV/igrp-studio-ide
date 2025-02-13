@@ -76,10 +76,10 @@ const MainPageBuilder = ({
 
     useEffect(() => {
         if (pages) {
-            const page = pages.find((page) => page.name === 'pagesMeta.json');
+            const page = pages.find((page) => page.name === 'pages');
 
-            if (page && page.content && page.content.resourceItems) {
-                const resourceItems = page.content.resourceItems;
+            if (page  && page.children) {
+                const resourceItems = page.children;
                 setContent(resourceItems);
             }
         }
@@ -100,7 +100,7 @@ const MainPageBuilder = ({
             <IGRPContainer>
                 <div className="flex items-center text-foreground">
                     <LayoutDashboard className="w-5 h-5 mr-2" />
-                    {t('Page Lists')}
+                    {t('pageLists')}
                 </div>
                 <div>
                     <div className="mb-4">

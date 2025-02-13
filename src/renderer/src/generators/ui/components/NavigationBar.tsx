@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { AppWindowMac, Braces, TvMinimal } from 'lucide-react';
+import { Code, Eye, TvMinimal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface NavigationBarProps {
@@ -56,7 +56,7 @@ const NavigationBar = ({
                 title={isDesign ? 'Show Code' : 'Show Design'}
                 variant={'ghost'}
             >
-                {isDesign ? <AppWindowMac /> : <Braces />}
+                {isDesign ? <Eye /> : <Code />}
             </Button>
             <Button
                 size="sm"

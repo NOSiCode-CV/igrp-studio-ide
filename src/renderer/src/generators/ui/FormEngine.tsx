@@ -18,6 +18,7 @@ import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 const addRow = () => {
     const newRowId = generateId('row');
@@ -55,7 +56,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             setEditingComponent,
             updateComponent,
             clearEditingComponent,
-            currentComponent
+            currentComponent,
         } = useDroppedComponents();
 
         const components = getAllComponents();
@@ -102,13 +103,13 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         }, [components]);
 
-        useEffect(()=>{
-            clearEditingComponent()
-        },[isDesign])
+        useEffect(() => {
+            clearEditingComponent();
+        }, [isDesign]);
 
         const handleSave = async (jsonStructure: Component[]) => {
             try {
-                if (pagePath === undefined || basePath === undefined) return;
+                if (basePath === undefined) return;
 
                 const pageConfig: PageConfig = {
                     type: 'page',
@@ -191,23 +192,27 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <AppSidebar data={navData} />
                 <SidebarInset>
                     {isDesign ? (
-                        <div className="space-y-6 p-4">
-                            {components.map((row) => (
-                                <RowContainer
-                                    key={row.id}
-                                    id={row.id}
-                                    onClickAddControl={handleClickAddControl}
-                                    onClickDeleteSection={
-                                        handleClickDeleteSection
-                                    }
-                                />
-                            ))}
-                        </div>
+                        <ScrollArea className="!h-[calc(100svh-var(--header-height-two))]">
+                            <div className="px-4 py-5">
+                                {components.map((row) => (
+                                    <RowContainer
+                                        key={row.id}
+                                        id={row.id}
+                                        onClickAddControl={
+                                            handleClickAddControl
+                                        }
+                                        onClickDeleteSection={
+                                            handleClickDeleteSection
+                                        }
+                                    />
+                                ))}
+                            </div>
+                        </ScrollArea>
                     ) : (
                         <CodeContent pagePath={pagePath} />
                     )}
                 </SidebarInset>
-               {currentComponent && <SidebarRight />}
+                {currentComponent && <SidebarRight />}
             </DragDropContext>
         );
     }

@@ -124,6 +124,8 @@ export const handleDropField = (draggableId, destination, { updateComponent, get
         ...formComponent.fields.slice(insertIndex)
     ];
 
+    console.log(updatedFields)
+
     updateComponent(componentId, {
         ...formComponent,
         fields: updatedFields,
