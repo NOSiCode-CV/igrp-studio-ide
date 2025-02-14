@@ -55,8 +55,6 @@ const IDEInitialScreen = () => {
             token?: string;
         }
     ) => {
-        console.log(`Cloning project: ${name} from ${url} to ${location}`);
-        console.log(`Authentication type: ${auth.type}`);
         if (auth.type === 'basic') {
             console.log(`Using basic auth with username: ${auth.username}`);
         } else if (auth.type === 'token') {

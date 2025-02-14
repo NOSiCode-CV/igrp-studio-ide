@@ -9,6 +9,7 @@ export const initialValues = {
 	tableName: '',
 	audit: true,
 	crud: false,
+	revision: false,
 	attributes: [
 		{
 			name: 'id',
@@ -18,7 +19,8 @@ export const initialValues = {
 			nullable: false,
 			unique: false,
 			primaryKey: true,
-			generationType: 'IDENTITY'
+			generationType: 'IDENTITY',
+			skipFieldRevision: false
 		},
 		{
 			name: '',
@@ -27,7 +29,8 @@ export const initialValues = {
 			defaultValue: '',
 			nullable: true,
 			unique: false,
-			primaryKey: false
+			primaryKey: false,
+			skipFieldRevision: false
 		}
 	],
 	indexes: [
@@ -41,7 +44,7 @@ export const initialValues = {
 	uniqueConstraints: [
 		{
 			name: '',
-			columns:[]
+			columns: []
 		}
 	]
 }
@@ -54,7 +57,8 @@ export const defaultValues: any = {
 		defaultValue: '',
 		nullable: false,
 		unique: false,
-		primaryKey: false
+		primaryKey: false,
+		skipFieldRevision: false
 	},
 	indexes: {
 		name: '',
@@ -90,6 +94,7 @@ export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
 export const getTablesColumns = ({
 	selectors,
 	attributes,
+	revision,
 	models
 }): { [value: string]: IColumnsTabelProps[] } => {
 
@@ -129,7 +134,7 @@ export const getTablesColumns = ({
 			{
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
-					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes },
+					{ key: 'advanced', name: '', type: 'popoverModel', options: { generateTypes, revision } },
 					{ key: 'relation', name: 'Relation', type: 'popoverRelation', options: { modelsOptions, models } },
 				]
 			}

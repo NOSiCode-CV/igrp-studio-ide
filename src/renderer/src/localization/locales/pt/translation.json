@@ -277,7 +277,7 @@
   "basePath": "Caminho Base",
   "moduleName": "Nome do Módulo",
   "endpointCreatedSuccess": "Endpoint {{name}} criado com sucesso.",
-  "msgInfoAccept": "Apenas caracteres alfanuméricos e sublinhados são permitidos.",
+  "msgInfoAccept": "Apenas caracteres alfanuméricos, underscore, hífen e espaços em branco são permitidos.",
   "none": "Nenhum",
   "formData": "Dados do Formulário",
   "json": "JSON",

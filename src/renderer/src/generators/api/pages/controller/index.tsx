@@ -226,6 +226,21 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         return newValues;
     };
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const handleSave = async (): Promise<void> => {
         try {
             const values = await getValuesToSubmit();
@@ -287,10 +302,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     (dataAction) => dataAction.actionName !== formik.actionName
                 );
 
-                const updatedValues = {
-                    ...values,
-                    actions: updatedActions,
-                };
+                const updatedValues = { ...values, actions: updatedActions };
 
                 const { error } = await window.api.createController(
                     updatedValues,
@@ -324,10 +336,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     useEffect(() => {
         const enumTypes = enums.map((enumItem) => {
-            return {
-                label: enumItem.name,
-                value: enumItem.name,
-            };
+            return { label: enumItem.name, value: enumItem.name };
         });
         setEnumTypes(enumTypes);
     }, [enums]);
@@ -352,11 +361,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         setSchemaTypes((prevSchemaTypes) =>
             prevSchemaTypes.map((schemaType) =>
                 schemaType.value === 'Reference other schemas'
-                    ? {
-                          ...schemaType,
-                          value: 'dto',
-                          items: targetDto,
-                      }
+                    ? { ...schemaType, value: 'dto', items: targetDto }
                     : schemaType
             )
         );

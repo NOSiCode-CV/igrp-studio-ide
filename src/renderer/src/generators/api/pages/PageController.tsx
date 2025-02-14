@@ -13,7 +13,7 @@ import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
 import { EnumLayout } from './enum/EnumLayout';
 import { EditorLayout } from './EditorLayout';
-import { FileTree } from 'src/main/types';
+import { FileTree, ProjectData } from 'src/main/types';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import { PermissionsLayout } from './permissions';
 
@@ -21,6 +21,7 @@ interface PageBuilderState {
     basePath: string;
     currentItem: any;
     filesThree: FileTree[];
+    config: ProjectData;
 }
 
 interface NewProps {
@@ -45,6 +46,7 @@ const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
 
         return {
             basePath: studio.basePath,
+            config: studio.config,
             models: extractByType(moduleData, OPTION_TYPE.MODELS),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
@@ -56,8 +58,16 @@ const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
         };
     });
 
-    const { basePath, models, dto, modules, responses, enums, permissions } =
-        useSelector(selectProperties);
+    const {
+        basePath,
+        config,
+        models,
+        dto,
+        modules,
+        responses,
+        enums,
+        permissions,
+    } = useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -118,6 +128,7 @@ const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
                             selectors={selectors}
                             models={models}
                             currentItem={tab.item}
+                            config={config}
                             onCloseTab={hangleClose}
                             onUpdateTab={handleUpdate}
                         />

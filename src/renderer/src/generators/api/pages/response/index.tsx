@@ -114,6 +114,21 @@ export const ResponseLayout = ({
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const handleSave = async (): Promise<void> => {
         try {
             const values = {
@@ -138,10 +153,7 @@ export const ResponseLayout = ({
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
-                t('createdSuccess', {
-                    name: t('response'),
-                    value: values.name,
-                })
+                t('createdSuccess', { name: t('response'), value: values.name })
             );
         } catch (error: unknown) {
             showErrorToast(error);
@@ -198,9 +210,7 @@ export const ResponseLayout = ({
 
         const updatedResponses = {
             ...formik.values.content,
-            [contentType]: {
-                schema: newSchema,
-            },
+            [contentType]: { schema: newSchema },
         };
 
         formik.setFieldValue('content', updatedResponses);

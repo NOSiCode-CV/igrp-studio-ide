@@ -5,6 +5,7 @@ import { ComponentRegistry } from '../../../data/ComponentRegistry';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { FEILD } from '@renderer/generators/ui/ComponentTypes';
 import { PageHeader } from '@igrp/igrp-design-system';
+import GenNoInfoField from '@renderer/generators/ui/components/GenNoInfoField';
 
 export interface FormComponentProps {
     componentName: string;
@@ -14,7 +15,10 @@ export interface FormComponentProps {
     onEdit: () => void;
 }
 
-const PageHeaderLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
+const PageHeaderLayout: React.FC<FormComponentProps> = ({
+    comp,
+    componentId,
+}) => {
     const [buttonComponents, setButtonComponents] = useState<
         DroppedComponent[]
     >([]);
@@ -61,6 +65,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({ comp, componentId }) =
             );
         });
 
+    console.log(buttonComponents.length, componentId);
     return (
         <PageHeader title={title}>
             <Droppable
@@ -68,20 +73,30 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({ comp, componentId }) =
                 type={FEILD}
                 direction="horizontal"
             >
-                {(provided, snapshot) => (
-                    <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`${
-                            snapshot.isDraggingOver
-                                ? 'border-2 border-dashed border-igrp p-2'
-                                : ''
-                        }`}
-                    >
-                        {renderButtons()}
-                        {provided.placeholder}
-                    </div>
-                )}
+                {(provided, snapshot) => {
+                    console.log(provided.placeholder);
+
+                    return (
+                        <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            className={`${
+                                snapshot.isDraggingOver
+                                    ? 'border-2 border-dashed border-igrp p-2'
+                                    : ''
+                            }`}
+                        >
+                            <div className='flex flex-1 space-x-2'>  
+                                {buttonComponents.length > 0 ? (
+                                    renderButtons()
+                                ) : (
+                                    <GenNoInfoField />
+                                )}
+                            </div>
+                            {provided.placeholder}
+                        </div>
+                    );
+                }}
             </Droppable>
         </PageHeader>
     );

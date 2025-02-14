@@ -36,7 +36,7 @@ export default function TabManager({ basePath }: ContentProps) {
     }>({});
 
     const handleClickOpenGerador = (page: any) => {
-        newTab(page.content.pageName);
+        newTab({ title: page.content.pageName });
         setCurrentPage(page);
     };
 
@@ -46,7 +46,6 @@ export default function TabManager({ basePath }: ContentProps) {
     };
 
     const handleSwitchClick = () => {
-
         setIsDesignStates((prevState) => ({
             ...prevState,
             [activeTab]: !prevState[activeTab],

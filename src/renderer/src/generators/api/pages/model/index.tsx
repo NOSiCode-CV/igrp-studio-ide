@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FocusEvent, useEffect, useState } from 'react';
 import useToast from '@renderer/components/useToast';
 import { useFormik } from 'formik';
 import {
@@ -30,12 +30,14 @@ import { FormList } from '../../components/form-list';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
+import { ProjectData } from 'src/main/types';
 
 interface ModelProps {
     basePath: string;
     selectors: Array<any>;
     models?: Array<any>;
     currentItem: any;
+    config: ProjectData;
     onCloseTab: () => void;
     onUpdateTab: (tabId: string) => void;
 }
@@ -45,6 +47,7 @@ const ModelLayout = ({
     selectors,
     models,
     currentItem,
+    config,
     onCloseTab,
     onUpdateTab,
 }: ModelProps): JSX.Element => {
@@ -57,6 +60,7 @@ const ModelLayout = ({
     }>({});
     const { showErrorToast, showSuccessToast } = useToast();
     const [data, setData] = useState<any>(null);
+    const [enableEntityRevision, hasEnableEntityRevision] = useState(false);
 
     const validationSchema = useModelValidation({ t });
 
@@ -70,7 +74,12 @@ const ModelLayout = ({
         },
     });
 
-    const suggestTableName = (name) => {
+    const suggestTableName = async (name: string) => {
+        const errors = await formik.validateForm();
+        console.log(errors.name);
+        if (errors.name) {
+            return '';
+        }
         return `t_${name
             .replace(/([a-z])([A-Z])/g, '$1_$2')
             .trim()
@@ -78,18 +87,27 @@ const ModelLayout = ({
             .replace(/\s+/g, '_')}`;
     };
 
-    const handleNameBlur = (e) => {
+    const handleNameBlur = async (
+        e: FocusEvent<HTMLInputElement>
+    ): Promise<void> => {
         formik.handleBlur(e);
         const name = e.target.value;
         if (!formik.values.tableName) {
-            formik.setFieldValue('tableName', suggestTableName(name));
+            const value = await suggestTableName(name);
+            formik.setFieldValue('tableName', value);
         }
     };
 
     useEffect(() => {
+        hasEnableEntityRevision(config.config.enableEntityRevision);
+    }, [config]);
+
+    useEffect(() => {
+        const { attributes, revision } = formik.values;
         const res = getTablesColumns({
             selectors,
-            attributes: formik.values.attributes,
+            attributes,
+            revision,
             models,
         });
         setTableColumns(res);
@@ -162,6 +180,21 @@ const ModelLayout = ({
             formik.setFieldValue('indexes', indexesTable);
         } else formik.resetForm();
     }, [data]);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     const handleSave = async (): Promise<void> => {
         try {
@@ -311,7 +344,7 @@ const ModelLayout = ({
                             </div>
                         </div>
                         <div className="flex">
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+                            <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
                                 <div className="flex items-center space-x-2">
                                     <Checkbox
                                         id="audit"
@@ -328,6 +361,23 @@ const ModelLayout = ({
                                     </Label>
                                 </div>
 
+                                {enableEntityRevision && (
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="revision"
+                                            onCheckedChange={(checked) =>
+                                                formik.setFieldValue(
+                                                    'revision',
+                                                    checked
+                                                )
+                                            }
+                                            checked={formik.values.revision}
+                                        />
+                                        <Label htmlFor="revision">
+                                            {t('revision')}
+                                        </Label>
+                                    </div>
+                                )}
                                 <div className="flex items-center space-x-2">
                                     <Checkbox
                                         id="crud"

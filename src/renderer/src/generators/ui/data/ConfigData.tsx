@@ -123,7 +123,6 @@ const Navdata = () => {
             id: CONTAINER.FIELDS,
             label: CONTAINER.FIELDS,
             icon: Pencil,
-
             stateVariables: isFormFields,
             type: FEILD,
             click: function (e: any) {

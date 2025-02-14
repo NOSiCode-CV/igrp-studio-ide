@@ -21,7 +21,7 @@ interface TabContextType {
     handleRenameTab: (tabId: string, newTitle: string) => void;
     handleMoveTab: (fromIndex: number, toIndex: number) => void;
     tabExists: (tabId: string) => void;
-    newTab: (title?: string) => void; // Add newTab function
+    newTab: ({ title, type }: { title?: string; type?: OptionType }) => void; // Add newTab function
     initializeTabFromCurrentItem: (currentItem: any) => void;
 }
 
@@ -86,12 +86,12 @@ export const TabProvider: React.FC<{ children: React.ReactNode }> = ({
         return tabs.some((tab) => tab.id === tabId);
     };
 
-    const newTab = (title?: string) => {
+    const newTab = ({ title, type }: { title?: string; type?: OptionType }) => {
         const newTabId = getId();
         handleNewTab({
             id: newTabId,
             title: title || `New...`,
-            open: 'none',
+            open: type || 'none',
             item: { id: newTabId },
         });
     };

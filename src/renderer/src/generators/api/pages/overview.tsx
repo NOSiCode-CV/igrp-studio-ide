@@ -8,15 +8,17 @@ import DashboardOverview from '../components/dashboard-overview';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { ContainerScrollArea } from '../components/ContainerScrollArea';
-import { TabItem } from '@renderer/components/navigation/TabContext';
+import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
     open: OptionType;
 }
 
-const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
+const Overview = ({}: NewProps): JSX.Element => {
     const { t } = useTranslation();
+
+    const { newTab } = useTabs();
 
     // Initialize stats with useState
     const [stats, setStats] = useState({
@@ -27,19 +29,13 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     });
 
     const handleOptionClick = (opt: OptionType) => {
-        onOpenNew({
-            id: `tab-${Date.now()}`,
-            title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
-            open: opt,
-        });
+        newTab({ type: opt });
     };
 
     const selectStudioState = (state: any) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
-        (studio) => ({
-            filesThree: studio.filesThree,
-        })
+        (studio) => ({ filesThree: studio.filesThree })
     );
 
     const { filesThree } = useSelector(selectStudioProperties);

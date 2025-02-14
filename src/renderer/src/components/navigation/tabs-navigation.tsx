@@ -14,11 +14,13 @@ import { useTranslation } from 'react-i18next';
 import { TAB_DEFAULT, TabItem, useTabs } from './TabContext';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Button } from '../ui/button';
+import { OptionType } from '@renderer/constants/appConstants';
+import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 
 interface TabsNavigationProps {
     tabs: TabItem[];
     activeTab: string;
-    newTab: () => void;
+    newTab: ({ title, type }: { title?: string; type?: OptionType }) => void;
     setActiveTab: (tabId: string) => void;
     children?: ReactNode;
     btnNew?: boolean;
@@ -38,7 +40,7 @@ const TabsNavigation = ({
     const { handleCloseTab } = useTabs();
 
     const onClickNewTab = () => {
-        newTab();
+        newTab({});
         setTimeout(() => {
             scrollAreaRef.current?.scrollTo({
                 left: scrollAreaRef.current.scrollWidth,
@@ -141,7 +143,7 @@ const TabsNavigation = ({
                                                 >
                                                     {t('closeSelectedTab')}
                                                     <ContextMenuShortcut>
-                                                        ⌘W
+                                                        {SHORTCUTS.CLOSE_TAB}
                                                     </ContextMenuShortcut>
                                                 </ContextMenuItem>
                                                 <ContextMenuItem
@@ -176,7 +178,7 @@ const TabsNavigation = ({
                             );
                         })}
                     </div>
-                    <ScrollBar orientation="horizontal" />
+                    <ScrollBar orientation="horizontal" className='h-2'/>
                 </ScrollArea>
                 {btnNew && (
                     <div className="flex items-center px-2 gap-2">

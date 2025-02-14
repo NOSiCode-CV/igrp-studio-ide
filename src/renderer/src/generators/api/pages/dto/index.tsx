@@ -105,6 +105,22 @@ const DtoLayout = ({
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault(); 
+                handleSave(formik.values); 
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
             const config = {

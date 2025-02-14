@@ -30,6 +30,7 @@ export interface SpringConfigData {
     database: string;
     projectStructureStyle: 'technical' | 'domain';
     enableObservability: boolean;
+    enableEntityRevision: boolean;
     projectStructureStyle: string;
     igrpCoreVersion: string
 }

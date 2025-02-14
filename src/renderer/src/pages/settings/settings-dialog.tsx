@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Globe, Home, Link, Settings } from 'lucide-react';
+import { Bell, Globe, Home, Keyboard, Link, Settings } from 'lucide-react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -30,7 +30,7 @@ import {
 import { AboutSettings } from './about-settings';
 import { LanguageSettings } from './language-settings';
 import { ConnectedAccountsSettings } from './connected-accounts-settings';
-import React, {  } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -39,6 +39,7 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import KeyboardShortcuts from './keyboard-shortcuts';
 
 const data = {
     nav: [
@@ -50,6 +51,7 @@ const data = {
             component: ConnectedAccountsSettings,
         },
         { name: 'notifications', icon: Bell },
+        { name: 'shortcuts', icon: Keyboard, component: KeyboardShortcuts },
     ],
 };
 
@@ -72,7 +74,7 @@ export function SettingsDialog() {
                 <TooltipContent>{t('settings')}</TooltipContent>
             </Tooltip>
             <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[800px] max-w-[900px]">
-                <DialogHeader className='pb-3'>
+                <DialogHeader className="pb-3">
                     <DialogTitle className="sr-only">
                         {t('settings')}
                     </DialogTitle>

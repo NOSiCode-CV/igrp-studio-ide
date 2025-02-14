@@ -1,7 +1,9 @@
 import { UiButton, UiDate, UiText } from '../types/fields';
-import FormLayout from '../types/containers/form';
 import { COLUMN, COMPONENTS, FIELDS } from '../ComponentTypes';
-import PageHeaderLayout from '../types/containers/pageHeader';
+import { lazy } from 'react';
+
+const PageHeaderLayout = lazy(() => import('../types/containers/pageHeader'));
+const FormLayout = lazy(() => import('../types/containers/form'));
 
 export const ComponentRegistry: { [key: string]: React.FC<any> } = {
     [COMPONENTS.FORM]: FormLayout,
