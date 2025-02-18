@@ -25,6 +25,8 @@ build_packagedev:
 
 release:
   stage: release
+  only:
+    - master
   image: curlimages/curl:latest
   script:
     - echo "Creating a new release on GitLab..."
