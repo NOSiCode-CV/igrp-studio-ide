@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  } from 'react';
 import {
     COMPONENT,
     COMPONENTS,
@@ -17,37 +17,13 @@ import {
 } from 'lucide-react';
 
 const Navdata = () => {
-    //state data
-    const [isFormLayout, setIsFormLayout] = useState<boolean>(true);
-    const [isFormAction, setIsFormAction] = useState<boolean>(false);
-    const [isFormFields, setIsFormFields] = useState<boolean>(false);
-
-    const [iscurrentState, setIscurrentState] = useState(CONTAINER.FORMS_LISTS);
-
-    useEffect(() => {
-        if (iscurrentState !== CONTAINER.FORMS_LISTS) {
-            setIsFormLayout(false);
-        }
-        if (iscurrentState !== CONTAINER.PAGE_ELEMENTS) {
-            setIsFormAction(false);
-        }
-        if (iscurrentState !== CONTAINER.FIELDS) {
-            setIsFormFields(false);
-        }
-    }, [iscurrentState, isFormAction, isFormAction, isFormFields]);
 
     const menuItems: any = [
         {
             id: CONTAINER.FORMS_LISTS,
             label: CONTAINER.FORMS_LISTS,
             icon: ListTodo,
-            stateVariables: isFormLayout,
             type: COMPONENT,
-            click: function (e: any) {
-                e.preventDefault();
-                setIsFormLayout(!isFormLayout);
-                setIscurrentState(CONTAINER.FORMS_LISTS);
-            },
             subItems: [
                 {
                     id: COMPONENTS.FORM,
@@ -79,13 +55,7 @@ const Navdata = () => {
             id: CONTAINER.PAGE_ELEMENTS,
             label: CONTAINER.PAGE_ELEMENTS,
             icon: Layers,
-            stateVariables: isFormAction,
             type: COMPONENT,
-            click: function (e: any) {
-                e.preventDefault();
-                setIsFormAction(!isFormAction);
-                setIscurrentState(CONTAINER.PAGE_ELEMENTS);
-            },
             subItems: [
                 {
                     id: 'pageheader',
@@ -123,13 +93,7 @@ const Navdata = () => {
             id: CONTAINER.FIELDS,
             label: CONTAINER.FIELDS,
             icon: Pencil,
-            stateVariables: isFormFields,
             type: FEILD,
-            click: function (e: any) {
-                e.preventDefault();
-                setIsFormFields(!isFormFields);
-                setIscurrentState(CONTAINER.FIELDS);
-            },
             subItems: [
                 {
                     id: FIELDS.TEXT,

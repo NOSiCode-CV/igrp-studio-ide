@@ -1,6 +1,6 @@
-import { GripHorizontal, Settings } from "lucide-react";
-import { Draggable } from "@hello-pangea/dnd";
-import { useTranslation } from "react-i18next";
+import { GripHorizontal, Settings } from 'lucide-react';
+import { Draggable } from '@hello-pangea/dnd';
+import { useTranslation } from 'react-i18next';
 
 const DraggableElement = ({ item, index }) => {
     const { t } = useTranslation();
@@ -14,24 +14,39 @@ const DraggableElement = ({ item, index }) => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         className={`transition-colors duration-200 
-                            ${snapshot.isDragging ? 'bg-blue-100' : 'bg-transparent'} 
+                            ${snapshot.isDragging ? 'bg-blue-100' : 'bg-white'} 
                             flex flex-col items-center justify-center 
-                            text-center text-xs  w-full space-y-1 p-2`}
+                            text-xs  w-full space-y-2 p-2 rounded-lg 
+                            shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 `}
                     >
-                        <GripHorizontal className="h-4 w-4 text-gray-400 opacity-75" aria-hidden="true" />
-                        {item.icon ? (<item.icon className="h-5 w-5" />) : (<Settings className="h-5 w-5"/>) }
-                        <span>{t(item.label || 'Default Label')}</span>
+                        <GripHorizontal
+                            className="h-4 w-4 text-gray-400 opacity-75"
+                            aria-hidden="true"
+                        />
+                        {item.icon ? (
+                            <item.icon className="h-6 w-6" />
+                        ) : (
+                            <Settings className="h-6 w-6" />
+                        )}
+                        <span>{t(item.label || 'Widget')}</span>
                     </div>
                     {snapshot.isDragging && (
                         <div
                             className="transition-colors duration-200 
-                                bg-blue-100 max-w-[200px] flex flex-col 
-                                items-center justify-center text-center 
-                                text-xs border border-gray-300 rounded p-2"
+                                bg-blue-100 flex flex-col 
+                                items-center justify-center 
+                                text-xs  p-2 w-full"
                         >
-                            <GripHorizontal className="h-4 w-4 text-gray-400 opacity-75" aria-hidden="true" />
-                            {item.icon ? (<item.icon className="h-5 w-5" />) : (<Settings className="h-5 w-5"/>) }
-                            <span>{t(item.label || 'Default Label')}</span>
+                            <GripHorizontal
+                                className="h-4 w-4 text-gray-400 opacity-75"
+                                aria-hidden="true"
+                            />
+                            {item.icon ? (
+                                <item.icon className="h-6 w-6" />
+                            ) : (
+                                <Settings className="h-6 w-6" />
+                            )}
+                            <span>{t(item.label || 'Widget')}</span>
                         </div>
                     )}
                 </>

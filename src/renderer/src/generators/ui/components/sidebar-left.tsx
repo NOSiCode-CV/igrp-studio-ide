@@ -4,6 +4,7 @@ import {
     SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarInput,
     SidebarMenu,
@@ -13,26 +14,54 @@ import {
     useSidebar,
 } from '@renderer/components/ui/sidebar';
 import { cn } from '@renderer/lib/utils';
-import { Home } from 'lucide-react';
+import {
+    Badge,
+    ChevronRight,
+    Component,
+    FileText,
+    GitBranch,
+    Home,
+    ListTodo,
+    Server,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
 import React, { useEffect, useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import DraggableElement from '@renderer/generators/ui/dnd/DraggableElement';
+import { MenuItem } from 'src/main/types';
+import FileExplorerSidebar from '@renderer/components/fileExplorer';
+import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@renderer/components/ui/collapsible';
+import { useNavigate } from 'react-router-dom';
+import AppComponents from './AppComponents';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
+    basePath: string;
 };
 
-export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
+export function AppSidebar({
+    data: initialData,
+    basePath,
+    ...props
+}: AppSidebarProps) {
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    const [activeMenuGroup, setActiveMenuGroup] =
+        useState<string>('widgetPalette');
 
     const [originalData, _setOriginalData] = useState(initialData);
     const [filteredData, setFilteredData] = useState(initialData);
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeItem, setActiveItem] = useState(initialData[0] || {});
 
     useEffect(() => {
         if (searchQuery.trim() === '') {
@@ -42,13 +71,33 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
         }
     }, [searchQuery, originalData]);
 
-    useEffect(() => {
-        setActiveItem(filteredData[0] || {});
-    }, [filteredData]);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
     };
+
+    const handleNavegationClick = (item: any) => {
+        setActiveMenuGroup(item.id);
+    };
+
+    const handleNavigation = (link: string | undefined) => {
+        if (link) navigate(link);
+    };
+
+    const navegations: MenuItem[] = [
+        { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
+        { icon: Component, label: t('components'), id: 'components' },
+        { icon: FileText, label: t('explorer'), id: 'explorer' },
+        {
+            icon: Badge,
+            label: t('settings'),
+            id: 'settings',
+        },
+        {
+            icon: GitBranch,
+            label: t('git'),
+            id: 'git',
+        },
+    ];
 
     return (
         <Sidebar
@@ -88,20 +137,19 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                     <SidebarGroup>
                         <SidebarGroupContent className="px-1.5 md:px-0">
                             <SidebarMenu>
-                                {filteredData.map((item) => (
+                                {navegations.map((item) => (
                                     <SidebarMenuItem key={item.id}>
                                         <SidebarMenuButton
                                             tooltip={{
                                                 children: t(item.label),
                                                 hidden: false,
                                             }}
-                                            onClick={(e) => {
-                                                setActiveItem(item);
-                                                item.click(e);
+                                            onClick={() => {
                                                 setOpen(true);
+                                                handleNavegationClick(item);
                                             }}
                                             isActive={
-                                                activeItem?.id === item.id
+                                                activeMenuGroup === item.id
                                             }
                                             size="lg"
                                             className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
@@ -119,8 +167,8 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                         </SidebarGroupContent>
                     </SidebarGroup>
                 </SidebarContent>
-                <SidebarFooter>
-                    <SidebarTrigger/>
+                <SidebarFooter className="items-center justify-center">
+                    <SidebarTrigger className="items-center justify-center" />
                 </SidebarFooter>
             </Sidebar>
 
@@ -129,7 +177,7 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                 <SidebarHeader className="gap-3.5 border-b p-4">
                     <div className="flex w-full items-center justify-between">
                         <div className="text-base font-medium text-foreground">
-                            {t(activeItem?.label)}
+                            {t(activeMenuGroup)}
                         </div>
                     </div>
                     <SidebarInput
@@ -139,51 +187,88 @@ export function AppSidebar({ data: initialData, ...props }: AppSidebarProps) {
                     />
                 </SidebarHeader>
                 <SidebarContent>
-                    <SidebarGroup className="px-0">
-                        <SidebarGroupContent>
-                            <Droppable
-                                droppableId={`${activeItem.id}`}
-                                key={activeItem.id}
-                                isDropDisabled={true}
-                                type={activeItem.type}
-                            >
-                                {(provided) => (
-                                    <div
-                                        className="grid grid-cols-2 gap-3 p-3 rounded-lg"
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
+                    <ScrollArea>
+                        {activeMenuGroup === 'explorer' ? (
+                            <FileExplorerSidebar
+                                basePath={basePath}
+                                searchTerm={searchQuery}
+                            />
+                        ) : activeMenuGroup === 'git' ? (
+                            <GitCommitsSidebar
+                                basePath={basePath}
+                                onSelectCommit={(commit) => {
+                                    console.log('Selected Commit:', commit);
+                                    // Optional: Handle commit selection
+                                }}
+                            />
+                        ) : activeMenuGroup === 'components' ? (
+                            <AppComponents searchTerm={searchQuery} />
+                        ) : (
+                            filteredData.map((item) => (
+                                <Collapsible
+                                    key={item.title}
+                                    title={item.title}
+                                    defaultOpen
+                                    className="group/collapsible"
+                                >
+                                    <Droppable
+                                        droppableId={item.id}
+                                        key={item.id}
+                                        isDropDisabled={true}
+                                        type={item.type}
                                     >
-                                        {activeItem?.subItems &&
-                                            activeItem.subItems.map(
-                                                (subItem, key) => (
-                                                    <div
-                                                        key={subItem.id}
-                                                        className="flex flex-col items-center justify-center bg-white rounded-md shadow-sm"
-                                                        onClick={() => {
-                                                            if (
-                                                                typeof subItem.click ===
-                                                                'function'
-                                                            ) {
-                                                                subItem.click(
-                                                                    subItem
-                                                                );
-                                                            }
-                                                        }}
+                                        {(provided) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.droppableProps}
+                                            >
+                                                <SidebarGroup>
+                                                    <SidebarGroupLabel
+                                                        asChild
+                                                        className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                                     >
-                                                        <DraggableElement
-                                                            item={subItem}
-                                                            index={key}
-                                                        />
-                                                    </div>
-                                                )
-                                            )}
-
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
+                                                        <CollapsibleTrigger>
+                                                            {t(item.label)}
+                                                            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                                                        </CollapsibleTrigger>
+                                                    </SidebarGroupLabel>
+                                                    <CollapsibleContent>
+                                                        <SidebarGroupContent>
+                                                            <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
+                                                                {item.subItems.map(
+                                                                    (
+                                                                        item: MenuItem,
+                                                                        key: number
+                                                                    ) => (
+                                                                        <SidebarMenuItem
+                                                                            key={
+                                                                                key
+                                                                            }
+                                                                            className="flex flex-col items-center justify-center bg-muted rounded-md shadow-sm"
+                                                                        >
+                                                                            <DraggableElement
+                                                                                item={
+                                                                                    item
+                                                                                }
+                                                                                index={
+                                                                                    key
+                                                                                }
+                                                                            />
+                                                                        </SidebarMenuItem>
+                                                                    )
+                                                                )}
+                                                            </SidebarMenu>
+                                                        </SidebarGroupContent>
+                                                    </CollapsibleContent>
+                                                </SidebarGroup>
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </Collapsible>
+                            ))
+                        )}
+                    </ScrollArea>
                 </SidebarContent>
             </Sidebar>
         </Sidebar>

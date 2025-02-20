@@ -243,7 +243,7 @@
   "jsonSchemaPreview": "JSON Schema Preview",
   "jsonSchemaDescription": "This is a preview of your generated JSON schema.",
   "definition": "Definition",
-  "controllerDefintion": "Provide the name and configuration for this action",
+  "controllerDefinition": "Provide the name and configuration for this action",
   "supportTitle": "Need support?",
   "supportDescription": "Contact us to get support.",
   "supportContactVia": "Contact support via {{channel}}",
@@ -319,5 +319,14 @@
   "defaultValue": "Default Value",
   "unique": "Unique",
   "nullable": "Nullable",
-  "primaryKey": "Primary Key"
+  "primaryKey": "Primary Key",
+  "columns": "Columns",
+  "isRequired": "Is Required?",
+  "header": "Header",
+  "widgetPalette": "Widget Palette",
+  "addPage": "Add Page",
+  "seachPages": "Search pages...",
+  "addComponents": "Add Components",
+  "editComponents": "Edit Component",
+  "components":"Components"
 }

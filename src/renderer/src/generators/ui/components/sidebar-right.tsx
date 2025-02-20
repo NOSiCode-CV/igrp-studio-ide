@@ -128,7 +128,7 @@ export function SidebarRight({
                 <Tabs className="flex-1" defaultValue="props">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="props">Props</TabsTrigger>
-                        <TabsTrigger value="styles">Styles</TabsTrigger>
+                        <TabsTrigger value="styles">Style</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="props" className="space-y-6">
@@ -184,7 +184,7 @@ export function SidebarRight({
                             </AccordionItem>
                             <AccordionItem value="item-2" className="px-3">
                                 <AccordionTrigger>
-                                    {t('Custom Classes')}
+                                    {t('customClasses')}
                                 </AccordionTrigger>
                                 <AccordionContent>
                                     <CustomStyle />

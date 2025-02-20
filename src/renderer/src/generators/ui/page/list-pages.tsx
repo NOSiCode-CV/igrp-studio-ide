@@ -29,6 +29,7 @@ const MainPageBuilder = ({
     const dispatch: any = useDispatch();
 
     const [content, setContent] = useState<any>([]);
+    const [components, setComponents] = useState<any>([]);
     const [page, setPage] = useState<any>([]);
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -45,10 +46,10 @@ const MainPageBuilder = ({
     const selectProperties = createSelector(selectState, (studio) => ({
         basePath: studio.basePath,
         config: studio.config,
-        pages: studio.filesThree,
+        files: studio.filesThree,
     }));
 
-    const { basePath, pages, config } = useSelector(selectProperties);
+    const { basePath, files, config } = useSelector(selectProperties);
 
     const handleDeletePage = () => {
         const pageConfig: PageConfig = {
@@ -75,18 +76,26 @@ const MainPageBuilder = ({
     }, [loadingTable]);
 
     useEffect(() => {
-        if (pages) {
-            const page = pages.find((page) => page.name === 'pages');
+        if (files) {
+            const pages = files.find((page) => page.name === 'pages');
+            const components = files.find((page) => page.name === 'components');
 
-            if (page  && page.children) {
-                const resourceItems = page.children;
-                setContent(resourceItems);
+            if (pages && pages.children) {
+                setContent(pages.children);
+            }
+
+            if (components && components.children) {
+                setComponents(components.children);
             }
         }
-    }, [pages]);
+    }, [files]);
 
     const filteredPages = content.filter((page) =>
         page.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredComponents = components.filter((comp) =>
+        comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -94,7 +103,7 @@ const MainPageBuilder = ({
             <PageHeader title={config?.name} description={config?.description}>
                 <Button size="sm" onClick={() => setNewPageModal(true)}>
                     <Plus />
-                    Add Page
+                    {t('addPage')}
                 </Button>
             </PageHeader>
             <IGRPContainer>
@@ -105,7 +114,7 @@ const MainPageBuilder = ({
                 <div>
                     <div className="mb-4">
                         <Input
-                            placeholder="Search pages..."
+                            placeholder={t('seachPages')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -117,6 +126,17 @@ const MainPageBuilder = ({
                                 page={page}
                                 onDelete={() => setDeleteModal(true)}
                                 onAddComponents={handleAddComponents}
+                                isPage
+                            />
+                        ))}
+
+                        {filteredComponents.map((comp) => (
+                            <PageCard
+                                key={comp.name}
+                                page={comp}
+                                onDelete={() => setDeleteModal(true)}
+                                onAddComponents={handleAddComponents}
+                                isPage={false}
                             />
                         ))}
                     </div>

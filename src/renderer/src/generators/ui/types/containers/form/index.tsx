@@ -13,6 +13,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@renderer/components/ui/card';
+import { cn } from '@renderer/lib/utils';
 
 export interface FormComponentProps {
     componentName: string;
@@ -29,7 +30,7 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     >([]);
 
     const { setEditingComponent } = useDroppedComponents();
-    const { title } = comp.config;
+    const { title, colSize } = comp.config;
 
     useEffect(() => {
         if (comp.fields) {
@@ -50,43 +51,43 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
         setEditingComponent({ ...component, componentId: componentId });
     };
 
-    const renderFields = () =>
-        formFields.length > 0 ? (
-            formFields.map((field: DroppedComponent, index: number) => {
-                const component = ComponentRegistry[field.componentName];
-                return (
-                    <Draggable
-                        key={field.id}
-                        draggableId={field.id}
-                        index={index}
-                    >
-                        {(provided, _snapshot) =>
-                            component && (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={{ ...provided.draggableProps.style }}
-                                >
-                                    <BoxField
-                                        id={field.id}
-                                        size={3}
-                                        onEdit={() => handleEditClick(field)}
-                                    >
-                                        {React.createElement(component, {
-                                            comp: field,
-                                            componentId: field.id,
-                                        })}
-                                    </BoxField>
-                                </div>
-                            )
-                        }
-                    </Draggable>
-                );
-            })
-        ) : (
-            <GenNoInfoField />
-        );
+    const renderFields = (onDrop: boolean) =>
+        formFields.length > 0
+            ? formFields.map((field: DroppedComponent, index: number) => {
+                  const component = ComponentRegistry[field.componentName];
+                  return (
+                      <Draggable
+                          key={field.id}
+                          draggableId={field.id}
+                          index={index}
+                      >
+                          {(provided, _snapshot) =>
+                              component && (
+                                  <div
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      style={{
+                                          ...provided.draggableProps.style,
+                                      }}
+                                  >
+                                      <BoxField
+                                          id={field.id}
+                                          size={3}
+                                          onEdit={() => handleEditClick(field)}
+                                      >
+                                          {React.createElement(component, {
+                                              comp: field,
+                                              componentId: field.id,
+                                          })}
+                                      </BoxField>
+                                  </div>
+                              )
+                          }
+                      </Draggable>
+                  );
+              })
+            : !onDrop && <GenNoInfoField />;
 
     const renderButtons = () =>
         buttonComponents.map((button: DroppedComponent, index: number) => {
@@ -132,13 +133,13 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                         <div
                             ref={provided.innerRef}
                             {...provided.droppableProps}
-                            className={`grid grid-cols-4 gap-4 ${
+                            className={cn(`grid grid-cols-${colSize} gap-4 ${
                                 snapshot.isDraggingOver
                                     ? 'border-2 border-dashed border-igrp p-2'
                                     : ''
-                            }`}
+                            }`)}
                         >
-                            {renderFields()}
+                            {renderFields(snapshot.isDraggingOver)}
                             {provided.placeholder}
                         </div>
                     )}

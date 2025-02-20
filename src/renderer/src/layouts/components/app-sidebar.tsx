@@ -200,7 +200,10 @@ export function AppSidebar({
                     <SidebarContent className="mb-20">
                         <ScrollArea>
                             {activeMenuGroup === 'Explorer' ? (
-                                <FileExplorerSidebar basePath={basePath} />
+                                <FileExplorerSidebar
+                                    basePath={basePath}
+                                    searchTerm={searchQuery}
+                                />
                             ) : activeMenuGroup === 'Git' ? (
                                 <GitCommitsSidebar
                                     basePath={basePath}

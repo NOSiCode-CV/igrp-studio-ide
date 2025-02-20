@@ -109,6 +109,7 @@ const ModelLayout = ({
             attributes,
             revision,
             models,
+            t
         });
         setTableColumns(res);
     }, [selectors, formik.values]);

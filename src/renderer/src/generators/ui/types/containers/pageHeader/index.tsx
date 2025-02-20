@@ -65,7 +65,6 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
             );
         });
 
-    console.log(buttonComponents.length, componentId);
     return (
         <PageHeader title={title}>
             <Droppable
@@ -74,7 +73,6 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
                 direction="horizontal"
             >
                 {(provided, snapshot) => {
-                    console.log(provided.placeholder);
 
                     return (
                         <div

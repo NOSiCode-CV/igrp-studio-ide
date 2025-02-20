@@ -95,7 +95,8 @@ export const getTablesColumns = ({
 	selectors,
 	attributes,
 	revision,
-	models
+	models,
+	t
 }): { [value: string]: IColumnsTabelProps[] } => {
 
 	const modelsOptions = (models || [])
@@ -129,8 +130,8 @@ export const getTablesColumns = ({
 	)
 	return {
 		attributes: [
-			{ key: 'name', name: 'Name', type: 'text' },
-			{ key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
+			{ key: 'name', name: t('name'), type: 'text' },
+			{ key: 'type', name: t('type'), type: 'select', options: fieldTypeOptions },
 			{
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
@@ -140,24 +141,24 @@ export const getTablesColumns = ({
 			}
 		],
 		indexes: [
-			{ key: 'name', name: 'Name', type: 'text', width: '25%' },
+			{ key: 'name', name: t('name'), type: 'text', width: '25%' },
 			{
 				key: 'columns',
-				name: 'Columns',
+				name: t('columns'),
 				type: 'multiSelect',
 				options: columns,
 				width: '50%'
 			},
 			{
 				key: 'unique',
-				name: 'Unique',
+				name: t('unique'),
 				type: 'checkbox',
 				width: '25%'
 			}
 		],
 		uniqueConstraints: [
-			{ key: 'name', name: 'Name', type: 'text', width: '25%' },
-			{ key: 'columns', name: 'Columns', type: 'multiSelect', options: columns, width: '50%' }
+			{ key: 'name', name: t('name'), type: 'text', width: '25%' },
+			{ key: 'columns', name: t('columns'), type: 'multiSelect', options: columns, width: '50%' }
 		]
 	}
 }

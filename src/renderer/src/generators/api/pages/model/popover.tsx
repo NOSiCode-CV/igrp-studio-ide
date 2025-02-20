@@ -45,7 +45,7 @@ export function PopoverModel({
     useEffect(() => {
         setIsPrimary(row?.['primaryKey'] === true);
     }, [row]);
-    console.log(options);
+
     return (
         <Popover>
             <Tooltip>

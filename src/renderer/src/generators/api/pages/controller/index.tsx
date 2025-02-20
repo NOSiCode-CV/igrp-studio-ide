@@ -117,7 +117,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     }, [currentItem]);
 
     useEffect(() => {
-        const res = getTablesColumns(selectors, enumTypes);
+        const res = getTablesColumns(selectors, enumTypes, t);
         setTableColumns(res);
     }, [selectors]);
 
@@ -418,7 +418,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     <CardHeader>
                         <CardTitle>{t('definition')}</CardTitle>
                         <CardDescription>
-                            {t('controllerDefintion')}
+                            {t('controllerDefinition')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

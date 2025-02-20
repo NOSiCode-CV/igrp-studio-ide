@@ -1,6 +1,7 @@
 export const COLUMN = 'column'
 export const COMPONENT = 'component';
 export const FEILD = 'field';
+export const APP_COMPONENT = 'appcomponent';
 
 export const CONTAINER = {
     FORMS_LISTS: "formsLists",

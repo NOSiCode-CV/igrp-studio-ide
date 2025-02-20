@@ -4,6 +4,7 @@ import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import ColContainer, { ColProps } from './ColContainer';
 import { generateId } from '@renderer/utils/helpers';
 import { HierarchicalComponent } from '@renderer/generators/ui/interfaces';
+import { cn } from '@renderer/lib/utils';
 
 interface RowContainerProps {
     id: string;
@@ -63,13 +64,12 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
 
     return (
         <div id={id} className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm">
-            {/* RowOptions only visible on hover */}
             <RowOptions
                 onClickAddControl={handleClickAddControl}
                 onClickStructure={handleClickStructure}
                 onClickDeleteSection={() => onClickDeleteSection(id)}
             />
-            <div className='w-full p-3 flex flex-1'>
+            <div className={cn('bg-white w-full p-3 grid gap-4', `grid-cols-${columns.length}`)}>
                 {columns.map((column, index) => {
                     return (
                         <ColContainer key={index} rowId={id} columnId={column.id} colSize={column.colSize} />

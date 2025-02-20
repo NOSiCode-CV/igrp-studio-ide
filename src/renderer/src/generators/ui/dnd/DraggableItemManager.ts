@@ -93,9 +93,6 @@ export const handleDropComponent = (draggableId, destination, { addDroppedCompon
 
 export const handleDropField = (draggableId, destination, { updateComponent, getComponent }) => {
 
-    console.log(draggableId)
-
-
     const label = draggableId
     const componentId = destination.droppableId;
     const insertIndex = destination.index;

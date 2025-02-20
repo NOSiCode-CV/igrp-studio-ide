@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
 import { Component, Trash } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PageCardProps {
     page: {
@@ -10,19 +11,29 @@ interface PageCardProps {
         created: string;
         content: {
             pageName: string;
+            name: string;
         };
     };
+    isPage: boolean;
     onDelete: (page: any) => void;
     onAddComponents: (page: any) => void;
 }
 
-export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
+export function PageCard({
+    page,
+    isPage,
+    onDelete,
+    onAddComponents,
+}: PageCardProps) {
+    const { t } = useTranslation();
     return (
         <Card>
             <CardContent className="pt-6">
-                <h3 className="font-semibold mb-2">{page?.content.pageName}</h3>
+                <h3 className="font-semibold mb-2">
+                    {page.content?.pageName || page.content?.name}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                    Created: {page.created}
+                    {t('Type')}: {isPage ? 'Page' : 'Component'}
                 </p>
             </CardContent>
             <CardFooter className="flex justify-between">
@@ -32,7 +43,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
                     onClick={() => onAddComponents(page)}
                 >
                     <Component className="h-4 w-4 mr-2" />
-                    Add Components
+                    {isPage ? t('addComponents') : t('editComponents')}
                 </Button>
                 <Button
                     variant="ghost"
@@ -40,7 +51,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
                     onClick={() => onDelete(page)}
                 >
                     <Trash className="h-4 w-4 text-red-500" />
-                    <span>Delete</span>
+                    <span>{t('delete')}</span>
                 </Button>
             </CardFooter>
         </Card>

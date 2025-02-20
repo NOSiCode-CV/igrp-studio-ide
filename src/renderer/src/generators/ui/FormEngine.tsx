@@ -31,7 +31,7 @@ const addRow = () => {
 };
 
 interface FormEngineProps {
-    basePath: string | undefined;
+    basePath: string;
     page: string;
     pagePath: string | undefined;
     isDesign: boolean;
@@ -189,11 +189,13 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         return (
             <DragDropContext onDragEnd={onDragEnd}>
-                <AppSidebar data={navData} />
+                <AppSidebar data={navData} basePath={basePath} />
                 <SidebarInset>
                     {isDesign ? (
-                        <ScrollArea className="!h-[calc(100svh-var(--header-height-two))]">
-                            <div className="px-4 py-5">
+                        <ScrollArea className="!h-[calc(100svh-var(--header-height-two))] bg-custom-pattern">
+                            <div
+                                className="px-4 py-5"
+                            >
                                 {components.map((row) => (
                                     <RowContainer
                                         key={row.id}
