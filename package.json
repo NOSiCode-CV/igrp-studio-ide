@@ -1,9 +1,9 @@
 {
-	"name": "igrp-studio",
-	"version": "0.0.1",
-	"description": "IGRP Studio for dev",
+	"name": "@igrp/igrp-studio",
+	"version": "0.0.1-alpha",
+	"description": "IGRP Studio for development",
 	"main": "dist/main/index.js",
-	"author": "nosi.cv",
+	"author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
 	"homepage": "igrp.cv",
 	"scripts": {
 		"format": "prettier --write .",
