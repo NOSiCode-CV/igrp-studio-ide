@@ -38,6 +38,14 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
+    'engine:create-permission',
+    async (_event, data: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createPermission(data, basePath);
+    }
+);
+
+handleWithCustomErrors(
     'engine:delete-element',
     async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);

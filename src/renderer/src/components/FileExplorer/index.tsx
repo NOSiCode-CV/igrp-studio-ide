@@ -1,4 +1,4 @@
-import { File, Folder, ChevronRight } from 'lucide-react'; // Ícones da Lucide
+import { File, Folder, ChevronRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { FileTree } from 'src/main/types';
 import {
@@ -6,28 +6,41 @@ import {
     SidebarMenuSub,
     SidebarMenuItem,
     SidebarMenuButton,
-} from '@renderer/components/ui/sidebar'; // Componentes do shadcn/ui
+} from '@renderer/components/ui/sidebar';
 import {
     Collapsible,
     CollapsibleTrigger,
     CollapsibleContent,
-} from '@renderer/components/ui/collapsible'; // Componentes do shadcn/ui
+} from '@renderer/components/ui/collapsible';
 import { ScrollArea } from '../ui/scroll-area';
 
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
+import { createSelector } from 'reselect';
 
 interface FileExplorerSidebarProps {
     basePath: string;
+    searchTerm: string;
 }
 
 const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
     basePath,
+    searchTerm,
 }) => {
     const [fileTree, setFileTree] = useState<FileTree[]>([]);
 
     const dispatch: any = useDispatch();
+
+    const selectStudioState = (state: any) => state.PageBuilder;
+    const selectStudioProperties = createSelector(
+        selectStudioState,
+        (studio) => ({
+            changeStatus: studio.changeStatus,
+        })
+    );
+
+    const { changeStatus } = useSelector(selectStudioProperties);
 
     useEffect(() => {
         const loadFileTree = async () => {
@@ -35,14 +48,35 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
             setFileTree(tree);
         };
         loadFileTree();
-    }, [basePath]);
+    }, [basePath, changeStatus]);
 
     const handleFileSelect = (item: FileTree) => {
-        dispatch(onSetCurrentItem({ ...item, type: OPTION_TYPE.FILE_THREE, label: item.name }));
+        dispatch(
+            onSetCurrentItem({
+                ...item,
+                type: OPTION_TYPE.FILE_THREE,
+                label: item.name,
+            })
+        );
     };
 
+    const filterTree = (tree: FileTree[], term: string): FileTree[] => {
+        return tree.filter((item) => {
+            if (item.name.toLowerCase().includes(term.toLowerCase())) {
+                return true;
+            }
+            if (item.children) {
+                item.children = filterTree(item.children, term);
+                return item.children.length > 0;
+            }
+            return false;
+        });
+    };
+
+
     const renderTree = (tree: FileTree[]) => {
-        return tree.map((item) => (
+        const filteredTree = searchTerm ? filterTree(tree, searchTerm) : tree;
+        return filteredTree.map((item) => (
             <SidebarMenuItem key={item.path}>
                 {item.isDirectory ? (
                     <Collapsible>

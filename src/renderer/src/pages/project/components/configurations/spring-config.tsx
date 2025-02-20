@@ -13,9 +13,10 @@ import { ProjectData, SpringConfigData } from 'src/main/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/required';
+import { Separator } from '@renderer/components/ui/separator';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -31,6 +32,7 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
+    enableEntityRevision: false,
     igrpCoreVersion: '',
 };
 
@@ -164,9 +166,7 @@ export function SpringConfig({
                     )}
                 </div>
                 <div className="space-y-2 flex flex-col">
-                    <LabelRequired>
-                        {t('igrpCoreVersion')}
-                    </LabelRequired>
+                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
                     <Combobox
                         options={versions || []}
                         name="igrpCoreVersion"
@@ -183,6 +183,8 @@ export function SpringConfig({
                     )}
                 </div>
             </div>
+
+            <Separator orientation="horizontal" />
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
@@ -210,20 +212,37 @@ export function SpringConfig({
                     </RadioGroup>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="observability"
-                        checked={data.enableObservability}
-                        onCheckedChange={(checked) =>
-                            onChange({
-                                ...data,
-                                enableObservability: checked as boolean,
-                            })
-                        }
-                    />
-                    <Label htmlFor="observability">
-                        {t('enableObservability')}
-                    </Label>
+                <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="observability"
+                            checked={data.enableObservability}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableObservability: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="observability">
+                            {t('enableObservability')}
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="enableEntityRevision"
+                            checked={data.enableEntityRevision}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableEntityRevision: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="enableEntityRevision">
+                            {t('enableEntityRevision')}
+                        </Label>
+                    </div>
                 </div>
             </div>
         </div>

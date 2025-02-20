@@ -7,6 +7,9 @@ import { ProjectData } from '../types';
 import { ResponseConfig } from '@igrp/dotnet-engine/dist/interfaces/types';
 
 export class NextjsEngine implements BaseEngine {
+  createPermission (_data: any, _basePath: string) : Promise<void>{
+    throw new Error('Method not implemented.');
+  }
   serializeElement(_data: any, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }

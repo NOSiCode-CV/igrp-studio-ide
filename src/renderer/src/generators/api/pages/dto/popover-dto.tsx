@@ -1,6 +1,6 @@
 import { Combobox } from '@igrp/igrp-design-system';
 import { Button } from '@renderer/components/ui/button';
-import { Switch } from '@renderer/components/ui/Switch';
+import { Switch } from '@renderer/components/ui/switch';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import {

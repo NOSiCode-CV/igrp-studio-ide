@@ -1,5 +1,4 @@
 import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -15,7 +14,7 @@ import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
 
 interface EnumProps {
@@ -92,6 +91,21 @@ export const EnumLayout = ({
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const handleSave = async (): Promise<void> => {
         try {
             const data = { ...formik.values, module: currentItem.module };
@@ -108,11 +122,7 @@ export const EnumLayout = ({
                     return { type: type === 'text' ? 'string' : type, name };
                 }
             );
-            const values = {
-                ...data,
-                values: convertedValues,
-                attributes,
-            };
+            const values = { ...data, values: convertedValues, attributes };
 
             const { error } = await window.engine.createEnum(
                 values,
@@ -130,10 +140,7 @@ export const EnumLayout = ({
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
-                t('createdSuccess', {
-                    name: t('enum'),
-                    value: values.name,
-                })
+                t('createdSuccess', { name: t('enum'), value: values.name })
             );
         } catch (error: unknown) {
             showErrorToast(error);

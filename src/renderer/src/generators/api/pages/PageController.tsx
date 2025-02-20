@@ -13,13 +13,15 @@ import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
 import { EnumLayout } from './enum/EnumLayout';
 import { EditorLayout } from './EditorLayout';
-import { FileTree } from 'src/main/types';
-import { TabItem, useTabs } from '@renderer/components/TabContext';
+import { FileTree, ProjectData } from 'src/main/types';
+import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
+import { PermissionsLayout } from './permissions';
 
 interface PageBuilderState {
     basePath: string;
     currentItem: any;
     filesThree: FileTree[];
+    config: ProjectData;
 }
 
 interface NewProps {
@@ -28,21 +30,14 @@ interface NewProps {
     tab: TabItem;
 }
 
-const PageController = ({
-    onOpenNew,
-    open,
-    tab,
-}: NewProps): JSX.Element => {
+const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
     const [module, setModule] = useState<string>('shared');
 
     const { t } = useTranslation();
 
-     const {
-            handleCloseTab,
-            handleUpdateTab,
-        } = useTabs();
+    const { handleCloseTab, handleUpdateTab } = useTabs();
 
     const selectState = (state: any): PageBuilderState => state.PageBuilder;
 
@@ -51,18 +46,28 @@ const PageController = ({
 
         return {
             basePath: studio.basePath,
+            config: studio.config,
             models: extractByType(moduleData, OPTION_TYPE.MODELS),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
             responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
             enums: extractByType(moduleData, OPTION_TYPE.ENUM),
+            permissions: extractByType(moduleData, OPTION_TYPE.PERMISSIONS),
             modules: getModulesArray(studio.filesThree),
             filesThree: studio.filesThree,
         };
     });
 
-    const { basePath, models, dto, modules, responses, enums } =
-        useSelector(selectProperties);
+    const {
+        basePath,
+        config,
+        models,
+        dto,
+        modules,
+        responses,
+        enums,
+        permissions,
+    } = useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -123,6 +128,7 @@ const PageController = ({
                             selectors={selectors}
                             models={models}
                             currentItem={tab.item}
+                            config={config}
                             onCloseTab={hangleClose}
                             onUpdateTab={handleUpdate}
                         />
@@ -170,6 +176,15 @@ const PageController = ({
                         <EnumLayout
                             basePath={basePath}
                             selectors={selectors}
+                            currentItem={tab.item}
+                            onCloseTab={hangleClose}
+                        />
+                    )}
+                    {option === OPTION_TYPE.PERMISSIONS && (
+                        <PermissionsLayout
+                            basePath={basePath}
+                            selectors={selectors}
+                            permissions={permissions}
                             currentItem={tab.item}
                             onCloseTab={hangleClose}
                         />

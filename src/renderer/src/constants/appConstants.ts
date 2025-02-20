@@ -27,10 +27,11 @@ export enum OPTION_TYPE {
     ENUM = 'enum',
     DELETE = 'delete',
     ERDDiagram = "ERDDiagram",
-    FILE_THREE = "filethree"
+    FILE_THREE = "filethree",
+    PERMISSIONS = "permissions"
 };
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree';
+export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree' | 'permissions';
 
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',

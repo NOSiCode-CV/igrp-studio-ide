@@ -1,4 +1,4 @@
-import { TabProvider } from '@renderer/components/TabContext';
+import { TabProvider } from '@renderer/components/navigation/TabContext';
 import TabManager from './components/TabManager';
 
 interface PageBuilderProps {

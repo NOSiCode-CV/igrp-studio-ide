@@ -13,9 +13,9 @@ import RecentsProjects from './components/recents-projects';
 import { PageHeader } from '@igrp/igrp-design-system';
 import { ProjectWizard } from '../project';
 import { IOpenProject } from 'src/main/types';
-import { CloneProjectModal } from './components/clone-project-modal';
+import { CloneProjectModal } from '../../components/git/clone-project-modal';
 
-const IDEInitialScreen = (): JSX.Element => {
+const IDEInitialScreen = () => {
     const { t } = useTranslation();
 
     const navigate = useNavigate();
@@ -46,10 +46,8 @@ const IDEInitialScreen = (): JSX.Element => {
         navigateToNextPage(navigate, config);
     };
 
-    const handleCloneProject = (
+    const handleCloneProject = async (
         url: string,
-        name: string,
-        location: string,
         auth: {
             type: string;
             username?: string;
@@ -57,26 +55,26 @@ const IDEInitialScreen = (): JSX.Element => {
             token?: string;
         }
     ) => {
-        console.log(`Cloning project: ${name} from ${url} to ${location}`);
-        console.log(`Authentication type: ${auth.type}`);
         if (auth.type === 'basic') {
             console.log(`Using basic auth with username: ${auth.username}`);
         } else if (auth.type === 'token') {
             console.log('Using token authentication');
         }
-        // Implement the logic to clone the project with authentication
-    };
 
+        try {
+            await window.electron.ipcRenderer.invoke('clone-repository', url);
+        } catch (error) {}
+    };
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
             <PageHeader title={t('welcome')}>
-                <div className="flex justify-end space-x-3 ">
+                <div className="flex justify-end space-x-3">
                     <ProjectWizard />
 
                     <CloneProjectModal handleCloneProject={handleCloneProject}>
                         <Button variant="outline">
                             <GitFork className="w-4 h-4 mr-2" />
-                            Clone Project
+                            {t('cloneProject')}
                         </Button>
                     </CloneProjectModal>
 
@@ -94,5 +92,4 @@ const IDEInitialScreen = (): JSX.Element => {
         </div>
     );
 };
-
 export default IDEInitialScreen;

@@ -30,9 +30,7 @@ import { NextConfig } from './components/configurations/next-config';
 import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import {
-    projectIcons,
-} from '@renderer/constants/appConstants';
+import { projectIcons } from '@renderer/constants/appConstants';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
@@ -50,6 +48,7 @@ import {
 import { ProjectData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
+import { LabelRequired } from '@renderer/components/required';
 
 export function ProjectWizard() {
     const [open, setOpen] = React.useState(false);
@@ -123,16 +122,11 @@ export function ProjectWizard() {
             errors?: FormikErrors<ProjectData>;
             onChange: (config: any) => void;
         }>
-    > = {
-        springboot: SpringConfig,
-        nextjs: NextConfig,
-        dotnet: DotNetConfig,
-    };
+    > = { springboot: SpringConfig, nextjs: NextConfig, dotnet: DotNetConfig };
 
-    const frameworks =
-        formik.values.type === 'frontend'
-            ? frontendFrameworks
-            : backendFrameworks;
+    const isFrontend = formik.values.type === 'frontend';
+
+    const frameworks = isFrontend ? frontendFrameworks : backendFrameworks;
 
     const canNavigateToStep = (targetStep: number) => {
         if (targetStep === 1) return true;
@@ -154,6 +148,8 @@ export function ProjectWizard() {
 
     const handleNext = async () => {
         const errors = await formik.validateForm();
+
+        if (step === 1 && errors.name) return;
 
         if (
             step === 3 &&
@@ -215,6 +211,21 @@ export function ProjectWizard() {
         formik.handleBlur('projectName');
     }, []);
 
+    React.useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
+                event.preventDefault();
+                setOpen(true);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -253,10 +264,9 @@ export function ProjectWizard() {
                         {step === 1 && (
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">
+                                    <LabelRequired>
                                         {t('projectName')}
-                                        <span className="text-red-500"> *</span>
-                                    </Label>
+                                    </LabelRequired>
                                     <Input
                                         id="name"
                                         name="name"
@@ -521,32 +531,40 @@ export function ProjectWizard() {
                                                 )}
                                         </div>
 
-                                        <div>
-                                            <Label>{t('themeColor')}</Label>
-                                            <div className="grid grid-cols-12 gap-2 mt-2">
-                                                {THEME_COLORS.map((color) => (
-                                                    <button
-                                                        key={color.value}
-                                                        type="button"
-                                                        onClick={() =>
-                                                            formik.setFieldValue(
-                                                                'themeColor',
-                                                                color.value
-                                                            )
-                                                        }
-                                                        className={`
+                                        {isFrontend && (
+                                            <div>
+                                                <Label>{t('themeColor')}</Label>
+                                                <div className="grid grid-cols-12 gap-2 mt-2">
+                                                    {THEME_COLORS.map(
+                                                        (color) => (
+                                                            <button
+                                                                key={
+                                                                    color.value
+                                                                }
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    formik.setFieldValue(
+                                                                        'themeColor',
+                                                                        color.value
+                                                                    )
+                                                                }
+                                                                className={`
                               w-8 h-8 rounded-full 
                               ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
                             `}
-                                                        style={{
-                                                            backgroundColor:
-                                                                color.value,
-                                                        }}
-                                                        title={color.name}
-                                                    />
-                                                ))}
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        color.value,
+                                                                }}
+                                                                title={
+                                                                    color.name
+                                                                }
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

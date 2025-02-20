@@ -6,7 +6,9 @@ import { BaseApiConfig, DeleteConfig, EnumConfig, ResponseConfig } from '@igrp/s
 import { ProjectData } from '../types';
 
 export class SpringEngine implements BaseEngine {
-
+  createPermission (_data: any, _basePath: string) : Promise<void>{
+    throw new Error('Method not implemented.');
+  }
   async delete(config: DeleteConfig, basePath: string): Promise<void> {
     await deleteElement(config, basePath)
   }

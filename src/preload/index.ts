@@ -153,8 +153,14 @@ const engine = {
 		} catch (error) {
 			return handleError(error)
 		}
+	},
+	createPermission: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:create-permission', data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
 	}
-
 }
 
 const repo = {

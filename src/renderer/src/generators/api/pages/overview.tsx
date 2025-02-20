@@ -8,15 +8,17 @@ import DashboardOverview from '../components/dashboard-overview';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { ContainerScrollArea } from '../components/ContainerScrollArea';
-import { TabItem } from '@renderer/components/TabContext';
+import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
     open: OptionType;
 }
 
-const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
+const Overview = ({}: NewProps): JSX.Element => {
     const { t } = useTranslation();
+
+    const { newTab } = useTabs();
 
     // Initialize stats with useState
     const [stats, setStats] = useState({
@@ -27,19 +29,13 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     });
 
     const handleOptionClick = (opt: OptionType) => {
-        onOpenNew({
-            id: `tab-${Date.now()}`,
-            title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
-            open: opt,
-        });
+        newTab({ type: opt });
     };
 
     const selectStudioState = (state: any) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
-        (studio) => ({
-            filesThree: studio.filesThree,
-        })
+        (studio) => ({ filesThree: studio.filesThree })
     );
 
     const { filesThree } = useSelector(selectStudioProperties);
@@ -47,7 +43,9 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     useEffect(() => {
         const newStats = { modules: 0, controllers: 0, models: 0, dto: 0 };
 
-        newStats.modules = filesThree.filter((file) => file.name !== 'shared').length;
+        newStats.modules = filesThree.filter(
+            (file) => file.name !== 'shared'
+        ).length;
 
         filesThree.forEach((file: any) => {
             if (!file.children) return;
@@ -66,8 +64,8 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
         <ContainerScrollArea>
             <div className="w-full max-w-4xl mx-auto space-y-8 p-6 mb-10">
                 <PageHeader
-                    title="API Overview"
-                    description="Manage your API endpoints"
+                    title={t('apiOverview')}
+                    description={t('manageApiEndpoints')}
                 />
                 <DashboardOverview stats={stats} />
                 <EmptyPage onClick={handleOptionClick} />

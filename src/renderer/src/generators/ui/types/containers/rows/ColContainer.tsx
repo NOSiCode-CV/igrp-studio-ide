@@ -3,10 +3,13 @@ import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { DroppedComponent } from '@renderer/generators/ui/interfaces';
-import ModalEdition from '@renderer/generators/ui/components/EditComponent/ModalEdition';
 import { COMPONENT } from '@renderer/generators/ui/ComponentTypes';
-import { AcceptTypesRegistry, ComponentRegistry } from '@renderer/generators/ui/data/ComponentRegistry';
+import {
+    AcceptTypesRegistry,
+    ComponentRegistry,
+} from '@renderer/generators/ui/data/ComponentRegistry';
 import { GenNoInfoComp } from '@renderer/generators/ui/components/GenNoInfoComp';
+import { cn } from '@renderer/lib/utils';
 
 export interface ColProps {
     rowId: string;
@@ -14,12 +17,8 @@ export interface ColProps {
     colSize: number;
 }
 
-const getListStyle = isDraggingOver => ({
-    border: isDraggingOver ? '2px dashed blue' : 'none',
-});
-
 const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
-    const { getComponents, setEditingComponent, currentComponent } = useDroppedComponents();
+    const { getComponents, setEditingComponent } = useDroppedComponents();
     const components: DroppedComponent[] = getComponents(rowId, columnId);
 
     const handleEditClick = (component: Partial<DroppedComponent>) => {
@@ -27,70 +26,80 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
     };
 
     return (
-
-        <div className={`col-span-${colSize}`}
-            style={{ width: `${(colSize / 12) * 100}%` }}>
-            {currentComponent &&
-                <ModalEdition
-                    show={currentComponent !== null}
-                />
-            }
-
-            <div
-                className={`gen-column`}
-                id={columnId}
-            >
-                <Droppable droppableId={`${rowId}-${columnId}`}
-                    type={COMPONENT}
-                >
-                    {(provided: any, snapshot: any) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className='gen-container-placeholder space-y-4'
-                            style={getListStyle(snapshot.isDraggingOver)}
-                        >
-                            {components.length > 0 ? components.map((comp: DroppedComponent, index: number) => {
-                                const component = ComponentRegistry[comp.componentName];
-                                return (
-
-                                    <Draggable
-                                        key={comp.id}
-                                        draggableId={comp.id}
-                                        index={index}
-                                    >
-                                        {(provided: any) => (
-                                            <div key={comp.id}
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                            >
-
-                                                {component && (
-                                                    <BoxContainer key={comp.id}
-                                                        id={comp.id} tag={comp.id}
-                                                        onEdit={() => handleEditClick(comp)}
-                                                        dragHandleProps={provided.dragHandleProps}
-                                                    >
-                                                        {React.createElement(component, {
-                                                            comp,
-                                                            acceptTypes: AcceptTypesRegistry[comp.componentName],
-                                                            componentId: comp.id,
-                                                            onEdit: () => handleEditClick(comp),
-                                                        })}
-                                                    </BoxContainer>
-                                                )}
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                )
-                            }) : (
-                                <GenNoInfoComp />
-                            )}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </div>
+        <div className={cn(`bg-muted/70 rounded-lg p-2 col-span-${colSize}`)} id={columnId}>
+            <Droppable droppableId={`${rowId}-${columnId}`} type={COMPONENT}>
+                {(provided: any, snapshot: any) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={cn(
+                            'grid gap-4',
+                            snapshot.isDraggingOver
+                                ? 'border-2 border-dashed border-igrp p-2'
+                                : ''
+                        )}
+                    >
+                        {components.length > 0
+                            ? components.map(
+                                  (comp: DroppedComponent, index: number) => {
+                                      const component =
+                                          ComponentRegistry[comp.componentName];
+                                      return (
+                                          <Draggable
+                                              key={comp.id}
+                                              draggableId={comp.id}
+                                              index={index}
+                                          >
+                                              {(provided: any) => (
+                                                  <div
+                                                      key={comp.id}
+                                                      ref={provided.innerRef}
+                                                      {...provided.draggableProps}
+                                                  >
+                                                      {component && (
+                                                          <BoxContainer
+                                                              key={comp.id}
+                                                              id={comp.id}
+                                                              tag={comp.id}
+                                                              onEdit={() =>
+                                                                  handleEditClick(
+                                                                      comp
+                                                                  )
+                                                              }
+                                                              dragHandleProps={
+                                                                  provided.dragHandleProps
+                                                              }
+                                                          >
+                                                              {React.createElement(
+                                                                  component,
+                                                                  {
+                                                                      comp,
+                                                                      acceptTypes:
+                                                                          AcceptTypesRegistry[
+                                                                              comp
+                                                                                  .componentName
+                                                                          ],
+                                                                      componentId:
+                                                                          comp.id,
+                                                                      onEdit: () =>
+                                                                          handleEditClick(
+                                                                              comp
+                                                                          ),
+                                                                  }
+                                                              )}
+                                                          </BoxContainer>
+                                                      )}
+                                                  </div>
+                                              )}
+                                          </Draggable>
+                                      );
+                                  }
+                              )
+                            : !snapshot.isDraggingOver && <GenNoInfoComp />}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
         </div>
     );
 };

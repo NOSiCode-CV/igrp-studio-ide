@@ -69,6 +69,8 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                   }
                 : null;
 
+            console.log(newComponent);
+
             setComponents((prevComponents) => {
                 const updatedComponents = [...prevComponents];
 
@@ -114,28 +116,49 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                         },
                     ];
                 } else {
-                    let updatedColumn = { ...updatedRow.columns[columnIndex] };
+                    // Update existing column
+                    const updatedColumn = {
+                        ...updatedRow.columns[columnIndex],
+                    };
 
-                    // Se a coluna já existir e o componente não for nulo, adicionar o novo componente
-                    if (updatedColumn.components.length > 0 && newComponent) {
+                    if (newComponent) {
                         const insertIndex =
                             typeof index === 'number'
                                 ? index
                                 : updatedColumn.components.length;
 
-                        updatedColumn.components = [
-                            ...updatedColumn.components.slice(0, insertIndex),
-                            newComponent,
-                            ...updatedColumn.components.slice(insertIndex),
-                        ];
-                    } else if (newComponent) {
-                        // No components yet, just add the new component
-                        updatedColumn.components = [newComponent];
+                        // Check if a component with the same ID already exists
+                        const existingComponentIndex =
+                            updatedColumn.components.findIndex(
+                                (comp) => comp.id === newComponent.id
+                            );
+
+                        console.log(existingComponentIndex);
+                        if (existingComponentIndex !== -1) {
+                            // If the component exists, update it
+                            updatedColumn.components[existingComponentIndex] = {
+                                ...updatedColumn.components[
+                                    existingComponentIndex
+                                ],
+                                ...newComponent, // Merge existing props with new props
+                            };
+                        } else if (updatedColumn.components.length > 0) {
+                            // If the component doesn't exist and there are existing components, insert it
+                            updatedColumn.components = [
+                                ...updatedColumn.components.slice(
+                                    0,
+                                    insertIndex
+                                ),
+                                newComponent,
+                                ...updatedColumn.components.slice(insertIndex),
+                            ];
+                        } else {
+                            // If no components exist, add the new component as the first element
+                            updatedColumn.components = [newComponent];
+                        }
                     } else {
-                        updatedColumn = {
-                            ...updatedColumn,
-                            colSize: data.colSize,
-                        };
+                        // Update colSize if no new component is provided
+                        updatedColumn.colSize = data.colSize;
                     }
 
                     updatedRow.columns[columnIndex] = updatedColumn;

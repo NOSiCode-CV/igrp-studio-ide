@@ -9,13 +9,13 @@ import {
 import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { File } from 'src/main/types';
-import { Card, CardContent, CardHeader } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
-import { TableLayout } from '../components/TableLayout';
+import { LayoutDashboard, Plus } from 'lucide-react';
+import { Input } from '@renderer/components/ui/input';
+import { PageCard } from './page-card';
+import { IGRPContainer, PageHeader } from '@igrp/igrp-design-system';
 import { NewPageModal } from './new-page-modal';
-import { Component, Trash } from 'lucide-react';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
-import { PageHeader } from '@igrp/igrp-design-system';
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: File) => void;
@@ -29,32 +29,27 @@ const MainPageBuilder = ({
     const dispatch: any = useDispatch();
 
     const [content, setContent] = useState<any>([]);
+    const [components, setComponents] = useState<any>([]);
     const [page, setPage] = useState<any>([]);
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
+
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleAddComponents = (page: any) => {
+        onPageClick?.(page);
+    };
 
     const selectState = (state: any) => state.PageBuilder;
 
     const selectProperties = createSelector(selectState, (studio) => ({
         basePath: studio.basePath,
         config: studio.config,
-        pages: studio.filesThree,
+        files: studio.filesThree,
     }));
 
-    const { basePath, pages } = useSelector(selectProperties);
-
-    const tableColumns = [
-        {
-            header: 'Page Name',
-            accessorKey: 'name',
-            enableSorting: true,
-            enableColumnFilter: true,
-        },
-        { header: 'URL', accessorKey: 'url' },
-        { header: 'Status', accessorKey: 'status' },
-        { header: 'Created', accessorKey: 'created' },
-    ];
+    const { basePath, files, config } = useSelector(selectProperties);
 
     const handleDeletePage = () => {
         const pageConfig: PageConfig = {
@@ -73,19 +68,6 @@ const MainPageBuilder = ({
         isLoadingTable(true);
     };
 
-    const onClickDelete = (page: any) => {
-        setPage(page);
-        setDeleteModal(true);
-    };
-
-    const onClickNewPage = () => {
-        setNewPageModal(true);
-    };
-
-    const onClickBtnGerador = (item: File) => {
-        if (onPageClick) onPageClick(item);
-    };
-
     useEffect(() => {
         if (loadingTable) {
             dispatch(onGetPages(basePath));
@@ -94,60 +76,72 @@ const MainPageBuilder = ({
     }, [loadingTable]);
 
     useEffect(() => {
-        console.log(pages);
+        if (files) {
+            const pages = files.find((page) => page.name === 'pages');
+            const components = files.find((page) => page.name === 'components');
 
-        if (pages) {
-            const page = pages.find((page) => page.name === 'pagesMeta.json');
+            if (pages && pages.children) {
+                setContent(pages.children);
+            }
 
-            if (page && page.content && page.content.resourceItems) {
-                const resourceItems = page.content.resourceItems;
-                setContent(resourceItems);
+            if (components && components.children) {
+                setComponents(components.children);
             }
         }
-    }, [pages]); 
+    }, [files]);
 
-    const actions = (cell: any) => (
-        <div className="flex space-x-2">
-            <Button
-                title="Add Components"
-                variant="ghost"
-                size="icon"
-                onClick={() => onClickBtnGerador(cell.row.original)}
-            >
-                <Component className="h-4" />
-            </Button>
-            <Button
-                title="Delete Page"
-                variant="ghost"
-                size="icon"
-                onClick={() => onClickDelete(cell.row.original)}
-            >
-                <Trash className="h-4 text-red-500" />
-            </Button>
-        </div>
+    const filteredPages = content.filter((page) =>
+        page.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredComponents = components.filter((comp) =>
+        comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <div className="container mt-4">
-            <PageHeader title={'IGRP UI'} />
-            <Card>
-                <CardHeader className="flex flex-1 flex-row justify-between">
-                    <h4 className="text-lg font-semibold">{t('pageLists')}</h4>
-                    <div className="ml-auto">
-                        <Button size="sm" onClick={onClickNewPage}>
-                            {t('create')}
-                        </Button>
+        <div className="container mx-auto p-4">
+            <PageHeader title={config?.name} description={config?.description}>
+                <Button size="sm" onClick={() => setNewPageModal(true)}>
+                    <Plus />
+                    {t('addPage')}
+                </Button>
+            </PageHeader>
+            <IGRPContainer>
+                <div className="flex items-center text-foreground">
+                    <LayoutDashboard className="w-5 h-5 mr-2" />
+                    {t('pageLists')}
+                </div>
+                <div>
+                    <div className="mb-4">
+                        <Input
+                            placeholder={t('seachPages')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                </CardHeader>
-                <CardContent>
-                    <TableLayout
-                        content={content || []}
-                        columns={tableColumns}
-                        actions={actions}
-                    />
-                </CardContent>
-            </Card>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {filteredPages.map((page) => (
+                            <PageCard
+                                key={page.name}
+                                page={page}
+                                onDelete={() => setDeleteModal(true)}
+                                onAddComponents={handleAddComponents}
+                                isPage
+                            />
+                        ))}
 
+                        {filteredComponents.map((comp) => (
+                            <PageCard
+                                key={comp.name}
+                                page={comp}
+                                onDelete={() => setDeleteModal(true)}
+                                onAddComponents={handleAddComponents}
+                                isPage={false}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </IGRPContainer>
             <NewPageModal
                 basePath={basePath}
                 isOpen={newPageModal}

@@ -20,7 +20,7 @@ import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 
 interface DtoProps {
     basePath: string;
@@ -104,6 +104,22 @@ const DtoLayout = ({
         });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
+
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault(); 
+                handleSave(formik.values); 
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {

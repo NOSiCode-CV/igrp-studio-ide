@@ -166,7 +166,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
             {/* Response Tab Content */}
             <div>
                 {Object.keys(responses).map((statusCode) => {
-                    const description = responses[statusCode].description;
+                    const description = responses[statusCode].description || '';
                     const name = responses[statusCode].name;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];

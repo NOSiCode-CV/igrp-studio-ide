@@ -5,6 +5,9 @@ export function useProjectValidation({ t, step }) {
     const validationSchema = Yup.object().shape({
         name: Yup.string().required(
             t('fieldRequired', { name: t('projectName') })
+        ).matches(
+            PATTERNS.NAME_VALIDATION_PATTERN,
+            t('msgInfoAccept')
         ).max(
             20,
             t('maxLengthExceeded', { max: 20 })

@@ -20,4 +20,5 @@ export interface BaseEngine {
     createResponse(config: ResponseConfig, basePath: string): Promise<void>;
     createEnum(data: EnumConfig, basePath: string): Promise<void>;
     serializeElement: (data: any, basePath: string) => Promise<void>;
+    createPermission: (data: any, basePath: string) => Promise<void>;
 }

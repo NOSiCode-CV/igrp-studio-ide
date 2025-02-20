@@ -22,12 +22,14 @@ import './handlers/dbHandler';
 import { updateApp } from './helpers/update'
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
+import NextJsManager from './helpers/nextjsManager'
 
 const backend = require('i18next-electron-fs-backend')
 
+
 let mainWindow: BrowserWindow
 
-const repo = new ProjectRepository()
+let repo, nextJsManager
 
 // Load the initial language configuration
 loadConfig();
@@ -51,6 +53,10 @@ function createWindow(): void {
     titleBarStyle: "hidden",
     icon: path.join(__dirname, 'resources/icons', 'icon.icns'), // Set icon for the window
   })
+
+  repo = new ProjectRepository()
+
+  nextJsManager = new NextJsManager(mainWindow);
 
   mainWindow.maximize()
 
@@ -232,7 +238,7 @@ ipcMain.handle('get-app-version', () => {
 ipcMain.on('open-directory-dialog', async (event) => {
   await dialog
     .showOpenDialog(mainWindow, {
-      properties: ['openDirectory'],
+      properties: ['openDirectory', 'createDirectory'],
       buttonLabel: 'Select Destination Folder'
     })
     .then((result) => {
@@ -499,4 +505,20 @@ ipcMain.handle('get-language', () => {
 ipcMain.handle('set-language', (_, lang: string) => {
   setCurrentLanguage(lang);
   return lang; // Return the new language for confirmation
+});
+
+// NEXTJS
+
+ipcMain.on('start-nextjs', (_event, basePath) => {
+  nextJsManager.setNextJsPath(basePath); // Define o base path
+  nextJsManager.startNextJsServer(); // Inicia o servidor
+});
+
+
+ipcMain.on('open-preview', (_event, pageName) => {
+  nextJsManager.openPreviewWindow(pageName); // Passa o nome da página
+});
+
+ipcMain.on('stop-nextjs', () => {
+  nextJsManager.stopNextJsServer();
 });

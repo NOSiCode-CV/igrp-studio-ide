@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
+import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import RowContainer from './types/containers/rows';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { generateId } from '@renderer/utils/helpers';
@@ -13,11 +13,12 @@ import { HierarchicalComponent } from './interfaces';
 
 import { DragDropContext } from '@hello-pangea/dnd';
 import { handleDragEnd } from './dnd/DraggableItemManager';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { AppSidebar } from '@renderer/layouts/components/app-ui-sidebar';
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
+import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
+import { SidebarRight } from './components/sidebar-right';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 const addRow = () => {
     const newRowId = generateId('row');
@@ -30,7 +31,7 @@ const addRow = () => {
 };
 
 interface FormEngineProps {
-    basePath: string | undefined;
+    basePath: string;
     page: string;
     pagePath: string | undefined;
     isDesign: boolean;
@@ -54,11 +55,11 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             getComponent,
             setEditingComponent,
             updateComponent,
+            clearEditingComponent,
+            currentComponent,
         } = useDroppedComponents();
 
         const components = getAllComponents();
-
-        //const [isDesign, setIsDesign] = useState(true);
 
         const { showErrorToast, showSuccessToast } = useToast();
 
@@ -102,9 +103,13 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         }, [components]);
 
+        useEffect(() => {
+            clearEditingComponent();
+        }, [isDesign]);
+
         const handleSave = async (jsonStructure: Component[]) => {
             try {
-                if (pagePath === undefined || basePath === undefined) return;
+                if (basePath === undefined) return;
 
                 const pageConfig: PageConfig = {
                     type: 'page',
@@ -184,42 +189,32 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         return (
             <DragDropContext onDragEnd={onDragEnd}>
-                <SidebarProvider
-                    style={
-                        {
-                            '--sidebar-width': '350px',
-                        } as React.CSSProperties
-                    }
-                >
-                    <AppSidebar data={navData} />
-                    <SidebarInset>
-                        {isDesign ? (
-                            <div className="flex flex-1 flex-col gap-4 px-4">
-                                <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto pr-3">
-                                    <>
-                                        <div className="igrp-page-header"></div>
-                                        <div className="space-y-6 my-6">
-                                            {components.map((row) => (
-                                                <RowContainer
-                                                    key={row.id}
-                                                    id={row.id}
-                                                    onClickAddControl={
-                                                        handleClickAddControl
-                                                    }
-                                                    onClickDeleteSection={
-                                                        handleClickDeleteSection
-                                                    }
-                                                />
-                                            ))}
-                                        </div>
-                                    </>
-                                </ScrollArea>
+                <AppSidebar data={navData} basePath={basePath} />
+                <SidebarInset>
+                    {isDesign ? (
+                        <ScrollArea className="!h-[calc(100svh-var(--header-height-two))] bg-custom-pattern">
+                            <div
+                                className="px-4 py-5"
+                            >
+                                {components.map((row) => (
+                                    <RowContainer
+                                        key={row.id}
+                                        id={row.id}
+                                        onClickAddControl={
+                                            handleClickAddControl
+                                        }
+                                        onClickDeleteSection={
+                                            handleClickDeleteSection
+                                        }
+                                    />
+                                ))}
                             </div>
-                        ) : (
-                            pagePath && <CodeContent pagePath={pagePath} />
-                        )}
-                    </SidebarInset>
-                </SidebarProvider>
+                        </ScrollArea>
+                    ) : (
+                        <CodeContent pagePath={pagePath} />
+                    )}
+                </SidebarInset>
+                {currentComponent && <SidebarRight />}
             </DragDropContext>
         );
     }

@@ -9,6 +9,7 @@ export const initialValues = {
 	tableName: '',
 	audit: true,
 	crud: false,
+	revision: false,
 	attributes: [
 		{
 			name: 'id',
@@ -18,7 +19,8 @@ export const initialValues = {
 			nullable: false,
 			unique: false,
 			primaryKey: true,
-			generationType: 'IDENTITY'
+			generationType: 'IDENTITY',
+			skipFieldRevision: false
 		},
 		{
 			name: '',
@@ -27,7 +29,8 @@ export const initialValues = {
 			defaultValue: '',
 			nullable: true,
 			unique: false,
-			primaryKey: false
+			primaryKey: false,
+			skipFieldRevision: false
 		}
 	],
 	indexes: [
@@ -41,7 +44,7 @@ export const initialValues = {
 	uniqueConstraints: [
 		{
 			name: '',
-			columns:[]
+			columns: []
 		}
 	]
 }
@@ -54,7 +57,8 @@ export const defaultValues: any = {
 		defaultValue: '',
 		nullable: false,
 		unique: false,
-		primaryKey: false
+		primaryKey: false,
+		skipFieldRevision: false
 	},
 	indexes: {
 		name: '',
@@ -90,7 +94,9 @@ export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
 export const getTablesColumns = ({
 	selectors,
 	attributes,
-	models
+	revision,
+	models,
+	t
 }): { [value: string]: IColumnsTabelProps[] } => {
 
 	const modelsOptions = (models || [])
@@ -124,35 +130,35 @@ export const getTablesColumns = ({
 	)
 	return {
 		attributes: [
-			{ key: 'name', name: 'Name', type: 'text' },
-			{ key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
+			{ key: 'name', name: t('name'), type: 'text' },
+			{ key: 'type', name: t('type'), type: 'select', options: fieldTypeOptions },
 			{
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
-					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes },
+					{ key: 'advanced', name: '', type: 'popoverModel', options: { generateTypes, revision } },
 					{ key: 'relation', name: 'Relation', type: 'popoverRelation', options: { modelsOptions, models } },
 				]
 			}
 		],
 		indexes: [
-			{ key: 'name', name: 'Name', type: 'text', width: '25%' },
+			{ key: 'name', name: t('name'), type: 'text', width: '25%' },
 			{
 				key: 'columns',
-				name: 'Columns',
+				name: t('columns'),
 				type: 'multiSelect',
 				options: columns,
 				width: '50%'
 			},
 			{
 				key: 'unique',
-				name: 'Unique',
+				name: t('unique'),
 				type: 'checkbox',
 				width: '25%'
 			}
 		],
 		uniqueConstraints: [
-			{ key: 'name', name: 'Name', type: 'text', width: '25%' },
-			{ key: 'columns', name: 'Columns', type: 'multiSelect', options: columns, width: '50%' }
+			{ key: 'name', name: t('name'), type: 'text', width: '25%' },
+			{ key: 'columns', name: t('columns'), type: 'multiSelect', options: columns, width: '50%' }
 		]
 	}
 }

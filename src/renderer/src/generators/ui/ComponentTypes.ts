@@ -1,6 +1,7 @@
 export const COLUMN = 'column'
 export const COMPONENT = 'component';
 export const FEILD = 'field';
+export const APP_COMPONENT = 'appcomponent';
 
 export const CONTAINER = {
     FORMS_LISTS: "formsLists",
@@ -17,7 +18,8 @@ export const COMPONENTS = {
     VERTICAL_MENU: 'verticalmenu',
     TREEMENU: 'treemenu',
     TREELIST: 'treelist',
-    TOOLSBAR: 'toolsbar'
+    TOOLSBAR: 'toolsbar',
+    PAGE_HEADER: 'pageheader'
 }
 
 export const FIELDS = {

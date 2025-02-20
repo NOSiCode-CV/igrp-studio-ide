@@ -32,7 +32,6 @@ import useToast from '@renderer/components/useToast';
 import NavigationBar from '../../components/navigation-bar';
 import { CreateEndpointDialog } from './create-endpoint-dialog';
 import { TextInput } from '../../components/inputs-form';
-import { Label } from '@renderer/components/ui/label';
 import { TabResponse } from './tab-response';
 import {
     ENV_TYPES,
@@ -41,7 +40,7 @@ import {
 } from '@renderer/constants/appConstants';
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
 
 interface ControllerProps {
@@ -118,7 +117,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     }, [currentItem]);
 
     useEffect(() => {
-        const res = getTablesColumns(selectors, enumTypes);
+        const res = getTablesColumns(selectors, enumTypes, t);
         setTableColumns(res);
     }, [selectors]);
 
@@ -227,6 +226,21 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         return newValues;
     };
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const handleSave = async (): Promise<void> => {
         try {
             const values = await getValuesToSubmit();
@@ -288,10 +302,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     (dataAction) => dataAction.actionName !== formik.actionName
                 );
 
-                const updatedValues = {
-                    ...values,
-                    actions: updatedActions,
-                };
+                const updatedValues = { ...values, actions: updatedActions };
 
                 const { error } = await window.api.createController(
                     updatedValues,
@@ -325,10 +336,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     useEffect(() => {
         const enumTypes = enums.map((enumItem) => {
-            return {
-                label: enumItem.name,
-                value: enumItem.name,
-            };
+            return { label: enumItem.name, value: enumItem.name };
         });
         setEnumTypes(enumTypes);
     }, [enums]);
@@ -353,11 +361,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         setSchemaTypes((prevSchemaTypes) =>
             prevSchemaTypes.map((schemaType) =>
                 schemaType.value === 'Reference other schemas'
-                    ? {
-                          ...schemaType,
-                          value: 'dto',
-                          items: targetDto,
-                      }
+                    ? { ...schemaType, value: 'dto', items: targetDto }
                     : schemaType
             )
         );
@@ -414,7 +418,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     <CardHeader>
                         <CardTitle>{t('definition')}</CardTitle>
                         <CardDescription>
-                            {t('controllerDefintion')}
+                            {t('controllerDefinition')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
