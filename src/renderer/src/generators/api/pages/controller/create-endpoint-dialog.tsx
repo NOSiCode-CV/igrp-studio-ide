@@ -13,7 +13,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { ControllerConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';

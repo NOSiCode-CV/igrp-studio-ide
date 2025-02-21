@@ -1,5 +1,5 @@
 import { AcceptTypesRegistry } from "../../data/ComponentRegistry"
-import Navdata from "../../data/ConfigData"
+import Navdata from "../../data/useConfigData"
 import { findComponentItem, generateId } from "@renderer/utils/helpers"
 import { useDroppedComponents } from "../../dnd/DroppedComponentsContext"
 import { DroppedComponent } from "../../interfaces"

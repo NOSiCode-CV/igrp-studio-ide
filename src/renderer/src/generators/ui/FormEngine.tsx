@@ -1,9 +1,9 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
-import RowContainer from './types/containers/rows';
+import RowContainer from './types/rows';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { generateId } from '@renderer/utils/helpers';
 
-import { useConfigdata } from './data/ConfigData';
+import { useConfigdata } from './data/useConfigData';
 import {
     Component,
     PageConfig,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { DroppedComponent } from '../../../interfaces';
-import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
-import { ComponentRegistry } from '../../../data/ComponentRegistry';
+import { DroppedComponent } from '../../interfaces';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
+import { ComponentRegistry } from '../../data/ComponentRegistry';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { FIELD } from '@renderer/generators/ui/ComponentTypes';
 import { PageHeader } from '@igrp/igrp-design-system';

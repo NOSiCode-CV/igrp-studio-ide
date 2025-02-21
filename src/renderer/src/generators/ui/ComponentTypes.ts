@@ -16,7 +16,7 @@ export const COMPONENTS = {
 }
 
 export const Containers = {
-    FORM: 'Form'
+    Form: 'Form'
 }
 
 export const BasicElements = {

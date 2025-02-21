@@ -1,5 +1,5 @@
 import React from 'react';
-import { DroppedComponent } from '../../../interfaces';
+import { DroppedComponent } from '../interfaces';
 
 export interface FormComponentProps {
     componentName: string;

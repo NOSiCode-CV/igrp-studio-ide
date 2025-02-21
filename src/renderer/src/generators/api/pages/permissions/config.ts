@@ -1,4 +1,4 @@
-import { PermissionConfig } from "@igrp/spring-engine/dist/interfaces/types";
+import { PermissionConfig } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/types";
 
 export const getTablesColumns = (): { [value: string]: any[] } => {
     return {

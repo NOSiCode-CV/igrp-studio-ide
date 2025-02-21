@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { DroppedComponent } from '@renderer/generators/ui/interfaces';

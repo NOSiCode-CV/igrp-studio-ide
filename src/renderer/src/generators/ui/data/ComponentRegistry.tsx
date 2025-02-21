@@ -1,5 +1,4 @@
-import { UiDate, UiText } from '../types/fields';
-import { APP_COMPONENT, Containers, FIELDS } from '../ComponentTypes';
+import { APP_COMPONENT, Containers } from '../ComponentTypes';
 import { lazy } from 'react';
 import {
     Type,
@@ -46,17 +45,14 @@ import {
     FormInput as Form,
 } from 'lucide-react';
 
-const PageHeaderLayout = lazy(() => import('../types/containers/pageHeader'));
-const FormLayout = lazy(() => import('../types/containers/form'));
-const AppCompLayout = lazy(() => import('../types/containers/app'));
+const PageHeaderLayout = lazy(() => import('../types/pageHeader'));
+const FormLayout = lazy(() => import('../types/form'));
+const AppCompLayout = lazy(() => import('../types/AppComponent'));
 
 export const ComponentRegistry: { [key: string]: React.FC<any> } = {
-    [Containers.FORM]: FormLayout,
+    [Containers.Form]: FormLayout,
     //[COMPONENTS.PAGE_HEADER]: PageHeaderLayout,
-    [APP_COMPONENT]: AppCompLayout,
-    [FIELDS.InputInput]: UiText,
-    [FIELDS.DatePicker]: UiDate,
-    //[FIELDS.BUTTON]: UiButton,
+    [APP_COMPONENT]: AppCompLayout
 };
 
 export const ICON_MAP: Record<string, React.ElementType> = {

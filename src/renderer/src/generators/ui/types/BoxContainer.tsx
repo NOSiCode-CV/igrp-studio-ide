@@ -1,6 +1,6 @@
 import React from "react";
-import { useDroppedComponents } from "../../dnd/DroppedComponentsContext";
-import CompTools from "../tools/CompTools";
+import { useDroppedComponents } from "../dnd/DroppedComponentsContext";
+import CompTools from "./tools/CompTools";
 
 interface BoxContainerProps {
     children: React.ReactElement,

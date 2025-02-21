@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import {
     ControllerAction,
     ControllerConfig,
-} from '@igrp/spring-engine/dist/interfaces/types';
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import {
     Card,
     CardContent,

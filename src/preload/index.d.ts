@@ -1,7 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
-import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { Connection, FileTree, IConnenctionRepository, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
 

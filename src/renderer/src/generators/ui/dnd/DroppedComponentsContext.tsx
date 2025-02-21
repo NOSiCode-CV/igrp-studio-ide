@@ -6,7 +6,7 @@ import React, {
     useCallback,
 } from 'react';
 import { Column, DroppedComponent, HierarchicalComponent } from '../interfaces';
-import { ColProps } from '../types/containers/rows/ColContainer';
+import { ColProps } from '../types/rows/ColContainer';
 import { reorder } from './helpers';
 
 export interface ComponentProps {

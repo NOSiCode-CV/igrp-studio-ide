@@ -23,7 +23,7 @@ const useConfigdata = () => {
                 type: COMPONENT,
                 subItems: [
                     {
-                        id: Containers.FORM,
+                        id: Containers.Form,
                         label: 'Form',
                         icon: Sheet,
                         type: COMPONENTS.Containers,
@@ -101,7 +101,7 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.BasicElements,
                 label: 'Basic Elements',
-                type: COMPONENT,
+                type: FIELD,
                 subItems: [
                     {
                         id: BasicElements.Link,

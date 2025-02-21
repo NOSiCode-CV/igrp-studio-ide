@@ -4,7 +4,6 @@ import RowTools from "../tools/RowTools";
 interface BoxProps {
     children: React.ReactElement,
     id: string;
-    size: number;
     className?: string;
     onEdit: () => void;
     refProp?: any;

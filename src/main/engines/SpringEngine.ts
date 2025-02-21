@@ -1,8 +1,8 @@
 // engines/SpringEngine.ts
-import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement } from '@igrp/spring-engine';
+import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement } from '@igrp/igrp-studio-springboot-engine';
 import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
-import { BaseApiConfig, DeleteConfig, EnumConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { BaseApiConfig, DeleteConfig, EnumConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
 
 export class SpringEngine implements BaseEngine {

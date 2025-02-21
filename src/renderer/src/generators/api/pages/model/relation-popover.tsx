@@ -12,7 +12,7 @@ import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { RelationTypeSelector } from './relation-type-selector';
 import { Switch } from '@renderer/components/ui/switch';
-import { Relation } from '@igrp/spring-engine/dist/interfaces/types';
+import { Relation } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { Combobox } from '@igrp/igrp-design-system';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 

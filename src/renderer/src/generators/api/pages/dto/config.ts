@@ -1,4 +1,4 @@
-import { DTOConfig } from "@igrp/spring-engine/dist/interfaces/types"
+import { DTOConfig } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/types"
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 import { SchemaTypeItem } from "src/main/types"

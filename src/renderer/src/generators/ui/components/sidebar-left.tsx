@@ -21,8 +21,7 @@ import {
     FileText,
     GitBranch,
     Home,
-    ListTodo,
-    Server,
+    ListTodo
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -38,8 +37,8 @@ import {
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
 import { useNavigate } from 'react-router-dom';
-import AppComponents from './AppComponents';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import SidebarAppComponents from './sidebar-app-components';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -202,7 +201,7 @@ export function AppSidebar({
                                 }}
                             />
                         ) : activeMenuGroup === 'components' ? (
-                            <AppComponents searchTerm={searchQuery} />
+                            <SidebarAppComponents searchTerm={searchQuery} />
                         ) : (
                             filteredData.map((item) => (
                                 <Collapsible

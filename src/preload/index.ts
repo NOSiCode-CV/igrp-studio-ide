@@ -4,7 +4,7 @@ import {
 	ControllerConfig,
 	DTOConfig,
 	ModelConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
 const backend = require('i18next-electron-fs-backend')

@@ -1082,6 +1082,20 @@
     eslint-plugin-prettier "^5.2.1"
     lucide-react "^0.465.0"
 
+"@igrp/igrp-studio-springboot-engine@^0.0.1-alpha.1":
+  version "0.0.1-alpha.1"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.1.tgz#d2d05f011689cf7c187efd1d94e98a8c98f36492"
+  integrity sha512-SGvc2OX66WKHnlXTI2+SQI5affb481yW4t9xIfj04S3s0Sf0k+cJMFMvK0TbInVlYvq61ffXZ1kgVsSpH1C+nA==
+  dependencies:
+    ajv "^8.17.1"
+    ajv-errors "^3.0.0"
+    ajv-formats "^3.0.1"
+    fast-xml-parser "^4.3.2"
+    fs-extra "^11.2.0"
+    sass "^1.77.8"
+    source-map-loader "^5.0.0"
+    ts-loader "^9.5.1"
+
 "@igrp/nextjs-engine@^0.1.5":
   version "0.1.7"
   resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/nextjs-engine/-/nextjs-engine-0.1.7.tgz#3478192247d622d1c072d51c688239f03233fb32"
@@ -1097,9 +1111,9 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/spring-engine@^0.0.1-alpha":
+"@igrp/igrp-studio-springboot-engine@^0.0.1-alpha":
   version "0.0.1-alpha"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/spring-engine/-/spring-engine-0.0.1-alpha.tgz#199c7933e8b18087332f5c03d8dd206a84d5f6cc"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/spring-engine-0.0.1-alpha.tgz#199c7933e8b18087332f5c03d8dd206a84d5f6cc"
   integrity sha512-Txt+b77LDh64hxN15/cGZXn/8w4k7MXw32jI24aQwkCoMBSHWitlTd5vQGv7LTApHbpiT5GQIc20aGcu5XwhZA==
   dependencies:
     ajv "^8.17.1"

@@ -4,9 +4,9 @@ import { handleWithCustomErrors } from '../helpers';
 import {
     ControllerConfig,
     DTOConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 
-import { addController, addDTO, addModel, addModule, engineTypes } from '@igrp/spring-engine'
+import { addController, addDTO, addModel, addModule, engineTypes } from '@igrp/igrp-studio-springboot-engine'
 import { addComponentToPage, deletePage, newPage } from '@igrp/nextjs-engine';
 
 import { Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'

@@ -39,11 +39,11 @@ export const handleDragEnd = (
             break;
 
         case FIELD:
-            if (component !== null && component !== undefined) {
-                handleDropField(draggableId, destination, { updateComponent, getComponent });
-            }
-            else if (source.droppableId === destination.droppableId) {
+
+            if (source.droppableId === destination.droppableId) {
                 reorderField(source, destination, { updateComponent, getComponent });
+            } else {
+                handleDropField(draggableId, destination, { updateComponent, getComponent });
             }
             break;
 

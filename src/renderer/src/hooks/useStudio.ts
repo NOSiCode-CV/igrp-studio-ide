@@ -35,7 +35,17 @@ const useStudio = () => {
         return component
     }, [])
 
-    return { fetchComponents, discoverComponent };
+    const dynamicImport = useCallback(async (type: string, componentName: string) => {
+        try {
+            const module = await import(`@renderer/generators/ui/types/${type}/components/${componentName}`);
+            return module.default;
+        } catch (error) {
+            const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+            return fallbackModule.default;
+        }
+    }, []);
+
+    return { fetchComponents, discoverComponent, dynamicImport };
 };
 
 export default useStudio;

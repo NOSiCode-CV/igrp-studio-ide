@@ -4,7 +4,7 @@ import DraggableElement from '../dnd/DraggableElement';
 import { COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/useStudio';
 
-const AppComponents = ({ searchTerm }: { searchTerm: string }) => {
+const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
     const { fetchComponents } = useStudio();
 
     const components = fetchComponents();
@@ -50,4 +50,4 @@ const AppComponents = ({ searchTerm }: { searchTerm: string }) => {
     );
 };
 
-export default AppComponents;
+export default SidebarAppComponents;

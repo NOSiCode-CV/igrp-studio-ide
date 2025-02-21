@@ -8,7 +8,7 @@ import {
     TemplateOptions,
     initialValues,
 } from './config';
-import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { DTOConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
