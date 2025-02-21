@@ -4,12 +4,9 @@ import BoxContainer from '../BoxContainer';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { DroppedComponent } from '@renderer/generators/ui/interfaces';
 import { COMPONENT } from '@renderer/generators/ui/ComponentTypes';
-import {
-    AcceptTypesRegistry,
-    ComponentRegistry,
-} from '@renderer/generators/ui/data/ComponentRegistry';
 import { GenNoInfoComp } from '@renderer/generators/ui/components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
+import useStudio from '@renderer/hooks/useStudio';
 
 export interface ColProps {
     rowId: string;
@@ -19,6 +16,9 @@ export interface ColProps {
 
 const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
     const { getComponents, setEditingComponent } = useDroppedComponents();
+
+    const { discoverComponent } = useStudio();
+
     const components: DroppedComponent[] = getComponents(rowId, columnId);
 
     const handleEditClick = (component: Partial<DroppedComponent>) => {
@@ -26,7 +26,10 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
     };
 
     return (
-        <div className={cn(`bg-muted/70 rounded-lg p-2 col-span-${colSize}`)} id={columnId}>
+        <div
+            className={cn(`bg-muted/70 rounded-lg p-2 col-span-${colSize}`)}
+            id={columnId}
+        >
             <Droppable droppableId={`${rowId}-${columnId}`} type={COMPONENT}>
                 {(provided: any, snapshot: any) => (
                     <div
@@ -42,8 +45,9 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                         {components.length > 0
                             ? components.map(
                                   (comp: DroppedComponent, index: number) => {
-                                      const component =
-                                          ComponentRegistry[comp.componentName];
+                                      const component = discoverComponent(
+                                          comp.componentName
+                                      );
                                       return (
                                           <Draggable
                                               key={comp.id}
@@ -74,11 +78,6 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                                   component,
                                                                   {
                                                                       comp,
-                                                                      acceptTypes:
-                                                                          AcceptTypesRegistry[
-                                                                              comp
-                                                                                  .componentName
-                                                                          ],
                                                                       componentId:
                                                                           comp.id,
                                                                       onEdit: () =>

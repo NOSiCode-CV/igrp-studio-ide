@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import GenNoInfoField from '../../../components/GenNoInfoField';
 import { DroppedComponent } from '../../../interfaces';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import BoxField from '../../fields/BoxFields';
 import { ComponentRegistry } from '../../../data/ComponentRegistry';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { FEILD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
+import { FIELD, FIELDS } from '@renderer/generators/ui/ComponentTypes';
 import {
     Card,
     CardContent,
@@ -14,6 +13,7 @@ import {
     CardTitle,
 } from '@renderer/components/ui/card';
 import { cn } from '@renderer/lib/utils';
+import { EmptySlotComponent } from '@renderer/generators/ui/components/EmptySlotComponent';
 
 export interface FormComponentProps {
     componentName: string;
@@ -51,9 +51,9 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
         setEditingComponent({ ...component, componentId: componentId });
     };
 
-    const renderFields = (onDrop: boolean) =>
-        formFields.length > 0
-            ? formFields.map((field: DroppedComponent, index: number) => {
+    const renderFields = (_onDrop: boolean) => {
+        const fields = formFields.length > 0
+            && formFields.map((field: DroppedComponent, index: number) => {
                   const component = ComponentRegistry[field.componentName];
                   return (
                       <Draggable
@@ -86,8 +86,26 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                           }
                       </Draggable>
                   );
-              })
-            : !onDrop && <GenNoInfoField />;
+              })/* 
+            : !onDrop && <GenNoInfoField />; */
+    
+        // Calculate the number of empty slots
+        const emptySlots = colSize - formFields.length;
+    
+        // Render GenDefaultBG for each empty slot
+        const emptySlotComponents = Array.from({ length: emptySlots }, (_, index) => (
+            <div key={`empty-slot-${index}`}>
+                <EmptySlotComponent />
+            </div>
+        ));
+    
+        return (
+            <>
+                {fields}
+                {emptySlotComponents}
+            </>
+        );
+    };
 
     const renderButtons = () =>
         buttonComponents.map((button: DroppedComponent, index: number) => {
@@ -126,14 +144,14 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
             <CardContent>
                 <Droppable
                     droppableId={`${componentId}`}
-                    type={FEILD}
+                    type={FIELD}
                     direction="horizontal"
                 >
                     {(provided, snapshot) => (
                         <div
                             ref={provided.innerRef}
                             {...provided.droppableProps}
-                            className={cn(`grid grid-cols-${colSize} gap-4 ${
+                            className={cn(`grid auto-rows-min grid-cols-1 lg:grid-cols-${colSize} gap-4 ${
                                 snapshot.isDraggingOver
                                     ? 'border-2 border-dashed border-igrp p-2'
                                     : ''
@@ -149,7 +167,7 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                 <CardFooter className="w-full">
                     <Droppable
                         droppableId={`${componentId}`}
-                        type={FEILD}
+                        type={FIELD}
                         direction="horizontal"
                     >
                         {(provided, snapshot) => (

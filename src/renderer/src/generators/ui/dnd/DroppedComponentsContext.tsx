@@ -69,8 +69,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                   }
                 : null;
 
-            console.log(newComponent);
-
             setComponents((prevComponents) => {
                 const updatedComponents = [...prevComponents];
 
@@ -133,7 +131,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                                 (comp) => comp.id === newComponent.id
                             );
 
-                        console.log(existingComponentIndex);
                         if (existingComponentIndex !== -1) {
                             // If the component exists, update it
                             updatedColumn.components[existingComponentIndex] = {

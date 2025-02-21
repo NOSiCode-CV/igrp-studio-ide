@@ -3,7 +3,7 @@ import { DroppedComponent } from '../../../interfaces';
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
 import { ComponentRegistry } from '../../../data/ComponentRegistry';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { FEILD } from '@renderer/generators/ui/ComponentTypes';
+import { FIELD } from '@renderer/generators/ui/ComponentTypes';
 import { PageHeader } from '@igrp/igrp-design-system';
 import GenNoInfoField from '@renderer/generators/ui/components/GenNoInfoField';
 
@@ -69,7 +69,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
         <PageHeader title={title}>
             <Droppable
                 droppableId={`${componentId}`}
-                type={FEILD}
+                type={FIELD}
                 direction="horizontal"
             >
                 {(provided, snapshot) => {

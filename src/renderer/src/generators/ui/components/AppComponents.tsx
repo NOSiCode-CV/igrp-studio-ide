@@ -1,39 +1,19 @@
-import { createSelector } from 'reselect';
-import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import { SidebarMenu, SidebarMenuItem } from '@renderer/components/ui/sidebar';
 import DraggableElement from '../dnd/DraggableElement';
-import {COMPONENT } from '../ComponentTypes';
+import { COMPONENT } from '../ComponentTypes';
+import useStudio from '@renderer/hooks/useStudio';
 
 const AppComponents = ({ searchTerm }: { searchTerm: string }) => {
-    const [components, setComponents] = useState<any[]>([]);
+    const { fetchComponents } = useStudio();
 
-    const selectState = (state: any) => state.PageBuilder;
+    const components = fetchComponents();
 
-    const selectProperties = createSelector(selectState, (studio) => ({
-        basePath: studio.basePath,
-        config: studio.config,
-        files: studio.filesThree,
-    }));
-
-    const { files } = useSelector(selectProperties);
-
-    useEffect(() => {
-        if (files) {
-            const componentsFolder = files.find(
-                (page) => page.name === 'components'
-            );
-
-            if (componentsFolder && componentsFolder.children) {
-                setComponents(componentsFolder.children);
-            }
-        }
-    }, [files]);
-
-    const filteredComponents = components.filter((comp) =>
-        comp.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredComponents =
+        components &&
+        components.filter((comp) =>
+            comp.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
     return (
         <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">

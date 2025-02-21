@@ -59,12 +59,10 @@ export function SidebarRight({
 
     const [formValues, setFormValues] = React.useState(initialFormValues);
 
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        const newValue = type === 'checkbox' ? checked : value;
+    const handleInputChange = (name: string, value: string) => {
         setFormValues((prevValues) => ({
             ...prevValues,
-            [name]: newValue,
+            [name]: value,
         }));
     };
 

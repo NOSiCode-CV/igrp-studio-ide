@@ -2,11 +2,11 @@ import { ColumnComponent, ColumnConfig, Field, FieldConfig } from "@igrp/nextjs-
 import { generateId } from "@renderer/utils/helpers";
 import { DroppedComponent } from "../interfaces";
 import { ComponentProps } from "./DroppedComponentsContext";
-import { ComponentRegistry } from "../data/ComponentRegistry";
-import { COMPONENT, FEILD } from "../ComponentTypes";
+import { COMPONENT, FIELD } from "../ComponentTypes";
 
 export const handleDragEnd = (
     result: any,
+    component: any,
     { moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
 ) => {
 
@@ -15,8 +15,6 @@ export const handleDragEnd = (
     if (!destination) {
         return;
     }
-
-    const component = ComponentRegistry[draggableId];
 
     switch (type) {
         case COMPONENT:
@@ -40,7 +38,7 @@ export const handleDragEnd = (
             }
             break;
 
-        case FEILD:
+        case FIELD:
             if (component !== null && component !== undefined) {
                 handleDropField(draggableId, destination, { updateComponent, getComponent });
             }

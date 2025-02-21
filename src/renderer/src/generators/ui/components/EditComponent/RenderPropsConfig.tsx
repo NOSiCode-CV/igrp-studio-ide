@@ -5,7 +5,7 @@ import { Label } from '@renderer/components/ui/label';
 
 const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
     return (
-        <div className='space-y-3'>
+        <div className="space-y-3">
             {Object.keys(propsConfig).map((key) => {
                 const config = propsConfig[key];
 
@@ -22,7 +22,9 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                                 formValues[key] ??
                                                 config.defaultValue
                                             }
-                                            onChange={handleInputChange}
+                                            onChange={(checked) =>
+                                                handleInputChange(key, checked)
+                                            }
                                             className="ml-3"
                                         />
                                     );
@@ -34,7 +36,9 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                                 formValues[key] ??
                                                 config.defaultValue
                                             }
-                                            onChange={handleInputChange}
+                                            onChange={(value) =>
+                                                handleInputChange(key, value)
+                                            }
                                             options={config.options}
                                             className="w-full"
                                         />
@@ -49,7 +53,12 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                                 formValues[key] ??
                                                 config.defaultValue
                                             }
-                                            onChange={handleInputChange}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    key,
+                                                    e.target.value
+                                                )
+                                            }
                                             className=""
                                         />
                                     );

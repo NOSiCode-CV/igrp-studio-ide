@@ -1,5 +1,5 @@
 {
-	"name": "@igrp/igrp-studio",
+	"name": "igrp-studio",
 	"version": "0.0.1-alpha",
 	"description": "IGRP Studio for development",
 	"main": "dist/main/index.js",
