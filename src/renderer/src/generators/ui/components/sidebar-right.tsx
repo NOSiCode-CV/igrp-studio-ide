@@ -46,7 +46,7 @@ export function SidebarRight({
         return null;
     }
 
-    const { componentName, id, componentId, config, fields } = currentComponent;
+    const { componentName, id, componentId, config } = currentComponent;
 
     const propsConfig = useConfigComponent(componentName);
 
@@ -104,7 +104,7 @@ export function SidebarRight({
     return (
         <Sidebar
             collapsible="none"
-            className="overflow-hidden [&>[data-sidebar=sidebar]]:flex-row !top-[--header-height-two] !h-[calc(100svh-var(--header-height-two))]"
+            className="overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-two))]!"
             {...props}
         >
             <SidebarHeader className="h-16 border-b border-sidebar-border">

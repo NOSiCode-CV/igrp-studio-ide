@@ -31,7 +31,7 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
                         >
                             <SidebarMenuItem
                                 key={key}
-                                className="flex flex-col items-center justify-center bg-muted rounded-md shadow-sm"
+                                className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
                             >
                                 <DraggableElement
                                     item={{

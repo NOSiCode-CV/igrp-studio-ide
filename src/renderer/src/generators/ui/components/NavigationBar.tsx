@@ -22,7 +22,7 @@ const NavigationBar = ({
     onSave,
     basePath,
     page
-}: NavigationBarProps): JSX.Element => {
+}: NavigationBarProps) => {
     const { t } = useTranslation();
 
     const handleSaveClick = () => {

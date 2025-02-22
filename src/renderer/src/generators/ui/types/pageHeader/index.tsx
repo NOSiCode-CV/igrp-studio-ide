@@ -4,7 +4,7 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { ComponentRegistry } from '../../data/ComponentRegistry';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { FIELD } from '@renderer/generators/ui/ComponentTypes';
-import { PageHeader } from '@igrp/igrp-design-system';
+import { PageHeader } from '@igrp/igrp-framework-react-design-system';
 import GenNoInfoField from '@renderer/generators/ui/components/GenNoInfoField';
 
 export interface FormComponentProps {

@@ -10,7 +10,7 @@ import {
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import React, { useState } from 'react';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { getStatusLabel } from '@renderer/utils/helpers';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +74,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                                 name="statusCode"
                                 value={statusCode}
                                 onChange={(value) => handleChangeCode(value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-igrp focus:border-igrp"
                                 placeholder={t('httpStatusCodePlaceholder')}
                             />
                         </div>
@@ -84,7 +84,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-igrp focus:border-igrp"
                                 placeholder={t('responseNamePlaceholder')}
                             />
                         </div>
@@ -95,7 +95,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                                 options={contentTypes}
                                 value={contentType}
                                 onChange={(value) => setContentType(value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-igrp focus:border-igrp"
                             />
                         </div>
 

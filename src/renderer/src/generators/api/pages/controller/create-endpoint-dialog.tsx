@@ -21,7 +21,7 @@ import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { useEffect } from 'react';
 
 interface CreateEndpointDialogProps {

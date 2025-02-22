@@ -40,7 +40,7 @@ const DtoLayout = ({
     currentItem,
     onCloseTab,
     onUpdateTab,
-}: DtoProps): JSX.Element => {
+}: DtoProps) => {
     const { initializeTabFromCurrentItem } = useTabs();
 
     const dispatch: any = useDispatch();
@@ -105,12 +105,11 @@ const DtoLayout = ({
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
-
     useEffect(() => {
         const handleKeyDown = (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault(); 
-                handleSave(formik.values); 
+                event.preventDefault();
+                handleSave(formik.values);
             }
         };
 

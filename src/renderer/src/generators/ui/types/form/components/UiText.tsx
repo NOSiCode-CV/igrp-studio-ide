@@ -1,9 +1,9 @@
 import { Label } from "@renderer/components/ui/label"
-import { DroppedComponent } from "../../interfaces"
 import { Input } from "@renderer/components/ui/input"
+import { DroppedComponent } from "@renderer/generators/ui/interfaces"
 
 export interface InputTextProps {
-    comp: DroppedComponent,
+    comp: DroppedComponent  ,
     componentId: string,
     onEdit: () => void
 }

@@ -45,13 +45,11 @@ import {
     FormInput as Form,
 } from 'lucide-react';
 
-const PageHeaderLayout = lazy(() => import('../types/pageHeader'));
 const FormLayout = lazy(() => import('../types/form'));
 const AppCompLayout = lazy(() => import('../types/AppComponent'));
 
 export const ComponentRegistry: { [key: string]: React.FC<any> } = {
     [Containers.Form]: FormLayout,
-    //[COMPONENTS.PAGE_HEADER]: PageHeaderLayout,
     [APP_COMPONENT]: AppCompLayout
 };
 

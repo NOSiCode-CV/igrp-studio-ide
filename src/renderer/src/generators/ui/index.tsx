@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { TabProvider } from '@renderer/components/navigation/TabContext';

@@ -12,7 +12,7 @@ import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { GripVertical, Plus, Trash } from 'lucide-react'
 import { Checkbox } from '@renderer/components/ui/checkbox'
-import { Combobox } from '@igrp/igrp-design-system'
+import { Combobox } from '@igrp/igrp-framework-react-design-system'
 import MultipleSelector from '@renderer/components/multiples-selector'
 import { cn } from '@renderer/lib/utils'
 import {
@@ -210,7 +210,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                               : []
 
                             return (
-                              <TableCell key={index2} className='!py-1'>
+                              <TableCell key={index2} className='py-1!'>
                                 <div className="flex">
                                   {index2 === 0 && (
                                     <button
@@ -412,7 +412,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             )
                           })}
                           {removeRow && (
-                            <TableCell className='!py-1'>
+                            <TableCell className='py-1!'>
                               <Button
                                 variant="ghost"
                                 size="icon"

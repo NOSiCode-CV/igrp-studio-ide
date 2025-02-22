@@ -1,11 +1,9 @@
 import { BrowserWindow } from 'electron';
 
 class NextJsManager {
-  private mainWindow: BrowserWindow;
   private previewWindow: BrowserWindow | null = null;
 
-  constructor(mainWindow: BrowserWindow) {
-    this.mainWindow = mainWindow;
+  constructor(_mainWindow: BrowserWindow) {
   }
 
   // Abre a janela de preview com o nome da página

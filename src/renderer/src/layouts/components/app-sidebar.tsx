@@ -116,7 +116,7 @@ export function AppSidebar({
             <Sidebar
                 collapsible="icon"
                 className={cn(
-                    'overflow-hidden [&>[data-sidebar=sidebar]]:flex-row mt-10',
+                    'overflow-hidden *:data-[sidebar=sidebar]:flex-row mt-10',
                     className
                 )}
             >
@@ -124,8 +124,8 @@ export function AppSidebar({
                 <Sidebar
                     collapsible="none"
                     className={cn(
-                        '!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r',
-                        '!w-20'
+                        'w-[calc(var(--sidebar-width-icon)+1px)]! border-r',
+                        'w-20!'
                     )}
                 >
                     <SidebarHeader className="pr-0">
@@ -331,7 +331,7 @@ function Three({
                     <TreeItem />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <SidebarMenuSub className="!pr-0 !mr-0">
+                    <SidebarMenuSub className="pr-0! mr-0!">
                         {item.subItems?.map((subItem, subIndex) => (
                             <Three
                                 key={subIndex}

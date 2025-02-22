@@ -199,7 +199,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
                     {isDesign ? (
-                        <ScrollArea className="!h-[calc(100svh-var(--header-height-two))] bg-custom-pattern">
+                        <ScrollArea className="h-[calc(100svh-var(--header-height-two))]! bg-custom-pattern">
                             <div className="px-4 py-5">
                                 {components.map((row) => (
                                     <RowContainer

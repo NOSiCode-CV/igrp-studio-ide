@@ -1,8 +1,6 @@
 import { Textarea } from '@renderer/components/ui/Textarea';
-import { useState } from 'react';
 
 export const CustomStyle = () => {
-    const [properties, setProperties] = useState();
 
     return (
         <>

@@ -25,7 +25,7 @@ interface LayoutProps {
     }>;
 }
 
-const Layout = (props: LayoutProps): JSX.Element => {
+const Layout = (props: LayoutProps) => {
     const dispatch: any = useDispatch();
     const navigate = useNavigate();
 

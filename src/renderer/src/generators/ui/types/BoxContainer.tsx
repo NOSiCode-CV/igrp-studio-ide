@@ -34,10 +34,7 @@ const BoxContainer = ({ children, id, tag, onEdit, dragHandleProps }: BoxContain
                 />
             </div>
             <div className="container-contents">
-                {React.cloneElement(children, {
-                    id,
-                    tag
-                })}
+                {React.cloneElement(children)}
             </div>
         </div>
     )

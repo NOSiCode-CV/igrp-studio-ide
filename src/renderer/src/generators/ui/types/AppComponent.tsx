@@ -15,7 +15,7 @@ const AppCompLayout: React.FC<FormComponentProps> = ({
 }) => {
 
     return (
-        <div className="p-4 border rounded-lg shadow bg-white">
+        <div className="p-4 border rounded-lg shadow-sm bg-white">
             <h3 className="text-lg font-bold">{componentName}</h3>
             <p className="text-sm text-gray-600">Component ID: {componentId}</p>
         </div>

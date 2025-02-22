@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@renderer/components/ui/input';
 import { httpStatusCodes } from '@renderer/constants/appConstants';

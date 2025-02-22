@@ -30,7 +30,7 @@ interface NewProps {
     tab: TabItem;
 }
 
-const PageController = ({ onOpenNew, open, tab }: NewProps): JSX.Element => {
+const PageController = ({ onOpenNew, open, tab }: NewProps) => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
     const [module, setModule] = useState<string>('shared');

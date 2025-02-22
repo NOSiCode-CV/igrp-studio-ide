@@ -38,7 +38,7 @@ interface HeaderProps {
     basePath?: string;
 }
 
-const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
+const Header = ({ config, basePath }: HeaderProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const { isGitEnabled } = useSelector((state: RootState) => state.git);
@@ -91,14 +91,14 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         className,
     }: {
         onClick: () => void;
-        icon: JSX.Element;
+        icon: React.ReactNode;
         label: string;
         className?: string;
     }) => (
         <button
             onClick={onClick}
             className={cn(
-                'flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300',
+                'flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300',
                 className
             )}
             title={label}
@@ -132,7 +132,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         <>
             <TooltipProvider>
                 <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
-                    <div className="flex h-[--header-height] w-full items-center gap-2 px-4 justify-between">
+                    <div className="flex h-(--header-height) w-full items-center gap-2 px-4 justify-between">
                         <div className="flex items-center space-x-2 home cursor-pointer">
                             <div
                                 onClick={openPage}
@@ -172,7 +172,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center space-x-2 " >
+                        <div className="flex items-center space-x-2 ">
                             <ModeToggle />
 
                             {config?.name && (

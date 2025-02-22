@@ -1,6 +1,6 @@
 import { Label } from '@renderer/components/ui/label';
 import { useState } from 'react';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 const languages = [

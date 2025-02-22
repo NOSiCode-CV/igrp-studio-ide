@@ -13,7 +13,10 @@ import { Button } from '@renderer/components/ui/button';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
 import { PageCard } from './page-card';
-import { IGRPContainer, PageHeader } from '@igrp/igrp-design-system';
+import {
+    IGRPContainer,
+    PageHeader,
+} from '@igrp/igrp-framework-react-design-system';
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 
@@ -23,7 +26,7 @@ interface PageBuilderContentProps {
 
 const MainPageBuilder = ({
     onPageClick = (): void => {},
-}: PageBuilderContentProps): JSX.Element => {
+}: PageBuilderContentProps) => {
     const { t } = useTranslation();
 
     const dispatch: any = useDispatch();

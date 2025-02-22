@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { SidebarProvider } from '@renderer/components/ui/sidebar';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string }>;
@@ -17,7 +17,7 @@ export interface RootState {
     };
 }
 
-const Layout = (props: LayoutProps): JSX.Element => {
+const Layout = (props: LayoutProps) => {
     const selectStudioState = (state: RootState) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
@@ -30,7 +30,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
     const { config, basePath } = useSelector(selectStudioProperties);
 
     return (
-        <div className="[--header-height:calc(theme(spacing.10))] [--header-height-two:calc(theme(spacing.20))] overflow-hidden h-screen">
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] overflow-hidden h-screen">
             <SidebarProvider
                 className="flex flex-col"
                 style={{ height: '100%' }}

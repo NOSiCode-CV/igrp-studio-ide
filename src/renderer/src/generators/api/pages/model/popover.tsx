@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 
 interface PopoverProps {
     children?: ReactNode;

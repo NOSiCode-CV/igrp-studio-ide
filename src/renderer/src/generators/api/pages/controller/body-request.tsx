@@ -7,7 +7,7 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { Card, CardContent } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';

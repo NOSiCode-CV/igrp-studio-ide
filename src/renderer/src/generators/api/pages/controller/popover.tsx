@@ -23,7 +23,7 @@ import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
 import { toInitCap } from '@renderer/utils/helpers';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import MonacoEditor from '@renderer/components/MonacoEditor';
 
 interface PopoverProps {

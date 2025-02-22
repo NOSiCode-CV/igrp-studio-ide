@@ -50,7 +50,7 @@ const ModelLayout = ({
     config,
     onCloseTab,
     onUpdateTab,
-}: ModelProps): JSX.Element => {
+}: ModelProps) => {
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
     const { t } = useTranslation();
@@ -109,7 +109,7 @@ const ModelLayout = ({
             attributes,
             revision,
             models,
-            t
+            t,
         });
         setTableColumns(res);
     }, [selectors, formik.values]);

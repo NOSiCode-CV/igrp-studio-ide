@@ -24,7 +24,7 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
 import { TabRequest } from './tab-resquest';
 

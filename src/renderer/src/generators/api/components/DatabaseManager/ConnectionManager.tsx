@@ -9,8 +9,8 @@ import {
     DialogTrigger,
 } from '@renderer/components/ui/dialog';
 import { Plus } from 'lucide-react';
-import { IGRPDataTable } from '@igrp/igrp-design-system';
-import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
+import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types';
 import { ConnectionForm } from './ConnectionForm';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Connection } from 'src/main/types';

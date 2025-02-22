@@ -1,7 +1,7 @@
 import { Label } from '@renderer/components/ui/label';
-import { DroppedComponent } from '../../interfaces';
 import { useState } from 'react';
-import { DateRangePicker } from '@igrp/igrp-design-system';
+import { DateRangePicker } from '@igrp/igrp-framework-react-design-system';
+import { DroppedComponent } from '@renderer/generators/ui/interfaces';
 
 interface InputDateProps {
     comp: DroppedComponent;

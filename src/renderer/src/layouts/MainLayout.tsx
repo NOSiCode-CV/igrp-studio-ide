@@ -8,10 +8,10 @@ import {
     IGRPSidebarContent,
     IGRPSidebarFooter,
     SidebarProvider,
-} from '@igrp/igrp-design-system';
+} from '@igrp/igrp-framework-react-design-system';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { Home } from 'lucide-react';
-import { SidebarProps } from '@igrp/igrp-design-system/dist/types';
+import { SidebarProps } from '@igrp/igrp-framework-react-design-system/dist/types';
 import Footer from './components/footer';
 
 interface LayoutProps {
@@ -26,7 +26,7 @@ const navData: SidebarProps[] = [
     }
 ];
 
-const MainLayout = (props: LayoutProps): JSX.Element => {
+const MainLayout = (props: LayoutProps) => {
     return (
         <div className="h-screen flex flex-col">
             <ToastContainer />

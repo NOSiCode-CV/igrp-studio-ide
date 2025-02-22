@@ -31,9 +31,9 @@ export const PermissionsLayout = ({
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
 
-    const [title, setTitle] = useState('');
+    const [title, _setTitle] = useState('');
 
-    const [data, setData] = useState<any>(null);
+    const [data, _setData] = useState<any>(null);
 
     const [fetchedPermissions, setFetchedPermissions] = useState<
         PermissionConfig[] | null

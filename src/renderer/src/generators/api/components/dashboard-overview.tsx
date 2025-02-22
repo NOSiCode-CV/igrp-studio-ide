@@ -1,6 +1,6 @@
 'use client';
 
-import { IGRPContainer } from '@igrp/igrp-design-system';
+import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card';
 import { Database, FileCode, FileText, Boxes } from 'lucide-react';
 import { useTranslation } from 'react-i18next'; // Import useTranslation

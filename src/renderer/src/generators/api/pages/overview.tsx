@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import EmptyPage from './EmptyPage';
 import { OptionType } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
-import { PageHeader } from '@igrp/igrp-design-system';
+import { PageHeader } from '@igrp/igrp-framework-react-design-system';
 import DashboardOverview from '../components/dashboard-overview';
 
 import { createSelector } from 'reselect';
@@ -15,7 +15,7 @@ interface NewProps {
     open: OptionType;
 }
 
-const Overview = ({}: NewProps): JSX.Element => {
+const Overview = ({}: NewProps) => {
     const { t } = useTranslation();
 
     const { newTab } = useTabs();

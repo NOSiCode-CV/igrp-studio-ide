@@ -196,7 +196,7 @@ export function SchemaFieldRow({
             >
                 <TableCell
                     style={{ paddingLeft: `${depth * 28 + 8}px` }}
-                    className="flex  flex-1 !py-1"
+                    className="flex  flex-1 py-1!"
                 >
                     {(type === 'object' || type === 'array') && (
                         <Button
@@ -225,7 +225,7 @@ export function SchemaFieldRow({
                         }
                     />
                 </TableCell>
-                <TableCell className="!py-1">
+                <TableCell className="py-1!">
                     <div className="flex flex-1 items-center">
                         <TypeSelectorDropdown
                             type={type}
@@ -248,7 +248,7 @@ export function SchemaFieldRow({
                         />
                     </div>
                 </TableCell>
-                <TableCell className="!py-1">
+                <TableCell className="py-1!">
                     <Input
                         ref={descInputRef}
                         value={description}
@@ -257,7 +257,7 @@ export function SchemaFieldRow({
                         className="w-full text-sm h-8"
                     />
                 </TableCell>
-                <TableCell className="text-right !py-1">
+                <TableCell className="text-right py-1!">
                     <div className="flex justify-end space-x-1 opacity-0 group-hover/opt:opacity-100">
                         {(type === 'object' || type === 'array') && (
                             <Button

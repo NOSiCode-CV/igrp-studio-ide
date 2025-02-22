@@ -11,7 +11,7 @@ import {
 } from './ui/tooltip';
 
 const IconLibrary: React.FC = () => {
-    const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+    const [_selectedIcon, setSelectedIcon] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
 
     const iconNames = Object.keys(icons) as Array<keyof typeof icons>;

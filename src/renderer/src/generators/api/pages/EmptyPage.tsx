@@ -1,4 +1,4 @@
-import { IGRPContainer } from '@igrp/igrp-design-system';
+import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
 import { Button } from '@renderer/components/ui/button';
 import { Card, CardContent } from '@renderer/components/ui/card';
 import {

@@ -2,8 +2,7 @@ import { useRef, useState } from 'react';
 import FormEngine from '../FormEngine';
 import { File } from 'src/main/types';
 import {
-    DroppedComponentsProvider,
-    useDroppedComponents,
+    DroppedComponentsProvider
 } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
 import { Separator } from '@renderer/components/ui/separator';
