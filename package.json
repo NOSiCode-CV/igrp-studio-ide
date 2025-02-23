@@ -58,6 +58,7 @@
 		"@radix-ui/react-tooltip": "^1.1.8",
 		"@reduxjs/toolkit": "^2.5.1",
 		"@shadcn/ui": "^0.0.4",
+		"@tailwindcss/vite": "^4.0.8",
 		"@types/express": "^5.0.0",
 		"@types/jest": "^29.5.14",
 		"axios": "^1.7.9",
@@ -151,8 +152,5 @@
 		"directories": {
 			"output": "out"
 		}
-	},
-	"resolutions": {
-		"glob": "^9.0.0"
 	}
 }

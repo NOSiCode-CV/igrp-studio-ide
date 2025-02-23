@@ -62,7 +62,7 @@ const Overview = ({}: NewProps) => {
 
     return (
         <ContainerScrollArea>
-            <div className="w-full max-w-4xl mx-auto space-y-8 p-6 mb-10">
+            <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
                 <PageHeader
                     title={t('apiOverview')}
                     description={t('manageApiEndpoints')}

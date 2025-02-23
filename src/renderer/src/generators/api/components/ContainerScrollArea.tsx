@@ -9,5 +9,5 @@ interface ContainerScrollAreaProps {
 export const ContainerScrollArea: React.FC<ContainerScrollAreaProps> = ({
     children
 }) => {
-    return <ScrollArea className="h-100">{children}</ScrollArea>;
+    return <ScrollArea>{children}</ScrollArea>;
 };

@@ -1,4 +1,3 @@
-const { fontFamily } = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -40,9 +39,9 @@ module.exports = {
                     DEFAULT: '#008054',
                     dark: '#3AA0D9',
                 },
-                
+               
             },
-            
+           
         },
     },
     plugins: [require('tailwindcss-animate'),
