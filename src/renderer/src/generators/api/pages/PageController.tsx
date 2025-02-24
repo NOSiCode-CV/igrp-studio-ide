@@ -157,6 +157,7 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
                     selectors={selectors}
                     dto={dto}
                     models={models}
+                    enums={enums}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}

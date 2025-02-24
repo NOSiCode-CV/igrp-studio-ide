@@ -37,7 +37,7 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
-export const getTablesColumns = ({ selectors, dto, models, currentDto, t }): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = ({ selectors, dto, models, enums, currentDto, t }): { [value: string]: IColumnsTabelProps[] } => {
 
     const paramsTypesData = formatMethods(
         (
@@ -70,7 +70,8 @@ export const getTablesColumns = ({ selectors, dto, models, currentDto, t }): { [
     const namespacesOptions: SchemaTypeItem[] = [
         { label: t('dto'), value: 'dto', items: getOptions(dto) },
         { label: t('model'), value: 'model', items: getOptions(models) },
-        { label: t('dataTypes'), value: 'java', items: paramsTypesData }
+        { label: t('dataTypes'), value: 'java', items: paramsTypesData },
+        { label: t('enum'), value: 'enum', items: getOptions(enums) }
     ]
 
     return {

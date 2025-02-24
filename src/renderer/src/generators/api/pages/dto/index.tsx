@@ -27,6 +27,7 @@ interface DtoProps {
     selectors: Array<any>;
     models?: Array<any>;
     dto?: Array<any>;
+    enums?:Array<any>;
     currentItem: any;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
@@ -37,6 +38,7 @@ const DtoLayout = ({
     selectors,
     dto,
     models,
+    enums,
     currentItem,
     onCloseTab,
     onUpdateTab,
@@ -99,6 +101,7 @@ const DtoLayout = ({
             selectors,
             dto,
             models,
+            enums,
             currentDto: data?.name,
             t,
         });
