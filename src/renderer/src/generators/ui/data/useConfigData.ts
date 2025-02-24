@@ -37,9 +37,9 @@ const useConfigdata = () => {
                 type: FIELD,
                 subItems: [
                     {
-                        id: FIELDS.InputInput,
+                        id: FIELDS.InputField,
                         label: 'Input Field',
-                        icon: ICON_MAP[FIELDS.InputInput],
+                        icon: ICON_MAP[FIELDS.InputField],
                     },
                     {
                         id: FIELDS.DatePicker,

@@ -35,9 +35,11 @@ const useStudio = () => {
         return component
     }, [])
 
-    const dynamicImport = useCallback(async (type: string, componentName: string) => {
+    const dynamicImport = useCallback(async (componentName: string) => {
         try {
-            const module = await import(`@renderer/generators/ui/types/${type}/components/${componentName}`);
+            /* @vite-ignore */
+            const module = await import(`@renderer/generators/ui/types/components/${componentName}`);
+            console.log(module)
             return module.default;
         } catch (error) {
             const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);

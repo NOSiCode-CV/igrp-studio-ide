@@ -1177,10 +1177,10 @@
     sonner "^2.0.1"
     zod "^3.24.2"
 
-"@igrp/igrp-studio-springboot-engine@^0.0.1-alpha.2":
-  version "0.0.1-alpha.2"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.2.tgz#0fb6dd94d69d8339bc7de9bfc1d2429b90cf639d"
-  integrity sha512-9twYYl16KfYp9zLMPNau64ZubKXnWTfnREiXVzkIFwmgBUZgLPKwHSXcsxUuyQ5AzTGYs7FjcQOB21Je3NshMg==
+"@igrp/igrp-studio-springboot-engine@^0.0.1-alpha.3":
+  version "0.0.1-alpha.3"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.3.tgz#cffc92374eba0cd83e270640aabca8f9163c7de0"
+  integrity sha512-hG4sqVre/qyBCrgUy2+I/wACHsgdxiZYAbMrYbA/71l+Sfb5G7fvgTo1Fnk8DHqcwZdIa+3iOHShts8jnhos+A==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -8706,10 +8706,10 @@ react-style-singleton@^2.2.1, react-style-singleton@^2.2.2, react-style-singleto
     get-nonce "^1.0.0"
     tslib "^2.0.0"
 
-react-toastify@^11.0.3:
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-11.0.3.tgz#1684de60baf745e761d3c608bb29581657e2fe01"
-  integrity sha512-cbPtHJPfc0sGqVwozBwaTrTu1ogB9+BLLjd4dDXd863qYLj7DGrQ2sg5RAChjFUB4yc3w8iXOtWcJqPK/6xqRQ==
+react-toastify@^11.0.5:
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-11.0.5.tgz#ce4c42d10eeb433988ab2264d3e445c4e9d13313"
+  integrity sha512-EpqHBGvnSTtHYhCPLxML05NLY2ZX0JURbAdNYa6BUkk+amz4wbKBQvoKQAB0ardvSarUBuY4Q4s1sluAzZwkmA==
   dependencies:
     clsx "^2.1.1"
 

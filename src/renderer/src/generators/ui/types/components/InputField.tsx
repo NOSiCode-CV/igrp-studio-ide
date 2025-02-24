@@ -8,7 +8,7 @@ export interface InputTextProps {
     onEdit: () => void
 }
 
-const UiText: React.FC<InputTextProps> = ({ componentId, comp }) => {
+const InputField: React.FC<InputTextProps> = ({ componentId, comp }) => {
 
     const { placeholder, label } = comp.config
 
@@ -24,4 +24,4 @@ const UiText: React.FC<InputTextProps> = ({ componentId, comp }) => {
     )
 }
 
-export default UiText
+export default InputField

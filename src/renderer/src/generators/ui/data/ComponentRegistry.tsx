@@ -54,7 +54,7 @@ export const ComponentRegistry: { [key: string]: React.FC<any> } = {
 };
 
 export const ICON_MAP: Record<string, React.ElementType> = {
-    InputInput: FormInput,
+    InputField: FormInput,
     DatePicker: Calendar,
     TimePicker: Clock,
     Password: Eye,

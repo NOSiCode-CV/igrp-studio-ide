@@ -9,7 +9,7 @@ interface InputDateProps {
     onEdit: () => void;
 }
 
-const InputDate: React.FC<InputDateProps> = ({ comp, componentId }) => {
+const DatePicker: React.FC<InputDateProps> = ({ comp, componentId }) => {
     const { label } = comp.config;
 
     const [date, _setDate] = useState();
@@ -24,4 +24,4 @@ const InputDate: React.FC<InputDateProps> = ({ comp, componentId }) => {
     );
 };
 
-export default InputDate;
+export default DatePicker;

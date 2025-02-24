@@ -61,7 +61,6 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
             // Load form fields
             for (const field of formFields) {
                 const component = await dynamicImport(
-                    componentName,
                     field.componentName
                 );
                 components[field.id] = component;
@@ -70,7 +69,6 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
             // Load buttons
             for (const button of buttonComponents) {
                 const component = await dynamicImport(
-                    componentName,
                     button.componentName
                 );
                 components[button.id] = component;

@@ -12,7 +12,6 @@ export const COMPONENTS = {
     Layout: "Layout",
     Widgets: "Widgets",
     Advanced: "Advanced"
-
 }
 
 export const Containers = {
@@ -36,7 +35,7 @@ export const DataDisplay = {
 }
 
 export const FIELDS = {
-    InputInput: 'InputInput',
+    InputField: 'InputField',
     DatePicker: 'DatePicker',
     TimePicker: 'TimePicker',
     Password: "Password",
