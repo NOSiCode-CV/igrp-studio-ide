@@ -116,7 +116,7 @@ export function CreateEndpointDialog({
         formik.setFieldValue('name', endpointName);
         formik.setFieldValue('basePath', pathController);
         formik.setFieldValue('module', defaultModule);
-    }, [formik.values.name, defaultModule, endpointName, pathController]);
+    }, [defaultModule, endpointName, pathController]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -138,7 +138,7 @@ export function CreateEndpointDialog({
                                     id="name"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.name || endpointName}
+                                    value={formik.values.name}
                                     className={cn(
                                         formik.touched.name &&
                                             formik.errors.name

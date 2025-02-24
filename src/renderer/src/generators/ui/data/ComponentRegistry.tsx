@@ -45,7 +45,7 @@ import {
     FormInput as Form,
 } from 'lucide-react';
 
-const FormLayout = lazy(() => import('../types/form'));
+const FormLayout = lazy(() => import('../types/components/Form'));
 const AppCompLayout = lazy(() => import('../types/AppComponent'));
 
 export const ComponentRegistry: { [key: string]: React.FC<any> } = {

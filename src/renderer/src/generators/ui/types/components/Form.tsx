@@ -13,7 +13,7 @@ import {
 import { cn } from '@renderer/lib/utils';
 import { EmptySlotComponent } from '@renderer/generators/ui/components/EmptySlotComponent';
 import useStudio from '@renderer/hooks/useStudio';
-import BoxField from './BoxFields';
+import BoxField from '../tools/BoxFields';
 
 export interface FormComponentProps {
     componentId: string;
@@ -21,7 +21,7 @@ export interface FormComponentProps {
     onEdit: () => void;
 }
 
-const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
+const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     const [formFields, setFormFields] = useState<DroppedComponent[]>([]);
     const [buttonComponents, setButtonComponents] = useState<
         DroppedComponent[]
@@ -34,7 +34,7 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     const { dynamicImport } = useStudio();
     const { setEditingComponent } = useDroppedComponents();
 
-    const { componentName, config } = comp;
+    const { config } = comp;
     const { title, colSize } = config;
 
     useEffect(() => {
@@ -60,17 +60,13 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
 
             // Load form fields
             for (const field of formFields) {
-                const component = await dynamicImport(
-                    field.componentName
-                );
+                const component = await dynamicImport(field.componentName);
                 components[field.id] = component;
             }
 
             // Load buttons
             for (const button of buttonComponents) {
-                const component = await dynamicImport(
-                    button.componentName
-                );
+                const component = await dynamicImport(button.componentName);
                 components[button.id] = component;
             }
 
@@ -229,4 +225,4 @@ const FormLayout: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     );
 };
 
-export default FormLayout;
+export default Form;

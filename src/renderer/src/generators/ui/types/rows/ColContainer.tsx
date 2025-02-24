@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
@@ -15,15 +15,36 @@ export interface ColProps {
 }
 
 const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
+    const [loadedComponents, setLoadedComponents] = useState<{
+        [key: string]: React.ComponentType<any>;
+    }>({});
     const { getComponents, setEditingComponent } = useDroppedComponents();
 
-    const { discoverComponent } = useStudio();
+    const { dynamicImport } = useStudio();
 
     const components: DroppedComponent[] = getComponents(rowId, columnId);
 
     const handleEditClick = (component: Partial<DroppedComponent>) => {
         setEditingComponent(component);
     };
+
+    useEffect(() => {
+        const loadComponents = async () => {
+            const comps: { [key: string]: React.ComponentType<any> } = {};
+
+            // Load form fields
+            for (const comp of components) {
+                console.log(comp.componentName);
+                const component = await dynamicImport(comp.componentName);
+                components[comp.id] = component;
+                console.log(components[comp.id]);
+            }
+
+            setLoadedComponents(comps);
+        };
+
+        loadComponents();
+    }, [components, dynamicImport]);
 
     return (
         <div
@@ -45,9 +66,9 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                         {components.length > 0
                             ? components.map(
                                   (comp: DroppedComponent, index: number) => {
-                                      const component = discoverComponent(
-                                          comp.componentName
-                                      );
+                                      const Component =
+                                          loadedComponents[comp.id];
+
                                       return (
                                           <Draggable
                                               key={comp.id}
@@ -60,7 +81,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                       ref={provided.innerRef}
                                                       {...provided.draggableProps}
                                                   >
-                                                      {component && (
+                                                      {Component && (
                                                           <BoxContainer
                                                               key={comp.id}
                                                               id={comp.id}
@@ -74,18 +95,17 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                                   provided.dragHandleProps
                                                               }
                                                           >
-                                                              {React.createElement(
-                                                                  component,
-                                                                  {
-                                                                      comp,
-                                                                      componentId:
-                                                                          comp.id,
-                                                                      onEdit: () =>
-                                                                          handleEditClick(
-                                                                              comp
-                                                                          ),
+                                                              <Component
+                                                                  comp={comp}
+                                                                  componentId={
+                                                                      comp.id
                                                                   }
-                                                              )}
+                                                                  onEdit={() =>
+                                                                      handleEditClick(
+                                                                          comp
+                                                                      )
+                                                                  }
+                                                              />
                                                           </BoxContainer>
                                                       )}
                                                   </div>

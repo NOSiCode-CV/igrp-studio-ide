@@ -1,5 +1,5 @@
 import React from "react";
-import RowTools from "../tools/RowTools";
+import RowTools from "./RowTools";
 
 interface BoxProps {
     children: React.ReactElement,
