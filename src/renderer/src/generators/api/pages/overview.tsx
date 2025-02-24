@@ -7,7 +7,6 @@ import DashboardOverview from '../components/dashboard-overview';
 
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { ContainerScrollArea } from '../components/ContainerScrollArea';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 
 interface NewProps {
@@ -61,16 +60,14 @@ const Overview = ({}: NewProps) => {
     }, [filesThree]);
 
     return (
-        <ContainerScrollArea>
-            <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
-                <PageHeader
-                    title={t('apiOverview')}
-                    description={t('manageApiEndpoints')}
-                />
-                <DashboardOverview stats={stats} />
-                <EmptyPage onClick={handleOptionClick} />
-            </div>
-        </ContainerScrollArea>
+        <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
+            <PageHeader
+                title={t('apiOverview')}
+                description={t('manageApiEndpoints')}
+            />
+            <DashboardOverview stats={stats} />
+            <EmptyPage onClick={handleOptionClick} />
+        </div>
     );
 };
 

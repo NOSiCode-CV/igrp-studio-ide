@@ -64,35 +64,36 @@ const Layout = (props: LayoutProps) => {
     }, [basePath, navigate]);
 
     return (
-        <SidebarProvider
-            style={
-                {
-                    '--sidebar-width': '380px',
-                } as React.CSSProperties
-            }
-        >
-            <div className="h-screen flex flex-col w-full">
-                <ToastContainer />
-                <Header config={config} basePath={basePath} />
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))]">
+            <SidebarProvider
+                style={
+                    {
+                        '--sidebar-width': '380px',
+                    } as React.CSSProperties
+                }
+            >
+                <div className="h-screen flex flex-col w-full">
+                    <ToastContainer />
+                    <Header config={config} basePath={basePath} />
 
-                <div className="flex flex-1 overflow-hidden">
-                    <AppSidebar
-                        menuItems={menuItems}
-                        className="mt-10"
-                        config={config}
-                        basePath={basePath}
-                        header
-                    />
-                    <SidebarInset className="flex-1">
-                        {React.cloneElement(props.children, {
-                            basePath,
-                            currentItem,
-                            project: config,
-                        })}
-                    </SidebarInset>
+                    <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
+                        <AppSidebar
+                            menuItems={menuItems}
+                            config={config}
+                            basePath={basePath}
+                            header
+                        />
+                        <SidebarInset className="flex-1">
+                            {React.cloneElement(props.children, {
+                                basePath,
+                                currentItem,
+                                project: config,
+                            })}
+                        </SidebarInset>
+                    </div>
                 </div>
-            </div>
-        </SidebarProvider>
+            </SidebarProvider>
+        </div>
     );
 };
 

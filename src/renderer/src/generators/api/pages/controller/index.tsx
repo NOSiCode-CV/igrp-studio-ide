@@ -230,7 +230,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         const handleKeyDown = (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
-                handleSave();
+                onSubmit();
             }
         };
 
@@ -397,12 +397,17 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 isNew={!data}
                 title={title || t('createNewAction')}
                 showSourceCode={onClickSourceCode}
+                onClickBreadcrumbLink={() => setIsModalOpen(true)}
             />
 
             <CreateEndpointDialog
                 isOpen={isModalOpen}
                 basePath={basePath}
                 mode="formik"
+                modules={modules}
+                defaultModule={module}
+                pathController={pathController}
+                endpointName={name}
                 onConfirm={(values) => {
                     setName(values.name);
                     setPathController(values.basePath);
@@ -410,8 +415,6 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
-                modules={modules}
-                defaultModule={module}
             />
             <div className="space-y-4 p-4">
                 <Card className="rounded">
