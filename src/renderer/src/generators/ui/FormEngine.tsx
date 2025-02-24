@@ -64,8 +64,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { discoverComponent } = useStudio();
-
         const { menuItems } = useConfigdata();
 
         // Internal handleSave function in FormEngine
@@ -188,10 +186,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const onDragEnd = (result: any) => {
             const { draggableId } = result;
-
-            let component = discoverComponent(draggableId);
-
-            handleDragEnd(result, component, droppedComponentsMethods);
+            const component = getComponent(draggableId);
+            handleDragEnd(
+                result,
+                component === undefined,
+                droppedComponentsMethods
+            );
         };
 
         return (

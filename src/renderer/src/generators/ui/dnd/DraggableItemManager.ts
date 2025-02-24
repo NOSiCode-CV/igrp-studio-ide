@@ -6,7 +6,7 @@ import { COMPONENT, FIELD } from "../ComponentTypes";
 
 export const handleDragEnd = (
     result: any,
-    component: any,
+    isDrop: boolean,
     { moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
 ) => {
 
@@ -15,10 +15,11 @@ export const handleDragEnd = (
     if (!destination) {
         return;
     }
-
+    console.log(isDrop)
     switch (type) {
         case COMPONENT:
-            if (component !== null && component !== undefined) {
+            if (isDrop) {
+
                 handleDropComponent(draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent });
             }
             else if (source.droppableId === destination.droppableId) {

@@ -8,11 +8,11 @@ import {
     DataDisplay,
     FIELD,
     FIELDS,
-    Layout,
+    ICON_MAP,
+    LayoutWidget,
     Widgets,
 } from '../ComponentTypes';
 import { Pencil, Sheet } from 'lucide-react';
-import { ICON_MAP } from './ComponentRegistry';
 
 const useConfigdata = () => {
     const menuItems: any = useMemo(
@@ -163,44 +163,44 @@ const useConfigdata = () => {
                 ],
             },
             {
-                id: COMPONENTS.Layout,
+                id: COMPONENTS.LayoutWidget,
                 label: 'Layout',
                 type: COMPONENT,
                 subItems: [
                     {
-                        id: Layout.Box,
+                        id: LayoutWidget.Box,
                         label: 'Box',
-                        icon: ICON_MAP[Layout.Box],
+                        icon: ICON_MAP[LayoutWidget.Box],
                     },
                     {
-                        id: Layout.Panel,
+                        id: LayoutWidget.Panel,
                         label: 'Panel',
-                        icon: ICON_MAP[Layout.Panel],
+                        icon: ICON_MAP[LayoutWidget.Panel],
                     },
                     {
-                        id: Layout.Card,
+                        id: LayoutWidget.Card,
                         label: 'Card',
-                        icon: ICON_MAP[Layout.Card],
+                        icon: ICON_MAP[LayoutWidget.Card],
                     },
                     {
-                        id: Layout.Tabs,
+                        id: LayoutWidget.Tabs,
                         label: 'Tabs',
-                        icon: ICON_MAP[Layout.Tabs],
+                        icon: ICON_MAP[LayoutWidget.Tabs],
                     },
                     {
-                        id: Layout.List,
+                        id: LayoutWidget.List,
                         label: 'List',
-                        icon: ICON_MAP[Layout.List],
+                        icon: ICON_MAP[LayoutWidget.List],
                     },
                     {
-                        id: Layout.iFrame,
+                        id: LayoutWidget.iFrame,
                         label: 'iFrame',
-                        icon: ICON_MAP[Layout.iFrame],
+                        icon: ICON_MAP[LayoutWidget.iFrame],
                     },
                     {
-                        id: Layout.InfoPanel,
+                        id: LayoutWidget.InfoPanel,
                         label: 'Info Panel',
-                        icon: ICON_MAP[Layout.InfoPanel],
+                        icon: ICON_MAP[LayoutWidget.InfoPanel],
                     },
                 ],
             },

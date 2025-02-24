@@ -5,7 +5,7 @@ export function useModelValidation({t}) {
     const validationSchema = Yup.object({
         name: Yup.string().required('Name is required')
             .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-            .max(20, t("maxLengthExceeded", { max: 20 })),
+            .max(30, t("maxLengthExceeded", { max: 30 })),
         tableName: Yup.string().required('Table name is required'),
         attributes: Yup.array().of(
             Yup.object().shape({

@@ -18,6 +18,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
     }>({});
+
     const { getComponents, setEditingComponent } = useDroppedComponents();
 
     const { dynamicImport } = useStudio();
@@ -32,12 +33,9 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
         const loadComponents = async () => {
             const comps: { [key: string]: React.ComponentType<any> } = {};
 
-            // Load form fields
             for (const comp of components) {
-                console.log(comp.componentName);
                 const component = await dynamicImport(comp.componentName);
-                components[comp.id] = component;
-                console.log(components[comp.id]);
+                comps[comp.id] = component;
             }
 
             setLoadedComponents(comps);
@@ -81,7 +79,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                       ref={provided.innerRef}
                                                       {...provided.draggableProps}
                                                   >
-                                                      {Component && (
+                                                      {Component ? (
                                                           <BoxContainer
                                                               key={comp.id}
                                                               id={comp.id}
@@ -96,17 +94,14 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                               }
                                                           >
                                                               <Component
-                                                                  comp={comp}
+                                                                  {...comp}
                                                                   componentId={
                                                                       comp.id
                                                                   }
-                                                                  onEdit={() =>
-                                                                      handleEditClick(
-                                                                          comp
-                                                                      )
-                                                                  }
                                                               />
                                                           </BoxContainer>
+                                                      ) : (
+                                                          <div>Loading...</div> 
                                                       )}
                                                   </div>
                                               )}
