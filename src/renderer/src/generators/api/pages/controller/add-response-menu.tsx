@@ -97,7 +97,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                 </Button>
                             </HoverCardTrigger>
-                            <HoverCardContent
+                           {responseTypes && responseTypes.length > 0 && <HoverCardContent
                                 className="w-60 p-0"
                                 align="start"
                                 sideOffset={-44}
@@ -106,7 +106,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                 <div className="border-t">
                                     <ErrorList />
                                 </div>
-                            </HoverCardContent>
+                            </HoverCardContent>}
                         </HoverCard>
                     </div>
                 </PopoverContent>

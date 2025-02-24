@@ -15,13 +15,11 @@ export function useModelValidation({t}) {
         ),
         indexes: Yup.array().of(
             Yup.object().shape({
-                /* name: Yup.string().required('Name is required') */
             })
         ),
         contraint: Yup.object().shape({
             compoundUnique: Yup.array().of(
                 Yup.object().shape({
-                    /* name: Yup.string().required('Name is required') */
                 })
             )
         })

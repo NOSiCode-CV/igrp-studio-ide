@@ -59,7 +59,17 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const [data, setData] = useState([]);
 
     const content = useMemo(() => {
-        return formik.values.requestBody?.content?.[contentType]?.schema;
+        const schema =
+            formik.values.requestBody?.content?.[contentType]?.schema;
+
+        return schema
+            ? {
+                  type: '',
+                  properties: {
+                      [schema.name]: schema,
+                  },
+              }
+            : null;
     }, [formik.values.requestBody, contentType]);
 
     useEffect(() => {
@@ -189,6 +199,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                         filePath=""
                                         onChange={handleChangeEditor}
                                         height="20vh"
+                                        language="json"
                                     />
                                 </TabsContent>
                                 <TabsContent value="schema">

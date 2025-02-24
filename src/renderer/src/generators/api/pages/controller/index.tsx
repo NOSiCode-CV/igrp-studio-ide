@@ -141,6 +141,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 requestParams,
                 headers,
                 responses,
+                requestBody,
             } = currentItem.content;
 
             setOldActionName(actionName);
@@ -151,6 +152,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             );
             formik.setFieldValue('method', method || initialValues.method);
             formik.setFieldValue('path', path || initialValues.path);
+            formik.setFieldValue('requestBody', requestBody || '');
             formik.setFieldValue(
                 'pathVariables',
                 pathVariables || initialValues.pathVariables
