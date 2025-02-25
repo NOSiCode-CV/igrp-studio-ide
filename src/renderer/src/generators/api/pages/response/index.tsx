@@ -234,100 +234,113 @@ export const ResponseLayout = ({
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                    {/* HTTP Status Code */}
-                    <div className="space-y-2">
-                        <LabelRequired>{t('httpStatusCode')}</LabelRequired>
-                        <Combobox
-                            options={httpStatusCodes}
-                            name="statusCode"
-                            value={formik.values.statusCode}
-                            onChange={(value) => {
-                                formik.setFieldValue('statusCode', value),
-                                    handleChangeCode(value);
-                            }}
-                            className={`w-full h-9 focus:ring-igrp focus:border-igrp ${
-                                formik.errors.statusCode &&
-                                formik.touched.statusCode
-                                    ? 'border-red-500'
-                                    : 'border-gray-300'
-                            }`}
-                            placeholder={t('httpStatusCodePlaceholder')}
-                        />
-                        {formik.errors.statusCode &&
-                            formik.touched.statusCode && (
-                                <div className="text-red-500 text-sm">
-                                    {formik.errors.statusCode}
-                                </div>
-                            )}
-                    </div>
-
-                    {/* Name */}
-                    <div className="space-y-2">
-                        <LabelRequired>{t('name')}</LabelRequired>
-                        <Input
-                            type="text"
-                            name="name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                            className={`w-full  focus:ring-igrp focus:border-igrp ${
-                                formik.errors.name && formik.touched.name
-                                    ? 'border-red-500'
-                                    : 'border-gray-300'
-                            }`}
-                            placeholder={t('responseNamePlaceholder')}
-                        />
-                        {formik.errors.name && formik.touched.name && (
-                            <div className="text-red-500 text-sm">
-                                {formik.errors.name}
+                <Card className="rounded-sm p-6">
+                    <div className="flex flex-col gap-4">
+                        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                            {/* HTTP Status Code */}
+                            <div className="flex flex-col gap-3">
+                                <LabelRequired>
+                                    {t('httpStatusCode')}
+                                </LabelRequired>
+                                <Combobox
+                                    options={httpStatusCodes}
+                                    name="statusCode"
+                                    value={formik.values.statusCode}
+                                    onChange={(value) => {
+                                        formik.setFieldValue(
+                                            'statusCode',
+                                            value
+                                        ),
+                                            handleChangeCode(value);
+                                    }}
+                                    className={`w-full h-9 focus:ring-igrp focus:border-igrp ${
+                                        formik.errors.statusCode &&
+                                        formik.touched.statusCode
+                                            ? 'border-red-500'
+                                            : 'border-gray-300'
+                                    }`}
+                                    placeholder={t('httpStatusCodePlaceholder')}
+                                />
+                                {formik.errors.statusCode &&
+                                    formik.touched.statusCode && (
+                                        <div className="text-red-500 text-sm">
+                                            {formik.errors.statusCode}
+                                        </div>
+                                    )}
                             </div>
-                        )}
-                    </div>
 
-                    {/* Content Type */}
-                    <div className="space-y-2">
-                        <LabelRequired>{t('contentType')}</LabelRequired>
-                        <Input
-                            name="contentType"
-                            value={'application/json'}
-                            onChange={() => {}}
-                        />
-                    </div>
-                </div>
-                {/* Description */}
-                <div className="space-y-2">
-                    <Label>{t('description')}</Label>
-                    <Input
-                        type="text"
-                        name="description"
-                        value={formik.values.description}
-                        onChange={formik.handleChange}
-                        className={`w-full  focus:ring-igrp focus:border-igrp ${
-                            formik.errors.description &&
-                            formik.touched.description
-                                ? 'border-red-500'
-                                : 'border-gray-300'
-                        }`}
-                    />
-                    {formik.errors.name && formik.touched.description && (
-                        <div className="text-red-500 text-sm">
-                            {formik.errors.description}
+                            {/* Name */}
+                            <div className="flex flex-col gap-3">
+                                <LabelRequired>{t('name')}</LabelRequired>
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    className={`w-full  focus:ring-igrp focus:border-igrp ${
+                                        formik.errors.name &&
+                                        formik.touched.name
+                                            ? 'border-red-500'
+                                            : 'border-gray-300'
+                                    }`}
+                                    placeholder={t('responseNamePlaceholder')}
+                                />
+                                {formik.errors.name && formik.touched.name && (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.name}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Content Type */}
+                            <div className="flex flex-col gap-3">
+                                <LabelRequired>
+                                    {t('contentType')}
+                                </LabelRequired>
+                                <Input
+                                    name="contentType"
+                                    value={'application/json'}
+                                    onChange={() => {}}
+                                />
+                            </div>
                         </div>
-                    )}
-                </div>
-                <Card className="rounded">
-                    <CardHeader>
-                        <CardTitle>{t('dataSchema')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <JSONSchemaBuilder
-                            schemaTypes={schemaTypes}
-                            initialSchema={dataSchema}
-                            onSchemaChange={(value) => {
-                                handleSchemaChange(value);
-                            }}
-                        />
-                    </CardContent>
+                        {/* Description */}
+                        <div className="flex flex-col gap-3">
+                            <Label>{t('description')}</Label>
+                            <Input
+                                type="text"
+                                name="description"
+                                value={formik.values.description}
+                                onChange={formik.handleChange}
+                                className={`w-full  focus:ring-igrp focus:border-igrp ${
+                                    formik.errors.description &&
+                                    formik.touched.description
+                                        ? 'border-red-500'
+                                        : 'border-gray-300'
+                                }`}
+                            />
+                            {formik.errors.name &&
+                                formik.touched.description && (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.description}
+                                    </div>
+                                )}
+                        </div>
+                        <Card className="rounded">
+                            <CardHeader>
+                                <CardTitle>{t('dataSchema')}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <JSONSchemaBuilder
+                                    schemaTypes={schemaTypes}
+                                    initialSchema={dataSchema}
+                                    onSchemaChange={(value) => {
+                                        handleSchemaChange(value);
+                                    }}
+                                />
+                            </CardContent>
+                        </Card>
+                    </div>
                 </Card>
             </div>
         </>
