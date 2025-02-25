@@ -17,7 +17,7 @@ export default function ERDLayout({ models }: { models: Array<any> }) {
 
             setRelations(relations);
         }
-    }, [models]); // This will run every time 'models' changes
+    }, [models]); 
 
     return (
         <>

@@ -351,7 +351,7 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
 
     // Retorna somente os números de versão
     return {
-      result: data.items.map((item: { version: string }) => item.version),
+      result: data.items.filter((item) => item.version !== null).map((item: { version: string, maven2: { version: string } }) => item.version || item.maven2?.version),
     };
   } catch (error) {
     console.error("Erro ao buscar versões:", error);

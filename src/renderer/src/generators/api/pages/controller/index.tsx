@@ -428,7 +428,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </CardHeader>
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                            <div className="space-y-3">
+                            <div className="flex flex-col gap-3">
                                 <LabelRequired>{t('methodType')}</LabelRequired>
                                 <Combobox
                                     name={t('method')}

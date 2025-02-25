@@ -130,7 +130,7 @@ export function CreateEndpointDialog({
                 <form onSubmit={formik.handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-1 items-center gap-4">
-                            <div className="col-span-12 space-y-3">
+                            <div className="col-span-12 flex flex-col gap-3">
                                 <LabelRequired>
                                     {t('endpointName')}
                                 </LabelRequired>
@@ -152,10 +152,9 @@ export function CreateEndpointDialog({
                                     </p>
                                 )}
                             </div>
-                            <div className="col-span-12 space-y-3">
+                            <div className="col-span-12 gap-3 flex-col flex">
                                 <Label
                                     htmlFor="basePath"
-                                    className="text-right"
                                 >
                                     {t('basePath')}
                                 </Label>
@@ -177,7 +176,7 @@ export function CreateEndpointDialog({
                                     </p>
                                 )}
                             </div>
-                            <div className="col-span-12 space-y-3">
+                            <div className="col-span-12 flex flex-col gap-3">
                                 <LabelRequired>{t('moduleName')}</LabelRequired>
                                 <Combobox
                                     name="module"

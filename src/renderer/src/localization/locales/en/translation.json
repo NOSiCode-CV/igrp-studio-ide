@@ -328,5 +328,7 @@
   "seachPages": "Search pages...",
   "addComponents": "Add Components",
   "editComponents": "Edit Component",
-  "components":"Components"
+  "components":"Components",
+  "msgSpecialCharactersRegex":"Name contains special characters",
+  "msgNoSpacesAllowed": "Names with spaces are not accepted"
 }

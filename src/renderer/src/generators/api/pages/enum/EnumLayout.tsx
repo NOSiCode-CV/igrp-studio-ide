@@ -16,6 +16,7 @@ import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/t
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
+import { TextInput } from '../../components/inputs-form';
 
 interface EnumProps {
     basePath: string;
@@ -203,26 +204,17 @@ export const EnumLayout = ({
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                {/* name */}
-                <div className="space-y-2">
-                    <LabelRequired>{t('name')}</LabelRequired>
-                    <Input
-                        type="text"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        className={`w-full  focus:ring-igrp focus:border-igrp ${
-                            formik.errors.name && formik.touched.name
-                                ? 'border-red-500'
-                                : 'border-gray-300'
-                        }`}
-                    />
-                    {formik.errors.name && formik.touched.name && (
-                        <div className="text-red-500 text-sm">
-                            {formik.errors.name}
-                        </div>
-                    )}
-                </div>
+                <TextInput
+                    id="name"
+                    label={t('name')}
+                    placeholder={''}
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleChange}
+                    error={formik.errors.name}
+                    isRequired
+                />
+
                 <FormList
                     columns={tablesColumns.values || []}
                     formik={formik}

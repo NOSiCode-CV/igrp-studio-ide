@@ -67,35 +67,35 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                     }}
                 >
                     <div className="space-y-4">
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-3">
                             <Label className="">{t('httpStatusCode')}</Label>
                             <Combobox
                                 options={httpStatusCodes}
                                 name="statusCode"
                                 value={statusCode}
                                 onChange={(value) => handleChangeCode(value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-igrp focus:border-igrp"
+                                className="w-full"
                                 placeholder={t('httpStatusCodePlaceholder')}
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-3">
                             <Label className="">{t('name')}</Label>
                             <Input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-igrp focus:border-igrp"
+                                className="w-full"
                                 placeholder={t('responseNamePlaceholder')}
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-3">
                             <Label className="">{t('contentType')}</Label>
                             <Combobox
                                 name={'contentType'}
                                 options={contentTypes}
                                 value={contentType}
                                 onChange={(value) => setContentType(value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-igrp focus:border-igrp"
+                                className="w-full"
                             />
                         </div>
 

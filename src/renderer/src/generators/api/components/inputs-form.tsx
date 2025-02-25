@@ -14,7 +14,7 @@ export const TextInput = ({
     onBlur,
     error,
 }) => (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-3">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
@@ -43,7 +43,7 @@ export const SelectInput = ({
     onChange,
     error,
 }) => (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-3">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
