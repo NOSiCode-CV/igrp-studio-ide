@@ -223,6 +223,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             basePath: pathController,
             actions: finalActions,
             module,
+            id: currentItem.id,
         };
 
         return newValues;

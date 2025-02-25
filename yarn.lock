@@ -1177,10 +1177,10 @@
     sonner "^2.0.1"
     zod "^3.24.2"
 
-"@igrp/igrp-studio-springboot-engine@^0.0.1-alpha.6":
-  version "0.0.1-alpha.6"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.6.tgz#11b92743307630e22b007926ff9f8a4e5df38918"
-  integrity sha512-pmPg/5aqLNJ1u+1RIFz280+8F9dRp2WeHloDs8zClOJHqrtRRN+ffewIPdWrESV1us/FPqrzn8qwHsdBdxTlhg==
+"@igrp/igrp-studio-springboot-engine@^0.0.1-alpha.8":
+  version "0.0.1-alpha.8"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.8.tgz#280f0d3e2503a06e404a17ce336de918a8e24bb4"
+  integrity sha512-Q9bdCKqIpf9xZZVeL+xjbxuUo5QEkcQRyO/9cxUWZZz3yqrI12LEFiTyw6qFwkXpuDTpIKQiHPilP7c4RmUgLQ==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"

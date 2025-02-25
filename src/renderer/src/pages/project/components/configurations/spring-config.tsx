@@ -78,7 +78,7 @@ export function SpringConfig({
 
     return (
         <div className="space-y-6">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
                     id="apiName"
@@ -96,7 +96,7 @@ export function SpringConfig({
                 )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-3">
                 <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                     id="description"
@@ -109,7 +109,7 @@ export function SpringConfig({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('group')}</LabelRequired>
                     <Input
                         id="group"
@@ -127,7 +127,7 @@ export function SpringConfig({
                     )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('artifact')}</LabelRequired>
                     <Input
                         id="artifact"
@@ -148,7 +148,7 @@ export function SpringConfig({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 flex flex-col">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
                     <Combobox
                         name="database"
@@ -165,7 +165,7 @@ export function SpringConfig({
                         </p>
                     )}
                 </div>
-                <div className="space-y-2 flex flex-col">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
                     <Combobox
                         options={versions || []}
@@ -187,7 +187,7 @@ export function SpringConfig({
             <Separator orientation="horizontal" />
 
             <div className="grid grid-cols-2">
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                     <Label>{t('projectStructureStyle')}</Label>
                     <RadioGroup
                         value={data.projectStructureStyle}
@@ -212,7 +212,7 @@ export function SpringConfig({
                     </RadioGroup>
                 </div>
 
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="observability"
