@@ -84,7 +84,7 @@ const TabsNavigation = ({
                                         <ContextMenuTrigger>
                                             <div
                                                 className={cn(
-                                                    'px-4 h-10 text-sm font-medium focus:outline-none cursor-pointer align-middle flex',
+                                                    'px-4 h-10 text-sm font-medium focus:outline-hidden cursor-pointer align-middle flex',
                                                     {
                                                         'text-igrp border-t-2 border-igrp':
                                                             activeTab ===

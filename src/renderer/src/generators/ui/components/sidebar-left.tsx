@@ -21,8 +21,7 @@ import {
     FileText,
     GitBranch,
     Home,
-    ListTodo,
-    Server,
+    ListTodo
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -37,9 +36,8 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
-import { useNavigate } from 'react-router-dom';
-import AppComponents from './AppComponents';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import SidebarAppComponents from './sidebar-app-components';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -53,8 +51,6 @@ export function AppSidebar({
 }: AppSidebarProps) {
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
-    const navigate = useNavigate();
-
     const [activeMenuGroup, setActiveMenuGroup] =
         useState<string>('widgetPalette');
 
@@ -79,10 +75,6 @@ export function AppSidebar({
         setActiveMenuGroup(item.id);
     };
 
-    const handleNavigation = (link: string | undefined) => {
-        if (link) navigate(link);
-    };
-
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
@@ -103,7 +95,7 @@ export function AppSidebar({
         <Sidebar
             collapsible="icon"
             className={cn(
-                'overflow-hidden [&>[data-sidebar=sidebar]]:flex-row !top-[--header-height-two] !h-[calc(100svh-var(--header-height-two))]',
+                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-two))]!',
                 props.className
             )}
             {...props}
@@ -112,8 +104,8 @@ export function AppSidebar({
             <Sidebar
                 collapsible="none"
                 className={cn(
-                    '!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r',
-                    '!w-20'
+                    'w-[calc(var(--sidebar-width-icon)+1px)]! border-r',
+                    'w-20!'
                 )}
             >
                 <SidebarHeader className="pr-0">
@@ -202,7 +194,7 @@ export function AppSidebar({
                                 }}
                             />
                         ) : activeMenuGroup === 'components' ? (
-                            <AppComponents searchTerm={searchQuery} />
+                            <SidebarAppComponents searchTerm={searchQuery} />
                         ) : (
                             filteredData.map((item) => (
                                 <Collapsible
@@ -244,7 +236,7 @@ export function AppSidebar({
                                                                             key={
                                                                                 key
                                                                             }
-                                                                            className="flex flex-col items-center justify-center bg-muted rounded-md shadow-sm"
+                                                                            className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
                                                                         >
                                                                             <DraggableElement
                                                                                 item={

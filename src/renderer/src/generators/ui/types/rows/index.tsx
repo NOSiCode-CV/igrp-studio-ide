@@ -1,6 +1,6 @@
 import React from 'react';
 import RowOptions from './RowOptions';
-import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import ColContainer, { ColProps } from './ColContainer';
 import { generateId } from '@renderer/utils/helpers';
 import { HierarchicalComponent } from '@renderer/generators/ui/interfaces';

@@ -7,7 +7,7 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { Card, CardContent } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
@@ -59,7 +59,17 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const [data, setData] = useState([]);
 
     const content = useMemo(() => {
-        return formik.values.requestBody?.content?.[contentType]?.schema;
+        const schema =
+            formik.values.requestBody?.content?.[contentType]?.schema;
+
+        return schema
+            ? {
+                  type: '',
+                  properties: {
+                      [schema.name]: schema,
+                  },
+              }
+            : null;
     }, [formik.values.requestBody, contentType]);
 
     useEffect(() => {
@@ -189,6 +199,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                         filePath=""
                                         onChange={handleChangeEditor}
                                         height="20vh"
+                                        language="json"
                                     />
                                 </TabsContent>
                                 <TabsContent value="schema">

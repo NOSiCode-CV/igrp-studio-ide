@@ -11,7 +11,7 @@ import { useTabs } from '@renderer/components/navigation/TabContext';
 import { usePermisisonValidation } from './validation';
 import { FormList } from '../../components/form-list';
 import { getTablesColumns, defaultInitialValues } from './config';
-import { PermissionConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { PermissionConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 
 interface PermissionsProps {
     basePath: string;
@@ -31,9 +31,9 @@ export const PermissionsLayout = ({
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
 
-    const [title, setTitle] = useState('');
+    const [title, _setTitle] = useState('');
 
-    const [data, setData] = useState<any>(null);
+    const [data, _setData] = useState<any>(null);
 
     const [fetchedPermissions, setFetchedPermissions] = useState<
         PermissionConfig[] | null

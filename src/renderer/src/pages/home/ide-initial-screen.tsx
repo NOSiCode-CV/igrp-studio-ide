@@ -10,7 +10,7 @@ import {
     setConfig,
 } from '@renderer/redux/thunks';
 import RecentsProjects from './components/recents-projects';
-import { PageHeader } from '@igrp/igrp-design-system';
+import { PageHeader } from '@igrp/igrp-framework-react-design-system';
 import { ProjectWizard } from '../project';
 import { IOpenProject } from 'src/main/types';
 import { CloneProjectModal } from '../../components/git/clone-project-modal';

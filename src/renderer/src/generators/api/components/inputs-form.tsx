@@ -1,4 +1,4 @@
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { LabelRequired } from '@renderer/components/required';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -14,7 +14,7 @@ export const TextInput = ({
     onBlur,
     error,
 }) => (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-3">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
@@ -43,7 +43,7 @@ export const SelectInput = ({
     onChange,
     error,
 }) => (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-3">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (

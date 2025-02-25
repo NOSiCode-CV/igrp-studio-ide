@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@renderer/components/ui/input';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
@@ -193,7 +193,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             )}
                         >
                             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <div className="space-y-2">
+                                <div className="flex flex-col gap-3">
                                     <LabelRequired>
                                         {t('httpStatusCode')}
                                     </LabelRequired>
@@ -215,7 +215,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         )}
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="flex flex-col gap-3">
                                     <LabelRequired>{t('name')}</LabelRequired>
                                     <Input
                                         name={t('name')}
@@ -230,7 +230,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         }
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="flex flex-col gap-3">
                                     <LabelRequired>
                                         {t('contentType')}
                                     </LabelRequired>
@@ -264,7 +264,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             </div>
 
                             {/* Descritpion */}
-                            <div className="space-y-2">
+                            <div className="flex flex-col gap-3">
                                 <Label>{t('description')}</Label>
                                 <Input
                                     type="text"

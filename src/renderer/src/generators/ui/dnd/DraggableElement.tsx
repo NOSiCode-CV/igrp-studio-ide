@@ -1,10 +1,7 @@
 import { GripHorizontal, Settings } from 'lucide-react';
 import { Draggable } from '@hello-pangea/dnd';
-import { useTranslation } from 'react-i18next';
 
 const DraggableElement = ({ item, index }) => {
-    const { t } = useTranslation();
-
     return (
         <Draggable draggableId={`${item.id}`} index={index}>
             {(provided, snapshot) => (
@@ -28,7 +25,7 @@ const DraggableElement = ({ item, index }) => {
                         ) : (
                             <Settings className="h-6 w-6" />
                         )}
-                        <span>{t(item.label || 'Widget')}</span>
+                        <span>{item.label || 'Widget'}</span>
                     </div>
                     {snapshot.isDragging && (
                         <div
@@ -46,7 +43,7 @@ const DraggableElement = ({ item, index }) => {
                             ) : (
                                 <Settings className="h-6 w-6" />
                             )}
-                            <span>{t(item.label || 'Widget')}</span>
+                            <span>{item.label || 'Widget'}</span>
                         </div>
                     )}
                 </>

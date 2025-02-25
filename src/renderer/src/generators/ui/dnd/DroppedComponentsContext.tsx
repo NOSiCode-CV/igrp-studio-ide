@@ -6,7 +6,7 @@ import React, {
     useCallback,
 } from 'react';
 import { Column, DroppedComponent, HierarchicalComponent } from '../interfaces';
-import { ColProps } from '../types/containers/rows/ColContainer';
+import { ColProps } from '../types/rows/ColContainer';
 import { reorder } from './helpers';
 
 export interface ComponentProps {
@@ -68,8 +68,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                       ...props,
                   }
                 : null;
-
-            console.log(newComponent);
 
             setComponents((prevComponents) => {
                 const updatedComponents = [...prevComponents];
@@ -133,7 +131,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                                 (comp) => comp.id === newComponent.id
                             );
 
-                        console.log(existingComponentIndex);
                         if (existingComponentIndex !== -1) {
                             // If the component exists, update it
                             updatedColumn.components[existingComponentIndex] = {

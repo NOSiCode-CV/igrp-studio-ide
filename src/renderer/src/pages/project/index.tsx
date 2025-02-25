@@ -235,7 +235,7 @@ export function ProjectWizard() {
                 </Button>
             </DialogTrigger>
             <DialogContent
-                className="md:max-w-[700px] max-w-[800px]"
+                className="overflow-hidden md:max-w-[700px] lg:max-w-[800px]"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
@@ -262,7 +262,7 @@ export function ProjectWizard() {
                     </div>
                     <div className="py-2">
                         {step === 1 && (
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="space-y-2">
                                     <LabelRequired>
                                         {t('projectName')}
@@ -277,6 +277,7 @@ export function ProjectWizard() {
                                         ref={inputRef}
                                         autoFocus
                                         maxLength={20}
+                                        className="mt-2"
                                     />
                                     {formik.touched.name &&
                                         formik.errors.name && (
@@ -310,7 +311,7 @@ export function ProjectWizard() {
                                         onValueChange={(value) =>
                                             handleChangeType(value)
                                         }
-                                        className="grid grid-cols-2 gap-4"
+                                        className="grid grid-cols-2 gap-4 mt-2"
                                     >
                                         <div
                                             className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
@@ -379,7 +380,7 @@ export function ProjectWizard() {
                         )}
 
                         {step === 2 && (
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <Label>{t('selectFramework')}</Label>
                                 <RadioGroup
                                     name="framework"
@@ -387,7 +388,7 @@ export function ProjectWizard() {
                                     onValueChange={(value) =>
                                         handleChangeFramework(value)
                                     }
-                                    className="grid gap-4"
+                                    className="grid gap-4 mt-2"
                                 >
                                     {frameworks.map((fw) => (
                                         <div
@@ -445,22 +446,24 @@ export function ProjectWizard() {
                         )}
 
                         {step === 3 && (
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 {SelectedComponent ? (
                                     <>
                                         <Label>
                                             {t('frameworkConfiguration')}
                                         </Label>
-                                        <SelectedComponent
-                                            data={formik.values.config}
-                                            errors={formik.errors}
-                                            onChange={(config) =>
-                                                formik.setFieldValue(
-                                                    'config',
-                                                    config
-                                                )
-                                            }
-                                        />
+                                        <div className='mt-3'>
+                                            <SelectedComponent
+                                                data={formik.values.config}
+                                                errors={formik.errors}
+                                                onChange={(config) =>
+                                                    formik.setFieldValue(
+                                                        'config',
+                                                        config
+                                                    )
+                                                }
+                                            />
+                                        </div>
                                     </>
                                 ) : (
                                     <div className="text-center text-muted-foreground pb-8">

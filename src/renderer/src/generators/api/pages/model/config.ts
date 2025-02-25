@@ -1,4 +1,4 @@
-import { ModelConfig } from '@igrp/spring-engine/dist/interfaces/types'
+import { ModelConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 import { formatMethods } from '../../helpers'
 import { IColumnsTabelProps } from '../../types/Interfaces'
 

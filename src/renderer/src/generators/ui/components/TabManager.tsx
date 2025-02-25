@@ -1,10 +1,7 @@
 import { useRef, useState } from 'react';
 import FormEngine from '../FormEngine';
 import { File } from 'src/main/types';
-import {
-    DroppedComponentsProvider,
-    useDroppedComponents,
-} from '../dnd/DroppedComponentsContext';
+import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
 import { Separator } from '@renderer/components/ui/separator';
 import NavigationBar from './NavigationBar';
@@ -20,6 +17,10 @@ interface ContentProps {
     basePath: string;
 }
 
+interface FormEngineRef {
+    handleSave: () => void;
+}
+
 export default function TabManager({ basePath }: ContentProps) {
     const { activeTab, tabs, newTab, setActiveTab } = useTabs();
 
@@ -32,7 +33,7 @@ export default function TabManager({ basePath }: ContentProps) {
 
     // Ref to hold the handleSave function from FormEngine
     const formEngineRefs = useRef<{
-        [key: string]: { handleSave: () => void } | null;
+        [key: string]: FormEngineRef | null;
     }>({});
 
     const handleClickOpenGerador = (page: any) => {
@@ -61,13 +62,15 @@ export default function TabManager({ basePath }: ContentProps) {
                 setActiveTab={setActiveTab}
                 btnNew={false}
             >
-                <NavigationBar
-                    isDesign={isDesignStates[activeTab] ?? true}
-                    onSave={handleSave}
-                    onSwitch={handleSwitchClick}
-                    page={activeTab}
-                    basePath={basePath}
-                />
+                {activeTab !== TAB_DEFAULT && (
+                    <NavigationBar
+                        isDesign={isDesignStates[activeTab] ?? true}
+                        onSave={handleSave}
+                        onSwitch={handleSwitchClick}
+                        page={activeTab}
+                        basePath={basePath}
+                    />
+                )}
             </TabsNavigation>
 
             <Separator />
@@ -97,9 +100,9 @@ export default function TabManager({ basePath }: ContentProps) {
                                 }
                             >
                                 <FormEngine
-                                    ref={(ref) =>
-                                        (formEngineRefs.current[tab.id] = ref)
-                                    }
+                                    ref={(ref) => {
+                                        formEngineRefs.current[tab.id] = ref;
+                                    }}
                                     basePath={basePath}
                                     page={tab.title}
                                     pagePath={currentPage?.path}

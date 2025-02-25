@@ -1,5 +1,3 @@
-'use client';
-
 import * as Yup from 'yup';
 
 import { Button } from '@renderer/components/ui/button';
@@ -13,7 +11,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { ControllerConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
@@ -21,12 +19,15 @@ import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { useEffect } from 'react';
+import { LabelRequired } from '@renderer/components/required';
 
 interface CreateEndpointDialogProps {
     defaultModule: string | undefined;
     basePath: string;
+    pathController: string;
+    endpointName: string;
     isOpen: boolean;
     modules: Array<any>;
     mode?: 'self' | 'formik'; // 'self' = submits its own data, 'formik' = updates Formik
@@ -37,6 +38,8 @@ interface CreateEndpointDialogProps {
 export function CreateEndpointDialog({
     defaultModule,
     basePath,
+    pathController,
+    endpointName,
     isOpen,
     onClose,
     modules,
@@ -51,17 +54,19 @@ export function CreateEndpointDialog({
 
     const validationSchema = Yup.object({
         name: Yup.string()
-            .required(t('thisFieldRequired'))
+            .required(t('thisFieldRequired', { name: t('endpointName') }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccept'))
             .max(20, t('maxLengthExceeded', { max: 20 })),
-        module: Yup.string().required(t('thisFieldRequired')),
+        module: Yup.string().required(
+            t('thisFieldRequired', { name: t('module') })
+        ),
     });
 
     const formik = useFormik({
         initialValues: {
             type: 'controller',
             name: '',
-            basePath: '',
+            basePath:  'api',
             actions: [],
             module: defaultModule,
         },
@@ -108,12 +113,14 @@ export function CreateEndpointDialog({
     };
 
     useEffect(() => {
+        formik.setFieldValue('name', endpointName);
+        formik.setFieldValue('basePath', pathController);
         formik.setFieldValue('module', defaultModule);
-    }, [defaultModule]);
+    }, [defaultModule, endpointName, pathController]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t('createNewEndpoint')}</DialogTitle>
                     <DialogDescription>
@@ -122,16 +129,16 @@ export function CreateEndpointDialog({
                 </DialogHeader>
                 <form onSubmit={formik.handleSubmit}>
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <div className="col-span-12 space-y-3">
-                                <Label htmlFor="name" className="text-right">
+                        <div className="grid grid-cols-1 items-center gap-4">
+                            <div className="col-span-12 flex flex-col gap-3">
+                                <LabelRequired>
                                     {t('endpointName')}
-                                </Label>
+                                </LabelRequired>
                                 <Input
                                     id="name"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.name || ''}
+                                    value={formik.values.name}
                                     className={cn(
                                         formik.touched.name &&
                                             formik.errors.name
@@ -145,10 +152,9 @@ export function CreateEndpointDialog({
                                     </p>
                                 )}
                             </div>
-                            <div className="col-span-12 space-y-3">
+                            <div className="col-span-12 gap-3 flex-col flex">
                                 <Label
                                     htmlFor="basePath"
-                                    className="text-right"
                                 >
                                     {t('basePath')}
                                 </Label>
@@ -156,7 +162,7 @@ export function CreateEndpointDialog({
                                     id="basePath"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.basePath || ''}
+                                    value={formik.values.basePath || pathController}
                                     className={cn(
                                         formik.touched.basePath &&
                                             formik.errors.basePath
@@ -170,10 +176,8 @@ export function CreateEndpointDialog({
                                     </p>
                                 )}
                             </div>
-                            <div className="col-span-12 space-y-3">
-                                <Label htmlFor="module" className="text-right">
-                                    {t('moduleName')}
-                                </Label>
+                            <div className="col-span-12 flex flex-col gap-3">
+                                <LabelRequired>{t('moduleName')}</LabelRequired>
                                 <Combobox
                                     name="module"
                                     options={modules}

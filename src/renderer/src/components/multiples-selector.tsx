@@ -29,13 +29,13 @@ export default function MultipleSelector({ options, value, onChange, placeholder
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     {value.length > 0 ? (
                         value.map((item) => (
                             <Badge key={item} variant="secondary" className="mr-1 mb-1">
                                 {options.find((option) => option.value === item)?.label}
                                 <button
-                                    className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    className="ml-1 ring-offset-background rounded-full outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                             handleUnselect(item)

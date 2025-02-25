@@ -3,7 +3,6 @@ import { Separator } from '@renderer/components/ui/separator';
 import { ContainerScrollArea } from './ContainerScrollArea';
 import PageController from '../pages/PageController';
 import Overview from '../pages/overview';
-import { useTranslation } from 'react-i18next';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
 
@@ -15,14 +14,12 @@ interface ContentProps {
 }
 
 const TabManager = ({ currentItem }: ContentProps) => {
-    const { t } = useTranslation();
     const {
         tabs,
         activeTab,
         newTab,
         setActiveTab,
         handleNewTab,
-        handleCloseTab,
         initializeTabFromCurrentItem,
     } = useTabs();
 

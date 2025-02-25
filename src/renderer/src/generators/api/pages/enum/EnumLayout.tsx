@@ -12,10 +12,12 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { FormList } from '../../components/form-list';
 import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
-import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
+import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
+import { TextInput } from '../../components/inputs-form';
+import { Card } from '@renderer/components/ui/card';
 
 interface EnumProps {
     basePath: string;
@@ -63,7 +65,6 @@ export const EnumLayout = ({
 
         try {
             const data = await window.api.getJsonContent(currentItem.path);
-            console.log(data);
             setData(data);
         } catch (error) {
             console.error('Failed to load JSON content:', error);
@@ -76,8 +77,23 @@ export const EnumLayout = ({
 
     useEffect(() => {
         if (data) {
-            setTitle(data.name);
-            formik.setValues(data);
+            const { name, values } = data;
+
+            setTitle(name);
+
+            formik.setFieldValue('name', name);
+            const attributes = values && values.map((value) => {
+                return {
+                    name: value.name,
+                    code: value.attributes[0],
+                    description: value.attributes[1]
+                };
+            });
+
+            formik.setFieldValue(
+                'values',
+                attributes || [defaultValue]
+            );
         }
     }, [data]);
 
@@ -203,46 +219,44 @@ export const EnumLayout = ({
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                {/* name */}
-                <div className="space-y-2">
-                    <LabelRequired>{t('name')}</LabelRequired>
-                    <Input
-                        type="text"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        className={`w-full  focus:ring-igrp focus:border-igrp ${
-                            formik.errors.name && formik.touched.name
-                                ? 'border-red-500'
-                                : 'border-gray-300'
-                        }`}
-                    />
-                    {formik.errors.name && formik.touched.name && (
-                        <div className="text-red-500 text-sm">
-                            {formik.errors.name}
-                        </div>
-                    )}
-                </div>
-                <FormList
-                    columns={tablesColumns.values || []}
-                    formik={formik}
-                    data={formik.values.values}
-                    changeValue={(element, position, result) =>
-                        changeValue(
-                            formik,
-                            element,
-                            position,
-                            result,
-                            tableName
-                        )
-                    }
-                    addRow={() => addNewRow(formik, tableName, defaultValue)}
-                    removeRow={(position) =>
-                        removeRow(formik, tableName, position)
-                    }
-                    btnLabels={'Enum'}
-                    name={tableName}
-                />
+                <Card className="rounded-sm p-6">
+                    <div className="flex flex-col gap-4">
+                        <TextInput
+                            id="name"
+                            label={t('name')}
+                            placeholder={''}
+                            value={formik.values.name}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleChange}
+                            error={formik.errors.name}
+                            isRequired
+                        />
+                        <Card className="rounded-sm">
+                            <FormList
+                                columns={tablesColumns.values || []}
+                                formik={formik}
+                                data={formik.values.values}
+                                changeValue={(element, position, result) =>
+                                    changeValue(
+                                        formik,
+                                        element,
+                                        position,
+                                        result,
+                                        tableName
+                                    )
+                                }
+                                addRow={() =>
+                                    addNewRow(formik, tableName, defaultValue)
+                                }
+                                removeRow={(position) =>
+                                    removeRow(formik, tableName, position)
+                                }
+                                btnLabels={'Enum'}
+                                name={tableName}
+                            />
+                        </Card>
+                    </div>
+                </Card>
             </div>
         </>
     );

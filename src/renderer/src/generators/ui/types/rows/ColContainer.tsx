@@ -1,15 +1,12 @@
-import React from 'react';
-import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext';
+import React, { useEffect, useState } from 'react';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { DroppedComponent } from '@renderer/generators/ui/interfaces';
 import { COMPONENT } from '@renderer/generators/ui/ComponentTypes';
-import {
-    AcceptTypesRegistry,
-    ComponentRegistry,
-} from '@renderer/generators/ui/data/ComponentRegistry';
 import { GenNoInfoComp } from '@renderer/generators/ui/components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
+import useStudio from '@renderer/hooks/useStudio';
 
 export interface ColProps {
     rowId: string;
@@ -18,15 +15,40 @@ export interface ColProps {
 }
 
 const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
+    const [loadedComponents, setLoadedComponents] = useState<{
+        [key: string]: React.ComponentType<any>;
+    }>({});
+
     const { getComponents, setEditingComponent } = useDroppedComponents();
+
+    const { dynamicImport } = useStudio();
+
     const components: DroppedComponent[] = getComponents(rowId, columnId);
 
     const handleEditClick = (component: Partial<DroppedComponent>) => {
         setEditingComponent(component);
     };
 
+    useEffect(() => {
+        const loadComponents = async () => {
+            const comps: { [key: string]: React.ComponentType<any> } = {};
+
+            for (const comp of components) {
+                const component = await dynamicImport(comp.componentName);
+                comps[comp.id] = component;
+            }
+
+            setLoadedComponents(comps);
+        };
+
+        loadComponents();
+    }, [components, dynamicImport]);
+
     return (
-        <div className={cn(`bg-muted/70 rounded-lg p-2 col-span-${colSize}`)} id={columnId}>
+        <div
+            className={cn(`bg-muted/70 rounded-lg p-2 col-span-${colSize}`)}
+            id={columnId}
+        >
             <Droppable droppableId={`${rowId}-${columnId}`} type={COMPONENT}>
                 {(provided: any, snapshot: any) => (
                     <div
@@ -42,8 +64,9 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                         {components.length > 0
                             ? components.map(
                                   (comp: DroppedComponent, index: number) => {
-                                      const component =
-                                          ComponentRegistry[comp.componentName];
+                                      const Component =
+                                          loadedComponents[comp.id];
+
                                       return (
                                           <Draggable
                                               key={comp.id}
@@ -56,7 +79,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                       ref={provided.innerRef}
                                                       {...provided.draggableProps}
                                                   >
-                                                      {component && (
+                                                      {Component ? (
                                                           <BoxContainer
                                                               key={comp.id}
                                                               id={comp.id}
@@ -70,24 +93,15 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                                   provided.dragHandleProps
                                                               }
                                                           >
-                                                              {React.createElement(
-                                                                  component,
-                                                                  {
-                                                                      comp,
-                                                                      acceptTypes:
-                                                                          AcceptTypesRegistry[
-                                                                              comp
-                                                                                  .componentName
-                                                                          ],
-                                                                      componentId:
-                                                                          comp.id,
-                                                                      onEdit: () =>
-                                                                          handleEditClick(
-                                                                              comp
-                                                                          ),
+                                                              <Component
+                                                                  {...comp}
+                                                                  componentId={
+                                                                      comp.id
                                                                   }
-                                                              )}
+                                                              />
                                                           </BoxContainer>
+                                                      ) : (
+                                                          <div>Loading...</div> 
                                                       )}
                                                   </div>
                                               )}

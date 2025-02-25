@@ -2,11 +2,11 @@ import { ColumnComponent, ColumnConfig, Field, FieldConfig } from "@igrp/nextjs-
 import { generateId } from "@renderer/utils/helpers";
 import { DroppedComponent } from "../interfaces";
 import { ComponentProps } from "./DroppedComponentsContext";
-import { ComponentRegistry } from "../data/ComponentRegistry";
-import { COMPONENT, FEILD } from "../ComponentTypes";
+import { COMPONENT, FIELD } from "../ComponentTypes";
 
 export const handleDragEnd = (
     result: any,
+    isDrop: boolean,
     { moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
 ) => {
 
@@ -15,12 +15,11 @@ export const handleDragEnd = (
     if (!destination) {
         return;
     }
-
-    const component = ComponentRegistry[draggableId];
-
+    console.log(isDrop)
     switch (type) {
         case COMPONENT:
-            if (component !== null && component !== undefined) {
+            if (isDrop) {
+
                 handleDropComponent(draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent });
             }
             else if (source.droppableId === destination.droppableId) {
@@ -40,12 +39,12 @@ export const handleDragEnd = (
             }
             break;
 
-        case FEILD:
-            if (component !== null && component !== undefined) {
-                handleDropField(draggableId, destination, { updateComponent, getComponent });
-            }
-            else if (source.droppableId === destination.droppableId) {
+        case FIELD:
+
+            if (source.droppableId === destination.droppableId) {
                 reorderField(source, destination, { updateComponent, getComponent });
+            } else {
+                handleDropField(draggableId, destination, { updateComponent, getComponent });
             }
             break;
 

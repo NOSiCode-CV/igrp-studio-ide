@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import {
     ControllerAction,
     ControllerConfig,
-} from '@igrp/spring-engine/dist/interfaces/types';
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import {
     Card,
     CardContent,
@@ -24,7 +24,7 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-design-system';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
 import { TabRequest } from './tab-resquest';
 
@@ -141,6 +141,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 requestParams,
                 headers,
                 responses,
+                requestBody,
             } = currentItem.content;
 
             setOldActionName(actionName);
@@ -151,6 +152,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             );
             formik.setFieldValue('method', method || initialValues.method);
             formik.setFieldValue('path', path || initialValues.path);
+            formik.setFieldValue('requestBody', requestBody || '');
             formik.setFieldValue(
                 'pathVariables',
                 pathVariables || initialValues.pathVariables
@@ -230,7 +232,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         const handleKeyDown = (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
-                handleSave();
+                onSubmit();
             }
         };
 
@@ -397,12 +399,17 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 isNew={!data}
                 title={title || t('createNewAction')}
                 showSourceCode={onClickSourceCode}
+                onClickBreadcrumbLink={() => setIsModalOpen(true)}
             />
 
             <CreateEndpointDialog
                 isOpen={isModalOpen}
                 basePath={basePath}
                 mode="formik"
+                modules={modules}
+                defaultModule={module}
+                pathController={pathController}
+                endpointName={name}
                 onConfirm={(values) => {
                     setName(values.name);
                     setPathController(values.basePath);
@@ -410,8 +417,6 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
-                modules={modules}
-                defaultModule={module}
             />
             <div className="space-y-4 p-4">
                 <Card className="rounded">
@@ -423,7 +428,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </CardHeader>
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                            <div className="space-y-3">
+                            <div className="flex flex-col gap-3">
                                 <LabelRequired>{t('methodType')}</LabelRequired>
                                 <Combobox
                                     name={t('method')}

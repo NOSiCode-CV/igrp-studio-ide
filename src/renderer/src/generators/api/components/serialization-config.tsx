@@ -19,7 +19,7 @@ import {
 } from '@renderer/components/ui/select';
 import MonacoEditor from '@renderer/components/MonacoEditor';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import { SerializationConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';

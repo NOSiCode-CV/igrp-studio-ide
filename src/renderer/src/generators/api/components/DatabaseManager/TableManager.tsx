@@ -8,11 +8,11 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { Combobox, IGRPDataTable } from '@igrp/igrp-design-system';
+import { Combobox, IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
-import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { useTranslation } from 'react-i18next';

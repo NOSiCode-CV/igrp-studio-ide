@@ -12,7 +12,7 @@ import {
 } from '@renderer/components/ui/select';
 import { Toggle } from '@renderer/components/ui/toggle';
 import { Label } from '@renderer/components/ui/label';
-import { Plus, Info, Italic, Underline, Strikethrough } from 'lucide-react';
+import { Plus, Italic, Underline, Strikethrough } from 'lucide-react';
 
 interface TextProperties {
     fontWeight: string;

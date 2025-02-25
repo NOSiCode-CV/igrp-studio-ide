@@ -1,9 +1,9 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
-import RowContainer from './types/containers/rows';
+import RowContainer from './types/rows';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { generateId } from '@renderer/utils/helpers';
 
-import navdata from './data/ConfigData';
+import { useConfigdata } from './data/useConfigData';
 import {
     Component,
     PageConfig,
@@ -19,6 +19,7 @@ import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import useStudio from '@renderer/hooks/useStudio';
 
 const addRow = () => {
     const newRowId = generateId('row');
@@ -63,7 +64,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const navData = navdata().props.children;
+        const { menuItems } = useConfigdata();
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
@@ -184,18 +185,22 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         };
 
         const onDragEnd = (result: any) => {
-            handleDragEnd(result, droppedComponentsMethods);
+            const { draggableId } = result;
+            const component = getComponent(draggableId);
+            handleDragEnd(
+                result,
+                component === undefined,
+                droppedComponentsMethods
+            );
         };
 
         return (
             <DragDropContext onDragEnd={onDragEnd}>
-                <AppSidebar data={navData} basePath={basePath} />
+                <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
                     {isDesign ? (
-                        <ScrollArea className="!h-[calc(100svh-var(--header-height-two))] bg-custom-pattern">
-                            <div
-                                className="px-4 py-5"
-                            >
+                        <ScrollArea className="h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
+                            <div className="px-4 py-5">
                                 {components.map((row) => (
                                     <RowContainer
                                         key={row.id}

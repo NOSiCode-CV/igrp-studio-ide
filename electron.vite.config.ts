@@ -33,6 +33,9 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ['monaco-editor']
     },
+    css: {
+      postcss: './postcss.config.mjs',
+    },
     build: {
       outDir: 'dist/renderer',
       rollupOptions: {

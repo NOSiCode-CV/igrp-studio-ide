@@ -1,7 +1,16 @@
 const GenNoInfoField = () => {
     return (
-        <div className="bg-center text-xs text-nowrap">DROP <a href="/#" className="text-igrp"><b> FIELDS</b></a> OR <a href="/#" className=" text-igrp"><b> COPY</b></a></div>
-    )
-}
+        <div className="text-xs space-x-1">
+            <span>DROP</span>
+            <span className="text-igrp">
+                <b>FIELDS</b>
+            </span>
+            <span>OR</span>
+            <span className=" text-igrp">
+                <b>COPY</b>
+            </span>
+        </div>
+    );
+};
 
 export default GenNoInfoField;

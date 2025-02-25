@@ -19,27 +19,34 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ActionProps {
+    title: string;
+    isNew?: boolean;
     onDelete: () => void;
     onSubmit: () => void;
     showSourceCode?: () => void;
-    title: string;
-    isNew?: boolean;
+    onClickBreadcrumbLink?: () => void;
 }
 
 const NavigationBar = ({
     onSubmit,
     onDelete,
     showSourceCode,
+    onClickBreadcrumbLink,
     title,
     isNew,
 }: ActionProps) => {
+    const { t } = useTranslation();
+
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const handleSourceCode = () => {
-        if (showSourceCode) showSourceCode();
+        showSourceCode?.();
     };
 
-    const { t } = useTranslation();
+    const handleBreadcrumbLink = () => {
+        onClickBreadcrumbLink?.();
+    };
+
     return (
         <TooltipProvider>
             <div className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
@@ -57,8 +64,8 @@ const NavigationBar = ({
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="#/">
-                                <span className="font-semibold ">{title}</span>
+                            <BreadcrumbLink onClick={handleBreadcrumbLink} className='cursor-pointer'>
+                                <span className="font-semibold">{title}</span>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>

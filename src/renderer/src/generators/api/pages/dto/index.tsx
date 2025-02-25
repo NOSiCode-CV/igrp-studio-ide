@@ -8,7 +8,7 @@ import {
     TemplateOptions,
     initialValues,
 } from './config';
-import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { DTOConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
@@ -27,6 +27,7 @@ interface DtoProps {
     selectors: Array<any>;
     models?: Array<any>;
     dto?: Array<any>;
+    enums?:Array<any>;
     currentItem: any;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
@@ -37,10 +38,11 @@ const DtoLayout = ({
     selectors,
     dto,
     models,
+    enums,
     currentItem,
     onCloseTab,
     onUpdateTab,
-}: DtoProps): JSX.Element => {
+}: DtoProps) => {
     const { initializeTabFromCurrentItem } = useTabs();
 
     const dispatch: any = useDispatch();
@@ -99,18 +101,18 @@ const DtoLayout = ({
             selectors,
             dto,
             models,
+            enums,
             currentDto: data?.name,
             t,
         });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
-
     useEffect(() => {
         const handleKeyDown = (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault(); 
-                handleSave(formik.values); 
+                event.preventDefault();
+                handleSave(formik.values);
             }
         };
 

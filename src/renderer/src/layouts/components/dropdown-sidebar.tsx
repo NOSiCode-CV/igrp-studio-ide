@@ -23,6 +23,13 @@ interface DropdownSidebarMenuButtonProps {
     basePath?: string;
 }
 
+interface ModalComponentProps {
+    item: any; 
+    basePath: string;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+}
+
 export const DropdownSidebarMenuButton: React.FC<
     DropdownSidebarMenuButtonProps
 > = ({ menuItem, basePath }) => {
@@ -139,7 +146,7 @@ export const DropdownSidebarMenuButton: React.FC<
             {/* Render the selected component */}
             {activeComponent && (
                 <div className="modal-container">
-                    {React.cloneElement(activeComponent as React.ReactElement, {
+                    {React.cloneElement(activeComponent as React.ReactElement<ModalComponentProps>, {
                         item: modalProps,
                         basePath: basePath,
                         isOpen,

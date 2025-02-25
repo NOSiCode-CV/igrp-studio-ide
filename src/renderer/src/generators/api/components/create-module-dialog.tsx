@@ -22,7 +22,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import { ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';

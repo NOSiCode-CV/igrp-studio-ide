@@ -24,13 +24,14 @@ const AttributesCard = ({
     removeRow,
     changeValue,
 }: AttributesCardProps) => {
+
     return (
         <FormList
+            errors={errors}
             formik={formik}
             columns={columns}
             data={data}
             changeValue={changeValue}
-            errors={errors}
             addRow={addRow}
             removeRow={removeRow}
             btnLabels={'Attribute'}

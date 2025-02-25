@@ -49,7 +49,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
         const type =
             formik.values.requestBody?.content &&
             Object.keys(formik.values.requestBody.content)?.[0];
-        setBodyType(type || 'none');
+        if (type !== bodyType) setBodyType(type || 'none');
     }, [formik.values.requestBody]);
 
     useEffect(() => {
@@ -84,19 +84,24 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     const handleSchemaChange = (newSchema: JSONSchema) => {
         const currentSchema = formik.values.requestBody?.content[contentType];
 
-        // Se o schema for o mesmo, não faça nada
+        // Garantir que há propriedades antes de acessar
+        const properties = newSchema.properties || {};
+        const firstKey = Object.keys(properties)[0];
+
+        // Se houver pelo menos uma propriedade, extraia o schema, senão mantenha o original
+        const extractedSchema = firstKey ? properties[firstKey] : newSchema;
+
         if (
-            (currentSchema &&
-                JSON.stringify(currentSchema.schema) ===
-                    JSON.stringify(newSchema)) ||
-            bodyType === 'none'
+            currentSchema &&
+            JSON.stringify(currentSchema.schema) ===
+                JSON.stringify(extractedSchema)
         ) {
             return; // Não há mudanças, então não faça nada
         }
 
         const content = {
             [contentType]: {
-                schema: newSchema,
+                schema: extractedSchema,
             },
         };
 
@@ -122,9 +127,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                     <IGRPTabsTrigger value="params">
                         {t('params')}
                     </IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="body">
-                        {t('body')}
-                    </IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="body">{t('body')}</IGRPTabsTrigger>
                     <IGRPTabsTrigger value="headers">
                         {t('headers')}
                     </IGRPTabsTrigger>

@@ -1,438 +1,827 @@
-import { FunctionComponent, useEffect, useState } from 'react'
-import { ITabelContainer } from '../types/Interfaces'
+import { FunctionComponent, useEffect, useState } from 'react';
+import { ITabelContainer } from '../types/Interfaces';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@renderer/components/ui/table'
-import { Button } from '@renderer/components/ui/button'
-import { Input } from '@renderer/components/ui/input'
-import { GripVertical, Plus, Trash } from 'lucide-react'
-import { Checkbox } from '@renderer/components/ui/checkbox'
-import { Combobox } from '@igrp/igrp-design-system'
-import MultipleSelector from '@renderer/components/multiples-selector'
-import { cn } from '@renderer/lib/utils'
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@renderer/components/ui/table';
+import { Button } from '@renderer/components/ui/button';
+import { Input } from '@renderer/components/ui/input';
+import { GripVertical, Plus, Trash } from 'lucide-react';
+import { Checkbox } from '@renderer/components/ui/checkbox';
+import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import MultipleSelector from '@renderer/components/multiples-selector';
+import { cn } from '@renderer/lib/utils';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@renderer/components/ui/tooltip'
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
-import { PopoverController } from '../pages/controller/popover'
-import { PopoverModel } from '../pages/model/popover'
-import { PopoverDto } from '../pages/dto/popover-dto'
-import { RelationPopover } from '../pages/model/relation-popover'
-import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { PopoverController } from '../pages/controller/popover';
+import { PopoverModel } from '../pages/model/popover';
+import { PopoverDto } from '../pages/dto/popover-dto';
+import { RelationPopover } from '../pages/model/relation-popover';
+import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
-  data,
-  formik,
-  errors,
-  touched,
-  changeValue,
-  addRow,
-  removeRow,
-  columns,
-  name,
-  btnLabels
+    data,
+    formik,
+    errors,
+    touched,
+    changeValue,
+    addRow,
+    removeRow,
+    columns,
+    name,
+    btnLabels,
 }) => {
-  const [formData, setFormData] = useState(data || [])
-  const [dynamicOptions, setDynamicOptions] = useState({})
+    const [formData, setFormData] = useState(data || []);
+    const [dynamicOptions, setDynamicOptions] = useState({});
 
-  useEffect(() => {
-    setFormData(data)
-  }, [data])
+    useEffect(() => {
+        setFormData(data);
+    }, [data]);
 
-  const updateDependentFields = (key, index, selectedValue) => {
-    // Procura por colunas que dependem da chave atual
-    const dependentColumn = columns.find((col) => col.dependsOn === key)
+    const updateDependentFields = (key, index, selectedValue) => {
+        // Procura por colunas que dependem da chave atual
+        const dependentColumn = columns.find((col) => col.dependsOn === key);
 
-    // Se houver uma coluna dependente e ela tiver uma função para obter opções
-    if (dependentColumn && dependentColumn.getOptions) {
-      // Obtém as opções atualizadas com base no valor selecionado
-      const updatedOptions = dependentColumn.getOptions(selectedValue)
+        // Se houver uma coluna dependente e ela tiver uma função para obter opções
+        if (dependentColumn && dependentColumn.getOptions) {
+            // Obtém as opções atualizadas com base no valor selecionado
+            const updatedOptions = dependentColumn.getOptions(selectedValue);
 
-      // Atualiza as opções dinâmicas, se houve mudança
-      if (
-        JSON.stringify(dynamicOptions[`${index}-${dependentColumn.key}`]) !==
-        JSON.stringify(updatedOptions)
-      ) {
-        setDynamicOptions((prevOptions) => ({
-          ...prevOptions,
-          [`${index}-${dependentColumn.key}`]: updatedOptions
-        }))
-      }
+            // Atualiza as opções dinâmicas, se houve mudança
+            if (
+                JSON.stringify(
+                    dynamicOptions[`${index}-${dependentColumn.key}`]
+                ) !== JSON.stringify(updatedOptions)
+            ) {
+                setDynamicOptions((prevOptions) => ({
+                    ...prevOptions,
+                    [`${index}-${dependentColumn.key}`]: updatedOptions,
+                }));
+            }
 
-      // Atualiza o valor do campo dependente
-      const newValue = updatedOptions.length ? updatedOptions[0].value : ''
+            // Atualiza o valor do campo dependente
+            const newValue = updatedOptions.length
+                ? updatedOptions[0].value
+                : '';
 
-      // Evitar atualização desnecessária
-      if (formData[index][dependentColumn.key] !== newValue) {
-        const updatedRow = {
-          ...formData[index],
-          [dependentColumn.key]: newValue
+            // Evitar atualização desnecessária
+            if (formData[index][dependentColumn.key] !== newValue) {
+                const updatedRow = {
+                    ...formData[index],
+                    [dependentColumn.key]: newValue,
+                };
+
+                // Atualiza o estado do formData
+                const newFormData = [...formData];
+                newFormData[index] = updatedRow;
+                //setFormData(newFormData)
+            }
+        }
+    };
+
+    // Executa a atualização dos campos dependentes assim que os dados forem carregados
+    useEffect(() => {
+        if (formData && formData.length > 0)
+            formData.forEach((row, index) => {
+                // Verifica se a linha tem algum campo dependente
+                columns.forEach((col) => {
+                    if (col.dependsOn && row[col.dependsOn]) {
+                        // Atualiza os campos dependentes para cada chave
+                        updateDependentFields(
+                            col.dependsOn,
+                            index,
+                            row[col.dependsOn]
+                        );
+                    }
+                });
+            });
+    }, [formData, columns]);
+
+    // Função para atualizar as opções de um campo baseado em outro
+    const handleDependentChange = (key, index, selectedValue) => {
+        changeValue(key, index, selectedValue);
+
+        // Verificar se o campo atual tem uma dependência para atualizar outro campo
+        const dependentColumn = columns.find((col) => col.dependsOn === key);
+        if (dependentColumn && dependentColumn.getOptions) {
+            const updatedOptions = dependentColumn.getOptions(selectedValue);
+
+            setDynamicOptions((prevOptions) => ({
+                ...prevOptions,
+                [`${index}-${dependentColumn.key}`]: updatedOptions,
+            }));
+        }
+    };
+
+    const onDragEnd = (result: any) => {
+        const { source, destination } = result;
+
+        // Check if destination exists
+        if (!destination) return;
+
+        // If the item is dropped in the same position, do nothing
+        if (
+            source.droppableId === destination.droppableId &&
+            source.index === destination.index
+        ) {
+            return;
         }
 
-        // Atualiza o estado do formData
-        const newFormData = [...formData]
-        newFormData[index] = updatedRow
-        //setFormData(newFormData)
-      }
-    }
-  }
+        // Create a copy of the current data
+        const updatedData = Array.from(formData);
 
-  // Executa a atualização dos campos dependentes assim que os dados forem carregados
-  useEffect(() => {
-    if (formData && formData.length > 0)
-      formData.forEach((row, index) => {
-        // Verifica se a linha tem algum campo dependente
-        columns.forEach((col) => {
-          if (col.dependsOn && row[col.dependsOn]) {
-            // Atualiza os campos dependentes para cada chave
-            updateDependentFields(col.dependsOn, index, row[col.dependsOn])
-          }
-        })
-      })
-  }, [formData, columns])
+        // Remove the item from its source position
+        const [movedItem] = updatedData.splice(source.index, 1);
 
-  // Função para atualizar as opções de um campo baseado em outro
-  const handleDependentChange = (key, index, selectedValue) => {
-    changeValue(key, index, selectedValue)
+        // Insert the item at the destination position
+        updatedData.splice(destination.index, 0, movedItem);
 
-    // Verificar se o campo atual tem uma dependência para atualizar outro campo
-    const dependentColumn = columns.find((col) => col.dependsOn === key)
-    if (dependentColumn && dependentColumn.getOptions) {
-      const updatedOptions = dependentColumn.getOptions(selectedValue)
+        // Update the state
+        setFormData(updatedData);
+        formik.setFieldValue(name, updatedData);
+    };
 
-      setDynamicOptions((prevOptions) => ({
-        ...prevOptions,
-        [`${index}-${dependentColumn.key}`]: updatedOptions
-      }))
-    }
-  }
-
-  const onDragEnd = (result: any) => {
-    const { source, destination } = result
-
-    // Check if destination exists
-    if (!destination) return
-
-    // If the item is dropped in the same position, do nothing
-    if (source.droppableId === destination.droppableId && source.index === destination.index) {
-      return
-    }
-
-    // Create a copy of the current data
-    const updatedData = Array.from(formData)
-
-    // Remove the item from its source position
-    const [movedItem] = updatedData.splice(source.index, 1)
-
-    // Insert the item at the destination position
-    updatedData.splice(destination.index, 0, movedItem)
-
-    // Update the state
-    setFormData(updatedData)
-    formik.setFieldValue(name, updatedData)
-  }
-
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId={`${name}`}>
-        {(provided: any) => (
-          <Table ref={provided.innerRef} {...provided.droppableProps}>
-            <TableHeader>
-              <TableRow>
-                {columns.map(({ name, width }, index) => (
-                  <TableHead style={{ width }} key={index}>
-                    {index === 0 ? (
-                      <span className="flex items-center">
-                        <button className="me-1" disabled>
-                          <GripVertical className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                        {name}
-                      </span>
-                    ) : (
-                      name
+    return (
+        <>
+            <div className="p-1">
+                {Array.isArray(errors) &&
+                    errors.map((erro, index) =>
+                        Object.entries(erro).map(
+                            ([key, mensagem], subIndex) => (
+                                <p
+                                    className="text-xs text-red-500 italic"
+                                    key={`${index}-${subIndex}`}
+                                >
+                                    <strong>{key.toUpperCase()}:</strong>{' '}
+                                    {mensagem as string}
+                                </p>
+                            )
+                        )
                     )}
-                  </TableHead>
-                ))}
-                {<TableHead className="text-right">
-                    {addRow && 
-                     <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                            onClick={() => addRow()}
-                            variant="ghost"
-                            size="sm"
-                            className="text-green-500 h-6 w-6"
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId={`${name}`}>
+                    {(provided: any) => (
+                        <Table
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
                         >
-                            <Plus size={14} />
-                            <span className="sr-only">{`New ${btnLabels}`}</span>
-                        </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
-
-                        </Tooltip>
-                        </TooltipProvider>}
-                </TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {formData &&
-                formData.map((row: any, index: number) => {
-                  const rowId = row.id || `row-${name}-${index}`
-
-                  return (
-                    <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
-                      {(provided: any) => (
-                        <TableRow
-                          className={`group/item`}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                        >
-                          {columns.map(({ name, key, type, options, items }, index2) => {
-                            const selectValue = ['select'].includes(type)
-                              ? (dynamicOptions?.[`${index}-${key}`] || options)?.filter(
-                                  (d) => row[key] && d.value === row[key]
-                                )[0]?.value
-                              : ''
-
-                            const selectMultiValues = ['multiSelect'].includes(type)
-                              ? options
-                                  ?.filter((d) => row[key]?.includes(d.value))
-                                  .map((d) => d.value)
-                              : []
-
-                            return (
-                              <TableCell key={index2} className='!py-1'>
-                                <div className="flex">
-                                  {index2 === 0 && (
-                                    <button
-                                      className="opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0"
-                                      {...provided.dragHandleProps}
-                                    >
-                                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                    </button>
-                                  )}
-
-                                  {type === 'group' && items && items?.length > 0 ? (
-                                    <div className="flex gap-2 align-center">
-                                      {items.map((item, itemIndex) => {
-                                        const itemValue = row[item.key] || ''
-                                        const itemOptions = item.options || []
+                            <TableHeader>
+                                <TableRow>
+                                    {columns.map(({ name, width }, index) => (
+                                        <TableHead
+                                            style={{ width }}
+                                            key={index}
+                                        >
+                                            {index === 0 ? (
+                                                <span className="flex items-center">
+                                                    <button
+                                                        className="me-1"
+                                                        disabled
+                                                    >
+                                                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                                    </button>
+                                                    {name}
+                                                </span>
+                                            ) : (
+                                                name
+                                            )}
+                                        </TableHead>
+                                    ))}
+                                    {
+                                        <TableHead className="text-right">
+                                            {addRow && (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    addRow()
+                                                                }
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="text-green-500 h-6 w-6"
+                                                            >
+                                                                <Plus
+                                                                    size={14}
+                                                                />
+                                                                <span className="sr-only">{`New ${btnLabels}`}</span>
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            )}
+                                        </TableHead>
+                                    }
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {formData &&
+                                    formData.map((row: any, index: number) => {
+                                        const rowId =
+                                            row.id || `row-${name}-${index}`;
 
                                         return (
-                                          <div key={itemIndex} className="flex items-center">
-                                            {item.type === 'select' && (
-                                              <Combobox
-                                                name={item.name}
-                                                placeholder={`Select ${item.name}`}
-                                                options={itemOptions || []}
-                                                value={itemValue}
-                                                onChange={(selectedOption) =>
-                                                  changeValue(item.key, index, selectedOption)
-                                                }
-                                                className="w-auto h-8"
-                                              />
-                                            )}
-
-                                            {item.type === 'checkbox' && (
-                                              <TooltipProvider>
-                                              <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                  <div className="flex align-center">
-                                                    <Checkbox
-                                                      id={`${item.key}_${index2}`}
-                                                      onCheckedChange={(checked) => changeValue(item.key, index, checked)}
-                                                      checked={row?.[item.key] || false}
-                                                    />
-                                                  </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>{item.name}</TooltipContent>
-                                              </Tooltip>
-                                            </TooltipProvider>
-                                            )}
-
-                                            {item.type === 'popoverController' && (
-                                              <PopoverController
-                                                key={itemIndex}
-                                                row={row}
-                                                changeValue={(element, value) =>
-                                                  changeValue(element, index, value)
-                                                }
-                                                options={itemOptions || []}
-                                              />
-                                            )}
-
-                                            {item.type === 'popoverModel' && (
-                                              <PopoverModel
-                                                key={itemIndex}
+                                            <Draggable
+                                                key={rowId + '-col'}
+                                                draggableId={rowId}
                                                 index={index}
-                                                row={row}
-                                                changeValue={(element, position, value) =>
-                                                  changeValue(element, position, value)
-                                                }
-                                                options={itemOptions || []}
-                                              />
-                                            )}
+                                            >
+                                                {(provided: any) => (
+                                                    <TableRow
+                                                        className={`group/item`}
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                    >
+                                                        {columns.map(
+                                                            (
+                                                                {
+                                                                    name,
+                                                                    key,
+                                                                    type,
+                                                                    options,
+                                                                    items,
+                                                                },
+                                                                index2
+                                                            ) => {
+                                                                const selectValue =
+                                                                    [
+                                                                        'select',
+                                                                    ].includes(
+                                                                        type
+                                                                    )
+                                                                        ? (
+                                                                              dynamicOptions?.[
+                                                                                  `${index}-${key}`
+                                                                              ] ||
+                                                                              options
+                                                                          )?.filter(
+                                                                              (
+                                                                                  d
+                                                                              ) =>
+                                                                                  row[
+                                                                                      key
+                                                                                  ] &&
+                                                                                  d.value ===
+                                                                                      row[
+                                                                                          key
+                                                                                      ]
+                                                                          )[0]
+                                                                              ?.value
+                                                                        : '';
 
-                                            {item.type === 'popoverDto' && (
-                                              <PopoverDto
-                                                key={itemIndex}
-                                                index={index}
-                                                row={row}
-                                                changeValue={(element, position, value) =>
-                                                  changeValue(element, position, value)
-                                                }
-                                                collectionTypes={itemOptions || []}
-                                              />
-                                            )}
+                                                                const selectMultiValues =
+                                                                    [
+                                                                        'multiSelect',
+                                                                    ].includes(
+                                                                        type
+                                                                    )
+                                                                        ? options
+                                                                              ?.filter(
+                                                                                  (
+                                                                                      d
+                                                                                  ) =>
+                                                                                      row[
+                                                                                          key
+                                                                                      ]?.includes(
+                                                                                          d.value
+                                                                                      )
+                                                                              )
+                                                                              .map(
+                                                                                  (
+                                                                                      d
+                                                                                  ) =>
+                                                                                      d.value
+                                                                              )
+                                                                        : [];
 
-                                             {item.type === 'popoverRelation' && row['type'] === 'relation' && (
-                                              <RelationPopover
-                                                key={itemIndex}
-                                                field={row}
-                                                changeValue={(element,value) =>
-                                                  changeValue(element, index, value)
-                                                } 
-                                                options={itemOptions || []}
-                                              />
-                                            )}
-                                          </div>
-                                        )
-                                      })}
-                                    </div>
-                                  ) : (
-                                    <>
-                                      {['text', 'number'].includes(type) && (
-                                        <Input
-                                          className={cn(
-                                            'h-8 text-sm',
-                                            errors?.[index]?.[key] && touched?.[index]?.[key] ? 'border-red-500' : ''
-                                          )}
-                                          type={type}
-                                          value={row?.[key] || ''}
-                                          onChange={(ev) =>
-                                            changeValue(key, index, ev.target.value)
-                                          }
-                                        />
-                                      )}
+                                                                return (
+                                                                    <TableCell
+                                                                        key={
+                                                                            index2
+                                                                        }
+                                                                        className="py-1!"
+                                                                    >
+                                                                        <div className="flex">
+                                                                            {index2 ===
+                                                                                0 && (
+                                                                                <button
+                                                                                    className="opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0"
+                                                                                    {...provided.dragHandleProps}
+                                                                                >
+                                                                                    <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                                                                </button>
+                                                                            )}
 
-                                      {['select'].includes(type) && (
-                                        <Combobox
-                                          key={`${index}-${index2}`}
-                                          name={name}
-                                          placeholder={`Select ${name}`}
-                                          options={dynamicOptions[`${index}-${key}`] || options}
-                                          value={selectValue}
-                                          onChange={(selectedOption) => {
-                                            handleDependentChange(key, index, selectedOption)
-                                          }}
-                                          className="w-full h-8"
-                                        />
-                                      )}
+                                                                            {type ===
+                                                                                'group' &&
+                                                                            items &&
+                                                                            items?.length >
+                                                                                0 ? (
+                                                                                <div className="flex gap-2 align-center">
+                                                                                    {items.map(
+                                                                                        (
+                                                                                            item,
+                                                                                            itemIndex
+                                                                                        ) => {
+                                                                                            const itemValue =
+                                                                                                row[
+                                                                                                    item
+                                                                                                        .key
+                                                                                                ] ||
+                                                                                                '';
+                                                                                            const itemOptions =
+                                                                                                item.options ||
+                                                                                                [];
 
-                                      {['multiSelect'].includes(type) && (
-                                        <MultipleSelector
-                                          placeholder={`Select ${name}`}
-                                          options={dynamicOptions[`${index}-${key}`] || options}
-                                          value={selectMultiValues}
-                                          onChange={(selectedOption) => {
-                                            changeValue(key, index, selectedOption)
-                                          }}
-                                        />
-                                      )}
+                                                                                            return (
+                                                                                                <div
+                                                                                                    key={
+                                                                                                        itemIndex
+                                                                                                    }
+                                                                                                    className="flex items-center"
+                                                                                                >
+                                                                                                    {item.type ===
+                                                                                                        'select' && (
+                                                                                                        <Combobox
+                                                                                                            name={
+                                                                                                                item.name
+                                                                                                            }
+                                                                                                            placeholder={`Select ${item.name}`}
+                                                                                                            options={
+                                                                                                                itemOptions ||
+                                                                                                                []
+                                                                                                            }
+                                                                                                            value={
+                                                                                                                itemValue
+                                                                                                            }
+                                                                                                            onChange={(
+                                                                                                                selectedOption
+                                                                                                            ) =>
+                                                                                                                changeValue(
+                                                                                                                    item.key,
+                                                                                                                    index,
+                                                                                                                    selectedOption
+                                                                                                                )
+                                                                                                            }
+                                                                                                            className="w-auto h-8"
+                                                                                                        />
+                                                                                                    )}
 
-                                      {['checkbox'].includes(type) && (
-                                        <Checkbox
-                                          id={`${key}_${index2}`}
-                                          onCheckedChange={(checked) =>
-                                            changeValue(key, index, checked)
-                                          }
-                                          checked={row?.[key] || false}
-                                        />
-                                      )}
+                                                                                                    {item.type ===
+                                                                                                        'checkbox' && (
+                                                                                                        <TooltipProvider>
+                                                                                                            <Tooltip>
+                                                                                                                <TooltipTrigger
+                                                                                                                    asChild
+                                                                                                                >
+                                                                                                                    <div className="flex align-center">
+                                                                                                                        <Checkbox
+                                                                                                                            id={`${item.key}_${index2}`}
+                                                                                                                            onCheckedChange={(
+                                                                                                                                checked
+                                                                                                                            ) =>
+                                                                                                                                changeValue(
+                                                                                                                                    item.key,
+                                                                                                                                    index,
+                                                                                                                                    checked
+                                                                                                                                )
+                                                                                                                            }
+                                                                                                                            checked={
+                                                                                                                                row?.[
+                                                                                                                                    item
+                                                                                                                                        .key
+                                                                                                                                ] ||
+                                                                                                                                false
+                                                                                                                            }
+                                                                                                                        />
+                                                                                                                    </div>
+                                                                                                                </TooltipTrigger>
+                                                                                                                <TooltipContent>
+                                                                                                                    {
+                                                                                                                        item.name
+                                                                                                                    }
+                                                                                                                </TooltipContent>
+                                                                                                            </Tooltip>
+                                                                                                        </TooltipProvider>
+                                                                                                    )}
 
-                                      {['popover'].includes(type) && (
-                                        <PopoverController
-                                          key={index}
-                                          row={row}
-                                          changeValue={(element, value) =>
-                                            changeValue(element, index, value)
-                                          }
-                                          options={options || []}
-                                        />
-                                      )}
+                                                                                                    {item.type ===
+                                                                                                        'popoverController' && (
+                                                                                                        <PopoverController
+                                                                                                            key={
+                                                                                                                itemIndex
+                                                                                                            }
+                                                                                                            row={
+                                                                                                                row
+                                                                                                            }
+                                                                                                            changeValue={(
+                                                                                                                element,
+                                                                                                                value
+                                                                                                            ) =>
+                                                                                                                changeValue(
+                                                                                                                    element,
+                                                                                                                    index,
+                                                                                                                    value
+                                                                                                                )
+                                                                                                            }
+                                                                                                            options={
+                                                                                                                itemOptions ||
+                                                                                                                []
+                                                                                                            }
+                                                                                                        />
+                                                                                                    )}
 
-                                      {['popoverModel'].includes(type) && (
-                                        <PopoverModel
-                                          key={index}
-                                          index={index}
-                                          row={row}
-                                          changeValue={(element, position, value) =>
-                                            changeValue(element, position, value)
-                                          }
-                                          options={options}
-                                        />
-                                      )}
+                                                                                                    {item.type ===
+                                                                                                        'popoverModel' && (
+                                                                                                        <PopoverModel
+                                                                                                            key={
+                                                                                                                itemIndex
+                                                                                                            }
+                                                                                                            index={
+                                                                                                                index
+                                                                                                            }
+                                                                                                            row={
+                                                                                                                row
+                                                                                                            }
+                                                                                                            changeValue={(
+                                                                                                                element,
+                                                                                                                position,
+                                                                                                                value
+                                                                                                            ) =>
+                                                                                                                changeValue(
+                                                                                                                    element,
+                                                                                                                    position,
+                                                                                                                    value
+                                                                                                                )
+                                                                                                            }
+                                                                                                            options={
+                                                                                                                itemOptions ||
+                                                                                                                []
+                                                                                                            }
+                                                                                                        />
+                                                                                                    )}
 
-                                      {['popoverDto'].includes(type) && (
-                                        <PopoverDto
-                                          key={index}
-                                          index={index}
-                                          row={row}
-                                          changeValue={(element, position, value) =>
-                                            changeValue(element, position, value)
-                                          }
-                                          collectionTypes={options}
-                                        />
-                                      )}
+                                                                                                    {item.type ===
+                                                                                                        'popoverDto' && (
+                                                                                                        <PopoverDto
+                                                                                                            key={
+                                                                                                                itemIndex
+                                                                                                            }
+                                                                                                            index={
+                                                                                                                index
+                                                                                                            }
+                                                                                                            row={
+                                                                                                                row
+                                                                                                            }
+                                                                                                            changeValue={(
+                                                                                                                element,
+                                                                                                                position,
+                                                                                                                value
+                                                                                                            ) =>
+                                                                                                                changeValue(
+                                                                                                                    element,
+                                                                                                                    position,
+                                                                                                                    value
+                                                                                                                )
+                                                                                                            }
+                                                                                                            collectionTypes={
+                                                                                                                itemOptions ||
+                                                                                                                []
+                                                                                                            }
+                                                                                                        />
+                                                                                                    )}
 
-                                      {['typeSelectorDropdown'].includes(type) && (
-                                        <TypeSelectorDropdown
-                                          type={row?.[key] || ''}
-                                          onTypeChange={(dataType: any) => {
+                                                                                                    {item.type ===
+                                                                                                        'popoverRelation' &&
+                                                                                                        row[
+                                                                                                            'type'
+                                                                                                        ] ===
+                                                                                                            'relation' && (
+                                                                                                            <RelationPopover
+                                                                                                                key={
+                                                                                                                    itemIndex
+                                                                                                                }
+                                                                                                                field={
+                                                                                                                    row
+                                                                                                                }
+                                                                                                                changeValue={(
+                                                                                                                    element,
+                                                                                                                    value
+                                                                                                                ) =>
+                                                                                                                    changeValue(
+                                                                                                                        element,
+                                                                                                                        index,
+                                                                                                                        value
+                                                                                                                    )
+                                                                                                                }
+                                                                                                                options={
+                                                                                                                    itemOptions ||
+                                                                                                                    []
+                                                                                                                }
+                                                                                                            />
+                                                                                                        )}
+                                                                                                </div>
+                                                                                            );
+                                                                                        }
+                                                                                    )}
+                                                                                </div>
+                                                                            ) : (
+                                                                                <>
+                                                                                    {[
+                                                                                        'text',
+                                                                                        'number',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <Input
+                                                                                            className={cn(
+                                                                                                'h-8 text-sm',
+                                                                                                errors?.[
+                                                                                                    index
+                                                                                                ]?.[
+                                                                                                    key
+                                                                                                ] &&
+                                                                                                    touched?.[
+                                                                                                        index
+                                                                                                    ]?.[
+                                                                                                        key
+                                                                                                    ]
+                                                                                                    ? 'border-red-500'
+                                                                                                    : ''
+                                                                                            )}
+                                                                                            type={
+                                                                                                type
+                                                                                            }
+                                                                                            value={
+                                                                                                row?.[
+                                                                                                    key
+                                                                                                ] ||
+                                                                                                ''
+                                                                                            }
+                                                                                            onChange={(
+                                                                                                ev
+                                                                                            ) =>
+                                                                                                changeValue(
+                                                                                                    key,
+                                                                                                    index,
+                                                                                                    ev
+                                                                                                        .target
+                                                                                                        .value
+                                                                                                )
+                                                                                            }
+                                                                                        />
+                                                                                    )}
 
-                                            changeValue(key, index, dataType)
+                                                                                    {[
+                                                                                        'select',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <Combobox
+                                                                                            key={`${index}-${index2}`}
+                                                                                            name={
+                                                                                                name
+                                                                                            }
+                                                                                            placeholder={`Select ${name}`}
+                                                                                            options={
+                                                                                                dynamicOptions[
+                                                                                                    `${index}-${key}`
+                                                                                                ] ||
+                                                                                                options
+                                                                                            }
+                                                                                            value={
+                                                                                                selectValue
+                                                                                            }
+                                                                                            onChange={(
+                                                                                                selectedOption
+                                                                                            ) => {
+                                                                                                handleDependentChange(
+                                                                                                    key,
+                                                                                                    index,
+                                                                                                    selectedOption
+                                                                                                );
+                                                                                            }}
+                                                                                            className="w-full h-8"
+                                                                                        />
+                                                                                    )}
 
-                                          }}
-                                          schemaTypes={options}
-                                        />
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              </TableCell>
-                            )
-                          })}
-                          {removeRow && (
-                            <TableCell className='!py-1'>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className={`text-red-500 opacity-0 group-hover/item:opacity-100`}
-                                onClick={() => removeRow(index)}
-                              >
-                                <Trash />
-                              </Button>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      )}
-                    </Draggable>
-                  )
-                })}
-            </TableBody>
-            {provided.placeholder}
-          </Table>
-        )}
-      </Droppable>
-    </DragDropContext>
-  )
-}
+                                                                                    {[
+                                                                                        'multiSelect',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <MultipleSelector
+                                                                                            placeholder={`Select ${name}`}
+                                                                                            options={
+                                                                                                dynamicOptions[
+                                                                                                    `${index}-${key}`
+                                                                                                ] ||
+                                                                                                options
+                                                                                            }
+                                                                                            value={
+                                                                                                selectMultiValues
+                                                                                            }
+                                                                                            onChange={(
+                                                                                                selectedOption
+                                                                                            ) => {
+                                                                                                changeValue(
+                                                                                                    key,
+                                                                                                    index,
+                                                                                                    selectedOption
+                                                                                                );
+                                                                                            }}
+                                                                                        />
+                                                                                    )}
+
+                                                                                    {[
+                                                                                        'checkbox',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <Checkbox
+                                                                                            id={`${key}_${index2}`}
+                                                                                            onCheckedChange={(
+                                                                                                checked
+                                                                                            ) =>
+                                                                                                changeValue(
+                                                                                                    key,
+                                                                                                    index,
+                                                                                                    checked
+                                                                                                )
+                                                                                            }
+                                                                                            checked={
+                                                                                                row?.[
+                                                                                                    key
+                                                                                                ] ||
+                                                                                                false
+                                                                                            }
+                                                                                        />
+                                                                                    )}
+
+                                                                                    {[
+                                                                                        'popover',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <PopoverController
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                            row={
+                                                                                                row
+                                                                                            }
+                                                                                            changeValue={(
+                                                                                                element,
+                                                                                                value
+                                                                                            ) =>
+                                                                                                changeValue(
+                                                                                                    element,
+                                                                                                    index,
+                                                                                                    value
+                                                                                                )
+                                                                                            }
+                                                                                            options={
+                                                                                                options ||
+                                                                                                []
+                                                                                            }
+                                                                                        />
+                                                                                    )}
+
+                                                                                    {[
+                                                                                        'popoverModel',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <PopoverModel
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                            index={
+                                                                                                index
+                                                                                            }
+                                                                                            row={
+                                                                                                row
+                                                                                            }
+                                                                                            changeValue={(
+                                                                                                element,
+                                                                                                position,
+                                                                                                value
+                                                                                            ) =>
+                                                                                                changeValue(
+                                                                                                    element,
+                                                                                                    position,
+                                                                                                    value
+                                                                                                )
+                                                                                            }
+                                                                                            options={
+                                                                                                options
+                                                                                            }
+                                                                                        />
+                                                                                    )}
+
+                                                                                    {[
+                                                                                        'popoverDto',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <PopoverDto
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                            index={
+                                                                                                index
+                                                                                            }
+                                                                                            row={
+                                                                                                row
+                                                                                            }
+                                                                                            changeValue={(
+                                                                                                element,
+                                                                                                position,
+                                                                                                value
+                                                                                            ) =>
+                                                                                                changeValue(
+                                                                                                    element,
+                                                                                                    position,
+                                                                                                    value
+                                                                                                )
+                                                                                            }
+                                                                                            collectionTypes={
+                                                                                                options
+                                                                                            }
+                                                                                        />
+                                                                                    )}
+
+                                                                                    {[
+                                                                                        'typeSelectorDropdown',
+                                                                                    ].includes(
+                                                                                        type
+                                                                                    ) && (
+                                                                                        <TypeSelectorDropdown
+                                                                                            type={
+                                                                                                row?.[
+                                                                                                    key
+                                                                                                ] ||
+                                                                                                ''
+                                                                                            }
+                                                                                            onTypeChange={(
+                                                                                                dataType: any
+                                                                                            ) => {
+                                                                                                changeValue(
+                                                                                                    key,
+                                                                                                    index,
+                                                                                                    dataType
+                                                                                                );
+                                                                                            }}
+                                                                                            schemaTypes={
+                                                                                                options
+                                                                                            }
+                                                                                        />
+                                                                                    )}
+                                                                                </>
+                                                                            )}
+                                                                        </div>
+                                                                    </TableCell>
+                                                                );
+                                                            }
+                                                        )}
+                                                        {removeRow && (
+                                                            <TableCell className="py-1!">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className={`text-red-500 opacity-0 group-hover/item:opacity-100`}
+                                                                    onClick={() =>
+                                                                        removeRow(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Trash />
+                                                                </Button>
+                                                            </TableCell>
+                                                        )}
+                                                    </TableRow>
+                                                )}
+                                            </Draggable>
+                                        );
+                                    })}
+                            </TableBody>
+                            {provided.placeholder}
+                        </Table>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        </>
+    );
+};
