@@ -29,11 +29,16 @@ import { CustomStyle } from './EditComponent/custom-style';
 import { ButtonAppearancePanel } from './EditComponent/button-appearance';
 import { DroppedComponent } from '../interfaces';
 import IconLibrary from '@renderer/components/icon-library';
+import useStudio from '@renderer/hooks/useStudio';
 
 export function SidebarRight({
     ...props
 }: React.ComponentProps<typeof Sidebar>) {
     const { t } = useTranslation();
+
+    const { getConfigComponent } = useStudio();
+
+    const [propsComponent, setPropsComponents] = React.useState({});
 
     const {
         currentComponent,
@@ -48,12 +53,20 @@ export function SidebarRight({
 
     const { componentName, id, componentId, config } = currentComponent;
 
-    const propsConfig = useConfigComponent(componentName);
+    React.useEffect(() => {
+        const loadComponents = async () => {
+            const props = await getConfigComponent(componentName);
+            setPropsComponents(props);
+            console.log(props);
+        };
+
+        loadComponents();
+    }, [componentName, getConfigComponent]);
 
     const initialFormValues =
-        propsConfig &&
-        Object.keys(propsConfig).reduce((acc, key) => {
-            acc[key] = propsConfig[key].defaultValue ?? config[key] ?? '';
+        propsComponent &&
+        Object.keys(props).reduce((acc, key) => {
+            acc[key] = props[key].defaultValue ?? config[key] ?? '';
             return acc;
         }, {});
 
@@ -67,7 +80,6 @@ export function SidebarRight({
     };
 
     const handleChange = (changes: any) => {
-        console.log(changes);
         Object.entries(changes).forEach(([key, value]) => {
             setFormValues((prevValues) => ({
                 ...prevValues,
@@ -141,9 +153,9 @@ export function SidebarRight({
                                     {t('properties')}
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                    {propsConfig && (
+                                    {propsComponent && (
                                         <RenderPropsConfig
-                                            propsConfig={propsConfig}
+                                            propsConfig={propsComponent}
                                             formValues={formValues}
                                             handleInputChange={
                                                 handleInputChange

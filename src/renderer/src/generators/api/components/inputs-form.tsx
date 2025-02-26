@@ -13,6 +13,7 @@ export const TextInput = ({
     onChange,
     onBlur,
     error,
+    ...props
 }) => (
     <div className="flex flex-col gap-3">
         {isRequired ? (
@@ -28,6 +29,7 @@ export const TextInput = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            {...props}
         />
         {error && <p className="text-xs text-red-500">{error}</p>}
     </div>

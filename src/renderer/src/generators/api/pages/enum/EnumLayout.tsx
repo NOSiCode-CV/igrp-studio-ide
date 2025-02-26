@@ -52,11 +52,11 @@ export const EnumLayout = ({
 
     const formik = useFormik({
         enableReinitialize: true,
-        initialValues, // Use the passed-in initial values
+        initialValues,
         validationSchema,
         onSubmit: (_values, actions) => {
             actions.setSubmitting(false);
-            handleSave(); // Pass values to the save handler
+            handleSave();
         },
     });
 
@@ -102,7 +102,6 @@ export const EnumLayout = ({
         if (Object.keys(errors).length === 0) {
             formik.handleSubmit();
         } else {
-            // Handle validation errors (optional)
             console.error('Validation errors:', errors);
         }
     };
@@ -185,7 +184,6 @@ export const EnumLayout = ({
 
             createGitCommit(basePath, `Delete enum ${formik.values.name}`);
 
-            // Notify of successful deletion or update
             dispatch(onSetChangeStatus(true));
             onCloseTab();
             showSuccessToast(t('deletedSuccess', { name: t('response') }));

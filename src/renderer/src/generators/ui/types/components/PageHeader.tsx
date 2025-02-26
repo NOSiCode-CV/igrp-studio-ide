@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { DroppedComponent } from '../../interfaces';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { ComponentRegistry } from '../../data/ComponentRegistry';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { FIELD } from '@renderer/generators/ui/ComponentTypes';
 import { PageHeader } from '@igrp/igrp-framework-react-design-system';
 import GenNoInfoField from '@renderer/generators/ui/components/GenNoInfoField';
+import useStudio from '@renderer/hooks/useStudio';
 
 export interface FormComponentProps {
     componentName: string;
@@ -23,6 +23,12 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
         DroppedComponent[]
     >([]);
 
+    const [loadedComponents, setLoadedComponents] = useState<{
+        [key: string]: React.ComponentType<any>;
+    }>({});
+
+    const { dynamicImport } = useStudio();
+
     const { setEditingComponent } = useDroppedComponents();
     const { title } = comp.config;
 
@@ -36,36 +42,53 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
     const handleEditClick = (component: Partial<DroppedComponent>) => {
         setEditingComponent({ ...component, componentId: componentId });
     };
+
+    useEffect(() => {
+        const loadComponents = async () => {
+            const comps: { [key: string]: React.ComponentType<any> } = {};
+
+            for (const comp of buttonComponents) {
+                const component = await dynamicImport(comp.componentName);
+                comps[comp.id] = component;
+            }
+
+            setLoadedComponents(comps);
+        };
+
+        loadComponents();
+    }, [buttonComponents, dynamicImport]);
+
     const renderButtons = () =>
         buttonComponents.map((button: DroppedComponent, index: number) => {
-            const component = ComponentRegistry[button.componentName];
-            return (
+            const Component = loadedComponents[button.id];
+            return Component ? (
                 <Draggable
                     key={button.id}
                     draggableId={`${button.id}`}
                     index={index}
                 >
-                    {(provided, _snapshot) =>
-                        component && (
-                            <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={{ ...provided.draggableProps.style }}
-                            >
-                                {React.createElement(component, {
-                                    comp: button,
-                                    componentId: button.id,
-                                    onEdit: () => handleEditClick(button),
-                                })}
-                            </div>
-                        )
-                    }
+                    {(provided, _snapshot) => (
+                        <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{ ...provided.draggableProps.style }}
+                        >
+                            <Component
+                                comp={button}
+                                componentId={button.id}
+                                onEdit={() => handleEditClick(button)}
+                            />
+                        </div>
+                    )}
                 </Draggable>
+            ) : (
+                <div key={comp.id}>Loading...</div>
             );
         });
 
     return (
+        <div className='bg-white rounded-sm p-3'>
         <PageHeader title={title}>
             <Droppable
                 droppableId={`${componentId}`}
@@ -73,7 +96,6 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
                 direction="horizontal"
             >
                 {(provided, snapshot) => {
-
                     return (
                         <div
                             ref={provided.innerRef}
@@ -84,7 +106,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
                                     : ''
                             }`}
                         >
-                            <div className='flex flex-1 space-x-2'>  
+                            <div className="flex flex-1 space-x-2">
                                 {buttonComponents.length > 0 ? (
                                     renderButtons()
                                 ) : (
@@ -97,6 +119,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
                 }}
             </Droppable>
         </PageHeader>
+        </div>
     );
 };
 

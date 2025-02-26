@@ -23,30 +23,26 @@ const useStudio = () => {
         return componentsFolder?.children ?? [];
     }, [files]);
 
-    /*   const discoverComponent = useCallback((draggableId: string) => {
-          let component = ComponentRegistry[draggableId] || null;
-  
-          if (!component) {
-              const components = fetchComponents()
-              const appComponent = components.find((comp) => comp.content.name === draggableId);
-              return appComponent ? ComponentRegistry[APP_COMPONENT] : null
-          }
-          return component
-      }, []) */
-
     const dynamicImport = useCallback(async (componentName: string) => {
         try {
-            /* @vite-ignore */
-            const module = await import(`@renderer/generators/ui/types/components/${componentName}`);
+            const module = await import(`../generators/ui/types/components/${componentName}`);
             return module.default;
         } catch (error) {
-            console.error(`Failed to load component ${componentName}:`, error);
             const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
             return fallbackModule.default;
         }
     }, []);
 
-    return { fetchComponents, dynamicImport };
+    const getConfigComponent = useCallback(async (componentName: string) => {
+        try {
+            const module = await import(`../generators/ui/types/properties/${componentName}Properties`);
+            return module.default;
+        } catch (error) {
+            return null;
+        }
+    }, []);
+
+    return { fetchComponents, dynamicImport, getConfigComponent };
 };
 
 export default useStudio;

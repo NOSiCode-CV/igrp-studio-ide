@@ -173,7 +173,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                     const schema = content?.[contentType]?.['schema'];
 
-                    const contentData = schema
+                    const contentData = schema && schema.name && schema.name !== 'undefined'
                         ? {
                               type: '',
                               properties: {

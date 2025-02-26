@@ -12,20 +12,26 @@ import {
     LayoutWidget,
     Widgets,
 } from '../ComponentTypes';
-import { Pencil, Sheet } from 'lucide-react';
+import { PanelTopIcon, Pencil, Sheet } from 'lucide-react';
 
 const useConfigdata = () => {
     const menuItems: any = useMemo(
         () => [
             {
                 id: COMPONENTS.Containers,
-                label: 'Conatiners',
+                label: 'Containers',
                 type: COMPONENT,
                 subItems: [
                     {
                         id: Containers.Form,
                         label: 'Form',
                         icon: Sheet,
+                        type: COMPONENTS.Containers,
+                    },
+                    {
+                        id: Containers.PageHeader,
+                        label: 'Page Header',
+                        icon: PanelTopIcon,
                         type: COMPONENTS.Containers,
                     },
                 ],

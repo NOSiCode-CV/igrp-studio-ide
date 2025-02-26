@@ -10,6 +10,7 @@ import {
 import { JSONSchema } from '../../types/schema';
 import { BodyRequest } from './body-request';
 import { useTranslation } from 'react-i18next';
+import { Card } from '@renderer/components/ui/card';
 
 interface TabRequestProps {
     formik: any;
@@ -47,13 +48,13 @@ export const TabRequest: React.FC<TabRequestProps> = ({
 
     useEffect(() => {
         const type =
-            formik.values.requestBody?.content &&
-            Object.keys(formik.values.requestBody.content)?.[0];
-        if (type !== bodyType) setBodyType(type || 'none');
-    }, [formik.values.requestBody]);
+            (formik.values.requestBody?.content &&
+                Object.keys(formik.values.requestBody.content)?.[0]) ||
+            'none';
+        setBodyType(type);
+    }, []);
 
     useEffect(() => {
-        // Clear formik values for body content when type changes
         if (bodyType === 'none') {
             formik.setFieldValue('requestBody', '');
         } else if (bodyType === 'multipart/form-data') {
@@ -136,65 +137,73 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                     {columnsQuery && (
                         <div className="space-y-3">
                             <p className="text-sm">{t('queryParameters')}</p>
-                            <FormList
-                                formik={formik}
-                                columns={columnsQuery}
-                                data={formik.values[tabQueryParams]}
-                                changeValue={(element, position, value) =>
-                                    changeValue(
-                                        formik,
-                                        element,
-                                        position,
-                                        value,
-                                        tabQueryParams
-                                    )
-                                }
-                                addRow={() =>
-                                    addNewRow(
-                                        formik,
-                                        tabQueryParams,
-                                        tabQueryParams
-                                    )
-                                }
-                                removeRow={(position) =>
-                                    removeRow(formik, tabQueryParams, position)
-                                }
-                                errors={formik.errors[tabQueryParams]}
-                                btnLabels={t('queryParameter')}
-                                name={tabQueryParams}
-                            />
+                            <Card className="rounded-sm">
+                                <FormList
+                                    formik={formik}
+                                    columns={columnsQuery}
+                                    data={formik.values[tabQueryParams]}
+                                    changeValue={(element, position, value) =>
+                                        changeValue(
+                                            formik,
+                                            element,
+                                            position,
+                                            value,
+                                            tabQueryParams
+                                        )
+                                    }
+                                    addRow={() =>
+                                        addNewRow(
+                                            formik,
+                                            tabQueryParams,
+                                            tabQueryParams
+                                        )
+                                    }
+                                    removeRow={(position) =>
+                                        removeRow(
+                                            formik,
+                                            tabQueryParams,
+                                            position
+                                        )
+                                    }
+                                    errors={formik.errors[tabQueryParams]}
+                                    btnLabels={t('queryParameter')}
+                                    name={tabQueryParams}
+                                />
+                            </Card>
                             <p className="text-sm">{t('variables')}</p>
-                            <FormList
-                                formik={formik}
-                                columns={columnsVariables}
-                                data={formik.values[tabPathVariables]}
-                                changeValue={(element, position, value) =>
-                                    changeValue(
-                                        formik,
-                                        element,
-                                        position,
-                                        value,
-                                        tabPathVariables
-                                    )
-                                }
-                                addRow={() =>
-                                    addNewRow(
-                                        formik,
-                                        tabPathVariables,
-                                        tabPathVariables
-                                    )
-                                }
-                                removeRow={(position) =>
-                                    removeRow(
-                                        formik,
-                                        tabPathVariables,
-                                        position
-                                    )
-                                }
-                                errors={formik.errors[tabPathVariables]}
-                                btnLabels={t('variable')}
-                                name={tabPathVariables}
-                            />
+                            <Card className="rounded-sm">
+                                <FormList
+                                    formik={formik}
+                                    columns={columnsVariables}
+                                    data={formik.values[tabPathVariables]}
+                                    changeValue={(element, position, value) =>
+                                        changeValue(
+                                            formik,
+                                            element,
+                                            position,
+                                            value,
+                                            tabPathVariables
+                                        )
+                                    }
+                                    addRow={() =>
+                                        addNewRow(
+                                            formik,
+                                            tabPathVariables,
+                                            tabPathVariables
+                                        )
+                                    }
+                                    removeRow={(position) =>
+                                        removeRow(
+                                            formik,
+                                            tabPathVariables,
+                                            position
+                                        )
+                                    }
+                                    errors={formik.errors[tabPathVariables]}
+                                    btnLabels={t('variable')}
+                                    name={tabPathVariables}
+                                />
+                            </Card>
                         </div>
                     )}
                 </IGRPTabsContent>

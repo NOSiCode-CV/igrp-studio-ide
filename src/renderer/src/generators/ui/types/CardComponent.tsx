@@ -2,10 +2,13 @@ import { ICON_MAP } from '../ComponentTypes';
 import { DroppedComponent } from '../interfaces';
 
 export interface CardComponentProps {
-    componentName: string;
+    comp: DroppedComponent;
 }
 
-const CardComponent = ({ componentName }: DroppedComponent) => {
+const CardComponent = ({ comp }: CardComponentProps) => {
+
+    const {componentName} = comp
+
     const Icon = ICON_MAP[componentName];
 
     return (

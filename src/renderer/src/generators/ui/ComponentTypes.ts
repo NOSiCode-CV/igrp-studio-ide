@@ -58,7 +58,8 @@ export const COMPONENTS = {
 }
 
 export const Containers = {
-    Form: 'Form'
+    Form: 'Form',
+    PageHeader: 'PageHeader'
 }
 
 export const BasicElements = {

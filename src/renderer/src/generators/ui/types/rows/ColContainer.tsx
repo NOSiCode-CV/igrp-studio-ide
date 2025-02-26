@@ -67,7 +67,7 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                       const Component =
                                           loadedComponents[comp.id];
 
-                                      return (
+                                      return Component ? (
                                           <Draggable
                                               key={comp.id}
                                               draggableId={comp.id}
@@ -79,33 +79,31 @@ const ColContainer: React.FC<ColProps> = ({ rowId, columnId, colSize }) => {
                                                       ref={provided.innerRef}
                                                       {...provided.draggableProps}
                                                   >
-                                                      {Component ? (
-                                                          <BoxContainer
-                                                              key={comp.id}
-                                                              id={comp.id}
-                                                              tag={comp.id}
-                                                              onEdit={() =>
-                                                                  handleEditClick(
-                                                                      comp
-                                                                  )
+                                                      <BoxContainer
+                                                          key={comp.id}
+                                                          id={comp.id}
+                                                          tag={comp.id}
+                                                          onEdit={() =>
+                                                              handleEditClick(
+                                                                  comp
+                                                              )
+                                                          }
+                                                          dragHandleProps={
+                                                              provided.dragHandleProps
+                                                          }
+                                                      >
+                                                          <Component
+                                                              comp={comp}
+                                                              componentId={
+                                                                  comp.id
                                                               }
-                                                              dragHandleProps={
-                                                                  provided.dragHandleProps
-                                                              }
-                                                          >
-                                                              <Component
-                                                                  {...comp}
-                                                                  componentId={
-                                                                      comp.id
-                                                                  }
-                                                              />
-                                                          </BoxContainer>
-                                                      ) : (
-                                                          <div>Loading...</div> 
-                                                      )}
+                                                          />
+                                                      </BoxContainer>
                                                   </div>
                                               )}
                                           </Draggable>
+                                      ) : (
+                                          <div   key={comp.id}>Loading...</div>
                                       );
                                   }
                               )

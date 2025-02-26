@@ -154,19 +154,38 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         <>
             <div className="p-1">
                 {Array.isArray(errors) &&
-                    errors.map((erro, index) =>
-                        Object.entries(erro).map(
-                            ([key, mensagem], subIndex) => (
+                    errors.map((erro, index) => {
+                        if (typeof erro === 'string') {
+                            return (
                                 <p
                                     className="text-xs text-red-500 italic"
-                                    key={`${index}-${subIndex}`}
+                                    key={`${index}`}
                                 >
-                                    <strong>{key.toUpperCase()}:</strong>{' '}
-                                    {mensagem as string}
+                                    {erro}
                                 </p>
-                            )
-                        )
-                    )}
+                            );
+                        }
+
+                        if (typeof erro === 'object' && erro !== null) {
+                            return Object.entries(erro).map(
+                                ([key, mensagem], subIndex) =>
+                                    mensagem !== undefined && (
+                                        <p
+                                            className="text-xs text-red-500 italic"
+                                            key={`${index}-${subIndex}`}
+                                        >
+                                            <strong>
+                                                {key.toUpperCase()}:
+                                            </strong>
+                                            {mensagem as string}
+                                        </p>
+                                    )
+                            );
+                        }
+
+                        // If erro is neither a string nor an object, return null (or handle accordingly)
+                        return null;
+                    })}
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId={`${name}`}>
