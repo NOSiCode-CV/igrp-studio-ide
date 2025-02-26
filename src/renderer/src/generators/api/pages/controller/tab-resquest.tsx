@@ -48,10 +48,11 @@ export const TabRequest: React.FC<TabRequestProps> = ({
 
     useEffect(() => {
         const type =
-            formik.values.requestBody?.content &&
-            Object.keys(formik.values.requestBody.content)?.[0] || 'none';
-        if (type !== bodyType) setBodyType(type );
-    }, [formik.values.requestBody]);
+            (formik.values.requestBody?.content &&
+                Object.keys(formik.values.requestBody.content)?.[0]) ||
+            'none';
+        setBodyType(type);
+    }, []);
 
     useEffect(() => {
         if (bodyType === 'none') {
