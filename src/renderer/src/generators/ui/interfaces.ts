@@ -1,7 +1,7 @@
 
 export interface DroppedComponent {
     id: string; // ID único para o componente dropado
-    [key: string]: any;    
+    [key: string]: any;
 }
 
 export interface Column {
@@ -10,8 +10,15 @@ export interface Column {
     components: DroppedComponent[] | []; // Componentes dropados na coluna
 }
 
+export interface ComponentData {
+    id: string;
+    componentName: string;
+    label: string;
+    children?: ComponentData[];
+}
+
 export interface HierarchicalComponent {
-    id: string; // ID da linha (row)
-    columns: Column[]; // Lista de colunas nessa linha
+    id: string; 
+    components: ComponentData[];
 }
 

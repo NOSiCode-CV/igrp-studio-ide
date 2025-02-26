@@ -1,29 +1,68 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import RowOptions from './RowOptions';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import ColContainer, { ColProps } from './ColContainer';
+import { ColProps } from './ColContainer';
 import { generateId } from '@renderer/utils/helpers';
-import { HierarchicalComponent } from '@renderer/generators/ui/interfaces';
+import {
+    ComponentData,
+    DroppedComponent,
+    HierarchicalComponent,
+} from '@renderer/generators/ui/interfaces';
 import { cn } from '@renderer/lib/utils';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
+import { COMPONENT } from '../../ComponentTypes';
+import useStudio from '@renderer/hooks/useStudio';
+import BoxContainer from '../BoxContainer';
+import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 
 interface RowContainerProps {
     id: string;
+    components: ComponentData[];
     onClickAddControl: (id: string, type: string) => void;
     onClickDeleteSection: (id: string) => void;
 }
 
-const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onClickDeleteSection }) => {
+const RowContainer: React.FC<RowContainerProps> = ({
+    id,
+    components,
+    onClickAddControl,
+    onClickDeleteSection,
+}) => {
+    const { addDroppedComponent, removeColumn, getRow } =
+        useDroppedComponents();
 
-    const { getComponentsByRow, addDroppedComponent, removeColumn, getRow } = useDroppedComponents();
-    const columns = getComponentsByRow(id);
+    const [loadedComponents, setLoadedComponents] = useState<{
+        [key: string]: React.ComponentType<any>;
+    }>({});
+
+    const { dynamicImport } = useStudio();
+
+    useEffect(() => {
+        const loadComponents = async () => {
+            const comps: { [key: string]: React.ComponentType<any> } = {};
+
+            for (const comp of components) {
+                const component = await dynamicImport(comp.componentName);
+                comps[comp.id] = component;
+            }
+
+            setLoadedComponents(comps);
+        };
+
+        loadComponents();
+    }, [components, dynamicImport]);
 
     const handleClickStructure = (layout: string) => {
-        const newLayout = layout.split(',').map(size => parseInt(size.trim(), 10));
+        const newLayout = layout
+            .split(',')
+            .map((size) => parseInt(size.trim(), 10));
         const currentRow: HierarchicalComponent[] = getRow(id); // Pega o primeiro elemento, pois `getRow` retorna um array
         const currentColumns = currentRow ? currentRow[0].columns : [];
 
         // Get current column sizes
-        const currentSizes = currentColumns.map(col => parseInt(col.colSize.toString()));
+        const currentSizes = currentColumns.map((col) =>
+            parseInt(col.colSize.toString())
+        );
 
         // Add new columns or update existing columns
         newLayout.forEach((colSize, index) => {
@@ -37,14 +76,25 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
                     props.components = [...currentCol.components];
                 }
 
-                const data: ColProps = { rowId: id, columnId: props.id, colSize }
+                const data: ColProps = {
+                    rowId: id,
+                    columnId: props.id,
+                    colSize,
+                };
 
                 // update the column existing
                 addDroppedComponent({ data, props: props });
             } else {
                 // Create  a new column if does not exist
-                const data: ColProps = { rowId: id, columnId: generateId("col"), colSize }
-                addDroppedComponent({ data, props: { size: colSize.toString() } });
+                const data: ColProps = {
+                    rowId: id,
+                    columnId: generateId('col'),
+                    colSize,
+                };
+                addDroppedComponent({
+                    data,
+                    props: { size: colSize.toString() },
+                });
             }
         });
 
@@ -55,7 +105,6 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
                 removeColumn(currentColumns[newLayout.length + i].id);
             }
         }
-
     };
 
     const handleClickAddControl = (type: string) => {
@@ -63,19 +112,80 @@ const RowContainer: React.FC<RowContainerProps> = ({ id, onClickAddControl, onCl
     };
 
     return (
-        <div id={id} className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm">
+        <div
+            id={id}
+            className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm bg-white"
+        >
             <RowOptions
                 onClickAddControl={handleClickAddControl}
                 onClickStructure={handleClickStructure}
                 onClickDeleteSection={() => onClickDeleteSection(id)}
             />
-            <div className={cn('bg-white w-full p-3 grid gap-4', `grid-cols-${columns.length}`)}>
-                {columns.map((column, index) => {
-                    return (
-                        <ColContainer key={index} rowId={id} columnId={column.id} colSize={column.colSize} />
-                    );
-                })}
-            </div>
+            <Droppable droppableId={id} type={COMPONENT}>
+                {(provided: any, snapshot: any) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={cn(
+                            'grid gap-4',
+                            snapshot.isDraggingOver
+                                ? 'border-2 border-dashed border-igrp p-2'
+                                : ''
+                        )}
+                    >
+                        {components.length > 0
+                            ? components.map(
+                                  (comp: DroppedComponent, index: number) => {
+                                      const Component =
+                                          loadedComponents[comp.id];
+
+                                      return Component ? (
+                                          <Draggable
+                                              key={comp.id}
+                                              draggableId={comp.id}
+                                              index={index}
+                                          >
+                                              {(provided: any) => (
+                                                  <div
+                                                      key={comp.id}
+                                                      ref={provided.innerRef}
+                                                      {...provided.draggableProps}
+                                                  >
+                                                      <BoxContainer
+                                                          key={comp.id}
+                                                          id={comp.id}
+                                                          tag={comp.id}
+                                                          onEdit={
+                                                              () =>
+                                                                  console.log()
+                                                              /*  handleEditClick(
+                                                                  comp
+                                                              ) */
+                                                          }
+                                                          dragHandleProps={
+                                                              provided.dragHandleProps
+                                                          }
+                                                      >
+                                                          <Component
+                                                              comp={comp}
+                                                              componentId={
+                                                                  comp.id
+                                                              }
+                                                          />
+                                                      </BoxContainer>
+                                                  </div>
+                                              )}
+                                          </Draggable>
+                                      ) : (
+                                          <div key={comp.id}>Loading...</div>
+                                      );
+                                  }
+                              )
+                            : !snapshot.isDraggingOver && <GenNoInfoComp />}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
         </div>
     );
 };

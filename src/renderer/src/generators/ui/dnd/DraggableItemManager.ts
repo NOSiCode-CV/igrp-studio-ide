@@ -15,11 +15,11 @@ export const handleDragEnd = (
     if (!destination) {
         return;
     }
-    console.log(isDrop)
+    console.log("type",type)
+
     switch (type) {
         case COMPONENT:
             if (isDrop) {
-
                 handleDropComponent(draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent });
             }
             else if (source.droppableId === destination.droppableId) {

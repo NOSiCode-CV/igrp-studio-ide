@@ -7,9 +7,9 @@ const CodeContent = (pagePath) => {
     const { getAllComponents } = useDroppedComponents();
     const components = getAllComponents();
 
-    const jsonStructure: Component[] = buildJsonStructure(components);
+   // const jsonStructure: Component[] = buildJsonStructure(components);
 
-    const code = JSON.stringify(jsonStructure, null, 2);
+    const code = JSON.stringify(components, null, 2);
 
     return <MonacoEditor filePath={pagePath} content={code} />;
 };

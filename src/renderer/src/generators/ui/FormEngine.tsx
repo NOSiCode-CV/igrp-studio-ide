@@ -19,13 +19,12 @@ import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import useStudio from '@renderer/hooks/useStudio';
 
 const addRow = () => {
     const newRowId = generateId('row');
     const newRow: HierarchicalComponent = {
         id: newRowId,
-        columns: [{ id: generateId('col'), colSize: 12, components: [] }],
+        components: [],
     };
 
     return newRow;
@@ -186,7 +185,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const onDragEnd = (result: any) => {
             const { draggableId } = result;
-            const component = getComponent(draggableId);
+            const component = undefined;//getComponent(draggableId);
             handleDragEnd(
                 result,
                 component === undefined,
@@ -200,11 +199,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <SidebarInset>
                     {isDesign ? (
                         <ScrollArea className="h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
-                            <div className="px-4 py-5">
+                            <div className="px-4 py-5 gap-3 grid">
                                 {components.map((row) => (
                                     <RowContainer
                                         key={row.id}
                                         id={row.id}
+                                        components={row.components}
                                         onClickAddControl={
                                             handleClickAddControl
                                         }
