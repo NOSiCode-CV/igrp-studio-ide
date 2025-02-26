@@ -177,6 +177,11 @@ const useNavdata = (filesThree: FileTree[]) => {
                         actionType: OPTION_TYPE.MODEL,
                         icon: getIcon(OPTION_TYPE.MODELS),
                     },
+                    {
+                        label: t('newEnum'),
+                        actionType: OPTION_TYPE.ENUM,
+                        icon: getIcon(OPTION_TYPE.ENUM),
+                    },
                 ].filter(
                     (menu) =>
                         menu.actionType !== OPTION_TYPE.RESPONSE &&
@@ -190,11 +195,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                             label: t('newResponses'),
                             actionType: OPTION_TYPE.RESPONSE,
                             icon: getIcon(OPTION_TYPE.RESPONSE),
-                        },
-                        {
-                            label: t('newEnum'),
-                            actionType: OPTION_TYPE.ENUM,
-                            icon: getIcon(OPTION_TYPE.ENUM),
                         },
                         {
                             label: t('newPermission'),
