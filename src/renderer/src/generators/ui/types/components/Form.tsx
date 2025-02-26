@@ -107,9 +107,9 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                                         onEdit={() => handleEditClick(field)}
                                     >
                                         <Component
-                                            {...field}
+                                            comp={field}
                                             componentId={field.id}
-                                        />
+                                        /> 
                                     </BoxField>
                                 </div>
                             )
@@ -188,7 +188,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             className={cn(
-                                `grid auto-rows-min grid-cols-1 lg:grid-cols-${colSize} gap-4 ${
+                                `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${colSize} gap-4 ${
                                     snapshot.isDraggingOver
                                         ? 'border-2 border-dashed border-igrp p-2'
                                         : ''

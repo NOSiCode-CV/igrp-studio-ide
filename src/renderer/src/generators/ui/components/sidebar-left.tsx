@@ -196,9 +196,9 @@ export function AppSidebar({
                         ) : activeMenuGroup === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
                         ) : (
-                            filteredData.map((item) => (
+                            filteredData.map((item, index) => (
                                 <Collapsible
-                                    key={item.title}
+                                    key={index}
                                     title={item.title}
                                     defaultOpen
                                     className="group/collapsible"
@@ -220,7 +220,7 @@ export function AppSidebar({
                                                         className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                                     >
                                                         <CollapsibleTrigger>
-                                                            {t(item.label)}
+                                                            {item.label}
                                                             <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                                                         </CollapsibleTrigger>
                                                     </SidebarGroupLabel>
