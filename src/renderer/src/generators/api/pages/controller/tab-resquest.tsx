@@ -49,12 +49,11 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     useEffect(() => {
         const type =
             formik.values.requestBody?.content &&
-            Object.keys(formik.values.requestBody.content)?.[0];
-        if (type !== bodyType) setBodyType(type || 'none');
+            Object.keys(formik.values.requestBody.content)?.[0] || 'none';
+        if (type !== bodyType) setBodyType(type );
     }, [formik.values.requestBody]);
 
     useEffect(() => {
-        // Clear formik values for body content when type changes
         if (bodyType === 'none') {
             formik.setFieldValue('requestBody', '');
         } else if (bodyType === 'multipart/form-data') {
