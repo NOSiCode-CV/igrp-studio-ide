@@ -9,7 +9,6 @@ interface BoxProps {
     refProp?: any;
     draggableProps?: any;
     dragHandleProps?: any;
-    style?: any;
 }
 
 const BoxField = ({ children, id, onEdit }: BoxProps) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import RowOptions from './RowOptions';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { ColProps } from './ColContainer';
+import { ColProps } from '../components/Grid';
 import { generateId } from '@renderer/utils/helpers';
 import {
     ComponentData,
@@ -10,7 +10,6 @@ import {
 } from '@renderer/generators/ui/interfaces';
 import { cn } from '@renderer/lib/utils';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { COMPONENT } from '../../ComponentTypes';
 import useStudio from '@renderer/hooks/useStudio';
 import BoxContainer from '../BoxContainer';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
@@ -112,24 +111,21 @@ const RowContainer: React.FC<RowContainerProps> = ({
     };
 
     return (
-        <div
-            id={id}
-            className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm bg-white"
-        >
+        <div className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm bg-white p-3">
             <RowOptions
                 onClickAddControl={handleClickAddControl}
                 onClickStructure={handleClickStructure}
                 onClickDeleteSection={() => onClickDeleteSection(id)}
             />
-            <Droppable droppableId={id} type={COMPONENT}>
+            <Droppable droppableId={id}>
                 {(provided: any, snapshot: any) => (
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                         className={cn(
-                            'grid gap-4',
+                            'grid gap-3',
                             snapshot.isDraggingOver
-                                ? 'border-2 border-dashed border-igrp p-2'
+                                ? 'border-2 border-dashed border-igrp p-2 '
                                 : ''
                         )}
                     >
@@ -154,7 +150,7 @@ const RowContainer: React.FC<RowContainerProps> = ({
                                                       <BoxContainer
                                                           key={comp.id}
                                                           id={comp.id}
-                                                          tag={comp.id}
+                                                          group="components"
                                                           onEdit={
                                                               () =>
                                                                   console.log()
@@ -165,6 +161,7 @@ const RowContainer: React.FC<RowContainerProps> = ({
                                                           dragHandleProps={
                                                               provided.dragHandleProps
                                                           }
+                                                          className={"left-0 top-0 right-auto"}
                                                       >
                                                           <Component
                                                               comp={comp}

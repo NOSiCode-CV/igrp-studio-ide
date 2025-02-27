@@ -45,6 +45,8 @@ interface FormEngineRef {
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
     ({ basePath, pagePath, page, isDesign }, ref) => {
         const {
+            handleAddComponentToRow,
+            handleAddChildToComponent,
             reorderComponents,
             moveComponent,
             getComponentsByRow,
@@ -144,7 +146,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     if (data.components) {
                         let dataSaved: HierarchicalComponent[] = [];
 
-                        data.components.map((row) => {
+                        /*  data.components.map((row) => {
                             dataSaved = [
                                 ...dataSaved,
                                 {
@@ -160,7 +162,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                                     })),
                                 },
                             ];
-                        });
+                        }); */
 
                         setInitComponents(dataSaved);
                     }
@@ -181,11 +183,13 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             removeRow,
             moveComponent,
             updateComponent,
+            handleAddComponentToRow,
+            handleAddChildToComponent,
         };
 
         const onDragEnd = (result: any) => {
             const { draggableId } = result;
-            const component = undefined;//getComponent(draggableId);
+            const component = undefined; //getComponent(draggableId);
             handleDragEnd(
                 result,
                 component === undefined,
@@ -193,6 +197,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             );
         };
 
+        console.log(components);
         return (
             <DragDropContext onDragEnd={onDragEnd}>
                 <AppSidebar data={menuItems} basePath={basePath} />

@@ -5,9 +5,16 @@ import React, {
     ReactNode,
     useCallback,
 } from 'react';
-import { Column, DroppedComponent, HierarchicalComponent } from '../interfaces';
-import { ColProps } from '../types/rows/ColContainer';
+import {
+    Column,
+    ComponentData,
+    Destination,
+    DroppedComponent,
+    HierarchicalComponent,
+} from '../interfaces';
+import { ColProps } from '../types/components/Grid';
 import { reorder } from './helpers';
+import { useSidebar } from '@renderer/components/ui/sidebar';
 
 export interface ComponentProps {
     data: ColProps;
@@ -22,10 +29,22 @@ interface DroppedComponentsContextType {
     getComponents: (rowId: string, columnId: string) => DroppedComponent[];
     getRow: (rowId: string) => HierarchicalComponent[];
     addDroppedComponent: (props: ComponentProps) => void;
+
+    handleAddComponentToRow: (
+        destination: Destination,
+        childComponent: ComponentData
+    ) => void;
+
+    handleAddChildToComponent: (
+        destination: Destination,
+        childComponent: ComponentData
+    ) => void;
+
     updateComponent: (
         id: string,
         updatedComponent: Partial<DroppedComponent>
     ) => void;
+
     removeRow: (rowId: string) => void;
     getComponentsByRow: (rowId: string) => Column[];
     setEditingComponent: (component: Partial<DroppedComponent>) => void;
@@ -55,10 +74,135 @@ const DroppedComponentsContext = createContext<
 export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
+    const { toggleSidebar, setOpen } = useSidebar();
+
     const [components, setComponents] = useState<HierarchicalComponent[]>([]);
     const [currentComponent, setCurrentComponent] =
         useState<Partial<DroppedComponent> | null>(null);
 
+    const handleAddComponentToRow = useCallback(
+        (
+            destination: Destination, // Contains droppableId (row ID) and index
+            childComponent: ComponentData
+        ) => {
+            if (!childComponent) {
+                console.error('Child component is undefined or invalid');
+                return;
+            }
+
+            setComponents((prev) =>
+                prev.map((row) => {
+                    if (row.id !== destination.droppableId) return row;
+
+                    const updatedComponents = [...(row.components || [])];
+
+                    updatedComponents.splice(
+                        destination.index,
+                        0,
+                        childComponent
+                    );
+                    return {
+                        ...row,
+                        components: updatedComponents,
+                    };
+                })
+            );
+        },
+        []
+    );
+
+    const handleAddChildToComponent = useCallback(
+        (
+            destination: Destination, // Contains droppableId (component ID) and index
+            childComponent: ComponentData
+        ) => {
+            if (!childComponent) {
+                console.error('Child component is undefined or invalid');
+                return;
+            }
+
+            setComponents((prev) =>
+                prev.map((row) => {
+                    // Step 2: If the row doesn't match, search through its components
+                    const updatedComponents = (row.components || []).map(
+                        (comp) => {
+                            // Step 3: If the component ID matches, add the childComponent to its children
+                            if (comp.id === destination.droppableId) {
+                                const updatedChildren = [
+                                    ...(comp.children || []),
+                                ];
+                                updatedChildren.splice(
+                                    destination.index,
+                                    0,
+                                    childComponent
+                                );
+                                return {
+                                    ...comp,
+                                    children: updatedChildren,
+                                };
+                            }
+
+                            // Step 4: If the component doesn't match, search through its children recursively
+                            if (comp.children) {
+                                const updatedChildren = comp.children.map(
+                                    (child) =>
+                                        findAndAddChild(
+                                            child,
+                                            destination,
+                                            childComponent
+                                        )
+                                );
+                                return {
+                                    ...comp,
+                                    children: updatedChildren,
+                                };
+                            }
+
+                            // If no match is found, return the component unchanged
+                            return comp;
+                        }
+                    );
+
+                    return {
+                        ...row,
+                        components: updatedComponents,
+                    };
+                })
+            );
+        },
+        []
+    );
+
+    // Recursive helper function to search through children
+    const findAndAddChild = (
+        component: ComponentData,
+        destination: Destination,
+        childComponent: ComponentData
+    ): ComponentData => {
+        // Check if this component matches the destination ID
+        if (component.id === destination.droppableId) {
+            const updatedChildren = [...(component.children || [])];
+            updatedChildren.splice(destination.index, 0, childComponent);
+            return {
+                ...component,
+                children: updatedChildren,
+            };
+        }
+
+        // If this component doesn't match, search through its children recursively
+        if (component.children) {
+            const updatedChildren = component.children.map((child) =>
+                findAndAddChild(child, destination, childComponent)
+            );
+            return {
+                ...component,
+                children: updatedChildren,
+            };
+        }
+
+        // If no match is found, return the component unchanged
+        return component;
+    };
     // Função que adiciona componentes na coluna correta
     const addDroppedComponent = useCallback(
         ({ data, index, componentId, props }: ComponentProps) => {
@@ -175,17 +319,14 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     //Funcao para fazer update de um component
     const updateComponent = (
         id: string,
-        updatedComponent: Partial<DroppedComponent>
+        updatedComponent: Partial<ComponentData>
     ) => {
         setComponents((prevComponents) =>
             prevComponents.map((row) => ({
                 ...row,
-                columns: row.columns.map((column) => ({
-                    ...column,
-                    components: column.components.map((comp) =>
-                        comp.id === id ? { ...comp, ...updatedComponent } : comp
-                    ),
-                })),
+                components: row.components.map((comp) =>
+                    comp.id === id ? { ...comp, ...updatedComponent } : comp
+                ),
             }))
         );
     };
@@ -275,6 +416,8 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
     const setEditingComponent = (component: Partial<DroppedComponent>) => {
         setCurrentComponent(component);
+        toggleSidebar();
+        setOpen(false)
     };
 
     const clearEditingComponent = () => {
@@ -428,6 +571,8 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         <DroppedComponentsContext.Provider
             value={{
                 setInitComponents,
+                handleAddComponentToRow,
+                handleAddChildToComponent,
                 addDroppedComponent,
                 updateComponent,
                 getRow,

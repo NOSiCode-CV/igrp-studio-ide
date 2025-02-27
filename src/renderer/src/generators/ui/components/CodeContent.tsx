@@ -11,7 +11,7 @@ const CodeContent = (pagePath) => {
 
     const code = JSON.stringify(components, null, 2);
 
-    return <MonacoEditor filePath={pagePath} content={code} />;
+    return <MonacoEditor /* filePath={pagePath} */ content={code} />;
 };
 
 export default CodeContent;

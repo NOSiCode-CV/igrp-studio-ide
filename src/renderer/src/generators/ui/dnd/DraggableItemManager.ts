@@ -1,101 +1,115 @@
-import { ColumnComponent, ColumnConfig, Field, FieldConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
+import { Field, FieldConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
 import { generateId } from "@renderer/utils/helpers";
-import { DroppedComponent } from "../interfaces";
-import { ComponentProps } from "./DroppedComponentsContext";
-import { COMPONENT, FIELD } from "../ComponentTypes";
+import { ComponentData, Destination, DroppedComponent } from "../interfaces";
+import { COMPONENT, Containers, FIELD, STRUCTURE, STRUCTURES } from "../ComponentTypes";
 
 export const handleDragEnd = (
     result: any,
     isDrop: boolean,
-    { moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
+    { handleAddComponentToRow, handleAddChildToComponent, moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
 ) => {
-
     const { draggableId, source, destination, type } = result;
+
+    console.log(destination);
 
     if (!destination) {
         return;
     }
-    console.log("type",type)
 
-    switch (type) {
-        case COMPONENT:
-            if (isDrop) {
-                handleDropComponent(draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent });
-            }
-            else if (source.droppableId === destination.droppableId) {
-                const path = destination.droppableId.split("-");
-                reorderComponents({ rowId: path[0], columnId: path[1], startIndex: source.index, endIndex: destination.index });
-            } else {
-                const pathDestination = destination.droppableId.split("-");
-                const pathSource = source.droppableId.split("-");
-                moveComponent({
-                    sourceRowId: pathSource[0],
-                    sourceColumnId: pathSource[1],
-                    destinationRowId: pathDestination[0],
-                    destinationColumnId: pathDestination[1],
-                    sourceIndex: source.index,
-                    destinationIndex: destination.index
-                });
-            }
-            break;
+    const isRow = destination.droppableId.startsWith("row_");
 
-        case FIELD:
-
-            if (source.droppableId === destination.droppableId) {
-                reorderField(source, destination, { updateComponent, getComponent });
-            } else {
-                handleDropField(draggableId, destination, { updateComponent, getComponent });
-            }
-            break;
-
-        default:
-            console.warn("Unknown drag type:", type);
-            break;
+    if (isRow) {
+        if (isDrop) {
+            handleDropComponent(draggableId, destination, { handleAddComponentToRow, addDroppedComponent, getComponent, setEditingComponent });
+        } else if (source.droppableId === destination.droppableId) {
+            const path = destination.droppableId.split("-");
+            reorderComponents({ rowId: path[0], columnId: path[1], startIndex: source.index, endIndex: destination.index });
+        } else {
+            const pathDestination = destination.droppableId.split("-");
+            const pathSource = source.droppableId.split("-");
+            moveComponent({
+                sourceRowId: pathSource[0],
+                sourceColumnId: pathSource[1],
+                destinationRowId: pathDestination[0],
+                destinationColumnId: pathDestination[1],
+                sourceIndex: source.index,
+                destinationIndex: destination.index
+            });
+        }
+    } else {
+        if (source.droppableId === destination.droppableId) {
+            reorderField(source, destination, { updateComponent, getComponent });
+        } else {
+            handleDropField(draggableId, destination, { updateComponent, handleAddChildToComponent, getComponent });
+        }
     }
-
 };
 
-
-export const handleDropComponent = (draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent }: any) => {
-
-    const path = destination.droppableId.split("-");
-
+export const handleDropComponent = (
+    draggableId: string,
+    destination: Destination,
+    { handleAddComponentToRow, addDroppedComponent, getComponent, setEditingComponent }: any
+) => {
+    // Generate a unique ID for the component
     const componentId = generateId(draggableId);
 
-    const config: ColumnConfig = {
-        title: draggableId,
-        colSize: 12
-    };
-
-    const columnComponent: ColumnComponent = {
+    // Create the component object
+    const component: ComponentData = {
         id: componentId,
         componentName: draggableId,
-        config: config,
-        fields: [],
+        label: draggableId,
+        config: null,
+        children: [], // Initialize children array
     };
 
-    const props: ComponentProps = {
-        data: { rowId: path[0], columnId: path[1], colSize: 12 },
-        componentId: componentId,
-        props: columnComponent,
-        index: destination.index
+    // Handle Columns component
+    if (draggableId === STRUCTURES.Columns) {
+        // Add gridCol configuration for the parent Columns component
+        component.config = { gridCol: 2 };
+
+        // Create two child columns and add them to the parent's children array
+        for (let i = 0; i < 2; i++) {
+            const childColumnId = generateId(`Column_${i + 1}`);
+            const childColumn: ComponentData = {
+                id: childColumnId,
+                componentName: `Column`,
+                label: `Column ${i + 1}`,
+                config: null,
+                children: [],
+            };
+            component.children?.push(childColumn);
+        }
     }
 
-    // Adiciona o componente à coluna
-    addDroppedComponent(props);
+    // Handle other components (Grid, Form, etc.)
+    if (draggableId === STRUCTURES.Grid) {
+        component.config = {
+            gridCol: 4,
+        };
+    }
 
-    //open component dropped
-    const comp: Partial<DroppedComponent> = getComponent(componentId) ?? {};
-    if (comp)
-        setEditingComponent(comp);
-}
+    if (draggableId === Containers.Form) {
+        component.config = {
+            gridCol: 4,
+        };
+    }
 
-export const handleDropField = (draggableId, destination, { updateComponent, getComponent }) => {
+    // Add the component to the row
+    handleAddComponentToRow(destination, component);
+
+    // Set the component as the editing component
+    //setEditingComponent(component);
+};
+
+export const handleDropField = (draggableId, destination, { updateComponent, handleAddChildToComponent, getComponent }) => {
+
+    console.log(draggableId, destination)
 
     const label = draggableId
     const componentId = destination.droppableId;
     const insertIndex = destination.index;
-    const formComponent: Partial<DroppedComponent> = getComponent(componentId) ?? {};
+    /*     const formComponent: Partial<DroppedComponent> = getComponent(componentId) ?? {};
+     */
     const fieldId = generateId(componentId + '_' + draggableId);
 
     const fieldConfig: FieldConfig = {
@@ -117,16 +131,18 @@ export const handleDropField = (draggableId, destination, { updateComponent, get
         ...field,
     };
 
-    const updatedFields = [
-        ...formComponent.fields.slice(0, insertIndex),
-        newField,
-        ...formComponent.fields.slice(insertIndex)
-    ];
+    /*  const updatedFields = [
+         ...formComponent.fields.slice(0, insertIndex),
+         newField,
+         ...formComponent.fields.slice(insertIndex)
+     ]; */
 
-    updateComponent(componentId, {
+    /* updateComponent(componentId, {
         ...formComponent,
         fields: updatedFields,
-    });
+    }); */
+
+    handleAddChildToComponent(destination, newField)
 }
 
 export const reorderField = (source, destination, { updateComponent, getComponent }) => {

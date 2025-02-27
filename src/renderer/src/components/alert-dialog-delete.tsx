@@ -37,7 +37,7 @@ const AlertDialogDelete: React.FC<DeleteModalProps> = ({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="outline outline-1 outline-red-500 text-red-500"
+                        className="outline  outline-red-500 text-red-500"
                     >
                         <Trash /> {t('delete')}
                     </Button>

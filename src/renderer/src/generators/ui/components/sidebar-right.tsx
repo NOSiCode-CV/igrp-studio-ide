@@ -57,7 +57,6 @@ export function SidebarRight({
         const loadComponents = async () => {
             const props = await getConfigComponent(componentName);
             setPropsComponents(props);
-            console.log(props);
         };
 
         loadComponents();

@@ -61,6 +61,7 @@ const shortcutData: ShortcutGroup[] = [
     {
         title: 'General',
         shortcuts: [
+            { name: 'Open/Close Sidebar', shortcut: SHORTCUTS.CLOSE_SIDEBAR },
             { name: 'Settings', shortcut: SHORTCUTS.SETTINGS },
             { name: 'Wrap', shortcut: ['↵', '⇧ ↵'] }, // Não precisa de adaptação, pois é específico do editor
             { name: 'Hide Window', shortcut: 'Click to edit' }, // Ação não relacionada a atalhos de teclado

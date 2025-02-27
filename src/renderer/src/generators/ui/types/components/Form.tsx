@@ -22,36 +22,38 @@ export interface FormComponentProps {
 }
 
 const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
+    const { componentName, config, children } = comp;
+    const { title, gridCol } = config || {};
+
     const [formFields, setFormFields] = useState<DroppedComponent[]>([]);
+
     const [buttonComponents, setButtonComponents] = useState<
         DroppedComponent[]
     >([]);
+
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
     }>({});
+
     const [loading, setLoading] = useState(false);
 
     const { dynamicImport } = useStudio();
+
     const { setEditingComponent } = useDroppedComponents();
 
-    const { config } = comp;
-    const { title, colSize } = config;
-
     useEffect(() => {
-        const { fields } = comp;
-
-        if (fields) {
-            const buttons = fields.filter(
+        if (children) {
+            const buttons = children.filter(
                 (field: any) => field.componentName === BasicElements.Button
             );
-            const otherFields = fields.filter(
+            const otherFields = children.filter(
                 (field: any) => field.componentName !== BasicElements.Button
             );
 
             setFormFields(otherFields);
             setButtonComponents(buttons);
         }
-    }, [comp]);
+    }, [comp, children]);
 
     useEffect(() => {
         const loadComponents = async () => {
@@ -109,7 +111,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                                         <Component
                                             comp={field}
                                             componentId={field.id}
-                                        /> 
+                                        />
                                     </BoxField>
                                 </div>
                             )
@@ -118,12 +120,12 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                 );
             });
 
-        const emptySlots = colSize - formFields.length;
+        const emptySlots = gridCol - formFields.length;
         const emptySlotComponents = Array.from(
             { length: emptySlots },
             (_, index) => (
                 <div key={`empty-slot-${index}`}>
-                    <EmptySlotComponent />
+                    <EmptySlotComponent isComponent={false} />
                 </div>
             )
         );
@@ -173,9 +175,9 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
     };
 
     return (
-        <Card className="rounded-sm">
+        <Card className="group/form hover:border-2 hover:border-gray-300 hover:border-dashed rounded-sm">
             <CardHeader>
-                <CardTitle>{title}</CardTitle>
+                <CardTitle>{title || componentName}</CardTitle>
             </CardHeader>
             <CardContent>
                 <Droppable
@@ -188,7 +190,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             className={cn(
-                                `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${colSize} gap-4 ${
+                                `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${gridCol} gap-4 ${
                                     snapshot.isDraggingOver
                                         ? 'border-2 border-dashed border-igrp p-2'
                                         : ''

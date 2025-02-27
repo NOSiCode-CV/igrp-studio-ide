@@ -10,29 +10,45 @@ import {
     FIELDS,
     ICON_MAP,
     LayoutWidget,
+    STRUCTURE,
+    STRUCTURES,
     Widgets,
 } from '../ComponentTypes';
-import { PanelTopIcon, Pencil, Sheet } from 'lucide-react';
+import { Columns, Grid, PanelTopIcon, Pencil, Sheet } from 'lucide-react';
 
 const useConfigdata = () => {
     const menuItems: any = useMemo(
         () => [
             {
+                id: COMPONENTS.Structures,
+                label: 'Structure',
+                subItems: [
+                    {
+                        id: STRUCTURES.Columns,
+                        label: 'Columns',
+                        icon: Columns
+                    },
+                    {
+                        id: STRUCTURES.Grid,
+                        label: 'Grid',
+                        icon: Grid,
+                    }
+                ],
+            },
+            {
                 id: COMPONENTS.Containers,
                 label: 'Containers',
-                type: COMPONENT,
                 subItems: [
                     {
                         id: Containers.Form,
                         label: 'Form',
                         icon: Sheet,
-                        type: COMPONENTS.Containers,
+                        type: COMPONENT
                     },
                     {
                         id: Containers.PageHeader,
                         label: 'Page Header',
                         icon: PanelTopIcon,
-                        type: COMPONENTS.Containers,
                     },
                 ],
             },
@@ -107,7 +123,6 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.BasicElements,
                 label: 'Basic Elements',
-                type: FIELD,
                 subItems: [
                     {
                         id: BasicElements.Link,
@@ -139,7 +154,6 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.DataDisplay,
                 label: 'Data Display',
-                type: COMPONENT,
                 subItems: [
                     {
                         id: DataDisplay.Table,
@@ -171,7 +185,6 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.LayoutWidget,
                 label: 'Layout',
-                type: COMPONENT,
                 subItems: [
                     {
                         id: LayoutWidget.Box,
@@ -213,7 +226,6 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.Widgets,
                 label: 'Widgets',
-                type: COMPONENT,
                 subItems: [
                     {
                         id: Widgets.Calendar,
@@ -255,7 +267,6 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.Advanced,
                 label: 'Advanced',
-                type: COMPONENT,
                 subItems: [
                     {
                         id: Advanced.Accordion,

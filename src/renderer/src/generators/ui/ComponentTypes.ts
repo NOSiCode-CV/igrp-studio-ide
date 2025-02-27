@@ -46,8 +46,10 @@ export const COLUMN = 'column'
 export const COMPONENT = 'component';
 export const FIELD = 'field';
 export const APP_COMPONENT = 'appcomponent';
+export const STRUCTURE = 'structure';
 
 export const COMPONENTS = {
+    Structures: "Structure",
     Containers: "Containers",
     FormElements: "FormElements",
     BasicElements: 'BasicElements',
@@ -55,6 +57,11 @@ export const COMPONENTS = {
     LayoutWidget: "Layout",
     Widgets: "Widgets",
     Advanced: "Advanced"
+}
+
+export const STRUCTURES = {
+    Columns: "Columns",
+    Grid: "Grid"
 }
 
 export const Containers = {

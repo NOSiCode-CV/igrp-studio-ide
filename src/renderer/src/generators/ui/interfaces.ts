@@ -14,6 +14,7 @@ export interface ComponentData {
     id: string;
     componentName: string;
     label: string;
+    config: any;
     children?: ComponentData[];
 }
 
@@ -22,3 +23,6 @@ export interface HierarchicalComponent {
     components: ComponentData[];
 }
 
+export interface Destination{
+    droppableId: string, index: number
+}
