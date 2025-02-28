@@ -74,18 +74,21 @@ const ModelLayout = ({
         },
     });
 
-    const suggestTableName = async (name: string) => {
-        const errors = await formik.validateForm();
-        console.log(errors.name);
-        if (errors.name) {
-            return '';
-        }
-        return `t_${name
-            .replace(/([a-z])([A-Z])/g, '$1_$2')
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, '_')}`;
-    };
+  const suggestTableName = async (name: string) => {
+      const errors = await formik.validateForm();
+      console.log(errors.name);
+      if (errors.name) {
+          return '';
+      }
+
+      const nameProcessed = name
+          .replace(/([a-z])([A-Z])/g, '$1_$2')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '_');
+
+     return nameProcessed.startsWith('t_') ? nameProcessed : `t_${nameProcessed}`;
+  };
 
     const handleNameBlur = async (
         e: FocusEvent<HTMLInputElement>
