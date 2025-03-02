@@ -20,8 +20,9 @@ import {
     Component,
     FileText,
     GitBranch,
+    GripHorizontal,
     Home,
-    ListTodo
+    ListTodo,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -38,6 +39,8 @@ import {
 } from '@renderer/components/ui/collapsible';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
+import { useDragDrop } from '@renderer/lib/dnd/drag-drop-context';
+import Draggable from '@renderer/lib/dnd/Draggable';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -199,11 +202,11 @@ export function AppSidebar({
                             filteredData.map((item, index) => (
                                 <Collapsible
                                     key={index}
-                                    title={item.title}
+                                    title={item.label}
                                     defaultOpen
                                     className="group/collapsible"
                                 >
-                                    <Droppable
+                                    {/*   <Droppable
                                         droppableId={item.id}
                                         key={item.id}
                                         isDropDisabled={true}
@@ -213,50 +216,69 @@ export function AppSidebar({
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.droppableProps}
-                                            >
-                                                <SidebarGroup>
-                                                    <SidebarGroupLabel
-                                                        asChild
-                                                        className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                                    >
-                                                        <CollapsibleTrigger>
-                                                            {item.label}
-                                                            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                                                        </CollapsibleTrigger>
-                                                    </SidebarGroupLabel>
-                                                    <CollapsibleContent>
-                                                        <SidebarGroupContent>
-                                                            <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
-                                                                {item.subItems.map(
-                                                                    (
-                                                                        item: MenuItem,
-                                                                        key: number
-                                                                    ) => (
-                                                                        <SidebarMenuItem
-                                                                            key={
-                                                                                key
-                                                                            }
-                                                                            className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
-                                                                        >
-                                                                            <DraggableElement
+                                            > */}
+
+                                    <SidebarGroup>
+                                        <SidebarGroupLabel
+                                            asChild
+                                            className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                        >
+                                            <CollapsibleTrigger>
+                                                {item.label}
+                                                <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                                            </CollapsibleTrigger>
+                                        </SidebarGroupLabel>
+                                        <CollapsibleContent>
+                                            <SidebarGroupContent>
+                                                <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
+                                                    {item.subItems.map(
+                                                        (
+                                                            subItem: MenuItem,
+                                                            key: number
+                                                        ) => (
+                                                            <SidebarMenuItem
+                                                                key={key}
+                                                                className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
+                                                            >
+                                                                <Draggable
+                                                                    item={subItem}
+                                                                    className="w-full h-full"
+                                                                    dropZone={false}
+                                                                    type={item.type}
+                                                                >
+                                                                    <div className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2
+                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card">
+                                                                        <GripHorizontal className="w-4 h-4 text-gray-400" />
+
+                                                                        <div className="flex flex-col items-center gap-2">
+                                                                            <subItem.icon className="w-6 h-6 text-gray-600" />
+                                                                            <span className=" text-gray-700 text-center">
+                                                                                {
+                                                                                    subItem.label
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </Draggable>
+                                                                {/*  <DraggableElement
                                                                                 item={
                                                                                     item
                                                                                 }
                                                                                 index={
                                                                                     key
                                                                                 }
-                                                                            />
-                                                                        </SidebarMenuItem>
-                                                                    )
-                                                                )}
-                                                            </SidebarMenu>
-                                                        </SidebarGroupContent>
-                                                    </CollapsibleContent>
-                                                </SidebarGroup>
-                                                {provided.placeholder}
+                                                                            /> */}
+                                                            </SidebarMenuItem>
+                                                        )
+                                                    )}
+                                                </SidebarMenu>
+                                            </SidebarGroupContent>
+                                        </CollapsibleContent>
+                                    </SidebarGroup>
+                                    {/*  {provided.placeholder}
                                             </div>
                                         )}
-                                    </Droppable>
+                                    </Droppable> */}
                                 </Collapsible>
                             ))
                         )}

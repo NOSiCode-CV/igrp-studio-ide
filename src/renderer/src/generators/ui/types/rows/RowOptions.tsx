@@ -3,7 +3,6 @@ import { Copy, Move, Plus, Trash } from 'lucide-react';
 
 interface RowOptionsProps {
     onClickAddControl: (type: string) => void;
-    onClickStructure: (layout: string) => void;
     onClickDeleteSection: () => void;
 }
 

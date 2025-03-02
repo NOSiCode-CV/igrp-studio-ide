@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
-import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { DroppedComponent } from '@renderer/generators/ui/interfaces';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import Droppable from '@renderer/lib/dnd/Droppable';
+import Draggable from '@renderer/lib/dnd/Draggable';
 
-export interface ColProps {
-    componentId: string;
-    comp: DroppedComponent;
-    onEdit: () => void;
+export interface GridProps {
+    comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
 }
 
-const Grid: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
-    const { children, config } = comp;
+const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
+    const { children, props, id: componentId } = comp;
 
-    const { gridCol } = config || {};
+    const { gridCol } = props || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -26,7 +26,7 @@ const Grid: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
 
     const { dynamicImport } = useStudio();
 
-    const handleEditClick = (component: Partial<DroppedComponent>) => {
+    const handleEditClick = (component: Partial<StructuredComponent>) => {
         setEditingComponent(component);
     };
 
@@ -46,37 +46,30 @@ const Grid: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
     }, [children, dynamicImport]);
 
     const renderColumns = () => {
-        const columns =
+        const fields =
             children.length > 0 &&
-            children.map((comp: DroppedComponent, index: number) => {
+            children.map((comp: StructuredComponent, index: number) => {
                 const Component = loadedComponents[comp.id];
 
                 return Component ? (
                     <Draggable
                         key={comp.id}
-                        draggableId={comp.id}
+                        item={comp.id}
+                        layout="horizontal"
                         index={index}
+                        dropTargetId={componentId}
                     >
-                        {(provided: any) => (
-                            <div
+                        <div key={comp.id}>
+                            <BoxContainer
                                 key={comp.id}
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
+                                id={comp.id}
+                                group="comp"
+                                onEdit={() => handleEditClick(comp)}
+                                /*  dragHandleProps={provided.dragHandleProps} */
                             >
-                                <BoxContainer
-                                    key={comp.id}
-                                    id={comp.id}
-                                    group='comp'
-                                    onEdit={() => handleEditClick(comp)}
-                                    dragHandleProps={provided.dragHandleProps}
-                                >
-                                    <Component
-                                        comp={comp}
-                                        componentId={comp.id}
-                                    />
-                                </BoxContainer>
-                            </div>
-                        )}
+                                <Component comp={comp} onDragEnd={onDragEnd} />
+                            </BoxContainer>
+                        </div>
                     </Draggable>
                 ) : (
                     <div key={comp.id}>Loading...</div>
@@ -95,7 +88,7 @@ const Grid: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
 
         return (
             <>
-                {columns}
+                {fields}
                 {emptySlotComponents}
             </>
         );
@@ -108,22 +101,17 @@ const Grid: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
             )}
             id={componentId}
         >
-            <Droppable droppableId={componentId}>
-                {(provided: any, snapshot: any) => (
-                    <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={cn(
-                            `grid gap-4 grid-cols-${gridCol}`,
-                            snapshot.isDraggingOver
-                                ? 'border-2 border-dashed border-igrp p-2'
-                                : ''
-                        )}
-                    >
-                        {renderColumns()}
-                        {provided.placeholder}
-                    </div>
-                )}
+            <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
+                <div
+                    className={cn(
+                        `grid gap-4 grid-cols-${gridCol}`
+                        /*  snapshot.isDraggingOver
+                            ? 'border-2 border-dashed border-igrp p-2'
+                            : '' */
+                    )}
+                >
+                    {renderColumns()}
+                </div>
             </Droppable>
         </div>
     );

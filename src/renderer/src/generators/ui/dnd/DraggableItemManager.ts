@@ -1,16 +1,13 @@
-import { Field, FieldConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
 import { generateId } from "@renderer/utils/helpers";
-import { ComponentData, Destination, DroppedComponent } from "../interfaces";
-import { COMPONENT, Containers, FIELD, STRUCTURE, STRUCTURES } from "../ComponentTypes";
+import { Containers, STRUCTURES } from "../ComponentTypes";
+import { Destination, StructuredComponent } from "@renderer/lib/dnd/types";
 
 export const handleDragEnd = (
     result: any,
     isDrop: boolean,
-    { handleAddComponentToRow, handleAddChildToComponent, moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
+    { handleAddComponentToRow, handleAddChildToComponent, moveComponent, reorderComponents, getComponent, setEditingComponent, updateComponent }: any
 ) => {
     const { draggableId, source, destination, type } = result;
-
-    console.log(destination);
 
     if (!destination) {
         return;
@@ -20,7 +17,7 @@ export const handleDragEnd = (
 
     if (isRow) {
         if (isDrop) {
-            handleDropComponent(draggableId, destination, { handleAddComponentToRow, addDroppedComponent, getComponent, setEditingComponent });
+            handleDropComponent(draggableId, destination, { handleAddComponentToRow, getComponent, setEditingComponent });
         } else if (source.droppableId === destination.droppableId) {
             const path = destination.droppableId.split("-");
             reorderComponents({ rowId: path[0], columnId: path[1], startIndex: source.index, endIndex: destination.index });
@@ -40,41 +37,40 @@ export const handleDragEnd = (
         if (source.droppableId === destination.droppableId) {
             reorderField(source, destination, { updateComponent, getComponent });
         } else {
-            handleDropField(draggableId, destination, { updateComponent, handleAddChildToComponent, getComponent });
+            handleDropField(draggableId, destination, { handleAddChildToComponent });
         }
     }
 };
 
-export const handleDropComponent = (
+const handleDropComponent = (
     draggableId: string,
     destination: Destination,
-    { handleAddComponentToRow, addDroppedComponent, getComponent, setEditingComponent }: any
+    { handleAddComponentToRow }: any
 ) => {
     // Generate a unique ID for the component
     const componentId = generateId(draggableId);
 
     // Create the component object
-    const component: ComponentData = {
+    const component: StructuredComponent = {
         id: componentId,
         componentName: draggableId,
         label: draggableId,
-        config: null,
         children: [], // Initialize children array
     };
 
     // Handle Columns component
     if (draggableId === STRUCTURES.Columns) {
         // Add gridCol configuration for the parent Columns component
-        component.config = { gridCol: 2 };
+        component.props = { gridCol: 2 };
 
         // Create two child columns and add them to the parent's children array
         for (let i = 0; i < 2; i++) {
-            const childColumnId = generateId(`Column_${i + 1}`);
-            const childColumn: ComponentData = {
+            const childColumnId = generateId(`column_${i + 1}`);
+            const childColumn: StructuredComponent = {
                 id: childColumnId,
                 componentName: `Column`,
                 label: `Column ${i + 1}`,
-                config: null,
+                props: {},
                 children: [],
             };
             component.children?.push(childColumn);
@@ -83,13 +79,13 @@ export const handleDropComponent = (
 
     // Handle other components (Grid, Form, etc.)
     if (draggableId === STRUCTURES.Grid) {
-        component.config = {
+        component.props = {
             gridCol: 4,
         };
     }
 
     if (draggableId === Containers.Form) {
-        component.config = {
+        component.props = {
             gridCol: 4,
         };
     }
@@ -97,50 +93,30 @@ export const handleDropComponent = (
     // Add the component to the row
     handleAddComponentToRow(destination, component);
 
-    // Set the component as the editing component
-    //setEditingComponent(component);
 };
 
-export const handleDropField = (draggableId, destination, { updateComponent, handleAddChildToComponent, getComponent }) => {
-
-    console.log(draggableId, destination)
+export const handleDropField = (draggableId, destination, { handleAddChildToComponent }) => {
 
     const label = draggableId
     const componentId = destination.droppableId;
-    const insertIndex = destination.index;
-    /*     const formComponent: Partial<DroppedComponent> = getComponent(componentId) ?? {};
-     */
+
     const fieldId = generateId(componentId + '_' + draggableId);
 
-    const fieldConfig: FieldConfig = {
+    const fieldConfig = {
         type: draggableId,
         name: fieldId,
         label: label,
         placeholder: `Enter your ${label}`,
-        colSize: 4
+        gridCol: 4,
     }
 
-    const field: Field = {
-        type: draggableId,
-        config: fieldConfig
-    }
-
-    const newField: DroppedComponent = {
+    const newField: StructuredComponent = {
         id: fieldId,
         componentName: draggableId,
-        ...field,
+        label: label,
+        props: fieldConfig,
+        children: []
     };
-
-    /*  const updatedFields = [
-         ...formComponent.fields.slice(0, insertIndex),
-         newField,
-         ...formComponent.fields.slice(insertIndex)
-     ]; */
-
-    /* updateComponent(componentId, {
-        ...formComponent,
-        fields: updatedFields,
-    }); */
 
     handleAddChildToComponent(destination, newField)
 }
@@ -149,10 +125,10 @@ export const reorderField = (source, destination, { updateComponent, getComponen
 
     const componentId = destination.droppableId;
     const insertIndex = destination.index;
-    const formComponent: Partial<DroppedComponent> = getComponent(componentId) ?? {};
-    const fieldToMove = formComponent.fields[source.index];
+    const formComponent: Partial<StructuredComponent> = getComponent(componentId) ?? {};
+    const fieldToMove = formComponent.children[source.index];
 
-    const fieldsWithoutMoved = formComponent.fields.filter((_, index) => index !== source.index);
+    const fieldsWithoutMoved = formComponent.children.filter((_, index) => index !== source.index);
 
     const updatedFields = [
         ...fieldsWithoutMoved.slice(0, insertIndex),

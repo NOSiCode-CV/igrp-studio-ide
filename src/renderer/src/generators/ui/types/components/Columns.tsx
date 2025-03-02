@@ -1,29 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
-import {
-    Draggable,
-    DraggableProvided,
-    Droppable,
-    DroppableProvided,
-} from '@hello-pangea/dnd';
-import {
-    ComponentData,
-    DroppedComponent,
-} from '@renderer/generators/ui/interfaces';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import Draggable from '@renderer/lib/dnd/Draggable';
 
 export interface ColProps {
-    componentId: string;
-    comp: DroppedComponent;
-    onEdit: () => void;
+    comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
 }
 
-const Columns: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
-    const { children, config } = comp;
+const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
+    const { children, props, id: componentId } = comp;
 
-    const { gridCol } = config || {};
+    const { gridCol } = props || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -33,7 +24,7 @@ const Columns: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
 
     const { dynamicImport } = useStudio();
 
-    const handleEditClick = (component: Partial<DroppedComponent>) => {
+    const handleEditClick = (component: Partial<StructuredComponent>) => {
         setEditingComponent(component);
     };
 
@@ -53,28 +44,19 @@ const Columns: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
     }, [children, dynamicImport]);
 
     const renderColumns = () => {
-        return children.map((comp: ComponentData, index: number) => {
+        return children.map((comp: StructuredComponent, index: number) => {
             const Component = loadedComponents[comp.id];
 
             return Component ? (
-                <Draggable key={comp.id} draggableId={comp.id} index={index}>
-                    {(provided: DraggableProvided) => (
-                        <div
-                            key={comp.id}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                        >
-                            <BoxContainer
-                                key={comp.id}
-                                id={comp.id}
-                                onEdit={() => handleEditClick(comp)}
-                                dragHandleProps={provided.dragHandleProps}
-                                group="column"
-                            >
-                                <Component comp={comp} componentId={comp.id} />
-                            </BoxContainer>
-                        </div>
-                    )}
+                <Draggable key={comp.id} item={comp} index={index} dropZone={false}>
+                    <BoxContainer
+                        key={comp.id}
+                        id={comp.id}
+                        onEdit={() => handleEditClick(comp)}
+                        group="column"
+                    >
+                        <Component comp={comp} onDragEnd={onDragEnd} />
+                    </BoxContainer>
                 </Draggable>
             ) : (
                 <div key={comp.id}>Loading...</div>
@@ -83,30 +65,15 @@ const Columns: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
     };
 
     return (
-        <div
-            className={cn(
-                `bg-card rounded-lg border p-4 hover:border-2 hover:border-dashed`
-            )}
-            id={componentId}
-        >
-            <Droppable droppableId={componentId}>
-                {(provided: DroppableProvided, snapshot: any) => (
-                    <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={cn(
-                            `grid grid-cols-${gridCol} gap-3`,
-                            snapshot.isDraggingOver
-                                ? 'border-2 border-dashed border-igrp p-2'
-                                : ''
-                        )}
-                    >
-                        {renderColumns()}
-                        {provided.placeholder}
-                    </div>
+        <>
+            <div
+                className={cn(
+                    `grid grid-cols-${gridCol} gap-3 p-2`
                 )}
-            </Droppable>
-        </div>
+            >
+                {renderColumns()}
+            </div>
+        </>
     );
 };
 

@@ -1,28 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import BoxContainer from '../BoxContainer';
-import {
-    Draggable,
-    DraggableProvided,
-    Droppable,
-    DroppableProvided,
-} from '@hello-pangea/dnd';
-import {
-    ComponentData,
-    DroppedComponent,
-} from '@renderer/generators/ui/interfaces';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import Droppable from '@renderer/lib/dnd/Droppable';
 
 export interface ColProps {
-    componentId: string;
-    comp: DroppedComponent;
-    onEdit: () => void;
+    comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
 }
 
-const Column: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
-    const { children } = comp;
+const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
+    const { children, id: componentId } = comp;
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -32,7 +24,7 @@ const Column: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
 
     const { dynamicImport } = useStudio();
 
-    const handleEditClick = (component: Partial<DroppedComponent>) => {
+    const handleEditClick = (component: Partial<StructuredComponent>) => {
         setEditingComponent(component);
     };
 
@@ -54,27 +46,24 @@ const Column: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
     const renderComponents = () => {
         if (children.length === 0) return <EmptySlotComponent />;
 
-        return children.map((comp: ComponentData, index: number) => {
+        return children.map((comp: StructuredComponent, index: number) => {
             const Component = loadedComponents[comp.id];
 
             return Component ? (
-                <Draggable key={comp.id} draggableId={comp.id} index={index}>
-                    {(provided: DraggableProvided) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                        >
-                            <BoxContainer
-                                id={comp.id}
-                                group="comp"
-                                onEdit={() => handleEditClick(comp)}
-                                dragHandleProps={provided.dragHandleProps}
-                                className="top-0"
-                            >
-                                <Component comp={comp} componentId={comp.id} />
-                            </BoxContainer>
-                        </div>
-                    )}
+                <Draggable
+                    key={comp.id}
+                    item={comp}
+                    index={index}
+                    dropTargetId={componentId}
+                >
+                    <BoxContainer
+                        id={comp.id}
+                        group="comp"
+                        onEdit={() => handleEditClick(comp)}
+                        className="top-0"
+                    >
+                        <Component comp={comp} onDragEnd={onDragEnd} />
+                    </BoxContainer>
                 </Draggable>
             ) : (
                 <div key={comp.id}>Loading...</div>
@@ -83,29 +72,13 @@ const Column: React.FC<ColProps> = ({ comp, componentId }: ColProps) => {
     };
 
     return (
-        <div
-            className={cn(
-                `bg-muted/70 rounded-lg border hover:border-2 hover:border-gray-300 hover:border-dashed `
-            )}
-            id={componentId}
-        >
-            <Droppable droppableId={componentId}>
-                {(provided: DroppableProvided, snapshot: any) => (
-                    <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={cn(
-                            `w-full flex flex-col p-3 gap-3`,
-                            snapshot.isDraggingOver &&
-                                'border-2 border-dashed border-igrp'
-                        )}
-                    >
-                        {renderComponents()}
-                        {provided.placeholder}
-                    </div>
-                )}
+        <>
+            <Droppable component={comp} onDrop={onDragEnd}>
+                <div className={cn(`w-full flex flex-col p-3 gap-3`)}>
+                    {renderComponents()}
+                </div>
             </Droppable>
-        </div>
+        </>
     );
 };
 

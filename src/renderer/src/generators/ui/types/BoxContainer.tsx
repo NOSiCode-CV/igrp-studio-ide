@@ -33,7 +33,6 @@ const BoxContainer = ({
     return (
         <div
             className={cn(`relative group/${group}`)}
-            onClick={(e) => console.log(e)}
             id={id}
         >
             <div

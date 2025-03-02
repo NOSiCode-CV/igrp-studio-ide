@@ -1,6 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle } from 'react';
-import RowContainer from './types/rows';
-import { useDroppedComponents } from './dnd/DroppedComponentsContext';
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 import { generateId } from '@renderer/utils/helpers';
 
 import { useConfigdata } from './data/useConfigData';
@@ -9,22 +7,23 @@ import {
     PageConfig,
 } from '@igrp/nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
-import { HierarchicalComponent } from './interfaces';
 
-import { DragDropContext } from '@hello-pangea/dnd';
-import { handleDragEnd } from './dnd/DraggableItemManager';
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { DragEndResult, StructuredRow } from '@renderer/lib/dnd/types';
+import { handleDragEnd } from './dnd/DraggableItemManager';
+import { useDroppedComponents } from './dnd/DroppedComponentsContext';
+import { Rows } from './types/components/Rows';
 
 const addRow = () => {
     const newRowId = generateId('row');
-    const newRow: HierarchicalComponent = {
+    const newRow: StructuredRow = {
         id: newRowId,
-        components: [],
+        children: [],
     };
 
     return newRow;
@@ -49,11 +48,9 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             handleAddChildToComponent,
             reorderComponents,
             moveComponent,
-            getComponentsByRow,
             setInitComponents,
             getAllComponents,
             removeRow,
-            addDroppedComponent,
             getComponent,
             setEditingComponent,
             updateComponent,
@@ -78,25 +75,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         useImperativeHandle(ref, () => ({
             handleSave: internalHandleSave,
         }));
-
-        const handleClickAddControl = (id: string, type: string) => {
-            const newRow = addRow();
-            const rowIndex = components.findIndex((row) => row.id === id);
-
-            if (rowIndex !== -1) {
-                const newRows = [...components];
-                if (type === 'top') {
-                    newRows.splice(rowIndex, 0, newRow);
-                } else if (type === 'bottom') {
-                    newRows.splice(rowIndex + 1, 0, newRow);
-                }
-                setInitComponents(newRows);
-            }
-        };
-
-        const handleClickDeleteSection = (id: string) => {
-            removeRow(id);
-        };
 
         useEffect(() => {
             if (components.length === 0) {
@@ -144,9 +122,9 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                     const data = await window.api.getJsonContent(pagePath);
                     if (data.components) {
-                        let dataSaved: HierarchicalComponent[] = [];
+                        /*let dataSaved: HierarchicalComponent[] = [];
 
-                        /*  data.components.map((row) => {
+                          data.components.map((row) => {
                             dataSaved = [
                                 ...dataSaved,
                                 {
@@ -164,7 +142,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                             ];
                         }); */
 
-                        setInitComponents(dataSaved);
+                        setInitComponents(data.components);
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
@@ -175,8 +153,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const droppedComponentsMethods = {
             reorderComponents,
-            getComponentsByRow,
-            addDroppedComponent,
             getComponent,
             setEditingComponent,
             setInitComponents,
@@ -187,37 +163,27 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             handleAddChildToComponent,
         };
 
-        const onDragEnd = (result: any) => {
-            const { draggableId } = result;
+        const onDragEnd = useCallback((result: DragEndResult) => {
+            console.log('dropZone', result);
             const component = undefined; //getComponent(draggableId);
             handleDragEnd(
                 result,
                 component === undefined,
                 droppedComponentsMethods
             );
-        };
+        }, []);
 
-        console.log(components);
         return (
-            <DragDropContext onDragEnd={onDragEnd}>
+            <>
                 <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
                     {isDesign ? (
                         <ScrollArea className="h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
-                            <div className="px-4 py-5 gap-3 grid">
-                                {components.map((row) => (
-                                    <RowContainer
-                                        key={row.id}
-                                        id={row.id}
-                                        components={row.components}
-                                        onClickAddControl={
-                                            handleClickAddControl
-                                        }
-                                        onClickDeleteSection={
-                                            handleClickDeleteSection
-                                        }
-                                    />
-                                ))}
+                            <div className="px-4 py-6 gap-3 grid">
+                                <Rows
+                                    components={components}
+                                    onDragEnd={onDragEnd}
+                                />
                             </div>
                         </ScrollArea>
                     ) : (
@@ -225,7 +191,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     )}
                 </SidebarInset>
                 {currentComponent && <SidebarRight />}
-            </DragDropContext>
+            </>
         );
     }
 );

@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DroppedComponent } from '../../interfaces';
-import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { BasicElements, FIELD } from '@renderer/generators/ui/ComponentTypes';
+import { BasicElements } from '@renderer/generators/ui/ComponentTypes';
 import {
     Card,
     CardContent,
@@ -14,21 +11,24 @@ import { cn } from '@renderer/lib/utils';
 import { EmptySlotComponent } from '@renderer/generators/ui/components/EmptySlotComponent';
 import useStudio from '@renderer/hooks/useStudio';
 import BoxField from '../tools/BoxFields';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import Droppable from '@renderer/lib/dnd/Droppable';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 
 export interface FormComponentProps {
-    componentId: string;
-    comp: DroppedComponent;
-    onEdit: () => void;
+    comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
 }
 
-const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
-    const { componentName, config, children } = comp;
-    const { title, gridCol } = config || {};
+const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
+    const { id: componentId, componentName, props, children } = comp;
+    const { title, gridCol } = props || {};
 
-    const [formFields, setFormFields] = useState<DroppedComponent[]>([]);
+    const [formFields, setFormFields] = useState<StructuredComponent[]>([]);
 
     const [buttonComponents, setButtonComponents] = useState<
-        DroppedComponent[]
+        StructuredComponent[]
     >([]);
 
     const [loadedComponents, setLoadedComponents] = useState<{
@@ -79,43 +79,33 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
         loadComponents();
     }, [formFields, buttonComponents, dynamicImport]);
 
-    const handleEditClick = (component: Partial<DroppedComponent>) => {
-        setEditingComponent({ ...component, componentId: componentId });
+    const handleEditClick = (component: StructuredComponent) => {
+        setEditingComponent({ ...component });
     };
 
-    const renderFields = (_onDrop: boolean) => {
+    const renderFields = () => {
         const fields =
             formFields.length > 0 &&
-            formFields.map((field: DroppedComponent, index: number) => {
+            formFields.map((field: StructuredComponent, index: number) => {
                 const Component = loadedComponents[field.id];
                 return (
                     <Draggable
                         key={field.id}
-                        draggableId={field.id}
+                        item={field}
                         index={index}
+                        dropTargetId={componentId}
+                        layout="horizontal"
+                        className="p-1"
                     >
-                        {(provided, _snapshot) =>
-                            Component && (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={{
-                                        ...provided.draggableProps.style,
-                                    }}
-                                >
-                                    <BoxField
-                                        id={field.id}
-                                        onEdit={() => handleEditClick(field)}
-                                    >
-                                        <Component
-                                            comp={field}
-                                            componentId={field.id}
-                                        />
-                                    </BoxField>
-                                </div>
-                            )
-                        }
+                        {Component && (
+                            <BoxField
+                                id={field.id}
+                                onEdit={() => handleEditClick(field)}
+                                index={index}
+                            >
+                                <Component comp={field} onDragEnd={onDragEnd} />
+                            </BoxField>
+                        )}
                     </Draggable>
                 );
             });
@@ -144,30 +134,30 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
         }
 
         return buttonComponents.map(
-            (button: DroppedComponent, index: number) => {
+            (button: StructuredComponent, index: number) => {
                 const Component = loadedComponents[button.id];
                 return (
                     <Draggable
                         key={button.id}
-                        draggableId={`${button.id}`}
+                        item={button}
                         index={index}
+                        dropTargetId={componentId}
+                        layout="horizontal"
+                        className="p-1"
                     >
-                        {(provided, _snapshot) =>
-                            Component && (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={{ ...provided.draggableProps.style }}
-                                >
-                                    <Component
-                                        comp={button}
-                                        componentId={button.id}
-                                        onEdit={() => handleEditClick(button)}
-                                    />
-                                </div>
-                            )
-                        }
+                        {Component && (
+                            <BoxField
+                                id={button.id}
+                                onEdit={() => handleEditClick(button)}
+                                index={index}
+                            >
+                                <Component
+                                    comp={button}
+                                    onDragEnd={onDragEnd}
+                                    index={index}
+                                />
+                            </BoxField>
+                        )}
                     </Draggable>
                 );
             }
@@ -181,45 +171,29 @@ const Form: React.FC<FormComponentProps> = ({ comp, componentId }) => {
             </CardHeader>
             <CardContent>
                 <Droppable
-                    droppableId={`${componentId}`}
-                    type={FIELD}
-                    direction="horizontal"
+                    component={comp}
+                    onDrop={onDragEnd}
+                    layout="horizontal"
                 >
-                    {(provided, snapshot) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className={cn(
-                                `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${gridCol} gap-4 ${
-                                    snapshot.isDraggingOver
-                                        ? 'border-2 border-dashed border-igrp p-2'
-                                        : ''
-                                }`
-                            )}
-                        >
-                            {renderFields(snapshot.isDraggingOver)}
-                            {provided.placeholder}
-                        </div>
-                    )}
+                    <div
+                        className={cn(
+                            `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${gridCol} gap-4`
+                        )}
+                    >
+                        {renderFields()}
+                    </div>
                 </Droppable>
             </CardContent>
             {buttonComponents.length > 0 && (
                 <CardFooter className="w-full">
                     <Droppable
-                        droppableId={`${componentId}`}
-                        type={FIELD}
-                        direction="horizontal"
+                        component={comp}
+                        onDrop={onDragEnd}
+                        layout="horizontal"
                     >
-                        {(provided, snapshot) => (
-                            <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                                className={`flex flex-1 space-x-2 justify-end  ${snapshot.isDraggingOver ? 'border-2 border-dashed border-igrp p-2' : ''}`}
-                            >
-                                {renderButtons()}
-                                {provided.placeholder}
-                            </div>
-                        )}
+                        <div className={`flex flex-1 space-x-2 justify-end}`}>
+                            {renderButtons()}
+                        </div>
                     </Droppable>
                 </CardFooter>
             )}

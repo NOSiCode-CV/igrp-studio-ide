@@ -12,6 +12,7 @@ import {
     useTabs,
 } from '@renderer/components/navigation/TabContext';
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
+import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
 
 interface ContentProps {
     basePath: string;
@@ -99,16 +100,21 @@ export default function TabManager({ basePath }: ContentProps) {
                                     } as React.CSSProperties
                                 }
                             >
-                                <FormEngine
-                                    ref={(ref) => {
-                                        formEngineRefs.current[tab.id] = ref;
-                                    }}
-                                    basePath={basePath}
-                                    page={tab.title}
-                                    pagePath={currentPage?.path}
-                                    isDesign={isDesignStates[tab.id] ?? true}
-                                    onSave={handleSave}
-                                />
+                                <DragProvider>
+                                    <FormEngine
+                                        ref={(ref) => {
+                                            formEngineRefs.current[tab.id] =
+                                                ref;
+                                        }}
+                                        basePath={basePath}
+                                        page={tab.title}
+                                        pagePath={currentPage?.path}
+                                        isDesign={
+                                            isDesignStates[tab.id] ?? true
+                                        }
+                                        onSave={handleSave}
+                                    />
+                                </DragProvider>
                             </SidebarProvider>
                         </DroppedComponentsProvider>
                     )}
