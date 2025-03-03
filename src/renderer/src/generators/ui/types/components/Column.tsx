@@ -24,7 +24,7 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
 
     const { dynamicImport } = useStudio();
 
-    const handleEditClick = (component: Partial<StructuredComponent>) => {
+    const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent(component);
     };
 
@@ -58,9 +58,9 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                 >
                     <BoxContainer
                         id={comp.id}
-                        group="comp"
+                        group="group/column-comp"
                         onEdit={() => handleEditClick(comp)}
-                        className="top-0"
+                        className="top-0 opacity-0 group-hover/column-comp:opacity-100"
                     >
                         <Component comp={comp} onDragEnd={onDragEnd} />
                     </BoxContainer>

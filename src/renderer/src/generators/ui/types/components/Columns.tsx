@@ -12,9 +12,9 @@ export interface ColProps {
 }
 
 const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
-    const { children, props, id: componentId } = comp;
+    const { children, properties } = comp;
 
-    const { gridCol } = props || {};
+    const { gridCol } = properties || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -24,7 +24,7 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
 
     const { dynamicImport } = useStudio();
 
-    const handleEditClick = (component: Partial<StructuredComponent>) => {
+    const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent(component);
     };
 
@@ -53,7 +53,8 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                         key={comp.id}
                         id={comp.id}
                         onEdit={() => handleEditClick(comp)}
-                        group="column"
+                        group="group/comp"
+                        className="opacity-0 group-hover/comp:opacity-100"
                     >
                         <Component comp={comp} onDragEnd={onDragEnd} />
                     </BoxContainer>

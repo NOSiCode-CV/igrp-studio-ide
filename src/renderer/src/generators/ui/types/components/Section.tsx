@@ -8,8 +8,9 @@ import useStudio from '@renderer/hooks/useStudio';
 import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxContainer from '../BoxContainer';
+import { COMPONENT, STRUCTURE } from '../../ComponentTypes';
 
-export const Row = ({ component, onDragEnd, onAddControl }) => {
+export const Section = ({ component, onDragEnd, onAddControl }) => {
     const { children: components, id: componentId } = component;
 
     const { removeRow } = useDroppedComponents();
@@ -45,13 +46,20 @@ export const Row = ({ component, onDragEnd, onAddControl }) => {
 
     const layoutMode = 'vertical';
 
+    const ACCEPTS = [COMPONENT, STRUCTURE];
+
     return (
         <div className="group/row relative hover:border-2 hover:border-igrp hover:rounded-sm ">
             <RowOptions
                 onClickAddControl={(type) => onAddControl(type, componentId)}
                 onClickDeleteSection={handleDeleteSection}
             />
-            <Droppable onDrop={handleDrop} component={component} className='hover:border-none'>
+            <Droppable
+                onDrop={handleDrop}
+                component={component}
+                className="hover:border-none"
+                accept={ACCEPTS}
+            >
                 <div
                     id={component.id}
                     className={cn(
@@ -72,15 +80,13 @@ export const Row = ({ component, onDragEnd, onAddControl }) => {
                                         item={comp}
                                         index={index}
                                         dropTargetId={componentId}
+                                        mode="MOVE"
                                     >
                                         <BoxContainer
-                                            key={comp.id}
                                             id={comp.id}
-                                            group="components"
                                             onEdit={() => console.log()}
-                                            className={
-                                                'left-0 top-0 right-auto'
-                                            }
+                                            group="group/row-comp"
+                                            className="left-0 top-0 right-auto opacity-0 group-hover/row-comp:opacity-100"
                                         >
                                             <Component
                                                 comp={comp}

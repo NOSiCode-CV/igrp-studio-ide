@@ -1,5 +1,4 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
-import { generateId } from '@renderer/utils/helpers';
 
 import { useConfigdata } from './data/useConfigData';
 import {
@@ -14,20 +13,10 @@ import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { DragEndResult, StructuredRow } from '@renderer/lib/dnd/types';
+import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
-import { Rows } from './types/components/Rows';
-
-const addRow = () => {
-    const newRowId = generateId('row');
-    const newRow: StructuredRow = {
-        id: newRowId,
-        children: [],
-    };
-
-    return newRow;
-};
+import { Page } from './types/components/Page';
 
 interface FormEngineProps {
     basePath: string;
@@ -44,21 +33,18 @@ interface FormEngineRef {
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
     ({ basePath, pagePath, page, isDesign }, ref) => {
         const {
-            handleAddComponentToRow,
             handleAddChildToComponent,
-            reorderComponents,
-            moveComponent,
-            setInitComponents,
+            handleReorderChildInComponent,
             getAllComponents,
             removeRow,
-            getComponent,
             setEditingComponent,
             updateComponent,
             clearEditingComponent,
             currentComponent,
+            setInitComponents,
         } = useDroppedComponents();
 
-        const components = getAllComponents();
+        const components: StructuredLayout = getAllComponents();
 
         const { showErrorToast, showSuccessToast } = useToast();
 
@@ -75,13 +61,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         useImperativeHandle(ref, () => ({
             handleSave: internalHandleSave,
         }));
-
-        useEffect(() => {
-            if (components.length === 0) {
-                const newRow = addRow();
-                setInitComponents([newRow]);
-            }
-        }, [components]);
 
         useEffect(() => {
             clearEditingComponent();
@@ -152,25 +131,16 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         }, [basePath, page]);
 
         const droppedComponentsMethods = {
-            reorderComponents,
-            getComponent,
             setEditingComponent,
-            setInitComponents,
             removeRow,
-            moveComponent,
             updateComponent,
-            handleAddComponentToRow,
             handleAddChildToComponent,
+            handleReorderChildInComponent,
         };
 
         const onDragEnd = useCallback((result: DragEndResult) => {
             console.log('dropZone', result);
-            const component = undefined; //getComponent(draggableId);
-            handleDragEnd(
-                result,
-                component === undefined,
-                droppedComponentsMethods
-            );
+            handleDragEnd(result, droppedComponentsMethods);
         }, []);
 
         return (
@@ -178,13 +148,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
                     {isDesign ? (
-                        <ScrollArea className="h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
-                            <div className="px-4 py-6 gap-3 grid">
-                                <Rows
-                                    components={components}
-                                    onDragEnd={onDragEnd}
-                                />
-                            </div>
+                        <ScrollArea>
+                            <Page page={components} onDragEnd={onDragEnd} />
                         </ScrollArea>
                     ) : (
                         <CodeContent pagePath={pagePath} />

@@ -10,6 +10,7 @@ interface DroppableProps {
     layout?: string;
     children: React.ReactNode;
     className?: string;
+    accept?: string[]
 }
 
 const Droppable = ({
@@ -39,6 +40,8 @@ const Droppable = ({
     useEffect(() => {
         setComponents(component.children);
     }, [component.children]);
+
+   // console.log(draggingItem)
 
     return (
         <div

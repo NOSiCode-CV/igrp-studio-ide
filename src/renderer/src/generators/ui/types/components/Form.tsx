@@ -22,8 +22,8 @@ export interface FormComponentProps {
 }
 
 const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
-    const { id: componentId, componentName, props, children } = comp;
-    const { title, gridCol } = props || {};
+    const { id: componentId, componentName, properties, children } = comp;
+    const { title, gridCol } = properties || {};
 
     const [formFields, setFormFields] = useState<StructuredComponent[]>([]);
 
@@ -142,6 +142,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                         item={button}
                         index={index}
                         dropTargetId={componentId}
+                        mode="MOVE"
                         layout="horizontal"
                         className="p-1"
                     >
@@ -165,7 +166,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     };
 
     return (
-        <Card className="group/form hover:border-2 hover:border-gray-300 hover:border-dashed rounded-sm">
+        <Card className="rounded-sm">
             <CardHeader>
                 <CardTitle>{title || componentName}</CardTitle>
             </CardHeader>

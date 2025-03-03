@@ -17,27 +17,24 @@ const BoxContainer = ({
     id,
     group,
     className,
-    onEdit,
     dragHandleProps,
+    onEdit,
 }: BoxContainerProps) => {
-    const { removeComponent } = useDroppedComponents();
+    const { handleRemoveChildFromComponent } = useDroppedComponents();
 
     const handleClickBtnEdition = () => {
         onEdit();
     };
 
     const handleClickDeleteComp = () => {
-        removeComponent(id);
+        handleRemoveChildFromComponent({ droppableId: id, index: 0 });
     };
 
     return (
-        <div
-            className={cn(`relative group/${group}`)}
-            id={id}
-        >
+        <div className={cn('relative', group)} id={id}>
             <div
                 className={cn(
-                    `absolute -top-6 right-0 px-2 bg-gray-600 text-white rounded opacity-0 group-hover/${group}:opacity-100 transition-opacity duration-200 shadow-lg z-50`,
+                    `absolute -top-6 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
                     className
                 )}
             >

@@ -82,18 +82,17 @@ export const EnumLayout = ({
             setTitle(name);
 
             formik.setFieldValue('name', name);
-            const attributes = values && values.map((value) => {
-                return {
-                    name: value.name,
-                    code: value.attributes[0],
-                    description: value.attributes[1]
-                };
-            });
+            const attributes =
+                values &&
+                values.map((value) => {
+                    return {
+                        name: value.name,
+                        code: value.attributes[0],
+                        description: value.attributes[1],
+                    };
+                });
 
-            formik.setFieldValue(
-                'values',
-                attributes || [defaultValue]
-            );
+            formik.setFieldValue('values', attributes || [defaultValue]);
         }
     }, [data]);
 
@@ -132,11 +131,13 @@ export const EnumLayout = ({
                 })
             );
 
-            const attributes = tablesColumns[tableName].map(
-                ({ type, name }) => {
+            const attributes = tablesColumns[tableName]
+                .filter((attr) => {
+                    attr.name !== 'name';
+                })
+                .map(({ type, name }) => {
                     return { type: type === 'text' ? 'string' : type, name };
-                }
-            );
+                });
             const values = { ...data, values: convertedValues, attributes };
 
             const { error } = await window.engine.createEnum(

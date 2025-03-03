@@ -14,9 +14,9 @@ export interface GridProps {
 }
 
 const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
-    const { children, props, id: componentId } = comp;
+    const { children, properties, id: componentId } = comp;
 
-    const { gridCol } = props || {};
+    const { gridCol } = properties || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -26,7 +26,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
 
     const { dynamicImport } = useStudio();
 
-    const handleEditClick = (component: Partial<StructuredComponent>) => {
+    const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent(component);
     };
 

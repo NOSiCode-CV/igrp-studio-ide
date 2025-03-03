@@ -12,6 +12,7 @@ interface DraggableProps {
     dropZone?: boolean;
     children: React.ReactNode;
     type?: string;
+    mode?: string;
 }
 
 const Draggable = ({
@@ -23,8 +24,8 @@ const Draggable = ({
     children,
     dropZone = true,
     type = 'DEFAULT',
+    mode = 'DROP',
 }: DraggableProps) => {
-
     const { id: componentId } = item;
 
     const {
@@ -37,11 +38,9 @@ const Draggable = ({
         setLayoutMode,
     } = useDragDrop();
 
-   
-
     const handleLayoutChange = (layout: LayoutMode) => {
         setLayoutMode(layout); // No error, since `layout` is of type `LayoutMode`
-      };
+    };
 
     return (
         <div
@@ -50,6 +49,8 @@ const Draggable = ({
                 onDragStart(item);
                 e.dataTransfer.setData('text/plain', JSON.stringify(item));
                 e.dataTransfer.setData('type', JSON.stringify(type));
+                e.dataTransfer.setData('mode', JSON.stringify(mode));
+                e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
             }}
             onDragEnd={onDragEnd}
             onDragLeave={handleDragLeave}

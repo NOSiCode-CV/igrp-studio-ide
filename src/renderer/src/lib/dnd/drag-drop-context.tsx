@@ -63,18 +63,28 @@ export const DragProvider = ({ children }) => {
         // Just collect the data and set state, business logic removed
         const droppedItem = JSON.parse(e.dataTransfer.getData('text/plain'));
         const type = JSON.parse(e.dataTransfer.getData('type'));
+        const mode = JSON.parse(e.dataTransfer.getData('mode'));
+        const draggableIndex = JSON.parse(
+            e.dataTransfer.getData('draggableIndex')
+        );
 
         const position =
             activeDropZone?.position ||
             (layoutMode === 'vertical' ? 'bottom' : 'right');
+
         const dropTargetId = isEmptyChildren
             ? targetId
             : activeDropZone?.dropTargetId || activeDropZone?.id || targetId;
 
         const targetIndex = activeDropZone?.cellIndex || 0;
         const insertIndex =
-            position === 'bottom' || position === 'right'
+            (position === 'bottom' || position === 'right') && targetIndex > 1
                 ? targetIndex + 1
+                : targetIndex;
+
+        const moveIndex =
+            (position === 'top' || position === 'left') && targetIndex > 1
+                ? targetIndex - 1
                 : targetIndex;
 
         setDraggedId(null);
@@ -83,14 +93,22 @@ export const DragProvider = ({ children }) => {
         // Emit the drop event with all necessary data
         // Business logic for processing this data should be handled outside
         return {
-            source: droppedItem,
+            source: {
+                ...droppedItem,
+                droppableId:
+                    mode === 'MOVE'
+                        ? activeDropZone?.dropTargetId
+                        : droppedItem.id,
+                index: draggableIndex,
+            },
             draggableId: droppedItem.id,
             position,
             destination: {
                 droppableId: dropTargetId,
-                index: insertIndex,
+                index: mode === 'MOVE' ? moveIndex : insertIndex,
             },
             type,
+            mode,
         };
     };
 

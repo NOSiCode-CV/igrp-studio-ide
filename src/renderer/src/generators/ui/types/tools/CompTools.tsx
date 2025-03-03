@@ -1,41 +1,69 @@
 import { Copy, Move, Settings, Trash } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@renderer/components/ui/tooltip"; // Adjust the import path based on your project structure
 
 interface ToolsProps {
-    dragHandleProps?: any,
+    dragHandleProps?: any;
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
-    id: string
+    id: string;
 }
+
 const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandleProps, id }: ToolsProps) => {
-
     return (
-        <div className="flex justify-content-end shadow-lg align-middle">
-            <div className="flex align-middle">
-                <span className="gen-c-copy-i" title="Container Copied">*</span>
-                <span className="c-holder-loading"></span>
-                <span className="c-type me-2 text-xs">{id}</span>
+        <TooltipProvider>
+            <div className="flex justify-end shadow-lg align-middle p-0 space-x-0">
+                <div className="flex align-middle items-center">
+                    <span className="text-xs">{id}</span>
+                </div>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded" {...dragHandleProps}>
+                            <Move className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Move</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded" title="Clonar">
+                            <Copy className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Clone</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button className="container-edit gen-edition-btn cursor-pointer p-1 hover:bg-white hover:text-black rounded" title="Editar"
+                            onClick={handleClickBtnEdition}>
+                            <Settings className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Edit</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded" title="Remover"
+                            onClick={handleClickDeleteComp}>
+                            <Trash className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Delete</p>
+                    </TooltipContent>
+                </Tooltip>
             </div>
+        </TooltipProvider>
+    );
+};
 
-            <button className="container-mover cursor-pointer" {...dragHandleProps}>
-                <Move className="h-4" />
-            </button>
-
-            <button className="container-clone cursor-pointer" title="Clonar">
-                <Copy className="h-4" />
-            </button>
-
-            <button className="container-edit gen-edition-btn cursor-pointer" title="Editar"
-                onClick={handleClickBtnEdition}>
-                <Settings className="h-4" />
-            </button>
-
-            <button className="container-remove cursor-pointer" title="Remover"
-                onClick={handleClickDeleteComp}>
-                <Trash className="h-4" />
-            </button>
-
-        </div>
-    )
-}
-
-export default CompTools
+export default CompTools;

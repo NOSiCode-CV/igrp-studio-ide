@@ -22,6 +22,7 @@ const useConfigdata = () => {
             {
                 id: COMPONENTS.Structures,
                 label: 'Structure',
+                type: STRUCTURE,
                 subItems: [
                     {
                         id: STRUCTURES.Columns,

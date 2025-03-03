@@ -31,6 +31,7 @@ export interface DragEndResult {
     droppableId: string
     index: number
   } | null
+  mode: 'MOVE' | 'DROP'
 }
 
 export interface ComponentConfig {
@@ -47,18 +48,34 @@ export interface StructuredComponent {
   id: string
   componentName: string
   label: string
-  type?: string
-  props?: Record<string, any>
+  properties?: Record<string, any>
   children: StructuredComponent[]
 }
 
-export interface StructuredRow {
-  id: string
-  children: StructuredComponent[]
-}
-
-export type StructuredLayout = StructuredRow[]
+export type StructuredLayout = StructuredComponent
 
 export interface Destination {
   droppableId: string, index: number
+}
+
+
+export interface DroppedComponentsContextType {
+  addSection: () => StructuredComponent;
+  setInitComponents: (components: StructuredLayout) => void;
+  getAllComponents: () => StructuredLayout;
+  handleAddComponentToRow: (
+    destination: Destination,
+    childComponent: StructuredComponent
+  ) => void;
+  handleAddChildToComponent: (
+    destination: Destination,
+    childComponent: StructuredComponent
+  ) => void;
+  handleRemoveChildFromComponent: (destination: Destination) => void;
+  handleReorderChildInComponent: (
+    draggableId: string,
+    source: Destination,
+    destination: Destination
+  ) => void;
+  updateComponent: (id: string, updatedComponent: StructuredComponent) => void;
 }

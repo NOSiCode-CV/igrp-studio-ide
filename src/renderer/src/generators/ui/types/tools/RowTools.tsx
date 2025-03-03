@@ -1,11 +1,13 @@
 import { Copy, Settings, Trash } from 'lucide-react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@renderer/components/ui/tooltip'; // Adjust the import path based on your project structure
 
 interface ToolsProps {
     onEdit: () => void;
     id: string;
     index: number;
 }
+
 const RowTools = ({ id, index, onEdit }: ToolsProps) => {
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
@@ -14,29 +16,53 @@ const RowTools = ({ id, index, onEdit }: ToolsProps) => {
     };
 
     return (
-        <div className="shadow-lg  flex justify-end">
-            <button
-                className=" flex align-items-center justify-center  field-clone gen-clone-btn"
-                title=""
-            >
-                <Copy className="h-4" />
-            </button>
+        <TooltipProvider>
+            <div className="shadow-lg flex justify-end p-0 space-x-0">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
+                            title="Clone"
+                        >
+                            <Copy className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Clone</p>
+                    </TooltipContent>
+                </Tooltip>
 
-            <button
-                className=" flex align-center justify-center  field-edit gen-edition-btn"
-                title=""
-                onClick={onEdit}
-            >
-                <Settings className="h-4" />
-            </button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
+                            title="Edit"
+                            onClick={onEdit}
+                        >
+                            <Settings className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Edit</p>
+                    </TooltipContent>
+                </Tooltip>
 
-            <button
-                className=" flex align-items-center justify-center  field-remove"
-                onClick={onClickDeleteField}
-            >
-                <Trash className="h-4" />
-            </button>
-        </div>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
+                            title="Delete"
+                            onClick={onClickDeleteField}
+                        >
+                            <Trash className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Delete</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </TooltipProvider>
     );
 };
 
