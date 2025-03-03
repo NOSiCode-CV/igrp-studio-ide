@@ -10,7 +10,6 @@ import {
 import { Button } from '@renderer/components/ui/button';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { useTranslation } from 'react-i18next';
-import useConfigComponent from './EditComponent/useConfigComponent';
 import RenderPropsConfig from './EditComponent/RenderPropsConfig';
 import {
     Accordion,
@@ -27,9 +26,9 @@ import {
 import { TextPropertiesPanel } from './EditComponent/text-properties';
 import { CustomStyle } from './EditComponent/custom-style';
 import { ButtonAppearancePanel } from './EditComponent/button-appearance';
-import { DroppedComponent } from '../interfaces';
 import IconLibrary from '@renderer/components/icon-library';
 import useStudio from '@renderer/hooks/useStudio';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 export function SidebarRight({
     ...props
@@ -40,18 +39,14 @@ export function SidebarRight({
 
     const [propsComponent, setPropsComponents] = React.useState({});
 
-    const {
-        currentComponent,
-        updateComponent,
-        getComponent,
-        clearEditingComponent,
-    } = useDroppedComponents();
+    const { currentComponent, updateComponent, clearEditingComponent } =
+        useDroppedComponents();
 
     if (!currentComponent) {
         return null;
     }
 
-    const { componentName, id, componentId, config } = currentComponent;
+    const { componentName, id: componentId, properties } = currentComponent;
 
     React.useEffect(() => {
         const loadComponents = async () => {
@@ -65,7 +60,7 @@ export function SidebarRight({
     const initialFormValues =
         propsComponent &&
         Object.keys(props).reduce((acc, key) => {
-            acc[key] = props[key].defaultValue ?? config[key] ?? '';
+            acc[key] = props[key].defaultValue ?? properties?.[key] ?? '';
             return acc;
         }, {});
 
@@ -92,24 +87,25 @@ export function SidebarRight({
     };
 
     React.useEffect(() => {
-        const updatedConfig = { ...config, ...formValues };
+        const updatedConfig = { ...properties, ...formValues };
 
-        const updatedComponent: Partial<DroppedComponent> = {
+        const updatedComponent: StructuredComponent = {
             ...currentComponent,
-            config: updatedConfig,
+            properties: updatedConfig,
         };
 
         if (componentId) {
-            const formComponent: Partial<DroppedComponent> =
+            /*  const formComponent: StructuredComponent =
                 getComponent(componentId) ?? {};
 
             updateComponent(componentId, {
                 ...formComponent,
                 fields: formComponent.fields.map((field) =>
-                    field.id === id ? { ...field, ...updatedComponent } : field
+                    field.id === componentId ? { ...field, ...updatedComponent } : field
                 ),
-            });
-        } else if (id !== undefined) updateComponent(id, updatedComponent);
+            }); */
+        } else if (componentId !== undefined)
+            updateComponent(componentId, updatedComponent);
     }, [formValues]);
 
     return (
@@ -125,7 +121,7 @@ export function SidebarRight({
                             {t('settings')}
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                            {`${componentName} - ${id}`}
+                            {`${componentName} - ${componentId}`}
                         </p>
                     </div>
                     <Button variant={'ghost'} onClick={handleClose}>

@@ -1,4 +1,3 @@
-import { APP_COMPONENT } from '@renderer/generators/ui/ComponentTypes';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';

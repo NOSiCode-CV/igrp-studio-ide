@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import RowOptions from './RowOptions';
-import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
+import RowOptions from '../tools/RowOptions';
 import { ColProps } from '../components/Grid';
 import { generateId } from '@renderer/utils/helpers';
-import {
-    ComponentData,
-    DroppedComponent,
-    HierarchicalComponent,
-} from '@renderer/generators/ui/interfaces';
 import { cn } from '@renderer/lib/utils';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import useStudio from '@renderer/hooks/useStudio';
@@ -27,8 +21,6 @@ const RowContainer: React.FC<RowContainerProps> = ({
     onClickAddControl,
     onClickDeleteSection,
 }) => {
-    const { addDroppedComponent, removeColumn, getRow } =
-        useDroppedComponents();
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;

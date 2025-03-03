@@ -1,10 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 
 import { useConfigdata } from './data/useConfigData';
-import {
-    Component,
-    PageConfig,
-} from '@igrp/nextjs-engine/dist/interfaces/types';
+import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
 
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
@@ -17,6 +14,7 @@ import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { Page } from './types/components/Page';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface FormEngineProps {
     basePath: string;
@@ -66,7 +64,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             clearEditingComponent();
         }, [isDesign]);
 
-        const handleSave = async (jsonStructure: Component[]) => {
+        const handleSave = async (jsonStructure: StructuredLayout) => {
             try {
                 if (basePath === undefined) return;
 
@@ -74,11 +72,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     type: 'page',
                     pageName: page,
                     path: page,
+                    components: jsonStructure,
                 };
 
-                const { error } = await window.api.addComponentToPage(
+                const { error } = await window.engine.createPage(
                     pageConfig,
-                    jsonStructure,
+                    ENV_TYPES.NEXTJS,
                     basePath
                 );
 

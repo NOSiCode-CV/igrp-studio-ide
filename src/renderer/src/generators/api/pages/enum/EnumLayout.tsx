@@ -1,4 +1,3 @@
-import { Input } from '@renderer/components/ui/input';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -15,7 +14,6 @@ import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { LabelRequired } from '@renderer/components/required';
 import { TextInput } from '../../components/inputs-form';
 import { Card } from '@renderer/components/ui/card';
 

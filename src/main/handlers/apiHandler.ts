@@ -7,11 +7,10 @@ import {
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 
 import { addController, addDTO, addModel, addModule, engineTypes } from '@igrp/igrp-studio-springboot-engine'
-import { addComponentToPage, deletePage, newPage } from '@igrp/nextjs-engine';
 
-import { Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { ipcMain } from 'electron';
 import { ProjectData } from '../types';
+import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 handleWithCustomErrors(
     'engine:create-project',
@@ -25,7 +24,7 @@ handleWithCustomErrors(
     'engine:create-response',
     async (_event, response: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.createResponse(response, basePath);
+        await engine.createResponse?.(response, basePath);
     }
 );
 
@@ -33,7 +32,7 @@ handleWithCustomErrors(
     'engine:create-enum',
     async (_event, data: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.createEnum(data, basePath);
+        await engine.createEnum?.(data, basePath);
     }
 );
 
@@ -41,7 +40,7 @@ handleWithCustomErrors(
     'engine:create-permission',
     async (_event, data: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.createPermission(data, basePath);
+        await engine.createPermission?.(data, basePath);
     }
 );
 
@@ -57,7 +56,7 @@ handleWithCustomErrors(
     'engine:serialize-element',
     async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.serializeElement(config, basePath);
+        await engine.serializeElement?.(config, basePath);
     }
 )
 
@@ -89,22 +88,9 @@ ipcMain.handle('spring-engine:fetch-selectors', async (_event, module: string, b
 
 handleWithCustomErrors(
     'next-engine:create-page',
-    async (_event, pageConfig: PageConfig, basePath: string) => {
-        await newPage(pageConfig, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:add-component-page',
-    async (_event, pageConfig: PageConfig, components: Component[], basePath: string) => {
-        await addComponentToPage(pageConfig, components, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:delete-page',
-    async (_event, pageConfig: PageConfig, basePath: string) => {
-        await deletePage(pageConfig, basePath)
+    async (_event, pageConfig: PageConfig, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createPage?.(pageConfig, basePath);
     }
 )
 

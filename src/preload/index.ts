@@ -5,7 +5,6 @@ import {
 	DTOConfig,
 	ModelConfig
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
 const backend = require('i18next-electron-fs-backend')
 
@@ -46,39 +45,6 @@ const api = {
 	): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('spring-engine:create-controller', controllerConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deletePage: async (pageConfig: PageConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:delete-page', pageConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	addComponentToPage: async (
-		pageConfig: PageConfig,
-		components: Component[],
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke(
-				'next-engine:add-component-page',
-				pageConfig,
-				components,
-				basePath
-			)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -157,6 +123,14 @@ const engine = {
 	createPermission: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('engine:create-permission', data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	createPage: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke('engine:create-page', data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}

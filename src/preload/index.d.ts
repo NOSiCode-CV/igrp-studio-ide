@@ -48,6 +48,9 @@ interface BaseEngine {
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
 }
 
 interface CustomMenu {

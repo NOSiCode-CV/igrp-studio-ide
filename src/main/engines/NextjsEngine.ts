@@ -1,29 +1,18 @@
 // engines/DotNetEngine.ts
-import { newApp } from '@igrp/nextjs-engine';
+import { deletePage, newApp, newPage } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
 import { ProjectRepository } from '../repo/projects';
-import { AppConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
+import { AppConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
-import { ResponseConfig } from '@igrp/dotnet-engine/dist/interfaces/types';
 
 export class NextjsEngine implements BaseEngine {
-  createPermission (_data: any, _basePath: string) : Promise<void>{
-    throw new Error('Method not implemented.');
-  }
-  serializeElement(_data: any, _basePath: string): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async delete(config: any, basePath: string): Promise<void> {
+    await deletePage(config, basePath)
   }
 
-  createEnum(_data: any, _basePath: string): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-
-  createResponse(_config: ResponseConfig, _basePath: string): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-
-  async delete(_config: any, _basePath: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async createPage(pageConfig: PageConfig, basePath: string): Promise<void> {
+    await newPage(pageConfig, basePath);
   }
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {

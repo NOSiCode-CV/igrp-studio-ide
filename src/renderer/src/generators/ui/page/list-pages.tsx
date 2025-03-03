@@ -6,7 +6,6 @@ import {
     getFileThree as onGetPages,
     deletePage as onDeletePage,
 } from '@renderer/redux/thunks';
-import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { File } from 'src/main/types';
 import { Button } from '@renderer/components/ui/button';
@@ -19,6 +18,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
+import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: File) => void;

@@ -7,10 +7,10 @@ import {
   setChangeStatusAction,
   setCurrentItemAction
 } from './reducer';
-import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
 import { ProjectData, FileTree } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 /**
  * set BasePath
  * @param {*} param0
@@ -88,7 +88,7 @@ export const getFileThree = (basePath: string) => async (dispatch: any) => {
 export const deletePage = (pageConfig: PageConfig, basePath: string) => async () => {
   const { showErrorToast, showSuccessToast } = useToast();
   try {
-    const { error } = await window.api.deletePage(pageConfig, basePath)
+    const { error } = await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath)
 
     if (error) {
       showErrorToast(error);

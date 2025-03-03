@@ -27,8 +27,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
 import React, { useEffect, useState } from 'react';
-import { Droppable } from '@hello-pangea/dnd';
-import DraggableElement from '@renderer/generators/ui/dnd/DraggableElement';
 import { MenuItem } from 'src/main/types';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
@@ -39,7 +37,6 @@ import {
 } from '@renderer/components/ui/collapsible';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
-import { useDragDrop } from '@renderer/lib/dnd/drag-drop-context';
 import Draggable from '@renderer/lib/dnd/Draggable';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {

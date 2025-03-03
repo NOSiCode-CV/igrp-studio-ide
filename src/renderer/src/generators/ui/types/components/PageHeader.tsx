@@ -10,10 +10,9 @@ export interface FormComponentProps {
 }
 
 const PageHeaderLayout: React.FC<FormComponentProps> = ({
-    comp,
-    onDragEnd,
+    comp
 }) => {
-    const { id: componentId, children: fields, componentName, props } = comp;
+    const { id: componentId, children: fields, componentName } = comp;
 
     const [buttonComponents, setButtonComponents] = useState<
         StructuredComponent[]
@@ -34,7 +33,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
         }
     }, [comp]);
 
-    const handleEditClick = (component: Partial<StructuredComponent>) => {
+    const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({ ...component});
     };
 

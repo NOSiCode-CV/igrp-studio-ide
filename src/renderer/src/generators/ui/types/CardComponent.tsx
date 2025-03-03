@@ -1,13 +1,12 @@
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { ICON_MAP } from '../ComponentTypes';
-import { DroppedComponent } from '../interfaces';
 
 export interface CardComponentProps {
-    comp: DroppedComponent;
+    comp: StructuredComponent;
 }
 
 const CardComponent = ({ comp }: CardComponentProps) => {
-
-    const {componentName} = comp
+    const { componentName } = comp;
 
     const Icon = ICON_MAP[componentName];
 

@@ -137,7 +137,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
     const handleReorderChildInComponent = useCallback(
         (
-            draggableId: string,
+            _draggableId: string,
             source: Destination,
             destination: Destination
         ) => {
