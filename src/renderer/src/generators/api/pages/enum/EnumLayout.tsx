@@ -132,11 +132,12 @@ export const EnumLayout = ({
                 })
             );
 
-            const attributes = tablesColumns[tableName].map(
-                ({ type, name }) => {
+            const attributes = tablesColumns[tableName]
+                .filter((attr) => attr.name !== 'Name')
+                .map(({ type, name }) => {
                     return { type: type === 'text' ? 'string' : type, name };
-                }
-            );
+                });
+
             const values = { ...data, values: convertedValues, attributes };
 
             const { error } = await window.engine.createEnum(
