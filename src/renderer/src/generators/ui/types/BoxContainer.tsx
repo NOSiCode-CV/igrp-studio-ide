@@ -2,6 +2,9 @@ import React from 'react';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import CompTools from './tools/CompTools';
 import { cn } from '@renderer/lib/utils';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { generateId } from '@renderer/utils/helpers';
+import { STRUCTURES } from '../ComponentTypes';
 
 interface BoxContainerProps {
     children: React.ReactElement;
@@ -9,20 +12,24 @@ interface BoxContainerProps {
     componentName: string;
     group?: string;
     className?: string;
+    components: StructuredComponent[];
     onEdit: () => void;
-    dragHandleProps?: any;
 }
 
 const BoxContainer = ({
-    children,
     id,
+    children,
     componentName,
     group,
     className,
-    dragHandleProps,
+    components,
     onEdit,
 }: BoxContainerProps) => {
-    const { handleRemoveChildFromComponent } = useDroppedComponents();
+    const {
+        handleRemoveChildFromComponent,
+        handleAddChildToComponent,
+        handleUpdateChildComponent,
+    } = useDroppedComponents();
 
     const onClickBtnEdition = () => {
         onEdit();
@@ -33,7 +40,61 @@ const BoxContainer = ({
     };
 
     const onClickStructure = (layout: string) => {
-        console.log(layout);
+        const newLayout = layout
+            .split(',')
+            .map((size) => parseInt(size.trim(), 10));
+
+        if (componentName === STRUCTURES.Columns) {
+            const currentSizes = components.length;
+            newLayout.forEach((colSize, index) => {
+                if (index < currentSizes) {
+                    // if column exists, update size and move components
+                    const currentCol = components[index];
+                    const props = {
+                        ...currentCol,
+                        properties: {
+                            gridCol: colSize.toString(),
+                        },
+                    };
+
+                    // move components from current column to new one
+                    if (currentCol.children.length > 0) {
+                        props.children = [...currentCol.children];
+                    }
+
+                    handleUpdateChildComponent(components[index].id, props);
+                } else {
+                    // Create  a new column if does not exist
+                    const childColumnId = generateId(`column_${index + 1}`);
+                    const childColumn: StructuredComponent = {
+                        id: childColumnId,
+                        componentName: `Column`,
+                        label: `Column ${index + 1}`,
+                        properties: {},
+                        children: [],
+                    };
+                    handleAddChildToComponent(
+                        { droppableId: id, index },
+                        childColumn
+                    );
+                }
+            });
+
+            // Remove extra column
+            if (newLayout.length < currentSizes) {
+                const columnsToRemove = currentSizes - newLayout.length;
+                for (let i = 0; i < columnsToRemove; i++) {
+                    handleRemoveChildFromComponent({
+                        droppableId: components[newLayout.length + i].id,
+                        index: 0,
+                    });
+                }
+            }
+        }
+
+        handleUpdateChildComponent(id, {
+            properties: { gridCol: newLayout.length },
+        });
     };
 
     return (
@@ -49,7 +110,6 @@ const BoxContainer = ({
                     handleClickDeleteComp={onClickDeleteComp}
                     handleClickBtnEdition={onClickBtnEdition}
                     handleClickStructComp={onClickStructure}
-                    dragHandleProps={dragHandleProps}
                 />
             </div>
             {children}

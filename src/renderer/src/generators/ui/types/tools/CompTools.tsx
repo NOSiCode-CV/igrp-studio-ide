@@ -4,12 +4,11 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@renderer/components/ui/tooltip'; 
-import { STRUCTURES } from '../../ComponentTypes';
+} from '@renderer/components/ui/tooltip';
+import { Containers, STRUCTURES } from '../../ComponentTypes';
 import StructureDropdown from '../../components/StructureDropdown';
 
 interface ToolsProps {
-    dragHandleProps?: any;
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
     handleClickStructComp: (layout: string) => void;
@@ -20,10 +19,13 @@ const CompTools = ({
     handleClickBtnEdition,
     handleClickDeleteComp,
     handleClickStructComp,
-    dragHandleProps,
     id,
 }: ToolsProps) => {
-    const isGrids = [STRUCTURES.Columns, STRUCTURES.Grid].includes(id);
+    const isGrids = [
+        STRUCTURES.Columns,
+        STRUCTURES.Grid,
+        Containers.Form,
+    ].includes(id);
 
     return (
         <TooltipProvider>
@@ -34,10 +36,7 @@ const CompTools = ({
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button
-                            className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded"
-                            {...dragHandleProps}
-                        >
+                        <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded">
                             <Move className="h-4" />
                         </button>
                     </TooltipTrigger>
@@ -61,7 +60,9 @@ const CompTools = ({
                 </Tooltip>
 
                 {isGrids && (
-                    <StructureDropdown onClickStructure={handleClickStructComp} />
+                    <StructureDropdown
+                        onClickStructure={handleClickStructComp}
+                    />
                 )}
 
                 <Tooltip>

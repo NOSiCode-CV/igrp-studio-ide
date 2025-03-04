@@ -85,6 +85,7 @@ export const Section = ({ component, onDragEnd, onAddControl }) => {
                                     >
                                         <BoxContainer
                                             {...comp}
+                                            components={comp.children}
                                             onEdit={() => console.log()}
                                             group="group/row-comp"
                                             className="left-0 right-auto opacity-0 group-hover/row-comp:opacity-100"
