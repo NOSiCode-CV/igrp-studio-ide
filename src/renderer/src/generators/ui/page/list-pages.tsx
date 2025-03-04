@@ -7,7 +7,6 @@ import {
     deletePage as onDeletePage,
 } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
-import { File } from 'src/main/types';
 import { Button } from '@renderer/components/ui/button';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
@@ -19,9 +18,17 @@ import {
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { FileTree } from 'src/main/types';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
+import { NewComponentModal } from './new-component-modal';
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: File) => void;
+    onPageClick?: (pageFile: FileTree) => void;
 }
 
 const MainPageBuilder = ({
@@ -35,6 +42,7 @@ const MainPageBuilder = ({
     const [components, setComponents] = useState<any>([]);
     const [page, setPage] = useState<any>([]);
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
+    const [showNewComponentModal, setNewComponentModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
 
@@ -104,10 +112,25 @@ const MainPageBuilder = ({
     return (
         <div className="container mx-auto p-4">
             <PageHeader title={config?.name} description={config?.description}>
-                <Button size="sm" onClick={() => setNewPageModal(true)}>
-                    <Plus />
-                    {t('addPage')}
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline">
+                            <Plus className="mr-2 h-4 w-4" /> {t('add')}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem
+                            onSelect={() => setNewPageModal(true)}
+                        >
+                            {t('createNewPage')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => setNewComponentModal(true)}
+                        >
+                            {t('createNewComponent')}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </PageHeader>
             <IGRPContainer>
                 <div className="flex items-center text-foreground">
@@ -149,6 +172,13 @@ const MainPageBuilder = ({
                 basePath={basePath}
                 isOpen={newPageModal}
                 onClose={() => setNewPageModal(false)}
+                onConfirm={handleNewPage}
+            />
+
+            <NewComponentModal
+                basePath={basePath}
+                isOpen={showNewComponentModal}
+                onClose={() => setNewComponentModal(false)}
                 onConfirm={handleNewPage}
             />
 

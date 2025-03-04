@@ -149,8 +149,8 @@ export function AppSidebar({
                                             <div className="w-8 h-8 flex items-center justify-center">
                                                 <item.icon size={20} />
                                             </div>
-                                            <span className="text-xs text-center sr-only">
-                                                {t(item.label)}
+                                            <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
+                                                {item.label}
                                             </span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -203,18 +203,6 @@ export function AppSidebar({
                                     defaultOpen
                                     className="group/collapsible"
                                 >
-                                    {/*   <Droppable
-                                        droppableId={item.id}
-                                        key={item.id}
-                                        isDropDisabled={true}
-                                        type={item.type}
-                                    >
-                                        {(provided) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.droppableProps}
-                                            > */}
-
                                     <SidebarGroup>
                                         <SidebarGroupLabel
                                             asChild
@@ -238,13 +226,21 @@ export function AppSidebar({
                                                                 className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
                                                             >
                                                                 <Draggable
-                                                                    item={subItem}
+                                                                    item={
+                                                                        subItem
+                                                                    }
                                                                     className="w-full h-full"
-                                                                    dropZone={false}
-                                                                    type={item.type}
+                                                                    dropZone={
+                                                                        false
+                                                                    }
+                                                                    type={
+                                                                        item.type
+                                                                    }
                                                                 >
-                                                                    <div className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2
-                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card">
+                                                                    <div
+                                                                        className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2
+                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card"
+                                                                    >
                                                                         <GripHorizontal className="w-4 h-4 text-gray-400" />
 
                                                                         <div className="flex flex-col items-center gap-2">
@@ -257,14 +253,6 @@ export function AppSidebar({
                                                                         </div>
                                                                     </div>
                                                                 </Draggable>
-                                                                {/*  <DraggableElement
-                                                                                item={
-                                                                                    item
-                                                                                }
-                                                                                index={
-                                                                                    key
-                                                                                }
-                                                                            /> */}
                                                             </SidebarMenuItem>
                                                         )
                                                     )}
@@ -272,10 +260,6 @@ export function AppSidebar({
                                             </SidebarGroupContent>
                                         </CollapsibleContent>
                                     </SidebarGroup>
-                                    {/*  {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable> */}
                                 </Collapsible>
                             ))
                         )}

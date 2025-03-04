@@ -55,6 +55,7 @@
   "shared": "Components",
   "dialogDescription": "Enter the name for your new module. Click save when you're done.",
   "endpointDescription": "Enter the name for your new endpoint. Click save when you're done.",
+  "comonDialogtDescription": "Enter the name for your new {{name}}. Click save when you're done.",
   "newObject": "New {{name}}",
   "deletedSuccess": "{{name}} deleted successfully!",
   "createdSuccess": "{{name}} {{value}} have been successfully added.",
@@ -328,7 +329,11 @@
   "seachPages": "Search pages...",
   "addComponents": "Add Components",
   "editComponents": "Edit Component",
-  "components":"Components",
-  "msgSpecialCharactersRegex":"Name contains special characters",
-  "msgNoSpacesAllowed": "Names with spaces are not accepted"
+  "components": "Components",
+  "msgSpecialCharactersRegex": "Name contains special characters",
+  "msgNoSpacesAllowed": "Names with spaces are not accepted",
+  "createNewPage": "Create New Page",
+  "createNewComponent": "Create New Component",
+  "pageName":"Page Name",
+  "componentName":"Component Name"
 }

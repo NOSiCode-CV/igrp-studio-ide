@@ -1,14 +1,30 @@
-import { Copy, Move, Settings, Trash } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@renderer/components/ui/tooltip"; // Adjust the import path based on your project structure
+import { Copy, Move, Settings, Trash } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip'; 
+import { STRUCTURES } from '../../ComponentTypes';
+import StructureDropdown from '../../components/StructureDropdown';
 
 interface ToolsProps {
     dragHandleProps?: any;
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
+    handleClickStructComp: (layout: string) => void;
     id: string;
 }
 
-const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandleProps, id }: ToolsProps) => {
+const CompTools = ({
+    handleClickBtnEdition,
+    handleClickDeleteComp,
+    handleClickStructComp,
+    dragHandleProps,
+    id,
+}: ToolsProps) => {
+    const isGrids = [STRUCTURES.Columns, STRUCTURES.Grid].includes(id);
+
     return (
         <TooltipProvider>
             <div className="flex justify-end shadow-lg align-middle p-0 space-x-0">
@@ -18,7 +34,10 @@ const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandlePro
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded" {...dragHandleProps}>
+                        <button
+                            className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            {...dragHandleProps}
+                        >
                             <Move className="h-4" />
                         </button>
                     </TooltipTrigger>
@@ -29,7 +48,10 @@ const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandlePro
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded" title="Clonar">
+                        <button
+                            className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            title="Clonar"
+                        >
                             <Copy className="h-4" />
                         </button>
                     </TooltipTrigger>
@@ -38,10 +60,17 @@ const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandlePro
                     </TooltipContent>
                 </Tooltip>
 
+                {isGrids && (
+                    <StructureDropdown onClickStructure={handleClickStructComp} />
+                )}
+
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button className="container-edit gen-edition-btn cursor-pointer p-1 hover:bg-white hover:text-black rounded" title="Editar"
-                            onClick={handleClickBtnEdition}>
+                        <button
+                            className="container-edit gen-edition-btn cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            title="Editar"
+                            onClick={handleClickBtnEdition}
+                        >
                             <Settings className="h-4" />
                         </button>
                     </TooltipTrigger>
@@ -52,8 +81,11 @@ const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandlePro
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded" title="Remover"
-                            onClick={handleClickDeleteComp}>
+                        <button
+                            className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            title="Remover"
+                            onClick={handleClickDeleteComp}
+                        >
                             <Trash className="h-4" />
                         </button>
                     </TooltipTrigger>

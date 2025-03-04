@@ -6,6 +6,7 @@ import {
 	ModelConfig
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
+import { EVENTS } from '../main/constants/events'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -130,7 +131,7 @@ const engine = {
 
 	createPage: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-page', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PAGE, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}

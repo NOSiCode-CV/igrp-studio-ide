@@ -1,8 +1,8 @@
-import { Droppable } from '@hello-pangea/dnd';
 import { SidebarMenu, SidebarMenuItem } from '@renderer/components/ui/sidebar';
-import DraggableElement from '../dnd/DraggableElement';
-import { COMPONENT } from '../ComponentTypes';
+import { APP_COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/useStudio';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import { GripHorizontal } from 'lucide-react';
 
 const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
     const { fetchComponents } = useStudio();
@@ -18,33 +18,35 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
     return (
         <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
             {filteredComponents.map((item, key) => (
-                <Droppable
-                    droppableId={`${item.name}`}
-                    key={item.name}
-                    type={COMPONENT}
-                    isDropDisabled={true}
+                <SidebarMenuItem
+                    key={key}
+                    className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
                 >
-                    {(provided) => (
+                    <Draggable
+                        item={{
+                            id: item.content.name,
+                        }}
+                        className="w-full h-full"
+                        dropZone={false}
+                        type={APP_COMPONENT}
+                    >
                         <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
+                            className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2 
+                            shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card"
                         >
-                            <SidebarMenuItem
-                                key={key}
-                                className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
-                            >
-                                <DraggableElement
-                                    item={{
-                                        label: item.content.name,
-                                        id: item.content.name,
-                                    }}
-                                    index={key}
-                                />
-                            </SidebarMenuItem>
-                            {provided.placeholder}
+                            <GripHorizontal className="w-4 h-4 text-gray-400" />
+
+                            <div className="flex flex-col items-center gap-2">
+                                {item.content?.icon && (
+                                    <item.content.icon className="w-6 h-6 text-gray-600" />
+                                )}
+                                <span className=" text-gray-700 text-center">
+                                    {item.content?.name}
+                                </span>
+                            </div>
                         </div>
-                    )}
-                </Droppable>
+                    </Draggable>
+                </SidebarMenuItem>
             ))}
         </SidebarMenu>
     );

@@ -1,7 +1,10 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 
 import { useConfigdata } from './data/useConfigData';
-import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    ComponentConfig,
+    PageConfig,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
 
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
@@ -19,6 +22,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 interface FormEngineProps {
     basePath: string;
     page: string;
+    type?: string;
     pagePath: string | undefined;
     isDesign: boolean;
     onSave: () => void;
@@ -29,7 +33,7 @@ interface FormEngineRef {
 }
 
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
-    ({ basePath, pagePath, page, isDesign }, ref) => {
+    ({ basePath, pagePath, page, isDesign, type = 'page' }, ref) => {
         const {
             handleAddChildToComponent,
             handleReorderChildInComponent,
@@ -75,8 +79,15 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     components: jsonStructure,
                 };
 
+                const compConfig: ComponentConfig = {
+                    type: 'component',
+                    name: page,
+                    path: page,
+                    components: jsonStructure,
+                };
+
                 const { error } = await window.engine.createPage(
-                    pageConfig,
+                    type === 'page' ? pageConfig : compConfig,
                     ENV_TYPES.NEXTJS,
                     basePath
                 );
@@ -100,26 +111,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                     const data = await window.api.getJsonContent(pagePath);
                     if (data.components) {
-                        /*let dataSaved: HierarchicalComponent[] = [];
-
-                          data.components.map((row) => {
-                            dataSaved = [
-                                ...dataSaved,
-                                {
-                                    id: generateId('row'),
-                                    columns: row.Row.map((col) => ({
-                                        id: col.id || generateId('col'),
-                                        colSize: 12,
-                                        components: col.Col.flatMap((c) =>
-                                            c.components.map((comp) => ({
-                                                ...comp,
-                                            }))
-                                        ),
-                                    })),
-                                },
-                            ];
-                        }); */
-
                         setInitComponents(data.components);
                     }
                 } catch (error) {

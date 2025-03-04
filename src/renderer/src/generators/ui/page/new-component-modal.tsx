@@ -14,34 +14,36 @@ import {
 } from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
-import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ComponentConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
-const initialValues: PageConfig = {
-    type: 'page',
-    pageName: '',
-    path: 'teste',
+const initialValues: ComponentConfig = {
+    type: 'component',
+    name: '',
+    path: 'teste'
 };
 
-interface NewPageModalProps {
+interface NewComponentModalProps {
     isOpen: boolean;
     basePath: string;
     onClose: () => void;
     onConfirm: () => void;
 }
 
-export function NewPageModal({
+export function NewComponentModal({
     isOpen,
     basePath,
     onClose,
     onConfirm,
-}: NewPageModalProps) {
+}: NewComponentModalProps) {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
+    const handleConfirm = async (
+        pageConfig: ComponentConfig
+    ): Promise<void> => {
         try {
             const { error } = await window.engine.createPage(
                 pageConfig,
@@ -55,25 +57,26 @@ export function NewPageModal({
             }
 
             showSuccessToast(
-                `Page ${pageConfig.pageName} has been successfully added.`
+                `Component ${pageConfig.name} has been successfully added.`
             );
             // commit after creating the page
-            createGitCommit(basePath, `Add page ${pageConfig.pageName}`);
+            createGitCommit(basePath, `Add Component ${pageConfig.name}`);
             onConfirm?.();
 
             formik.resetForm();
         } catch (error) {
+            console.log(error)
             showErrorToast(error);
         }
     };
 
     const validationSchema = Yup.object({
-        pageName: Yup.string()
-            .required(t('thisFieldRequired', { name: t('pageName') }))
+        name: Yup.string()
+            .required(t('thisFieldRequired', { name: t('componentName') }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
     });
 
-    const formik = useFormik<PageConfig>({
+    const formik = useFormik<ComponentConfig>({
         enableReinitialize: true,
         initialValues,
         validationSchema,
@@ -86,8 +89,10 @@ export function NewPageModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
-                <DialogTitle>{t('createNewPage')}</DialogTitle>
-                <DialogDescription>{t('comonDialogtDescription', {'name':'Page'})}</DialogDescription>
+                <DialogTitle>{t('createNewComponent')}</DialogTitle>
+                <DialogDescription>
+                    {t('comonDialogtDescription', { name: 'Component' })}
+                </DialogDescription>
                 <form
                     className="needs-validation"
                     onSubmit={(e) => {
@@ -97,13 +102,15 @@ export function NewPageModal({
                 >
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="pageName">{t('pageName')}</Label>
+                            <Label htmlFor="componentName">
+                                {t('componentName')}
+                            </Label>
                             <Input
-                                id="pageName"
+                                id="name"
                                 className="col-span-3"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                value={formik.values.pageName || ''}
+                                value={formik.values.name || ''}
                             />
                         </div>
                     </div>

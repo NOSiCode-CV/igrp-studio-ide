@@ -58,18 +58,17 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                         layout="horizontal"
                         index={index}
                         dropTargetId={componentId}
+                        mode="MOVE"
                     >
-                        <div key={comp.id}>
-                            <BoxContainer
-                                key={comp.id}
-                                id={comp.id}
-                                group="comp"
-                                onEdit={() => handleEditClick(comp)}
-                                /*  dragHandleProps={provided.dragHandleProps} */
-                            >
-                                <Component comp={comp} onDragEnd={onDragEnd} />
-                            </BoxContainer>
-                        </div>
+                        <BoxContainer
+                            {...comp}
+                            key={comp.id}
+                            group="group/column-comp"
+                            onEdit={() => handleEditClick(comp)}
+                            className="opacity-0 group-hover/column-comp:opacity-100"
+                        >
+                            <Component comp={comp} onDragEnd={onDragEnd} />
+                        </BoxContainer>
                     </Draggable>
                 ) : (
                     <div key={comp.id}>Loading...</div>
@@ -97,7 +96,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
     return (
         <div
             className={cn(
-                `hover:border-2 hover:border-gray-300 hover:border-dashed bg-white rounded-lg p-2`
+                `rounded-lg p-2`
             )}
             id={componentId}
         >
@@ -105,9 +104,6 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                 <div
                     className={cn(
                         `grid gap-4 grid-cols-${gridCol}`
-                        /*  snapshot.isDraggingOver
-                            ? 'border-2 border-dashed border-igrp p-2'
-                            : '' */
                     )}
                 >
                     {renderColumns()}

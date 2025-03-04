@@ -13,12 +13,9 @@ export const handleDragEnd = (
     }
 
     if (mode === 'MOVE') {
-        if (source.droppableId === destination.droppableId) {
-            handleReorderChildInComponent(draggableId, source, destination);
-        }
+        handleReorderChildInComponent(draggableId, source, destination);
     } else {
         handleDropComponent(draggableId, destination, { handleAddChildToComponent, getComponent });
-
     }
 };
 

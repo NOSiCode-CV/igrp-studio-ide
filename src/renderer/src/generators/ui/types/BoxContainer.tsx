@@ -6,6 +6,7 @@ import { cn } from '@renderer/lib/utils';
 interface BoxContainerProps {
     children: React.ReactElement;
     id: string;
+    componentName: string;
     group?: string;
     className?: string;
     onEdit: () => void;
@@ -15,6 +16,7 @@ interface BoxContainerProps {
 const BoxContainer = ({
     children,
     id,
+    componentName,
     group,
     className,
     dragHandleProps,
@@ -22,12 +24,16 @@ const BoxContainer = ({
 }: BoxContainerProps) => {
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
-    const handleClickBtnEdition = () => {
+    const onClickBtnEdition = () => {
         onEdit();
     };
 
-    const handleClickDeleteComp = () => {
+    const onClickDeleteComp = () => {
         handleRemoveChildFromComponent({ droppableId: id, index: 0 });
+    };
+
+    const onClickStructure = (layout: string) => {
+        console.log(layout);
     };
 
     return (
@@ -39,9 +45,10 @@ const BoxContainer = ({
                 )}
             >
                 <CompTools
-                    id={id}
-                    handleClickDeleteComp={handleClickDeleteComp}
-                    handleClickBtnEdition={handleClickBtnEdition}
+                    id={componentName}
+                    handleClickDeleteComp={onClickDeleteComp}
+                    handleClickBtnEdition={onClickBtnEdition}
+                    handleClickStructComp={onClickStructure}
                     dragHandleProps={dragHandleProps}
                 />
             </div>

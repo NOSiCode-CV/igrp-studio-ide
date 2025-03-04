@@ -1,7 +1,7 @@
 import { useDragDrop } from './drag-drop-context';
 
 import { useEffect, type DragEvent } from 'react';
-import { StructuredComponent } from './types';
+import { LayoutMode, StructuredComponent } from './types';
 import { cn } from '../utils';
 
 interface DroppableProps {
@@ -10,7 +10,7 @@ interface DroppableProps {
     layout?: string;
     children: React.ReactNode;
     className?: string;
-    accept?: string[]
+    accept?: string[];
 }
 
 const Droppable = ({
@@ -19,40 +19,49 @@ const Droppable = ({
     children,
     className,
 }: DroppableProps) => {
+    const { id: componentId } = component;
+
     const {
+        activeDropZone,
         draggingItem,
         setComponents,
         handleDrop,
         handleDragLeave,
         handleDragOver,
+        setLayoutMode,
     } = useDragDrop();
+
+    const handleLayoutChange = (layout: LayoutMode) => {
+        setLayoutMode(layout);
+    };
 
     const handleDropItem = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         const droppedItem = handleDrop(
             e,
-            component.id,
-            component.children.length === 0
+            component.id
         );
         onDrop(droppedItem);
     };
 
     useEffect(() => {
+        handleLayoutChange;
         setComponents(component.children);
     }, [component.children]);
 
-   // console.log(draggingItem)
+    // console.log(draggingItem, activeDropZone?.dropTargetId,componentId)
 
     return (
         <div
-            onDragOver={(e) => handleDragOver(e)}
+            onDragOver={(e) => handleDragOver(e, componentId)}
             onDrop={handleDropItem}
             onDragLeave={handleDragLeave}
             id={component.id}
             className={cn(
                 'min-h-12 p-5 border-2 border-dashed border-gray-400',
-                draggingItem ? 'bg-gray-200' : 'bg-card',
-              /*   activeDropZone?.dropTargetId === component.id ? 'border-igrp' : '', */
+                draggingItem && activeDropZone?.dropTargetId === componentId
+                    ? 'bg-muted/75 border-igrp rounded-lg'
+                    : 'bg-card',
                 className
             )}
         >

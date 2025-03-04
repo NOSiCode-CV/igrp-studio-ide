@@ -55,9 +55,10 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     item={comp}
                     index={index}
                     dropTargetId={componentId}
+                    mode="MOVE"
                 >
                     <BoxContainer
-                        id={comp.id}
+                        {...comp}
                         group="group/column-comp"
                         onEdit={() => handleEditClick(comp)}
                         className="top-0 opacity-0 group-hover/column-comp:opacity-100"
@@ -74,7 +75,7 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     return (
         <>
             <Droppable component={comp} onDrop={onDragEnd}>
-                <div className={cn(`w-full flex flex-col p-3 gap-3`)}>
+                <div className={cn(`w-full flex flex-col p-0 gap-3`)}>
                     {renderComponents()}
                 </div>
             </Droppable>

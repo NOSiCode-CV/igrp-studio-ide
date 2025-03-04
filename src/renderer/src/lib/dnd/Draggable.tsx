@@ -2,6 +2,7 @@ import { DropZone } from '@renderer/generators/ui/light/DropZone';
 import { cn } from '../utils';
 import { useDragDrop } from './drag-drop-context';
 import { LayoutMode } from './types';
+import type { DragEvent } from 'react';
 
 interface DraggableProps {
     index?: number;
@@ -16,15 +17,15 @@ interface DraggableProps {
 }
 
 const Draggable = ({
-    index = 0,
     item,
     dropTargetId,
     className,
-    layout = 'vertical',
-    children,
+    index = 0,
     dropZone = true,
+    layout = 'vertical',
     type = 'DEFAULT',
     mode = 'DROP',
+    children,
 }: DraggableProps) => {
     const { id: componentId } = item;
 
@@ -36,24 +37,36 @@ const Draggable = ({
         handleDragLeave,
         handleDragOver,
         setLayoutMode,
+        handleDragStartComponent,
     } = useDragDrop();
 
     const handleLayoutChange = (layout: LayoutMode) => {
-        setLayoutMode(layout); // No error, since `layout` is of type `LayoutMode`
+        setLayoutMode(layout);
+    };
+
+    const hadleDragStart = (e: DragEvent<HTMLDivElement>) => {
+        onDragStart(item);
+        handleDragStartComponent(e, componentId);
+        e.dataTransfer.setData('text/plain', JSON.stringify(item));
+        e.dataTransfer.setData('type', JSON.stringify(type));
+        e.dataTransfer.setData('mode', JSON.stringify(mode));
+        e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
+        e.dataTransfer.setData('dropTargetId', JSON.stringify(dropTargetId));
     };
 
     return (
         <div
             draggable
-            onDragStart={(e) => {
-                onDragStart(item);
-                e.dataTransfer.setData('text/plain', JSON.stringify(item));
-                e.dataTransfer.setData('type', JSON.stringify(type));
-                e.dataTransfer.setData('mode', JSON.stringify(mode));
-                e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
+            onDragStartCapture={(e) => {
+                hadleDragStart(e);
             }}
+            /*  onDragStart={(e) => {
+                
+            }} */
             onDragEnd={onDragEnd}
-            onDragLeave={handleDragLeave}
+            onDragLeave={(e) => {
+                handleDragLeave(e);
+            }}
             onDragOver={(e) => {
                 handleDragOver(e, componentId, index, dropTargetId);
                 handleLayoutChange(layout);
@@ -61,8 +74,8 @@ const Draggable = ({
             className={cn(
                 dropZone &&
                     'relative group border rounded-md bg-card transition-all',
-                draggedId === componentId
-                    ? 'opacity-50 border-primary'
+                draggedId === componentId && dropZone
+                    ? 'opacity-25 border-primary'
                     : 'border-border',
                 dropZone && 'hover:border-primary/50',
                 className

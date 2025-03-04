@@ -44,6 +44,7 @@ export const Section = ({ component, onDragEnd, onAddControl }) => {
         removeRow(component.id);
     };
 
+    //TODO
     const layoutMode = 'vertical';
 
     const ACCEPTS = [COMPONENT, STRUCTURE];
@@ -65,7 +66,7 @@ export const Section = ({ component, onDragEnd, onAddControl }) => {
                     className={cn(
                         'relative ',
                         layoutMode === 'vertical'
-                            ? 'space-y-2'
+                            ? 'space-y-6'
                             : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'
                     )}
                 >
@@ -83,10 +84,10 @@ export const Section = ({ component, onDragEnd, onAddControl }) => {
                                         mode="MOVE"
                                     >
                                         <BoxContainer
-                                            id={comp.id}
+                                            {...comp}
                                             onEdit={() => console.log()}
                                             group="group/row-comp"
-                                            className="left-0 top-0 right-auto opacity-0 group-hover/row-comp:opacity-100"
+                                            className="left-0 right-auto opacity-0 group-hover/row-comp:opacity-100"
                                         >
                                             <Component
                                                 comp={comp}

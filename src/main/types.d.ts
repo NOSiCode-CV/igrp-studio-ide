@@ -85,21 +85,6 @@ export interface MenuItem {
     content?: any,
 }
 
-type FolderFiles = { [folderName: string]: FolderFileStructure };
-
-export interface File {
-    name: string;
-    path: string;
-    config?: Object
-    content?: Object
-}
-
-export interface FolderFileStructure {
-    name: string;
-    files: Array<Record<string, File[]>>; // Group files by subfolder
-    path: string;
-}
-
 export interface FileTree {
     name: string; // Name of the file or folder
     path: string; // Full path of the file or folder

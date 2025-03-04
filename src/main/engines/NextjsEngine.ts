@@ -1,8 +1,8 @@
 // engines/DotNetEngine.ts
-import { deletePage, newApp, newPage } from '@igrp/igrp-studio-nextjs-engine';
+import { deletePage, getOneComponent, initComponents, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
 import { ProjectRepository } from '../repo/projects';
-import { AppConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { AppConfig, ComponentConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
 
 export class NextjsEngine implements BaseEngine {
@@ -11,8 +11,20 @@ export class NextjsEngine implements BaseEngine {
     await deletePage(config, basePath)
   }
 
-  async createPage(pageConfig: PageConfig, basePath: string): Promise<void> {
-    await newPage(pageConfig, basePath);
+  async createPage(pageConfig: any, basePath: string): Promise<void> {
+
+    await initComponents();
+
+     const result = await getOneComponent({
+      'name': 'aspect'
+    }) 
+
+    console.log(result)
+
+    if (pageConfig.type === 'component') {
+      await newComponent(pageConfig as ComponentConfig, basePath);
+    } else
+      await newPage(pageConfig as PageConfig, basePath);
   }
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {

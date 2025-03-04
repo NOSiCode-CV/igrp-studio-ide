@@ -2,6 +2,7 @@ import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { Section } from './Section';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import PageTools from '../tools/PageTools';
+import { useEffect } from 'react';
 
 interface PageProps {
     page: StructuredLayout;
@@ -32,6 +33,16 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
             });
         }
     };
+
+    useEffect(() => {
+        if (components.length === 0) {
+            const newRow = newStructure('section');
+            setInitComponents({
+                ...page,
+                children: [newRow],
+            });
+        }
+    }, [components]);
 
     return (
         <div className="m-1 px-4  group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">

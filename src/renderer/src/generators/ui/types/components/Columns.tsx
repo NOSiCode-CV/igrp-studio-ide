@@ -48,10 +48,15 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
             const Component = loadedComponents[comp.id];
 
             return Component ? (
-                <Draggable key={comp.id} item={comp} index={index} dropZone={false}>
+                <Draggable
+                    key={comp.id}
+                    item={comp}
+                    index={index}
+                    dropZone={false}
+                >
                     <BoxContainer
+                        {...comp}
                         key={comp.id}
-                        id={comp.id}
                         onEdit={() => handleEditClick(comp)}
                         group="group/comp"
                         className="opacity-0 group-hover/comp:opacity-100"
@@ -67,11 +72,7 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
 
     return (
         <>
-            <div
-                className={cn(
-                    `grid grid-cols-${gridCol} gap-3 p-2`
-                )}
-            >
+            <div className={cn(`grid grid-cols-${gridCol} gap-3 p-2`)}>
                 {renderColumns()}
             </div>
         </>

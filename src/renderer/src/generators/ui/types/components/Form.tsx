@@ -95,7 +95,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                         index={index}
                         dropTargetId={componentId}
                         layout="horizontal"
-                        className="p-1"
+                        className="p-0 border-none"
                     >
                         {Component && (
                             <BoxField
@@ -144,7 +144,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                         dropTargetId={componentId}
                         mode="MOVE"
                         layout="horizontal"
-                        className="p-1"
+                        className="p-0"
                     >
                         {Component && (
                             <BoxField
@@ -175,10 +175,11 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                     component={comp}
                     onDrop={onDragEnd}
                     layout="horizontal"
+                    className='border-none hover:border-dashed'
                 >
                     <div
                         className={cn(
-                            `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${gridCol} gap-4`
+                            `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${gridCol} gap-4 `
                         )}
                     >
                         {renderFields()}

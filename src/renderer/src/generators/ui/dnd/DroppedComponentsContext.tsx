@@ -70,7 +70,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     const { toggleSidebar, setOpen } = useSidebar();
 
     const [components, setComponents] = useState<StructuredLayout>(
-        newStructuredComponent('page', [newStructuredComponent('section')])
+        newStructuredComponent('container', [newStructuredComponent('section')])
     );
     const [currentComponent, setCurrentComponent] =
         useState<StructuredComponent | null>(null);
@@ -151,67 +151,70 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 console.error('Invalid source or destination');
                 return;
             }
-
-            // Check if source and destination are the same
-            if (source.droppableId !== destination.droppableId) {
-                console.error(
-                    'Source and destination droppableId must be the same for reorder'
-                );
-                return;
-            }
-
-            // Recursive function to find and reorder the target component
-            const updateComponentTree = (
+    
+            let movedComponent: StructuredComponent | null = null;
+    
+            // Recursive function to find and remove the source component
+            const removeComponentFromSource = (
                 component: StructuredComponent
             ): StructuredComponent => {
-
-                // If the current component matches the parent ID, reorder its children
                 if (component.id === source.droppableId) {
-                  
                     const updatedChildren = [...(component.children || [])];
-
-                    // Remove the source component from its current position
-                    const [movedComponent] = updatedChildren.splice(
-                        source.index,
-                        1
-                    );
-                  
-                    // Insert the source component into the new position
-                    updatedChildren.splice(
-                        destination.index,
-                        0,
-                        movedComponent
-                    );
-                 
+                    // Capture the moved component
+                    [movedComponent] = updatedChildren.splice(source.index, 1);
                     return {
                         ...component,
                         children: updatedChildren,
                     };
                 }
-
-                // If the current component has children, search recursively
+    
                 if (component.children) {
-                    const updatedChildren =
-                        component.children.map(updateComponentTree);
+                    const updatedChildren = component.children.map(removeComponentFromSource);
                     return {
                         ...component,
                         children: updatedChildren,
                     };
                 }
-
-                // If no match is found, return the component unchanged
+    
                 return component;
             };
-
+    
+            // Recursive function to insert the component into the destination
+            const insertComponentIntoDestination = (
+                component: StructuredComponent
+            ): StructuredComponent => {
+                if (component.id === destination.droppableId) {
+                    const updatedChildren = [...(component.children || [])];
+                    // Insert the moved component into the destination
+                    if (movedComponent) {
+                        updatedChildren.splice(destination.index, 0, movedComponent);
+                    }
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+    
+                if (component.children) {
+                    const updatedChildren = component.children.map(insertComponentIntoDestination);
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+    
+                return component;
+            };
+    
             // Update the components state
             setComponents((prev) => {
-                console.log('Previous state:', prev);
-                const updatedComponents = {
-                    ...prev,
-                    children: (prev.children || []).map(updateComponentTree),
-                };
-
-                console.log('Updated components:', updatedComponents);
+    
+                // First, remove the component from the source
+                const componentsAfterRemoval = removeComponentFromSource(prev);
+    
+                // Then, insert the component into the destination
+                const updatedComponents = insertComponentIntoDestination(componentsAfterRemoval);
+    
                 return updatedComponents;
             });
         },
@@ -232,7 +235,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
             ): StructuredComponent | null => {
                 // If the current component matches the target ID, return null to remove it
                 if (component.id === destination.droppableId) {
-                    console.log('Found and removed component:', component.id);
                     return null;
                 }
 

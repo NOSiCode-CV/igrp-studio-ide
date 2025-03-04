@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import FormEngine from '../FormEngine';
-import { File } from 'src/main/types';
+import { FileTree } from 'src/main/types';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
 import { Separator } from '@renderer/components/ui/separator';
@@ -25,7 +25,7 @@ interface FormEngineRef {
 export default function TabManager({ basePath }: ContentProps) {
     const { activeTab, tabs, newTab, setActiveTab } = useTabs();
 
-    const [currentPage, setCurrentPage] = useState<File | null>(null);
+    const [currentPage, setCurrentPage] = useState<FileTree | null>(null);
 
     // Track the isDesign state for each tab
     const [isDesignStates, setIsDesignStates] = useState<{
@@ -109,6 +109,7 @@ export default function TabManager({ basePath }: ContentProps) {
                                         basePath={basePath}
                                         page={tab.title}
                                         pagePath={currentPage?.path}
+                                        type={currentPage?.content.type}
                                         isDesign={
                                             isDesignStates[tab.id] ?? true
                                         }

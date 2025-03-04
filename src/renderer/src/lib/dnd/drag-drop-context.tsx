@@ -15,11 +15,7 @@ interface DragDropContextType {
     // Event handlers
     onDragEnd: () => void;
     onDragStart: (item: any) => void;
-    handleDrop: (
-        e: DragEvent<HTMLDivElement>,
-        targetId?: string,
-        isEmptyChildren?: boolean
-    ) => void;
+    handleDrop: (e: DragEvent<HTMLDivElement>, targetId?: string) => void;
     handleDragOver: (
         e: DragEvent<HTMLDivElement>,
         id?: string,
@@ -27,6 +23,10 @@ interface DragDropContextType {
         dropTargetId?: string
     ) => void;
     handleDragLeave: (e: DragEvent<HTMLDivElement>) => void;
+    handleDragStartComponent: (
+        _e: DragEvent<HTMLDivElement>,
+        id: string
+    ) => void;
 }
 
 // Create the Context
@@ -51,12 +51,15 @@ export const DragProvider = ({ children }) => {
         setDraggingItem(null);
     }, []);
 
-    // Handle drop - core functionality
-    const handleDrop = (
-        e: DragEvent<HTMLDivElement>,
-        targetId?: string,
-        isEmptyChildren?: boolean
+    const handleDragStartComponent = (
+        _e: DragEvent<HTMLDivElement>,
+        id: string
     ) => {
+        setDraggedId(id);
+    };
+
+    // Handle drop - core functionality
+    const handleDrop = (e: DragEvent<HTMLDivElement>, targetId?: string) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -64,6 +67,12 @@ export const DragProvider = ({ children }) => {
         const droppedItem = JSON.parse(e.dataTransfer.getData('text/plain'));
         const type = JSON.parse(e.dataTransfer.getData('type'));
         const mode = JSON.parse(e.dataTransfer.getData('mode'));
+
+        const dropTargetId =
+            mode === 'MOVE'
+                ? JSON.parse(e.dataTransfer.getData('dropTargetId'))
+                : '';
+
         const draggableIndex = JSON.parse(
             e.dataTransfer.getData('draggableIndex')
         );
@@ -72,13 +81,10 @@ export const DragProvider = ({ children }) => {
             activeDropZone?.position ||
             (layoutMode === 'vertical' ? 'bottom' : 'right');
 
-        const dropTargetId = isEmptyChildren
-            ? targetId
-            : activeDropZone?.dropTargetId || activeDropZone?.id || targetId;
-
         const targetIndex = activeDropZone?.cellIndex || 0;
+        
         const insertIndex =
-            (position === 'bottom' || position === 'right') && targetIndex > 1
+            position === 'bottom' || position === 'right'
                 ? targetIndex + 1
                 : targetIndex;
 
@@ -90,21 +96,16 @@ export const DragProvider = ({ children }) => {
         setDraggedId(null);
         setActiveDropZone(null);
 
-        // Emit the drop event with all necessary data
-        // Business logic for processing this data should be handled outside
         return {
             source: {
                 ...droppedItem,
-                droppableId:
-                    mode === 'MOVE'
-                        ? activeDropZone?.dropTargetId
-                        : droppedItem.id,
+                droppableId: dropTargetId,
                 index: draggableIndex,
             },
             draggableId: droppedItem.id,
             position,
             destination: {
-                droppableId: dropTargetId,
+                droppableId: targetId,
                 index: mode === 'MOVE' ? moveIndex : insertIndex,
             },
             type,
@@ -183,6 +184,7 @@ export const DragProvider = ({ children }) => {
         handleDrop,
         handleDragOver,
         handleDragLeave,
+        handleDragStartComponent,
     };
 
     return (
