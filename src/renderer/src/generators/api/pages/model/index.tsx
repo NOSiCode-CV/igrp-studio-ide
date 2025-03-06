@@ -243,8 +243,6 @@ const ModelLayout = ({
 
             if (error) return showErrorToast(error);
 
-            createGitCommit(basePath, `Add schema ${formik.values.name}`);
-
             dispatch(onSetChangeStatus(true));
 
             onCloseTab();
