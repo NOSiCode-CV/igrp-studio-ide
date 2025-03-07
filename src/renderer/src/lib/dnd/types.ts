@@ -47,8 +47,13 @@ export interface ComponentConfig {
 export interface StructuredComponent {
   id: string
   componentName: string
-  label: string
-  properties?: Record<string, any>
+  label?: string
+  type?: string
+  properties: {
+    className?: string;
+    content?: string;
+    [key: string]: any;
+  };
   children: StructuredComponent[]
 }
 
@@ -58,6 +63,9 @@ export interface Destination {
   droppableId: string, index: number
 }
 
+export interface Source {
+  droppableId: string, index: number, label: string
+}
 
 export interface DroppedComponentsContextType {
   addSection: () => StructuredComponent;

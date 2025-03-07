@@ -38,7 +38,7 @@ export function useProjectValidation({ t, step }) {
                                         })
                                     )
                                     .matches(
-                                        PATTERNS.NO_SPACE_AND_HYPHEN,
+                                        PATTERNS.NAME_APP_VALIDATION,
                                         t('msgInfoAccpet')
                                     )
                                     .max(

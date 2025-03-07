@@ -5,7 +5,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import { Containers, STRUCTURES } from '../../ComponentTypes';
+import { STRUCTURES } from '../../ComponentTypes';
 import StructureDropdown from '../../components/StructureDropdown';
 
 interface ToolsProps {
@@ -13,6 +13,8 @@ interface ToolsProps {
     handleClickDeleteComp: () => void;
     handleClickStructComp: (layout: string) => void;
     id: string;
+    type?: string;
+    label?: string;
 }
 
 const CompTools = ({
@@ -20,18 +22,15 @@ const CompTools = ({
     handleClickDeleteComp,
     handleClickStructComp,
     id,
+    label,
 }: ToolsProps) => {
-    const isGrids = [
-        STRUCTURES.Columns,
-        STRUCTURES.Grid,
-        Containers.Form,
-    ].includes(id);
+    const isGrids = [STRUCTURES.Columns].includes(id);
 
     return (
         <TooltipProvider>
             <div className="flex justify-end shadow-lg align-middle p-0 space-x-0">
                 <div className="flex align-middle items-center">
-                    <span className="text-xs">{id}</span>
+                    <span className="text-xs">{label}</span>
                 </div>
 
                 <Tooltip>

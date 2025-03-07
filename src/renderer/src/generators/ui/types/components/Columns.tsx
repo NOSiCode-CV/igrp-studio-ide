@@ -5,16 +5,18 @@ import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
+import { layoutMapping } from '../../utils/layout-mapping';
 
 export interface ColProps {
+    isDisabled?: boolean;
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
 }
 
 const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
-    const { children, properties } = comp;
+    const { children, properties, componentName } = comp;
 
-    const { gridCol } = properties || {};
+    const { variant, className } = properties || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -46,6 +48,18 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     const renderColumns = () => {
         return children.map((comp: StructuredComponent, index: number) => {
             const Component = loadedComponents[comp.id];
+            const { properties, componentName } = comp;
+
+            const { variant, className } = properties || {};
+
+            let baseClass = className;
+            if (
+                layoutMapping[componentName] &&
+                layoutMapping[componentName][variant] &&
+                variant !== 'custom'
+            ) {
+                baseClass = layoutMapping[componentName][variant];
+            }
 
             return Component ? (
                 <Draggable
@@ -53,10 +67,11 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     item={comp}
                     index={index}
                     dropZone={false}
+                    className={baseClass}
                 >
                     <BoxContainer
                         {...comp}
-                        key={comp.id}
+                        components={comp.children}
                         onEdit={() => handleEditClick(comp)}
                         group="group/comp"
                         className="opacity-0 group-hover/comp:opacity-100"
@@ -70,12 +85,17 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
         });
     };
 
+    let baseClass = className;
+    if (
+        layoutMapping[componentName] &&
+        layoutMapping[componentName][variant] &&
+        variant !== 'custom'
+    ) {
+        baseClass = layoutMapping[componentName][variant];
+    }
+
     return (
-        <>
-            <div className={cn(`grid grid-cols-${gridCol} gap-3 p-2`)}>
-                {renderColumns()}
-            </div>
-        </>
+        <div className={cn(`gap-3 p-4`, baseClass)}>{renderColumns()}</div>
     );
 };
 

@@ -19,7 +19,7 @@ const Droppable = ({
     children,
     className,
 }: DroppableProps) => {
-    const { id: componentId } = component;
+    const { id: componentId } = component || {};
 
     const {
         activeDropZone,
@@ -37,17 +37,16 @@ const Droppable = ({
 
     const handleDropItem = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        const droppedItem = handleDrop(
-            e,
-            component.id
-        );
+        const droppedItem = handleDrop(e, componentId);
         onDrop(droppedItem);
     };
 
     useEffect(() => {
-        handleLayoutChange;
-        setComponents(component.children);
-    }, [component.children]);
+        if (component) {
+            handleLayoutChange;
+            setComponents(component.children);
+        }
+    }, [component]);
 
     // console.log(draggingItem, activeDropZone?.dropTargetId,componentId)
 
@@ -56,11 +55,11 @@ const Droppable = ({
             onDragOver={(e) => handleDragOver(e, componentId)}
             onDrop={handleDropItem}
             onDragLeave={handleDragLeave}
-            id={component.id}
+            id={componentId}
             className={cn(
-                'min-h-12 p-5 border-2 border-dashed border-gray-400',
+                'min-h-12 p-5 border-2 border-dashed border-gray-400 rounded-lg',
                 draggingItem && activeDropZone?.dropTargetId === componentId
-                    ? 'bg-muted/75 border-igrp rounded-lg'
+                    ? 'bg-muted/75 border-igrp'
                     : 'bg-card',
                 className
             )}

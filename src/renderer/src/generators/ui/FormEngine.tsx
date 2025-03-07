@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 
-import { useConfigdata } from './data/useConfigData';
+import { useConfigdata } from './utils/useConfigData';
 import {
     ComponentConfig,
     PageConfig,
@@ -21,9 +21,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface FormEngineProps {
     basePath: string;
-    page: string;
-    type?: string;
-    pagePath: string | undefined;
+    page: any;
     isDesign: boolean;
     onSave: () => void;
 }
@@ -33,14 +31,16 @@ interface FormEngineRef {
 }
 
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
-    ({ basePath, pagePath, page, isDesign, type = 'page' }, ref) => {
+    ({ basePath, page, isDesign }, ref) => {
+        const { id, content, path: pagePath, label } = page;
+        const { type, path } = content;
+
         const {
             handleAddChildToComponent,
             handleReorderChildInComponent,
             getAllComponents,
             removeRow,
             setEditingComponent,
-            updateComponent,
             clearEditingComponent,
             currentComponent,
             setInitComponents,
@@ -54,7 +54,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
-            console.log('FormEngine save triggered');
             const jsonStructure = buildJsonStructure(components);
             handleSave(jsonStructure);
         };
@@ -73,16 +72,18 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 if (basePath === undefined) return;
 
                 const pageConfig: PageConfig = {
-                    type: 'page',
-                    pageName: page,
-                    path: page,
+                    id,
+                    type,
+                    path,
+                    pageName: label,
                     components: jsonStructure,
                 };
 
                 const compConfig: ComponentConfig = {
-                    type: 'component',
-                    name: page,
-                    path: page,
+                    id,
+                    type,
+                    path,
+                    name: label,
                     components: jsonStructure,
                 };
 
@@ -123,7 +124,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         const droppedComponentsMethods = {
             setEditingComponent,
             removeRow,
-            updateComponent,
             handleAddChildToComponent,
             handleReorderChildInComponent,
         };

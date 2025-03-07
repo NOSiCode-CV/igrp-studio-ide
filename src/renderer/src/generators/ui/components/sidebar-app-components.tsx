@@ -3,6 +3,7 @@ import { APP_COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/useStudio';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { GripHorizontal } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
     const { fetchComponents } = useStudio();
@@ -15,6 +16,14 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
             comp.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
+    // Render the icon component dynamically
+    const renderIcon = (iconName: string) => {
+        // @ts-ignore - Dynamic access to the icons
+        const IconComponent = LucideIcons[iconName];
+
+        return IconComponent ? <IconComponent className="h-6 w-6" /> : null;
+    };
+
     return (
         <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
             {filteredComponents.map((item, key) => (
@@ -25,6 +34,7 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
                     <Draggable
                         item={{
                             id: item.content.name,
+                            label: item.content.name,
                         }}
                         className="w-full h-full"
                         dropZone={false}
@@ -37,9 +47,7 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
                             <GripHorizontal className="w-4 h-4 text-gray-400" />
 
                             <div className="flex flex-col items-center gap-2">
-                                {item.content?.icon && (
-                                    <item.content.icon className="w-6 h-6 text-gray-600" />
-                                )}
+                                {renderIcon(item.content?.icon)}
                                 <span className=" text-gray-700 text-center">
                                     {item.content?.name}
                                 </span>

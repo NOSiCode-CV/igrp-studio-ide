@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import FormEngine from '../FormEngine';
-import { FileTree } from 'src/main/types';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
 import { Separator } from '@renderer/components/ui/separator';
@@ -13,6 +12,7 @@ import {
 } from '@renderer/components/navigation/TabContext';
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
 import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
+import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 
 interface ContentProps {
     basePath: string;
@@ -23,9 +23,13 @@ interface FormEngineRef {
 }
 
 export default function TabManager({ basePath }: ContentProps) {
-    const { activeTab, tabs, newTab, setActiveTab } = useTabs();
-
-    const [currentPage, setCurrentPage] = useState<FileTree | null>(null);
+    const {
+        activeTab,
+        tabs,
+        initializeTabFromCurrentItem,
+        setActiveTab,
+        newTab,
+    } = useTabs();
 
     // Track the isDesign state for each tab
     const [isDesignStates, setIsDesignStates] = useState<{
@@ -38,8 +42,11 @@ export default function TabManager({ basePath }: ContentProps) {
     }>({});
 
     const handleClickOpenGerador = (page: any) => {
-        newTab({ title: page.content.pageName });
-        setCurrentPage(page);
+        initializeTabFromCurrentItem({
+            ...page,
+            label: page.content.pageName || page.content.name,
+            id: page.content.id,
+        });
     };
 
     const handleSave = () => {
@@ -75,6 +82,7 @@ export default function TabManager({ basePath }: ContentProps) {
             </TabsNavigation>
 
             <Separator />
+
             {tabs.map((tab) => (
                 <div
                     key={tab.id}
@@ -85,11 +93,13 @@ export default function TabManager({ basePath }: ContentProps) {
                 >
                     {tab.id === TAB_DEFAULT ? (
                         <SidebarInset>
-                            <div className="flex flex-1 flex-col gap-4 p-4">
-                                <MainPageBuilder
-                                    onPageClick={handleClickOpenGerador}
-                                />
-                            </div>
+                            <ContainerScrollArea>
+                                <div className="flex flex-1 flex-col gap-4 p-4">
+                                    <MainPageBuilder
+                                        onPageClick={handleClickOpenGerador}
+                                    />
+                                </div>
+                            </ContainerScrollArea>
                         </SidebarInset>
                     ) : (
                         <DroppedComponentsProvider>
@@ -107,9 +117,7 @@ export default function TabManager({ basePath }: ContentProps) {
                                                 ref;
                                         }}
                                         basePath={basePath}
-                                        page={tab.title}
-                                        pagePath={currentPage?.path}
-                                        type={currentPage?.content.type}
+                                        page={tab.item}
                                         isDesign={
                                             isDesignStates[tab.id] ?? true
                                         }

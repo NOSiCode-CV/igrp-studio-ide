@@ -1,12 +1,12 @@
 import { generateId } from "@renderer/utils/helpers";
-import { Containers, STRUCTURES } from "../ComponentTypes";
-import { Destination, StructuredComponent } from "@renderer/lib/dnd/types";
+import { CONTAINERS, STRUCTURES } from "../ComponentTypes";
+import { Destination, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 
 export const handleDragEnd = (
     result: any,
-    { handleAddChildToComponent, getComponent, handleReorderChildInComponent }: any
+    { handleAddChildToComponent, handleReorderChildInComponent }: any
 ) => {
-    const { draggableId, source, destination, mode } = result;
+    const { draggableId, source, destination, mode, type } = result;
 
     if (!destination) {
         return;
@@ -15,15 +15,18 @@ export const handleDragEnd = (
     if (mode === 'MOVE') {
         handleReorderChildInComponent(draggableId, source, destination);
     } else {
-        handleDropComponent(draggableId, destination, { handleAddChildToComponent, getComponent });
+        handleDropComponent(draggableId, source, destination, type, { handleAddChildToComponent });
     }
 };
 
 const handleDropComponent = (
     draggableId: string,
+    source: Source,
     destination: Destination,
+    type: string,
     { handleAddChildToComponent }: any
 ) => {
+    const { label } = source
     // Generate a unique ID for the component
     const componentId = generateId(draggableId);
 
@@ -31,23 +34,25 @@ const handleDropComponent = (
     const component: StructuredComponent = {
         id: componentId,
         componentName: draggableId,
-        label: draggableId,
+        label,
+        type,
+        properties: {},
         children: [], // Initialize children array
     };
 
     // Handle Columns component
     if (draggableId === STRUCTURES.Columns) {
         // Add gridCol configuration for the parent Columns component
-        component.properties = { gridCol: 2 };
+        component.properties = { variant: 'cols12' };
 
         // Create two child columns and add them to the parent's children array
         for (let i = 0; i < 2; i++) {
             const childColumnId = generateId(`column_${i + 1}`);
             const childColumn: StructuredComponent = {
                 id: childColumnId,
-                componentName: `Column`,
+                componentName: STRUCTURES.Column,
                 label: `Column ${i + 1}`,
-                properties: {},
+                properties: { variant: 'span6' },
                 children: [],
             };
             component.children?.push(childColumn);
@@ -56,15 +61,11 @@ const handleDropComponent = (
 
     // Handle other components (Grid, Form, etc.)
     if (draggableId === STRUCTURES.Grid) {
-        component.properties = {
-            gridCol: 4,
-        };
+        component.properties = { variant: 'cols4' };
     }
 
-    if (draggableId === Containers.Form) {
-        component.properties = {
-            gridCol: 4,
-        };
+    if (draggableId === CONTAINERS.Form) {
+        component.properties = { variant: 'cols4' };
     }
 
     // Add the component to the row

@@ -8,7 +8,7 @@ import {
 } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
-import { LayoutDashboard, Plus } from 'lucide-react';
+import { Contact, LayoutDashboard, Plus } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
 import { PageCard } from './page-card';
 import {
@@ -17,7 +17,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
-import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { FileTree } from 'src/main/types';
 import {
     DropdownMenu,
@@ -40,7 +40,7 @@ const MainPageBuilder = ({
 
     const [content, setContent] = useState<any>([]);
     const [components, setComponents] = useState<any>([]);
-    const [page, setPage] = useState<any>([]);
+    const [page, setPage] = useState<any>();
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
     const [showNewComponentModal, setNewComponentModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -62,11 +62,15 @@ const MainPageBuilder = ({
 
     const { basePath, files, config } = useSelector(selectProperties);
 
-    const handleDeletePage = () => {
-        const pageConfig: PageConfig = {
-            type: 'page',
-            pageName: page.name,
-            path: page.path,
+    const handleDeletePage = (page: any) => {
+        setDeleteModal(true);
+        setPage(page);
+    };
+
+    const confirmDeletion = () => {
+        const pageConfig: DeleteConfig = {
+            type: page.content.type,
+            name: page.content.pageName || page.content.name,
         };
         dispatch(onDeletePage(pageConfig, basePath));
         setDeleteModal(false);
@@ -76,6 +80,7 @@ const MainPageBuilder = ({
 
     const handleNewPage = () => {
         setNewPageModal(false);
+        setNewComponentModal(false)
         isLoadingTable(true);
     };
 
@@ -150,7 +155,7 @@ const MainPageBuilder = ({
                             <PageCard
                                 key={page.name}
                                 page={page}
-                                onDelete={() => setDeleteModal(true)}
+                                onDelete={() => handleDeletePage(page)}
                                 onAddComponents={handleAddComponents}
                                 isPage
                             />
@@ -160,7 +165,7 @@ const MainPageBuilder = ({
                             <PageCard
                                 key={comp.name}
                                 page={comp}
-                                onDelete={() => setDeleteModal(true)}
+                                onDelete={() => handleDeletePage(comp)}
                                 onAddComponents={handleAddComponents}
                                 isPage={false}
                             />
@@ -185,7 +190,7 @@ const MainPageBuilder = ({
             <AlertDialogDelete
                 isOpen={deleteModal}
                 onClose={() => setDeleteModal(false)}
-                onConfirm={handleDeletePage}
+                onConfirm={confirmDeletion}
                 hasTrigger={false}
             />
         </div>

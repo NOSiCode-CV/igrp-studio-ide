@@ -15,11 +15,14 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { getId } from '@renderer/utils/helpers';
+import IconBrowser from '@renderer/components/icon/icon-browser';
 
 const initialValues: PageConfig = {
     type: 'page',
     pageName: '',
     path: 'teste',
+    id: getId()
 };
 
 interface NewPageModalProps {

@@ -3,16 +3,31 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { PageHeader } from '@igrp/igrp-framework-react-design-system';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import Droppable from '@renderer/lib/dnd/Droppable';
+import { cn } from '@renderer/lib/utils';
+import { layoutMapping } from '../../utils/layout-mapping';
+import { STRUCTURES } from '../../ComponentTypes';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import BoxField from '../tools/BoxFields';
 
 export interface FormComponentProps {
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
+    isDisabled?: boolean;
 }
 
 const PageHeaderLayout: React.FC<FormComponentProps> = ({
-    comp
+    comp,
+    onDragEnd,
 }) => {
-    const { id: componentId, children: fields, componentName } = comp;
+    const {
+        id: componentId,
+        children: fields,
+        componentName,
+        label,
+        properties,
+    } = comp;
+    const { className, variant } = properties;
 
     const [buttonComponents, setButtonComponents] = useState<
         StructuredComponent[]
@@ -34,7 +49,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
     }, [comp]);
 
     const handleEditClick = (component: StructuredComponent) => {
-        setEditingComponent({ ...component});
+        setEditingComponent({ ...component });
     };
 
     useEffect(() => {
@@ -52,54 +67,55 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
         loadComponents();
     }, [buttonComponents, dynamicImport]);
 
-    /*  const renderButtons = () =>
-        buttonComponents.map((button: DroppedComponent, index: number) => {
+    const renderButtons = () =>
+        buttonComponents.map((button: StructuredComponent, index: number) => {
             const Component = loadedComponents[button.id];
-            return Component ? (
+            return (
                 <Draggable
                     key={button.id}
-                    draggableId={`${button.id}`}
+                    item={button}
                     index={index}
+                    dropTargetId={componentId}
+                    layout="horizontal"
+                    className="p-0 border-none"
                 >
-                    {(provided, _snapshot) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{ ...provided.draggableProps.style }}
+                    {Component && (
+                        <BoxField
+                            id={button.id}
+                            onEdit={() => handleEditClick(button)}
+                            index={index}
                         >
-                            <Component
-                                comp={button}
-                                componentId={button.id}
-                                onEdit={() => handleEditClick(button)}
-                            />
-                        </div>
+                            <Component comp={button} onDragEnd={onDragEnd} />
+                        </BoxField>
                     )}
                 </Draggable>
-            ) : (
-                <div key={comp.id}>Loading...</div>
             );
-        }); */
+        });
+
+    let baseClass = className;
+    if (
+        layoutMapping['flex'] &&
+        layoutMapping['flex'][variant] &&
+        variant !== 'custom'
+    ) {
+        baseClass = layoutMapping['flex'][variant];
+    }
 
     return (
-        <div className="rounded-lg shadow-xs border border-gray-200 p-4 bg-white">
-            <PageHeader title={componentName} description={componentId}>
-                {/* <Droppable component={comp} layout="horizontal">
-                    <div>
-                     <div className="flex flex-1 space-x-2">
-                                    {buttonComponents.length > 0 ? (
-                                        renderButtons()
-                                    ) : (
-                                        <GenNoInfoField />
-                                    )}
-                                </div>
-                                {provided.placeholder}
-                    </div>
-                </Droppable> */}
+        <Droppable
+            component={comp}
+            onDrop={onDragEnd}
+            layout="horizontal"
+            className="border-none"
+        >
+            <PageHeader
+                title={label || componentName}
+                description={componentId}
+            >
+                <div className={cn(baseClass)}>{renderButtons()}</div>
             </PageHeader>
-        </div>
+        </Droppable>
     );
 };
 
 export default PageHeaderLayout;
-

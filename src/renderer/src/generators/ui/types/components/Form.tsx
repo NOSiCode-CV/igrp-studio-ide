@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BasicElements } from '@renderer/generators/ui/ComponentTypes';
 import {
     Card,
     CardContent,
@@ -15,15 +14,22 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
+import { layoutMapping } from '../../utils/layout-mapping';
+import { BASIC_ELEMENTS, STRUCTURES } from '../../ComponentTypes';
 
 export interface FormComponentProps {
+    isDisabled?: boolean;
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
-    const { id: componentId, componentName, properties, children } = comp;
-    const { title, gridCol } = properties || {};
+const Form: React.FC<FormComponentProps> = ({
+    comp,
+    isDisabled,
+    onDragEnd,
+}) => {
+    const { id: componentId, properties, label, children } = comp;
+    const { title, className, variant } = properties || {};
 
     const [formFields, setFormFields] = useState<StructuredComponent[]>([]);
 
@@ -44,10 +50,10 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     useEffect(() => {
         if (children) {
             const buttons = children.filter(
-                (field: any) => field.componentName === BasicElements.Button
+                (field: any) => field.componentName === BASIC_ELEMENTS.Button
             );
             const otherFields = children.filter(
-                (field: any) => field.componentName !== BasicElements.Button
+                (field: any) => field.componentName !== BASIC_ELEMENTS.Button
             );
 
             setFormFields(otherFields);
@@ -110,7 +116,8 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                 );
             });
 
-        const emptySlots = gridCol - formFields.length;
+        const emptySlots =
+            variant && variant.replace('cols', 0) - children.length;
         const emptySlotComponents = Array.from(
             { length: emptySlots },
             (_, index) => (
@@ -123,7 +130,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
         return (
             <>
                 {fields}
-                {emptySlotComponents}
+                {!isDisabled && emptySlotComponents}
             </>
         );
     };
@@ -144,7 +151,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                         dropTargetId={componentId}
                         mode="MOVE"
                         layout="horizontal"
-                        className="p-0"
+                        className="p-0 border-none"
                     >
                         {Component && (
                             <BoxField
@@ -165,35 +172,39 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
         );
     };
 
+    let baseClass = className;
+    if (
+        layoutMapping[STRUCTURES.Grid] &&
+        layoutMapping[STRUCTURES.Grid][variant] &&
+        variant !== 'custom'
+    ) {
+        baseClass = layoutMapping[STRUCTURES.Grid][variant];
+    }
+
     return (
         <Card className="rounded-sm">
             <CardHeader>
-                <CardTitle>{title || componentName}</CardTitle>
+                <CardTitle>{title || label}</CardTitle>
             </CardHeader>
             <CardContent>
                 <Droppable
                     component={comp}
                     onDrop={onDragEnd}
                     layout="horizontal"
-                    className='border-none hover:border-dashed'
+                    className="border-none hover:border-dashed p-1"
                 >
-                    <div
-                        className={cn(
-                            `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${gridCol} gap-4 `
-                        )}
-                    >
-                        {renderFields()}
-                    </div>
+                    <div className={cn(baseClass)}>{renderFields()}</div>
                 </Droppable>
             </CardContent>
             {buttonComponents.length > 0 && (
-                <CardFooter className="w-full">
+                <CardFooter className="w-full justify-end">
                     <Droppable
                         component={comp}
                         onDrop={onDragEnd}
                         layout="horizontal"
+                        className="border-none hover:border-dashed p-1"
                     >
-                        <div className={`flex flex-1 space-x-2 justify-end}`}>
+                        <div className={`flex flex-1 space-x-2 justify-end w-full`}>
                             {renderButtons()}
                         </div>
                     </Droppable>

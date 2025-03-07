@@ -7,6 +7,7 @@ import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
+import { layoutMapping } from '../../utils/layout-mapping';
 
 export interface GridProps {
     comp: StructuredComponent;
@@ -14,9 +15,9 @@ export interface GridProps {
 }
 
 const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
-    const { children, properties, id: componentId } = comp;
+    const { children, properties, id: componentId, componentName } = comp;
 
-    const { gridCol } = properties || {};
+    const { variant, className } = properties || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -59,10 +60,12 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                         index={index}
                         dropTargetId={componentId}
                         mode="MOVE"
+                        className='p-1'
                     >
                         <BoxContainer
                             {...comp}
                             key={comp.id}
+                            components={comp.children}
                             group="group/column-comp"
                             onEdit={() => handleEditClick(comp)}
                             className="opacity-0 group-hover/column-comp:opacity-100"
@@ -75,7 +78,8 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                 );
             });
 
-        const emptySlots = gridCol - children.length;
+        const emptySlots =
+            variant && variant.replace('cols', 0) - children.length;
         const emptySlotComponents = Array.from(
             { length: emptySlots },
             (_, index) => (
@@ -93,23 +97,24 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
         );
     };
 
+    let baseClass = className;
+    if (
+        layoutMapping[componentName] &&
+        layoutMapping[componentName][variant] &&
+        variant !== 'custom'
+    ) {
+        baseClass = layoutMapping[componentName][variant];
+    }
+
     return (
-        <div
-            className={cn(
-                `rounded-lg p-2`
-            )}
-            id={componentId}
+        <Droppable
+            component={comp}
+            onDrop={onDragEnd}
+            layout="horizontal"
+            className="border-none"
         >
-            <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
-                <div
-                    className={cn(
-                        `grid gap-4 grid-cols-${gridCol}`
-                    )}
-                >
-                    {renderColumns()}
-                </div>
-            </Droppable>
-        </div>
+            <div className={cn(baseClass)}>{renderColumns()}</div>
+        </Droppable>
     );
 };
 

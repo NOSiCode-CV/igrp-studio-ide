@@ -42,136 +42,148 @@ import {
     Bell as BellIcon,
     FormInput as Form,
 } from 'lucide-react';
-export const COLUMN = 'column'
+
+// Constants
+export const COLUMN = 'column';
 export const COMPONENT = 'component';
 export const FIELD = 'field';
-export const APP_COMPONENT = 'appcomponent';
+export const APP_COMPONENT = 'appComponent';
 export const STRUCTURE = 'structure';
 
+// Component Categories
 export const COMPONENTS = {
-    Structures: "Structure",
-    Containers: "Containers",
-    FormElements: "FormElements",
-    BasicElements: 'BasicElements',
-    DataDisplay: "DataDisplay",
-    LayoutWidget: "Layout",
-    Widgets: "Widgets",
-    Advanced: "Advanced"
-}
+    Structures: "structure",
+    Containers: "containers",
+    FormElements: "formElements",
+    BasicElements: "basicElements",
+    DataDisplay: "dataDisplay",
+    LayoutWidget: "layout",
+    Widgets: "widgets",
+    Advanced: "advanced"
+};
 
+// Structures
 export const STRUCTURES = {
-    Columns: "Columns",
-    Grid: "Grid"
-}
+    Columns: "columns",
+    Column: "column",
+    Grid: "grid",
+    Section: "section",
+    Container: 'container'
+};
 
-export const Containers = {
-    Form: 'Form',
-    PageHeader: 'PageHeader'
-}
+// Containers
+export const CONTAINERS = {
+    Form: 'form',
+    PageHeader: 'pageHeader'
+};
 
-export const BasicElements = {
-    Link: 'Link',
-    Button: "Button",
-    Text: "Text",
-    Image: "Image",
-    RichTextEditor: "RichTextEditor"
-}
+// Basic Elements
+export const BASIC_ELEMENTS = {
+    Link: 'link',
+    Button: "button",
+    Text: "text",
+    Image: "image",
+    RichTextEditor: "richTextEditor"
+};
 
-export const DataDisplay = {
-    Table: "Table",
-    Charts: "Charts",
-    Maps: "Maps",
-    Carousel: "Carousel",
-    Fingerprint: "Fingerprint"
-}
+// Data Display
+export const DATA_DISPLAY = {
+    Table: "table",
+    Charts: "charts",
+    Maps: "maps",
+    Carousel: "carousel",
+    Fingerprint: "fingerprint"
+};
 
-export const FIELDS = {
-    InputField: 'InputField',
-    DatePicker: 'DatePicker',
-    TimePicker: 'TimePicker',
-    Password: "Password",
-    Textarea: 'Textarea',
-    ColorPicker: "ColorPicker",
-    Select: "Select",
-    Checkbox: "Checkbox",
-    Radio: "Radio",
-    Switch: "Switch",
-    RangeSlider: "RangeSlider",
-    FileUpload: "FileUpload"
-}
+// Fields
+export const FORM_ELEMENTS = {
+    InputField: 'inputField',
+    DatePicker: 'datePicker',
+    TimePicker: 'timePicker',
+    Password: "password",
+    Textarea: 'textarea',
+    ColorPicker: "colorPicker",
+    Select: "select",
+    Checkbox: "checkbox",
+    Radio: "radio",
+    Switch: "switch",
+    RangeSlider: "rangeSlider",
+    FileUpload: "fileUpload"
+};
 
-
-export const LayoutWidget = {
-    Box: 'Box',
-    Panel: 'Panel',
-    Card: 'Card',
-    Tabs: 'Tabs',
-    List: 'List',
+// Layout Widgets
+export const LAYOUT_WIDGET = {
+    Box: 'box',
+    Panel: 'panel',
+    Card: 'card',
+    Tabs: 'tabs',
+    List: 'list',
     iFrame: 'iFrame',
-    InfoPanel: 'InfoPanel'
+    InfoPanel: 'infoPanel'
 };
 
-export const Widgets = {
-    Calendar: 'Calendar',
-    Alerts: 'Alerts',
-    Badges: 'Badges',
-    Ratings: 'Ratings',
-    Dropdowns: 'Dropdowns',
-    EmbedVideo: 'EmbedVideo',
-    Progress: 'Progress'
+// Widgets
+export const WIDGETS = {
+    Calendar: 'calendar',
+    Alerts: 'alerts',
+    Badges: 'badges',
+    Ratings: 'ratings',
+    Dropdowns: 'dropdowns',
+    EmbedVideo: 'embedVideo',
+    Progress: 'progress'
 };
 
-
-export const Advanced = {
-    Accordion: 'Accordion',
-    TreeView: 'TreeView',
-    Chat: 'Chat',
-    Modal: 'Modal',
-    Notifications: 'Notifications'
+// Advanced Components
+export const ADVANCED = {
+    Accordion: 'accordion',
+    TreeView: 'treeView',
+    Chat: 'chat',
+    Modal: 'modal',
+    Notifications: 'notifications'
 };
 
-
+// Icon Mapping
 export const ICON_MAP: Record<string, React.ElementType> = {
-    InputField: FormInput,
-    DatePicker: Calendar,
-    TimePicker: Clock,
-    Password: Eye,
-    ColorPicker: Palette,
-    Textarea: FileText,
-    Select: List,
-    Checkbox: CheckSquare,
-    Radio: Radio,
-    Switch: ToggleLeft,
-    RangeSlider: Sliders,
-    FileUpload: Upload,
-    Link: Link2,
-    Button: ButtonIcon,
-    Text: Type,
-    Image: Image,
-    RichTextEditor: Edit3,
-    Table: Table,
-    Charts: BarChart2,
-    Maps: Map,
-    Carousel: Play,
-    Fingerprint: Fingerprint,
-    Box: Columns,
-    Panel: Layout,
-    Card: CreditCard,
-    Tabs: Tabs,
-    List: ListIcon,
+    inputField: FormInput,
+    datePicker: Calendar,
+    timePicker: Clock,
+    password: Eye,
+    colorPicker: Palette,
+    textarea: FileText,
+    select: List,
+    checkbox: CheckSquare,
+    radio: Radio,
+    switch: ToggleLeft,
+    rangeSlider: Sliders,
+    fileUpload: Upload,
+    link: Link2,
+    button: ButtonIcon,
+    text: Type, // Updated to lowercase
+    image: Image,
+    richTextEditor: Edit3,
+    table: Table,
+    charts: BarChart2,
+    maps: Map,
+    carousel: Play,
+    fingerprint: Fingerprint,
+    box: Columns,
+    panel: Layout,
+    card: CreditCard,
+    tabs: Tabs,
+    list: ListIcon,
     iFrame: Frame,
-    InfoPanel: Info,
-    Calendar: CalendarIcon,
-    Alerts: Bell,
-    Badges: Badge,
-    Ratings: Star,
-    Dropdowns: ChevronDown,
-    EmbedVideo: Video,
-    Progress: Activity,
-    Accordion: AlignLeft,
-    TreeView: GitMerge,
-    Chat: MessageSquare,
-    Modal: MessageCircle,
-    Notifications: BellIcon,
-    Form: Form,
+    infoPanel: Info,
+    calendar: CalendarIcon,
+    alerts: Bell,
+    badges: Badge,
+    ratings: Star,
+    dropdowns: ChevronDown,
+    embedVideo: Video,
+    progress: Activity,
+    accordion: AlignLeft,
+    treeView: GitMerge,
+    chat: MessageSquare,
+    modal: MessageCircle,
+    notifications: BellIcon,
+    form: Form,
 };

@@ -12,42 +12,87 @@ interface NavigationBarProps {
     isDesign: boolean;
     onSwitch?: () => void;
     onSave?: () => void;
-    basePath: string
-    page: string
+    basePath: string;
+    page: string;
+}
+
+interface StudioDropdownProps {
+    onStart: () => void;
+    onPreview: () => void;
+    onStop: () => void;
+    onOpenLogs: () => void;
+    logs: string[];
 }
 
 const NavigationBar = ({
-    isDesign,
     onSwitch,
     onSave,
-    basePath,
-    page
+    isDesign
 }: NavigationBarProps) => {
     const { t } = useTranslation();
+
+    /* const { tabs, activeTab } = useTabs();
+    const [logs, setLogs] = useState<string[]>([]);
+    const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+
+    // Função para receber logs do processo principal
+    useEffect(() => {
+        const handleLog = (_event: any, message: string) => {
+            setLogs((prevLogs) => [...prevLogs, message]);
+        };
+
+        window.electron.ipcRenderer.on('log', handleLog);
+
+        return () => {
+            window.electron.ipcRenderer.removeListener('log', handleLog);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (logs.length > 0) {
+            setIsLogModalOpen(true);
+        }
+    }, [logs]); */
 
     const handleSaveClick = () => {
         onSave?.();
     };
 
-    const handleStart = () => {
+  /*   const handleStart = () => {
         window.electron.ipcRenderer.send('start-nextjs', basePath);
     };
 
     const handlePreview = () => {
-        window.electron.ipcRenderer.send('open-preview', page);
+        const tab = tabs.filter((t) => t.id === activeTab);
+
+        window.electron.ipcRenderer.send(
+            'open-preview',
+            tab[0].title.toLowerCase()
+        );
     };
 
     const handleStop = () => {
         window.electron.ipcRenderer.send('stop-nextjs');
     };
 
+    const handleOpenLogs = () => {
+        setIsLogModalOpen(true); 
+    }; */
+
     return (
         <div className="flex justify-end items-center space-x-2 ">
-            <StudioDropdown
+            {/*<StudioDropdown
                 onStart={handleStart}
                 onPreview={handlePreview}
                 onStop={handleStop}
+                onOpenLogs={handleOpenLogs}
+                logs={logs}
             />
+             <LogModal
+                logs={logs}
+                isOpen={isLogModalOpen}
+                onOpenChange={setIsLogModalOpen}
+            /> */}
             <Button
                 color={isDesign ? 'primary' : 'light'}
                 size="sm"
@@ -70,7 +115,13 @@ const NavigationBar = ({
     );
 };
 
-const StudioDropdown = ({ onStart, onPreview, onStop }) => {
+const StudioDropdown = ({
+    onStart,
+    onPreview,
+    onStop,
+    onOpenLogs,
+    logs,
+}: StudioDropdownProps) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -85,6 +136,11 @@ const StudioDropdown = ({ onStart, onPreview, onStop }) => {
                 <DropdownMenuItem onClick={onPreview}>
                     Abrir Preview
                 </DropdownMenuItem>
+                {logs && logs.length > 0 && (
+                    <DropdownMenuItem onClick={onOpenLogs}>
+                        Ver Logs
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={onStop}>
                     Parar Next.js
                 </DropdownMenuItem>

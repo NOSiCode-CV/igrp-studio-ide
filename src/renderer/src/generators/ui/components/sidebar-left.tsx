@@ -23,6 +23,7 @@ import {
     GripHorizontal,
     Home,
     ListTodo,
+    Terminal,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -38,6 +39,7 @@ import {
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
 import Draggable from '@renderer/lib/dnd/Draggable';
+import LogTerminal from './LogTerminal';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -88,6 +90,11 @@ export function AppSidebar({
             icon: GitBranch,
             label: t('git'),
             id: 'git',
+        },
+        {
+            icon: Terminal,
+            label: t('terminal'),
+            id: 'terminal',
         },
     ];
 
@@ -172,11 +179,13 @@ export function AppSidebar({
                             {t(activeMenuGroup)}
                         </div>
                     </div>
-                    <SidebarInput
-                        placeholder="Type to search..."
-                        value={searchQuery}
-                        onChange={handleInputChange}
-                    />
+                    {activeMenuGroup !== 'terminal' && (
+                        <SidebarInput
+                            placeholder="Type to search..."
+                            value={searchQuery}
+                            onChange={handleInputChange}
+                        />
+                    )}
                 </SidebarHeader>
                 <SidebarContent>
                     <ScrollArea>
@@ -195,6 +204,8 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
+                        ) : activeMenuGroup === 'terminal' ? (
+                            <LogTerminal basePath={basePath} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible
@@ -244,7 +255,9 @@ export function AppSidebar({
                                                                         <GripHorizontal className="w-4 h-4 text-gray-400" />
 
                                                                         <div className="flex flex-col items-center gap-2">
-                                                                            <subItem.icon className="w-6 h-6 text-gray-600" />
+                                                                            {subItem.icon && (
+                                                                                <subItem.icon className="w-6 h-6 text-gray-600" />
+                                                                            )}
                                                                             <span className=" text-gray-700 text-center">
                                                                                 {
                                                                                     subItem.label

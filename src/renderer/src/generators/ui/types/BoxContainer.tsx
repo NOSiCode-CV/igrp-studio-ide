@@ -9,7 +9,9 @@ import { STRUCTURES } from '../ComponentTypes';
 interface BoxContainerProps {
     children: React.ReactElement;
     id: string;
+    label?:string,
     componentName: string;
+    type?: string,
     group?: string;
     className?: string;
     components: StructuredComponent[];
@@ -18,6 +20,8 @@ interface BoxContainerProps {
 
 const BoxContainer = ({
     id,
+    type,
+    label,
     children,
     componentName,
     group,
@@ -53,7 +57,7 @@ const BoxContainer = ({
                     const props = {
                         ...currentCol,
                         properties: {
-                            gridCol: colSize.toString(),
+                            variant: `span${colSize.toString()}`,
                         },
                     };
 
@@ -70,7 +74,9 @@ const BoxContainer = ({
                         id: childColumnId,
                         componentName: `Column`,
                         label: `Column ${index + 1}`,
-                        properties: {},
+                        properties: {
+                            variant: `span${colSize.toString()}`,
+                        },
                         children: [],
                     };
                     handleAddChildToComponent(
@@ -91,10 +97,6 @@ const BoxContainer = ({
                 }
             }
         }
-
-        handleUpdateChildComponent(id, {
-            properties: { gridCol: newLayout.length },
-        });
     };
 
     return (
@@ -107,6 +109,8 @@ const BoxContainer = ({
             >
                 <CompTools
                     id={componentName}
+                    label={label}
+                    type={type}
                     handleClickDeleteComp={onClickDeleteComp}
                     handleClickBtnEdition={onClickBtnEdition}
                     handleClickStructComp={onClickStructure}

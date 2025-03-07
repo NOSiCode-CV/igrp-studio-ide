@@ -1,14 +1,14 @@
 // engines/DotNetEngine.ts
-import { deletePage, getOneComponent, initComponents, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
+import { deleteElement, getOneComponent, initComponents, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
 import { ProjectRepository } from '../repo/projects';
-import { AppConfig, ComponentConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { AppConfig, ComponentConfig, DeleteConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
 
 export class NextjsEngine implements BaseEngine {
 
-  async delete(config: any, basePath: string): Promise<void> {
-    await deletePage(config, basePath)
+  async delete(config: DeleteConfig, basePath: string): Promise<void> {
+    await deleteElement(config, basePath)
   }
 
   async createPage(pageConfig: any, basePath: string): Promise<void> {

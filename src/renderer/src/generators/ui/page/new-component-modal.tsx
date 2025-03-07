@@ -15,11 +15,15 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { ComponentConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { getId } from '@renderer/utils/helpers';
+import IconBrowser from '@renderer/components/icon/icon-browser';
 
 const initialValues: ComponentConfig = {
     type: 'component',
     name: '',
-    path: 'teste'
+    path: 'teste',
+    icon: '',
+    id: getId(),
 };
 
 interface NewComponentModalProps {
@@ -65,7 +69,7 @@ export function NewComponentModal({
 
             formik.resetForm();
         } catch (error) {
-            console.log(error)
+            console.log(error);
             showErrorToast(error);
         }
     };
@@ -101,7 +105,7 @@ export function NewComponentModal({
                     }}
                 >
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
+                        <div className="grid grid-cols-1 items-center gap-3">
                             <Label htmlFor="componentName">
                                 {t('componentName')}
                             </Label>
@@ -111,6 +115,14 @@ export function NewComponentModal({
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 value={formik.values.name || ''}
+                            />
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <IconBrowser
+                                title="Icon Display [IGRP Studio]?"
+                                onIconSelect={(icon) => {
+                                    formik.setFieldValue('icon', icon);
+                                }}
                             />
                         </div>
                     </div>

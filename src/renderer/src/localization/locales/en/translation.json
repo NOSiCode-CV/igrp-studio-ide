@@ -334,6 +334,7 @@
   "msgNoSpacesAllowed": "Names with spaces are not accepted",
   "createNewPage": "Create New Page",
   "createNewComponent": "Create New Component",
-  "pageName":"Page Name",
-  "componentName":"Component Name"
+  "pageName": "Page Name",
+  "componentName": "Component Name",
+  "terminal": "Terminal"
 }

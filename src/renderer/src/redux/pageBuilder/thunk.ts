@@ -10,7 +10,7 @@ import {
 import useToast from '@renderer/components/useToast';
 import { ProjectData, FileTree } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
-import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 /**
  * set BasePath
  * @param {*} param0
@@ -85,7 +85,7 @@ export const getFileThree = (basePath: string) => async (dispatch: any) => {
 *  delete  page file
 * @param {*} param0
 */
-export const deletePage = (pageConfig: PageConfig, basePath: string) => async () => {
+export const deletePage = (pageConfig: DeleteConfig, basePath: string) => async () => {
   const { showErrorToast, showSuccessToast } = useToast();
   try {
     const { error } = await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath)

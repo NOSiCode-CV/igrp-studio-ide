@@ -12,6 +12,7 @@ import {
     StructuredLayout,
 } from '@renderer/lib/dnd/types';
 import { generateId } from '@renderer/utils/helpers';
+import { STRUCTURES } from '../ComponentTypes';
 
 interface DroppedComponentsContextType {
     newStructure: (name: string) => StructuredComponent;
@@ -70,7 +71,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     const { toggleSidebar, setOpen } = useSidebar();
 
     const [components, setComponents] = useState<StructuredLayout>(
-        newStructuredComponent('container', [newStructuredComponent('section')])
+        newStructuredComponent(STRUCTURES.Container, [newStructuredComponent(STRUCTURES.Section)])
     );
     const [currentComponent, setCurrentComponent] =
         useState<StructuredComponent | null>(null);

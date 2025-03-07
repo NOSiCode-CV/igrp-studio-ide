@@ -1,8 +1,9 @@
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
-import { Section } from './Section';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import PageTools from '../tools/PageTools';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import useStudio from '@renderer/hooks/useStudio';
+import { STRUCTURES } from '../../ComponentTypes';
 
 interface PageProps {
     page: StructuredLayout;
@@ -14,8 +15,29 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
 
     const { children: components } = page;
 
+    const [loadedComponents, setLoadedComponents] = useState<{
+        [key: string]: React.ComponentType<any>;
+    }>({});
+
+    const { dynamicImport } = useStudio();
+
+    useEffect(() => {
+        const loadComponents = async () => {
+            const comps: { [key: string]: React.ComponentType<any> } = {};
+
+            for (const comp of components) {
+                const component = await dynamicImport(comp.componentName);
+                comps[comp.id] = component;
+            }
+
+            setLoadedComponents(comps);
+        };
+
+        if (components) loadComponents();
+    }, [components, dynamicImport]);
+
     const handleAddControl = (type: string, componentId: string) => {
-        const newRow = newStructure('section');
+        const newRow = newStructure(STRUCTURES.Section);
         const rowIndex = components.findIndex(
             (section) => section.id === componentId
         );
@@ -36,7 +58,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
 
     useEffect(() => {
         if (components.length === 0) {
-            const newRow = newStructure('section');
+            const newRow = newStructure(STRUCTURES.Section);
             setInitComponents({
                 ...page,
                 children: [newRow],
@@ -45,17 +67,23 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
     }, [components]);
 
     return (
-        <div className="m-1 px-4  group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
+        <div className="m-1 px-4 group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
             <PageTools onEdit={() => console.log()} />
             <div className="py-6 gap-3 grid">
-                {components.map((row) => (
-                    <Section
-                        key={row.id}
-                        component={row}
-                        onDragEnd={onDragEnd}
-                        onAddControl={handleAddControl}
-                    />
-                ))}
+                {components.map((row) => {
+                    const Component = loadedComponents[row.id];
+                    return Component ? (
+                        <Component
+                            key={row.id}
+                            isDisabled={false}
+                            comp={row}
+                            onDragEnd={onDragEnd}
+                            onAddControl={handleAddControl}
+                        />
+                    ) : (
+                        <div key={row.id}>Loading...</div>
+                    );
+                })}
             </div>
         </div>
     );

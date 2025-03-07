@@ -6,16 +6,18 @@ import { FileTree } from 'src/main/types';
 interface RootState {
     PageBuilder: {
         filesThree: FileTree[];
+        basePath: string
     };
 }
 
 const selectState = (state: RootState) => state.PageBuilder;
 const selectProperties = createSelector(selectState, (studio) => ({
     files: studio.filesThree ?? [],
+    basePath: studio.basePath,
 }));
 
 const useStudio = () => {
-    const { files } = useSelector(selectProperties);
+    const { files, basePath } = useSelector(selectProperties);
 
     const fetchComponents = useCallback(() => {
         const componentsFolder = files.find((page) => page.name === 'components');
@@ -41,7 +43,37 @@ const useStudio = () => {
         }
     }, []);
 
-    return { fetchComponents, dynamicImport, getConfigComponent };
+    const getComponentData = useCallback(async (componentName: string) => {
+        try {
+            const data = await window.api.getJsonContent(
+                `${basePath}/.igrpstudio/components/${componentName}.json`
+            );
+            return data
+        } catch (error) {
+            console.error('Failed to load JSON content:', error);
+        }
+    }, []);
+
+    const getPageData = useCallback(async (componentName: string) => {
+        try {
+            const components = files.find((page) => page.name === 'components');
+
+            if (!components || !components.children) {
+                return null;
+            }
+
+            const filteredPages = components.children.filter((page) =>
+                page.content.name.includes(componentName)
+            );
+
+            return filteredPages[0] || null;
+        } catch (error) {
+            console.error('Failed to load JSON content:', error);
+            return null;
+        }
+    }, []);
+
+    return { basePath, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
 };
 
 export default useStudio;
