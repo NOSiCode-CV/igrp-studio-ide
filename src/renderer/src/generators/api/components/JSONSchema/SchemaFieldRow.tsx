@@ -196,7 +196,7 @@ export function SchemaFieldRow({
             >
                 <TableCell
                     style={{ paddingLeft: `${depth * 28 + 8}px` }}
-                    className="flex  flex-1 py-1!"
+                    className="flex flex-1 py-1!"
                 >
                     {(type === 'object' || type === 'array') && (
                         <Button
@@ -221,7 +221,7 @@ export function SchemaFieldRow({
                         placeholder={
                             index !== undefined && type === 'array'
                                 ? `Item ${index + 1}`
-                                : 'Enter field name'
+                                : 'fieldName'
                         }
                     />
                 </TableCell>

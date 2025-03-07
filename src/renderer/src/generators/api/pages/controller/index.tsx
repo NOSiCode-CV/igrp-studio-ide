@@ -337,6 +337,14 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         )?.MYME_TYPES || []
     );
 
+    const collectionType = formatMethods(
+        (
+            selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
+                | { COLLECTION_TYPES: string[] }
+                | undefined
+        )?.COLLECTION_TYPES || []
+    );
+
     useEffect(() => {
         const enumTypes = enums.map((enumItem) => {
             return { label: enumItem.name, value: enumItem.name };
@@ -363,7 +371,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
         setSchemaTypes((prevSchemaTypes) =>
             prevSchemaTypes.map((schemaType) =>
-                schemaType.value === 'Reference other schemas'
+                schemaType.value === 'Reference other Object'
                     ? { ...schemaType, value: 'dto', items: targetDto }
                     : schemaType
             )
@@ -498,6 +506,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                             contentTypes={typesData}
                             responseTypes={responses}
                             enumTypes={enumTypes}
+                            collectionTypes={collectionType}
                         />
                     </TabsContent>
                 </Tabs>
