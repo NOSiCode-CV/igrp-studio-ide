@@ -1,3 +1,5 @@
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { Button } from '@renderer/components/ui/button';
 import {
     DropdownMenu,
@@ -5,7 +7,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { Code, Eye, TvMinimal } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { OPTION_TYPE } from '@renderer/constants/appConstants';
+import { AppWindowMac, Code, Eye, TvMinimal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface NavigationBarProps {
@@ -27,12 +35,13 @@ interface StudioDropdownProps {
 const NavigationBar = ({
     onSwitch,
     onSave,
-    isDesign
+    basePath,
+    isDesign,
 }: NavigationBarProps) => {
     const { t } = useTranslation();
 
-    /* const { tabs, activeTab } = useTabs();
-    const [logs, setLogs] = useState<string[]>([]);
+    const { tabs, activeTab, initializeTabFromCurrentItem } = useTabs();
+    /* const [logs, setLogs] = useState<string[]>([]);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
     // Função para receber logs do processo principal
@@ -54,11 +63,7 @@ const NavigationBar = ({
         }
     }, [logs]); */
 
-    const handleSaveClick = () => {
-        onSave?.();
-    };
-
-  /*   const handleStart = () => {
+    /*   const handleStart = () => {
         window.electron.ipcRenderer.send('start-nextjs', basePath);
     };
 
@@ -79,9 +84,27 @@ const NavigationBar = ({
         setIsLogModalOpen(true); 
     }; */
 
+    const handleSaveClick = () => {
+        onSave?.();
+    };
+
+    const onClickSourceCode = () => {
+        const tab = tabs.filter((t) => t.id === activeTab);
+
+        console.log(tab);
+
+        const page = tab[0];
+        initializeTabFromCurrentItem({
+            path: `${basePath}/src/app/pages/${page.item.label.toLowerCase()}/page.tsx`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${page.item.label}.tsx`,
+        });
+    };
+
     return (
-        <div className="flex justify-end items-center space-x-2 ">
-            {/*<StudioDropdown
+        <TooltipProvider>
+            <div className="flex justify-end items-center space-x-2 ">
+                {/*<StudioDropdown
                 onStart={handleStart}
                 onPreview={handlePreview}
                 onStop={handleStop}
@@ -93,25 +116,50 @@ const NavigationBar = ({
                 isOpen={isLogModalOpen}
                 onOpenChange={setIsLogModalOpen}
             /> */}
-            <Button
-                color={isDesign ? 'primary' : 'light'}
-                size="sm"
-                onClick={onSwitch}
-                className="hover:bg-igrp"
-                title={isDesign ? 'Show Code' : 'Show Design'}
-                variant={'ghost'}
-            >
-                {isDesign ? <Eye /> : <Code />}
-            </Button>
-            <Button
-                size="sm"
-                className="bg-igrp"
-                onClick={handleSaveClick}
-                title="Add Components to Page"
-            >
-                {t('save')}
-            </Button>
-        </div>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            size="sm"
+                            variant={'secondary'}
+                            onClick={onClickSourceCode}
+                        >
+                            <AppWindowMac />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('sourceCode')}</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            color={isDesign ? 'primary' : 'light'}
+                            size="sm"
+                            onClick={onSwitch}
+                            className="hover:bg-igrp"
+                            variant={'ghost'}
+                        >
+                            {isDesign ? <Eye /> : <Code />}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {isDesign ? 'Show Code [JSON]' : 'Show Design'}
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            size="sm"
+                            className="bg-igrp"
+                            onClick={handleSaveClick}
+                        >
+                            {t('save')}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {t('Add Components to Page')}
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </TooltipProvider>
     );
 };
 

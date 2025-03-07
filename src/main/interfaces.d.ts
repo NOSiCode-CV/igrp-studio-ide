@@ -24,4 +24,6 @@ export interface BaseEngine {
 
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>;
 
+    registryComponent?(basePath: string): Promise<void>;
+    getComponents?(): Record<string, Component>;
 }

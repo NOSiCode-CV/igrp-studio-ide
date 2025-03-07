@@ -87,3 +87,20 @@ handleWithCustomErrors(
     }
 );
 
+handleWithCustomErrors(
+    EVENTS.NEXT.REGISTRY_COMPONENT,
+    async (_event, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.registryComponent?.(basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.NEXT.GET_COMPONENT,
+    async (_event, engineType: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        const data  = engine.getComponents?.();
+
+       return data;
+    }
+);

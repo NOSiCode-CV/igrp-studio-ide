@@ -5,7 +5,7 @@ export const EVENTS = {
         CREATE_ENUM: 'engine:create-enum',
         CREATE_PERMISSION: 'engine:create-permission',
         DELETE_ELEMENT: 'engine:delete-element',
-        SERIALIZE_ELEMENT: 'engine:serialize-element'
+        SERIALIZE_ELEMENT: 'engine:serialize-element',
     },
     SPRING: {
         CREATE_MODULE: 'spring-engine:create-module',
@@ -17,5 +17,7 @@ export const EVENTS = {
     NEXT: {
         CREATE_PAGE: 'next-engine:create-page',
         DELETE_PAGE: 'next-engine:delete-page',
+        REGISTRY_COMPONENT: 'engine:registry-component',
+        GET_COMPONENT: 'engine:get-component'
     }
 };

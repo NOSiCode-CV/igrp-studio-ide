@@ -40,6 +40,7 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import LogTerminal from './LogTerminal';
+import useStudio from '@renderer/hooks/useStudio';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -51,6 +52,7 @@ export function AppSidebar({
     basePath,
     ...props
 }: AppSidebarProps) {
+    const { getRegistryComponent } = useStudio();
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
     const [activeMenuGroup, setActiveMenuGroup] =
@@ -60,6 +62,10 @@ export function AppSidebar({
     const [filteredData, setFilteredData] = useState(initialData);
 
     const [searchQuery, setSearchQuery] = useState('');
+
+    useEffect(() => {
+        getRegistryComponent();
+    }, []);
 
     useEffect(() => {
         if (searchQuery.trim() === '') {

@@ -23,6 +23,7 @@ import { updateApp } from './helpers/update'
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 import NextJsManager from './helpers/nextjsManager'
+import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -128,6 +129,8 @@ app.whenReady().then(async () => {
     }
 
     buildTaskbar()
+
+    initComponents()
 
   }
 

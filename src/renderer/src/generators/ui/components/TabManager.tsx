@@ -13,6 +13,8 @@ import {
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
 import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
+import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout';
+import { OPTION_TYPE } from '@renderer/constants/appConstants';
 
 interface ContentProps {
     basePath: string;
@@ -110,20 +112,24 @@ export default function TabManager({ basePath }: ContentProps) {
                                     } as React.CSSProperties
                                 }
                             >
-                                <DragProvider>
-                                    <FormEngine
-                                        ref={(ref) => {
-                                            formEngineRefs.current[tab.id] =
-                                                ref;
-                                        }}
-                                        basePath={basePath}
-                                        page={tab.item}
-                                        isDesign={
-                                            isDesignStates[tab.id] ?? true
-                                        }
-                                        onSave={handleSave}
-                                    />
-                                </DragProvider>
+                                {tab.open === OPTION_TYPE.FILE_THREE ? (
+                                    <EditorLayout currentItem={tab.item} />
+                                ) : (
+                                    <DragProvider>
+                                        <FormEngine
+                                            ref={(ref) => {
+                                                formEngineRefs.current[tab.id] =
+                                                    ref;
+                                            }}
+                                            basePath={basePath}
+                                            page={tab.item}
+                                            isDesign={
+                                                isDesignStates[tab.id] ?? true
+                                            }
+                                            onSave={handleSave}
+                                        />
+                                    </DragProvider>
+                                )}
                             </SidebarProvider>
                         </DroppedComponentsProvider>
                     )}

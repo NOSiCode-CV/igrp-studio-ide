@@ -1,3 +1,4 @@
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -73,7 +74,12 @@ const useStudio = () => {
         }
     }, []);
 
-    return { basePath, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
+    const getRegistryComponent = useCallback(async () => {
+        const result = await window.engine.getComponent(ENV_TYPES.NEXTJS)
+        console.log(result)
+    }, [])
+
+    return { basePath, getRegistryComponent, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
 };
 
 export default useStudio;

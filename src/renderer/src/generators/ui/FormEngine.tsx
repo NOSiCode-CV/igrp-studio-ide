@@ -7,6 +7,7 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
 
+
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
@@ -132,6 +133,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             console.log('dropZone', result);
             handleDragEnd(result, droppedComponentsMethods);
         }, []);
+
+    
 
         return (
             <>

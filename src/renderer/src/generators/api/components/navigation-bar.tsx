@@ -95,7 +95,7 @@ const NavigationBar = ({
                                         variant="outline"
                                         onClick={() => setDeleteModal(true)}
                                         size={'sm'}
-                                        className="outline outline-1 outline-red-500 text-red-500"
+                                        className="outline-1 outline-red-500 text-red-500"
                                     >
                                         <Trash />
                                         <span className="sr-only">
