@@ -26,7 +26,7 @@ const handleDropComponent = (
     type: string,
     { handleAddChildToComponent }: any
 ) => {
-    const { label } = source
+    const { label, properties } = source
     // Generate a unique ID for the component
     const componentId = generateId(draggableId);
 
@@ -36,14 +36,12 @@ const handleDropComponent = (
         componentName: draggableId,
         label,
         type,
-        properties: {},
+        properties: setDefaultProperties(properties),
         children: [], // Initialize children array
     };
 
     // Handle Columns component
     if (draggableId === STRUCTURES.Columns) {
-        // Add gridCol configuration for the parent Columns component
-        component.properties = { variant: 'cols12' };
 
         // Create two child columns and add them to the parent's children array
         for (let i = 0; i < 2; i++) {
@@ -59,16 +57,19 @@ const handleDropComponent = (
         }
     }
 
-    // Handle other components (Grid, Form, etc.)
-    if (draggableId === STRUCTURES.Grid) {
-        component.properties = { variant: 'cols4' };
-    }
-
-    if (draggableId === CONTAINERS.Form) {
-        component.properties = { variant: 'cols4' };
-    }
-
     // Add the component to the row
     handleAddChildToComponent(destination, component);
 
+};
+
+
+// Utility function to set default values based on the schema
+const setDefaultProperties = (schema: any) => {
+    const properties: any = {};
+    for (const key in schema) {
+        if (schema[key].default !== undefined) {
+            properties[key] = schema[key].default;
+        }
+    }
+    return properties;
 };

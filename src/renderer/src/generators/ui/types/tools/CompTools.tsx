@@ -28,7 +28,7 @@ const CompTools = ({
 
     return (
         <TooltipProvider>
-            <div className="flex justify-end shadow-lg align-middle p-0 space-x-0">
+            <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
                 <div className="flex align-middle items-center">
                     <span className="text-xs">{label}</span>
                 </div>

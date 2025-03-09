@@ -103,7 +103,7 @@ const NavigationBar = ({
 
     return (
         <TooltipProvider>
-            <div className="flex justify-end items-center space-x-2 ">
+            <div className="flex flex-1 justify-end items-center space-x-2">
                 {/*<StudioDropdown
                 onStart={handleStart}
                 onPreview={handlePreview}
@@ -131,11 +131,10 @@ const NavigationBar = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
-                            color={isDesign ? 'primary' : 'light'}
                             size="sm"
                             onClick={onSwitch}
                             className="hover:bg-igrp"
-                            variant={'ghost'}
+                            variant={'secondary'}
                         >
                             {isDesign ? <Eye /> : <Code />}
                         </Button>
@@ -148,7 +147,7 @@ const NavigationBar = ({
                     <TooltipTrigger asChild>
                         <Button
                             size="sm"
-                            className="bg-igrp"
+                            className="hover:text-igrp"
                             onClick={handleSaveClick}
                         >
                             {t('save')}

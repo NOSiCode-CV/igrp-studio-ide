@@ -64,7 +64,12 @@ export interface Destination {
 }
 
 export interface Source {
-  droppableId: string, index: number, label: string
+  droppableId: string, index: number, label: string,
+  properties: {
+    className?: string;
+    content?: string;
+    [key: string]: any;
+  };
 }
 
 export interface DroppedComponentsContextType {

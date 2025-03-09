@@ -41,6 +41,13 @@ import {
     MessageCircle,
     Bell as BellIcon,
     FormInput as Form,
+    Square,
+    Grid,
+    Columns2,
+    Table2,
+    RectangleHorizontal,
+    SlidersHorizontal,
+    ChartPie,
 } from 'lucide-react';
 
 // Constants
@@ -51,15 +58,15 @@ export const APP_COMPONENT = 'appComponent';
 export const STRUCTURE = 'structure';
 
 // Component Categories
-export const COMPONENTS = {
-    Structures: "structure",
-    Containers: "containers",
-    FormElements: "formElements",
-    BasicElements: "basicElements",
-    DataDisplay: "dataDisplay",
-    LayoutWidget: "layout",
-    Widgets: "widgets",
-    Advanced: "advanced"
+export const GROUP_COMPONET: Record<string, string> = {
+    structure: "Structure",
+    containers: "Containers",
+    formElements: "Form Elements",
+    basicElements: "Basic Elements",
+    dataDisplay: "Data Display",
+    layout: "Layout",
+    widget: "Widgets",
+    advanced: "Advanced"
 };
 
 // Structures
@@ -144,7 +151,7 @@ export const ADVANCED = {
 
 // Icon Mapping
 export const ICON_MAP: Record<string, React.ElementType> = {
-    inputField: FormInput,
+    input: FormInput,
     datePicker: Calendar,
     timePicker: Clock,
     password: Eye,
@@ -186,4 +193,12 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     modal: MessageCircle,
     notifications: BellIcon,
     form: Form,
+    container: Square,
+    grid: Grid,
+    columns: Columns2,
+    column: Columns2,
+    stack: Table2,
+    section: RectangleHorizontal,
+    slider: SlidersHorizontal,
+    chart: ChartPie
 };

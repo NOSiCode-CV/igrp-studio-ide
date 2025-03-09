@@ -5,8 +5,6 @@ import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { cn } from '@renderer/lib/utils';
-import { layoutMapping } from '../../utils/layout-mapping';
-import { STRUCTURES } from '../../ComponentTypes';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 
@@ -27,7 +25,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
         label,
         properties,
     } = comp;
-    const { className, variant } = properties;
+    const { title, description } = properties;
 
     const [buttonComponents, setButtonComponents] = useState<
         StructuredComponent[]
@@ -92,15 +90,6 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
             );
         });
 
-    let baseClass = className;
-    if (
-        layoutMapping['flex'] &&
-        layoutMapping['flex'][variant] &&
-        variant !== 'custom'
-    ) {
-        baseClass = layoutMapping['flex'][variant];
-    }
-
     return (
         <Droppable
             component={comp}
@@ -109,10 +98,12 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
             className="border-none"
         >
             <PageHeader
-                title={label || componentName}
-                description={componentId}
+                title={title || label || componentName}
+                description={description}
             >
-                <div className={cn(baseClass)}>{renderButtons()}</div>
+                <div className={cn('flex flex-1 justify-end gap-3')}>
+                    {renderButtons()}
+                </div>
             </PageHeader>
         </Droppable>
     );

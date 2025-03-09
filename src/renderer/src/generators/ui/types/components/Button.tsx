@@ -9,9 +9,9 @@ export interface UiButtonProps {
 }
 
 const UiButton = ({ comp, index }: UiButtonProps) => {
-    const { properties, id: componentId, label, componentName } = comp;
+    const { properties, id: componentId,  componentName } = comp;
 
-    const { variant, size, customClasses } = properties;
+    const { variant, size, customClasses, label } = properties;
 
     return (
         <div className="relative group">

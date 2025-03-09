@@ -2,57 +2,60 @@ import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
+import { Switch } from '@renderer/components/ui/switch';
 
-const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
+function getLabel(name: string) {
+    return name
+        .split('-')
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     return (
         <div className="space-y-3">
-            {Object.keys(propsConfig).map((key) => {
-                const config = propsConfig[key];
-
+            {Object.keys(propsComp).map((key) => {
+                const { enum: enumValues, type: typeValue } = propsComp[key];
+                const label = getLabel(key);
+                const type = enumValues ? 'enum' : typeValue;
                 return (
-                    <div className="space-y-2" key={key}>
-                        <Label htmlFor={key}>{config.label}</Label>
+                    <div className="flex flex-col gap-2 space-x-2" key={key}>
+                        <Label htmlFor={key}>{label}</Label>
                         {(() => {
-                            switch (config.type) {
+                            switch (type) {
                                 case 'boolean':
                                     return (
-                                        <Checkbox
+                                        <Switch
                                             name={key}
-                                            checked={
-                                                formValues[key] ??
-                                                config.defaultValue
-                                            }
+                                            checked={formValues[key]}
                                             onChange={(checked) =>
                                                 handleInputChange(key, checked)
                                             }
-                                            className="ml-3"
                                         />
                                     );
-                                case 'select':
+                                case 'enum':
                                     return (
                                         <Combobox
                                             name={key}
-                                            value={
-                                                formValues[key] ??
-                                                config.defaultValue
-                                            }
+                                            value={formValues[key]}
                                             onChange={(value) =>
                                                 handleInputChange(key, value)
                                             }
-                                            options={config.options}
+                                            options={enumValues.map(
+                                                (value: string) => ({
+                                                    value,
+                                                    label: getLabel(value),
+                                                })
+                                            )}
                                             className="w-full"
                                         />
                                     );
-                                case 'text':
-                                default:
+                                case 'string':
                                     return (
                                         <Input
                                             type="text"
                                             name={key}
-                                            value={
-                                                formValues[key] ??
-                                                config.defaultValue
-                                            }
+                                            value={formValues[key]}
                                             onChange={(e) =>
                                                 handleInputChange(
                                                     key,
@@ -62,6 +65,8 @@ const RenderPropsConfig = ({ propsConfig, formValues, handleInputChange }) => {
                                             className=""
                                         />
                                     );
+                                default:
+                                    return null;
                             }
                         })()}
                     </div>

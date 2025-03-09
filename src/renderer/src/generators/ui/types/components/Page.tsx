@@ -1,4 +1,8 @@
-import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
+import {
+    DragEndResult,
+    StructuredComponent,
+    StructuredLayout,
+} from '@renderer/lib/dnd/types';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import PageTools from '../tools/PageTools';
 import { useEffect, useState } from 'react';
@@ -11,7 +15,8 @@ interface PageProps {
 }
 
 export const Page = ({ onDragEnd, page }: PageProps) => {
-    const { setInitComponents, newStructure } = useDroppedComponents();
+    const { setInitComponents, newStructure, setEditingComponent } =
+        useDroppedComponents();
 
     const { children: components } = page;
 
@@ -66,15 +71,19 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         }
     }, [components]);
 
+    const handleEditClick = () => {
+        setEditingComponent({ ...page });
+    };
+
     return (
         <div className="m-1 px-4 group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
-            <PageTools onEdit={() => console.log()} />
+            <PageTools onEdit={handleEditClick} />
             <div className="py-6 gap-3 grid">
                 {components.map((row) => {
                     const Component = loadedComponents[row.id];
                     return Component ? (
                         <Component
-                            key={row.id}
+                            key={row.id} 
                             isDisabled={false}
                             comp={row}
                             onDragEnd={onDragEnd}

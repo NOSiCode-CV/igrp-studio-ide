@@ -4,7 +4,6 @@ import { X } from 'lucide-react';
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarHeader,
 } from '@renderer/components/ui/sidebar';
 import { Button } from '@renderer/components/ui/button';
@@ -24,9 +23,6 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { TextPropertiesPanel } from './EditComponent/text-properties';
-import { CustomStyle } from './EditComponent/custom-style';
-import { ButtonAppearancePanel } from './EditComponent/button-appearance';
-import IconLibrary from '@renderer/components/icon-library';
 import useStudio from '@renderer/hooks/useStudio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 
@@ -34,13 +30,17 @@ export function SidebarRight({
     ...props
 }: React.ComponentProps<typeof Sidebar>) {
     const { t } = useTranslation();
+    const [formValues, setFormValues] = React.useState({});
 
-    const { getConfigComponent } = useStudio();
+    const {getPropertiesComponent } = useStudio();
 
     const [propsComponent, setPropsComponents] = React.useState({});
 
-    const { currentComponent, updateComponent, clearEditingComponent } =
-        useDroppedComponents();
+    const {
+        currentComponent,
+        handleUpdateChildComponent,
+        clearEditingComponent,
+    } = useDroppedComponents();
 
     if (!currentComponent) {
         return null;
@@ -49,28 +49,20 @@ export function SidebarRight({
     const { componentName, id: componentId, properties } = currentComponent;
 
     React.useEffect(() => {
-        const loadComponents = async () => {
-            const props = await getConfigComponent(componentName);
-            setPropsComponents(props);
-        };
-
-        loadComponents();
-    }, [componentName, getConfigComponent]);
-
-    const initialFormValues =
-        propsComponent &&
-        Object.keys(props).reduce((acc, key) => {
-            acc[key] = props[key].defaultValue ?? properties?.[key] ?? '';
-            return acc;
-        }, {});
-
-    const [formValues, setFormValues] = React.useState(initialFormValues);
+        getPropertiesComponent(componentName).then((data) =>
+            setPropsComponents(data)
+        );
+    }, [getPropertiesComponent]);
 
     const handleInputChange = (name: string, value: string) => {
         setFormValues((prevValues) => ({
             ...prevValues,
             [name]: value,
         }));
+    };
+
+    const handleClose = () => {
+        clearEditingComponent();
     };
 
     const handleChange = (changes: any) => {
@@ -82,30 +74,27 @@ export function SidebarRight({
         });
     };
 
-    const handleClose = () => {
-        clearEditingComponent();
-    };
+    React.useEffect(() => {
+        if (propsComponent) {
+            const initialFormValues = Object.keys(propsComponent).reduce((acc, key) => {
+                acc[key] = properties?.[key] ?? propsComponent[key].defaultValue ?? '';
+                return acc;
+            }, {});
+
+            console.log('Initial Form Values:', initialFormValues);
+            setFormValues(initialFormValues); 
+        }
+    }, [propsComponent, properties]);
 
     React.useEffect(() => {
         const updatedConfig = { ...properties, ...formValues };
 
-        const updatedComponent: StructuredComponent = {
+        const updatedComponent: Partial<StructuredComponent> = {
             ...currentComponent,
             properties: updatedConfig,
         };
 
-        if (componentId) {
-            /*  const formComponent: StructuredComponent =
-                getComponent(componentId) ?? {};
-
-            updateComponent(componentId, {
-                ...formComponent,
-                fields: formComponent.fields.map((field) =>
-                    field.id === componentId ? { ...field, ...updatedComponent } : field
-                ),
-            }); */
-        } else if (componentId !== undefined)
-            updateComponent(componentId, updatedComponent);
+        handleUpdateChildComponent(componentId, updatedComponent);
     }, [formValues]);
 
     return (
@@ -143,31 +132,20 @@ export function SidebarRight({
                             className="w-full"
                             defaultValue="item-1"
                         >
-                            <AccordionItem value="item-1" className="px-3">
+                            <AccordionItem value="item-1" className="px-4">
                                 <AccordionTrigger>
                                     {t('properties')}
                                 </AccordionTrigger>
                                 <AccordionContent>
                                     {propsComponent && (
                                         <RenderPropsConfig
-                                            propsConfig={propsComponent}
+                                            propsComp={propsComponent}
                                             formValues={formValues}
                                             handleInputChange={
                                                 handleInputChange
                                             }
                                         />
                                     )}
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="item-3" className="px-3">
-                                <AccordionTrigger>
-                                    {t('buttonAppearance')}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <ButtonAppearancePanel
-                                        onChange={handleChange}
-                                    />
-                                    <IconLibrary />
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
@@ -187,19 +165,10 @@ export function SidebarRight({
                                     <TextPropertiesPanel />
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-2" className="px-3">
-                                <AccordionTrigger>
-                                    {t('customClasses')}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <CustomStyle />
-                                </AccordionContent>
-                            </AccordionItem>
                         </Accordion>
                     </TabsContent>
                 </Tabs>
             </SidebarContent>
-            <SidebarFooter></SidebarFooter>
         </Sidebar>
     );
 }

@@ -18,7 +18,6 @@ const PageTools = ({ onEdit }: ToolsProps) => {
                     <TooltipTrigger asChild>
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
-                            title="Edit"
                             onClick={onEdit}
                         >
                             <Settings className="h-4" />

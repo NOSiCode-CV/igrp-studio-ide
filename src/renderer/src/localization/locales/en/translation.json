@@ -336,5 +336,6 @@
   "createNewComponent": "Create New Component",
   "pageName": "Page Name",
   "componentName": "Component Name",
-  "terminal": "Terminal"
+  "terminal": "Terminal",
+  "debug": "Debug"
 }

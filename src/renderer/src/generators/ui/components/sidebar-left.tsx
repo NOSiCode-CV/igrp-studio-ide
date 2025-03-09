@@ -42,6 +42,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import LogTerminal from './LogTerminal';
 import useStudio from '@renderer/hooks/useStudio';
 
+
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
     basePath: string;
@@ -75,6 +76,10 @@ export function AppSidebar({
         }
     }, [searchQuery, originalData]);
 
+    useEffect(() => {
+        setFilteredData(initialData);
+    }, [initialData]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
     };
@@ -99,8 +104,8 @@ export function AppSidebar({
         },
         {
             icon: Terminal,
-            label: t('terminal'),
-            id: 'terminal',
+            label: t('debug'),
+            id: 'debug',
         },
     ];
 
@@ -210,7 +215,7 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
-                        ) : activeMenuGroup === 'terminal' ? (
+                        ) : activeMenuGroup === 'debug' ? (
                             <LogTerminal basePath={basePath} />
                         ) : (
                             filteredData.map((item, index) => (
@@ -256,15 +261,15 @@ export function AppSidebar({
                                                                 >
                                                                     <div
                                                                         className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2
-                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card"
+                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card h-full"
                                                                     >
                                                                         <GripHorizontal className="w-4 h-4 text-gray-400" />
 
                                                                         <div className="flex flex-col items-center gap-2">
                                                                             {subItem.icon && (
-                                                                                <subItem.icon className="w-6 h-6 text-gray-600" />
+                                                                                <subItem.icon className="w-6 h-6" />
                                                                             )}
-                                                                            <span className=" text-gray-700 text-center">
+                                                                            <span className="text-center">
                                                                                 {
                                                                                     subItem.label
                                                                                 }

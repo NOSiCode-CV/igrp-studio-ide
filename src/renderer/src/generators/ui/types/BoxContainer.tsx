@@ -72,8 +72,8 @@ const BoxContainer = ({
                     const childColumnId = generateId(`column_${index + 1}`);
                     const childColumn: StructuredComponent = {
                         id: childColumnId,
-                        componentName: `Column`,
-                        label: `Column ${index + 1}`,
+                        componentName: `column`,
+                        label: `Column ${index + 1}`,  
                         properties: {
                             variant: `span${colSize.toString()}`,
                         },
@@ -106,7 +106,7 @@ const BoxContainer = ({
                     `absolute -top-6 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
                     className
                 )}
-            >
+            >        
                 <CompTools
                     id={componentName}
                     label={label}

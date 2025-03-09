@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
+    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -28,8 +29,8 @@ const Form: React.FC<FormComponentProps> = ({
     isDisabled,
     onDragEnd,
 }) => {
-    const { id: componentId, properties, label, children } = comp;
-    const { title, className, variant } = properties || {};
+    const { id: componentId, properties, children } = comp;
+    const { className, variant } = properties || {};
 
     const [formFields, setFormFields] = useState<StructuredComponent[]>([]);
 
@@ -182,9 +183,13 @@ const Form: React.FC<FormComponentProps> = ({
     }
 
     return (
-        <Card className="rounded-sm">
+        <Card className="rounded-sm border shadow-sm">
             <CardHeader>
-                <CardTitle>{title || label}</CardTitle>
+                <CardTitle>{"Upgrade your subscription"}</CardTitle>
+                <CardDescription>
+                    You are currently on the free plan. Upgrade to the pro plan
+                    to get access to all features.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <Droppable
@@ -193,7 +198,7 @@ const Form: React.FC<FormComponentProps> = ({
                     layout="horizontal"
                     className="border-none hover:border-dashed p-1"
                 >
-                    <div className={cn(baseClass)}>{renderFields()}</div>
+                    <div className={cn("flex flex-col gap-6", baseClass)}>{renderFields()}</div>
                 </Droppable>
             </CardContent>
             {buttonComponents.length > 0 && (
@@ -204,7 +209,9 @@ const Form: React.FC<FormComponentProps> = ({
                         layout="horizontal"
                         className="border-none hover:border-dashed p-1"
                     >
-                        <div className={`flex flex-1 space-x-2 justify-end w-full`}>
+                        <div
+                            className={`flex flex-1 space-x-2 justify-end w-full`}
+                        >
                             {renderButtons()}
                         </div>
                     </Droppable>

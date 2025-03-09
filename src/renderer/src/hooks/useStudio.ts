@@ -75,11 +75,18 @@ const useStudio = () => {
     }, []);
 
     const getRegistryComponent = useCallback(async () => {
-        const result = await window.engine.getComponent(ENV_TYPES.NEXTJS)
-        console.log(result)
+        const { result, error } = await window.engine.getComponent(ENV_TYPES.NEXTJS)
+        return result.components
     }, [])
 
-    return { basePath, getRegistryComponent, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
+    const getPropertiesComponent = useCallback(async (componentName: string) => {
+        const { result, error } = await window.engine.getComponent(ENV_TYPES.NEXTJS)
+        const component = result.components.filter((comp) => comp.name === componentName)
+        console.log(component)
+        return component && component[0].properties;
+    }, [])
+
+    return { basePath, getPropertiesComponent, getRegistryComponent, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
 };
 
 export default useStudio;

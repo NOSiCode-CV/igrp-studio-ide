@@ -24,7 +24,10 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import {
+    Combobox,
+    IGRPInputSelect,
+} from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
 import { TabRequest } from './tab-resquest';
 
@@ -437,6 +440,17 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </CardHeader>
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                            <div className="flex flex-col gap-3">
+                                <IGRPInputSelect
+                                    labelText={t('methodType')}
+                                    helperText={t('methodType')}
+                                    options={httpMethods}
+                                    onChange={(e) =>
+                                        console.log(e.target.value)
+                                    }
+                                    className='h-8'
+                                />
+                            </div>
                             <div className="flex flex-col gap-3">
                                 <LabelRequired>{t('methodType')}</LabelRequired>
                                 <Combobox
