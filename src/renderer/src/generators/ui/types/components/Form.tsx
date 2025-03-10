@@ -15,7 +15,7 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { layoutMapping } from '../../utils/layout-mapping';
+import { formVariants, layoutMapping } from '../../utils/layout-mapping';
 import { BASIC_ELEMENTS, STRUCTURES } from '../../ComponentTypes';
 
 export interface FormComponentProps {
@@ -185,7 +185,7 @@ const Form: React.FC<FormComponentProps> = ({
     return (
         <Card className="rounded-sm border shadow-sm">
             <CardHeader>
-                <CardTitle>{"Upgrade your subscription"}</CardTitle>
+                <CardTitle>{'Upgrade your subscription'}</CardTitle>
                 <CardDescription>
                     You are currently on the free plan. Upgrade to the pro plan
                     to get access to all features.
@@ -198,7 +198,9 @@ const Form: React.FC<FormComponentProps> = ({
                     layout="horizontal"
                     className="border-none hover:border-dashed p-1"
                 >
-                    <div className={cn("flex flex-col gap-6", baseClass)}>{renderFields()}</div>
+                    <div className={cn(formVariants({ variant, className }))}>
+                        {renderFields()}
+                    </div>
                 </Droppable>
             </CardContent>
             {buttonComponents.length > 0 && (

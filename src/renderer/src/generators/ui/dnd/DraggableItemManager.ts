@@ -1,5 +1,5 @@
 import { generateId } from "@renderer/utils/helpers";
-import { CONTAINERS, STRUCTURES } from "../ComponentTypes";
+import { STRUCTURES } from "../ComponentTypes";
 import { Destination, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 
 export const handleDragEnd = (

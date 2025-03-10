@@ -7,28 +7,22 @@ import { generateId } from '@renderer/utils/helpers';
 import { STRUCTURES } from '../ComponentTypes';
 
 interface BoxContainerProps {
-    children: React.ReactElement;
-    id: string;
-    label?:string,
-    componentName: string;
-    type?: string,
     group?: string;
     className?: string;
-    components: StructuredComponent[];
+    comp: StructuredComponent;
     onEdit: () => void;
+    children: React.ReactElement;
 }
 
 const BoxContainer = ({
-    id,
-    type,
-    label,
+    comp,
     children,
-    componentName,
     group,
     className,
-    components,
     onEdit,
 }: BoxContainerProps) => {
+    const { id, componentName, children: components } = comp;
+
     const {
         handleRemoveChildFromComponent,
         handleAddChildToComponent,
@@ -73,7 +67,7 @@ const BoxContainer = ({
                     const childColumn: StructuredComponent = {
                         id: childColumnId,
                         componentName: `column`,
-                        label: `Column ${index + 1}`,  
+                        label: `Column ${index + 1}`,
                         properties: {
                             variant: `span${colSize.toString()}`,
                         },
@@ -106,11 +100,9 @@ const BoxContainer = ({
                     `absolute -top-6 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
                     className
                 )}
-            >        
+            >
                 <CompTools
-                    id={componentName}
-                    label={label}
-                    type={type}
+                    comp={comp}
                     handleClickDeleteComp={onClickDeleteComp}
                     handleClickBtnEdition={onClickBtnEdition}
                     handleClickStructComp={onClickStructure}

@@ -7,7 +7,7 @@ import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import { layoutMapping } from '../../utils/layout-mapping';
+import { gridVariants, layoutMapping } from '../../utils/layout-mapping';
 
 export interface GridProps {
     comp: StructuredComponent;
@@ -60,12 +60,10 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                         index={index}
                         dropTargetId={componentId}
                         mode="MOVE"
-                        className='p-1'
+                        className="p-1"
                     >
                         <BoxContainer
-                            {...comp}
-                            key={comp.id}
-                            components={comp.children}
+                            comp={comp}
                             group="group/column-comp"
                             onEdit={() => handleEditClick(comp)}
                             className="opacity-0 group-hover/column-comp:opacity-100"
@@ -97,15 +95,6 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
         );
     };
 
-    let baseClass = className;
-    if (
-        layoutMapping[componentName] &&
-        layoutMapping[componentName][variant] &&
-        variant !== 'custom'
-    ) {
-        baseClass = layoutMapping[componentName][variant];
-    }
-
     return (
         <Droppable
             component={comp}
@@ -113,7 +102,9 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
             layout="horizontal"
             className="border-none"
         >
-            <div className={cn(baseClass)}>{renderColumns()}</div>
+            <div className={cn(gridVariants({ variant, className }))}>
+                {renderColumns()}
+            </div>
         </Droppable>
     );
 };

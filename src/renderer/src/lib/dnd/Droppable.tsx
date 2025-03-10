@@ -48,8 +48,6 @@ const Droppable = ({
         }
     }, [component]);
 
-    // console.log(draggingItem, activeDropZone?.dropTargetId,componentId)
-
     return (
         <div
             onDragOver={(e) => handleDragOver(e, componentId)}

@@ -3,6 +3,8 @@ import useStudio from '@renderer/hooks/useStudio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { GROUP_COMPONET, ICON_MAP } from '../ComponentTypes';
 
+const HIDDEN_COMPONENTS = ['column']
+
 const useConfigdata = () => {
 
     const { getRegistryComponent } = useStudio()
@@ -30,12 +32,14 @@ const useConfigdata = () => {
             id: group,
             label: GROUP_COMPONET[group] || group,
             type: 'group',
-            subItems: groupedComponents[group].map((component: ComponentRegisterConfig) => ({
+            subItems: groupedComponents[group].filter((component: ComponentRegisterConfig) =>
+                !HIDDEN_COMPONENTS.includes(component.name)
+            ).map((component: ComponentRegisterConfig) => ({
                 id: component.name,
                 label: component.label,
                 icon: ICON_MAP[component.name],
                 properties: component.properties
-            })),
+            }))
         }));
     }, [components]);
 
