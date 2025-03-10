@@ -1,11 +1,7 @@
-import {
-    DragEndResult,
-    StructuredComponent,
-    StructuredLayout,
-} from '@renderer/lib/dnd/types';
+import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import PageTools from '../tools/PageTools';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useStudio from '@renderer/hooks/useStudio';
 import { STRUCTURES } from '../../ComponentTypes';
 
@@ -19,25 +15,28 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         useDroppedComponents();
 
     const { children: components } = page;
+    const { dynamicImport } = useStudio();
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
     }>({});
 
-    const { dynamicImport } = useStudio();
+
+    const loadedComponentsRef = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
     useEffect(() => {
         const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
+    
             for (const comp of components) {
-                const component = await dynamicImport(comp.componentName);
-                comps[comp.id] = component;
+                if (!loadedComponentsRef.current[comp.id]) {
+                    const component = await dynamicImport(comp.componentName);
+                    loadedComponentsRef.current[comp.id] = component;
+                }
             }
-
-            setLoadedComponents(comps);
+    
+            setLoadedComponents({ ...loadedComponentsRef.current });
         };
-
+    
         if (components) loadComponents();
     }, [components, dynamicImport]);
 
@@ -83,14 +82,19 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
                     const Component = loadedComponents[row.id];
                     return Component ? (
                         <Component
-                            key={row.id} 
+                            key={row.id}
                             isDisabled={false}
                             comp={row}
                             onDragEnd={onDragEnd}
                             onAddControl={handleAddControl}
                         />
                     ) : (
-                        <div key={row.id}>Loading...</div>
+                        <div
+                            key={row.id}
+                            className="animate-pulse h-20 w-full rounded-md"
+                        >
+                            Loading...
+                        </div>
                     );
                 })}
             </div>

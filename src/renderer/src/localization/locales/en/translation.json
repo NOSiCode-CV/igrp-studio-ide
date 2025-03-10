@@ -337,5 +337,6 @@
   "pageName": "Page Name",
   "componentName": "Component Name",
   "terminal": "Terminal",
-  "debug": "Debug"
+  "debug": "Debug",
+  "navigator": "Navigator"
 }

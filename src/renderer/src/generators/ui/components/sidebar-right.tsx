@@ -120,9 +120,10 @@ export function SidebarRight({
             </SidebarHeader>
             <SidebarContent>
                 <Tabs className="flex-1" defaultValue="props">
-                    <TabsList className="grid w-full grid-cols-2">
+                    <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="props">Props</TabsTrigger>
                         <TabsTrigger value="styles">Style</TabsTrigger>
+                        <TabsTrigger value="interactions">Interactions</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="props" className="space-y-6">
@@ -166,6 +167,9 @@ export function SidebarRight({
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
+                    </TabsContent>
+                    <TabsContent  value="interactions" className="space-y-6">
+
                     </TabsContent>
                 </Tabs>
             </SidebarContent>

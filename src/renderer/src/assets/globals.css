@@ -52,6 +52,22 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+  
+    --custom-pattern: linear-gradient(90deg, #fcfcfc 9px, transparent 1%) center, 
+    linear-gradient(#fcfcfc 9px, transparent 1%) center, 
+    #9DADC3;
+
+    /* Background Size */
+    --bg-size-10: 10px 10px;
+
+    /* Background Position */
+    --bg-position-top-left: top left;
+
+        /* Custom Colors */
+    --igrp-light: #008054;
+    --igrp-default: #008054;
+    --igrp-dark: #3AA0D9;
   }
   
   .dark {
@@ -128,6 +144,9 @@
     --color-sidebar-ring: var(--sidebar-ring);
     --animate-accordion-down: accordion-down 0.2s ease-out;
     --animate-accordion-up: accordion-up 0.2s ease-out;
+
+     /* Custom Colors */
+    --color-igrp:var(--igrp-default);
   
     @keyframes accordion-down {
       from {

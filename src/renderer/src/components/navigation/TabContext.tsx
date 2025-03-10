@@ -15,6 +15,7 @@ interface TabContextType {
     tabs: TabItem[];
     activeTab: string;
     setActiveTab: (tabId: string) => void;
+    getActiveTab: () => TabItem;
     handleNewTab: (tab: TabItem) => void;
     handleCloseTab: (tabId: string) => void;
     handleUpdateTab: (oldId: string, newId: string) => void;
@@ -34,6 +35,11 @@ export const TabProvider: React.FC<{ children: React.ReactNode }> = ({
         { id: 'tab-0', title: 'Overview', open: 'none' },
     ]);
     const [activeTab, setActiveTab] = useState('tab-0');
+
+    const getActiveTab = () => {
+        const tabExists = tabs.filter((t) => t.id === activeTab);
+        return tabExists[0];
+    };
 
     const handleNewTab = (tab: TabItem) => {
         setTabs(
@@ -118,6 +124,7 @@ export const TabProvider: React.FC<{ children: React.ReactNode }> = ({
                 tabs,
                 activeTab,
                 setActiveTab,
+                getActiveTab,
                 handleNewTab,
                 handleCloseTab,
                 handleUpdateTab,

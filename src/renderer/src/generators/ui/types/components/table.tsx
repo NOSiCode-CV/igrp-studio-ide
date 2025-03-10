@@ -142,11 +142,13 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
         >
             <Table>
                 <TableHeader>
-                    <TableRow>{renderChildren()}</TableRow>
-                    {/* Add a single header for all buttons */}
-                    {buttonChildren.length > 0 && (
-                        <TableHead>Actions</TableHead>
-                    )}
+                    <TableRow>
+                        {renderChildren()}
+                        {/* Add a single header for all buttons */}
+                        {buttonChildren.length > 0 && (
+                            <TableHead>Actions</TableHead>
+                        )}
+                    </TableRow>
                 </TableHeader>
                 <TableBody>
                     {fakeData.map((row, rowIndex) => (
@@ -187,7 +189,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
                                                 }}
                                                 className="ml-auto"
                                             >
-                                                    <ChevronRight />
+                                                <ChevronRight />
                                             </Button>
                                         ))}
                                     </div>

@@ -6,7 +6,7 @@ import {
     PageConfig,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
-
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
@@ -19,6 +19,7 @@ import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { Page } from './types/components/Page';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { useDispatch } from 'react-redux';
 
 interface FormEngineProps {
     basePath: string;
@@ -52,6 +53,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         const { showErrorToast, showSuccessToast } = useToast();
 
         const { menuItems } = useConfigdata();
+
+        const dispatch: any = useDispatch();
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
@@ -100,6 +103,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 }
 
                 showSuccessToast('Components added successfully');
+
+                dispatch(onSetChangeStatus(true));
             } catch (error) {
                 showErrorToast(error);
             }

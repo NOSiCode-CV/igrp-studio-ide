@@ -19,10 +19,12 @@ import {
     ChevronRight,
     Component,
     FileText,
+    FolderTree,
     GitBranch,
     GripHorizontal,
     Home,
     ListTodo,
+    ListTree,
     Terminal,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +43,7 @@ import SidebarAppComponents from './sidebar-app-components';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import LogTerminal from './LogTerminal';
 import useStudio from '@renderer/hooks/useStudio';
-
+import NavigatorSidebar from './NavigatorSidebar';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -59,7 +61,6 @@ export function AppSidebar({
     const [activeMenuGroup, setActiveMenuGroup] =
         useState<string>('widgetPalette');
 
-    const [originalData, _setOriginalData] = useState(initialData);
     const [filteredData, setFilteredData] = useState(initialData);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -69,16 +70,8 @@ export function AppSidebar({
     }, []);
 
     useEffect(() => {
-        if (searchQuery.trim() === '') {
-            setFilteredData(originalData);
-        } else {
-            setFilteredData(filterSubItems(originalData, searchQuery));
-        }
-    }, [searchQuery, originalData]);
-
-    useEffect(() => {
-        setFilteredData(initialData);
-    }, [initialData]);
+        setFilteredData(filterSubItems(initialData, searchQuery));
+    }, [searchQuery, initialData]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -91,6 +84,7 @@ export function AppSidebar({
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
+        { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         {
             icon: Badge,
@@ -202,6 +196,11 @@ export function AppSidebar({
                     <ScrollArea>
                         {activeMenuGroup === 'explorer' ? (
                             <FileExplorerSidebar
+                                basePath={basePath}
+                                searchTerm={searchQuery}
+                            />
+                        ) : activeMenuGroup === 'navigator' ? (
+                            <NavigatorSidebar
                                 basePath={basePath}
                                 searchTerm={searchQuery}
                             />
