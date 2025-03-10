@@ -1,4 +1,4 @@
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { LabelRequired } from '@renderer/components/required';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -51,8 +51,7 @@ export const SelectInput = ({
         ) : (
             <Label htmlFor={id}>{label}</Label>
         )}
-        <Combobox
-            name={id}
+        <IGRPCombobox
             options={options}
             value={value}
             onChange={onChange}

@@ -1280,10 +1280,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.8":
-  version "0.0.0-alpha.8"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.8.tgz#43574c8b9eaf15dcad39ed02f5edf2fccd0b7bda"
-  integrity sha512-yIpq93oAlLTogw0pPlEON3SL64IsjWAzZFVBgwdLvMOjGfF1hhpOBeyQFnWGDMWnrektNyeVadQwIwhKMubDHA==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.9":
+  version "0.0.0-alpha.9"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.9.tgz#3aaeae6898b9360b20b48397c2260080d2abac4f"
+  integrity sha512-ZaodUMiAQ09Zn9jQv4yf1W7aGq0WMwhCXacs8Q84iBoX5bMIc8QC54y+qqmkWldfZiueiQaGQeXS3PGWHqJsqQ==
   dependencies:
     "@hookform/resolvers" "^4.1.3"
     "@radix-ui/react-accordion" "^1.2.3"

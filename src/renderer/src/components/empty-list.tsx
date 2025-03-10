@@ -28,7 +28,7 @@ export function EmptyList({
     return (
         <div
             className={cn(
-                'flex h-full w-full flex-col items-center justify-center gap-2 text-center p-8 border bg-card',
+                'flex h-full w-full flex-col items-center justify-center gap-2 text-center p-8 border bg-card rounded',
                 className
             )}
             {...props}

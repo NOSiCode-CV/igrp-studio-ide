@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@renderer/components/ui/input';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
@@ -18,7 +18,7 @@ import { AddResponseMenu } from './add-response-menu';
 import { Button } from '@renderer/components/ui/button';
 import { ChevronsUpDown, Trash } from 'lucide-react';
 import { LabelRequired } from '@renderer/components/required';
-import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 interface TabResponseProps {
     formik: any;
@@ -224,9 +224,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     <LabelRequired>
                                         {t('httpStatusCode')}
                                     </LabelRequired>
-                                    <Combobox
+                                    <IGRPCombobox
                                         options={httpStatusCodes}
-                                        name="statusCode"
                                         value={statusCode}
                                         onChange={(value) =>
                                             handleAddResponse({
@@ -265,8 +264,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     <LabelRequired>
                                         {t('contentType')}
                                     </LabelRequired>
-                                    <Combobox
-                                        name={t('contentType')}
+                                    <IGRPCombobox
                                         value={contentType}
                                         placeholder={t('selectContentType')}
                                         onChange={(value) =>
@@ -308,9 +306,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                                 <div className="flex flex-col gap-3">
                                     <Label>{t('collectionType')}</Label>
-                                    <Combobox
+                                    <IGRPCombobox
                                         options={collectionTypes}
-                                        name="collectionType"
                                         value={collectionType}
                                         onChange={(collectionType) =>
                                             handleAddResponse({

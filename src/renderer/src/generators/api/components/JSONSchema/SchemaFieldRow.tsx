@@ -4,7 +4,7 @@ import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { SchemaField } from '../../types/schema';
-import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 import { PopoverController } from '../../pages/controller/popover';
 
 interface SchemaFieldRowProps {

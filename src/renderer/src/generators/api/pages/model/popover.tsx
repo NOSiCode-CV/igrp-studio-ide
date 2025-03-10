@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 
 interface PopoverProps {
     children?: ReactNode;
@@ -147,8 +147,7 @@ export function PopoverModel({
                                                 <Label htmlFor="generationType">
                                                     {t('generationType')}
                                                 </Label>
-                                                <Combobox
-                                                    name={'generationType'}
+                                                <IGRPCombobox
                                                     placeholder={`Select Generation Type`}
                                                     options={
                                                         options.generateTypes

@@ -25,7 +25,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import {
-    Combobox,
+    IGRPCombobox,
     IGRPInputSelect,
 } from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
@@ -440,45 +440,31 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </CardHeader>
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-3 col-span-2">
                                 <IGRPInputSelect
-                                    labelText={t('methodType')}
-                                    helperText={t('methodType')}
-                                    options={httpMethods}
-                                    onChange={(e) =>
-                                        console.log(e.target.value)
-                                    }
-                                    className='h-8'
-                                />
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <LabelRequired>{t('methodType')}</LabelRequired>
-                                <Combobox
-                                    name={t('method')}
-                                    placeholder={t('enterMethod')}
                                     value={formik.values.method}
-                                    onChange={(value) =>
-                                        formik.setFieldValue('method', value)
-                                    }
+                                    labelText={t('methodType')}
                                     options={httpMethods}
-                                    className="h-9 w-full"
+                                    placeholder={'posts'}
+                                    onChange={(e) => {
+                                        formik.setFieldValue(
+                                            'path',
+                                            e.target.value
+                                        );
+                                    }}
+                                    onValueChange={(value) => {
+                                        formik.setFieldValue('method', value);
+                                    }}
+                                    onBlur={formik.handleBlur}
+                                    className="h-8"
+                                    required
                                 />
+                                {formik.errors.path && formik.touched.path && (
+                                    <p className="text-xs text-red-500">
+                                        {formik.errors.path}
+                                    </p>
+                                )}
                             </div>
-
-                            <TextInput
-                                id="path"
-                                label={t('path')}
-                                placeholder={'posts'}
-                                value={formik.values.path}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.errors.path && formik.touched.path
-                                        ? formik.errors.path
-                                        : ''
-                                }
-                            />
-
                             <TextInput
                                 id={'actionName'}
                                 label={t('actionName')}

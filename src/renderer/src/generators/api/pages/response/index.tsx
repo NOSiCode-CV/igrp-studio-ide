@@ -1,4 +1,4 @@
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import {
@@ -242,9 +242,8 @@ export const ResponseLayout = ({
                                 <LabelRequired>
                                     {t('httpStatusCode')}
                                 </LabelRequired>
-                                <Combobox
+                                <IGRPCombobox
                                     options={httpStatusCodes}
-                                    name="statusCode"
                                     value={formik.values.statusCode}
                                     onChange={(value) => {
                                         formik.setFieldValue(

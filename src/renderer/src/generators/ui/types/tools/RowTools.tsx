@@ -52,7 +52,10 @@ const RowTools = ({ id, index, onEdit }: ToolsProps) => {
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Edit"
-                            onClick={onEdit}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onEdit();
+                            }}
                         >
                             <Settings className="h-4" />
                         </button>

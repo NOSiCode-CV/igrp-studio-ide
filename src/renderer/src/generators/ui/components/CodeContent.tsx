@@ -1,5 +1,5 @@
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import MonacoEditor from '@renderer/components/MonacoEditor';
+import MonacoEditor from '@renderer/components/monaco-editor';
 
 const CodeContent = (_pagePath) => {
     const { getAllComponents } = useDroppedComponents();

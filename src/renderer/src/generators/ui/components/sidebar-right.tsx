@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { X } from 'lucide-react';
+import { MousePointer, X } from 'lucide-react';
 
 import {
     Sidebar,
@@ -25,6 +25,7 @@ import {
 import { TextPropertiesPanel } from './EditComponent/text-properties';
 import useStudio from '@renderer/hooks/useStudio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { EmptyList } from '@renderer/components/empty-list';
 
 export function SidebarRight({
     ...props
@@ -32,7 +33,7 @@ export function SidebarRight({
     const { t } = useTranslation();
     const [formValues, setFormValues] = React.useState({});
 
-    const {getPropertiesComponent } = useStudio();
+    const { getPropertiesComponent } = useStudio();
 
     const [propsComponent, setPropsComponents] = React.useState({});
 
@@ -52,7 +53,7 @@ export function SidebarRight({
         getPropertiesComponent(componentName).then((data) =>
             setPropsComponents(data)
         );
-    }, [getPropertiesComponent]);
+    }, [getPropertiesComponent, componentName]);
 
     const handleInputChange = (name: string, value: string) => {
         setFormValues((prevValues) => ({
@@ -76,15 +77,21 @@ export function SidebarRight({
 
     React.useEffect(() => {
         if (propsComponent) {
-            const initialFormValues = Object.keys(propsComponent).reduce((acc, key) => {
-                acc[key] = properties?.[key] ?? propsComponent[key].defaultValue ?? '';
-                return acc;
-            }, {});
+            const initialFormValues = Object.keys(propsComponent).reduce(
+                (acc, key) => {
+                    acc[key] =
+                        properties?.[key] ??
+                        propsComponent[key].defaultValue ??
+                        '';
+                    return acc;
+                },
+                {}
+            );
 
-            console.log('Initial Form Values:', initialFormValues);
-            setFormValues(initialFormValues); 
+            console.log('Initial Form Values:', initialFormValues, propsComponent);
+            setFormValues(initialFormValues);
         }
-    }, [propsComponent, properties]);
+    }, [propsComponent, properties, componentName]);
 
     React.useEffect(() => {
         const updatedConfig = { ...properties, ...formValues };
@@ -123,7 +130,9 @@ export function SidebarRight({
                     <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="props">Props</TabsTrigger>
                         <TabsTrigger value="styles">Style</TabsTrigger>
-                        <TabsTrigger value="interactions">Interactions</TabsTrigger>
+                        <TabsTrigger value="interactions">
+                            Interactions
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="props" className="space-y-6">
@@ -168,8 +177,14 @@ export function SidebarRight({
                             </AccordionItem>
                         </Accordion>
                     </TabsContent>
-                    <TabsContent  value="interactions" className="space-y-6">
-
+                    <TabsContent value="interactions" className="space-y-6">
+                        <div className='p-3'>
+                        <EmptyList
+                            title="Element Trigger"
+                            description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
+                            className="py-12"
+                            icon={<MousePointer/>}
+                        /></div>
                     </TabsContent>
                 </Tabs>
             </SidebarContent>

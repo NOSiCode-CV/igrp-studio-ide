@@ -18,7 +18,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Separator } from '@renderer/components/ui/separator';
-import MonacoEditor from '@renderer/components/MonacoEditor';
+import MonacoEditor from '@renderer/components/monaco-editor';
 
 interface FieldOptionsPopoverProps {
     field: SchemaField;

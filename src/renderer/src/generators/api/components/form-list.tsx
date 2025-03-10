@@ -12,7 +12,7 @@ import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { GripVertical, Plus, Trash } from 'lucide-react';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import MultipleSelector from '@renderer/components/multiples-selector';
 import { cn } from '@renderer/lib/utils';
 import {
@@ -26,7 +26,7 @@ import { PopoverController } from '../pages/controller/popover';
 import { PopoverModel } from '../pages/model/popover';
 import { PopoverDto } from '../pages/dto/popover-dto';
 import { RelationPopover } from '../pages/model/relation-popover';
-import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
     data,
@@ -372,10 +372,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                                                                 >
                                                                                                     {item.type ===
                                                                                                         'select' && (
-                                                                                                        <Combobox
-                                                                                                            name={
-                                                                                                                item.name
-                                                                                                            }
+                                                                                                        <IGRPCombobox
                                                                                                             placeholder={`Select ${item.name}`}
                                                                                                             options={
                                                                                                                 itemOptions ||
@@ -607,11 +604,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                                                     ].includes(
                                                                                         type
                                                                                     ) && (
-                                                                                        <Combobox
+                                                                                        <IGRPCombobox
                                                                                             key={`${index}-${index2}`}
-                                                                                            name={
-                                                                                                name
-                                                                                            }
                                                                                             placeholder={`Select ${name}`}
                                                                                             options={
                                                                                                 dynamicOptions[

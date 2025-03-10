@@ -10,7 +10,7 @@ import {
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import React, { useState } from 'react';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { getStatusLabel } from '@renderer/utils/helpers';
 import { useTranslation } from 'react-i18next';
@@ -69,9 +69,8 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3">
                             <Label className="">{t('httpStatusCode')}</Label>
-                            <Combobox
+                            <IGRPCombobox
                                 options={httpStatusCodes}
-                                name="statusCode"
                                 value={statusCode}
                                 onChange={(value) => handleChangeCode(value)}
                                 className="w-full"
@@ -90,8 +89,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                         </div>
                         <div className="flex flex-col gap-3">
                             <Label className="">{t('contentType')}</Label>
-                            <Combobox
-                                name={'contentType'}
+                            <IGRPCombobox
                                 options={contentTypes}
                                 value={contentType}
                                 onChange={(value) => setContentType(value)}

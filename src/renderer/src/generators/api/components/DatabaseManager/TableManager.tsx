@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { Combobox, IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox, IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
@@ -167,7 +167,7 @@ export function TableManager({
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
                     <Label>{t('databaseConnections')}</Label>
-                    <Combobox
+                    <IGRPCombobox
                         value={selectedConnection}
                         name="connection"
                         onChange={handleConnectionSelect}
@@ -180,7 +180,7 @@ export function TableManager({
                     <Label className="text-xs">
                         {t('whileMatchingSchema')}
                     </Label>
-                    <Combobox
+                    <IGRPCombobox
                         value={action}
                         name="action"
                         onChange={(value) => setAction(value)}

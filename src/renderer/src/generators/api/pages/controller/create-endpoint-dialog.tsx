@@ -19,7 +19,7 @@ import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useEffect } from 'react';
 import { LabelRequired } from '@renderer/components/required';
 
@@ -178,8 +178,7 @@ export function CreateEndpointDialog({
                             </div>
                             <div className="col-span-12 flex flex-col gap-3">
                                 <LabelRequired>{t('moduleName')}</LabelRequired>
-                                <Combobox
-                                    name="module"
+                                <IGRPCombobox
                                     options={modules}
                                     value={
                                         formik.values.module || defaultModule

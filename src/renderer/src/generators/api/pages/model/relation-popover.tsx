@@ -13,7 +13,7 @@ import { Input } from '@renderer/components/ui/input';
 import { RelationTypeSelector } from './relation-type-selector';
 import { Switch } from '@renderer/components/ui/switch';
 import { Relation } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 interface RelationPopoverProps {
@@ -145,7 +145,7 @@ export function RelationPopover({
                                     {t('entityNameDescription')}
                                 </p>
                                 {errors.joinTable && (
-                                    <p className="text-xs text-foreground text-red-500">
+                                    <p className="text-xs text-red-500">
                                         {errors.joinTable}
                                     </p>
                                 )}
@@ -153,8 +153,7 @@ export function RelationPopover({
                         )}
                         <div className="space-y-2 flex flex-col">
                             <Label htmlFor="entity">{t('entity')}</Label>
-                            <Combobox
-                                name="entity"
+                            <IGRPCombobox
                                 value={localRelation.entity}
                                 options={modelsOptions}
                                 placeholder={t('selectTargetTable')}
@@ -167,7 +166,7 @@ export function RelationPopover({
                                 }
                             />
                             {errors.entity && (
-                                <p className="text-xs text-foreground text-red-500">
+                                <p className="text-xs text-red-500">
                                     {errors.entity}
                                 </p>
                             )}
@@ -176,8 +175,7 @@ export function RelationPopover({
                             <Label htmlFor="referencedColumnName">
                                 {t('referenceColumnName')}
                             </Label>
-                            <Combobox
-                                name="entity"
+                            <IGRPCombobox
                                 value={localRelation.referencedColumnName}
                                 options={availableColumns}
                                 placeholder={t('selectReferenceColumn')}
@@ -189,7 +187,7 @@ export function RelationPopover({
                                 }
                             />
                             {errors.referencedColumnName && (
-                                <p className="text-xs text-foreground text-red-500">
+                                <p className="text-xs text-red-500">
                                     {errors.referencedColumnName}
                                 </p>
                             )}

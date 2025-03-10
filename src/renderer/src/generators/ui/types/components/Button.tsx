@@ -16,7 +16,6 @@ const UiButton = ({ comp, index }: UiButtonProps) => {
     return (
         <div className="relative group">
             <IGRPButton
-                onClick={(e) => e.preventDefault()}
                 variant={variant}
                 size={size}
                 className={customClasses}

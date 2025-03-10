@@ -1,5 +1,4 @@
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
-import { Checkbox } from '@renderer/components/ui/checkbox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { Switch } from '@renderer/components/ui/switch';
@@ -35,8 +34,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     );
                                 case 'enum':
                                     return (
-                                        <Combobox
-                                            name={key}
+                                        <IGRPCombobox
                                             value={formValues[key]}
                                             onChange={(value) =>
                                                 handleInputChange(key, value)
