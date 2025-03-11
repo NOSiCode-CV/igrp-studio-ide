@@ -1,3 +1,4 @@
+import { cva } from "class-variance-authority";
 
 // Comprehensive layout mapping with exhaustive options for flex and grid
 export const layoutMapping = {
@@ -115,36 +116,6 @@ export const layoutMapping = {
         custom: "" // Custom will use the className directly
     },
 
-    columns: {
-        cols1: "grid grid-cols-1 gap-4",
-        cols2: "grid grid-cols-2 gap-4",
-        cols3: "grid grid-cols-3 gap-4",
-        cols4: "grid grid-cols-4 gap-4",
-        cols5: "grid grid-cols-5 gap-4",
-        cols6: "grid grid-cols-6 gap-4",
-        cols7: "grid grid-cols-7 gap-4",
-        cols8: "grid grid-cols-8 gap-4",
-        cols9: "grid grid-cols-9 gap-4",
-        cols10: "grid grid-cols-10 gap-4",
-        cols11: "grid grid-cols-11 gap-4",
-        cols12: "grid grid-cols-12 gap-4",
-    },
-    
-    column: {
-        span1: "col-span-1",
-        span2: "col-span-2",
-        span3: "col-span-3",
-        span4: "col-span-4",
-        span5: "col-span-5",
-        span6: "col-span-6",
-        span7: "col-span-7",
-        span8: "col-span-8",
-        span9: "col-span-9",
-        span10: "col-span-10",
-        span11: "col-span-11",
-        span12: "col-span-12",
-    },
-
     // Container layout options
     container: {
         default: "container mx-auto px-4",
@@ -207,3 +178,77 @@ export const layoutMapping = {
         custom: ""
     }
 };
+
+export const columnsVariants = cva(
+    "flex flex-1",
+    {
+        variants: {
+            variant: {
+                cols1: "grid grid-cols-1 gap-4",
+                cols2: "grid grid-cols-2 gap-4",
+                cols3: "grid grid-cols-3 gap-4",
+                cols4: "grid grid-cols-4 gap-4",
+                cols5: "grid grid-cols-5 gap-4",
+                cols6: "grid grid-cols-6 gap-4",
+                cols7: "grid grid-cols-7 gap-4",
+                cols8: "grid grid-cols-8 gap-4",
+                cols9: "grid grid-cols-9 gap-4",
+                cols10: "grid grid-cols-10 gap-4",
+                cols11: "grid grid-cols-11 gap-4",
+                cols12: "grid grid-cols-12 gap-4",
+            },
+        },
+        defaultVariants: {
+            variant: "cols12",
+        },
+    }
+)
+
+export const columnVariants = cva(
+    "flex flex-col",
+    {
+        variants: {
+            variant: {
+                span1: "col-span-1",
+                span2: "col-span-2",
+                span3: "col-span-3",
+                span4: "col-span-4",
+                span5: "col-span-5",
+                span6: "col-span-6",
+                span7: "col-span-7",
+                span8: "col-span-8",
+                span9: "col-span-9",
+                span10: "col-span-10",
+                span11: "col-span-11",
+                span12: "col-span-12",
+            },
+        },
+        defaultVariants: {
+            variant: "span6",
+        },
+    }
+)
+
+export const gridVariants = cva(
+    "",
+    {
+        variants: {
+            variant: layoutMapping['grid']
+        },
+        defaultVariants: {
+            variant: "cols4",
+        },
+    }
+)
+
+export const formVariants = cva(
+    "flex flex-col",
+    {
+        variants: {
+            variant: layoutMapping['grid']
+        },
+        defaultVariants: {
+            variant: "cols4",
+        },
+    }
+)

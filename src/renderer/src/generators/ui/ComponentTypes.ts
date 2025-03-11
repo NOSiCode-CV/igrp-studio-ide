@@ -104,7 +104,7 @@ export const DATA_DISPLAY = {
 
 // Fields
 export const FORM_ELEMENTS = {
-    InputField: 'inputField',
+    InputField: 'input',
     DatePicker: 'datePicker',
     TimePicker: 'timePicker',
     Password: "password",

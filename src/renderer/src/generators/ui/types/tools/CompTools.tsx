@@ -5,26 +5,28 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import { STRUCTURES } from '../../ComponentTypes';
+import { CONTAINERS, DATA_DISPLAY, STRUCTURES } from '../../ComponentTypes';
 import StructureDropdown from '../../components/StructureDropdown';
+import { AddField } from '../../components/add-fields';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
     handleClickStructComp: (layout: string) => void;
-    id: string;
-    type?: string;
-    label?: string;
+    comp: StructuredComponent;
 }
 
 const CompTools = ({
     handleClickBtnEdition,
     handleClickDeleteComp,
     handleClickStructComp,
-    id,
-    label,
+    comp,
 }: ToolsProps) => {
-    const isGrids = [STRUCTURES.Columns].includes(id);
+    const { componentName, label } = comp;
+
+    const isGrids = [STRUCTURES.Columns].includes(componentName);
+    const hasAddField = [DATA_DISPLAY.Table, CONTAINERS.Form].includes(componentName);
 
     return (
         <TooltipProvider>
@@ -46,10 +48,7 @@ const CompTools = ({
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button
-                            className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded"
-                            title="Clonar"
-                        >
+                        <button className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded">
                             <Copy className="h-4" />
                         </button>
                     </TooltipTrigger>
@@ -63,12 +62,10 @@ const CompTools = ({
                         onClickStructure={handleClickStructComp}
                     />
                 )}
-
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button
-                            className="container-edit gen-edition-btn cursor-pointer p-1 hover:bg-white hover:text-black rounded"
-                            title="Editar"
+                            className="cursor-pointer p-1 hover:bg-white hover:text-black rounded"
                             onClick={handleClickBtnEdition}
                         >
                             <Settings className="h-4" />
@@ -83,7 +80,6 @@ const CompTools = ({
                     <TooltipTrigger asChild>
                         <button
                             className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded"
-                            title="Remover"
                             onClick={handleClickDeleteComp}
                         >
                             <Trash className="h-4" />
@@ -93,6 +89,7 @@ const CompTools = ({
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
+                {hasAddField && <AddField comp={comp}/>}
             </div>
         </TooltipProvider>
     );

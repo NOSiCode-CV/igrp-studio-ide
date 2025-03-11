@@ -3,7 +3,6 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import { layoutMapping } from '../../utils/layout-mapping';
 import {
     Table,
     TableBody,
@@ -19,6 +18,7 @@ import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Button } from '@renderer/components/ui/button';
 import { ChevronRight } from 'lucide-react';
+import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 
 export interface TableProps {
     isDisabled?: boolean;
@@ -27,9 +27,7 @@ export interface TableProps {
 }
 
 const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
-    const { children, properties, componentName, id: componentId } = comp;
-
-    const { variant, className } = properties || {};
+    const { children, id: componentId } = comp;
 
     const buttonChildren = children.filter(
         (child) => child.componentName === 'button'
@@ -82,18 +80,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
         return nonButtonChildren.map(
             (comp: StructuredComponent, index: number) => {
                 const Component = loadedComponents[comp.id];
-                const { properties, componentName } = comp;
-
-                const { variant, className } = properties || {};
-
-                let baseClass = className;
-                if (
-                    layoutMapping[componentName] &&
-                    layoutMapping[componentName][variant] &&
-                    variant !== 'custom'
-                ) {
-                    baseClass = layoutMapping[componentName][variant];
-                }
+                const { componentName } = comp;
 
                 return (
                     Component && (
@@ -104,10 +91,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
                                 mode="MOVE"
                                 layout="horizontal"
                                 dropTargetId={componentId}
-                                className={cn(
-                                    baseClass,
-                                    'relative group border-none'
-                                )}
+                                className={cn('relative group border-none')}
                             >
                                 <span>{componentName}</span>
                                 <div className="absolute top-0 text-center mt-1 px-2 py-1 bg-gray-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
@@ -124,15 +108,6 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
             }
         );
     };
-
-    let baseClass = className;
-    if (
-        layoutMapping[componentName] &&
-        layoutMapping[componentName][variant] &&
-        variant !== 'custom'
-    ) {
-        baseClass = layoutMapping[componentName][variant];
-    }
 
     return (
         <Droppable
@@ -151,52 +126,56 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {fakeData.map((row, rowIndex) => (
-                        <TableRow key={rowIndex}>
-                            {nonButtonChildren.map((child) => (
-                                <TableCell key={child.id}>
-                                    {child.componentName === 'checkbox' ? (
-                                        <Checkbox
-                                            id={child.id}
-                                            checked={row[child.id]}
-                                            onCheckedChange={(checked) => {
-                                                // Handle checkbox state change if needed
-                                                console.log(
-                                                    `Checkbox ${child.id} changed to:`,
-                                                    checked
-                                                );
-                                            }}
-                                        />
-                                    ) : (
-                                        row[child.id]
-                                    )}
-                                </TableCell>
-                            ))}
-                            {/* Render all buttons in a single cell */}
-                            {buttonChildren.length > 0 && (
-                                <TableCell>
-                                    <div className="flex flex-1 space-x-1">
-                                        {buttonChildren.map((child) => (
-                                            <Button
-                                                key={child.id}
-                                                variant="outline"
-                                                size={'icon'}
-                                                onClick={() => {
-                                                    // Handle button click
+                    {children.length > 0 ? (
+                        fakeData.map((row, rowIndex) => (
+                            <TableRow key={rowIndex}>
+                                {nonButtonChildren.map((child) => (
+                                    <TableCell key={child.id}>
+                                        {child.componentName === 'checkbox' ? (
+                                            <Checkbox
+                                                id={child.id}
+                                                checked={row[child.id]}
+                                                onCheckedChange={(checked) => {
+                                                    // Handle checkbox state change if needed
                                                     console.log(
-                                                        `Button ${child.id} clicked`
+                                                        `Checkbox ${child.id} changed to:`,
+                                                        checked
                                                     );
                                                 }}
-                                                className="ml-auto"
-                                            >
-                                                <ChevronRight />
-                                            </Button>
-                                        ))}
-                                    </div>
-                                </TableCell>
-                            )}
-                        </TableRow>
-                    ))}
+                                            />
+                                        ) : (
+                                            row[child.id]
+                                        )}
+                                    </TableCell>
+                                ))}
+                                {/* Render all buttons in a single cell */}
+                                {buttonChildren.length > 0 && (
+                                    <TableCell>
+                                        <div className="flex flex-1 space-x-1">
+                                            {buttonChildren.map((child) => (
+                                                <Button
+                                                    key={child.id}
+                                                    variant="outline"
+                                                    size={'icon'}
+                                                    onClick={() => {
+                                                        // Handle button click
+                                                        console.log(
+                                                            `Button ${child.id} clicked`
+                                                        );
+                                                    }}
+                                                    className="ml-auto"
+                                                >
+                                                    <ChevronRight />
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    </TableCell>
+                                )}
+                            </TableRow>
+                        ))
+                    ) : (
+                        <GenNoInfoComp />
+                    )}
                 </TableBody>
             </Table>
         </Droppable>

@@ -1,5 +1,6 @@
 import { Button } from '@renderer/components/ui/button';
-import { Copy, Move, Plus, Trash } from 'lucide-react';
+import { Copy, Move, Plus, Trash, Settings } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@renderer/components/ui/tooltip'; // Adjust the import based on your UI library
 
 interface RowOptionsProps {
     onClickAddControl: (type: string) => void;
@@ -13,72 +14,97 @@ const RowOptions = ({
     return (
         <div id="row-tools">
             {/* Top-aligned button */}
-            <Button
-                className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
-                title="Add New Row at Top"
-                onClick={() => onClickAddControl('top')}
-            >
-                <Plus className="h-7 w-7" />
-            </Button>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
+                        onClick={() => onClickAddControl('top')}
+                    >
+                        <Plus className="h-7 w-7" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Add New Row at Top</p>
+                </TooltipContent>
+            </Tooltip>
 
             {/* Bottom-aligned button */}
-            <Button
-                className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
-                title="Add New Row at Bottom"
-                onClick={() => onClickAddControl('bottom')}
-            >
-                <Plus className="h-7 w-7" />
-            </Button>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
+                        onClick={() => onClickAddControl('bottom')}
+                    >
+                        <Plus className="h-7 w-7" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Add New Row at Bottom</p>
+                </TooltipContent>
+            </Tooltip>
 
+            {/* Action buttons */}
             <div className="absolute z-10 left-0 -top-6 rounded opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
-                <ul className="flex">
-                    <li
-                        className="flex items-center cursor-pointer"
-                        title="Ordenar"
-                    >
-                        <a
-                            className="flex items-center p-1 hover:bg-gray-700 rounded"
-                            href="#"
-                            onClick={(e) => e.preventDefault()}
-                        >
-                            <Move className="h-4" />
-                        </a>
-                    </li>
+                <div className="flex">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
+                                onClick={(e) => e.preventDefault()}
+                            >
+                                <Move className="h-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Ordenar</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    <li
-                        className="flex items-center cursor-pointer"
-                        title="Clonar"
-                    >
-                        <a
-                            className="flex items-center p-1 hover:bg-gray-700 rounded"
-                            href="#"
-                            onClick={(e) => e.preventDefault()}
-                        >
-                            <Copy className="h-4" />
-                        </a>
-                    </li>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
+                                onClick={(e) => e.preventDefault()}
+                            >
+                                <Copy className="h-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Clonar</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    {/* Use the new StructureDropdown component */}
-                    {/*  <li className="flex items-center cursor-pointer" title="Estrutura">
-                        <StructureDropdown onClickStructure={onClickStructure} />
-                    </li> */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
+                                onClick={(e) => e.preventDefault()}
+                            >
+                                <Settings className="h-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Editar</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    <li
-                        className="flex items-center cursor-pointer"
-                        title="Eliminar Seção"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onClickDeleteSection();
-                        }}
-                    >
-                        <a
-                            className="flex items-center p-1 hover:bg-gray-700 rounded"
-                            href="#"
-                        >
-                            <Trash className="h-4" />
-                        </a>
-                    </li>
-                </ul>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onClickDeleteSection();
+                                }}
+                            >
+                                <Trash className="h-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Eliminar Seção</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
             </div>
         </div>
     );

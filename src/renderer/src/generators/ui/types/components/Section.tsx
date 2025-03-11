@@ -60,7 +60,7 @@ const Section = ({
         removeRow(componentId);
     };
 
-    const handleEditClick = async (component: StructuredComponent) => {
+    const handleEdit = async (component: StructuredComponent) => {
         if (component.type === APP_COMPONENT) {
             const page = await getPageData(component.componentName);
             initializeTabFromCurrentItem({
@@ -83,6 +83,7 @@ const Section = ({
                         onAddControl?.(type, componentId)
                     }
                     onClickDeleteSection={handleDeleteSection}
+                    onEdit={() => handleEdit(comp)}
                 />
             )}
             <Droppable
@@ -122,9 +123,8 @@ const Section = ({
                                         )}
                                     >
                                         <BoxContainer
-                                            {...comp}
-                                            components={comp.children}
-                                            onEdit={() => handleEditClick(comp)}
+                                            comp={comp}
+                                            onEdit={() => handleEdit(comp)}
                                             group="group/row-comp"
                                             className={cn(
                                                 'left-0 right-auto opacity-0',

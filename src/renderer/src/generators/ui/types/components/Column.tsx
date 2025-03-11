@@ -58,8 +58,7 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     mode="MOVE"
                 >
                     <BoxContainer
-                        {...comp}
-                        components={comp.children}
+                        comp={comp}
                         group="group/column-comp"
                         onEdit={() => handleEditClick(comp)}
                         className="top-0 opacity-0 group-hover/column-comp:opacity-100"

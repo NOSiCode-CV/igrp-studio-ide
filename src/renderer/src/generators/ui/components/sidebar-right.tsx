@@ -88,7 +88,11 @@ export function SidebarRight({
                 {}
             );
 
-            console.log('Initial Form Values:', initialFormValues, propsComponent);
+            console.log(
+                'Initial Form Values:',
+                initialFormValues,
+                propsComponent
+            );
             setFormValues(initialFormValues);
         }
     }, [propsComponent, properties, componentName]);
@@ -142,11 +146,11 @@ export function SidebarRight({
                             className="w-full"
                             defaultValue="item-1"
                         >
-                            <AccordionItem value="item-1" className="px-4">
-                                <AccordionTrigger>
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger className='px-2'>
                                     {t('properties')}
                                 </AccordionTrigger>
-                                <AccordionContent>
+                                <AccordionContent className='px-2'>
                                     {propsComponent && (
                                         <RenderPropsConfig
                                             propsComp={propsComponent}
@@ -178,13 +182,14 @@ export function SidebarRight({
                         </Accordion>
                     </TabsContent>
                     <TabsContent value="interactions" className="space-y-6">
-                        <div className='p-3'>
-                        <EmptyList
-                            title="Element Trigger"
-                            description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
-                            className="py-12"
-                            icon={<MousePointer/>}
-                        /></div>
+                        <div className="p-3">
+                            <EmptyList
+                                title="Element Trigger"
+                                description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
+                                className="py-12"
+                                icon={<MousePointer />}
+                            />
+                        </div>
                     </TabsContent>
                 </Tabs>
             </SidebarContent>
