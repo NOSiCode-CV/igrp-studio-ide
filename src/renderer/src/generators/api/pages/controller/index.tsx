@@ -25,7 +25,6 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import {
-    IGRPCombobox,
     IGRPInputSelect,
 } from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
@@ -44,7 +43,6 @@ import {
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { LabelRequired } from '@renderer/components/required';
 
 interface ControllerProps {
     basePath: string;
@@ -76,6 +74,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
     const [pathController, setPathController] = useState('');
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
@@ -126,11 +125,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     useEffect(() => {
         if (data) {
-            const { name, basePath } = data;
+            const { name, basePath, description } = data;
 
             setTitle(`${name}(${basePath})`);
             setName(name);
             setPathController(basePath);
+            setDescription(description);
         }
     }, [data]);
 
@@ -225,6 +225,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             name: name,
             basePath: pathController,
             actions: finalActions,
+            description: description,
             module,
             id: currentItem.id,
         };
@@ -422,10 +423,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 defaultModule={module}
                 pathController={pathController}
                 endpointName={name}
+                description={description}
                 onConfirm={(values) => {
                     setName(values.name);
                     setPathController(values.basePath);
                     setModule(values.module);
+                    setDescription(values.description)
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
@@ -466,19 +469,19 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 )}
                             </div>
                             <TextInput
-                                id={'actionName'}
-                                label={t('actionName')}
-                                placeholder={'getPosts'}
-                                value={formik.values.actionName}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.errors.actionName &&
-                                    formik.touched.actionName
-                                        ? formik.errors.actionName
-                                        : ''
-                                }
-                                isRequired
+                          id={'actionName'}
+                          label={t('actionName')}
+                          placeholder={'getPosts'}
+                          value={formik.values.actionName}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          error={
+                          formik.errors.actionName &&
+                          formik.touched.actionName
+                          ? formik.errors.actionName
+                          : ''
+                          }
+                          isRequired
                             />
                         </div>
                     </CardContent>
