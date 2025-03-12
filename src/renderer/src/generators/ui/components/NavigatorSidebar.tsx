@@ -12,7 +12,7 @@ import {
     CollapsibleContent,
 } from '@renderer/components/ui/collapsible';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
@@ -49,7 +49,7 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
 
                 const data = await window.api.getJsonContent(path);
                 if (data.components) {
-                    setFileTree([data.components]); 
+                    setFileTree([data.components]);
                 }
             } catch (error) {
                 console.error('Failed to load JSON content:', error);
@@ -62,7 +62,10 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
         console.log(item);
     };
 
-    const filterTree = (tree: StructuredComponent[], term: string): StructuredComponent[] => {
+    const filterTree = (
+        tree: StructuredComponent[],
+        term: string
+    ): StructuredComponent[] => {
         return tree
             .filter((item) => {
                 // Use componentName or label for filtering
@@ -80,7 +83,7 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
         return filteredTree.map((item) => (
             <SidebarMenuItem key={item.id}>
                 {item.children && item.children.length > 0 ? (
-                    <Collapsible defaultOpen={true} >
+                    <Collapsible defaultOpen={true}>
                         <CollapsibleTrigger asChild>
                             <SidebarMenuButton
                                 className="justify-between"
@@ -89,7 +92,9 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
                                 <div className="flex items-center space-x-2">
                                     <ChevronRight className="w-4 h-4 transition-transform transform group-data-[state=open]/collapsible:rotate-90" />
                                     <Folder className="w-4 h-4" />
-                                    <span>{item.componentName || item.label}</span>
+                                    <span>
+                                        {item.componentName || item.label}
+                                    </span>
                                 </div>
                             </SidebarMenuButton>
                         </CollapsibleTrigger>

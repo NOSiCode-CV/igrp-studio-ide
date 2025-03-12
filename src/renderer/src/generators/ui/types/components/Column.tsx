@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import BoxContainer from '../BoxContainer';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
+import BoxContainer from '../tools/BoxContainer';
 
 export interface ColProps {
     comp: StructuredComponent;

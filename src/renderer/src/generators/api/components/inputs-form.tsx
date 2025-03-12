@@ -15,7 +15,7 @@ export const TextInput = ({
     error,
     ...props
 }) => (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (

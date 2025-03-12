@@ -48,14 +48,11 @@ import {
     RectangleHorizontal,
     SlidersHorizontal,
     ChartPie,
+    Ellipsis,
 } from 'lucide-react';
 
 // Constants
-export const COLUMN = 'column';
-export const COMPONENT = 'component';
-export const FIELD = 'field';
 export const APP_COMPONENT = 'appComponent';
-export const STRUCTURE = 'structure';
 
 // Component Categories
 export const GROUP_COMPONET: Record<string, string> = {
@@ -69,41 +66,24 @@ export const GROUP_COMPONET: Record<string, string> = {
     advanced: "Advanced"
 };
 
-// Structures
-export const STRUCTURES = {
+export const COMPONENT: Record<string, string> = {
     Columns: "columns",
     Column: "column",
     Grid: "grid",
     Section: "section",
-    Container: 'container'
-};
-
-// Containers
-export const CONTAINERS = {
+    Container: 'container',
     Form: 'form',
-    PageHeader: 'pageHeader'
-};
-
-// Basic Elements
-export const BASIC_ELEMENTS = {
+    PageHeader: 'pageHeader',
     Link: 'link',
     Button: "button",
     Text: "text",
     Image: "image",
-    RichTextEditor: "richTextEditor"
-};
-
-// Data Display
-export const DATA_DISPLAY = {
+    RichTextEditor: "richTextEditor",
     Table: "table",
     Charts: "charts",
     Maps: "maps",
     Carousel: "carousel",
-    Fingerprint: "fingerprint"
-};
-
-// Fields
-export const FORM_ELEMENTS = {
+    Fingerprint: "fingerprint",
     InputField: 'input',
     DatePicker: 'datePicker',
     TimePicker: 'timePicker',
@@ -115,38 +95,22 @@ export const FORM_ELEMENTS = {
     Radio: "radio",
     Switch: "switch",
     RangeSlider: "rangeSlider",
-    FileUpload: "fileUpload"
-};
-
-// Layout Widgets
-export const LAYOUT_WIDGET = {
+    FileUpload: "fileUpload",
     Box: 'box',
     Panel: 'panel',
     Card: 'card',
     Tabs: 'tabs',
     List: 'list',
     iFrame: 'iFrame',
-    InfoPanel: 'infoPanel'
-};
-
-// Widgets
-export const WIDGETS = {
+    InfoPanel: 'infoPanel',
     Calendar: 'calendar',
     Alerts: 'alerts',
     Badges: 'badges',
     Ratings: 'ratings',
     Dropdowns: 'dropdowns',
     EmbedVideo: 'embedVideo',
-    Progress: 'progress'
-};
-
-// Advanced Components
-export const ADVANCED = {
-    Accordion: 'accordion',
-    TreeView: 'treeView',
-    Chat: 'chat',
-    Modal: 'modal',
-    Notifications: 'notifications'
+    Progress: 'progress',
+    Dropdown: 'dropdown'
 };
 
 // Icon Mapping
@@ -165,7 +129,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     fileUpload: Upload,
     link: Link2,
     button: ButtonIcon,
-    text: Type, // Updated to lowercase
+    text: Type,
     image: Image,
     richTextEditor: Edit3,
     table: Table,
@@ -200,5 +164,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     stack: Table2,
     section: RectangleHorizontal,
     slider: SlidersHorizontal,
-    chart: ChartPie
+    chart: ChartPie,
+    dropdown: Ellipsis
 };

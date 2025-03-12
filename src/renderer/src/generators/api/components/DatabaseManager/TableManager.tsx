@@ -169,7 +169,6 @@ export function TableManager({
                     <Label>{t('databaseConnections')}</Label>
                     <IGRPCombobox
                         value={selectedConnection}
-                        name="connection"
                         onChange={handleConnectionSelect}
                         placeholder={t('selectConnection')}
                         options={connections}
@@ -182,7 +181,6 @@ export function TableManager({
                     </Label>
                     <IGRPCombobox
                         value={action}
-                        name="action"
                         onChange={(value) => setAction(value)}
                         placeholder={t('selectAction')}
                         options={actions}

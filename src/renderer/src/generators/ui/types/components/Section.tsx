@@ -1,16 +1,16 @@
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import RowOptions from '../tools/RowOptions';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxContainer from '../BoxContainer';
-import { APP_COMPONENT, COMPONENT, STRUCTURE } from '../../ComponentTypes';
+import BoxContainer from '../tools/BoxContainer';
+import { APP_COMPONENT } from '../../ComponentTypes';
 import { ComponentRenderer } from '../ComponentRenderer';
 import { useTabs } from '@renderer/components/navigation/TabContext';
+import SectionTool from '../tools/SectionTool';
 
 export interface SectionProps {
     isDisabled?: boolean;
@@ -71,14 +71,10 @@ const Section = ({
         } else setEditingComponent({ ...component });
     };
 
-    //TODO
-    const layoutMode = 'vertical';
-
-    const ACCEPTS = [COMPONENT, STRUCTURE];
     return (
         <div className="group/row relative hover:border-2 hover:border-igrp rounded-lg">
             {!isDisabled && (
-                <RowOptions
+                <SectionTool
                     onClickAddControl={(type) =>
                         onAddControl?.(type, componentId)
                     }
@@ -90,71 +86,60 @@ const Section = ({
                 onDrop={handleDrop}
                 component={comp}
                 className={cn(
-                    'hover:border-none',
+                    'hover:border-none space-y-6',
                     isDisabled && 'border-none hover:border-red-500'
                 )}
-                accept={ACCEPTS}
             >
-                <div
-                    id={componentId}
-                    className={cn(
-                        'relative ',
-                        layoutMode === 'vertical'
-                            ? 'space-y-6'
-                            : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'
-                    )}
-                >
-                    {components && components.length > 0 ? (
-                        components.map(
-                            (comp: StructuredComponent, index: number) => {
-                                const Component = loadedComponents[comp.id];
+                {components && components.length > 0 ? (
+                    components.map(
+                        (comp: StructuredComponent, index: number) => {
+                            const Component = loadedComponents[comp.id];
 
-                                return Component ? (
-                                    <Draggable
-                                        key={comp.id}
-                                        item={comp}
-                                        index={index}
-                                        dropTargetId={componentId}
-                                        mode="MOVE"
-                                        isDisabled={isDisabled}
+                            return Component ? (
+                                <Draggable
+                                    key={comp.id}
+                                    item={comp}
+                                    index={index}
+                                    dropTargetId={componentId}
+                                    mode="MOVE"
+                                    isDisabled={isDisabled}
+                                    className={cn(
+                                        comp.type === APP_COMPONENT &&
+                                            'hover:border-red-500'
+                                    )}
+                                >
+                                    <BoxContainer
+                                        comp={comp}
+                                        onEdit={() => handleEdit(comp)}
+                                        group="group/row-comp"
                                         className={cn(
-                                            comp.type === APP_COMPONENT &&
-                                                'hover:border-red-500'
+                                            'left-0 right-auto opacity-0',
+                                            !isDisabled &&
+                                                'group-hover/row-comp:opacity-100'
                                         )}
                                     >
-                                        <BoxContainer
-                                            comp={comp}
-                                            onEdit={() => handleEdit(comp)}
-                                            group="group/row-comp"
-                                            className={cn(
-                                                'left-0 right-auto opacity-0',
-                                                !isDisabled &&
-                                                    'group-hover/row-comp:opacity-100'
-                                            )}
-                                        >
-                                            {comp.type === APP_COMPONENT ? (
-                                                <ComponentRenderer
-                                                    comp={comp}
-                                                    onDragEnd={onDragEnd}
-                                                />
-                                            ) : (
-                                                <Component
-                                                    comp={comp}
-                                                    onDragEnd={onDragEnd}
-                                                    isDisabled={isDisabled}
-                                                />
-                                            )}
-                                        </BoxContainer>
-                                    </Draggable>
-                                ) : (
-                                    <div key={comp.id}>Loading...</div>
-                                );
-                            }
-                        )
-                    ) : (
-                        <GenNoInfoComp />
-                    )}
-                </div>
+                                        {comp.type === APP_COMPONENT ? (
+                                            <ComponentRenderer
+                                                comp={comp}
+                                                onDragEnd={onDragEnd}
+                                            />
+                                        ) : (
+                                            <Component
+                                                comp={comp}
+                                                onDragEnd={onDragEnd}
+                                                isDisabled={isDisabled}
+                                            />
+                                        )}
+                                    </BoxContainer>
+                                </Draggable>
+                            ) : (
+                                <div key={comp.id}>Loading...</div>
+                            );
+                        }
+                    )
+                ) : (
+                    <GenNoInfoComp />
+                )}
             </Droppable>
         </div>
     );

@@ -1,10 +1,10 @@
 import React from 'react';
-import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import CompTools from './tools/CompTools';
 import { cn } from '@renderer/lib/utils';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { generateId } from '@renderer/utils/helpers';
-import { STRUCTURES } from '../ComponentTypes';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
+import { COMPONENT } from '../../ComponentTypes';
+import CompTools from './CompTools';
 
 interface BoxContainerProps {
     group?: string;
@@ -42,7 +42,7 @@ const BoxContainer = ({
             .split(',')
             .map((size) => parseInt(size.trim(), 10));
 
-        if (componentName === STRUCTURES.Columns) {
+        if (componentName === COMPONENT.Columns) {
             const currentSizes = components.length;
             newLayout.forEach((colSize, index) => {
                 if (index < currentSizes) {

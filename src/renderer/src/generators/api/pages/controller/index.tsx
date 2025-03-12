@@ -24,9 +24,6 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import {
-    IGRPInputSelect,
-} from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
 import { TabRequest } from './tab-resquest';
 
@@ -43,6 +40,7 @@ import {
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
+import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
 
 interface ControllerProps {
     basePath: string;
@@ -222,11 +220,11 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
         const newValues: ControllerConfig = {
             type: 'controller',
-            name: name,
+            name,
+            module,
+            description,
             basePath: pathController,
             actions: finalActions,
-            description: description,
-            module,
             id: currentItem.id,
         };
 
@@ -428,7 +426,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     setName(values.name);
                     setPathController(values.basePath);
                     setModule(values.module);
-                    setDescription(values.description)
+                    setDescription(values.description);
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
@@ -444,8 +442,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                             <div className="flex flex-col gap-3 col-span-2">
-                                <IGRPInputSelect
-                                    value={formik.values.method}
+                                <IGRPInputAddOn
+                                    selectValue={formik.values.method}
+                                    value={formik.values.path}
                                     labelText={t('methodType')}
                                     options={httpMethods}
                                     placeholder={'posts'}
@@ -455,11 +454,11 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                             e.target.value
                                         );
                                     }}
-                                    onValueChange={(value) => {
+                                    onSelectValueChange={(value) => {
                                         formik.setFieldValue('method', value);
                                     }}
                                     onBlur={formik.handleBlur}
-                                    className="h-8"
+                                    classNameGlobal="h-8"
                                     required
                                 />
                                 {formik.errors.path && formik.touched.path && (
@@ -469,19 +468,19 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 )}
                             </div>
                             <TextInput
-                          id={'actionName'}
-                          label={t('actionName')}
-                          placeholder={'getPosts'}
-                          value={formik.values.actionName}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          error={
-                          formik.errors.actionName &&
-                          formik.touched.actionName
-                          ? formik.errors.actionName
-                          : ''
-                          }
-                          isRequired
+                                id={'actionName'}
+                                label={t('actionName')}
+                                placeholder={'getPosts'}
+                                value={formik.values.actionName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.errors.actionName &&
+                                    formik.touched.actionName
+                                        ? formik.errors.actionName
+                                        : ''
+                                }
+                                isRequired
                             />
                         </div>
                     </CardContent>

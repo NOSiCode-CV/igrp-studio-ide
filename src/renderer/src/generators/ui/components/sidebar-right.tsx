@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MousePointer, X } from 'lucide-react';
+import { MousePointer, Settings, X } from 'lucide-react';
 
 import {
     Sidebar,
@@ -27,9 +27,13 @@ import useStudio from '@renderer/hooks/useStudio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
 
-export function SidebarRight({
-    ...props
-}: React.ComponentProps<typeof Sidebar>) {
+interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
+    comp?: StructuredComponent;
+}
+
+export function SidebarRight({ ...props }: SidebarRightProps) {
+    const { comp } = props;
+
     const { t } = useTranslation();
     const [formValues, setFormValues] = React.useState({});
 
@@ -43,16 +47,17 @@ export function SidebarRight({
         clearEditingComponent,
     } = useDroppedComponents();
 
-    if (!currentComponent) {
-        return null;
-    }
-
-    const { componentName, id: componentId, properties } = currentComponent;
+    const {
+        componentName,
+        id: componentId,
+        properties,
+    } = comp || currentComponent || {};
 
     React.useEffect(() => {
-        getPropertiesComponent(componentName).then((data) =>
-            setPropsComponents(data)
-        );
+        if (componentName)
+            getPropertiesComponent(componentName).then((data) =>
+                setPropsComponents(data)
+            );
     }, [getPropertiesComponent, componentName]);
 
     const handleInputChange = (name: string, value: string) => {
@@ -105,7 +110,8 @@ export function SidebarRight({
             properties: updatedConfig,
         };
 
-        handleUpdateChildComponent(componentId, updatedComponent);
+        if (componentId)
+            handleUpdateChildComponent(componentId, updatedComponent);
     }, [formValues]);
 
     return (
@@ -120,9 +126,11 @@ export function SidebarRight({
                         <h4 className="text-sm font-medium leading-none">
                             {t('settings')}
                         </h4>
-                        <p className="text-sm text-muted-foreground">
-                            {`${componentName} - ${componentId}`}
-                        </p>
+                        {componentName && (
+                            <p className="text-sm text-muted-foreground">
+                                {`${componentName} - ${componentId}`}
+                            </p>
+                        )}
                     </div>
                     <Button variant={'ghost'} onClick={handleClose}>
                         <X />
@@ -130,68 +138,86 @@ export function SidebarRight({
                 </div>
             </SidebarHeader>
             <SidebarContent>
-                <Tabs className="flex-1" defaultValue="props">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="props">Props</TabsTrigger>
-                        <TabsTrigger value="styles">Style</TabsTrigger>
-                        <TabsTrigger value="interactions">
-                            Interactions
-                        </TabsTrigger>
-                    </TabsList>
+                {!componentName ? (
+                   <div className='p-4'>
+                     <EmptyList
+                        icon={<Settings />}
+                        title="Settings Components"
+                        description="Select a component on the table to start edit"
+                    />
+                   </div>
+                ) : (
+                    <>
+                        <Tabs className="flex-1" defaultValue="props">
+                            <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="props">Props</TabsTrigger>
+                                <TabsTrigger value="styles">Style</TabsTrigger>
+                                <TabsTrigger value="interactions">
+                                    Interactions
+                                </TabsTrigger>
+                            </TabsList>
 
-                    <TabsContent value="props" className="space-y-6">
-                        <Accordion
-                            type="single"
-                            collapsible
-                            className="w-full"
-                            defaultValue="item-1"
-                        >
-                            <AccordionItem value="item-1">
-                                <AccordionTrigger className='px-2'>
-                                    {t('properties')}
-                                </AccordionTrigger>
-                                <AccordionContent className='px-2'>
-                                    {propsComponent && (
-                                        <RenderPropsConfig
-                                            propsComp={propsComponent}
-                                            formValues={formValues}
-                                            handleInputChange={
-                                                handleInputChange
-                                            }
-                                        />
-                                    )}
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </TabsContent>
-                    <TabsContent value="styles" className="space-y-6">
-                        <Accordion
-                            type="single"
-                            collapsible
-                            className="w-full"
-                            defaultValue="item-1"
-                        >
-                            <AccordionItem value="item-1" className="px-3">
-                                <AccordionTrigger>
-                                    {t('textProperties')}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <TextPropertiesPanel />
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </TabsContent>
-                    <TabsContent value="interactions" className="space-y-6">
-                        <div className="p-3">
-                            <EmptyList
-                                title="Element Trigger"
-                                description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
-                                className="py-12"
-                                icon={<MousePointer />}
-                            />
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                            <TabsContent value="props" className="space-y-6">
+                                <Accordion
+                                    type="single"
+                                    collapsible
+                                    className="w-full"
+                                    defaultValue="item-1"
+                                >
+                                    <AccordionItem value="item-1">
+                                        <AccordionTrigger className="px-2">
+                                            {t('properties')}
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-2">
+                                            {propsComponent && (
+                                                <RenderPropsConfig
+                                                    propsComp={propsComponent}
+                                                    formValues={formValues}
+                                                    handleInputChange={
+                                                        handleInputChange
+                                                    }
+                                                />
+                                            )}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </TabsContent>
+                            <TabsContent value="styles" className="space-y-6">
+                                <Accordion
+                                    type="single"
+                                    collapsible
+                                    className="w-full"
+                                    defaultValue="item-1"
+                                >
+                                    <AccordionItem
+                                        value="item-1"
+                                        className="px-3"
+                                    >
+                                        <AccordionTrigger>
+                                            {t('textProperties')}
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <TextPropertiesPanel />
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </TabsContent>
+                            <TabsContent
+                                value="interactions"
+                                className="space-y-6"
+                            >
+                                <div className="p-3">
+                                    <EmptyList
+                                        title="Element Trigger"
+                                        description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
+                                        className="py-12"
+                                        icon={<MousePointer />}
+                                    />
+                                </div>
+                            </TabsContent>
+                        </Tabs>
+                    </>
+                )}
             </SidebarContent>
         </Sidebar>
     );

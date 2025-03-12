@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import BoxContainer from '../BoxContainer';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { columnsVariants, columnVariants } from '../../utils/layout-mapping';
+import BoxContainer from '../tools/BoxContainer';
 
 export interface ColProps {
     isDisabled?: boolean;

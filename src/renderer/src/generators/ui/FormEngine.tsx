@@ -17,7 +17,7 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
-import { Page } from './types/components/Page';
+import { Page } from './types/components/page';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 
@@ -138,8 +138,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             console.log('dropZone', result);
             handleDragEnd(result, droppedComponentsMethods);
         }, []);
-
-    
 
         return (
             <>

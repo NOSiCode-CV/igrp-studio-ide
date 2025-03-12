@@ -56,7 +56,7 @@ class NextJsManager {
 
     this.sendLog(`Using ${installCommand} to install dependencies...`);
 
-    exec(installCommand, { cwd: this.nextAppPath }, (error, stdout, stderr) => {
+    exec(installCommand, { cwd: this.nextAppPath }, (error, _stdout, _stderr) => {
       if (error) {
         this.sendLog(`Error installing dependencies: ${error.message}`);
         return;
@@ -73,7 +73,7 @@ class NextJsManager {
     }
 
     this.sendLog('Starting Next.js...');
-    this.nextProcess = exec('npx next dev -p 3001', { cwd: this.nextAppPath }, (error, stdout, stderr) => {
+    this.nextProcess = exec('npx next dev -p 3001', { cwd: this.nextAppPath }, (error, stdout, _stderr) => {
       if (error) {
         this.sendLog(`Error starting Next.js: ${error.message}`);
         return;

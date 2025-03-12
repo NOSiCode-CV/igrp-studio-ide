@@ -7,7 +7,6 @@ import {
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
-import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({

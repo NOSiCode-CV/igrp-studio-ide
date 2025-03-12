@@ -11,12 +11,12 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import useStudio from '@renderer/hooks/useStudio';
-import {
-    DragEndResult,
-    StructuredComponent,
-} from '@renderer/lib/dnd/types';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
-import { BASIC_ELEMENTS, FORM_ELEMENTS, ICON_MAP } from '../ComponentTypes';
+import {
+    COMPONENT,
+    ICON_MAP,
+} from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 
@@ -27,23 +27,13 @@ export const AddField = ({ comp }: { comp: StructuredComponent }) => {
 
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
 
-    // Define the list of component names to filter by
-    const allowedComponentNames = [
-        FORM_ELEMENTS.InputField,
-        FORM_ELEMENTS.Checkbox,
-        FORM_ELEMENTS.Password,
-        FORM_ELEMENTS.DatePicker,
-        BASIC_ELEMENTS.Link,
-        BASIC_ELEMENTS.Button,
-    ];
-
     useEffect(() => {
         getRegistryComponent().then((data) => {
-            // Filter the components based on the allowed names
-            const filteredComponents = data.filter((item) =>
-                allowedComponentNames.includes(item.name)
+            const filteredComponents: ComponentRegisterConfig[] = data.filter(
+                (item: ComponentRegisterConfig) =>
+                    item.name === COMPONENT.Table
             );
-            setComponents(filteredComponents);
+            setComponents(filteredComponents[0].childrenTypes);
         });
     }, [getRegistryComponent]);
 

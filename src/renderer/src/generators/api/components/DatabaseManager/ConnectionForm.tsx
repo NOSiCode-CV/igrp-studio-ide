@@ -125,7 +125,6 @@ export function ConnectionForm({
                                                 value
                                             );
                                         }}
-                                        name="databaseType"
                                         className="w-full"
                                     />
                                     {errors.databaseType &&

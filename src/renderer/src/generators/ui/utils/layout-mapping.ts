@@ -242,13 +242,13 @@ export const gridVariants = cva(
 )
 
 export const formVariants = cva(
-    "flex flex-col",
+    "flex flex-col gap-y-8",
     {
         variants: {
             variant: layoutMapping['grid']
         },
         defaultVariants: {
-            variant: "cols4",
+            variant: "cols1",
         },
     }
 )

@@ -8,7 +8,7 @@ import {
 } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
-import { Contact, LayoutDashboard, Plus } from 'lucide-react';
+import { LayoutDashboard, Plus } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
 import { PageCard } from './page-card';
 import {
@@ -80,7 +80,7 @@ const MainPageBuilder = ({
 
     const handleNewPage = () => {
         setNewPageModal(false);
-        setNewComponentModal(false)
+        setNewComponentModal(false);
         isLoadingTable(true);
     };
 

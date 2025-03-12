@@ -55,10 +55,10 @@ const Droppable = ({
             onDragLeave={handleDragLeave}
             id={componentId}
             className={cn(
-                'min-h-12 p-5 border-2 border-dashed border-gray-400 rounded-lg',
-                draggingItem && activeDropZone?.dropTargetId === componentId
-                    ? 'bg-muted/75 border-igrp'
-                    : 'bg-card',
+                'min-h-12 p-5 border border-dashed border-gray-400 rounded-lg bg-card',
+                draggingItem &&
+                    activeDropZone?.dropTargetId === componentId &&
+                    'bg-igrp/35',
                 className
             )}
         >

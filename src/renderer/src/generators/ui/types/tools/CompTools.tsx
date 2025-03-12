@@ -5,10 +5,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import { CONTAINERS, DATA_DISPLAY, STRUCTURES } from '../../ComponentTypes';
 import StructureDropdown from '../../components/StructureDropdown';
 import { AddField } from '../../components/add-fields';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { COMPONENT } from '../../ComponentTypes';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -25,8 +25,8 @@ const CompTools = ({
 }: ToolsProps) => {
     const { componentName, label } = comp;
 
-    const isGrids = [STRUCTURES.Columns].includes(componentName);
-    const hasAddField = [DATA_DISPLAY.Table, CONTAINERS.Form].includes(componentName);
+    const isGrids = [COMPONENT.Columns].includes(componentName);
+    const hasAddField = [COMPONENT.Table].includes(componentName);
 
     return (
         <TooltipProvider>

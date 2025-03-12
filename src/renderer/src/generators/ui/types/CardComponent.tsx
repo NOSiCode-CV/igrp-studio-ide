@@ -26,4 +26,4 @@ const CardComponent = ({ comp }: CardComponentProps) => {
     );
 };
 
-export default CardComponent; // Export the component
+export default CardComponent; 

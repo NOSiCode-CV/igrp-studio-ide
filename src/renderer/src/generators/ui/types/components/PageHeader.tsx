@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { PageHeader } from '@igrp/igrp-framework-react-design-system';
+import { PageHeader as IGRPPageHeader} from '@igrp/igrp-framework-react-design-system';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
@@ -14,7 +14,7 @@ export interface FormComponentProps {
     isDisabled?: boolean;
 }
 
-const PageHeaderLayout: React.FC<FormComponentProps> = ({
+const PageHeader: React.FC<FormComponentProps> = ({
     comp,
     onDragEnd,
 }) => {
@@ -79,7 +79,7 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
                 >
                     {Component && (
                         <BoxField
-                            id={button.id}
+                            comp={button}
                             onEdit={() => handleEditClick(button)}
                             index={index}
                         >
@@ -97,16 +97,16 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
             layout="horizontal"
             className="border-none"
         >
-            <PageHeader
+            <IGRPPageHeader
                 title={title || label || componentName}
                 description={description}
             >
                 <div className={cn('flex flex-1 justify-end gap-3')}>
                     {renderButtons()}
                 </div>
-            </PageHeader>
+            </IGRPPageHeader>
         </Droppable>
     );
 };
 
-export default PageHeaderLayout;
+export default PageHeader;

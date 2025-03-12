@@ -48,13 +48,14 @@ export function EmptyList({
                 </Button>
             )}
 
-            <Separator orientation="horizontal"/>
-
             {shortcut && (
-                <p className="mt-4 text-sm text-muted-foreground">
-                    Create shortcut:{' '}
-                    <kbd className="font-semibold">{shortcut}</kbd>
-                </p>
+                <>
+                    <Separator orientation="horizontal" />
+                    <p className="mt-4 text-sm text-muted-foreground">
+                        Create shortcut:{' '}
+                        <kbd className="font-semibold">{shortcut}</kbd>
+                    </p>
+                </>
             )}
         </div>
     );

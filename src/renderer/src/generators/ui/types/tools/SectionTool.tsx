@@ -5,11 +5,13 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@renderer/components/ui
 interface RowOptionsProps {
     onClickAddControl: (type: string) => void;
     onClickDeleteSection: () => void;
+    onEdit: () => void;
 }
 
-const RowOptions = ({
+const SectionTool = ({
     onClickAddControl,
     onClickDeleteSection,
+    onEdit
 }: RowOptionsProps) => {
     return (
         <div id="row-tools">
@@ -78,7 +80,7 @@ const RowOptions = ({
                         <TooltipTrigger asChild>
                             <button
                                 className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
-                                onClick={(e) => e.preventDefault()}
+                                onClick={onEdit}
                             >
                                 <Settings className="h-4" />
                             </button>
@@ -110,4 +112,4 @@ const RowOptions = ({
     );
 };
 
-export default RowOptions;
+export default SectionTool;

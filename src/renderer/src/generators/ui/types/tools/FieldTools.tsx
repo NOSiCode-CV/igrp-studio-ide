@@ -5,20 +5,26 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@renderer/components/ui/tooltip'; // Adjust the import path based on your project structure
+} from '@renderer/components/ui/tooltip';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { COMPONENT } from '../../ComponentTypes';
+import { EditComponent } from '../../components/EditComponent';
 
 interface ToolsProps {
     onEdit: () => void;
-    id: string;
+    comp: StructuredComponent;
     index: number;
 }
 
-const RowTools = ({ id, index, onEdit }: ToolsProps) => {
+const FieldTools = ({ comp, index, onEdit }: ToolsProps) => {
+    const { id, componentName } = comp;
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
     const onClickDeleteField = () => {
         handleRemoveChildFromComponent({ droppableId: id, index });
     };
+
+    const isAddField = [COMPONENT.Dropdown].includes(componentName);
 
     return (
         <TooltipProvider>
@@ -79,9 +85,10 @@ const RowTools = ({ id, index, onEdit }: ToolsProps) => {
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
+                {isAddField && <EditComponent comp={comp} />}
             </div>
         </TooltipProvider>
     );
 };
 
-export default RowTools;
+export default FieldTools;

@@ -13,12 +13,14 @@ import {
 } from '@renderer/components/ui/table';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { generateFakeDataForField } from '@renderer/utils/helpers';
-import RowTools from '../tools/RowTools';
+import RowTools from '../tools/FieldTools';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Button } from '@renderer/components/ui/button';
-import { ChevronRight } from 'lucide-react';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
+import { COMPONENT } from '../../ComponentTypes';
+import { Button } from '@renderer/components/ui/button';
+import { Ellipsis, Pointer } from 'lucide-react';
+import BoxField from '../tools/BoxFields';
 
 export interface TableProps {
     isDisabled?: boolean;
@@ -27,14 +29,7 @@ export interface TableProps {
 }
 
 const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
-    const { children, id: componentId } = comp;
-
-    const buttonChildren = children.filter(
-        (child) => child.componentName === 'button'
-    );
-    const nonButtonChildren = children.filter(
-        (child) => child.componentName !== 'button'
-    );
+    const { children: components, id: componentId } = comp;
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -52,7 +47,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
         const loadComponents = async () => {
             const comps: { [key: string]: React.ComponentType<any> } = {};
 
-            for (const comp of children) {
+            for (const comp of components) {
                 const component = await dynamicImport(comp.componentName);
                 comps[comp.id] = component;
             }
@@ -61,13 +56,13 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
         };
 
         loadComponents();
-    }, [children, dynamicImport]);
+    }, [components, dynamicImport]);
 
     // Function to generate fake data for the table
     const generateFakeData = () => {
         return Array.from({ length: 4 }).map(() => {
             const rowData: { [key: string]: any } = {};
-            children.forEach((child) => {
+            components.forEach((child) => {
                 rowData[child.id] = generateFakeDataForField(child);
             });
             return rowData;
@@ -77,36 +72,33 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
     const fakeData = generateFakeData();
 
     const renderChildren = () => {
-        return nonButtonChildren.map(
-            (comp: StructuredComponent, index: number) => {
-                const Component = loadedComponents[comp.id];
-                const { componentName } = comp;
+        return components.map((comp: StructuredComponent, index: number) => {
+            const Component = loadedComponents[comp.id];
+            const { componentName } = comp;
 
-                return (
-                    Component && (
-                        <TableHead key={comp.id}>
-                            <Draggable
-                                item={comp}
+            return (
+                Component && (
+                    <TableHead key={comp.id}>
+                        <Draggable
+                            item={comp}
+                            index={index}
+                            mode="MOVE"
+                            layout="horizontal"
+                            dropTargetId={componentId}
+                            className={cn('border-none')}
+                        >
+                            <BoxField
                                 index={index}
-                                mode="MOVE"
-                                layout="horizontal"
-                                dropTargetId={componentId}
-                                className={cn('relative group border-none')}
+                                comp={comp}
+                                onEdit={() => handleEditClick(comp)}
                             >
                                 <span>{componentName}</span>
-                                <div className="absolute top-0 text-center mt-1 px-2 py-1 bg-gray-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
-                                    <RowTools
-                                        id={comp.id}
-                                        onEdit={() => handleEditClick(comp)}
-                                        index={index}
-                                    />
-                                </div>
-                            </Draggable>
-                        </TableHead>
-                    )
-                );
-            }
-        );
+                            </BoxField>
+                        </Draggable>
+                    </TableHead>
+                )
+            );
+        });
     };
 
     return (
@@ -117,60 +109,41 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }: TableProps) => {
         >
             <Table>
                 <TableHeader>
-                    <TableRow>
-                        {renderChildren()}
-                        {/* Add a single header for all buttons */}
-                        {buttonChildren.length > 0 && (
-                            <TableHead>Actions</TableHead>
-                        )}
-                    </TableRow>
+                    <TableRow>{renderChildren()}</TableRow>
                 </TableHeader>
                 <TableBody>
-                    {children.length > 0 ? (
+                    {components.length > 0 ? (
                         fakeData.map((row, rowIndex) => (
                             <TableRow key={rowIndex}>
-                                {nonButtonChildren.map((child) => (
+                                {components.map((child) => (
                                     <TableCell key={child.id}>
-                                        {child.componentName === 'checkbox' ? (
+                                        {child.componentName ===
+                                        COMPONENT.Checkbox ? (
                                             <Checkbox
                                                 id={child.id}
                                                 checked={row[child.id]}
-                                                onCheckedChange={(checked) => {
-                                                    // Handle checkbox state change if needed
-                                                    console.log(
-                                                        `Checkbox ${child.id} changed to:`,
-                                                        checked
-                                                    );
-                                                }}
                                             />
+                                        ) : child.componentName ===
+                                          COMPONENT.Dropdown ? (
+                                            <Button
+                                                variant={'ghost'}
+                                                size={'icon'}
+                                            >
+                                                <Ellipsis />
+                                            </Button>
+                                        ) : child.componentName ===
+                                          COMPONENT.Button ? (
+                                            <Button
+                                                variant={'secondary'}
+                                                size={'icon'}
+                                            >
+                                                <Pointer />
+                                            </Button>
                                         ) : (
                                             row[child.id]
                                         )}
                                     </TableCell>
                                 ))}
-                                {/* Render all buttons in a single cell */}
-                                {buttonChildren.length > 0 && (
-                                    <TableCell>
-                                        <div className="flex flex-1 space-x-1">
-                                            {buttonChildren.map((child) => (
-                                                <Button
-                                                    key={child.id}
-                                                    variant="outline"
-                                                    size={'icon'}
-                                                    onClick={() => {
-                                                        // Handle button click
-                                                        console.log(
-                                                            `Button ${child.id} clicked`
-                                                        );
-                                                    }}
-                                                    className="ml-auto"
-                                                >
-                                                    <ChevronRight />
-                                                </Button>
-                                            ))}
-                                        </div>
-                                    </TableCell>
-                                )}
                             </TableRow>
                         ))
                     ) : (

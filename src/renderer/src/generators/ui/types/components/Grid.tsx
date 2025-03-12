@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import BoxContainer from '../BoxContainer';
+import BoxContainer from '../tools/BoxContainer';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/useStudio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import { gridVariants, layoutMapping } from '../../utils/layout-mapping';
+import { gridVariants } from '../../utils/layout-mapping';
 
 export interface GridProps {
     comp: StructuredComponent;
@@ -15,7 +15,7 @@ export interface GridProps {
 }
 
 const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
-    const { children, properties, id: componentId, componentName } = comp;
+    const { children, properties, id: componentId } = comp;
 
     const { variant, className } = properties || {};
 

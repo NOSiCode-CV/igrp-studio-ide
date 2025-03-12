@@ -24,7 +24,6 @@ import {
     GripHorizontal,
     Home,
     ListTodo,
-    ListTree,
     Terminal,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -250,7 +249,8 @@ export function AppSidebar({
                                                                     item={
                                                                         subItem
                                                                     }
-                                                                    className="w-full h-full"
+                                                                    className="w-full h-full p-2 rounded-lg cursor-move flex flex-col items-center gap-2
+                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card "
                                                                     dropZone={
                                                                         false
                                                                     }
@@ -258,22 +258,17 @@ export function AppSidebar({
                                                                         item.type
                                                                     }
                                                                 >
-                                                                    <div
-                                                                        className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2
-                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card h-full"
-                                                                    >
-                                                                        <GripHorizontal className="w-4 h-4 text-gray-400" />
+                                                                    <GripHorizontal className="w-4 h-4 text-gray-400" />
 
-                                                                        <div className="flex flex-col items-center gap-2">
-                                                                            {subItem.icon && (
-                                                                                <subItem.icon className="w-6 h-6" />
-                                                                            )}
-                                                                            <span className="text-center">
-                                                                                {
-                                                                                    subItem.label
-                                                                                }
-                                                                            </span>
-                                                                        </div>
+                                                                    <div className="flex flex-col items-center gap-2">
+                                                                        {subItem.icon && (
+                                                                            <subItem.icon className="w-6 h-6" />
+                                                                        )}
+                                                                        <span className="text-center">
+                                                                            {
+                                                                                subItem.label
+                                                                            }
+                                                                        </span>
                                                                     </div>
                                                                 </Draggable>
                                                             </SidebarMenuItem>

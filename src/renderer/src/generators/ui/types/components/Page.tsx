@@ -3,7 +3,7 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import PageTools from '../tools/PageTools';
 import { useEffect, useRef, useState } from 'react';
 import useStudio from '@renderer/hooks/useStudio';
-import { STRUCTURES } from '../../ComponentTypes';
+import { COMPONENT } from '../../ComponentTypes';
 
 interface PageProps {
     page: StructuredLayout;
@@ -41,7 +41,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
     }, [components, dynamicImport]);
 
     const handleAddControl = (type: string, componentId: string) => {
-        const newRow = newStructure(STRUCTURES.Section);
+        const newRow = newStructure(COMPONENT.Section);
         const rowIndex = components.findIndex(
             (section) => section.id === componentId
         );
@@ -62,7 +62,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
 
     useEffect(() => {
         if (components.length === 0) {
-            const newRow = newStructure(STRUCTURES.Section);
+            const newRow = newStructure(COMPONENT.Section);
             setInitComponents({
                 ...page,
                 children: [newRow],
@@ -75,8 +75,9 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
     };
 
     return (
-        <div className="m-1 px-4 group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
+        <div className="group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
             <PageTools onEdit={handleEditClick} />
+            <div className='flex-1 overflow-y-auto flex flex-col'>
             <div className="py-6 gap-3 grid">
                 {components.map((row) => {
                     const Component = loadedComponents[row.id];
@@ -97,7 +98,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
                         </div>
                     );
                 })}
-            </div>
+            </div></div>
         </div>
     );
 };
