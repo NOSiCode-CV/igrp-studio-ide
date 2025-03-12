@@ -64,7 +64,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
         const type = isValueObject ? newType.value : newType;
 
-        const objectType = isValueObject ? newType.type : '';
+        const objectType = isValueObject ? newType.type : newType === 'object' ? 'dto' : '';
 
         const updatedResponses = {
             ...formik.values.responses,
