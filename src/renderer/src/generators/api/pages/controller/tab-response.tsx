@@ -169,7 +169,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     'border-b-2 border-igrp text-igrp'
                             )}
                         >
-                            {`${responses[statusCode].name} (${statusCode})`}
+                        {responses[statusCode]?.name ? `${responses[statusCode].name} (${statusCode})` : `${statusCode}`}
                         </button>
                     ))}
                 </div>
@@ -197,7 +197,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const schema = content?.[contentType]?.['schema'];
 
                     const type = schema && schema.type;
-                    const collectionType = schema && schema.collectionType || 'none'; 
+                    const collectionType = schema && schema.collectionType || 'none';
 
                     const contentData =
                         schema && schema.name !== 'undefined'
