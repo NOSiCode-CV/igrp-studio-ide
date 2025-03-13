@@ -369,6 +369,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         const targetDto = dto.map((d) => ({
             value: d.content?.name || d.name,
             label: d.content?.name || d.name,
+            module: d.content?.module,
         }));
 
         setSchemaTypes((prevSchemaTypes) =>

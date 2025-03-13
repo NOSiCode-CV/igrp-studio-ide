@@ -10,7 +10,6 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types';
 import { ConnectionForm } from './ConnectionForm';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Connection } from 'src/main/types';
@@ -62,7 +61,7 @@ export function ConnectionManager({ title }: { title?: string }) {
         await window.repo.connection.delete(name);
     };
 
-    const columns: ColumnDef<Connection>[] = [
+    const columns: any[] = [
         {
             header: t('connection_name'), // Use translation for header
             accessorKey: 'name',

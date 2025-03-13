@@ -74,21 +74,23 @@ const ModelLayout = ({
         },
     });
 
-  const suggestTableName = async (name: string) => {
-      const errors = await formik.validateForm();
-      console.log(errors.name);
-      if (errors.name) {
-          return '';
-      }
+    const suggestTableName = async (name: string) => {
+        const errors = await formik.validateForm();
 
-      const nameProcessed = name
-          .replace(/([a-z])([A-Z])/g, '$1_$2')
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, '_');
+        if (errors.name) {
+            return '';
+        }
 
-     return nameProcessed.startsWith('t_') ? nameProcessed : `t_${nameProcessed}`;
-  };
+        const nameProcessed = name
+            .replace(/([a-z])([A-Z])/g, '$1_$2')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '_');
+
+        return nameProcessed.startsWith('t_')
+            ? nameProcessed
+            : `t_${nameProcessed}`;
+    };
 
     const handleNameBlur = async (
         e: FocusEvent<HTMLInputElement>
@@ -232,7 +234,6 @@ const ModelLayout = ({
                 name: formik.values.name,
                 type: 'model',
                 module: currentItem.module,
-                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(
@@ -240,6 +241,9 @@ const ModelLayout = ({
                 ENV_TYPES.SPRING,
                 basePath
             );
+
+            console.log('error', error);
+            console.log('config', config);
 
             if (error) return showErrorToast(error);
 

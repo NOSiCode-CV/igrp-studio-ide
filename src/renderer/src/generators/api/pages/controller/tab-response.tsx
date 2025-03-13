@@ -57,14 +57,20 @@ export const TabResponse: React.FC<TabResponseProps> = ({
             statusCode,
             contentType,
             type: newType,
-            collectionType='none',
+            collectionType = 'none',
         } = response;
 
         const isValueObject = typeof newType === 'object' && newType !== null;
 
         const type = isValueObject ? newType.value : newType;
 
-        const objectType = isValueObject ? newType.type : newType === 'object' ? 'dto' : '';
+        const module = isValueObject ? newType.moduel : '';
+
+        const objectType = isValueObject
+            ? newType.type
+            : newType === 'object'
+              ? 'dto'
+              : '';
 
         const updatedResponses = {
             ...formik.values.responses,
@@ -78,6 +84,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             objectType,
                             name: '',
                             collectionType,
+                            module,
                         },
                     },
                 },
@@ -169,7 +176,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     'border-b-2 border-igrp text-igrp'
                             )}
                         >
-                        {responses[statusCode]?.name ? `${responses[statusCode].name} (${statusCode})` : `${statusCode}`}
+                            {responses[statusCode]?.name
+                                ? `${responses[statusCode].name} (${statusCode})`
+                                : `${statusCode}`}
                         </button>
                     ))}
                 </div>
@@ -197,7 +206,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const schema = content?.[contentType]?.['schema'];
 
                     const type = schema && schema.type;
-                    const collectionType = schema && schema.collectionType || 'none';
+                    const collectionType =
+                        (schema && schema.collectionType) || 'none';
 
                     const contentData =
                         schema && schema.name !== 'undefined'
