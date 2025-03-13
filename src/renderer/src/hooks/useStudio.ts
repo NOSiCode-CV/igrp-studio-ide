@@ -1,3 +1,4 @@
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -75,19 +76,45 @@ const useStudio = () => {
     }, []);
 
     const getRegistryComponent = useCallback(async () => {
-        const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS)
-        return result.components
-    }, [])
+        const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
+        return result.components;
+    }, []);
 
-    const getPropertiesComponent = useCallback(async (componentName: string) => {
-        if (!componentName) return null;
-        const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS)
-        const component = result.components.filter((comp) => comp.name === componentName)
-        console.log(component)
-        return component && component[0].properties;
-    }, [])
+    // Helper function to find a component by name or within a parent's acceptedChildren
+    const findComponent = useCallback(
+        async (parentComponentName: string | undefined, componentName: string) => {
+            if (!componentName) return null;
 
-    return { basePath, getPropertiesComponent, getRegistryComponent, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
+            const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
+
+            // First, try to find the component directly by its name
+            let component = result.components.find((comp: ComponentRegisterConfig) => comp.name === componentName);
+
+            if (!component && parentComponentName) {
+                // If not found, search within the acceptedChildren of the specified parentComponentName
+                const parentComponent = result.components.find((comp: ComponentRegisterConfig) => comp.name === parentComponentName);
+
+                if (parentComponent && parentComponent.acceptedChildren) {
+                    component = parentComponent.acceptedChildren.find((child: ComponentRegisterConfig) => child.name === componentName);
+                }
+            }
+
+            return component || null;
+        },
+        []
+    );
+
+    const getAcceptedChildren = useCallback(async (parentComponentName: string, componentName: string) => {
+        const component = await findComponent(parentComponentName, componentName);
+        return component ? component.acceptedChildren : [];
+    }, [findComponent]);
+
+    const getPropertiesComponent = useCallback(async (parentComponentName: string | undefined, componentName: string) => {
+        const component = await findComponent(parentComponentName, componentName);
+        return component ? component.properties : [];
+    }, [findComponent]);
+
+    return { basePath, getAcceptedChildren, getPropertiesComponent, getRegistryComponent, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
 };
 
 export default useStudio;

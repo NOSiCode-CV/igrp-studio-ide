@@ -51,12 +51,15 @@ export function SidebarRight({ ...props }: SidebarRightProps) {
         componentName,
         id: componentId,
         properties,
-    } = comp || currentComponent || {};
+    } = comp || currentComponent?.component || {};
+
+    const { componentName: parentComponentName } =
+        comp || currentComponent?.parentComp || {};
 
     React.useEffect(() => {
         if (componentName)
-            getPropertiesComponent(componentName).then((data) =>
-                setPropsComponents(data)
+            getPropertiesComponent(parentComponentName, componentName).then(
+                (data) => setPropsComponents(data)
             );
     }, [getPropertiesComponent, componentName]);
 
@@ -93,11 +96,6 @@ export function SidebarRight({ ...props }: SidebarRightProps) {
                 {}
             );
 
-            console.log(
-                'Initial Form Values:',
-                initialFormValues,
-                propsComponent
-            );
             setFormValues(initialFormValues);
         }
     }, [propsComponent, properties, componentName]);
@@ -126,26 +124,29 @@ export function SidebarRight({ ...props }: SidebarRightProps) {
                         <h4 className="text-sm font-medium leading-none">
                             {t('settings')}
                         </h4>
+
                         {componentName && (
                             <p className="text-sm text-muted-foreground">
                                 {`${componentName} - ${componentId}`}
                             </p>
                         )}
                     </div>
-                    <Button variant={'ghost'} onClick={handleClose}>
-                        <X />
-                    </Button>
+                    {!comp && (
+                        <Button variant={'ghost'} onClick={handleClose}>
+                            <X />
+                        </Button>
+                    )}
                 </div>
             </SidebarHeader>
             <SidebarContent>
                 {!componentName ? (
-                   <div className='p-4'>
-                     <EmptyList
-                        icon={<Settings />}
-                        title="Settings Components"
-                        description="Select a component on the table to start edit"
-                    />
-                   </div>
+                    <div className="p-4">
+                        <EmptyList
+                            icon={<Settings />}
+                            title="Settings Components"
+                            description="Select a component on the table to start edit"
+                        />
+                    </div>
                 ) : (
                     <>
                         <Tabs className="flex-1" defaultValue="props">

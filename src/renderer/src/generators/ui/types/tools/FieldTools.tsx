@@ -13,10 +13,11 @@ import { EditComponent } from '../../components/EditComponent';
 interface ToolsProps {
     onEdit: () => void;
     comp: StructuredComponent;
+    parentComp: StructuredComponent;
     index: number;
 }
 
-const FieldTools = ({ comp, index, onEdit }: ToolsProps) => {
+const FieldTools = ({ parentComp, comp, index, onEdit }: ToolsProps) => {
     const { id, componentName } = comp;
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
@@ -24,7 +25,7 @@ const FieldTools = ({ comp, index, onEdit }: ToolsProps) => {
         handleRemoveChildFromComponent({ droppableId: id, index });
     };
 
-    const isAddField = [COMPONENT.Dropdown].includes(componentName);
+    const hasAddField = [COMPONENT.Dropdown].includes(componentName);
 
     return (
         <TooltipProvider>
@@ -85,7 +86,9 @@ const FieldTools = ({ comp, index, onEdit }: ToolsProps) => {
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
-                {isAddField && <EditComponent comp={comp} />}
+                {hasAddField && (
+                    <EditComponent parentComp={parentComp} comp={comp} />
+                )}
             </div>
         </TooltipProvider>
     );

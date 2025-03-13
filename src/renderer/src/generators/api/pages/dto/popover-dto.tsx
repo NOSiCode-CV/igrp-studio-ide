@@ -179,13 +179,19 @@ export function PopoverDto({
                                             className="h-8"
                                             value={row?.['minLength'] || ''}
                                             placeholder=">=0"
-                                            onChange={(ev) =>
-                                                changeValue(
-                                                    'minLength',
-                                                    index,
-                                                    Number(ev.target.value)
-                                                )
-                                            }
+                                            min={1}
+                                            onChange={(ev) => {
+                                                const value = Number(
+                                                    ev.target.value
+                                                );
+                                                if (value >= 0) {
+                                                    changeValue(
+                                                        'minLength',
+                                                        index,
+                                                        value
+                                                    );
+                                                }
+                                            }}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -198,13 +204,18 @@ export function PopoverDto({
                                             className="h-8"
                                             value={row?.['maxLength'] || ''}
                                             placeholder=">=0"
-                                            onChange={(ev) =>
-                                                changeValue(
-                                                    'maxLength',
-                                                    index,
-                                                    Number(ev.target.value)
-                                                )
-                                            }
+                                            onChange={(ev) => {
+                                                const value = Number(
+                                                    ev.target.value
+                                                );
+                                                if (value >= 0) {
+                                                    changeValue(
+                                                        'minLength',
+                                                        index,
+                                                        value
+                                                    );
+                                                }
+                                            }}
                                         />
                                     </div>
                                     <div className="space-y-2">

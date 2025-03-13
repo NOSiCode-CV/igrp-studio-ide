@@ -22,7 +22,15 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
-    EVENTS.ENGINE.CREATE_RESPONSE,
+    EVENTS.SPRING.CREATE_ENUM,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createEnum?.(config, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_RESPONSE,
     async (_event, response: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
         await engine.createResponse?.(response, basePath);
@@ -45,31 +53,6 @@ handleWithCustomErrors(
     }
 );
 
-handleWithCustomErrors(EVENTS.SPRING.CREATE_MODULE, async (_event, moduleConfig, basePath) => {
-    await addModule(moduleConfig, basePath);
-});
-
-handleWithCustomErrors(EVENTS.SPRING.CREATE_MODEL, async (_event, modelConfig, basePath) => {
-    await addModel(modelConfig, basePath);
-});
-
-handleWithCustomErrors(
-    EVENTS.SPRING.CREATE_DTO,
-    async (_event, dtoConfig: DTOConfig, basePath: string) => {
-        await addDTO(dtoConfig, basePath);
-    }
-);
-
-handleWithCustomErrors(
-    EVENTS.SPRING.CREATE_CONTROLLER,
-    async (_event, controllerConfig: ControllerConfig, basePath: string) => {
-        await addController(controllerConfig, basePath);
-    }
-);
-
-ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
-    return await engineTypes(module, basePath);
-});
 
 handleWithCustomErrors(
     EVENTS.NEXT.CREATE_PAGE,
@@ -99,8 +82,35 @@ handleWithCustomErrors(
     EVENTS.NEXT.GET_COMPONENT,
     async (_event, engineType: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        const data  = engine.getComponents?.();
+        const data = engine.getComponents?.();
 
-       return data;
+        return data;
     }
 );
+
+
+handleWithCustomErrors(EVENTS.SPRING.CREATE_MODULE, async (_event, moduleConfig, basePath) => {
+    await addModule(moduleConfig, basePath);
+});
+
+handleWithCustomErrors(EVENTS.SPRING.CREATE_MODEL, async (_event, modelConfig, basePath) => {
+    await addModel(modelConfig, basePath);
+});
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_DTO,
+    async (_event, dtoConfig: DTOConfig, basePath: string) => {
+        await addDTO(dtoConfig, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_CONTROLLER,
+    async (_event, controllerConfig: ControllerConfig, basePath: string) => {
+        await addController(controllerConfig, basePath);
+    }
+);
+
+ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
+    return await engineTypes(module, basePath);
+});

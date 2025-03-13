@@ -110,7 +110,9 @@ export const COMPONENT: Record<string, string> = {
     Dropdowns: 'dropdowns',
     EmbedVideo: 'embedVideo',
     Progress: 'progress',
-    Dropdown: 'dropdown'
+    Dropdown: 'dropdown',
+    TableColumn: 'tableColumns',
+    TableFilter: 'tableFilters',
 };
 
 // Icon Mapping
@@ -165,5 +167,9 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     section: RectangleHorizontal,
     slider: SlidersHorizontal,
     chart: ChartPie,
-    dropdown: Ellipsis
+    dropdown: Ellipsis,
+    tableDateFilter: CalendarIcon,
+    tableTextFilter: FormInput,
+    tableNumberFilter: Sliders,
+    tableCheckboxFilter: CheckSquare,
 };

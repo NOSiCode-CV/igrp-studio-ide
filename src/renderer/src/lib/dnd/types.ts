@@ -1,3 +1,5 @@
+import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
+
 export type LayoutMode = "vertical" | "horizontal"
 export type DropPosition = "top" | "bottom" | "left" | "right" | "inside"
 
@@ -70,6 +72,12 @@ export interface Source {
     content?: string;
     [key: string]: any;
   };
+  childrenTypes?: ComponentRegisterConfig[]
+}
+
+export interface EditingComponentParams {
+  parentComp: StructuredComponent;
+  component: StructuredComponent;
 }
 
 export interface DroppedComponentsContextType {

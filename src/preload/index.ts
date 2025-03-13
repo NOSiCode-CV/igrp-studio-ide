@@ -88,42 +88,42 @@ const api = {
 const engine = {
 	createProject: async (project: ProjectData, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-project', project, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PROJECT, project, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.DELETE_ELEMENT, config, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_RESPONSE, response, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createEnum: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-enum', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_ENUM, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	serializeElement: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:serialize-element', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.SERIALIZE_ELEMENT, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createPermission: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-permission', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PERMISSION, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}

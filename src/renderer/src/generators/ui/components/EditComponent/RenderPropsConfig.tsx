@@ -27,6 +27,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                 const { enum: enumValues, type: typeValue } = propsComp[key];
                 const label = getLabel(key);
                 const type = enumValues ? 'enum' : typeValue;
+                const value = formValues[key] || '';
                 return (
                     <div className="flex flex-col gap-2" key={key}>
                         <Label htmlFor={key}>{label}</Label>
@@ -36,7 +37,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     return (
                                         <Switch
                                             name={key}
-                                            checked={formValues[key]}
+                                            checked={value}
                                             onChange={(checked) =>
                                                 handleInputChange(key, checked)
                                             }
@@ -45,7 +46,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                 case 'enum':
                                     return (
                                         <IGRPCombobox
-                                            value={formValues[key]}
+                                            value={value}
                                             onChange={(value) =>
                                                 handleInputChange(key, value)
                                             }
@@ -63,14 +64,13 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                         <Input
                                             type="text"
                                             name={key}
-                                            value={formValues[key]}
+                                            value={value}
                                             onChange={(e) =>
                                                 handleInputChange(
                                                     key,
                                                     e.target.value
                                                 )
                                             }
-                                            className=""
                                         />
                                     );
                                 case 'number':
@@ -78,14 +78,13 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                         <Input
                                             type="number"
                                             name={key}
-                                            value={formValues[key]}
+                                            value={value}
                                             onChange={(e) =>
                                                 handleInputChange(
                                                     key,
                                                     e.target.value
                                                 )
                                             }
-                                            className=""
                                         />
                                     );
                                 default:

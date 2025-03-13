@@ -15,7 +15,7 @@ import {
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState, useCallback } from 'react';
-import { COMPONENT, ICON_MAP } from '../../ComponentTypes';
+import { ICON_MAP } from '../../ComponentTypes';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../../dnd/DraggableItemManager';
 import { Button } from '@renderer/components/ui/button';
@@ -23,42 +23,45 @@ import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { SidebarRight } from '../sidebar-right';
-import { Separator } from '@renderer/components/ui/separator';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@renderer/components/ui/table';
 
-export const EditComponent = ({ comp }: { comp: StructuredComponent }) => {
+export const EditComponent = ({
+    parentComp,
+    comp,
+}: {
+    parentComp: StructuredComponent;
+    comp: StructuredComponent;
+}) => {
+    const { componentName: parentComponentName } = parentComp;
+
     const { componentName, id, children } = comp;
-    const { getRegistryComponent } = useStudio();
-    const { handleAddChildToComponent } = useDroppedComponents();
+
+    const [currentComponent, setCurrentComponent] =
+        useState<StructuredComponent>(comp);
 
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
-    const [actionComps, setActionComps] = useState<ComponentRegisterConfig[]>(
-        []
-    );
-    const [createdComponents, setCreatedComponents] = useState<
-        ComponentRegisterConfig[]
-    >([]);
-    const [createdActions, setCreatedActions] = useState<
-        ComponentRegisterConfig[]
-    >([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const { getAcceptedChildren } = useStudio();
+
+    const { handleAddChildToComponent } = useDroppedComponents();
 
     // Fetch and filter components on mount
     useEffect(() => {
-        const fetchComponents = async () => {
-            const data = await getRegistryComponent();
-            console.log(data);
-            const filteredComponents = data.filter(
-                (item: ComponentRegisterConfig) => item.name === COMPONENT.Table
-            );
-            setComponents(filteredComponents);
-        };
-
-        fetchComponents();
-    }, [getRegistryComponent]);
+        getAcceptedChildren(parentComponentName, componentName).then((data) => {
+            setComponents(data);
+        });
+    }, [getAcceptedChildren]);
 
     // Handle adding a component
     const handleAddComponent = useCallback(
-        (item: any, isAction: boolean = false) => {
+        (item: any) => {
             const result: DragEndResult = {
                 type: '',
                 draggableId: item.name,
@@ -72,34 +75,13 @@ export const EditComponent = ({ comp }: { comp: StructuredComponent }) => {
             handleDragEnd(result, {
                 handleAddChildToComponent,
             });
-
-            // Add the component to the created list
-            if (isAction) {
-                setCreatedActions((prev) => [...prev, item]);
-            } else {
-                setCreatedComponents((prev) => [...prev, item]);
-            }
         },
         [id, children.length, handleAddChildToComponent]
     );
 
-    // Render the icon for a component
-    const renderIcon = useCallback((iconName: string) => {
-        const IconComponent = ICON_MAP[iconName];
-        return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
-    }, []);
-
-    // Render a list of created components
-    const renderCreatedComponents = (components: ComponentRegisterConfig[]) => (
-        <div className="space-y-2">
-            {components.map((component) => (
-                <div key={component.name} className="flex items-center gap-2">
-                    {renderIcon(component.name)}
-                    <span>{component.label}</span>
-                </div>
-            ))}
-        </div>
-    );
+    const onEdit = (component: StructuredComponent) => {
+        setCurrentComponent(component);
+    };
 
     return (
         <>
@@ -122,33 +104,38 @@ export const EditComponent = ({ comp }: { comp: StructuredComponent }) => {
                 <DialogContent className="max-w-6xl h-[70vh] p-0 flex overflow-hidden">
                     <div className="flex flex-1 flex-col overflow-auto order-first">
                         <DialogHeader className="p-4">
-                            <DialogTitle>Add Component</DialogTitle>
-                            <DialogDescription>
-                                Select a component to add to your{' '}
-                                {componentName}
-                            </DialogDescription>
+                            <div className="flex justify-between">
+                                <div>
+                                    <DialogTitle>Add Component</DialogTitle>
+                                    <DialogDescription>
+                                        Select a component to add to your{' '}
+                                        {componentName}
+                                    </DialogDescription>
+                                </div>
+                                <div className="justify-end">
+                                    {components.map((comp) => {
+                                        return (
+                                            <Button
+                                                key={comp.name}
+                                                onClick={() =>
+                                                    handleAddComponent(comp)
+                                                }
+                                            >
+                                                <Plus />
+                                                {comp.label}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </DialogHeader>
                         <div className="flex-1 overflow-auto p-4">
                             <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <h3 className="text-lg font-semibold">
-                                        Component Details
-                                    </h3>
-                                    <Button
-                                        size={'sm'}
-                                        onClick={() => {
-                                            handleAddComponent(components[0]);
-                                        }}
-                                    >
-                                        <Plus />
-                                        <span>Add Component</span>
-                                    </Button>
-                                </div>
-                                <Separator />
                                 <div>
-                                    {createdComponents.length > 0 ? (
+                                    {children.length > 0 ? (
                                         renderCreatedComponents(
-                                            createdComponents
+                                            children,
+                                            onEdit
                                         )
                                     ) : (
                                         <>
@@ -160,10 +147,75 @@ export const EditComponent = ({ comp }: { comp: StructuredComponent }) => {
                         </div>
                     </div>
                     <div className="order-last border-l">
-                        <SidebarRight />
+                        <SidebarRight comp={currentComponent} />
                     </div>
                 </DialogContent>
             </Dialog>
         </>
+    );
+};
+const renderCreatedComponents = (
+    components: StructuredComponent[],
+    onEdit: (comp: StructuredComponent) => void
+) => {
+    const { handleRemoveChildFromComponent } = useDroppedComponents();
+
+    const handleEditComponent = (component: StructuredComponent) => {
+        onEdit(component);
+    };
+
+    // Render the icon for a component
+    const renderIcon = (iconName: string) => {
+        const IconComponent = ICON_MAP[iconName];
+        return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
+    };
+
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {components.map((component, index) => (
+                    <TableRow key={index}>
+                        <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                                {renderIcon(component.properties?.iconClass)}
+                                <span>{component.label}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        handleEditComponent(component)
+                                    }
+                                >
+                                    Edit
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-600 hover:text-red-900"
+                                    onClick={() =>
+                                        handleRemoveChildFromComponent({
+                                            droppableId: component.id,
+                                            index,
+                                        })
+                                    }
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
     );
 };

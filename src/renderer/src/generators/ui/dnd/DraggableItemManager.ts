@@ -1,6 +1,7 @@
 import { generateId } from "@renderer/utils/helpers";
 import { COMPONENT } from "../ComponentTypes";
 import { Destination, Source, StructuredComponent } from "@renderer/lib/dnd/types";
+import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export const handleDragEnd = (
     result: any,
@@ -26,7 +27,7 @@ const handleDropComponent = (
     type: string,
     { handleAddChildToComponent }: any
 ) => {
-    const { label, properties } = source
+    const { label, properties, childrenTypes } = source
     // Generate a unique ID for the component
     const componentId = generateId(draggableId);
 
@@ -39,6 +40,19 @@ const handleDropComponent = (
         properties: setDefaultProperties(properties),
         children: [], // Initialize children array
     };
+
+    childrenTypes && childrenTypes.map((child: ComponentRegisterConfig) => {
+        const { name, label, properties } = child
+        const childId = generateId(name);
+        const childComponent: StructuredComponent = {
+            id: childId,
+            componentName: name,
+            label: label,
+            properties: setDefaultProperties(properties),
+            children: [],
+        };
+        component.children?.push(childComponent);
+    });
 
     // Handle Columns component
     if (draggableId === COMPONENT.Columns) {
@@ -62,7 +76,7 @@ const handleDropComponent = (
         const childColumn: StructuredComponent = {
             id: childColumnId,
             componentName: COMPONENT.Grid,
-            label:COMPONENT.Grid,
+            label: COMPONENT.Grid,
             properties: { variant: 'cols4' },
             children: [],
         };

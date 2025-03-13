@@ -43,7 +43,10 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     }, [children, dynamicImport]);
 
     const handleEditClick = (component: StructuredComponent) => {
-        setEditingComponent({ ...component });
+        setEditingComponent({
+            parentComp: comp,
+            component,
+        });
     };
 
     const renderFields = () => {

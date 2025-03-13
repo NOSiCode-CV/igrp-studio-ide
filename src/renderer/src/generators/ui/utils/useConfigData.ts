@@ -38,7 +38,8 @@ const useConfigdata = () => {
                 id: component.name,
                 label: component.label,
                 icon: ICON_MAP[component.name],
-                properties: component.properties
+                properties: component.properties,
+                childrenTypes: component.childrenTypes
             }))
         }));
     }, [components]);

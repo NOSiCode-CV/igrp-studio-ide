@@ -28,7 +28,10 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
     const { dynamicImport } = useStudio();
 
     const handleEditClick = (component: StructuredComponent) => {
-        setEditingComponent(component);
+        setEditingComponent({
+            parentComp: comp,
+            component,
+        });
     };
 
     useEffect(() => {

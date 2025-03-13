@@ -47,7 +47,10 @@ const PageHeader: React.FC<FormComponentProps> = ({
     }, [comp]);
 
     const handleEditClick = (component: StructuredComponent) => {
-        setEditingComponent({ ...component });
+        setEditingComponent({
+            parentComp: comp,
+            component,
+        });
     };
 
     useEffect(() => {

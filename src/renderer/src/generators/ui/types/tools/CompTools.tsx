@@ -6,7 +6,6 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import StructureDropdown from '../../components/StructureDropdown';
-import { AddField } from '../../components/add-fields';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT } from '../../ComponentTypes';
 
@@ -26,7 +25,6 @@ const CompTools = ({
     const { componentName, label } = comp;
 
     const isGrids = [COMPONENT.Columns].includes(componentName);
-    const hasAddField = [COMPONENT.Table].includes(componentName);
 
     return (
         <TooltipProvider>
@@ -89,7 +87,6 @@ const CompTools = ({
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
-                {hasAddField && <AddField comp={comp}/>}
             </div>
         </TooltipProvider>
     );

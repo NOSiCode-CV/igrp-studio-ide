@@ -8,6 +8,7 @@ import React, {
 import { useSidebar } from '@renderer/components/ui/sidebar';
 import {
     Destination,
+    EditingComponentParams,
     StructuredComponent,
     StructuredLayout,
 } from '@renderer/lib/dnd/types';
@@ -38,9 +39,12 @@ interface DroppedComponentsContextType {
     ) => void;
 
     removeRow: (rowId: string) => void;
-    setEditingComponent: (component: StructuredComponent) => void;
+    setEditingComponent: ({
+        parentComp,
+        component,
+    }: EditingComponentParams) => void;
     clearEditingComponent: () => void;
-    currentComponent: StructuredComponent | null;
+    currentComponent: EditingComponentParams | null;
 }
 
 const DroppedComponentsContext = createContext<
@@ -76,7 +80,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         ])
     );
     const [currentComponent, setCurrentComponent] =
-        useState<StructuredComponent | null>(null);
+        useState<EditingComponentParams | null>(null);
 
     const setInitComponents = (components: StructuredLayout) => {
         setComponents(components);
@@ -350,8 +354,14 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     // Função que obtém todos os componentes
     const getAllComponents = (): StructuredLayout => components;
 
-    const setEditingComponent = (component: StructuredComponent) => {
-        setCurrentComponent(component);
+    const setEditingComponent = ({
+        parentComp,
+        component,
+    }: {
+        parentComp: StructuredComponent;
+        component: StructuredComponent;
+    }) => {
+        setCurrentComponent({ parentComp, component });
         toggleSidebar();
         setOpen(false);
     };

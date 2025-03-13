@@ -68,7 +68,11 @@ const Section = ({
                 id: page?.content.id,
                 label: page?.content.name,
             });
-        } else setEditingComponent({ ...component });
+        } else
+            setEditingComponent({
+                parentComp: comp,
+                component,
+            });
     };
 
     return (

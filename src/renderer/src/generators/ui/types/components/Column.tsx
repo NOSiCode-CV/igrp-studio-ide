@@ -25,7 +25,10 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     const { dynamicImport } = useStudio();
 
     const handleEditClick = (component: StructuredComponent) => {
-        setEditingComponent(component);
+        setEditingComponent({
+            parentComp: comp,
+            component,
+        });
     };
 
     useEffect(() => {

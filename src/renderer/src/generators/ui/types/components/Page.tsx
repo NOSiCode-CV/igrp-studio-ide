@@ -21,22 +21,22 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         [key: string]: React.ComponentType<any>;
     }>({});
 
-
-    const loadedComponentsRef = useRef<{ [key: string]: React.ComponentType<any> }>({});
+    const loadedComponentsRef = useRef<{
+        [key: string]: React.ComponentType<any>;
+    }>({});
 
     useEffect(() => {
         const loadComponents = async () => {
-    
             for (const comp of components) {
                 if (!loadedComponentsRef.current[comp.id]) {
                     const component = await dynamicImport(comp.componentName);
                     loadedComponentsRef.current[comp.id] = component;
                 }
             }
-    
+
             setLoadedComponents({ ...loadedComponentsRef.current });
         };
-    
+
         if (components) loadComponents();
     }, [components, dynamicImport]);
 
@@ -71,34 +71,35 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
     }, [components]);
 
     const handleEditClick = () => {
-        setEditingComponent({ ...page });
+        setEditingComponent({ component: page });
     };
 
     return (
         <div className="group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
             <PageTools onEdit={handleEditClick} />
-            <div className='flex-1 overflow-y-auto flex flex-col'>
-            <div className="py-6 gap-3 grid">
-                {components.map((row) => {
-                    const Component = loadedComponents[row.id];
-                    return Component ? (
-                        <Component
-                            key={row.id}
-                            isDisabled={false}
-                            comp={row}
-                            onDragEnd={onDragEnd}
-                            onAddControl={handleAddControl}
-                        />
-                    ) : (
-                        <div
-                            key={row.id}
-                            className="animate-pulse h-20 w-full rounded-md"
-                        >
-                            Loading...
-                        </div>
-                    );
-                })}
-            </div></div>
+            <div className="flex-1 overflow-y-auto flex flex-col">
+                <div className="py-6 gap-3 grid">
+                    {components.map((row) => {
+                        const Component = loadedComponents[row.id];
+                        return Component ? (
+                            <Component
+                                key={row.id}
+                                isDisabled={false}
+                                comp={row}
+                                onDragEnd={onDragEnd}
+                                onAddControl={handleAddControl}
+                            />
+                        ) : (
+                            <div
+                                key={row.id}
+                                className="animate-pulse h-20 w-full rounded-md"
+                            >
+                                Loading...
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
         </div>
     );
 };

@@ -13,29 +13,30 @@ import {
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
-import {
-    COMPONENT,
-    ICON_MAP,
-} from '../ComponentTypes';
+import { COMPONENT, ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 
-export const AddField = ({ comp }: { comp: StructuredComponent }) => {
-    const { componentName, id, children } = comp;
-    const { getRegistryComponent } = useStudio();
+export const AddField = ({
+    comp,
+    parentComp,
+}: {
+    parentComp: StructuredComponent;
+    comp: StructuredComponent;
+}) => {
+    const { componentName, id: componentId, children } = comp;
+    const { componentName: parentComponentName } = parentComp;
+
+    const { getAcceptedChildren } = useStudio();
     const { handleAddChildToComponent } = useDroppedComponents();
 
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
 
     useEffect(() => {
-        getRegistryComponent().then((data) => {
-            const filteredComponents: ComponentRegisterConfig[] = data.filter(
-                (item: ComponentRegisterConfig) =>
-                    item.name === COMPONENT.Table
-            );
-            setComponents(filteredComponents[0].childrenTypes);
+        getAcceptedChildren(parentComponentName, componentName).then((data) => {
+            setComponents(data);
         });
-    }, [getRegistryComponent]);
+    }, [parentComponentName, componentName, getAcceptedChildren]);
 
     const handleAddComponent = (item: any) => {
         const result: DragEndResult = {
@@ -43,7 +44,7 @@ export const AddField = ({ comp }: { comp: StructuredComponent }) => {
             draggableId: item.name,
             source: item,
             destination: {
-                droppableId: id,
+                droppableId: componentId,
                 index: children.length + 1,
             },
             mode: 'DROP',
