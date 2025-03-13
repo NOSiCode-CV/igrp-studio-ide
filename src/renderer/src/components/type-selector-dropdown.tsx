@@ -37,6 +37,18 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
     variant = 'ghost',
     children,
 }) => {
+    const renderIcon = (item: SchemaTypeItem) => {
+        const { module } = item;
+        if (module) {
+            return (
+                <div className="flex items-center justify-center w-5 h-5 rounded bg-igrp/25 text-igrp">
+                    {module === 'shared' ? 'C' : module.charAt(0).toUpperCase()}
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -44,7 +56,8 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                     variant={variant}
                     className={cn('h-6 px-2 text-sm', className)}
                 >
-                    <span className='flex flex-1'>{type || 'Set Type'}</span> {children}
+                    <span className="flex flex-1">{type || 'Set Type'}</span>{' '}
+                    {children}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
@@ -56,17 +69,19 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                     <DropdownMenuSubTrigger>
                                         {label}
                                     </DropdownMenuSubTrigger>
-                                    <DropdownMenuSubContent>
-                                        {items.map((subItem) => (
+                                    <DropdownMenuSubContent className="min-w-40">
+                                        {items.map((subItem, key) => (
                                             <DropdownMenuItem
-                                                key={subItem.value}
+                                                key={key}
                                                 onClick={() =>
                                                     onTypeChange({
                                                         type: value,
                                                         value: subItem.value,
+                                                        module: subItem.module,
                                                     } as any)
                                                 }
                                             >
+                                                {renderIcon(subItem)}
                                                 {subItem.label}
                                             </DropdownMenuItem>
                                         ))}

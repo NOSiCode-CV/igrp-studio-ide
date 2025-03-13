@@ -182,7 +182,7 @@ export function AppSidebar({
                         </SidebarGroup>
                     </SidebarContent>
                     <SidebarFooter className="items-center justify-center">
-                        <SidebarTrigger className="mb-14 items-center justify-center" />
+                        <SidebarTrigger className="items-center justify-center" />
                     </SidebarFooter>
                 </Sidebar>
 

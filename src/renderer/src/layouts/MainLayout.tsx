@@ -29,7 +29,7 @@ const navData: SidebarProps[] = [
 
 const MainLayout = (props: LayoutProps) => {
     return (
-        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] [--header-height-three:calc(--spacing(30))]">
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))]">
             <SidebarProvider>
                 <div className="flex flex-col w-full h-screen">
                     <ToastContainer />
@@ -46,7 +46,7 @@ const MainLayout = (props: LayoutProps) => {
                             </IGRPSidebarFooter>
                         </IGRPSidebar>
                         <SidebarInset className="flex-1">
-                            <ScrollArea className="h-full">
+                            <ScrollArea className="h-[calc(100svh-var(--header-height))]">
                                 {props.children}
                             </ScrollArea>
                         </SidebarInset>

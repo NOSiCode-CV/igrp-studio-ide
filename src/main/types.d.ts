@@ -135,5 +135,6 @@ export interface Connection {
 export interface SchemaTypeItem {
     label: string;
     value: string;
+    module?: string;
     items?: SchemaTypeItem[]; // Optional submenu items
 }

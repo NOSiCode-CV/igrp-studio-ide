@@ -441,7 +441,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </CardHeader>
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                            <div className="flex flex-col gap-3 col-span-2">
+                            <div className="flex flex-col gap-3 md:col-span-2 space-y-2">
                                 <IGRPInputAddOn
                                     selectValue={formik.values.method}
                                     value={formik.values.path}
@@ -458,7 +458,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                         formik.setFieldValue('method', value);
                                     }}
                                     onBlur={formik.handleBlur}
-                                    classNameGlobal="h-8"
+                                    classNameGlobal="h-8 mb-6"
                                     required
                                 />
                                 {formik.errors.path && formik.touched.path && (

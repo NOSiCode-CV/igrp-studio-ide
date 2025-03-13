@@ -27,7 +27,7 @@ interface DtoProps {
     selectors: Array<any>;
     models?: Array<any>;
     dto?: Array<any>;
-    enums?:Array<any>;
+    enums?: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
@@ -102,7 +102,7 @@ const DtoLayout = ({
             dto,
             models,
             enums,
-            currentDto: data?.name,
+            current: data,
             t,
         });
         setTableColumns(columns);
@@ -187,6 +187,37 @@ const DtoLayout = ({
         });
     };
 
+    const handleChangeValue = (
+        element: string,
+        position: number,
+        result: any,
+        value: string
+    ) => {
+        const isType = element === 'type';
+
+        const typeValue = isType ? result.value : result;
+
+        const typeModule = isType ? result.module : '';
+
+        const typeType = isType ? result.type : '';
+
+        if (isType)
+            formik.setFieldValue(
+                value,
+                formik.values[value].map((row: any, index: number) =>
+                    index === position
+                        ? {
+                              ...row,
+                              objectType: typeType,
+                              [element]: typeValue,
+                              module: typeModule,
+                          }
+                        : row
+                )
+            );
+        else changeValue(formik, element, position, typeValue, value);
+    };
+
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
         const data = formik?.values?.[value];
@@ -208,34 +239,7 @@ const DtoLayout = ({
                     addRow={() => addNewRow(formik, value, dValues)}
                     removeRow={(position) => removeRow(formik, value, position)}
                     changeValue={(element, position, result) => {
-                        const isType = element === 'type';
-
-                        const typeValue = isType ? result.value : result;
-
-                        const typeType = isType ? result.type : '';
-
-                        if (isType)
-                            formik.setFieldValue(
-                                value,
-                                formik.values[value].map(
-                                    (row: any, index: number) =>
-                                        index === position
-                                            ? {
-                                                  ...row,
-                                                  ['objectType']: typeType,
-                                                  [element]: typeValue,
-                                              }
-                                            : row
-                                )
-                            );
-                        else
-                            changeValue(
-                                formik,
-                                element,
-                                position,
-                                typeValue,
-                                value
-                            );
+                        handleChangeValue(element, position, result, value);
                     }}
                 />
             );
