@@ -269,7 +269,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.25.9"
 
-"@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.23.2", "@babel/runtime@^7.25.0", "@babel/runtime@^7.26.7", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.23.2", "@babel/runtime@^7.25.0", "@babel/runtime@^7.26.10", "@babel/runtime@^7.26.7", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7":
   version "7.26.10"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.26.10.tgz#a07b4d8fa27af131a633d7b3524db803eb4764c2"
   integrity sha512-2WJMeRQPHKSPemqk/awGrAiuFfzBmOIPXKizAsVhWH9YJqLZ0H+HS4c8loHGgW6utJ3E/ejXQUsiGaQy2NZ9Fw==
@@ -1285,10 +1285,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.23":
-  version "0.0.0-alpha.23"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.23.tgz#cf348f7a214b7206d3dd44db1754b2ac45c0599f"
-  integrity sha512-ceqzpO6OXionUohvWtuWmsaYT8UJ4OgZ84d5GkMC28a1VI1t5jhSpcfUE1vM9/qgDIR96zi9uKJ2JjTvjIvnuA==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.24":
+  version "0.0.0-alpha.24"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.24.tgz#1207c06ab5bb80f44baa54600a518711c9a32467"
+  integrity sha512-KRek1w8+yw/AEK4+V6ldwR0xfLJQQGUUF7TeXimHMjYTWt+qX6O9bQEOC44bl7fRhJGsWAXoTeczBF0v1OgI1A==
   dependencies:
     "@hookform/resolvers" "^4.1.3"
     "@radix-ui/react-accordion" "^1.2.3"
@@ -1318,6 +1318,7 @@
     lucide-react "^0.479.0"
     next-themes "^0.4.4"
     react-hook-form "^7.54.2"
+    react-router-dom "^7.3.0"
     recharts "^2.15.1"
     sonner "^2.0.1"
     tailwindcss "^4.0.12"
@@ -1346,10 +1347,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.25":
-  version "0.0.1-alpha.25"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.25.tgz#1b49a19803f95a1ef5a00bbafb286007909518dc"
-  integrity sha512-5wZFliVbUOiyDBeUv9K0EybLVVdBJvVrs8vxhxYs0WkSM0nBLI3OiXwrHKXB745GKN+YipQXO4C4NN9LLssYkw==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.27":
+  version "0.0.1-alpha.27"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.27.tgz#3856707be47c4b96d07d87187dea70487b68e155"
+  integrity sha512-2k39iahjp4swH0Ft13eVtgI6u1W6HbQ7zdmDAhykS/WPdmAb4j4pbfzkMVXsVqrq/1nZX6iMgXBq8YSAzq6Qdg==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -6142,12 +6143,12 @@ i18next-electron-fs-backend@^3.0.3:
     lodash.clonedeep "^4.5.0"
     lodash.merge "^4.6.2"
 
-i18next@^24.2.2:
-  version "24.2.2"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-24.2.2.tgz#3ba3d213302068d569142737f03f30929de696de"
-  integrity sha512-NE6i86lBCKRYZa5TaUDkU5S4HFgLIEJRLr3Whf2psgaxBleQ2LC1YW1Vc+SCgkAW7VEzndT6al6+CzegSUHcTQ==
+i18next@^24.2.3:
+  version "24.2.3"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-24.2.3.tgz#3a05f72615cbd7c00d7e348667e2aabef1df753b"
+  integrity sha512-lfbf80OzkocvX7nmZtu7nSTNbrTYR52sLWxPtlXX1zAhVw8WEnFk4puUkCR4B1dNQwbSpEHHHemcZu//7EcB7A==
   dependencies:
-    "@babel/runtime" "^7.23.2"
+    "@babel/runtime" "^7.26.10"
 
 iconv-corefoundation@^1.1.7:
   version "1.1.7"
