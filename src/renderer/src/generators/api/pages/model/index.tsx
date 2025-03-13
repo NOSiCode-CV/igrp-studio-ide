@@ -108,12 +108,13 @@ const ModelLayout = ({
     }, [config]);
 
     useEffect(() => {
-        const { attributes, revision } = formik.values;
+        const { attributes, name, revision } = formik.values;
         const res = getTablesColumns({
             selectors,
             attributes,
             revision,
             models,
+            name,
             t,
         });
         setTableColumns(res);

@@ -8,14 +8,18 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { IGRPCombobox, IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCombobox,
+    IGRPDataTable,
+} from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { useTranslation } from 'react-i18next';
+import { Connection } from 'src/main/types';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 
 const actions = [
     {
@@ -60,7 +64,7 @@ export function TableManager({
     useEffect(() => {
         const getConnections = async () => {
             const connections = await window.repo.connection.findAll();
-            const maps = connections.map((conn) => {
+            const maps = connections.map((conn: Connection) => {
                 return {
                     label: conn.name,
                     value: conn.name,
@@ -72,6 +76,8 @@ export function TableManager({
     }, []);
 
     const handleConnectionSelect = async (connectionName: string) => {
+        console.log(connectionName);
+
         setSelectedConnection(connectionName);
         onSelectedConnection(connectionName);
 
@@ -169,7 +175,10 @@ export function TableManager({
                     <Label>{t('databaseConnections')}</Label>
                     <IGRPCombobox
                         value={selectedConnection}
-                        onChange={handleConnectionSelect}
+                        onChange={(selected) => {
+                            console.log(selected);
+                            handleConnectionSelect(selected);
+                        }}
                         placeholder={t('selectConnection')}
                         options={connections}
                         className="w-full"
@@ -213,15 +222,21 @@ export function TableManager({
                     {selectedTable ? (
                         <>
                             <h3 className="text-sm text-muted-foreground">
-                                {t('previewTable', { tableName: selectedTable })}
+                                {t('previewTable', {
+                                    tableName: selectedTable,
+                                })}
                             </h3>
                             <ScrollArea className="h-[450px] w-full rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>{t('column')}</TableHead>
-                                            <TableHead>{t('dataType')}</TableHead>
-                                            <TableHead>{t('isNullable')}</TableHead>
+                                            <TableHead>
+                                                {t('dataType')}
+                                            </TableHead>
+                                            <TableHead>
+                                                {t('isNullable')}
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>

@@ -338,5 +338,6 @@
   "componentName": "Component Name",
   "terminal": "Terminal",
   "debug": "Debug",
-  "navigator": "Navigator"
+  "navigator": "Navigator",
+  "selectAll": "Select All"
 }

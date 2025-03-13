@@ -1285,10 +1285,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.24":
-  version "0.0.0-alpha.24"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.24.tgz#1207c06ab5bb80f44baa54600a518711c9a32467"
-  integrity sha512-KRek1w8+yw/AEK4+V6ldwR0xfLJQQGUUF7TeXimHMjYTWt+qX6O9bQEOC44bl7fRhJGsWAXoTeczBF0v1OgI1A==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.25":
+  version "0.0.0-alpha.25"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.25.tgz#3818a2bfabfd1d5c84ed1cf788af8b8f9338f596"
+  integrity sha512-YqIg9F9wEby9grtiBb/lD0fOTCS2tCePtTRQKk/z/vOq7kFn/1uIetEg9alnIsWhlzwnxVOtaoPN/sA0Ctxc0A==
   dependencies:
     "@hookform/resolvers" "^4.1.3"
     "@radix-ui/react-accordion" "^1.2.3"
@@ -1347,10 +1347,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.27":
-  version "0.0.1-alpha.27"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.27.tgz#3856707be47c4b96d07d87187dea70487b68e155"
-  integrity sha512-2k39iahjp4swH0Ft13eVtgI6u1W6HbQ7zdmDAhykS/WPdmAb4j4pbfzkMVXsVqrq/1nZX6iMgXBq8YSAzq6Qdg==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.28":
+  version "0.0.1-alpha.28"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.28.tgz#baae06aa7e50ef360c27b56747e882a9f49d2861"
+  integrity sha512-CS2N3G9QGI89CX70iuMatOOKl+Q+y7MyyJH8O1h0DHGpzFUI1j4n+ARZ2BoZ+4e/xyx5sALe40Lf5bIRrSl4ZQ==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
