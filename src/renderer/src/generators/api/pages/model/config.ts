@@ -183,7 +183,7 @@ export const getValuesToSubmit = (values, module) => {
 			type,
 		}));
 
-	const hasListPk = primaryKey.length > 1 ? true : false;
+	const hasListPk = primaryKey.length > 1;
 
 	const filteredAttributes = hasListPk
 		? attributes.filter((attribute) => attribute.primaryKey !== true)
