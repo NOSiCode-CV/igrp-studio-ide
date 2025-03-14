@@ -72,7 +72,7 @@ const TabsNavigation = ({
     };
 
     return (
-        <nav className="flex justify-between">
+        <nav className="flex justify-between me-5">
             <div className="flex flex-1 w-[100px]">
                 <ScrollArea ref={scrollAreaRef}>
                     <div className="flex items-center whitespace-nowrap">
@@ -178,7 +178,7 @@ const TabsNavigation = ({
                             );
                         })}
                     </div>
-                    <ScrollBar orientation="horizontal" className='h-2'/>
+                    <ScrollBar orientation="horizontal" className="h-2" />
                 </ScrollArea>
                 {btnNew && (
                     <div className="flex items-center px-2 gap-2">
@@ -194,7 +194,7 @@ const TabsNavigation = ({
                     </div>
                 )}
             </div>
-            <div className="justify-end me-5">{children}</div>
+            {children}
         </nav>
     );
 };

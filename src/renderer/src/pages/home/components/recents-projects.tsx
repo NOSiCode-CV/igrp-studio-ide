@@ -47,6 +47,7 @@ import { enUS, pt } from 'date-fns/locale';
 
 const RecentsProjects = () => {
     const [isDelete, setIdDelete] = useState(false);
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     const { i18n } = useTranslation();
 
@@ -133,8 +134,21 @@ const RecentsProjects = () => {
     };
 
     useEffect(() => {
-        setTimeout(() => setIsLoading(false), 1500);
+        setTimeout(() => setIsLoading(false), 1000);
     }, []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+
+            // Update date only if the day changes
+            if (now.getDate() !== currentDate.getDate()) {
+                setCurrentDate(now);
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [currentDate]);
 
     const RenderProjectCard = (
         project: ProjectData,
@@ -182,7 +196,7 @@ const RecentsProjects = () => {
                                     {t('lastModified')}:{' '}
                                     {formatDistance(
                                         project.dt_updated,
-                                        new Date(),
+                                        currentDate,
                                         { addSuffix: true, locale: getLocale() }
                                     )}
                                 </span>

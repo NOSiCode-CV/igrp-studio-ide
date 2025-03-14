@@ -1,3 +1,4 @@
+// page-card.tsx
 import { Card, CardContent, CardFooter } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
 import { Component, Trash } from 'lucide-react';

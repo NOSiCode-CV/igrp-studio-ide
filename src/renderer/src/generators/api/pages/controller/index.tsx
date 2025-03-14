@@ -286,7 +286,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
             if (countActions === 1) {
                 const config = {
-                    name: formik.values.name,
+                    name,
                     type: 'controller',
                     module: currentItem.module,
                 };
@@ -304,7 +304,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             } else {
                 // Remove only the current action and save the updated actions
                 const updatedActions = values.actions.filter(
-                    (dataAction) => dataAction.actionName !== formik.actionName
+                    (dataAction) => dataAction.actionName !== formik.values.actionName
                 );
 
                 const updatedValues = { ...values, actions: updatedActions };
@@ -313,6 +313,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     updatedValues,
                     basePath
                 );
+
+                console.log(   updatedValues, error);
 
                 if (error) {
                     showErrorToast(error);

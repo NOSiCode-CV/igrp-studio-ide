@@ -340,5 +340,6 @@
   "debug": "Debug",
   "navigator": "Navigator",
   "selectAll": "Select All",
-  "jsonSchema": "JSON Schema"
+  "jsonSchema": "JSON Schema",
+  "pages": "Pages"
 }

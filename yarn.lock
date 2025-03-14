@@ -1285,10 +1285,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.25":
-  version "0.0.0-alpha.25"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.25.tgz#3818a2bfabfd1d5c84ed1cf788af8b8f9338f596"
-  integrity sha512-YqIg9F9wEby9grtiBb/lD0fOTCS2tCePtTRQKk/z/vOq7kFn/1uIetEg9alnIsWhlzwnxVOtaoPN/sA0Ctxc0A==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.27":
+  version "0.0.0-alpha.27"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.27.tgz#44ceca8a8c4b9b229657a8d548797fa83144469e"
+  integrity sha512-qW1LKNJ73QVata3LDEmDd8DQb9Qq3bwVVrPmnYUxna9ytPpyGpNk0m7OPmx0DGKnD/KsMqfOXCCRXXoYkGoh/Q==
   dependencies:
     "@hookform/resolvers" "^4.1.3"
     "@radix-ui/react-accordion" "^1.2.3"
@@ -1347,10 +1347,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.29":
-  version "0.0.1-alpha.29"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.29.tgz#49769a60e15ef666b0dc98c928fcb411dc74698b"
-  integrity sha512-PUK+zDcECd4lLqMucuVAcNgS9k2tkWit51803AQmodjXL6E2i6Xi2/bqwZvP5pf8e5WjZf+5f8HzteJ54gYkWA==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.32":
+  version "0.0.1-alpha.32"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.32.tgz#69a53e053ec45380af33a3f57681157a30516390"
+  integrity sha512-JAXl/tP0PutQV67JfPeot3+WuYXcaHi4uK+w9WLq6x/px886z5l86vZh+P2OdsEIPM41ffTXHlvRi5brxNaJSQ==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -2305,7 +2305,20 @@
     "@radix-ui/react-roving-focus" "1.1.2"
     "@radix-ui/react-use-controllable-state" "1.1.0"
 
-"@radix-ui/react-toggle@^1.1.2":
+"@radix-ui/react-toggle-group@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-toggle-group/-/react-toggle-group-1.1.2.tgz#a4063a06124a008a206f5678018612e3ddd5923c"
+  integrity sha512-JBm6s6aVG/nwuY5eadhU2zDi/IwYS0sDM5ZWb4nymv/hn3hZdkw+gENn0LP4iY1yCd7+bgJaCwueMYJIU3vk4A==
+  dependencies:
+    "@radix-ui/primitive" "1.1.1"
+    "@radix-ui/react-context" "1.1.1"
+    "@radix-ui/react-direction" "1.1.0"
+    "@radix-ui/react-primitive" "2.0.2"
+    "@radix-ui/react-roving-focus" "1.1.2"
+    "@radix-ui/react-toggle" "1.1.2"
+    "@radix-ui/react-use-controllable-state" "1.1.0"
+
+"@radix-ui/react-toggle@1.1.2", "@radix-ui/react-toggle@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-toggle/-/react-toggle-1.1.2.tgz#c11cd1550046a2c78afbdffd35b541979df9ffc6"
   integrity sha512-lntKchNWx3aCHuWKiDY+8WudiegQvBpDRAYL8dKLRvKEH8VOpl0XX6SSU/bUBqIRJbcTy4+MW06Wv8vgp10rzQ==
@@ -7472,6 +7485,11 @@ lucide-react@^0.479.0:
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.479.0.tgz#7321f979a389ec5dd86747b2deb6444cf0922f8d"
   integrity sha512-aBhNnveRhorBOK7uA4gDjgaf+YlHMdMhQ/3cupk6exM10hWlEU+2QtWYOfhXhjAsmdb6LeKR+NZnow4UxRRiTQ==
 
+lucide-react@^0.481.0:
+  version "0.481.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.481.0.tgz#3a5ccfccae9af65517b4faa82b4bea268bb15841"
+  integrity sha512-NrvUDNFwgLIvHiwTEq9boa5Kiz1KdUT8RJ+wmNijwxdn9U737Fw42c43sRxJTMqhL+ySHpGRVCWpwiF+abrEjw==
+
 magic-string@^0.30.17:
   version "0.30.17"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.17.tgz#450a449673d2460e5bbcfba9a61916a1714c7453"
@@ -10295,10 +10313,10 @@ victory-vendor@^36.6.8:
     d3-time "^3.0.0"
     d3-timer "^3.0.1"
 
-vite@^6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.2.1.tgz#ae865d4bb93a11844be1bc647c8b2dd1856ea180"
-  integrity sha512-n2GnqDb6XPhlt9B8olZPrgMD/es/Nd1RdChF6CBD/fHW6pUyUTt2sQW2fPRX5GiD9XEa6+8A6A4f2vT6pSsE7Q==
+vite@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-6.2.2.tgz#8098b12a6bfd95abe39399aa7d5faa56545d7a1a"
+  integrity sha512-yW7PeMM+LkDzc7CgJuRLMW2Jz0FxMOsVJ8Lv3gpgW9WLcb9cTW+121UEr1hvmfR7w3SegR5ItvYyzVz1vxNJgQ==
   dependencies:
     esbuild "^0.25.0"
     postcss "^8.5.3"
