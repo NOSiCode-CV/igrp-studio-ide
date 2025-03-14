@@ -75,7 +75,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
     };
 
     return (
-        <div className="group/page relative hover:border-2 hover:rounded-sm h-[calc(100svh-var(--header-height-two))] !bg-custom-pattern">
+        <div className="group/page relative hover:border-2 hover:rounded-sm !bg-custom-pattern">
             <PageTools onEdit={handleEditClick} />
             <div className="flex-1 overflow-y-auto flex flex-col">
                 <div className="py-6 gap-3 grid">

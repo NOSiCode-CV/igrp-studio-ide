@@ -13,13 +13,13 @@ import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
-import { Page } from './types/components/Page';
+import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
+import { Page } from './types/components/page';
 
 interface FormEngineProps {
     basePath: string;
@@ -140,19 +140,19 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         }, []);
 
         return (
-            <>
-                <AppSidebar data={menuItems} basePath={basePath} />
-                <SidebarInset>
-                    {isDesign ? (
-                        <ScrollArea>
+            <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height-two))]">
+                <AppSidebar data={menuItems} basePath={basePath}/>
+                <SidebarInset className="flex-1">
+                    <ContainerScrollArea>
+                        {isDesign ? (
                             <Page page={components} onDragEnd={onDragEnd} />
-                        </ScrollArea>
-                    ) : (
-                        <CodeContent pagePath={pagePath} />
-                    )}
+                        ) : (
+                            <CodeContent pagePath={pagePath} />
+                        )}
+                    </ContainerScrollArea>
                 </SidebarInset>
                 {currentComponent && <SidebarRight />}
-            </>
+            </div>
         );
     }
 );

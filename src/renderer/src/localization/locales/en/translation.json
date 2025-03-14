@@ -339,5 +339,6 @@
   "terminal": "Terminal",
   "debug": "Debug",
   "navigator": "Navigator",
-  "selectAll": "Select All"
+  "selectAll": "Select All",
+  "jsonSchema": "JSON Schema"
 }

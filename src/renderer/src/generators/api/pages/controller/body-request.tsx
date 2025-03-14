@@ -45,7 +45,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const { t } = useTranslation();
 
     const routeFormData =
-        'requestBody.content.multipart/form-data.schema.properties';
+        'requestBody.content.multipart/form-data.schema';
 
     const defaultValue = [
         {
@@ -62,7 +62,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         const schema =
             formik.values.requestBody?.content?.[contentType]?.schema;
 
-        return schema
+        return schema && schema.name
             ? {
                   type: '',
                   properties: {
@@ -177,7 +177,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     />
                     <Card className="rounded">
                         <CardContent className="p-3">
-                            <Tabs defaultValue="value">
+                            <Tabs defaultValue="schema">
                                 <TabsList>
                                     <TabsTrigger value="value">
                                         {t('value')}

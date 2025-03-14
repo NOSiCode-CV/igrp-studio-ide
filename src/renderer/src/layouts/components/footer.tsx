@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Wifi, WifiOff, Circle, HelpCircle } from 'lucide-react'
+import { Wifi, WifiOff, HelpCircle } from 'lucide-react'
 
 import { Button } from "@renderer/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@renderer/components/ui/tooltip"
@@ -44,6 +44,17 @@ export function Footer() {
     
     return () => clearInterval(timer)
   }, [currentDate])
+
+  const [appVersion, setAppVersion] = useState('');
+
+    useEffect(() => {
+        // Fetch app version from Electron
+        if (window.electron && window.electron.getAppVersion) {
+            window.electron.getAppVersion().then((version) => {
+                setAppVersion(version);
+            });
+        }
+    }, []);
   
   return (
     <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0">
@@ -83,7 +94,7 @@ export function Footer() {
       </div>
       
       <div className="flex items-center space-x-3">
-        <span className="text-muted-foreground">v1.0.0</span>
+        <span className="text-muted-foreground">{`v${appVersion}`}</span>
         
         <Separator orientation="vertical" className="h-4" />
         

@@ -74,14 +74,14 @@ export function SidebarRight({ ...props }: SidebarRightProps) {
         clearEditingComponent();
     };
 
-    const handleChange = (changes: any) => {
+/*     const handleChange = (changes: any) => {
         Object.entries(changes).forEach(([key, value]) => {
             setFormValues((prevValues) => ({
                 ...prevValues,
                 [key]: value,
             }));
         });
-    };
+    }; */
 
     React.useEffect(() => {
         if (propsComponent) {

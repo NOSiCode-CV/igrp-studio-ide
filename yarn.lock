@@ -1347,10 +1347,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.28":
-  version "0.0.1-alpha.28"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.28.tgz#baae06aa7e50ef360c27b56747e882a9f49d2861"
-  integrity sha512-CS2N3G9QGI89CX70iuMatOOKl+Q+y7MyyJH8O1h0DHGpzFUI1j4n+ARZ2BoZ+4e/xyx5sALe40Lf5bIRrSl4ZQ==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.29":
+  version "0.0.1-alpha.29"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.29.tgz#49769a60e15ef666b0dc98c928fcb411dc74698b"
+  integrity sha512-PUK+zDcECd4lLqMucuVAcNgS9k2tkWit51803AQmodjXL6E2i6Xi2/bqwZvP5pf8e5WjZf+5f8HzteJ54gYkWA==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"

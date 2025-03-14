@@ -2,7 +2,6 @@ import { DTOConfig } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/t
 import { formatMethods } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 import { SchemaTypeItem } from "src/main/types"
-import { group } from "console"
 
 export const initialValues: DTOConfig = {
     type: 'dto',

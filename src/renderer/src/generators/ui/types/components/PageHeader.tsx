@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { PageHeader as IGRPPageHeader} from '@igrp/igrp-framework-react-design-system';
+import { PageHeader as IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
@@ -14,10 +14,7 @@ export interface FormComponentProps {
     isDisabled?: boolean;
 }
 
-const PageHeader: React.FC<FormComponentProps> = ({
-    comp,
-    onDragEnd,
-}) => {
+const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     const {
         id: componentId,
         children: fields,
@@ -83,6 +80,7 @@ const PageHeader: React.FC<FormComponentProps> = ({
                     {Component && (
                         <BoxField
                             comp={button}
+                            parentComp={comp}
                             onEdit={() => handleEditClick(button)}
                             index={index}
                         >

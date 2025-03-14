@@ -13,7 +13,7 @@ import {
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
-import { COMPONENT, ICON_MAP } from '../ComponentTypes';
+import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 

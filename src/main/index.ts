@@ -27,6 +27,7 @@ import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 
 const backend = require('i18next-electron-fs-backend')
 
+
 let mainWindow: BrowserWindow
 
 let nextJsManager: NextJsManager;

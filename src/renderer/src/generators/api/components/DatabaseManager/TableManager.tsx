@@ -45,7 +45,6 @@ interface TableManagerProps {
 }
 
 export function TableManager({
-    onRowsSubmit,
     onSelectedConnection,
 }: TableManagerProps) {
     const { t } = useTranslation();
@@ -119,10 +118,10 @@ export function TableManager({
         if (!success) showErrorToast(message);
         setPreviewColumns(structure);
     };
-
+/* 
     const handleChangeRows = (value) => {
         onRowsSubmit(value);
-    };
+    }; */
 
     const columns: ColumnDef<Database>[] = [
         {
@@ -211,8 +210,8 @@ export function TableManager({
                                 <IGRPDataTable
                                     columns={columns}
                                     data={tables}
-                                    onRowSelectionChange={handleChangeRows}
-                                    rowId="id"
+                                    //onRowSelectionChange={handleChangeRows}
+                                   // rowId="id"
                                 />
                             )}
                         </ScrollArea>

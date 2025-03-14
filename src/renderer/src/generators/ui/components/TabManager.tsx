@@ -64,7 +64,7 @@ export default function TabManager({ basePath }: ContentProps) {
     };
 
     return (
-        <>
+        <div className='flex-1'>
             <TabsNavigation
                 tabs={tabs}
                 activeTab={activeTab}
@@ -135,6 +135,6 @@ export default function TabManager({ basePath }: ContentProps) {
                     )}
                 </div>
             ))}
-        </>
+        </div>
     );
 }

@@ -357,10 +357,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     const setEditingComponent = ({
         parentComp,
         component,
-    }: {
-        parentComp: StructuredComponent;
-        component: StructuredComponent;
-    }) => {
+    }: EditingComponentParams) => {
         setCurrentComponent({ parentComp, component });
         toggleSidebar();
         setOpen(false);

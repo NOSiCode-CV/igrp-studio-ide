@@ -83,7 +83,6 @@ const Layout = (props: LayoutProps) => {
                             config={config}
                             basePath={basePath}
                             header
-                            className='h-[calc(100svh-var(--header-height-two))]'
                         />
                         <SidebarInset className="flex-1">
                             {React.cloneElement(props.children, {
