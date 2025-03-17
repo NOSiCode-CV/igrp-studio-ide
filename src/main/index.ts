@@ -24,6 +24,7 @@ import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 import NextJsManager from './helpers/nextjsManager'
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
+import dotenv from 'dotenv';
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -35,7 +36,7 @@ let nextJsManager: NextJsManager;
 let repo;
 // Load the initial language configuration
 loadConfig();
-
+dotenv.config();
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
