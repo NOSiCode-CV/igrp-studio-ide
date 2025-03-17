@@ -10,8 +10,10 @@ import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thun
 import useGitAuth from '@renderer/hooks/useGitAuth';
 import { LoadingSpinner } from '../loading-spinner';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTranslation } from 'react-i18next';
 
 export default function GitProject() {
+    const { t } = useTranslation();
     const { showErrorToast, showSuccessToast } = useToast();
     const [cloningRepoId, setCloningRepoId] = useState<number | null>(null);
     const [clonedRepos, setClonedRepos] = useState<number[]>([]);
@@ -35,7 +37,7 @@ export default function GitProject() {
                 setCloningRepoId(null);
             } 
             if (data.status === 'success') {
-                showSuccessToast(`Repository successfully cloned to ${data.path}`);
+                showSuccessToast(t('repositoryClonedSuccessfully', { path: data.path }));
                 try {
                     await window.repo.project.save({
                         name: data.config.name,
@@ -50,7 +52,7 @@ export default function GitProject() {
                         path: data.path
                     });
 
-                    // Atualiza os estados locais
+                    // Update local states
                     setClonedRepos(prevRepos => [...prevRepos, cloningRepoId!]);
                     setProjectPaths(prevPaths => ({
                         ...prevPaths,
@@ -61,11 +63,11 @@ export default function GitProject() {
                     dispatch(setConfig(data.config));
                     navigateToNextPage(navigate, data.config);
                 } catch (error) {
-                    showErrorToast('Failed to open project after cloning');
-                    console.error('Error opening project:', error);
+                    showErrorToast(t('failedOpenProjectAfterCloning'));
+                    console.error(t('errorOpeningProject'), error);
                 }
             } else if (data.status === 'error') {
-                showErrorToast(`Failed to clone repository: ${data.message}`);
+                showErrorToast(t('failedCloneRepository', { message: data.message }));
             }
         });
 
@@ -90,7 +92,7 @@ export default function GitProject() {
             window.electron.ipcRenderer.removeAllListeners('clone-progress');
             window.electron.ipcRenderer.removeAllListeners('request-project-name');
         };
-    }, [dispatch, navigate, showSuccessToast, showErrorToast]);
+    }, [dispatch, navigate, showSuccessToast, showErrorToast, t]);
 
     const handleClone = async (repo: Repository) => {
         setCloningRepoId(repo.id);
@@ -114,13 +116,13 @@ export default function GitProject() {
                 setClonedRepos(cloned);
                 setProjectPaths(paths);
             } catch (error) {
-                console.error('Error loading cloned repos data:', error);
-                showErrorToast('Failed to load repository data');
+                console.error(t('errorLoadingClonedReposData'), error);
+                showErrorToast(t('failedLoadRepositoryData'));
             }
         };
         
         loadClonedReposData();
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         const checkLocalProjectsExist = async () => {
@@ -133,7 +135,7 @@ export default function GitProject() {
         };
     
         checkLocalProjectsExist();
-    }, [repositoriesGitHub]);
+    }, [repositoriesGitHub, checkLocalProjects]);
 
     return (
         <div>
@@ -155,7 +157,7 @@ export default function GitProject() {
                     </div>
                 ) : (
                     <EmptyState
-                        message="No projects found in your git repository. Start by creating a new project!"
+                        message={t('noProjectsFound')}
                         className="text-muted-foreground"
                     />
                 )

@@ -1,57 +1,58 @@
-
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-  } from "../ui/dialog";
-  import { useState } from "react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-  
-  interface RemoteUrlDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm: (url: string) => void;
-  }
-  
-  export function RemoteUrlDialog({ isOpen, onClose, onConfirm }: RemoteUrlDialogProps) {
-    const [url, setUrl] = useState("");
-  
-    const handleConfirm = () => {
+import { useTranslation } from "react-i18next";
+
+interface RemoteUrlDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (url: string) => void;
+}
+
+export function RemoteUrlDialog({ isOpen, onClose, onConfirm }: RemoteUrlDialogProps) {
+  const { t } = useTranslation();
+  const [url, setUrl] = useState("");
+
+  const handleConfirm = () => {
       onConfirm(url);
       setUrl("");
       onClose();
-    };
-  
-    return (
+  };
+
+  return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Remote Repository</DialogTitle>
-            <DialogDescription>
-              Enter the URL of your remote Git repository to enable synchronization.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Input
-              placeholder="https://github.com/username/repository.git"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleConfirm} disabled={!url.trim()}>
-              Add Remote
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>{t('addRemoteRepository')}</DialogTitle>
+                  <DialogDescription>
+                      {t('enterRemoteRepositoryUrl')}
+                  </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                  <Input
+                      placeholder={t('remoteRepositoryUrlPlaceholder')}
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      className="w-full"
+                  />
+              </div>
+              <DialogFooter>
+                  <Button variant="outline" onClick={onClose}>
+                      {t('cancel')}
+                  </Button>
+                  <Button onClick={handleConfirm} disabled={!url.trim()}>
+                      {t('addRemote')}
+                  </Button>
+              </DialogFooter>
+          </DialogContent>
       </Dialog>
-    );
-  }
+  );
+}
