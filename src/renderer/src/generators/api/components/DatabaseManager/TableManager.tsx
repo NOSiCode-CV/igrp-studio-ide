@@ -8,8 +8,8 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import {
-    IGRPCombobox,
     IGRPDataTable,
 } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';

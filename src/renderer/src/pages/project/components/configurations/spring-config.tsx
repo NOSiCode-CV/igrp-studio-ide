@@ -6,13 +6,17 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
 import { ProjectData, SpringConfigData } from 'src/main/types';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
-import { DatabaseOptions, projectStructureStyle } from '@renderer/constants/appConstants';
+import {
+    DatabaseOptions,
+    projectStructureStyle,
+} from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/required';
 import { Separator } from '@renderer/components/ui/separator';
+import { SelectInput } from '@renderer/generators/api/components/inputs-form';
+import { IGRPCombobox } from '@renderer/components/combobox';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -182,11 +186,20 @@ export function SpringConfig({
 
             <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-3">
-                    <Label>{t('projectStructureStyle')}</Label>
-                    <IGRPCombobox
+                    <SelectInput
+                        id={'projectStructureStyle'}
+                        label={t('projectStructureStyle')}
                         options={projectStructureStyle || []}
                         value={data.projectStructureStyle}
                         onChange={(value) =>
+                            onChange({
+                                ...data,
+                                projectStructureStyle: value as
+                                    | 'technical'
+                                    | 'domain',
+                            })
+                        }
+                        onBlur={(value) =>
                             onChange({
                                 ...data,
                                 projectStructureStyle: value as

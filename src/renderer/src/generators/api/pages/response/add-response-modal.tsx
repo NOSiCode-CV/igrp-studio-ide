@@ -10,7 +10,7 @@ import {
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import React, { useState } from 'react';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { getStatusLabel } from '@renderer/utils/helpers';
 import { useTranslation } from 'react-i18next';

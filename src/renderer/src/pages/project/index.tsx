@@ -517,7 +517,7 @@ export function ProjectWizard() {
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog>
             <DialogTrigger asChild>
                 <Button variant="outline">
                     <PlusCircle className="w-4 h-4 mr-2" />
@@ -525,16 +525,16 @@ export function ProjectWizard() {
                 </Button>
             </DialogTrigger>
             <DialogContent
-                className="overflow-hidden max-h-[80vh] md:max-w-[700px] lg:max-w-[800px]"
+                className="overflow-hidden max-h-[80svh] md:max-w-[700px] lg:max-w-[800px] p-0"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
-                <DialogHeader>
+                <DialogHeader className="p-4">
                     <DialogTitle>{t('newProject')}</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
-                <ScrollArea className="h-[calc(63vh-80px)]">
-                    <form onSubmit={formik.handleSubmit} className="px-2">
+                <ScrollArea className="max-h-[calc(80svh-80px)]">
+                    <form onSubmit={formik.handleSubmit} className="mx-6 mb-6">
                         <div className="relative mb-6">
                             <div className="absolute top-5 left-0 right-0 h-[2px] bg-muted" />
                             <div className="relative flex justify-between">
@@ -561,7 +561,7 @@ export function ProjectWizard() {
                                         variant="outline"
                                         onClick={handleBack}
                                     >
-                                        <ArrowLeft className="w-4 h-4 mr-2" />{' '}
+                                        <ArrowLeft className="w-4 h-4 mr-2" />
                                         {t('back')}
                                     </Button>
                                 ) : (

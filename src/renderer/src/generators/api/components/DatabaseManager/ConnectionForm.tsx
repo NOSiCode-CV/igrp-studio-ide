@@ -9,7 +9,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import * as Yup from 'yup';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { Connection } from 'src/main/types';
 import useToast from '@renderer/components/useToast';
 

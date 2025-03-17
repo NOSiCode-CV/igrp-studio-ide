@@ -278,6 +278,9 @@ const DtoLayout = ({
                                 onChange={(option) =>
                                     formik.setFieldValue('template', option)
                                 }
+                                onBlur={(option) =>
+                                    formik.setFieldValue('template', option)
+                                }
                                 error={formik.errors.template}
                                 isTouched={formik.touched.template}
                                 isRequired

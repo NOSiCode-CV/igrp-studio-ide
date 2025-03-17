@@ -9,19 +9,15 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@renderer/components/ui/dialog';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import useToast from '@renderer/components/useToast';
-import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useEffect } from 'react';
-import { LabelRequired } from '@renderer/components/required';
+import { SelectInput, TextInput } from '../../components/inputs-form';
 
 interface CreateEndpointDialogProps {
     defaultModule: string | undefined;
@@ -73,12 +69,12 @@ export function CreateEndpointDialog({
             name: '',
             basePath: 'api',
             actions: [],
-            module: defaultModule,
+            module: '',
             description: '',
         },
         validationSchema,
         onSubmit: (values, actions) => {
-            const cValues: ControllerConfig = { ...values, type: 'controller' };
+            const cValues: any = { ...values, type: 'controller' };
 
             if (mode === 'self') {
                 handleCreateEndpoint(cValues, actions);
@@ -138,90 +134,56 @@ export function CreateEndpointDialog({
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-1 items-center gap-4">
                             <div className="col-span-12 flex flex-col gap-3">
-                                <LabelRequired>
-                                    {t('endpointName')}
-                                </LabelRequired>
-                                <Input
+                                <TextInput
                                     id="name"
+                                    label={t('endpointName')}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.name}
-                                    className={cn(
-                                        formik.touched.name &&
-                                            formik.errors.name &&
-                                            'border-red-500'
-                                    )}
+                                    error={formik.errors.name}
+                                    isTouched={formik.touched.name}
+                                    isRequired
                                 />
-                                {formik.touched.name &&
-                                    formik.errors.name && (
-                                        <p className="text-sm text-red-600">
-                                            {formik.errors.name}
-                                        </p>
-                                    )}
                             </div>
                             <div className="col-span-12 gap-3 flex-col flex">
-                                <Label htmlFor="basePath">
-                                    {t('basePath')}
-                                </Label>
-                                <Input
+                                <TextInput
                                     id="basePath"
+                                    label={t('basePath')}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.basePath}
-                                    className={cn(
-                                        formik.touched.basePath &&
-                                            formik.errors.basePath &&
-                                            'border-red-500'
-                                    )}
+                                    error={formik.errors.basePath}
+                                    isTouched={formik.touched.basePath}
                                 />
-                                {formik.touched.basePath &&
-                                    formik.errors.basePath && (
-                                        <p className="text-sm text-red-600">
-                                            {formik.errors.basePath}
-                                        </p>
-                                    )}
                             </div>
                             <div className="col-span-12 flex flex-col gap-3">
-                                <LabelRequired>{t('moduleName')}</LabelRequired>
-                                <IGRPCombobox
+                                <SelectInput
+                                    id={'module'}
+                                    label={t('moduleName')}
                                     options={modules}
                                     value={formik.values.module}
+                                    error={formik.errors.module}
+                                    isTouched={formik.touched.module}
                                     onChange={(value) =>
                                         formik.setFieldValue('module', value)
                                     }
-                                    className={cn(
-                                        'w-full',
-                                        formik.touched.module &&
-                                            formik.errors.module &&
-                                            'border-red-500'
-                                    )}
+                                    onBlur={(value) =>
+                                        formik.setFieldValue('module', value)
+                                    }
+                                    isRequired
                                 />
-                                {formik.errors.module && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.module}
-                                    </p>
-                                )}
                             </div>
                             <div className="col-span-12 gap-3 flex-col flex">
-                                <LabelRequired>
-                                    {t('description')}
-                                </LabelRequired>
-                                <Input
+                                <TextInput
                                     id="description"
+                                    label={t('description')}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.description}
-                                    className={cn(
-                                        formik.touched.description &&
-                                            formik.errors.description &&
-                                            'border-red-500'
-                                    )}
+                                    error={formik.errors.description}
+                                    isTouched={formik.touched.description}
+                                    isRequired
                                 />
-                                {formik.errors.description && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.description}
-                                    </p>
-                                )}
                             </div>
                         </div>
                     </div>
