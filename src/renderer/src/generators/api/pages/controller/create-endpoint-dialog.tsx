@@ -31,9 +31,9 @@ interface CreateEndpointDialogProps {
     description: string;
     isOpen: boolean;
     modules: Array<any>;
-    mode?: 'self' | 'formik'; // 'self' = submits its own data, 'formik' = updates Formik
+    mode?: 'self' | 'formik';
     onClose: () => void;
-    onConfirm?: (values: ControllerConfig) => void; // Callback for Formik updates
+    onConfirm?: (values: ControllerConfig) => void;
 }
 
 export function CreateEndpointDialog({
@@ -48,7 +48,6 @@ export function CreateEndpointDialog({
     mode = 'self',
     onConfirm,
 }: CreateEndpointDialogProps) {
-
     const { t } = useTranslation();
 
     const dispatch: any = useDispatch();
@@ -72,7 +71,7 @@ export function CreateEndpointDialog({
         initialValues: {
             type: 'controller',
             name: '',
-            basePath:  'api',
+            basePath: 'api',
             actions: [],
             module: defaultModule,
             description: '',
@@ -84,7 +83,7 @@ export function CreateEndpointDialog({
             if (mode === 'self') {
                 handleCreateEndpoint(cValues, actions);
             } else if (mode === 'formik' && onConfirm) {
-                onConfirm(cValues); // Pass values to parent Formik
+                onConfirm(cValues);
                 actions.setSubmitting(false);
                 formik.resetForm();
                 onClose();
@@ -149,57 +148,52 @@ export function CreateEndpointDialog({
                                     value={formik.values.name}
                                     className={cn(
                                         formik.touched.name &&
-                                            formik.errors.name
-                                            ? 'border-red-500'
-                                            : ''
+                                            formik.errors.name &&
+                                            'border-red-500'
                                     )}
                                 />
-                                {formik.errors.name && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.name}
-                                    </p>
-                                )}
+                                {formik.touched.name &&
+                                    formik.errors.name && (
+                                        <p className="text-sm text-red-600">
+                                            {formik.errors.name}
+                                        </p>
+                                    )}
                             </div>
                             <div className="col-span-12 gap-3 flex-col flex">
-                                <Label
-                                    htmlFor="basePath"
-                                >
+                                <Label htmlFor="basePath">
                                     {t('basePath')}
                                 </Label>
                                 <Input
                                     id="basePath"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.basePath || pathController}
+                                    value={formik.values.basePath}
                                     className={cn(
                                         formik.touched.basePath &&
-                                            formik.errors.basePath
-                                            ? 'border-red-500'
-                                            : ''
+                                            formik.errors.basePath &&
+                                            'border-red-500'
                                     )}
                                 />
-                                {formik.errors.basePath && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.basePath}
-                                    </p>
-                                )}
+                                {formik.touched.basePath &&
+                                    formik.errors.basePath && (
+                                        <p className="text-sm text-red-600">
+                                            {formik.errors.basePath}
+                                        </p>
+                                    )}
                             </div>
                             <div className="col-span-12 flex flex-col gap-3">
                                 <LabelRequired>{t('moduleName')}</LabelRequired>
                                 <IGRPCombobox
                                     options={modules}
-                                    value={
-                                        formik.values.module || defaultModule
-                                    }
+                                    value={formik.values.module}
                                     onChange={(value) =>
                                         formik.setFieldValue('module', value)
                                     }
                                     className={cn(
                                         'w-full',
                                         formik.touched.module &&
-                                            formik.errors.module
-                                            ? 'border-red-500'
-                                            : ''
+                                            formik.errors.module &&
+                                            'border-red-500'
                                     )}
                                 />
                                 {formik.errors.module && (
@@ -208,26 +202,27 @@ export function CreateEndpointDialog({
                                     </p>
                                 )}
                             </div>
-                          <div className="col-span-12 gap-3 flex-col flex">
-                            <LabelRequired>{t('description')}</LabelRequired>
-                            <Input
-                              id="description"
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                              value={formik.values.description || description}
-                              className={cn(
-                                formik.touched.description &&
-                                formik.errors.description
-                                  ? 'border-red-500'
-                                  : ''
-                              )}
-                            />
-                            {formik.errors.description && (
-                              <p className="text-sm text-red-600">
-                                {formik.errors.description}
-                              </p>
-                            )}
-                          </div>
+                            <div className="col-span-12 gap-3 flex-col flex">
+                                <LabelRequired>
+                                    {t('description')}
+                                </LabelRequired>
+                                <Input
+                                    id="description"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.description}
+                                    className={cn(
+                                        formik.touched.description &&
+                                            formik.errors.description &&
+                                            'border-red-500'
+                                    )}
+                                />
+                                {formik.errors.description && (
+                                    <p className="text-sm text-red-600">
+                                        {formik.errors.description}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

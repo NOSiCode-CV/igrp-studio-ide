@@ -22,13 +22,11 @@ interface ActionProps {
     title: string;
     isNew?: boolean;
     onDelete: () => void;
-    onSubmit: () => void;
     showSourceCode?: () => void;
     onClickBreadcrumbLink?: () => void;
 }
 
 const NavigationBar = ({
-    onSubmit,
     onDelete,
     showSourceCode,
     onClickBreadcrumbLink,
@@ -111,7 +109,6 @@ const NavigationBar = ({
                         <TooltipTrigger asChild>
                             <Button
                                 color="success"
-                                onClick={onSubmit}
                                 type="submit"
                             >
                                 {t('save')}

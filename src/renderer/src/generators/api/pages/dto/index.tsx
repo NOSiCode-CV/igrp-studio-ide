@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import useToast from '@renderer/components/useToast';
@@ -248,10 +248,9 @@ const DtoLayout = ({
     };
 
     return (
-        <React.Fragment>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={handleDelete}
-                onSubmit={formik.handleSubmit}
                 showSourceCode={onClickSourceCode}
                 isNew={!data}
                 title={t('dto')}
@@ -267,11 +266,8 @@ const DtoLayout = ({
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.name
-                                        ? formik.errors.name
-                                        : undefined
-                                }
+                                isTouched={formik.touched.name}
+                                error={formik.errors.name}
                                 isRequired
                             />
                             <SelectInput
@@ -283,6 +279,7 @@ const DtoLayout = ({
                                     formik.setFieldValue('template', option)
                                 }
                                 error={formik.errors.template}
+                                isTouched={formik.touched.template}
                                 isRequired
                             />
                         </div>
@@ -294,7 +291,7 @@ const DtoLayout = ({
                     </div>
                 </Card>
             </div>
-        </React.Fragment>
+        </form>
     );
 };
 

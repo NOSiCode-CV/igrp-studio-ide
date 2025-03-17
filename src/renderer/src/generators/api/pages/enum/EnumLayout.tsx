@@ -85,23 +85,16 @@ export const EnumLayout = ({
                 values.map((value) => {
                     return {
                         name: value.name,
-                        code: value.attributes[0],
-                        description: value.attributes[1],
+                        code: value.attributes ? value.attributes[0] : null,
+                        description: value.attributes
+                            ? value.attributes[1]
+                            : null,
                     };
                 });
 
             formik.setFieldValue('values', attributes || [defaultValue]);
         }
     }, [data]);
-
-    const onSubmit = async () => {
-        const errors = await formik.validateForm();
-        if (Object.keys(errors).length === 0) {
-            formik.handleSubmit();
-        } else {
-            console.error('Validation errors:', errors);
-        }
-    };
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -206,10 +199,9 @@ export const EnumLayout = ({
     const tableName = 'values';
 
     return (
-        <>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={handleDelete}
-                onSubmit={onSubmit}
                 isNew={!data}
                 title={title || t('createNewEnum')}
                 showSourceCode={onClickSourceCode}
@@ -220,11 +212,11 @@ export const EnumLayout = ({
                         <TextInput
                             id="name"
                             label={t('name')}
-                            placeholder={''}
                             value={formik.values.name}
                             onChange={formik.handleChange}
                             onBlur={formik.handleChange}
                             error={formik.errors.name}
+                            isTouched={formik.touched.name}
                             isRequired
                         />
                         <Card className="rounded-sm">
@@ -254,6 +246,6 @@ export const EnumLayout = ({
                     </div>
                 </Card>
             </div>
-        </>
+        </form>
     );
 };
