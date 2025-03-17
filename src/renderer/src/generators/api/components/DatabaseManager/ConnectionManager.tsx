@@ -10,11 +10,11 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types';
 import { ConnectionForm } from './ConnectionForm';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Connection } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 
 export function ConnectionManager({ title }: { title?: string }) {
     const { t } = useTranslation(); // Initialize translation hook
@@ -64,23 +64,23 @@ export function ConnectionManager({ title }: { title?: string }) {
 
     const columns: ColumnDef<Connection>[] = [
         {
-            header: t('connection_name'), // Use translation for header
+            header: t('connection_name'),
             accessorKey: 'name',
         },
         {
-            header: t('database_type'), // Use translation for header
+            header: t('database_type'),
             accessorKey: 'databaseType',
         },
         {
-            header: t('host'), // Use translation for header
+            header: t('host'),
             accessorKey: 'host',
         },
         {
-            header: t('port'), // Use translation for header
+            header: t('port'),
             accessorKey: 'port',
         },
         {
-            header: t('actions'), // Use translation for actions
+            header: t('actions'),
             cell: ({ row }) => (
                 <div>
                     <Button
@@ -89,7 +89,7 @@ export function ConnectionManager({ title }: { title?: string }) {
                             handleDeleteConnection(row.original.name)
                         }
                     >
-                        {t('delete')} {/* Use translation for button text */}
+                        {t('delete')}
                     </Button>
                 </div>
             ),

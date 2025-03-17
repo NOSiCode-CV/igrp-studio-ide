@@ -7,11 +7,11 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Card, CardContent } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
-import MonacoEditor from '@renderer/components/MonacoEditor';
+import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
 
 interface BodyRequestProps {
@@ -45,7 +45,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const { t } = useTranslation();
 
     const routeFormData =
-        'requestBody.content.multipart/form-data.schema.properties';
+        'requestBody.content.multipart/form-data.schema';
 
     const defaultValue = [
         {
@@ -62,7 +62,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         const schema =
             formik.values.requestBody?.content?.[contentType]?.schema;
 
-        return schema
+        return schema && schema.name
             ? {
                   type: '',
                   properties: {
@@ -168,8 +168,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             )}
             {bodyType === 'application/json' && (
                 <div className="space-y-3">
-                    <Combobox
-                        name="contentType"
+                    <IGRPCombobox
                         value={contentType}
                         placeholder={t('selectContentType')}
                         onChange={(value) => setContentType(value)}
@@ -178,7 +177,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     />
                     <Card className="rounded">
                         <CardContent className="p-3">
-                            <Tabs defaultValue="value">
+                            <Tabs defaultValue="schema">
                                 <TabsList>
                                     <TabsTrigger value="value">
                                         {t('value')}

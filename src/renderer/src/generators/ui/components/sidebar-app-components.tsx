@@ -1,8 +1,10 @@
-import { Droppable } from '@hello-pangea/dnd';
 import { SidebarMenu, SidebarMenuItem } from '@renderer/components/ui/sidebar';
-import DraggableElement from '../dnd/DraggableElement';
-import { COMPONENT } from '../ComponentTypes';
+import { APP_COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/useStudio';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import { GripHorizontal } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { EmptyList } from '@renderer/components/empty-list';
 
 const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
     const { fetchComponents } = useStudio();
@@ -15,38 +17,60 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
             comp.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
+    // Render the icon component dynamically
+    const renderIcon = (iconName: string) => {
+        // @ts-ignore - Dynamic access to the icons
+        const IconComponent = LucideIcons[iconName];
+
+        return IconComponent ? <IconComponent className="h-6 w-6" /> : null;
+    };
+
     return (
-        <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
-            {filteredComponents.map((item, key) => (
-                <Droppable
-                    droppableId={`${item.name}`}
-                    key={item.name}
-                    type={COMPONENT}
-                    isDropDisabled={true}
-                >
-                    {(provided) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
+        <>
+            {filteredComponents.length > 0 ? (
+                <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
+                    {filteredComponents.map((item, key) => (
+                        <SidebarMenuItem
+                            key={key}
+                            className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
                         >
-                            <SidebarMenuItem
-                                key={key}
-                                className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
+                            <Draggable
+                                item={{
+                                    id: item.content.name,
+                                    label: item.content.name,
+                                }}
+                                className="w-full h-full"
+                                dropZone={false}
+                                type={APP_COMPONENT}
                             >
-                                <DraggableElement
-                                    item={{
-                                        label: item.content.name,
-                                        id: item.content.name,
-                                    }}
-                                    index={key}
-                                />
-                            </SidebarMenuItem>
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            ))}
-        </SidebarMenu>
+                                <div
+                                    className="p-2 rounded-lg cursor-move flex flex-col items-center gap-2 
+                            shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card"
+                                >
+                                    <GripHorizontal className="w-4 h-4 text-gray-400" />
+
+                                    <div className="flex flex-col items-center gap-2">
+                                        {renderIcon(item.content?.icon)}
+                                        <span className=" text-gray-700 text-center">
+                                            {item.content?.name}
+                                        </span>
+                                    </div>
+                                </div>
+                            </Draggable>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+            ) : (
+                <div className="p-4">
+                    <EmptyList
+                        title="No components created yet"
+                        description="Components let you reuse designs in your application. To create a component."
+                        shortcut="Command + Shift + P"
+                        className="py-12"
+                    />
+                </div>
+            )}
+        </>
     );
 };
 

@@ -41,130 +41,135 @@ import {
     MessageCircle,
     Bell as BellIcon,
     FormInput as Form,
+    Square,
+    Grid,
+    Columns2,
+    Table2,
+    RectangleHorizontal,
+    SlidersHorizontal,
+    ChartPie,
+    Ellipsis,
 } from 'lucide-react';
-export const COLUMN = 'column'
-export const COMPONENT = 'component';
-export const FIELD = 'field';
-export const APP_COMPONENT = 'appcomponent';
 
-export const COMPONENTS = {
-    Containers: "Containers",
-    FormElements: "FormElements",
-    BasicElements: 'BasicElements',
-    DataDisplay: "DataDisplay",
-    LayoutWidget: "Layout",
-    Widgets: "Widgets",
-    Advanced: "Advanced"
-}
+// Constants
+export const APP_COMPONENT = 'appComponent';
 
-export const Containers = {
-    Form: 'Form',
-    PageHeader: 'PageHeader'
-}
+// Component Categories
+export const GROUP_COMPONET: Record<string, string> = {
+    structure: "Structure",
+    containers: "Containers",
+    formElements: "Form Elements",
+    basicElements: "Basic Elements",
+    dataDisplay: "Data Display",
+    layout: "Layout",
+    widget: "Widgets",
+    advanced: "Advanced"
+};
 
-export const BasicElements = {
-    Link: 'Link',
-    Button: "Button",
-    Text: "Text",
-    Image: "Image",
-    RichTextEditor: "RichTextEditor"
-}
-
-export const DataDisplay = {
-    Table: "Table",
-    Charts: "Charts",
-    Maps: "Maps",
-    Carousel: "Carousel",
-    Fingerprint: "Fingerprint"
-}
-
-export const FIELDS = {
-    InputField: 'InputField',
-    DatePicker: 'DatePicker',
-    TimePicker: 'TimePicker',
-    Password: "Password",
-    Textarea: 'Textarea',
-    ColorPicker: "ColorPicker",
-    Select: "Select",
-    Checkbox: "Checkbox",
-    Radio: "Radio",
-    Switch: "Switch",
-    RangeSlider: "RangeSlider",
-    FileUpload: "FileUpload"
-}
-
-
-export const LayoutWidget = {
-    Box: 'Box',
-    Panel: 'Panel',
-    Card: 'Card',
-    Tabs: 'Tabs',
-    List: 'List',
+export const COMPONENT: Record<string, string> = {
+    Columns: "columns",
+    Column: "column",
+    Grid: "grid",
+    Section: "section",
+    Container: 'container',
+    Form: 'form',
+    PageHeader: 'pageHeader',
+    Link: 'link',
+    Button: "button",
+    Text: "text",
+    Image: "image",
+    RichTextEditor: "richTextEditor",
+    Table: "table",
+    Charts: "charts",
+    Maps: "maps",
+    Carousel: "carousel",
+    Fingerprint: "fingerprint",
+    InputField: 'input',
+    DatePicker: 'datePicker',
+    TimePicker: 'timePicker',
+    Password: "password",
+    Textarea: 'textarea',
+    ColorPicker: "colorPicker",
+    Select: "select",
+    Checkbox: "checkbox",
+    Radio: "radio",
+    Switch: "switch",
+    RangeSlider: "rangeSlider",
+    FileUpload: "fileUpload",
+    Box: 'box',
+    Panel: 'panel',
+    Card: 'card',
+    Tabs: 'tabs',
+    List: 'list',
     iFrame: 'iFrame',
-    InfoPanel: 'InfoPanel'
+    InfoPanel: 'infoPanel',
+    Calendar: 'calendar',
+    Alerts: 'alerts',
+    Badges: 'badges',
+    Ratings: 'ratings',
+    Dropdowns: 'dropdowns',
+    EmbedVideo: 'embedVideo',
+    Progress: 'progress',
+    Dropdown: 'dropdown',
+    TableColumn: 'tableColumns',
+    TableFilter: 'tableFilters',
 };
 
-export const Widgets = {
-    Calendar: 'Calendar',
-    Alerts: 'Alerts',
-    Badges: 'Badges',
-    Ratings: 'Ratings',
-    Dropdowns: 'Dropdowns',
-    EmbedVideo: 'EmbedVideo',
-    Progress: 'Progress'
-};
-
-
-export const Advanced = {
-    Accordion: 'Accordion',
-    TreeView: 'TreeView',
-    Chat: 'Chat',
-    Modal: 'Modal',
-    Notifications: 'Notifications'
-};
-
-
+// Icon Mapping
 export const ICON_MAP: Record<string, React.ElementType> = {
-    InputField: FormInput,
-    DatePicker: Calendar,
-    TimePicker: Clock,
-    Password: Eye,
-    ColorPicker: Palette,
-    Textarea: FileText,
-    Select: List,
-    Checkbox: CheckSquare,
-    Radio: Radio,
-    Switch: ToggleLeft,
-    RangeSlider: Sliders,
-    FileUpload: Upload,
-    Link: Link2,
-    Button: ButtonIcon,
-    Text: Type,
-    Image: Image,
-    RichTextEditor: Edit3,
-    Table: Table,
-    Charts: BarChart2,
-    Maps: Map,
-    Carousel: Play,
-    Fingerprint: Fingerprint,
-    Box: Columns,
-    Panel: Layout,
-    Card: CreditCard,
-    Tabs: Tabs,
-    List: ListIcon,
+    input: FormInput,
+    datePicker: Calendar,
+    timePicker: Clock,
+    password: Eye,
+    colorPicker: Palette,
+    textarea: FileText,
+    select: List,
+    checkbox: CheckSquare,
+    radio: Radio,
+    switch: ToggleLeft,
+    rangeSlider: Sliders,
+    fileUpload: Upload,
+    link: Link2,
+    button: ButtonIcon,
+    text: Type,
+    image: Image,
+    richTextEditor: Edit3,
+    table: Table,
+    charts: BarChart2,
+    maps: Map,
+    carousel: Play,
+    fingerprint: Fingerprint,
+    box: Columns,
+    panel: Layout,
+    card: CreditCard,
+    tabs: Tabs,
+    list: ListIcon,
     iFrame: Frame,
-    InfoPanel: Info,
-    Calendar: CalendarIcon,
-    Alerts: Bell,
-    Badges: Badge,
-    Ratings: Star,
-    Dropdowns: ChevronDown,
-    EmbedVideo: Video,
-    Progress: Activity,
-    Accordion: AlignLeft,
-    TreeView: GitMerge,
-    Chat: MessageSquare,
-    Modal: MessageCircle,
-    Notifications: BellIcon,
-    Form: Form,
+    infoPanel: Info,
+    calendar: CalendarIcon,
+    alerts: Bell,
+    badges: Badge,
+    ratings: Star,
+    dropdowns: ChevronDown,
+    embedVideo: Video,
+    progress: Activity,
+    accordion: AlignLeft,
+    treeView: GitMerge,
+    chat: MessageSquare,
+    modal: MessageCircle,
+    notifications: BellIcon,
+    form: Form,
+    container: Square,
+    grid: Grid,
+    columns: Columns2,
+    column: Columns2,
+    stack: Table2,
+    section: RectangleHorizontal,
+    slider: SlidersHorizontal,
+    chart: ChartPie,
+    dropdown: Ellipsis,
+    tableDateFilter: CalendarIcon,
+    tableTextFilter: FormInput,
+    tableNumberFilter: Sliders,
+    tableCheckboxFilter: CheckSquare,
 };

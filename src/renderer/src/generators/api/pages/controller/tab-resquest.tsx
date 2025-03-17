@@ -83,13 +83,16 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     }, [bodyType]);
 
     const handleSchemaChange = (newSchema: JSONSchema) => {
+        console.log('newSchema', newSchema, contentType);
+        console.log('formik.values.requestBody', formik.values.requestBody);
+
+        if (!formik.values.requestBody) return;
+
         const currentSchema = formik.values.requestBody?.content[contentType];
 
-        // Garantir que há propriedades antes de acessar
         const properties = newSchema.properties || {};
         const firstKey = Object.keys(properties)[0];
 
-        // Se houver pelo menos uma propriedade, extraia o schema, senão mantenha o original
         const extractedSchema = firstKey ? properties[firstKey] : newSchema;
 
         if (
@@ -97,7 +100,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
             JSON.stringify(currentSchema.schema) ===
                 JSON.stringify(extractedSchema)
         ) {
-            return; // Não há mudanças, então não faça nada
+            return;
         }
 
         const content = {

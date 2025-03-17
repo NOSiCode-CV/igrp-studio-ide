@@ -1,11 +1,14 @@
-import dropComponentes from '@renderer/assets/images/layout/dropComponentes.svg'
-export const GenNoInfoComp = () => {
-    return (
-        <div className="min-h-[75px] bg-no-repeat bg-center"
-            style={{
-                backgroundImage: `url(${dropComponentes})`,
-                backgroundSize: '160px'
-            }}>
-        </ div>
-    )
+interface GenNoInfoCompProps {
+    type?: string;
 }
+export const GenNoInfoComp = ({ type = 'COMPONENTS' }: GenNoInfoCompProps) => {
+    return (
+        <div className="text-xs space-x-1 min-h-12 flex flex-1 items-center justify-center text-center">
+            <span>DROP</span>
+            <span className="text-igrp">
+                <b>HERE</b>
+            </span>
+            <span>{type}</span>
+        </div>
+    );
+};

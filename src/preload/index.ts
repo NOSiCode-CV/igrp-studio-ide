@@ -5,8 +5,8 @@ import {
 	DTOConfig,
 	ModelConfig
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
+import { EVENTS } from '../main/constants/events'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -51,39 +51,6 @@ const api = {
 		}
 	},
 
-	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deletePage: async (pageConfig: PageConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:delete-page', pageConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	addComponentToPage: async (
-		pageConfig: PageConfig,
-		components: Component[],
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke(
-				'next-engine:add-component-page',
-				pageConfig,
-				components,
-				basePath
-			)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
@@ -121,46 +88,70 @@ const api = {
 const engine = {
 	createProject: async (project: ProjectData, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-project', project, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PROJECT, project, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.DELETE_ELEMENT, config, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_RESPONSE, response, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createEnum: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-enum', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_ENUM, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	serializeElement: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:serialize-element', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.SERIALIZE_ELEMENT, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createPermission: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-permission', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PERMISSION, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
-	}
+	},
+
+	createPage: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PAGE, data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	registryComponent: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getComponent: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_COMPONENT, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {

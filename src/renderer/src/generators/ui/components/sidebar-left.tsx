@@ -19,15 +19,16 @@ import {
     ChevronRight,
     Component,
     FileText,
+    FolderTree,
     GitBranch,
+    GripHorizontal,
     Home,
-    ListTodo
+    ListTodo,
+    Terminal,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
 import React, { useEffect, useState } from 'react';
-import { Droppable } from '@hello-pangea/dnd';
-import DraggableElement from '@renderer/generators/ui/dnd/DraggableElement';
 import { MenuItem } from 'src/main/types';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
@@ -38,6 +39,10 @@ import {
 } from '@renderer/components/ui/collapsible';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import LogTerminal from './LogTerminal';
+import useStudio from '@renderer/hooks/useStudio';
+import NavigatorSidebar from './NavigatorSidebar';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -49,23 +54,23 @@ export function AppSidebar({
     basePath,
     ...props
 }: AppSidebarProps) {
+    const { getRegistryComponent } = useStudio();
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
     const [activeMenuGroup, setActiveMenuGroup] =
         useState<string>('widgetPalette');
 
-    const [originalData, _setOriginalData] = useState(initialData);
     const [filteredData, setFilteredData] = useState(initialData);
 
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        if (searchQuery.trim() === '') {
-            setFilteredData(originalData);
-        } else {
-            setFilteredData(filterSubItems(originalData, searchQuery));
-        }
-    }, [searchQuery, originalData]);
+        getRegistryComponent();
+    }, []);
+
+    useEffect(() => {
+        setFilteredData(filterSubItems(initialData, searchQuery));
+    }, [searchQuery, initialData]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -78,6 +83,7 @@ export function AppSidebar({
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
+        { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         {
             icon: Badge,
@@ -89,13 +95,18 @@ export function AppSidebar({
             label: t('git'),
             id: 'git',
         },
+        {
+            icon: Terminal,
+            label: t('debug'),
+            id: 'debug',
+        },
     ];
 
     return (
         <Sidebar
             collapsible="icon"
             className={cn(
-                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-two))]!',
+                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!',
                 props.className
             )}
             {...props}
@@ -149,8 +160,8 @@ export function AppSidebar({
                                             <div className="w-8 h-8 flex items-center justify-center">
                                                 <item.icon size={20} />
                                             </div>
-                                            <span className="text-xs text-center sr-only">
-                                                {t(item.label)}
+                                            <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
+                                                {item.label}
                                             </span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -172,16 +183,23 @@ export function AppSidebar({
                             {t(activeMenuGroup)}
                         </div>
                     </div>
-                    <SidebarInput
-                        placeholder="Type to search..."
-                        value={searchQuery}
-                        onChange={handleInputChange}
-                    />
+                    {activeMenuGroup !== 'terminal' && (
+                        <SidebarInput
+                            placeholder="Type to search..."
+                            value={searchQuery}
+                            onChange={handleInputChange}
+                        />
+                    )}
                 </SidebarHeader>
                 <SidebarContent>
                     <ScrollArea>
                         {activeMenuGroup === 'explorer' ? (
                             <FileExplorerSidebar
+                                basePath={basePath}
+                                searchTerm={searchQuery}
+                            />
+                        ) : activeMenuGroup === 'navigator' ? (
+                            <NavigatorSidebar
                                 basePath={basePath}
                                 searchTerm={searchQuery}
                             />
@@ -195,68 +213,71 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
+                        ) : activeMenuGroup === 'debug' ? (
+                            <LogTerminal basePath={basePath} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible
                                     key={index}
-                                    title={item.title}
+                                    title={item.label}
                                     defaultOpen
                                     className="group/collapsible"
                                 >
-                                    <Droppable
-                                        droppableId={item.id}
-                                        key={item.id}
-                                        isDropDisabled={true}
-                                        type={item.type}
-                                    >
-                                        {(provided) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.droppableProps}
-                                            >
-                                                <SidebarGroup>
-                                                    <SidebarGroupLabel
-                                                        asChild
-                                                        className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                                    >
-                                                        <CollapsibleTrigger>
-                                                            {item.label}
-                                                            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                                                        </CollapsibleTrigger>
-                                                    </SidebarGroupLabel>
-                                                    <CollapsibleContent>
-                                                        <SidebarGroupContent>
-                                                            <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
-                                                                {item.subItems.map(
-                                                                    (
-                                                                        item: MenuItem,
-                                                                        key: number
-                                                                    ) => (
-                                                                        <SidebarMenuItem
-                                                                            key={
-                                                                                key
+                                    <SidebarGroup>
+                                        <SidebarGroupLabel
+                                            asChild
+                                            className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                        >
+                                            <CollapsibleTrigger>
+                                                {item.label}
+                                                <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                                            </CollapsibleTrigger>
+                                        </SidebarGroupLabel>
+                                        <CollapsibleContent>
+                                            <SidebarGroupContent>
+                                                <SidebarMenu className="grid grid-cols-2 gap-3 p-3 rounded-lg">
+                                                    {item.subItems.map(
+                                                        (
+                                                            subItem: MenuItem,
+                                                            key: number
+                                                        ) => (
+                                                            <SidebarMenuItem
+                                                                key={key}
+                                                                className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
+                                                            >
+                                                                <Draggable
+                                                                    item={
+                                                                        subItem
+                                                                    }
+                                                                    className="w-full h-full p-2 rounded-lg cursor-move flex flex-col items-center gap-2
+                                                                     shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card "
+                                                                    dropZone={
+                                                                        false
+                                                                    }
+                                                                    type={
+                                                                        item.type
+                                                                    }
+                                                                >
+                                                                    <GripHorizontal className="w-4 h-4 text-gray-400" />
+
+                                                                    <div className="flex flex-col items-center gap-2">
+                                                                        {subItem.icon && (
+                                                                            <subItem.icon className="w-6 h-6" />
+                                                                        )}
+                                                                        <span className="text-center">
+                                                                            {
+                                                                                subItem.label
                                                                             }
-                                                                            className="flex flex-col items-center justify-center bg-muted rounded-md shadow-xs"
-                                                                        >
-                                                                            <DraggableElement
-                                                                                item={
-                                                                                    item
-                                                                                }
-                                                                                index={
-                                                                                    key
-                                                                                }
-                                                                            />
-                                                                        </SidebarMenuItem>
-                                                                    )
-                                                                )}
-                                                            </SidebarMenu>
-                                                        </SidebarGroupContent>
-                                                    </CollapsibleContent>
-                                                </SidebarGroup>
-                                                {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable>
+                                                                        </span>
+                                                                    </div>
+                                                                </Draggable>
+                                                            </SidebarMenuItem>
+                                                        )
+                                                    )}
+                                                </SidebarMenu>
+                                            </SidebarGroupContent>
+                                        </CollapsibleContent>
+                                    </SidebarGroup>
                                 </Collapsible>
                             ))
                         )}

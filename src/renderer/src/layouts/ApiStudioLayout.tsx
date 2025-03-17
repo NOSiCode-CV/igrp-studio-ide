@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
+import { Footer } from './components/footer';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -64,7 +65,7 @@ const Layout = (props: LayoutProps) => {
     }, [basePath, navigate]);
 
     return (
-        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))]">
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
             <SidebarProvider
                 style={
                     {
@@ -92,6 +93,7 @@ const Layout = (props: LayoutProps) => {
                         </SidebarInset>
                     </div>
                 </div>
+                <Footer /> 
             </SidebarProvider>
         </div>
     );

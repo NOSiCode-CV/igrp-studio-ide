@@ -6,39 +6,58 @@ import {
     getFileThree as onGetPages,
     deletePage as onDeletePage,
 } from '@renderer/redux/thunks';
-import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { File } from 'src/main/types';
 import { Button } from '@renderer/components/ui/button';
-import { LayoutDashboard, Plus } from 'lucide-react';
+import { Edit, LayoutGrid, Plus, TableIcon, Trash } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
 import { PageCard } from './page-card';
 import {
-    IGRPContainer,
+    IGRPDataTable,
     PageHeader,
 } from '@igrp/igrp-framework-react-design-system';
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
+import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { FileTree } from 'src/main/types';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
+import { NewComponentModal } from './new-component-modal';
+import {
+    IGRPTabs,
+    IGRPTabsContent,
+    IGRPTabsList,
+    IGRPTabsTrigger,
+} from '@renderer/components/tabs';
+import ProjectSettings from '@renderer/pages/project-settings';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
+import {
+    ToggleGroup,
+    ToggleGroupItem,
+} from '@renderer/components/ui/toggle-group';
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: File) => void;
+    onPageClick?: (pageFile: FileTree) => void;
 }
 
 const MainPageBuilder = ({
     onPageClick = (): void => {},
 }: PageBuilderContentProps) => {
     const { t } = useTranslation();
-
     const dispatch: any = useDispatch();
 
     const [content, setContent] = useState<any>([]);
     const [components, setComponents] = useState<any>([]);
-    const [page, setPage] = useState<any>([]);
+    const [page, setPage] = useState<any>();
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
+    const [showNewComponentModal, setNewComponentModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
-
     const [searchTerm, setSearchTerm] = useState('');
+    const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
     const handleAddComponents = (page: any) => {
         onPageClick?.(page);
@@ -52,13 +71,17 @@ const MainPageBuilder = ({
         files: studio.filesThree,
     }));
 
-    const { basePath, files, config } = useSelector(selectProperties);
+    const { basePath, files, config: project } = useSelector(selectProperties);
 
-    const handleDeletePage = () => {
-        const pageConfig: PageConfig = {
-            type: 'page',
-            pageName: page.name,
-            path: page.path,
+    const handleDeletePage = (page: any) => {
+        setDeleteModal(true);
+        setPage(page);
+    };
+
+    const confirmDeletion = () => {
+        const pageConfig: DeleteConfig = {
+            type: page.content.type,
+            name: page.content.pageName || page.content.name,
         };
         dispatch(onDeletePage(pageConfig, basePath));
         setDeleteModal(false);
@@ -68,6 +91,7 @@ const MainPageBuilder = ({
 
     const handleNewPage = () => {
         setNewPageModal(false);
+        setNewComponentModal(false);
         isLoadingTable(true);
     };
 
@@ -101,50 +125,156 @@ const MainPageBuilder = ({
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const tableData = [
+        ...filteredPages.map((page) => ({ ...page, isPage: true })),
+        ...filteredComponents.map((comp) => ({ ...comp, isPage: false })),
+    ];
+
+    const columns: ColumnDef<any>[] = [
+        {
+            accessorKey: 'name',
+            header: 'Name',
+        },
+        {
+            accessorKey: 'type',
+            header: 'Type',
+            cell: ({ row }) => (row.original.isPage ? 'Page' : 'Component'),
+        },
+        {
+            accessorKey: 'actions',
+            header: 'Actions',
+            cell: ({ row }) => (
+                <div className="flex space-x-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleAddComponents(row.original)}
+                    >
+                        <Edit className="h-4 w-4 mr-2" />
+                        {row.original.isPage
+                            ? t('addComponents')
+                            : t('editComponents')}
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePage(row.original)}
+                    >
+                        <Trash className="h-4 w-4 text-red-500" />
+                        <span>{t('delete')}</span>
+                    </Button>
+                </div>
+            ),
+        },
+    ];
+
     return (
         <div className="container mx-auto p-4">
-            <PageHeader title={config?.name} description={config?.description}>
-                <Button size="sm" onClick={() => setNewPageModal(true)}>
-                    <Plus />
-                    {t('addPage')}
-                </Button>
-            </PageHeader>
-            <IGRPContainer>
-                <div className="flex items-center text-foreground">
-                    <LayoutDashboard className="w-5 h-5 mr-2" />
-                    {t('pageLists')}
-                </div>
-                <div>
-                    <div className="mb-4">
-                        <Input
-                            placeholder={t('seachPages')}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {filteredPages.map((page) => (
-                            <PageCard
-                                key={page.name}
-                                page={page}
-                                onDelete={() => setDeleteModal(true)}
-                                onAddComponents={handleAddComponents}
-                                isPage
+            <PageHeader
+                title={project?.name}
+                description={project.config?.description}
+            />
+            <IGRPTabs defaultValue="pages">
+                <IGRPTabsList className="w-full">
+                    <IGRPTabsTrigger value="pages">
+                        {t('pages')}
+                    </IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="settings">
+                        {t('settings')}
+                    </IGRPTabsTrigger>
+                </IGRPTabsList>
+                <IGRPTabsContent value="pages" className="space-y-4">
+                    <div className="space-y-4 py-3">
+                        <div className="flex justify-between">
+                            <div className="flex items-center text-foreground">
+                                <h1 className="">{t('pageLists')}</h1>
+                            </div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button size="sm" variant="default">
+                                        <Plus className="h-4 w-4" />
+                                        {t('add')}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        onSelect={() => setNewPageModal(true)}
+                                    >
+                                        {t('createNewPage')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onSelect={() =>
+                                            setNewComponentModal(true)
+                                        }
+                                    >
+                                        {t('createNewComponent')}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                        <div className="flex flex-col sm:flex-row justify-between gap-4">
+                            <Input
+                                placeholder={t('seachPages')}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                        ))}
+                            <ToggleGroup
+                                type="single"
+                                value={viewMode}
+                                onValueChange={(value) =>
+                                    value &&
+                                    setViewMode(value as 'table' | 'card')
+                                }
+                            >
+                                <ToggleGroupItem
+                                    value="table"
+                                    aria-label="Table view"
+                                >
+                                    <TableIcon className="h-4 w-4" />
+                                </ToggleGroupItem>
+                                <ToggleGroupItem
+                                    value="card"
+                                    aria-label="Card view"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                </ToggleGroupItem>
+                            </ToggleGroup>
+                        </div>
+                        {viewMode === 'card' ? (
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                {filteredPages.map((page) => (
+                                    <PageCard
+                                        key={page.name}
+                                        page={page}
+                                        onDelete={() => handleDeletePage(page)}
+                                        onAddComponents={handleAddComponents}
+                                        isPage
+                                    />
+                                ))}
 
-                        {filteredComponents.map((comp) => (
-                            <PageCard
-                                key={comp.name}
-                                page={comp}
-                                onDelete={() => setDeleteModal(true)}
-                                onAddComponents={handleAddComponents}
-                                isPage={false}
-                            />
-                        ))}
+                                {filteredComponents.map((comp) => (
+                                    <PageCard
+                                        key={comp.name}
+                                        page={comp}
+                                        onDelete={() => handleDeletePage(comp)}
+                                        onAddComponents={handleAddComponents}
+                                        isPage={false}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <IGRPDataTable columns={columns} data={tableData} />
+                        )}
                     </div>
-                </div>
-            </IGRPContainer>
+                </IGRPTabsContent>
+                <IGRPTabsContent value="settings" className="space-y-4">
+                    <ProjectSettings
+                        hasTitle={false}
+                        project={project}
+                        className="max-w-screen px-0"
+                    />
+                </IGRPTabsContent>
+            </IGRPTabs>
             <NewPageModal
                 basePath={basePath}
                 isOpen={newPageModal}
@@ -152,10 +282,17 @@ const MainPageBuilder = ({
                 onConfirm={handleNewPage}
             />
 
+            <NewComponentModal
+                basePath={basePath}
+                isOpen={showNewComponentModal}
+                onClose={() => setNewComponentModal(false)}
+                onConfirm={handleNewPage}
+            />
+
             <AlertDialogDelete
                 isOpen={deleteModal}
                 onClose={() => setDeleteModal(false)}
-                onConfirm={handleDeletePage}
+                onConfirm={confirmDeletion}
                 hasTrigger={false}
             />
         </div>

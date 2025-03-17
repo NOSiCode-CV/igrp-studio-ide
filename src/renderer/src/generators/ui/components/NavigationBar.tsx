@@ -1,95 +1,96 @@
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { useTabs } from '@renderer/components/navigation/TabContext';
 import { Button } from '@renderer/components/ui/button';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
-import { Code, Eye, TvMinimal } from 'lucide-react';
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { OPTION_TYPE } from '@renderer/constants/appConstants';
+import { AppWindowMac, Code, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface NavigationBarProps {
     isDesign: boolean;
     onSwitch?: () => void;
     onSave?: () => void;
-    basePath: string
-    page: string
+    basePath: string;
+    page: string;
 }
 
 const NavigationBar = ({
-    isDesign,
     onSwitch,
     onSave,
     basePath,
-    page
+    isDesign,
 }: NavigationBarProps) => {
     const { t } = useTranslation();
+
+    const { tabs, activeTab, initializeTabFromCurrentItem } = useTabs();
 
     const handleSaveClick = () => {
         onSave?.();
     };
 
-    const handleStart = () => {
-        window.electron.ipcRenderer.send('start-nextjs', basePath);
-    };
+    const onClickSourceCode = () => {
+        const tab = tabs.filter((t) => t.id === activeTab);
 
-    const handlePreview = () => {
-        window.electron.ipcRenderer.send('open-preview', page);
-    };
+        console.log(tab);
 
-    const handleStop = () => {
-        window.electron.ipcRenderer.send('stop-nextjs');
+        const page = tab[0];
+        initializeTabFromCurrentItem({
+            path: `${basePath}/src/app/pages/${page.item.label.toLowerCase()}/page.tsx`,
+            type: OPTION_TYPE.FILE_THREE,
+            label: `${page.item.label}.tsx`,
+        });
     };
 
     return (
-        <div className="flex justify-end items-center space-x-2 ">
-            <StudioDropdown
-                onStart={handleStart}
-                onPreview={handlePreview}
-                onStop={handleStop}
-            />
-            <Button
-                color={isDesign ? 'primary' : 'light'}
-                size="sm"
-                onClick={onSwitch}
-                className="hover:bg-igrp"
-                title={isDesign ? 'Show Code' : 'Show Design'}
-                variant={'ghost'}
-            >
-                {isDesign ? <Eye /> : <Code />}
-            </Button>
-            <Button
-                size="sm"
-                className="bg-igrp"
-                onClick={handleSaveClick}
-                title="Add Components to Page"
-            >
-                {t('save')}
-            </Button>
-        </div>
-    );
-};
-
-const StudioDropdown = ({ onStart, onPreview, onStop }) => {
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
-                    <TvMinimal />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuItem onClick={onStart}>
-                    Iniciar Next.js
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onPreview}>
-                    Abrir Preview
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onStop}>
-                    Parar Next.js
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <TooltipProvider>
+            <div className="flex flex-1 justify-end items-center space-x-2">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            size="sm"
+                            variant={'secondary'}
+                            onClick={onClickSourceCode}
+                        >
+                            <AppWindowMac />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('sourceCode')}</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            size="sm"
+                            onClick={onSwitch}
+                            className="hover:bg-igrp"
+                            variant={'secondary'}
+                        >
+                            {isDesign ? <Eye /> : <Code />}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {isDesign ? 'Show Code [JSON]' : 'Show Design'}
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            size="sm"
+                            className="hover:text-igrp"
+                            onClick={handleSaveClick}
+                        >
+                            {t('save')}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {t('Add Components to Page')}
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </TooltipProvider>
     );
 };
 

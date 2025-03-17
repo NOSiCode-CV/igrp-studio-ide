@@ -1,4 +1,3 @@
-import { Input } from '@renderer/components/ui/input';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -15,7 +14,6 @@ import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { LabelRequired } from '@renderer/components/required';
 import { TextInput } from '../../components/inputs-form';
 import { Card } from '@renderer/components/ui/card';
 
@@ -82,18 +80,17 @@ export const EnumLayout = ({
             setTitle(name);
 
             formik.setFieldValue('name', name);
-            const attributes = values && values.map((value) => {
-                return {
-                    name: value.name,
-                    code: value.attributes[0],
-                    description: value.attributes[1]
-                };
-            });
+            const attributes =
+                values &&
+                values.map((value) => {
+                    return {
+                        name: value.name,
+                        code: value.attributes[0],
+                        description: value.attributes[1],
+                    };
+                });
 
-            formik.setFieldValue(
-                'values',
-                attributes || [defaultValue]
-            );
+            formik.setFieldValue('values', attributes || [defaultValue]);
         }
     }, [data]);
 
@@ -132,11 +129,12 @@ export const EnumLayout = ({
                 })
             );
 
-            const attributes = tablesColumns[tableName].map(
-                ({ type, name }) => {
+            const attributes = tablesColumns[tableName]
+                .filter((attr) => attr.name !== 'Name')
+                .map(({ type, name }) => {
                     return { type: type === 'text' ? 'string' : type, name };
-                }
-            );
+                });
+
             const values = { ...data, values: convertedValues, attributes };
 
             const { error } = await window.engine.createEnum(

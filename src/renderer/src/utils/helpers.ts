@@ -1,64 +1,9 @@
-import { FolderFiles, MenuItem } from 'src/main/types'
+import { MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 
-
-// Function to convert folders into menuItems
-export function generateMenuItems(folders: FolderFiles): MenuItem[] {
-	const menuItems: MenuItem[] = [];
-
-	// Iterate through each folder in the folders object
-	Object.keys(folders).forEach((folderName: string) => {
-		// Create a folder menu item as a header
-		const folderMenuItem: MenuItem = {
-			label: folderName,
-			subItems: [],
-			isHeader: true,
-
-			dropdownMenus: [
-				{
-					label: 'dto',
-					type: "dto"
-				},
-				{
-					label: 'models',
-					type: "models"
-				},
-				{
-					label: 'controllers',
-					type: "controllers"
-				}
-			]
-		};
-
-		// Process each folder's content
-		folders[folderName].files.forEach((folder) => {
-			// Iterate through the categories (e.g., "dto", "controller") within the folder
-			Object.keys(folder).forEach((categoryName: string) => {
-				// Create a category menu item
-				const categoryMenuItem: MenuItem = createMenuHeader(categoryName, categoryName);
-
-				// Add each file in the category as a sub-item
-				categoryMenuItem.subItems = folder[categoryName].map((file: { name: string; path: string }) => ({
-					label: file.name,
-					path: file.path,
-					module: folderName,
-					type: categoryName,
-				}));
-
-				// Add the category menu item to the folder's sub-items
-				folderMenuItem.subItems!.push(categoryMenuItem);
-			});
-		});
-
-		// Add the folder's menu item to the main menu items
-		menuItems.push(folderMenuItem);
-	});
-
-	return menuItems;
-}
 
 export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
@@ -144,23 +89,26 @@ export function findComponentItem(menus: Array<any>, idFind: string) {
 	return menus.flatMap((menu) => menu.subItems || []).find((sub) => sub.id === idFind) || null
 }
 
-export const generateFakeDataForField = (field: any) => {
-	switch (field.config.type) {
+// Function to generate fake data for a field based on its type
+export const generateFakeDataForField = (properties: any) => {
+	const { type } = properties;
+	switch (type) {
 		case 'text':
-			return faker.lorem.words(3)
+			return faker.lorem.words(3);
 		case 'number':
-			return faker.number.int({ min: 1, max: 100 })
+			return faker.number.int({ min: 1, max: 100 });
 		case 'date':
-			return faker.date.past().toLocaleDateString() // or use any other date format
+			return faker.date.past().toLocaleDateString(); // or use any other date format
 		case 'boolean':
-			return faker.datatype.boolean()
+			return faker.datatype.boolean();
 		case 'email':
-			return faker.internet.email()
+			return faker.internet.email();
 		// Add more cases for different field types as needed
 		default:
-			return faker.lorem.words(3) // Fallback to text if type is unknown
+			return faker.lorem.words(3); // Fallback to text if type is unknown
 	}
-}
+};
+
 export const getBadgeColor = (method: string): string | undefined => {
 	return httpMethods.find((item) => item.value === method)?.color;
 };

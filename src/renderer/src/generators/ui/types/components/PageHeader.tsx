@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { DroppedComponent } from '../../interfaces';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { FIELD } from '@renderer/generators/ui/ComponentTypes';
-import { PageHeader } from '@igrp/igrp-framework-react-design-system';
-import GenNoInfoField from '@renderer/generators/ui/components/GenNoInfoField';
+import { PageHeader as IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import useStudio from '@renderer/hooks/useStudio';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import Droppable from '@renderer/lib/dnd/Droppable';
+import { cn } from '@renderer/lib/utils';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import BoxField from '../tools/BoxFields';
 
 export interface FormComponentProps {
-    componentName: string;
-    componentId: string;
-    acceptTypes: string[];
-    comp: DroppedComponent;
-    onEdit: () => void;
+    comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
+    isDisabled?: boolean;
 }
 
-const PageHeaderLayout: React.FC<FormComponentProps> = ({
-    comp,
-    componentId,
-}) => {
+const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
+    const {
+        id: componentId,
+        children: fields,
+        componentName,
+        label,
+        properties,
+    } = comp;
+    const { title, description } = properties;
+
     const [buttonComponents, setButtonComponents] = useState<
-        DroppedComponent[]
+        StructuredComponent[]
     >([]);
 
     const [loadedComponents, setLoadedComponents] = useState<{
@@ -30,17 +35,19 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
     const { dynamicImport } = useStudio();
 
     const { setEditingComponent } = useDroppedComponents();
-    const { title } = comp.config;
 
     useEffect(() => {
-        if (comp.fields) {
-            const buttons = comp.fields;
+        if (fields) {
+            const buttons = fields;
             setButtonComponents(buttons);
         }
     }, [comp]);
 
-    const handleEditClick = (component: Partial<DroppedComponent>) => {
-        setEditingComponent({ ...component, componentId: componentId });
+    const handleEditClick = (component: StructuredComponent) => {
+        setEditingComponent({
+            parentComp: comp,
+            component,
+        });
     };
 
     useEffect(() => {
@@ -59,68 +66,48 @@ const PageHeaderLayout: React.FC<FormComponentProps> = ({
     }, [buttonComponents, dynamicImport]);
 
     const renderButtons = () =>
-        buttonComponents.map((button: DroppedComponent, index: number) => {
+        buttonComponents.map((button: StructuredComponent, index: number) => {
             const Component = loadedComponents[button.id];
-            return Component ? (
+            return (
                 <Draggable
                     key={button.id}
-                    draggableId={`${button.id}`}
+                    item={button}
                     index={index}
+                    dropTargetId={componentId}
+                    layout="horizontal"
+                    className="p-0 border-none"
                 >
-                    {(provided, _snapshot) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{ ...provided.draggableProps.style }}
+                    {Component && (
+                        <BoxField
+                            comp={button}
+                            parentComp={comp}
+                            onEdit={() => handleEditClick(button)}
+                            index={index}
                         >
-                            <Component
-                                comp={button}
-                                componentId={button.id}
-                                onEdit={() => handleEditClick(button)}
-                            />
-                        </div>
+                            <Component comp={button} onDragEnd={onDragEnd} />
+                        </BoxField>
                     )}
                 </Draggable>
-            ) : (
-                <div key={comp.id}>Loading...</div>
             );
         });
 
     return (
-        <div className='bg-white rounded-sm p-3'>
-        <PageHeader title={title}>
-            <Droppable
-                droppableId={`${componentId}`}
-                type={FIELD}
-                direction="horizontal"
+        <Droppable
+            component={comp}
+            onDrop={onDragEnd}
+            layout="horizontal"
+            className="border-none"
+        >
+            <IGRPPageHeader
+                title={title || label || componentName}
+                description={description}
             >
-                {(provided, snapshot) => {
-                    return (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className={`${
-                                snapshot.isDraggingOver
-                                    ? 'border-2 border-dashed border-igrp p-2'
-                                    : ''
-                            }`}
-                        >
-                            <div className="flex flex-1 space-x-2">
-                                {buttonComponents.length > 0 ? (
-                                    renderButtons()
-                                ) : (
-                                    <GenNoInfoField />
-                                )}
-                            </div>
-                            {provided.placeholder}
-                        </div>
-                    );
-                }}
-            </Droppable>
-        </PageHeader>
-        </div>
+                <div className={cn('flex flex-1 justify-end gap-3')}>
+                    {renderButtons()}
+                </div>
+            </IGRPPageHeader>
+        </Droppable>
     );
 };
 
-export default PageHeaderLayout;
+export default PageHeader;

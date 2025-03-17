@@ -17,6 +17,8 @@ export const SHORTCUTS = {
     JUMP_TO_SPECIFIC_TAB: isMac ? '⌘ 1-8' : 'Ctrl+1-8',
     JUMP_TO_LAST_TAB: isMac ? '⌘ 9' : 'Ctrl+9',
 
+    CLOSE_SIDEBAR: isMac ? '⌘ b' : 'Ctrl+b',
+
     // Novos atalhos para o editor de código e gerais
     FIND: isMac ? '⌘ F' : 'Ctrl+F',
     REPLACE: isMac ? '⌥ ⌘ F' : 'Ctrl+Alt+F',

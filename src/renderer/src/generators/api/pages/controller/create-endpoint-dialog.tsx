@@ -19,7 +19,7 @@ import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useEffect } from 'react';
 import { LabelRequired } from '@renderer/components/required';
 
@@ -28,6 +28,7 @@ interface CreateEndpointDialogProps {
     basePath: string;
     pathController: string;
     endpointName: string;
+    description: string;
     isOpen: boolean;
     modules: Array<any>;
     mode?: 'self' | 'formik'; // 'self' = submits its own data, 'formik' = updates Formik
@@ -40,12 +41,14 @@ export function CreateEndpointDialog({
     basePath,
     pathController,
     endpointName,
+    description,
     isOpen,
     onClose,
     modules,
     mode = 'self',
     onConfirm,
 }: CreateEndpointDialogProps) {
+
     const { t } = useTranslation();
 
     const dispatch: any = useDispatch();
@@ -60,6 +63,9 @@ export function CreateEndpointDialog({
         module: Yup.string().required(
             t('thisFieldRequired', { name: t('module') })
         ),
+        description: Yup.string()
+            .required(t('thisFieldRequired', { name: t('description') }))
+            .max(100, t('maxLengthExceeded', { max: 100 })),
     });
 
     const formik = useFormik({
@@ -69,6 +75,7 @@ export function CreateEndpointDialog({
             basePath:  'api',
             actions: [],
             module: defaultModule,
+            description: '',
         },
         validationSchema,
         onSubmit: (values, actions) => {
@@ -116,7 +123,8 @@ export function CreateEndpointDialog({
         formik.setFieldValue('name', endpointName);
         formik.setFieldValue('basePath', pathController);
         formik.setFieldValue('module', defaultModule);
-    }, [defaultModule, endpointName, pathController]);
+        formik.setFieldValue('description', description);
+    }, [defaultModule, endpointName, pathController, description]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -178,8 +186,7 @@ export function CreateEndpointDialog({
                             </div>
                             <div className="col-span-12 flex flex-col gap-3">
                                 <LabelRequired>{t('moduleName')}</LabelRequired>
-                                <Combobox
-                                    name="module"
+                                <IGRPCombobox
                                     options={modules}
                                     value={
                                         formik.values.module || defaultModule
@@ -201,6 +208,26 @@ export function CreateEndpointDialog({
                                     </p>
                                 )}
                             </div>
+                          <div className="col-span-12 gap-3 flex-col flex">
+                            <LabelRequired>{t('description')}</LabelRequired>
+                            <Input
+                              id="description"
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              value={formik.values.description || description}
+                              className={cn(
+                                formik.touched.description &&
+                                formik.errors.description
+                                  ? 'border-red-500'
+                                  : ''
+                              )}
+                            />
+                            {formik.errors.description && (
+                              <p className="text-sm text-red-600">
+                                {formik.errors.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
                     </div>
                     <DialogFooter>

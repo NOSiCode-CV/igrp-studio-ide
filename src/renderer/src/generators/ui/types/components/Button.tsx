@@ -1,30 +1,21 @@
-import { Button } from '@renderer/components/ui/button';
-import { DroppedComponent } from '@renderer/generators/ui/interfaces';
-import RowTools from '../tools/RowTools';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { IGRPButton } from '@igrp/igrp-framework-react-design-system';
 
 export interface UiButtonProps {
-    componentId: string;
-    comp: DroppedComponent;
-    onEdit: () => void;
+    index: number;
+    comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
 }
 
-const UiButton = ({ comp, componentId, onEdit }: UiButtonProps) => {
-    const { label, variant, size, customClasses } = comp.config;
+const UiButton = ({ comp }: UiButtonProps) => {
+    const { properties, componentName } = comp;
+
+    const { variant, size, customClasses, label } = properties;
 
     return (
-        <div className="relative group">
-            <Button
-                onClick={(e) => e.preventDefault()}
-                variant={variant}
-                size={size}
-                className={customClasses}
-            >
-                <span className="truncate">{label}</span>
-            </Button>
-            <div className="absolute top-0 right-0 mt-1 px-2 py-1 bg-gray-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
-                <RowTools id={componentId} onEdit={onEdit} />
-            </div>
-        </div>
+        <IGRPButton variant={variant} size={size} className={customClasses}>
+            {label || componentName}
+        </IGRPButton>
     );
 };
 

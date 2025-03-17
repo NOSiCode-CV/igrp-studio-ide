@@ -7,10 +7,10 @@ import {
   setChangeStatusAction,
   setCurrentItemAction
 } from './reducer';
-import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
 import { ProjectData, FileTree } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 /**
  * set BasePath
  * @param {*} param0
@@ -56,9 +56,10 @@ export const setCurrentItem = (item: any) => async (dispatch: any) => {
  * set BasePath
  * @param {*} param0
  */
-export const navigateToNextPage = (navigate, appConfig: ProjectData) => {
+export const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
   try {
     if (appConfig.framework === ENV_TYPES.NEXTJS) {
+      await window.engine.registryComponent(ENV_TYPES.NEXTJS, appConfig.path)
       navigate(ROUTES.PATH_PAGE_BUILDER_UI);
     } else if (appConfig.framework === ENV_TYPES.SPRING) {
       navigate(ROUTES.PATH_PAGE_BUILDER_API);
@@ -85,10 +86,10 @@ export const getFileThree = (basePath: string) => async (dispatch: any) => {
 *  delete  page file
 * @param {*} param0
 */
-export const deletePage = (pageConfig: PageConfig, basePath: string) => async () => {
+export const deletePage = (pageConfig: DeleteConfig, basePath: string) => async () => {
   const { showErrorToast, showSuccessToast } = useToast();
   try {
-    const { error } = await window.api.deletePage(pageConfig, basePath)
+    const { error } = await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath)
 
     if (error) {
       showErrorToast(error);

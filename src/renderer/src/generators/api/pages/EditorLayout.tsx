@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import MonacoEditor from '@renderer/components/MonacoEditor';
+import MonacoEditor from '@renderer/components/monaco-editor';
 
 export const EditorLayout = ({ currentItem }) => {
     const [data, setData] = useState<any>(null);

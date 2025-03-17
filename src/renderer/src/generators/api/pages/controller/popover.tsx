@@ -23,8 +23,8 @@ import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
 import { toInitCap } from '@renderer/utils/helpers';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
-import MonacoEditor from '@renderer/components/MonacoEditor';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import MonacoEditor from '@renderer/components/monaco-editor';
 
 interface PopoverProps {
     row: any;
@@ -147,8 +147,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     />
                                 )}
                                 {isEnum && (
-                                    <Combobox
-                                        name="enum"
+                                    <IGRPCombobox
                                         className="h-8"
                                         value={row?.['enum'] || ''}
                                         onChange={(ev) =>

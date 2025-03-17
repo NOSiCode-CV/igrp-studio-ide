@@ -35,7 +35,7 @@ export function NextConfig({
                     onChange={(e) =>
                         onChange({ ...data, appName: e.target.value })
                     }
-                    placeholder="mynextapp"
+                    placeholder="my-next-app"
                     maxLength={20}
                 />
                 {errors?.config && errors.config.appName && (

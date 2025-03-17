@@ -1,16 +1,16 @@
 import { Label } from '@renderer/components/ui/label';
 import { useState } from 'react';
 import { DateRangePicker } from '@igrp/igrp-framework-react-design-system';
-import { DroppedComponent } from '@renderer/generators/ui/interfaces';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 interface InputDateProps {
-    comp: DroppedComponent;
+    comp: StructuredComponent;
     componentId: string;
     onEdit: () => void;
 }
 
 const DatePicker: React.FC<InputDateProps> = ({ comp, componentId }) => {
-    const { label } = comp.config;
+    const { label } = comp;
 
     const [date, _setDate] = useState();
 

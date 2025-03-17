@@ -134,7 +134,6 @@ const useNavdata = (filesThree: FileTree[]) => {
 
     const getSubItems = useCallback(
         (
-            id: string,
             categoryName: string,
             file: any,
             path: string,
@@ -142,8 +141,9 @@ const useNavdata = (filesThree: FileTree[]) => {
         ) => {
             const actions = file?.content?.actions;
             if (categoryName === OPTION_TYPE.CONTROLLER && actions) {
+                
                 return actions.map((action) => ({
-                    id: id || action.actionName,
+                    id: `${categoryName}-${action.actionName}`,
                     label: action.actionName,
                     path: path,
                     type: OPTION_TYPE.ACTION,
@@ -254,7 +254,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                                             type: file.content?.type || 'file',
                                             link: ROUTES.PATH_PAGE_BUILDER_API,
                                             subItems: getSubItems(
-                                                file.content?.id,
                                                 file.content?.type,
                                                 file,
                                                 file.path,
@@ -287,7 +286,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                                 type: folder.content?.type || 'file',
                                 link: ROUTES.PATH_PAGE_BUILDER_API,
                                 subItems: getSubItems(
-                                    folder.content?.id,
                                     folder.content?.type,
                                     folder,
                                     folder.path,

@@ -1,15 +1,103 @@
+import { exec, ChildProcess } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 import { BrowserWindow } from 'electron';
 
 class NextJsManager {
+  private mainWindow: BrowserWindow;
+  private nextProcess: ChildProcess | null = null;
   private previewWindow: BrowserWindow | null = null;
+  private nextAppPath: string | null = null;
 
-  constructor(_mainWindow: BrowserWindow) {
+  constructor(mainWindow: BrowserWindow, nextAppPath: string | null = null) {
+    this.mainWindow = mainWindow;
+    this.nextAppPath = nextAppPath;
   }
 
-  // Abre a janela de preview com o nome da página
-  public openPreviewWindow(pageName: string): void {
+  public setNextJsPath(nextAppPath: string): void {
+    this.nextAppPath = nextAppPath;
+    this.sendLog(`Path set: ${nextAppPath}`);
+  }
+
+  public startNextJsServer(): void {
+    if (!this.nextAppPath) {
+      this.sendLog('Error: No path defined for the Next.js application.');
+      return;
+    }
+
+    const nodeModulesPath = path.join(this.nextAppPath, 'node_modules');
+    if (!fs.existsSync(nodeModulesPath)) {
+      this.sendLog('node_modules not found. Installing dependencies...');
+      this.installDependencies();
+    } else {
+      this.runNextJsDevServer();
+    }
+  }
+
+  private installDependencies(): void {
+    if (!this.nextAppPath) {
+      this.sendLog('Error: No path defined for the Next.js application.');
+      return;
+    }
+
+    const pnpmLockPath = path.join(this.nextAppPath, 'pnpm-lock.yaml');
+    const npmLockPath = path.join(this.nextAppPath, 'package-lock.json');
+    const yarnLockPath = path.join(this.nextAppPath, 'yarn.lock');
+
+    let installCommand = 'npm install'; // Default to npm
+
+    if (fs.existsSync(pnpmLockPath)) {
+      installCommand = 'pnpm install';
+    } else if (fs.existsSync(yarnLockPath)) {
+      installCommand = 'yarn install';
+    } else if (fs.existsSync(npmLockPath)) {
+      installCommand = 'npm install';
+    }
+
+    this.sendLog(`Using ${installCommand} to install dependencies...`);
+
+    exec(installCommand, { cwd: this.nextAppPath }, (error, _stdout, _stderr) => {
+      if (error) {
+        this.sendLog(`Error installing dependencies: ${error.message}`);
+        return;
+      }
+      this.sendLog('Dependencies installed successfully.');
+      this.runNextJsDevServer();
+    });
+  }
+
+  private runNextJsDevServer(): void {
+    if (!this.nextAppPath) {
+      this.sendLog('Error: No path defined for the Next.js application.');
+      return;
+    }
+
+    this.sendLog('Starting Next.js...');
+    this.nextProcess = exec('npx next dev -p 3001', { cwd: this.nextAppPath }, (error, stdout, _stderr) => {
+      if (error) {
+        this.sendLog(`Error starting Next.js: ${error.message}`);
+        return;
+      }
+      this.sendLog(`Next.js started: ${stdout}`);
+    });
+
+    if (this.nextProcess) {
+      this.nextProcess.stdout?.on('data', (data) => this.sendLog(data));
+      this.nextProcess.stderr?.on('data', (data) => this.sendLog(data));
+    }
+  }
+
+  public stopNextJsServer(): void {
+    if (this.nextProcess) {
+      this.nextProcess.kill();
+      this.sendLog('Next.js stopped.');
+    }
+  }
+
+  public openPreviewWindow(pageName?: string): void {
     if (this.previewWindow) {
-      this.previewWindow.focus(); // Foca na janela de preview existente, se já estiver aberta
+      this.previewWindow.focus();
+      this.previewWindow.reload();
       return;
     }
 
@@ -17,19 +105,23 @@ class NextJsManager {
       width: 1200,
       height: 800,
       webPreferences: {
-        nodeIntegration: false, // Desabilita nodeIntegration por segurança
-        contextIsolation: true, // Habilita context isolation por segurança
+        nodeIntegration: false,
+        contextIsolation: true,
       },
     });
 
-    // Carrega a URL da página específica
-    const previewUrl = `http://localhost:3000/pages/${pageName}`;
-    this.previewWindow.loadURL(previewUrl);
+    const url = pageName ? `http://localhost:3001/pages/${pageName}` : 'http://localhost:3001';
+    this.previewWindow.loadURL(url);
 
-    // Lida com o evento de fechamento da janela
     this.previewWindow.on('closed', () => {
-      this.previewWindow = null; // Limpa a referência quando a janela é fechada
+      this.previewWindow = null;
     });
+  }
+
+  private sendLog(message: string): void {
+    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+      this.mainWindow.webContents.send('log', message);
+    }
   }
 }
 

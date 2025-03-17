@@ -4,7 +4,7 @@ import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { SchemaField } from '../../types/schema';
-import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 import { PopoverController } from '../../pages/controller/popover';
 
 interface SchemaFieldRowProps {
@@ -196,7 +196,7 @@ export function SchemaFieldRow({
             >
                 <TableCell
                     style={{ paddingLeft: `${depth * 28 + 8}px` }}
-                    className="flex  flex-1 py-1!"
+                    className="flex flex-1 py-1!"
                 >
                     {(type === 'object' || type === 'array') && (
                         <Button
@@ -221,7 +221,7 @@ export function SchemaFieldRow({
                         placeholder={
                             index !== undefined && type === 'array'
                                 ? `Item ${index + 1}`
-                                : 'Enter field name'
+                                : 'fieldName'
                         }
                     />
                 </TableCell>

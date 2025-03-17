@@ -23,14 +23,16 @@ import { updateApp } from './helpers/update'
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 import NextJsManager from './helpers/nextjsManager'
+import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 
 const backend = require('i18next-electron-fs-backend')
 
 
 let mainWindow: BrowserWindow
 
-let repo, nextJsManager
+let nextJsManager: NextJsManager;
 
+let repo;
 // Load the initial language configuration
 loadConfig();
 
@@ -138,6 +140,8 @@ app.whenReady().then(async () => {
     }
 
     buildTaskbar()
+
+    initComponents()
 
   }
 
@@ -508,15 +512,13 @@ ipcMain.handle('set-language', (_, lang: string) => {
 });
 
 // NEXTJS
-
 ipcMain.on('start-nextjs', (_event, basePath) => {
-  nextJsManager.setNextJsPath(basePath); // Define o base path
-  nextJsManager.startNextJsServer(); // Inicia o servidor
+  nextJsManager.setNextJsPath(basePath);
+  nextJsManager.startNextJsServer();
 });
 
-
 ipcMain.on('open-preview', (_event, pageName) => {
-  nextJsManager.openPreviewWindow(pageName); // Passa o nome da página
+  nextJsManager.openPreviewWindow(pageName);
 });
 
 ipcMain.on('stop-nextjs', () => {

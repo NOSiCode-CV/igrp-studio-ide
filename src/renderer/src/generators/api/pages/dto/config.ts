@@ -37,7 +37,9 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
-export const getTablesColumns = ({ selectors, dto, models, enums, currentDto, t }): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = ({ selectors, dto, models, enums, current, t }): { [value: string]: IColumnsTabelProps[] } => {
+
+    const { name: currentDto, module } = current || {}
 
     const paramsTypesData = formatMethods(
         (
@@ -56,13 +58,15 @@ export const getTablesColumns = ({ selectors, dto, models, enums, currentDto, t 
         true
     )
 
-    const getOptions = (objects) => {
+    const getOptions = (objects: any) => {
         return objects !== undefined
             ? objects
-                .filter((m) => m.name !== currentDto)
-                .map((item) => ({
-                    value: item.content?.name || item.name,
-                    label: item.content?.name || item.name,
+                .filter((m: any) => {
+                    return !(m.content?.module === module && m.content?.name === currentDto)
+                }).map((item: any) => ({
+                    value: `${item.content?.name || item.name}`,
+                    label: `${item.content?.name || item.name}`,
+                    module: item.content?.module
                 }))
             : []
     }

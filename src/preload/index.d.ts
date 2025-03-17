@@ -4,6 +4,7 @@ import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { Connection, FileTree, IConnenctionRepository, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
+import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
 
 
 interface CustomAPI {
@@ -48,6 +49,11 @@ interface BaseEngine {
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    registryComponent: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    getComponent: (engineType: string) => Promise<HandlerResponse>;
+    getComponent: (engineType: string) => Promise<Record<string, Component>>;
 }
 
 interface CustomMenu {

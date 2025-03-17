@@ -24,7 +24,6 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Combobox } from '@igrp/igrp-framework-react-design-system';
 import { formatMethods } from '../../helpers';
 import { TabRequest } from './tab-resquest';
 
@@ -41,7 +40,7 @@ import {
 import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { LabelRequired } from '@renderer/components/required';
+import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
 
 interface ControllerProps {
     basePath: string;
@@ -73,6 +72,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
     const [pathController, setPathController] = useState('');
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
@@ -123,11 +123,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     useEffect(() => {
         if (data) {
-            const { name, basePath } = data;
+            const { name, basePath, description } = data;
 
             setTitle(`${name}(${basePath})`);
             setName(name);
             setPathController(basePath);
+            setDescription(description);
         }
     }, [data]);
 
@@ -219,10 +220,11 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
         const newValues: ControllerConfig = {
             type: 'controller',
-            name: name,
+            name,
+            module,
+            description,
             basePath: pathController,
             actions: finalActions,
-            module,
             id: currentItem.id,
         };
 
@@ -284,7 +286,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
             if (countActions === 1) {
                 const config = {
-                    name: formik.values.name,
+                    name,
                     type: 'controller',
                     module: currentItem.module,
                 };
@@ -302,7 +304,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             } else {
                 // Remove only the current action and save the updated actions
                 const updatedActions = values.actions.filter(
-                    (dataAction) => dataAction.actionName !== formik.actionName
+                    (dataAction) => dataAction.actionName !== formik.values.actionName
                 );
 
                 const updatedValues = { ...values, actions: updatedActions };
@@ -311,6 +313,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     updatedValues,
                     basePath
                 );
+
+                console.log(   updatedValues, error);
 
                 if (error) {
                     showErrorToast(error);
@@ -337,6 +341,14 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         )?.MYME_TYPES || []
     );
 
+    const collectionType = formatMethods(
+        (
+            selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
+                | { COLLECTION_TYPES: string[] }
+                | undefined
+        )?.COLLECTION_TYPES || []
+    );
+
     useEffect(() => {
         const enumTypes = enums.map((enumItem) => {
             return { label: enumItem.name, value: enumItem.name };
@@ -359,11 +371,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         const targetDto = dto.map((d) => ({
             value: d.content?.name || d.name,
             label: d.content?.name || d.name,
+            module: d.content?.module,
         }));
 
         setSchemaTypes((prevSchemaTypes) =>
             prevSchemaTypes.map((schemaType) =>
-                schemaType.value === 'Reference other schemas'
+                schemaType.value === 'Reference other Object'
                     ? { ...schemaType, value: 'dto', items: targetDto }
                     : schemaType
             )
@@ -411,10 +424,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                 defaultModule={module}
                 pathController={pathController}
                 endpointName={name}
+                description={description}
                 onConfirm={(values) => {
                     setName(values.name);
                     setPathController(values.basePath);
                     setModule(values.module);
+                    setDescription(values.description);
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
@@ -429,34 +444,32 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </CardHeader>
                     <CardContent>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                            <div className="flex flex-col gap-3">
-                                <LabelRequired>{t('methodType')}</LabelRequired>
-                                <Combobox
-                                    name={t('method')}
-                                    placeholder={t('enterMethod')}
-                                    value={formik.values.method}
-                                    onChange={(value) =>
-                                        formik.setFieldValue('method', value)
-                                    }
+                            <div className="flex flex-col gap-3 md:col-span-2 space-y-2">
+                                <IGRPInputAddOn
+                                    selectValue={formik.values.method}
+                                    value={formik.values.path}
+                                    labelText={t('methodType')}
                                     options={httpMethods}
-                                    className="h-9 w-full"
+                                    placeholder={'posts'}
+                                    onChange={(e) => {
+                                        formik.setFieldValue(
+                                            'path',
+                                            e.target.value
+                                        );
+                                    }}
+                                    onSelectValueChange={(value) => {
+                                        formik.setFieldValue('method', value);
+                                    }}
+                                    onBlur={formik.handleBlur}
+                                    classNameGlobal="h-8 mb-6"
+                                    required
                                 />
+                                {formik.errors.path && formik.touched.path && (
+                                    <p className="text-xs text-red-500">
+                                        {formik.errors.path}
+                                    </p>
+                                )}
                             </div>
-
-                            <TextInput
-                                id="path"
-                                label={t('path')}
-                                placeholder={'posts'}
-                                value={formik.values.path}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.errors.path && formik.touched.path
-                                        ? formik.errors.path
-                                        : ''
-                                }
-                            />
-
                             <TextInput
                                 id={'actionName'}
                                 label={t('actionName')}
@@ -498,6 +511,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                             contentTypes={typesData}
                             responseTypes={responses}
                             enumTypes={enumTypes}
+                            collectionTypes={collectionType}
                         />
                     </TabsContent>
                 </Tabs>

@@ -96,10 +96,12 @@ export const getTablesColumns = ({
 	attributes,
 	revision,
 	models,
+	name,
 	t
 }): { [value: string]: IColumnsTabelProps[] } => {
 
 	const modelsOptions = (models || [])
+		.filter((model) => model.content?.name !== name)
 		.map((model) => ({
 			value: model.content?.name || model.name,
 			label: model.content?.name || model.name,
@@ -183,7 +185,7 @@ export const getValuesToSubmit = (values, module) => {
 			type,
 		}));
 
-	const hasListPk = primaryKey.length > 1 ? true : false;
+	const hasListPk = primaryKey.length > 1;
 
 	const filteredAttributes = hasListPk
 		? attributes.filter((attribute) => attribute.primaryKey !== true)

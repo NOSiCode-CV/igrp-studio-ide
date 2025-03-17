@@ -7,14 +7,14 @@ import {
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 
 import { addController, addDTO, addModel, addModule, engineTypes } from '@igrp/igrp-studio-springboot-engine'
-import { addComponentToPage, deletePage, newPage } from '@igrp/nextjs-engine';
 
-import { Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { ipcMain } from 'electron';
 import { ProjectData } from '../types';
+import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { EVENTS } from '../constants/events';
 
 handleWithCustomErrors(
-    'engine:create-project',
+    EVENTS.ENGINE.CREATE_PROJECT,
     async (_event, project: ProjectData, basePath: string) => {
         const engine = EngineFactory.getEngine(project.framework);
         await engine.createProject(project, basePath);
@@ -22,31 +22,23 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
-    'engine:create-response',
+    EVENTS.SPRING.CREATE_ENUM,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createEnum?.(config, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_RESPONSE,
     async (_event, response: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.createResponse(response, basePath);
+        await engine.createResponse?.(response, basePath);
     }
 );
 
 handleWithCustomErrors(
-    'engine:create-enum',
-    async (_event, data: any, engineType: string, basePath: string) => {
-        const engine = EngineFactory.getEngine(engineType);
-        await engine.createEnum(data, basePath);
-    }
-);
-
-handleWithCustomErrors(
-    'engine:create-permission',
-    async (_event, data: any, engineType: string, basePath: string) => {
-        const engine = EngineFactory.getEngine(engineType);
-        await engine.createPermission(data, basePath);
-    }
-);
-
-handleWithCustomErrors(
-    'engine:delete-element',
+    EVENTS.ENGINE.DELETE_ELEMENT,
     async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
         await engine.delete(config, basePath);
@@ -54,57 +46,71 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
-    'engine:serialize-element',
+    EVENTS.ENGINE.SERIALIZE_ELEMENT,
     async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.serializeElement(config, basePath);
+        await engine.serializeElement?.(config, basePath);
     }
-)
+);
 
-handleWithCustomErrors('spring-engine:create-module', async (_event, moduleConfig, basePath) => {
-    await addModule(moduleConfig, basePath)
-})
-
-handleWithCustomErrors('spring-engine:create-model', async (_event, modelConfig, basePath) => {
-    await addModel(modelConfig, basePath)
-})
 
 handleWithCustomErrors(
-    'spring-engine:create-dto',
+    EVENTS.NEXT.CREATE_PAGE,
+    async (_event, pageConfig: PageConfig, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createPage?.(pageConfig, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.NEXT.DELETE_PAGE,
+    async (_event, pageConfig: PageConfig, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.delete?.(pageConfig, basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.NEXT.REGISTRY_COMPONENT,
+    async (_event, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.registryComponent?.(basePath);
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.NEXT.GET_COMPONENT,
+    async (_event, engineType: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        const data = engine.getComponents?.();
+
+        return data;
+    }
+);
+
+
+handleWithCustomErrors(EVENTS.SPRING.CREATE_MODULE, async (_event, moduleConfig, basePath) => {
+    await addModule(moduleConfig, basePath);
+});
+
+handleWithCustomErrors(EVENTS.SPRING.CREATE_MODEL, async (_event, modelConfig, basePath) => {
+    await addModel(modelConfig, basePath);
+});
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_DTO,
     async (_event, dtoConfig: DTOConfig, basePath: string) => {
-        await addDTO(dtoConfig, basePath)
+        await addDTO(dtoConfig, basePath);
     }
-)
+);
 
 handleWithCustomErrors(
-    'spring-engine:create-controller',
+    EVENTS.SPRING.CREATE_CONTROLLER,
     async (_event, controllerConfig: ControllerConfig, basePath: string) => {
-        await addController(controllerConfig, basePath)
+        await addController(controllerConfig, basePath);
     }
-)
+);
 
-ipcMain.handle('spring-engine:fetch-selectors', async (_event, module: string, basePath: string) => {
-    return await engineTypes(module, basePath)
-})
-
-handleWithCustomErrors(
-    'next-engine:create-page',
-    async (_event, pageConfig: PageConfig, basePath: string) => {
-        await newPage(pageConfig, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:add-component-page',
-    async (_event, pageConfig: PageConfig, components: Component[], basePath: string) => {
-        await addComponentToPage(pageConfig, components, basePath)
-    }
-)
-
-handleWithCustomErrors(
-    'next-engine:delete-page',
-    async (_event, pageConfig: PageConfig, basePath: string) => {
-        await deletePage(pageConfig, basePath)
-    }
-)
-
+ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
+    return await engineTypes(module, basePath);
+});

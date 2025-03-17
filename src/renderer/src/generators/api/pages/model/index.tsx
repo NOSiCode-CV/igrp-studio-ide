@@ -74,21 +74,23 @@ const ModelLayout = ({
         },
     });
 
-  const suggestTableName = async (name: string) => {
-      const errors = await formik.validateForm();
-      console.log(errors.name);
-      if (errors.name) {
-          return '';
-      }
+    const suggestTableName = async (name: string) => {
+        const errors = await formik.validateForm();
 
-      const nameProcessed = name
-          .replace(/([a-z])([A-Z])/g, '$1_$2')
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, '_');
+        if (errors.name) {
+            return '';
+        }
 
-     return nameProcessed.startsWith('t_') ? nameProcessed : `t_${nameProcessed}`;
-  };
+        const nameProcessed = name
+            .replace(/([a-z])([A-Z])/g, '$1_$2')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '_');
+
+        return nameProcessed.startsWith('t_')
+            ? nameProcessed
+            : `t_${nameProcessed}`;
+    };
 
     const handleNameBlur = async (
         e: FocusEvent<HTMLInputElement>
@@ -106,12 +108,13 @@ const ModelLayout = ({
     }, [config]);
 
     useEffect(() => {
-        const { attributes, revision } = formik.values;
+        const { attributes, name, revision } = formik.values;
         const res = getTablesColumns({
             selectors,
             attributes,
             revision,
             models,
+            name,
             t,
         });
         setTableColumns(res);
@@ -232,7 +235,6 @@ const ModelLayout = ({
                 name: formik.values.name,
                 type: 'model',
                 module: currentItem.module,
-                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(
@@ -241,9 +243,10 @@ const ModelLayout = ({
                 basePath
             );
 
-            if (error) return showErrorToast(error);
+            console.log('error', error);
+            console.log('config', config);
 
-            createGitCommit(basePath, `Add schema ${formik.values.name}`);
+            if (error) return showErrorToast(error);
 
             dispatch(onSetChangeStatus(true));
 

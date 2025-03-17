@@ -1,9 +1,14 @@
+import { GenNoInfoComp } from './GenNoInfoComp';
 import GenNoInfoField from './GenNoInfoField';
 
-export const EmptySlotComponent = () => {
+export const EmptySlotComponent = ({
+    isComponent = true,
+}: {
+    isComponent?: boolean;
+}) => {
     return (
-        <div className="aspect-[calc(4*3+1)/4] rounded-xl bg-muted/50 items-center justify-center flex">
-            <GenNoInfoField />
+        <div className="rounded-xl bg-muted/75 items-center w-full p-4">
+            {isComponent ? <GenNoInfoComp /> : <GenNoInfoField />}
         </div>
     );
 };

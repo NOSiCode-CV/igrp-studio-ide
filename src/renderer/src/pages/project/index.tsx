@@ -98,6 +98,8 @@ export function ProjectWizard() {
                 formik.values.path
             );
 
+            console.log(error)
+
             if (error) {
                 showErrorToast(error);
                 return;

@@ -1,151 +1,101 @@
-import { ColumnComponent, ColumnConfig, Field, FieldConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
 import { generateId } from "@renderer/utils/helpers";
-import { DroppedComponent } from "../interfaces";
-import { ComponentProps } from "./DroppedComponentsContext";
-import { COMPONENT, FIELD } from "../ComponentTypes";
+import { COMPONENT } from "../ComponentTypes";
+import { Destination, Source, StructuredComponent } from "@renderer/lib/dnd/types";
+import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export const handleDragEnd = (
     result: any,
-    isDrop: boolean,
-    { moveComponent, reorderComponents, addDroppedComponent, getComponent, setEditingComponent, updateComponent }: any
+    { handleAddChildToComponent, handleReorderChildInComponent }: any
 ) => {
-
-    const { draggableId, source, destination, type } = result;
+    const { draggableId, source, destination, mode, type } = result;
 
     if (!destination) {
         return;
     }
-    console.log(isDrop)
-    switch (type) {
-        case COMPONENT:
-            if (isDrop) {
 
-                handleDropComponent(draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent });
-            }
-            else if (source.droppableId === destination.droppableId) {
-                const path = destination.droppableId.split("-");
-                reorderComponents({ rowId: path[0], columnId: path[1], startIndex: source.index, endIndex: destination.index });
-            } else {
-                const pathDestination = destination.droppableId.split("-");
-                const pathSource = source.droppableId.split("-");
-                moveComponent({
-                    sourceRowId: pathSource[0],
-                    sourceColumnId: pathSource[1],
-                    destinationRowId: pathDestination[0],
-                    destinationColumnId: pathDestination[1],
-                    sourceIndex: source.index,
-                    destinationIndex: destination.index
-                });
-            }
-            break;
-
-        case FIELD:
-
-            if (source.droppableId === destination.droppableId) {
-                reorderField(source, destination, { updateComponent, getComponent });
-            } else {
-                handleDropField(draggableId, destination, { updateComponent, getComponent });
-            }
-            break;
-
-        default:
-            console.warn("Unknown drag type:", type);
-            break;
+    if (mode === 'MOVE') {
+        handleReorderChildInComponent(draggableId, source, destination);
+    } else {
+        handleDropComponent(draggableId, source, destination, type, { handleAddChildToComponent });
     }
+};
+
+const handleDropComponent = (
+    draggableId: string,
+    source: Source,
+    destination: Destination,
+    type: string,
+    { handleAddChildToComponent }: any
+) => {
+    const { label, properties, childrenTypes } = source
+    // Generate a unique ID for the component
+    const componentId = generateId(draggableId);
+
+    // Create the component object
+    const component: StructuredComponent = {
+        id: componentId,
+        componentName: draggableId,
+        label,
+        type,
+        properties: setDefaultProperties(properties),
+        children: [], // Initialize children array
+    };
+
+    childrenTypes && childrenTypes.map((child: ComponentRegisterConfig) => {
+        const { name, label, properties } = child
+        const childId = generateId(name);
+        const childComponent: StructuredComponent = {
+            id: childId,
+            componentName: name,
+            label: label,
+            properties: setDefaultProperties(properties),
+            children: [],
+        };
+        component.children?.push(childComponent);
+    });
+
+    // Handle Columns component
+    if (draggableId === COMPONENT.Columns) {
+
+        // Create two child columns and add them to the parent's children array
+        for (let i = 0; i < 2; i++) {
+            const childColumnId = generateId(`column_${i + 1}`);
+            const childColumn: StructuredComponent = {
+                id: childColumnId,
+                componentName: COMPONENT.Column,
+                label: `Column ${i + 1}`,
+                properties: { variant: 'span6' },
+                children: [],
+            };
+            component.children?.push(childColumn);
+        }
+    }
+
+    if (draggableId === COMPONENT.Form) {
+        const childColumnId = generateId(COMPONENT.Grid);
+        const childColumn: StructuredComponent = {
+            id: childColumnId,
+            componentName: COMPONENT.Grid,
+            label: COMPONENT.Grid,
+            properties: { variant: 'cols4' },
+            children: [],
+        };
+        component.children?.push(childColumn);
+    }
+
+    // Add the component to the row
+    handleAddChildToComponent(destination, component);
 
 };
 
 
-export const handleDropComponent = (draggableId, destination, { addDroppedComponent, getComponent, setEditingComponent }: any) => {
-
-    const path = destination.droppableId.split("-");
-
-    const componentId = generateId(draggableId);
-
-    const config: ColumnConfig = {
-        title: draggableId,
-        colSize: 12
-    };
-
-    const columnComponent: ColumnComponent = {
-        id: componentId,
-        componentName: draggableId,
-        config: config,
-        fields: [],
-    };
-
-    const props: ComponentProps = {
-        data: { rowId: path[0], columnId: path[1], colSize: 12 },
-        componentId: componentId,
-        props: columnComponent,
-        index: destination.index
+// Utility function to set default values based on the schema
+const setDefaultProperties = (schema: any) => {
+    const properties: any = {};
+    for (const key in schema) {
+        if (schema[key].default !== undefined) {
+            properties[key] = schema[key].default;
+        }
     }
-
-    // Adiciona o componente à coluna
-    addDroppedComponent(props);
-
-    //open component dropped
-    const comp: Partial<DroppedComponent> = getComponent(componentId) ?? {};
-    if (comp)
-        setEditingComponent(comp);
-}
-
-export const handleDropField = (draggableId, destination, { updateComponent, getComponent }) => {
-
-    const label = draggableId
-    const componentId = destination.droppableId;
-    const insertIndex = destination.index;
-    const formComponent: Partial<DroppedComponent> = getComponent(componentId) ?? {};
-    const fieldId = generateId(componentId + '_' + draggableId);
-
-    const fieldConfig: FieldConfig = {
-        type: draggableId,
-        name: fieldId,
-        label: label,
-        placeholder: `Enter your ${label}`,
-        colSize: 4
-    }
-
-    const field: Field = {
-        type: draggableId,
-        config: fieldConfig
-    }
-
-    const newField: DroppedComponent = {
-        id: fieldId,
-        componentName: draggableId,
-        ...field,
-    };
-
-    const updatedFields = [
-        ...formComponent.fields.slice(0, insertIndex),
-        newField,
-        ...formComponent.fields.slice(insertIndex)
-    ];
-
-    updateComponent(componentId, {
-        ...formComponent,
-        fields: updatedFields,
-    });
-}
-
-export const reorderField = (source, destination, { updateComponent, getComponent }) => {
-
-    const componentId = destination.droppableId;
-    const insertIndex = destination.index;
-    const formComponent: Partial<DroppedComponent> = getComponent(componentId) ?? {};
-    const fieldToMove = formComponent.fields[source.index];
-
-    const fieldsWithoutMoved = formComponent.fields.filter((_, index) => index !== source.index);
-
-    const updatedFields = [
-        ...fieldsWithoutMoved.slice(0, insertIndex),
-        fieldToMove,
-        ...fieldsWithoutMoved.slice(insertIndex)
-    ];
-
-    updateComponent(componentId, {
-        ...formComponent,
-        fields: updatedFields,
-    });
-}
+    return properties;
+};
