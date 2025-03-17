@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, HelpCircle } from 'lucide-react';
+import { Wifi, WifiOff, HelpCircle, Terminal } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -11,11 +11,11 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { Separator } from '@renderer/components/ui/separator';
+import { TerminalSimulator } from '@renderer/pages/terminal-simulator';
 
 export function Footer() {
     const [isOnline, setIsOnline] = useState(true);
-    const [currentTime, setCurrentTime] = useState(new Date());
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [isTerminalOpen, setIsTerminalOpen] = useState(false);
 
     // Monitor online status
     useEffect(() => {
@@ -34,21 +34,6 @@ export function Footer() {
             window.removeEventListener('offline', handleOnlineStatus);
         };
     }, []);
-
-    // Update time
-    useEffect(() => {
-        const timer = setInterval(() => {
-            const now = new Date();
-            setCurrentTime(now);
-
-            // Update date only if the day changes
-            if (now.getDate() !== currentDate.getDate()) {
-                setCurrentDate(now);
-            }
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [currentDate]);
 
     const [appVersion, setAppVersion] = useState('');
 
@@ -74,6 +59,24 @@ export function Footer() {
 
             <div className="flex items-center space-x-3">
                 <Separator orientation="vertical" className="h-4" />
+
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => setIsTerminalOpen(true)}
+                            >
+                                <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                            <p>Open Terminal</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
 
                 <TooltipProvider>
                     <Tooltip>
@@ -111,40 +114,10 @@ export function Footer() {
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-
-                {/* <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className="text-muted-foreground">
-                                {currentDate.toLocaleDateString(undefined, {
-                                    weekday: 'short',
-                                    month: 'short',
-                                    day: 'numeric',
-                                })}
-                            </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                            <p>Current Date</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className="text-muted-foreground">
-                                {currentTime.toLocaleTimeString(undefined, {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    second: '2-digit',
-                                })}
-                            </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                            <p>Current Time</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider> */}
+                <TerminalSimulator
+                    isOpen={isTerminalOpen}
+                    onClose={() => setIsTerminalOpen(false)}
+                />
             </div>
         </footer>
     );

@@ -38,6 +38,7 @@ import {
     ToggleGroup,
     ToggleGroupItem,
 } from '@renderer/components/ui/toggle-group';
+import { EmptyList } from '@renderer/components/empty-list';
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: FileTree) => void;
@@ -126,13 +127,21 @@ const MainPageBuilder = ({
     );
 
     const tableData = [
-        ...filteredPages.map((page) => ({ ...page, isPage: true })),
-        ...filteredComponents.map((comp) => ({ ...comp, isPage: false })),
+        ...filteredPages.map((page) => ({
+            ...page,
+            pageName: page.content?.pageName,
+            isPage: true,
+        })),
+        ...filteredComponents.map((comp) => ({
+            ...comp,
+            pageName: comp.content?.name,
+            isPage: false,
+        })),
     ];
 
     const columns: ColumnDef<any>[] = [
         {
-            accessorKey: 'name',
+            accessorKey: 'pageName',
             header: 'Name',
         },
         {
@@ -241,27 +250,27 @@ const MainPageBuilder = ({
                             </ToggleGroup>
                         </div>
                         {viewMode === 'card' ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {filteredPages.map((page) => (
-                                    <PageCard
-                                        key={page.name}
-                                        page={page}
-                                        onDelete={() => handleDeletePage(page)}
-                                        onAddComponents={handleAddComponents}
-                                        isPage
-                                    />
-                                ))}
-
-                                {filteredComponents.map((comp) => (
-                                    <PageCard
-                                        key={comp.name}
-                                        page={comp}
-                                        onDelete={() => handleDeletePage(comp)}
-                                        onAddComponents={handleAddComponents}
-                                        isPage={false}
-                                    />
-                                ))}
-                            </div>
+                            tableData.length > 0 ? (
+                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    {tableData.map((page) => (
+                                        <PageCard
+                                            key={page.name}
+                                            page={page}
+                                            onDelete={() =>
+                                                handleDeletePage(page)
+                                            }
+                                            onAddComponents={
+                                                handleAddComponents
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <EmptyList
+                                    title="No pages or components created yet"
+                                    description="Get started by creating your first page or component. Once created, you can use the Page Builder to design and customize it."
+                                />
+                            )
                         ) : (
                             <IGRPDataTable columns={columns} data={tableData} />
                         )}

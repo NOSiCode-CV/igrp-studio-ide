@@ -7,25 +7,38 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import { COMPONENT } from '../../ComponentTypes';
 import { EditComponent } from '../../components/EditComponent';
+import useStudio from '@renderer/hooks/useStudio';
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { useEffect, useState } from 'react';
 
 interface ToolsProps {
     onEdit: () => void;
     comp: StructuredComponent;
     parentComp: StructuredComponent;
+    path?: string;
     index: number;
 }
 
-const FieldTools = ({ parentComp, comp, index, onEdit }: ToolsProps) => {
+const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
     const { id, componentName } = comp;
+    const { componentName: parentComponentName } = parentComp;
+    const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
     const { handleRemoveChildFromComponent } = useDroppedComponents();
+
+    const { getAcceptedChildren } = useStudio();
+
+    useEffect(() => {
+        getAcceptedChildren(path || parentComponentName, componentName).then(
+            (data) => {
+                setComponents(data);
+            }
+        );
+    }, [parentComponentName, componentName, getAcceptedChildren]);
 
     const onClickDeleteField = () => {
         handleRemoveChildFromComponent({ droppableId: id, index });
     };
-
-    const hasAddField = [COMPONENT.Dropdown].includes(componentName);
 
     return (
         <TooltipProvider>
@@ -86,8 +99,8 @@ const FieldTools = ({ parentComp, comp, index, onEdit }: ToolsProps) => {
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
-                {hasAddField && (
-                    <EditComponent parentComp={parentComp} comp={comp} />
+                {components.length > 0 && path && (
+                    <EditComponent path={path} comp={comp} />
                 )}
             </div>
         </TooltipProvider>

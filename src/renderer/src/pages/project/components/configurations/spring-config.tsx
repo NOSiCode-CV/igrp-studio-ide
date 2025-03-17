@@ -2,16 +2,12 @@
 
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import {
-    RadioGroup,
-    RadioGroupItem,
-} from '@renderer/components/ui/radio-group';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
 import { ProjectData, SpringConfigData } from 'src/main/types';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
-import { DatabaseOptions } from '@renderer/constants/appConstants';
+import { DatabaseOptions, projectStructureStyle } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
@@ -184,12 +180,13 @@ export function SpringConfig({
 
             <Separator orientation="horizontal" />
 
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-3">
                     <Label>{t('projectStructureStyle')}</Label>
-                    <RadioGroup
+                    <IGRPCombobox
+                        options={projectStructureStyle || []}
                         value={data.projectStructureStyle}
-                        onValueChange={(value) =>
+                        onChange={(value) =>
                             onChange({
                                 ...data,
                                 projectStructureStyle: value as
@@ -197,17 +194,8 @@ export function SpringConfig({
                                     | 'domain',
                             })
                         }
-                        className="flex gap-4"
-                    >
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="technical" id="technical" />
-                            <Label htmlFor="technical">{t('technical')}</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">{t('domainDriven')}</Label>
-                        </div>
-                    </RadioGroup>
+                        className="w-full"
+                    />
                 </div>
 
                 <div className="flex flex-col gap-3">

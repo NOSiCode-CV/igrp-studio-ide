@@ -6,12 +6,20 @@ interface BoxProps {
     children: React.ReactElement;
     comp: StructuredComponent;
     parentComp: StructuredComponent;
+    path?: string;
     className?: string;
     onEdit: () => void;
     index: number;
 }
 
-const BoxField = ({ children, index, comp, parentComp, onEdit }: BoxProps) => {
+const BoxField = ({
+    children,
+    index,
+    comp,
+    parentComp,
+    path,
+    onEdit,
+}: BoxProps) => {
     return (
         <div className="relative group/field">
             {React.cloneElement(children)}
@@ -19,8 +27,9 @@ const BoxField = ({ children, index, comp, parentComp, onEdit }: BoxProps) => {
                 <FieldTools
                     comp={comp}
                     parentComp={parentComp}
-                    onEdit={() => onEdit()}
+                    path={path}
                     index={index}
+                    onEdit={() => onEdit()}
                 />
             </div>
         </div>

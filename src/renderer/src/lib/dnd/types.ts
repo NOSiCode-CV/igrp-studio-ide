@@ -76,7 +76,7 @@ export interface Source {
 }
 
 export interface EditingComponentParams {
-  parentComp?: StructuredComponent;
+  path?: string;
   component: StructuredComponent;
 }
 

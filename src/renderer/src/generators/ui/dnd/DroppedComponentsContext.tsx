@@ -40,7 +40,7 @@ interface DroppedComponentsContextType {
 
     removeRow: (rowId: string) => void;
     setEditingComponent: ({
-        parentComp,
+        path,
         component,
     }: EditingComponentParams) => void;
     clearEditingComponent: () => void;
@@ -355,10 +355,10 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     const getAllComponents = (): StructuredLayout => components;
 
     const setEditingComponent = ({
-        parentComp,
+        path,
         component,
     }: EditingComponentParams) => {
-        setCurrentComponent({ parentComp, component });
+        setCurrentComponent({ path, component });
         toggleSidebar();
         setOpen(false);
     };
