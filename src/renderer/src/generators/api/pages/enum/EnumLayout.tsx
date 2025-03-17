@@ -157,7 +157,7 @@ export const EnumLayout = ({
         try {
             const config = {
                 name: formik.values.name,
-                type: 'response',
+                type: 'enum',
                 module: currentItem.module,
                 id: currentItem.id,
             };
