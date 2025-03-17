@@ -17,6 +17,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { GitFork, Key, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface CloneProjectModalProps {
     handleCloneProject: (
@@ -35,6 +36,7 @@ export function CloneProjectModal({
     handleCloneProject,
     children,
 }: CloneProjectModalProps) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [projectUrl, setProjectUrl] = useState('');
     const [authType, setAuthType] = useState('none');
@@ -68,7 +70,7 @@ export function CloneProjectModal({
             <DialogContent className="sm:max-w-[600px] bg-background text-foreground">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold">
-                        Clone Project
+                        {t('cloneProject')}
                     </DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
@@ -79,11 +81,11 @@ export function CloneProjectModal({
                                 htmlFor="project-url"
                                 className="text-muted-foreground"
                             >
-                                Repository URL
+                                {t('repositoryUrl')}
                             </Label>
                             <Input
                                 id="project-url"
-                                placeholder="https://github.com/username/repo.git"
+                                placeholder={t('repositoryUrlPlaceholder')}
                                 value={projectUrl}
                                 onChange={(e) => setProjectUrl(e.target.value)}
                                 className="bg-background text-foreground placeholder-muted-foreground"
@@ -92,13 +94,13 @@ export function CloneProjectModal({
                     </div>
                     <div className="grid gap-2">
                         <Label className="text-muted-foreground">
-                            Authentication
+                            {t('authentication')}
                         </Label>
                         <Tabs value={authType} onValueChange={setAuthType}>
                             <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="none">None</TabsTrigger>
-                                <TabsTrigger value="basic">Basic</TabsTrigger>
-                                <TabsTrigger value="token">Token</TabsTrigger>
+                                <TabsTrigger value="none">{t('none')}</TabsTrigger>
+                                <TabsTrigger value="basic">{t('basic')}</TabsTrigger>
+                                <TabsTrigger value="token">{t('token')}</TabsTrigger>
                             </TabsList>
                             <TabsContent value="basic">
                                 <div className="grid grid-cols-2 gap-4 mt-4">
@@ -107,13 +109,13 @@ export function CloneProjectModal({
                                             htmlFor="username"
                                             className="text-muted-foreground"
                                         >
-                                            Username
+                                            {t('username')}
                                         </Label>
                                         <div className="relative">
                                             <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                             <Input
                                                 id="username"
-                                                placeholder="Username"
+                                                placeholder={t('usernamePlaceholder')}
                                                 value={username}
                                                 onChange={(e) =>
                                                     setUsername(e.target.value)
@@ -127,14 +129,14 @@ export function CloneProjectModal({
                                             htmlFor="password"
                                             className="text-muted-foreground"
                                         >
-                                            Password
+                                            {t('password')}
                                         </Label>
                                         <div className="relative">
                                             <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                             <Input
                                                 id="password"
                                                 type="password"
-                                                placeholder="Password"
+                                                placeholder={t('passwordPlaceholder')}
                                                 value={password}
                                                 onChange={(e) =>
                                                     setPassword(e.target.value)
@@ -151,14 +153,14 @@ export function CloneProjectModal({
                                         htmlFor="token"
                                         className="text-muted-foreground"
                                     >
-                                        Access Token
+                                        {t('accessToken')}
                                     </Label>
                                     <div className="relative">
                                         <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                         <Input
                                             id="token"
                                             type="password"
-                                            placeholder="ghp_xxxxxxxxxxxxxxxx"
+                                            placeholder={t('tokenPlaceholder')}
                                             value={token}
                                             onChange={(e) =>
                                                 setToken(e.target.value)
@@ -173,7 +175,7 @@ export function CloneProjectModal({
                 </div>
                 <Button onClick={onClone} className="w-full">
                     <GitFork className="w-4 h-4 mr-2" />
-                    Clone Project
+                    {t('cloneProject')}
                 </Button>
             </DialogContent>
         </Dialog>

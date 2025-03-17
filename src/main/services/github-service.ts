@@ -37,7 +37,7 @@ export const GitHubService = {
     return data;
   },
 
-  async listIGRPStudioRepositories(_window: BrowserWindow) {
+  async listIGRPStudioRepositoriesGithub(_window: BrowserWindow) {
     try {
       const igrpRepos: any = [];
       const batchSize = 10;

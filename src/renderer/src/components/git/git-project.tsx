@@ -7,15 +7,19 @@ import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
-import useGithubAuth from '@renderer/hooks/useGithubAuth';
+import useGitAuth from '@renderer/hooks/useGitAuth';
 import { LoadingSpinner } from '../loading-spinner';
 import { useGit } from '@renderer/hooks/useGit';
+import { useTranslation } from 'react-i18next';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 export default function GitProject() {
+    const { t } = useTranslation();
     const { showErrorToast, showSuccessToast } = useToast();
     const [cloningRepoId, setCloningRepoId] = useState<number | null>(null);
     const [clonedRepos, setClonedRepos] = useState<number[]>([]);
     const [projectPaths, setProjectPaths] = useState<Record<number, string>>({});
+    const [activeTab, setActiveTab] = useState('github');
     
     const navigate = useNavigate()
     const dispatch: any = useDispatch()
@@ -26,8 +30,8 @@ export default function GitProject() {
         onConfirm: (_name: string) => {},
     });
 
-    const { repositories, isLoading,  } = useGithubAuth();
-    const {checkLocalProjects} = useGit();
+    const { repositoriesGitHub, repositoriesGitLab, isLoading } = useGitAuth();
+    const { checkLocalProjects } = useGit();
 
     useEffect(() => {
         window.electron.ipcRenderer.on('clone-progress', async (_event, data) => {
@@ -35,7 +39,7 @@ export default function GitProject() {
                 setCloningRepoId(null);
             } 
             if (data.status === 'success') {
-                showSuccessToast(`Repository successfully cloned to ${data.path}`);
+                showSuccessToast(t('repositoryClonedSuccessfully', { path: data.path }));
                 try {
                     await window.repo.project.save({
                         name: data.config.name,
@@ -50,7 +54,7 @@ export default function GitProject() {
                         path: data.path
                     });
 
-                    // Atualiza os estados locais
+                    // Update local states
                     setClonedRepos(prevRepos => [...prevRepos, cloningRepoId!]);
                     setProjectPaths(prevPaths => ({
                         ...prevPaths,
@@ -61,11 +65,11 @@ export default function GitProject() {
                     dispatch(setConfig(data.config));
                     navigateToNextPage(navigate, data.config);
                 } catch (error) {
-                    showErrorToast('Failed to open project after cloning');
-                    console.error('Error opening project:', error);
+                    showErrorToast(t('failedOpenProjectAfterCloning'));
+                    console.error(t('errorOpeningProject'), error);
                 }
             } else if (data.status === 'error') {
-                showErrorToast(`Failed to clone repository: ${data.message}`);
+                showErrorToast(t('failedCloneRepository', { message: data.message }));
             }
         });
 
@@ -90,7 +94,7 @@ export default function GitProject() {
             window.electron.ipcRenderer.removeAllListeners('clone-progress');
             window.electron.ipcRenderer.removeAllListeners('request-project-name');
         };
-    }, [dispatch, navigate, showSuccessToast, showErrorToast]);
+    }, [dispatch, navigate, showSuccessToast, showErrorToast, t, cloningRepoId]);
 
     const handleClone = async (repo: Repository) => {
         setCloningRepoId(repo.id);
@@ -114,35 +118,106 @@ export default function GitProject() {
                 setClonedRepos(cloned);
                 setProjectPaths(paths);
             } catch (error) {
-                console.error('Error loading cloned repos data:', error);
-                showErrorToast('Failed to load repository data');
+                console.error(t('errorLoadingClonedReposData'), error);
+                showErrorToast(t('failedLoadRepositoryData'));
             }
         };
         
         loadClonedReposData();
-    }, []);
+    }, [t, showErrorToast]);
 
     useEffect(() => {
         const checkLocalProjectsExist = async () => {
-            if (!repositories) return;
+            if (!repositoriesGitHub && !repositoriesGitLab) return;
             
-            const results = await checkLocalProjects(repositories);
+            // Check GitHub repositories
+            if (repositoriesGitHub?.length > 0) {
+                const githubResults = await checkLocalProjects(repositoriesGitHub);
+                setClonedRepos(prev => [...prev, ...Object.keys(githubResults).map(Number)]);
+                setProjectPaths(prev => ({ ...prev, ...githubResults }));
+            }
             
-            setClonedRepos(prev => [...prev, ...Object.keys(results).map(Number)]);
-            setProjectPaths(prev => ({ ...prev, ...results }));
+            // Check GitLab repositories
+            if (repositoriesGitLab?.length > 0) {
+                const gitlabResults = await checkLocalProjects(repositoriesGitLab);
+                setClonedRepos(prev => [...prev, ...Object.keys(gitlabResults).map(Number)]);
+                setProjectPaths(prev => ({ ...prev, ...gitlabResults }));
+            }
         };
     
         checkLocalProjectsExist();
-    }, [repositories]);
+    }, [repositoriesGitHub, repositoriesGitLab, checkLocalProjects]);
+
+    // Check if we have any repositories
+    const hasGithubRepos = repositoriesGitHub && repositoriesGitHub.length > 0;
+    const hasGitlabRepos = repositoriesGitLab && repositoriesGitLab.length > 0;
+    
+    // If only one provider has repositories, set the active tab accordingly
+    useEffect(() => {
+        if (!hasGithubRepos && hasGitlabRepos) {
+            setActiveTab('gitlab');
+        }
+    }, [hasGithubRepos, hasGitlabRepos]);
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    // If no repositories are found from either provider
+    if (!hasGithubRepos && !hasGitlabRepos) {
+        return (
+            <EmptyState
+                message={t('noProjectsFound')}
+                className="text-muted-foreground"
+            />
+        );
+    }
 
     return (
         <div>
-            {isLoading ? (
-                <LoadingSpinner />
+            {/* Only show tabs if both GitHub and GitLab have repositories */}
+            {hasGithubRepos && hasGitlabRepos ? (
+                <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
+                    <TabsList className="grid w-[400px] grid-cols-2">
+                        <TabsTrigger value="github">GitHub</TabsTrigger>
+                        <TabsTrigger value="gitlab">GitLab</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="github">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {repositoriesGitHub?.map((repo) => (
+                                <CardGitProject
+                                    repo={repo}
+                                    key={repo.id}
+                                    handleClone={handleClone}
+                                    clonedRepos={clonedRepos}
+                                    projectPaths={projectPaths}
+                                    isCloning={cloningRepoId === repo.id}
+                                />
+                            ))}
+                        </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="gitlab">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {repositoriesGitLab?.map((repo) => (
+                                <CardGitProject
+                                    repo={repo}
+                                    key={repo.id}
+                                    handleClone={handleClone}
+                                    clonedRepos={clonedRepos}
+                                    projectPaths={projectPaths}
+                                    isCloning={cloningRepoId === repo.id}
+                                />
+                            ))}
+                        </div>
+                    </TabsContent>
+                </Tabs>
             ) : (
-                repositories?.length > 0 ? (
+                // If only GitHub has repositories
+                hasGithubRepos ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {repositories?.map((repo) => (
+                        {repositoriesGitHub?.map((repo) => (
                             <CardGitProject
                                 repo={repo}
                                 key={repo.id}
@@ -154,10 +229,19 @@ export default function GitProject() {
                         ))}
                     </div>
                 ) : (
-                    <EmptyState
-                        message="No projects found in your git repository. Start by creating a new project!"
-                        className="text-muted-foreground"
-                    />
+                    // If only GitLab has repositories
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {repositoriesGitLab?.map((repo) => (
+                            <CardGitProject
+                                repo={repo}
+                                key={repo.id}
+                                handleClone={handleClone}
+                                clonedRepos={clonedRepos}
+                                projectPaths={projectPaths}
+                                isCloning={cloningRepoId === repo.id}
+                            />
+                        ))}
+                    </div>
                 )
             )}
 

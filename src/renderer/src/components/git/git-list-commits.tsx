@@ -6,6 +6,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface Commit {
     hash: string;
@@ -30,6 +31,7 @@ export function GitCommitsSidebar({
     basePath,
     onSelectCommit,
 }: GitCommitsSidebarProps) {
+    const { t } = useTranslation();
     const { listCommits } = useGit();
     const [commits, setCommits] = useState<Commit[]>([]);
     const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ export function GitCommitsSidebar({
             const fetchedCommits = await listCommits(basePath);
             setCommits(fetchedCommits);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to fetch commits');
+            setError(err instanceof Error ? err.message : t('failedFetchCommits'));
             setCommits([]);
         } finally {
             setLoading(false);
@@ -64,7 +66,7 @@ export function GitCommitsSidebar({
             return (
                 <div className="flex flex-col items-center justify-center h-full p-4">
                     <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-                    <p className="mt-2 text-muted-foreground">Loading commits...</p>
+                    <p className="mt-2 text-muted-foreground">{t('loadingCommits')}</p>
                 </div>
             );
         }
@@ -79,7 +81,7 @@ export function GitCommitsSidebar({
                         className="mt-4"
                         onClick={fetchCommits}
                     >
-                        Retry
+                        {t('retry')}
                     </Button>
                 </div>
             );
@@ -89,7 +91,7 @@ export function GitCommitsSidebar({
             return (
                 <div className="flex flex-col items-center justify-center h-full p-4">
                     <GitCommit className="h-6 w-6 text-muted-foreground" />
-                    <p className="mt-2 text-muted-foreground">No commits found</p>
+                    <p className="mt-2 text-muted-foreground">{t('noCommitsFound')}</p>
                 </div>
             );
         }
@@ -115,11 +117,11 @@ export function GitCommitsSidebar({
             <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
                 <CardTitle className="flex items-center gap-2">
                     <GitBranch className="h-5 w-5" />
-                    Git Commits
+                    {t('gitCommits')}
                 </CardTitle>
                 {!loading && !error && (
                     <Badge variant="secondary">
-                        {commits.length} Commits
+                        {t('commitsCount', { count: commits.length })}
                     </Badge>
                 )}
             </CardHeader>
@@ -131,6 +133,7 @@ export function GitCommitsSidebar({
 }
 
 function CommitItem({ commit, isSelected, onSelect }: CommitItemProps) {
+    const { t } = useTranslation();
 
     return (
         <div

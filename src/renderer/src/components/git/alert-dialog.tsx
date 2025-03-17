@@ -8,6 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '../ui/alert-dialog';
+import { useTranslation } from 'react-i18next';
 
 interface SyncAlertProps {
     isOpen: boolean;
@@ -22,27 +23,28 @@ const AlertDialogSync: React.FC<SyncAlertProps> = ({
     onClose,
     branch,
 }) => {
+    const { t } = useTranslation();
+    
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Synchronization</AlertDialogTitle>
+                    <AlertDialogTitle>{t('confirmSynchronization')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This will sync your local branch <b>"{branch}"</b> with remote.
-                        This action will pull changes from remote and push your
-                        local changes. Make sure you've committed all your
-                        changes.
+                        {t('syncDescription', {
+                            branch: <b>"{branch}"</b>
+                        })}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => onClose(false)}>
-                        Cancel
+                        {t('cancel')}
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={onConfirm}
                         className="bg-igrp"
                     >
-                        Sync Changes
+                        {t('syncChanges')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

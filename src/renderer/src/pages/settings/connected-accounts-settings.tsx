@@ -1,5 +1,5 @@
 import { Button } from '@renderer/components/ui/button';
-import useGithubAuth from '@renderer/hooks/useGithubAuth';
+import useGithubAuth from '@renderer/hooks/useGitAuth';
 import { Github, Gitlab } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -36,7 +36,7 @@ function Account({ name, icon, connected, action }: AccountProps) {
 export function ConnectedAccountsSettings() {
     const { t } = useTranslation();
 
-    const { loginGithub, user, logoutGithub } = useGithubAuth();
+    const { loginGithub, loginGitLab, userGitHub, userGitLab, logoutGithub, logoutGitLab } = useGithubAuth();
 
     return (
         <div>
@@ -52,13 +52,14 @@ export function ConnectedAccountsSettings() {
                 <Account
                     name="github"
                     icon={<Github size={20} />}
-                    connected={user}
-                    action={user ? logoutGithub : loginGithub}
+                    connected={userGitHub}
+                    action={userGitHub ? logoutGithub : loginGithub}
                 />
                 <Account
                     name="gitlab"
                     icon={<Gitlab size={20} />}
-                    connected={false}
+                    connected={userGitLab}
+                    action={userGitLab ? logoutGitLab : loginGitLab}
                 />
             </div>
         </div>
