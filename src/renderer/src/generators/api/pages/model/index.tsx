@@ -306,10 +306,9 @@ const ModelLayout = ({
     };
 
     return (
-        <>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={deleteModel}
-                onSubmit={formik.handleSubmit}
                 isNew={data === null}
                 title={t('model')}
                 showSourceCode={onClickSourceCode}
@@ -317,108 +316,90 @@ const ModelLayout = ({
             <div className="space-y-4 p-4">
                 <Card className="p-6 rounded-sm">
                     <div className="space-y-6">
-                        <div className="flex gap-4">
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <TextInput
-                                    label={t('name')}
-                                    id="name"
-                                    placeholder={t('nameOfTheModel')}
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    onBlur={handleNameBlur}
-                                    error={
-                                        formik.touched.name
-                                            ? formik.errors.name
-                                            : undefined
-                                    }
-                                    isRequired
-                                />
+                        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                            <TextInput
+                                label={t('name')}
+                                id="name"
+                                placeholder={t('nameOfTheModel')}
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={handleNameBlur}
+                                isTouched={formik.touched.name}
+                                error={formik.errors.name}
+                                isRequired
+                            />
 
-                                <TextInput
-                                    label={t('tableName')}
-                                    id="tableName"
-                                    placeholder={t('enterTableName')}
-                                    value={formik.values.tableName}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={
-                                        formik.touched.tableName
-                                            ? formik.errors.tableName
-                                            : undefined
-                                    }
-                                    isRequired
-                                />
-                            </div>
+                            <TextInput
+                                label={t('tableName')}
+                                id="tableName"
+                                placeholder={t('enterTableName')}
+                                value={formik.values.tableName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                isTouched={formik.touched.tableName}
+                                error={formik.errors.tableName}
+                                isRequired
+                            />
                         </div>
-                        <div className="flex">
-                            <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+                        <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="audit"
+                                    onCheckedChange={(checked) =>
+                                        formik.setFieldValue('audit', checked)
+                                    }
+                                    checked={formik.values.audit}
+                                />
+                                <Label htmlFor="audit">{t('auditModel')}</Label>
+                            </div>
+
+                            {enableEntityRevision && (
                                 <div className="flex items-center space-x-2">
                                     <Checkbox
-                                        id="audit"
+                                        id="revision"
                                         onCheckedChange={(checked) =>
                                             formik.setFieldValue(
-                                                'audit',
+                                                'revision',
                                                 checked
                                             )
                                         }
-                                        checked={formik.values.audit}
+                                        checked={formik.values.revision}
                                     />
-                                    <Label htmlFor="audit">
-                                        {t('auditModel')}
+                                    <Label htmlFor="revision">
+                                        {t('revision')}
                                     </Label>
                                 </div>
+                            )}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="crud"
+                                    onCheckedChange={(checked) =>
+                                        formik.setFieldValue('crud', checked)
+                                    }
+                                    checked={formik.values.crud}
+                                />
+                                <Label htmlFor="Crud">{t('crud')}</Label>
+                            </div>
+                            {/* New GraphQL Option (Coming Soon) */}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="graphql" disabled />
+                                <Label htmlFor="graphql">
+                                    {t('graphql')}
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                        ({t('comingSoon')})
+                                    </span>
+                                </Label>
+                            </div>
 
-                                {enableEntityRevision && (
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="revision"
-                                            onCheckedChange={(checked) =>
-                                                formik.setFieldValue(
-                                                    'revision',
-                                                    checked
-                                                )
-                                            }
-                                            checked={formik.values.revision}
-                                        />
-                                        <Label htmlFor="revision">
-                                            {t('revision')}
-                                        </Label>
-                                    </div>
-                                )}
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="crud"
-                                        onCheckedChange={(checked) =>
-                                            formik.setFieldValue(
-                                                'crud',
-                                                checked
-                                            )
-                                        }
-                                        checked={formik.values.crud}
-                                    />
-                                    <Label htmlFor="Crud">{t('crud')}</Label>
-                                </div>
-                                {/* New GraphQL Option (Coming Soon) */}
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox id="graphql" disabled />
-                                    <Label htmlFor="graphql">
-                                        {t('graphql')}
-                                        <span className="ml-2 text-xs text-muted-foreground">
-                                            ({t('comingSoon')})
-                                        </span>
-                                    </Label>
-                                </div>
-
-                                {/* New OData Option (Coming Soon) */}
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox id="odata" disabled />
-                                    <Label htmlFor="odata">
-                                        {t('odata')}
-                                        <span className="ml-2 text-xs text-muted-foreground">
-                                            ({t('comingSoon')})
-                                        </span>
-                                    </Label>
-                                </div>
+                            {/* New OData Option (Coming Soon) */}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="odata" disabled />
+                                <Label htmlFor="odata">
+                                    {t('odata')}
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                        ({t('comingSoon')})
+                                    </span>
+                                </Label>
                             </div>
                         </div>
                     </div>
@@ -442,7 +423,7 @@ const ModelLayout = ({
                     </Tabs>
                 </Card>
             </div>
-        </>
+        </form>
     );
 };
 

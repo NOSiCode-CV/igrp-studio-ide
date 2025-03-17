@@ -41,6 +41,7 @@ import { SchemaTypeItem } from 'src/main/types';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
+import { cn } from '@renderer/lib/utils';
 
 interface ControllerProps {
     basePath: string;
@@ -235,7 +236,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         const handleKeyDown = (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
-                onSubmit();
+                formik.handleSubmit();
             }
         };
 
@@ -248,6 +249,11 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     const handleSave = async (): Promise<void> => {
         try {
+            if (!name || !module || !description) {
+                setIsModalOpen(true);
+                return;
+            }
+
             const values = await getValuesToSubmit();
 
             const { error } = await window.api.createController(
@@ -304,7 +310,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             } else {
                 // Remove only the current action and save the updated actions
                 const updatedActions = values.actions.filter(
-                    (dataAction) => dataAction.actionName !== formik.values.actionName
+                    (dataAction) =>
+                        dataAction.actionName !== formik.values.actionName
                 );
 
                 const updatedValues = { ...values, actions: updatedActions };
@@ -314,7 +321,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     basePath
                 );
 
-                console.log(   updatedValues, error);
+                console.log(updatedValues, error);
 
                 if (error) {
                     showErrorToast(error);
@@ -383,20 +390,6 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         );
     }, [dto, selectors]);
 
-    const onSubmit = async () => {
-        const errors = await formik.validateForm();
-        if (Object.keys(errors).length === 0) {
-            if (name && module && module !== 'shared') {
-                formik.handleSubmit();
-            } else {
-                setIsModalOpen(true);
-            }
-        } else {
-            // Handle validation errors (optional)
-            console.error('Validation errors:', errors);
-        }
-    };
-
     const onClickSourceCode = () => {
         initializeTabFromCurrentItem({
             path: `${currentItem.path}`,
@@ -406,10 +399,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     };
 
     return (
-        <React.Fragment>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={handleDelete}
-                onSubmit={onSubmit}
                 isNew={!data}
                 title={title || t('createNewAction')}
                 showSourceCode={onClickSourceCode}
@@ -451,6 +443,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                     labelText={t('methodType')}
                                     options={httpMethods}
                                     placeholder={'posts'}
+                                    onBlur={formik.handleBlur}
                                     onChange={(e) => {
                                         formik.setFieldValue(
                                             'path',
@@ -460,8 +453,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                     onSelectValueChange={(value) => {
                                         formik.setFieldValue('method', value);
                                     }}
-                                    onBlur={formik.handleBlur}
-                                    classNameGlobal="h-8 mb-6"
+                                    classNameGlobal={cn(
+                                        'w-full h-8 mb-6',
+                                        formik.touched.path &&
+                                            formik.errors.path &&
+                                            'border-red-500'
+                                    )}
                                     required
                                 />
                                 {formik.errors.path && formik.touched.path && (
@@ -477,12 +474,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                                 value={formik.values.actionName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                error={
-                                    formik.errors.actionName &&
-                                    formik.touched.actionName
-                                        ? formik.errors.actionName
-                                        : ''
-                                }
+                                error={formik.errors.actionName}
+                                isTouched={formik.touched.actionName}
                                 isRequired
                             />
                         </div>
@@ -516,7 +509,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
                     </TabsContent>
                 </Tabs>
             </div>
-        </React.Fragment>
+        </form>
     );
 };
 

@@ -1,6 +1,4 @@
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import {
     ENV_TYPES,
     httpStatusCodes,
@@ -26,6 +24,7 @@ import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
+import { SelectInput, TextInput } from '../../components/inputs-form';
 
 const contentType = 'application/json';
 
@@ -102,16 +101,6 @@ export const ResponseLayout = ({
     const handleChangeCode = (value) => {
         if (formik.values.name === '')
             formik.setFieldValue('name', getStatusLabel(value));
-    };
-
-    const onSubmit = async () => {
-        const errors = await formik.validateForm();
-        if (Object.keys(errors).length === 0) {
-            formik.handleSubmit();
-        } else {
-            // Handle validation errors (optional)
-            console.error('Validation errors:', errors);
-        }
     };
 
     useEffect(() => {
@@ -225,10 +214,9 @@ export const ResponseLayout = ({
     };
 
     return (
-        <>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={handleDelete}
-                onSubmit={onSubmit}
                 isNew={!data}
                 title={title || t('createNewResponse')}
                 showSourceCode={onClickSourceCode}
@@ -238,58 +226,36 @@ export const ResponseLayout = ({
                     <div className="flex flex-col gap-4">
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             {/* HTTP Status Code */}
-                            <div className="flex flex-col gap-3">
-                                <LabelRequired>
-                                    {t('httpStatusCode')}
-                                </LabelRequired>
-                                <IGRPCombobox
-                                    options={httpStatusCodes}
-                                    value={formik.values.statusCode}
-                                    onChange={(value) => {
-                                        formik.setFieldValue(
-                                            'statusCode',
-                                            value
-                                        ),
-                                            handleChangeCode(value);
-                                    }}
-                                    className={`w-full h-9 focus:ring-igrp focus:border-igrp ${
-                                        formik.errors.statusCode &&
-                                        formik.touched.statusCode
-                                            ? 'border-red-500'
-                                            : 'border-gray-300'
-                                    }`}
-                                    placeholder={t('httpStatusCodePlaceholder')}
-                                />
-                                {formik.errors.statusCode &&
-                                    formik.touched.statusCode && (
-                                        <div className="text-red-500 text-sm">
-                                            {formik.errors.statusCode}
-                                        </div>
-                                    )}
-                            </div>
-
+                            <SelectInput
+                                id="statusCode"
+                                label={t('httpStatusCode')}
+                                options={httpStatusCodes}
+                                value={formik.values.statusCode}
+                                onChange={(value) => {
+                                    formik.setFieldValue('statusCode', value),
+                                        handleChangeCode(value);
+                                }}
+                                onBlur={(value) => {
+                                    formik.setFieldValue('statusCode', value),
+                                        handleChangeCode(value);
+                                }}
+                                error={formik.errors.statusCode}
+                                isTouched={formik.touched.statusCode}
+                                isRequired
+                            />
                             {/* Name */}
-                            <div className="flex flex-col gap-3">
-                                <LabelRequired>{t('name')}</LabelRequired>
-                                <Input
-                                    type="text"
-                                    name="name"
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    className={`w-full  focus:ring-igrp focus:border-igrp ${
-                                        formik.errors.name &&
-                                        formik.touched.name
-                                            ? 'border-red-500'
-                                            : 'border-gray-300'
-                                    }`}
-                                    placeholder={t('responseNamePlaceholder')}
-                                />
-                                {formik.errors.name && formik.touched.name && (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.name}
-                                    </div>
-                                )}
-                            </div>
+                            <TextInput
+                                type="text"
+                                id="name"
+                                label={t('name')}
+                                value={formik.values.name}
+                                error={formik.errors.name}
+                                isTouched={formik.touched.name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleChange}
+                                placeholder={t('responseNamePlaceholder')}
+                                isRequired
+                            />
 
                             {/* Content Type */}
                             <div className="flex flex-col gap-3">
@@ -304,27 +270,18 @@ export const ResponseLayout = ({
                             </div>
                         </div>
                         {/* Description */}
-                        <div className="flex flex-col gap-3">
-                            <Label>{t('description')}</Label>
-                            <Input
-                                type="text"
-                                name="description"
-                                value={formik.values.description}
-                                onChange={formik.handleChange}
-                                className={`w-full  focus:ring-igrp focus:border-igrp ${
-                                    formik.errors.description &&
-                                    formik.touched.description
-                                        ? 'border-red-500'
-                                        : 'border-gray-300'
-                                }`}
-                            />
-                            {formik.errors.name &&
-                                formik.touched.description && (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.description}
-                                    </div>
-                                )}
-                        </div>
+                        <TextInput
+                            type="text"
+                            id="description"
+                            label={t('description')}
+                            value={formik.values.description}
+                            error={formik.errors.description}
+                            isTouched={formik.touched.description}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleChange}
+                            placeholder={t('description')}
+                            className={'w-full'}
+                        />
                         <Card className="rounded">
                             <CardHeader>
                                 <CardTitle>{t('dataSchema')}</CardTitle>
@@ -342,6 +299,6 @@ export const ResponseLayout = ({
                     </div>
                 </Card>
             </div>
-        </>
+        </form>
     );
 };

@@ -1326,10 +1326,10 @@
     vaul "^1.1.2"
     zod "^3.24.2"
 
-"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.79":
-  version "0.0.1-alpha.79"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.79.tgz#ea345488b4e254202554dc70bc4b84ec5ec33e8d"
-  integrity sha512-lcpnssJh/khWoffoyesCCtL4Qyvr+MH3OHXmdvr1AcrE14gS9aK9gjRnKgEXmuYCH6uNaDNxGAahboJ3DZeQ1A==
+"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.80":
+  version "0.0.1-alpha.80"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.80.tgz#6b46885e74bf665d965ceb479644925b5149c514"
+  integrity sha512-cfr7uMtDApgMEUSeKCw5kcXyeEHXYDhW1VVqjINzPGH9nt1AJcEFe2wqsfUX7OmToR6/lh54vJ9PuEY7bDeARQ==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1348,10 +1348,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.32":
-  version "0.0.1-alpha.32"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.32.tgz#69a53e053ec45380af33a3f57681157a30516390"
-  integrity sha512-JAXl/tP0PutQV67JfPeot3+WuYXcaHi4uK+w9WLq6x/px886z5l86vZh+P2OdsEIPM41ffTXHlvRi5brxNaJSQ==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.33":
+  version "0.0.1-alpha.33"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.33.tgz#293a36e897246b040fecabc58baf2cc210ce118a"
+  integrity sha512-TIOf2xmIgkj1EzewqWonl3MSsuPpym+oxJ2ojkrNA3TiBUHwobJ67QYtrHbbfQ1jDZbduPtrGTwcyKNfoc3lrw==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
