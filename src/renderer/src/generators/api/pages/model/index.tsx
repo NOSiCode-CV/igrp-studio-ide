@@ -31,6 +31,7 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { ProjectData } from 'src/main/types';
+import { RelationReference } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 
 interface ModelProps {
     basePath: string;

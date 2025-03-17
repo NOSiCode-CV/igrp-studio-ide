@@ -11,9 +11,13 @@ import {
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { RelationTypeSelector } from './relation-type-selector';
-import { Relation } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import {
+    Relation,
+    RelationshipTypes,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { IGRPCombobox } from '@renderer/components/combobox';
 import { useTranslation } from 'react-i18next';
+import { formatMethods } from '../../helpers';
 
 interface RelationPopoverProps {
     field: any;
@@ -37,7 +41,8 @@ export function RelationPopover({
             referencedColumnName: '',
             cardinality: 'oneWay',
             inverseJoinColumn: '',
-            joinTable: ''
+            joinTable: '',
+            fetchType: 'lazy',
         }
     );
     const [availableColumns, setAvailableColumns] = useState<
@@ -45,6 +50,8 @@ export function RelationPopover({
     >([]);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const fetchTypes = formatMethods(['lazy', 'eager']);
 
     useEffect(() => {
         if (localRelation.entity) {
@@ -66,7 +73,6 @@ export function RelationPopover({
     }, [localRelation.entity, models]);
 
     const handleUpdate = () => {
-
         if (!localRelation.entity) {
             setErrors({ ['entity']: t('entityRequired') });
             return;
@@ -113,41 +119,39 @@ export function RelationPopover({
                         onChange={(value) =>
                             setLocalRelation({
                                 ...localRelation,
-                                type: value as
-                                    | 'OneToOne'
-                                    | 'OneToMany'
-                                    | 'ManyToOne'
-                                    | 'ManyToMany',
+                                type: value as RelationshipTypes,
                             })
                         }
                         sourceField={field.name}
                         targetField={localRelation.entity || 'entity'}
                     />
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                         {localRelation.type === 'ManyToMany' && (
-                            <div className="col-span-2 gap-2">
+                            <div className="col-span-2 space-y-2 flex flex-col">
                                 <Label htmlFor="joinTable">
                                     {t('entityName')}
                                 </Label>
-                                <Input
-                                    id="joinTable"
-                                    value={localRelation.joinTable || ''}
-                                    onChange={(e) =>
-                                        setLocalRelation({
-                                            ...localRelation,
-                                            joinTable: e.target.value,
-                                        })
-                                    }
-                                    placeholder={t('entityNamePlaceholder')}
-                                />
-                                <p className="text-xs text-muted-foreground ">
-                                    {t('entityNameDescription')}
-                                </p>
-                                {errors.joinTable && (
-                                    <p className="text-xs text-red-500">
-                                        {errors.joinTable}
+                                <div>
+                                    <Input
+                                        id="joinTable"
+                                        value={localRelation.joinTable || ''}
+                                        onChange={(e) =>
+                                            setLocalRelation({
+                                                ...localRelation,
+                                                joinTable: e.target.value,
+                                            })
+                                        }
+                                        placeholder={t('entityNamePlaceholder')}
+                                    />
+                                    <p className="text-xs text-muted-foreground ">
+                                        {t('entityNameDescription')}
                                     </p>
-                                )}
+                                    {errors.joinTable && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.joinTable}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         )}
                         <div className="space-y-2 flex flex-col">
@@ -213,7 +217,26 @@ export function RelationPopover({
                             />
                         </div>
                     )}
-                   {/*  <div className="flex items-center space-x-2">
+
+                    <div className="space-y-2 flex flex-col">
+                        <Label htmlFor="fetchType">{t('fetchType')}</Label>
+                        <IGRPCombobox
+                            value={localRelation.fetchType}
+                            options={fetchTypes}
+                            onChange={(value) =>
+                                setLocalRelation({
+                                    ...localRelation,
+                                    fetchType: value as 'lazy' | 'eager',
+                                })
+                            }
+                        />
+                        {errors.referencedColumnName && (
+                            <p className="text-xs text-red-500">
+                                {errors.fetchType}
+                            </p>
+                        )}
+                    </div>
+                    {/*  <div className="flex items-center space-x-2">
                         <Switch
                             id="cardinality"
                             checked={localRelation.cardinality === 'twoWay'}
