@@ -49,6 +49,7 @@ import {
     SlidersHorizontal,
     ChartPie,
     Ellipsis,
+    DollarSign,
 } from 'lucide-react';
 
 // Constants
@@ -113,6 +114,8 @@ export const COMPONENT: Record<string, string> = {
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
     TableFilter: 'tableFilters',
+    TableActionListCell: 'tableActionListCell',
+    TableAmountCell: 'tableAmountCell',
 };
 
 // Icon Mapping
@@ -172,4 +175,12 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableTextFilter: FormInput,
     tableNumberFilter: Sliders,
     tableCheckboxFilter: CheckSquare,
+    tableSelectFilter: List,
+    tableActionListCell: ButtonIcon,
+    tableAmountCell: DollarSign,
+    tableCheckboxCell: CheckSquare,
+    tableDateCell: CalendarIcon,
+    tableTextCell: FormInput,
+    tableExpanderCell: ChevronDown,
+    tableBadgeCell: Badge,
 };

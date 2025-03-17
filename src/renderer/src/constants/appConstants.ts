@@ -90,5 +90,5 @@ export const DatabaseOptions = [
 
 export const projectStructureStyle = [
     { value: 'technical', label: 'Technical' },
-    { value: 'domain', label: 'Domain' },
+    { value: 'domain', label: 'Domain-Driven Design (DDD)' },
 ];

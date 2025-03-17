@@ -9,8 +9,8 @@ export function useProjectValidation({ t, step }) {
             PATTERNS.SPECIAL_CHARACTERS,
             t('msgSpecialCharactersRegex')
         ).max(
-            20,
-            t('maxLengthExceeded', { max: 20 })
+            50,
+            t('maxLengthExceeded', { max: 50 })
         ),
         type: Yup.string().oneOf(
             ['frontend', 'backend'],

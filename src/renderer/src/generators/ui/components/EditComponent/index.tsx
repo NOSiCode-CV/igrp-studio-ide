@@ -31,20 +31,26 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
 
 export const EditComponent = ({
-    parentComp,
+    path,
     comp,
 }: {
-    parentComp: StructuredComponent;
+    path: string;
     comp: StructuredComponent;
 }) => {
-    const { componentName: parentComponentName } = parentComp;
-
     const { componentName, id, children } = comp;
 
     const [currentComponent, setCurrentComponent] =
         useState<StructuredComponent>(comp);
+
+    const [currentPath, setCurrentPath] = useState<string>(path);
 
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
 
@@ -54,7 +60,7 @@ export const EditComponent = ({
 
     // Fetch and filter components on mount
     useEffect(() => {
-        getAcceptedChildren(parentComponentName, componentName).then((data) => {
+        getAcceptedChildren(path, componentName).then((data) => {
             setComponents(data);
         });
     }, [getAcceptedChildren]);
@@ -81,6 +87,7 @@ export const EditComponent = ({
 
     const onEdit = (component: StructuredComponent) => {
         setCurrentComponent(component);
+        setCurrentPath(`${path}/${comp.componentName}`);
     };
 
     return (
@@ -101,7 +108,7 @@ export const EditComponent = ({
                         <p>Add Comp</p>
                     </TooltipContent>
                 </Tooltip>
-                <DialogContent className="max-w-6xl h-[70vh] p-0 flex overflow-hidden">
+                <DialogContent className="max-w-6xl h-[70vh] p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))]">
                     <div className="flex flex-1 flex-col overflow-auto order-first">
                         <DialogHeader className="p-4">
                             <div className="flex justify-between">
@@ -113,19 +120,10 @@ export const EditComponent = ({
                                     </DialogDescription>
                                 </div>
                                 <div className="justify-end">
-                                    {components.map((comp) => {
-                                        return (
-                                            <Button
-                                                key={comp.name}
-                                                onClick={() =>
-                                                    handleAddComponent(comp)
-                                                }
-                                            >
-                                                <Plus />
-                                                {comp.label}
-                                            </Button>
-                                        );
-                                    })}
+                                    {renderAddComponents(
+                                        components,
+                                        handleAddComponent
+                                    )}
                                 </div>
                             </div>
                         </DialogHeader>
@@ -135,7 +133,9 @@ export const EditComponent = ({
                                     {children.length > 0 ? (
                                         renderCreatedComponents(
                                             children,
-                                            onEdit
+                                            components,
+                                            onEdit,
+                                            handleAddComponent
                                         )
                                     ) : (
                                         <>
@@ -147,18 +147,51 @@ export const EditComponent = ({
                         </div>
                     </div>
                     <div className="order-last border-l">
-                        <SidebarRight comp={currentComponent} />
+                        <SidebarRight
+                            comp={currentComponent}
+                            path={currentPath}
+                        />
                     </div>
                 </DialogContent>
             </Dialog>
         </>
     );
 };
+
+const renderAddComponents = (
+    components: ComponentRegisterConfig[],
+    handleAddComponent: (comp: ComponentRegisterConfig) => void
+) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Component
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                {components.map((comp) => (
+                    <DropdownMenuItem
+                        key={comp.name}
+                        onSelect={() => handleAddComponent(comp)}
+                    >
+                        {comp.label}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+};
+
 const renderCreatedComponents = (
     components: StructuredComponent[],
-    onEdit: (comp: StructuredComponent) => void
+    registryComponents: ComponentRegisterConfig[],
+    onEdit: (comp: StructuredComponent) => void,
+    handleAddComponent: (item: any) => void
 ) => {
-    const { handleRemoveChildFromComponent } = useDroppedComponents();
+    const { handleRemoveChildFromComponent, handleAddChildToComponent } =
+        useDroppedComponents();
 
     const handleEditComponent = (component: StructuredComponent) => {
         onEdit(component);
@@ -168,6 +201,24 @@ const renderCreatedComponents = (
     const renderIcon = (iconName: string) => {
         const IconComponent = ICON_MAP[iconName];
         return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
+    };
+
+    // Check if the component can accept children
+    const canAcceptChildren = (component: StructuredComponent) => {
+        const registryComponent = registryComponents.find(
+            (rc) => rc.name === component.componentName
+        );
+        return (
+            registryComponent && registryComponent.acceptedChildren.length > 0
+        );
+    };
+
+    // Get the accepted children for a component
+    const getAcceptedChildren = (component: StructuredComponent) => {
+        const registryComponent = registryComponents.find(
+            (rc) => rc.name === component.componentName
+        );
+        return registryComponent ? registryComponent.acceptedChildren : [];
     };
 
     return (
@@ -211,6 +262,11 @@ const renderCreatedComponents = (
                                 >
                                     Delete
                                 </Button>
+                                {canAcceptChildren(component) &&
+                                    renderAddComponents(
+                                        getAcceptedChildren(component),
+                                        handleAddComponent
+                                    )}
                             </div>
                         </TableCell>
                     </TableRow>

@@ -8,7 +8,7 @@ import { FileTree } from 'src/main/types';
 interface RootState {
     PageBuilder: {
         filesThree: FileTree[];
-        basePath: string
+        basePath: string;
     };
 }
 
@@ -21,11 +21,13 @@ const selectProperties = createSelector(selectState, (studio) => ({
 const useStudio = () => {
     const { files, basePath } = useSelector(selectProperties);
 
+    // Fetch components from the files tree
     const fetchComponents = useCallback(() => {
         const componentsFolder = files.find((page) => page.name === 'components');
         return componentsFolder?.children ?? [];
     }, [files]);
 
+    // Dynamically import a component by name
     const dynamicImport = useCallback(async (componentName: string) => {
         try {
             const module = await import(`../generators/ui/types/components/${componentName}`);
@@ -36,26 +38,20 @@ const useStudio = () => {
         }
     }, []);
 
-    const getConfigComponent = useCallback(async (componentName: string) => {
-        try {
-            const module = await import(`../generators/ui/types/properties/${componentName}Properties`);
-            return module.default;
-        } catch (error) {
-            return null;
-        }
-    }, []);
-
+    // Get component data from a JSON file
     const getComponentData = useCallback(async (componentName: string) => {
         try {
             const data = await window.api.getJsonContent(
                 `${basePath}/.igrpstudio/components/${componentName}.json`
             );
-            return data
+            return data;
         } catch (error) {
             console.error('Failed to load JSON content:', error);
+            return null;
         }
-    }, []);
+    }, [basePath]);
 
+    // Get page data by component name
     const getPageData = useCallback(async (componentName: string) => {
         try {
             const components = files.find((page) => page.name === 'components');
@@ -73,8 +69,9 @@ const useStudio = () => {
             console.error('Failed to load JSON content:', error);
             return null;
         }
-    }, []);
+    }, [files]);
 
+    // Get all registered components
     const getRegistryComponent = useCallback(async () => {
         const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
         return result.components;
@@ -82,39 +79,69 @@ const useStudio = () => {
 
     // Helper function to find a component by name or within a parent's acceptedChildren
     const findComponent = useCallback(
-        async (parentComponentName: string | undefined, componentName: string) => {
+        async (path: string | undefined, componentName: string) => {
             if (!componentName) return null;
 
             const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
 
-            // First, try to find the component directly by its name
-            let component = result.components.find((comp: ComponentRegisterConfig) => comp.name === componentName);
+            // If no path is provided, search for the component directly by name
 
-            if (!component && parentComponentName) {
-                // If not found, search within the acceptedChildren of the specified parentComponentName
-                const parentComponent = result.components.find((comp: ComponentRegisterConfig) => comp.name === parentComponentName);
+            let component: ComponentRegisterConfig | null = result.components.find((comp: ComponentRegisterConfig) => comp.name === componentName) || null;
 
-                if (parentComponent && parentComponent.acceptedChildren) {
-                    component = parentComponent.acceptedChildren.find((child: ComponentRegisterConfig) => child.name === componentName);
+            if (path && !component) {
+                // Split the path into parts (e.g., "table/tableColumns/tableTextCell" => ["table", "tableColumns", "tableTextCell"])
+                const pathParts = path.split('/');
+
+                // Start searching from the root level
+                let currentComponents = result.components;
+
+                for (let i = 0; i < pathParts.length; i++) {
+                    const currentPathPart = pathParts[i];
+
+                    // Find the parent component at the current level
+                    const parentComponent = currentComponents.find((comp: ComponentRegisterConfig) => comp.name === currentPathPart);
+
+                    if (!parentComponent) {
+                        // If the parent component or its children are not found, stop searching
+                        return null;
+                    }
+
+                    // Move to the next level in the hierarchy
+                    currentComponents = parentComponent.acceptedChildren;
+
+                    // If this is the last part of the path, search for the component by name
+                    if (i === pathParts.length - 1) {
+                        component = currentComponents.find((comp: ComponentRegisterConfig) => comp.name === componentName) || null;
+                    }
                 }
             }
-
-            return component || null;
+            return component;
         },
         []
     );
 
-    const getAcceptedChildren = useCallback(async (parentComponentName: string, componentName: string) => {
-        const component = await findComponent(parentComponentName, componentName);
+    // Get accepted children for a component
+    const getAcceptedChildren = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
         return component ? component.acceptedChildren : [];
     }, [findComponent]);
 
-    const getPropertiesComponent = useCallback(async (parentComponentName: string | undefined, componentName: string) => {
-        const component = await findComponent(parentComponentName, componentName);
+    // Get properties for a component
+    const getPropertiesComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
         return component ? component.properties : [];
     }, [findComponent]);
 
-    return { basePath, getAcceptedChildren, getPropertiesComponent, getRegistryComponent, getComponentData, getPageData, fetchComponents, dynamicImport, getConfigComponent };
+    return {
+        basePath,
+        getAcceptedChildren,
+        getPropertiesComponent,
+        getRegistryComponent,
+        getComponentData,
+        getPageData,
+        fetchComponents,
+        dynamicImport,
+    };
 };
 
 export default useStudio;

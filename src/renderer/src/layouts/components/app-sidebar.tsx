@@ -94,11 +94,11 @@ export function AppSidebar({
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-        {
+      /*   {
             icon: FileText,
             label: t('documents'),
             id: 'documents',
-        },
+        }, */
         {
             icon: Badge,
             label: t('settings'),

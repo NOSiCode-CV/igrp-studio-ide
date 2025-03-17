@@ -31,7 +31,7 @@ const Layout = (props: LayoutProps) => {
     const { config, basePath } = useSelector(selectStudioProperties);
 
     return (
-        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(26))]">
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] [--header-height-three:calc(--spacing(28))]">
             <SidebarProvider
                 style={
                     {
