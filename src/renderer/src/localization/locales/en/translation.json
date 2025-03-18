@@ -417,5 +417,6 @@
   "enterRemoteRepositoryUrl": "Enter the URL of your remote Git repository to enable synchronization.",
   "remoteRepositoryUrlPlaceholder": "https://github.com/username/repository.git",
   "addRemote": "Add Remote",
-  "fetchType": "Fetch Type"
+  "fetchType": "Fetch Type",
+  "module": "Module"
 }

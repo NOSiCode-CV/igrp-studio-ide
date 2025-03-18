@@ -1,6 +1,6 @@
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
 import { extractByType, getMergedFiles, getModulesArray } from '@renderer/generators/api/helpers';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { FileTree, ProjectData } from 'src/main/types';
@@ -36,7 +36,7 @@ const makeSelectProperties = (module: string) =>
 
 // Update the hook to accept `module` as a parameter
 const useStudioAPI = (module: string) => {
-    const selectProperties = makeSelectProperties(module);
+    const selectProperties = useMemo(() => makeSelectProperties(module), [module]);
 
     const {
         basePath,

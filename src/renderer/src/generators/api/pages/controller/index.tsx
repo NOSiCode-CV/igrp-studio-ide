@@ -61,9 +61,8 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
 
-    const { modules, dto, basePath, enums, responses } = useStudioAPI(
-        currentItem?.module
-    );
+    const { modules, dto, basePath, enums, responses, getJsonData } =
+        useStudioAPI(currentItem?.module);
 
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
@@ -96,20 +95,16 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             handleSave();
         },
     });
-
-    const getJsonData = async () => {
-        if (!currentItem) return;
-
-        try {
-            const data = await window.api.getJsonContent(currentItem.path);
-            setData(data);
-        } catch (error) {
-            console.error('Failed to load JSON content:', error);
-        }
-    };
-
     useEffect(() => {
-        getJsonData();
+        const load = async () => {
+            if (!currentItem) return;
+
+            await getJsonData(currentItem.path).then((data) => {
+                setData(data);
+            });
+        };
+
+        load();
     }, [currentItem]);
 
     useEffect(() => {
@@ -174,7 +169,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
         if (!values.requestBody) delete values.requestBody;
 
-        getJsonData();
+        const data = await getJsonData(currentItem?.path);
 
         const actionName = oldActionName || values.actionName;
 
