@@ -8,7 +8,7 @@ export interface InputProps {
     id: string; // Identificador único para o input
     label: string; // Rótulo do input
     placeholder?: string; // Placeholder opcional
-    value: string; // Valor do input
+    value?: string; // Valor do input
     isRequired?: boolean; // Indica se o campo é obrigatório
     error?: string; // Mensagem de erro (opcional)
     isTouched?: boolean; // Indica se o campo foi tocado/interagido

@@ -40,14 +40,12 @@ interface ModelProps {
     selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
-    onUpdateTab: (tabId: string) => void;
 }
 
 const ModelLayout = ({
     selectors,
     currentItem,
-    onCloseTab,
-    onUpdateTab,
+    onCloseTab
 }: ModelProps) => {
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
@@ -232,8 +230,6 @@ const ModelLayout = ({
             createRelationReference(values);
 
             dispatch(onSetChangeStatus(true));
-
-            onUpdateTab(formik.values.name);
 
             showSuccessToast(
                 t('createdSuccess', { name: t('model'), value: values.name })

@@ -29,6 +29,18 @@ interface NewProps {
     tab: TabItem;
 }
 
+const componentMap = {
+    [OPTION_TYPE.FILE_THREE]: EditorLayout,
+    [OPTION_TYPE.MODEL]: ModelLayout,
+    [OPTION_TYPE.ACTION]: ControllerLayout,
+    [OPTION_TYPE.CONTROLLER]: ControllerOverview,
+    [OPTION_TYPE.DATA_OBJECTS]: DtoLayout,
+    [OPTION_TYPE.RESPONSE]: ResponseLayout,
+    [OPTION_TYPE.ENUM]: EnumLayout,
+    [OPTION_TYPE.PERMISSIONS]: PermissionsLayout,
+    [OPTION_TYPE.ERDDiagram]: ERDLayout,
+};
+
 const PageController = ({ onOpenNew, open, tab }: NewProps) => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
@@ -36,7 +48,7 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
 
     const { t } = useTranslation();
 
-    const { handleCloseTab, handleUpdateTab } = useTabs();
+    const { handleCloseTab } = useTabs();
 
     const selectState = (state: any): PageBuilderState => state.PageBuilder;
 
@@ -83,9 +95,7 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
         handleCloseTab(tab.id);
     };
 
-    const handleUpdate = (tabId: string) => {
-        handleUpdateTab(tab.id, `tab-${tab.item?.module}-${tabId}`);
-    };
+    const Component = componentMap[option];
 
     return (
         <>
@@ -97,63 +107,13 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
                 </div>
             )}
 
-            {option === OPTION_TYPE.FILE_THREE && (
-                <EditorLayout currentItem={tab.item} />
-            )}
-            {option === OPTION_TYPE.MODEL && (
-                <ModelLayout
+            {Component && (
+                <Component
                     selectors={selectors}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.ACTION && (
-                <ControllerLayout
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.CONTROLLER && (
-                <ControllerOverview
                     basePath={basePath}
-                    currentItem={tab.item}
                 />
-            )}
-            {option === OPTION_TYPE.DATA_OBJECTS && (
-                <DtoLayout
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.RESPONSE && (
-                <ResponseLayout
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                    onUpdateTab={handleUpdate}
-                />
-            )}
-            {option === OPTION_TYPE.ENUM && (
-                <EnumLayout
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                />
-            )}
-            {option === OPTION_TYPE.PERMISSIONS && (
-                <PermissionsLayout
-                    selectors={selectors}
-                    currentItem={tab.item}
-                    onCloseTab={hangleClose}
-                />
-            )}
-            {option === OPTION_TYPE.ERDDiagram && (
-                <ERDLayout currentItem={tab.item} />
             )}
         </>
     );

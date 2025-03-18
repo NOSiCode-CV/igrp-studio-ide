@@ -27,14 +27,12 @@ interface DtoProps {
     selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
-    onUpdateTab: (newId: string) => void;
 }
 
 const DtoLayout = ({
     selectors,
     currentItem,
-    onCloseTab,
-    onUpdateTab,
+    onCloseTab
 }: DtoProps) => {
     const { initializeTabFromCurrentItem } = useTabs();
 
@@ -141,8 +139,6 @@ const DtoLayout = ({
             createGitCommit(basePath, `Add dto ${newValues.name}`);
 
             dispatch(onSetChangeStatus(true));
-
-            onUpdateTab(formik.values.name);
 
             showSuccessToast(
                 t('createdSuccess', { name: t('dto'), value: newValues.name })

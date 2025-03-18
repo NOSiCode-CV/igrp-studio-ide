@@ -83,8 +83,6 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     }, [bodyType]);
 
     const handleSchemaChange = (newSchema: JSONSchema) => {
-        console.log('newSchema', newSchema, contentType);
-        console.log('formik.values.requestBody', formik.values.requestBody);
 
         if (!formik.values.requestBody) return;
 

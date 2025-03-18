@@ -197,7 +197,7 @@ export function AppSidebar({
                             handleSearch={handleSearch}
                         />
                     )}
-                    <SidebarContent className="mb-10">
+                    <SidebarContent>
                         <ScrollArea>
                             {activeMenuGroup === 'Explorer' ? (
                                 <FileExplorerSidebar

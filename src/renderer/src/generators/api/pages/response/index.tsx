@@ -26,6 +26,7 @@ import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 
 const contentType = 'application/json';
 
@@ -36,27 +37,27 @@ interface ResponseProps {
     onUpdateTab: (newId: string) => void;
 }
 
-const initialValues = {
+const initialValues: ResponseConfig = {
+    type: 'response',
     statusCode: '',
     name: '',
     template: 'classic',
     description: '',
     module: '',
-    content: { [contentType]: { schema: {} } },
+    content: {},
 };
 
 export const ResponseLayout = ({
     selectors,
     currentItem,
     onCloseTab,
-    onUpdateTab,
 }: ResponseProps) => {
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
 
-    const { basePath } = useStudioAPI(currentItem?.module);
+    const { basePath, getJsonData } = useStudioAPI(currentItem?.module);
 
     const [title, setTitle] = useState('');
 
@@ -76,24 +77,36 @@ export const ResponseLayout = ({
         },
     });
 
-    const getJsonData = async () => {
-        if (!currentItem) return;
-
-        try {
-            const data = await window.api.getJsonContent(currentItem.path);
-            setData(data);
-        } catch (error) {
-            console.error('Failed to load JSON content:', error);
-        }
-    };
-
     useEffect(() => {
-        getJsonData();
-    }, []);
+        const load = async () => {
+            if (!currentItem) return;
+
+            await getJsonData(currentItem.path).then((data) => {
+                setData(data);
+            });
+        };
+
+        load();
+    }, [currentItem]);
 
     useEffect(() => {
         if (data) {
-            setDataSchema(data.content[contentType]?.schema as JSONSchema);
+            const schema = data.content[contentType]?.schema;
+
+            console.log(schema)
+
+            const dataSchema =
+                schema && schema.name
+                    ? {
+                          type: '',
+                          properties: {
+                              [schema.name]: schema,
+                          },
+                      }
+                    : null;
+
+            setDataSchema(dataSchema);
+
             setTitle(data.name);
             formik.setValues(data);
         }
@@ -132,9 +145,6 @@ export const ResponseLayout = ({
                 ENV_TYPES.SPRING,
                 basePath
             );
-
-            console.log(error, values);
-            onUpdateTab(formik.values.name);
 
             if (error) {
                 showErrorToast(error);
@@ -191,17 +201,29 @@ export const ResponseLayout = ({
         // Verificar se o schema realmente mudou antes de atualizar
         const currentSchema = formik.values.content[contentType];
 
-        // Se o schema for o mesmo, não faça nada
+
+        const properties = newSchema.properties || {};
+        const firstKey = Object.keys(properties)[0];
+
+        const extractedSchema = firstKey ? properties[firstKey] : newSchema;
+
         if (
             currentSchema &&
-            JSON.stringify(currentSchema.schema) === JSON.stringify(newSchema)
+            JSON.stringify(currentSchema.schema) ===
+                JSON.stringify(extractedSchema)
         ) {
-            return; // Não há mudanças, então não faça nada
+            return;
         }
+
+        const content = {
+            [contentType]: {
+                schema: extractedSchema,
+            },
+        };
 
         const updatedResponses = {
             ...formik.values.content,
-            [contentType]: { schema: newSchema },
+            ...content,
         };
 
         formik.setFieldValue('content', updatedResponses);
