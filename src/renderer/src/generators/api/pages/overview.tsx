@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import EmptyPage from './EmptyPage';
 import { OptionType } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
-import { PageHeader } from '@igrp/igrp-framework-react-design-system';
+import { IGRPHeaderPage } from '@igrp/igrp-framework-react-design-system';
 import DashboardOverview from '../components/dashboard-overview';
 
 import { createSelector } from 'reselect';
@@ -61,7 +61,7 @@ const Overview = ({}: NewProps) => {
 
     return (
         <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
-            <PageHeader
+            <IGRPHeaderPage variant={'h3'}
                 title={t('apiOverview')}
                 description={t('manageApiEndpoints')}
             />

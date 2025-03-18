@@ -213,6 +213,9 @@ const ModelLayout = ({
 
             const { error } = await window.api.createModel(values, basePath);
 
+            console.log('error', error);
+            console.log('values', values);
+
             if (error) {
                 showErrorToast(error);
                 return;

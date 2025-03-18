@@ -62,7 +62,10 @@ const NavigationBar = ({
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink onClick={handleBreadcrumbLink} className='cursor-pointer'>
+                            <BreadcrumbLink
+                                onClick={handleBreadcrumbLink}
+                                className="cursor-pointer"
+                            >
                                 <span className="font-semibold">{title}</span>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
@@ -91,7 +94,10 @@ const NavigationBar = ({
                                 <TooltipTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        onClick={() => setDeleteModal(true)}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setDeleteModal(true);
+                                        }}
                                         size={'sm'}
                                         className="outline-1 outline-red-500 text-red-500"
                                     >
@@ -107,10 +113,7 @@ const NavigationBar = ({
                     )}
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                color="success"
-                                type="submit"
-                            >
+                            <Button color="success" type="submit">
                                 {t('save')}
                             </Button>
                         </TooltipTrigger>

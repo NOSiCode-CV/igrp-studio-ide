@@ -18,6 +18,8 @@ import {
 import { IGRPCombobox } from '@renderer/components/combobox';
 import { useTranslation } from 'react-i18next';
 import { formatMethods } from '../../helpers';
+import { Switch } from '@renderer/components/ui/switch';
+import { LabelRequired } from '@renderer/components/required';
 
 interface RelationPopoverProps {
     field: any;
@@ -43,6 +45,7 @@ export function RelationPopover({
             inverseJoinColumn: '',
             joinTable: '',
             fetchType: 'lazy',
+            mappedBy: '',
         }
     );
     const [availableColumns, setAvailableColumns] = useState<
@@ -75,6 +78,10 @@ export function RelationPopover({
     const handleUpdate = () => {
         if (!localRelation.entity) {
             setErrors({ ['entity']: t('entityRequired') });
+            return;
+        }
+        if (!localRelation.fetchType) {
+            setErrors({ ['fetchType']: t('fieldRequired', {name: 'Fetch Type'}) });
             return;
         }
         if (!localRelation.referencedColumnName) {
@@ -196,13 +203,10 @@ export function RelationPopover({
                         </div>
                     </div>
 
-                    {(localRelation.cardinality === 'twoWay' ||
-                        localRelation.type === 'ManyToMany') && (
+                    {localRelation.cardinality === 'twoWay'  && localRelation.type === 'ManyToMany' && (
                         <div className="space-y-2">
                             <Label htmlFor="inverseJoinColumn">
-                                {t('fieldNameIn')}{' '}
-                                {localRelation.joinTable ||
-                                    localRelation.entity}
+                                {t('fieldNameIn')} {localRelation.joinTable}
                             </Label>
                             <Input
                                 id="inverseJoinColumn"
@@ -218,8 +222,30 @@ export function RelationPopover({
                         </div>
                     )}
 
+                    {(localRelation.cardinality === 'twoWay' || localRelation.type === 'OneToMany'
+                        ) &&  localRelation.type !== 'ManyToMany' && (
+                            <div className="space-y-2">
+                                <Label htmlFor="mappedBy">
+                                    {t('fieldNameIn')} {localRelation.entity}
+                                </Label>
+                                <Input
+                                    id="mappedBy"
+                                    value={
+                                        localRelation.mappedBy || ''
+                                    }
+                                    onChange={(e) =>
+                                        setLocalRelation({
+                                            ...localRelation,
+                                            mappedBy: e.target.value,
+                                        })
+                                    }
+                                    placeholder={t('fieldNamePlaceholder')}
+                                />
+                            </div>
+                        )}
+
                     <div className="space-y-2 flex flex-col">
-                        <Label htmlFor="fetchType">{t('fetchType')}</Label>
+                        <LabelRequired>{t('fetchType')}</LabelRequired>
                         <IGRPCombobox
                             value={localRelation.fetchType}
                             options={fetchTypes}
@@ -229,14 +255,15 @@ export function RelationPopover({
                                     fetchType: value as 'lazy' | 'eager',
                                 })
                             }
+                            required
                         />
-                        {errors.referencedColumnName && (
+                        {errors.fetchType && (
                             <p className="text-xs text-red-500">
                                 {errors.fetchType}
                             </p>
                         )}
                     </div>
-                    {/*  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
                         <Switch
                             id="cardinality"
                             checked={localRelation.cardinality === 'twoWay'}
@@ -250,7 +277,7 @@ export function RelationPopover({
                         <Label htmlFor="cardinality">
                             {t('twoWayRelationship')}
                         </Label>
-                    </div> */}
+                    </div>
                     <div className="flex justify-between">
                         <Button
                             variant="outline"

@@ -10,7 +10,7 @@ import {
     setConfig,
 } from '@renderer/redux/thunks';
 import RecentsProjects from './components/recents-projects';
-import { PageHeader } from '@igrp/igrp-framework-react-design-system';
+import { IGRPHeaderPage } from '@igrp/igrp-framework-react-design-system';
 import { ProjectWizard } from '../project';
 import { IOpenProject } from 'src/main/types';
 import { CloneProjectModal } from '../../components/git/clone-project-modal';
@@ -67,7 +67,7 @@ const IDEInitialScreen = () => {
     };
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
-            <PageHeader title={t('welcome')}>
+            <IGRPHeaderPage title={t('welcome')} variant={'h3'}>
                 <div className="flex justify-end space-x-3">
                     <ProjectWizard />
 
@@ -86,7 +86,7 @@ const IDEInitialScreen = () => {
                         {t('openProject')}
                     </Button>
                 </div>
-            </PageHeader>
+            </IGRPHeaderPage>
 
             <RecentsProjects />
         </div>
