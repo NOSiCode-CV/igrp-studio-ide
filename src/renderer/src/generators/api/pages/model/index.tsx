@@ -42,11 +42,7 @@ interface ModelProps {
     onCloseTab: () => void;
 }
 
-const ModelLayout = ({
-    selectors,
-    currentItem,
-    onCloseTab
-}: ModelProps) => {
+const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
     const { showErrorToast, showSuccessToast } = useToast();
@@ -262,6 +258,7 @@ const ModelLayout = ({
                             fetchType,
                             fieldName: mappedBy,
                             mappedBy: name,
+                            module: currentItem?.module,
                         };
 
                         const schemaRef = findModelsByName(entity);

@@ -14,7 +14,7 @@ import { cn } from '@renderer/lib/utils';
 
 interface TypeSelectorDropdownProps {
     type: string;
-    onTypeChange: (type: string) => void;
+    onTypeChange: (type: string | any) => void;
     schemaTypes?: SchemaTypeItem[];
     className?: string;
     variant?:
@@ -49,6 +49,8 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
         return null;
     };
 
+    console.log(schemaTypes);
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -62,7 +64,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
                 {schemaTypes &&
-                    schemaTypes.map(({ label, value, items }) => (
+                    schemaTypes.map(({ label, value, module, items }) => (
                         <React.Fragment key={value}>
                             {items && items.length > 0 ? (
                                 <DropdownMenuSub>
@@ -89,10 +91,16 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                 </DropdownMenuSub>
                             ) : (
                                 <DropdownMenuItem
-                                    onClick={() =>
-                                        onTypeChange(value as string)
-                                    }
+                                    onClick={() => {
+                                        if (module)
+                                            onTypeChange({
+                                                value,
+                                                module,
+                                            } as any);
+                                        else onTypeChange(value as string);
+                                    }}
                                 >
+                                    {renderIcon({ label, value, module })}
                                     {label}
                                 </DropdownMenuItem>
                             )}

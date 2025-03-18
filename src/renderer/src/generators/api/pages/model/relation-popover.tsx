@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@renderer/components/ui/button';
 import {
     Popover,
@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { formatMethods } from '../../helpers';
 import { Switch } from '@renderer/components/ui/switch';
 import { LabelRequired } from '@renderer/components/required';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 interface RelationPopoverProps {
     field: any;
@@ -46,6 +47,7 @@ export function RelationPopover({
             joinTable: '',
             fetchType: 'lazy',
             mappedBy: '',
+            module: '',
         }
     );
     const [availableColumns, setAvailableColumns] = useState<
@@ -81,7 +83,9 @@ export function RelationPopover({
             return;
         }
         if (!localRelation.fetchType) {
-            setErrors({ ['fetchType']: t('fieldRequired', {name: 'Fetch Type'}) });
+            setErrors({
+                ['fetchType']: t('fieldRequired', { name: 'Fetch Type' }),
+            });
             return;
         }
         if (!localRelation.referencedColumnName) {
@@ -163,18 +167,22 @@ export function RelationPopover({
                         )}
                         <div className="space-y-2 flex flex-col">
                             <Label htmlFor="entity">{t('entity')}</Label>
-                            <IGRPCombobox
-                                value={localRelation.entity}
-                                options={modelsOptions}
-                                placeholder={t('selectTargetTable')}
-                                onChange={(value) =>
+                            <TypeSelectorDropdown
+                                type={localRelation.entity}
+                                onTypeChange={({ value, module }) =>
                                     setLocalRelation({
                                         ...localRelation,
+                                        module,
                                         entity: value,
                                         referencedColumnName: '',
                                     })
                                 }
-                            />
+                                schemaTypes={modelsOptions}
+                                className={'w-full h-9 text-gray-500'}
+                                variant={'outline'}
+                            >
+                                <ChevronsUpDown />
+                            </TypeSelectorDropdown>
                             {errors.entity && (
                                 <p className="text-xs text-red-500">
                                     {errors.entity}
@@ -203,36 +211,38 @@ export function RelationPopover({
                         </div>
                     </div>
 
-                    {localRelation.cardinality === 'twoWay'  && localRelation.type === 'ManyToMany' && (
-                        <div className="space-y-2">
-                            <Label htmlFor="inverseJoinColumn">
-                                {t('fieldNameIn')} {localRelation.joinTable}
-                            </Label>
-                            <Input
-                                id="inverseJoinColumn"
-                                value={localRelation.inverseJoinColumn || ''}
-                                onChange={(e) =>
-                                    setLocalRelation({
-                                        ...localRelation,
-                                        inverseJoinColumn: e.target.value,
-                                    })
-                                }
-                                placeholder={t('fieldNamePlaceholder')}
-                            />
-                        </div>
-                    )}
+                    {localRelation.cardinality === 'twoWay' &&
+                        localRelation.type === 'ManyToMany' && (
+                            <div className="space-y-2">
+                                <Label htmlFor="inverseJoinColumn">
+                                    {t('fieldNameIn')} {localRelation.joinTable}
+                                </Label>
+                                <Input
+                                    id="inverseJoinColumn"
+                                    value={
+                                        localRelation.inverseJoinColumn || ''
+                                    }
+                                    onChange={(e) =>
+                                        setLocalRelation({
+                                            ...localRelation,
+                                            inverseJoinColumn: e.target.value,
+                                        })
+                                    }
+                                    placeholder={t('fieldNamePlaceholder')}
+                                />
+                            </div>
+                        )}
 
-                    {(localRelation.cardinality === 'twoWay' || localRelation.type === 'OneToMany'
-                        ) &&  localRelation.type !== 'ManyToMany' && (
+                    {(localRelation.cardinality === 'twoWay' ||
+                        localRelation.type === 'OneToMany') &&
+                        localRelation.type !== 'ManyToMany' && (
                             <div className="space-y-2">
                                 <Label htmlFor="mappedBy">
                                     {t('fieldNameIn')} {localRelation.entity}
                                 </Label>
                                 <Input
                                     id="mappedBy"
-                                    value={
-                                        localRelation.mappedBy || ''
-                                    }
+                                    value={localRelation.mappedBy || ''}
                                     onChange={(e) =>
                                         setLocalRelation({
                                             ...localRelation,

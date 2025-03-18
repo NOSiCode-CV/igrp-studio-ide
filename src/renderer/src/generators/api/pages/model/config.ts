@@ -105,6 +105,7 @@ export const getTablesColumns = ({
 		.map((model) => ({
 			value: model.content?.name || model.name,
 			label: model.content?.name || model.name,
+			module: model.content?.module
 		}));
 
 	const columns = attributes.map((attribute) => ({
