@@ -9,9 +9,7 @@ import {
     TableRow,
 } from '@renderer/components/ui/table';
 import { IGRPCombobox } from '@renderer/components/combobox';
-import {
-    IGRPDataTable,
-} from '@igrp/igrp-framework-react-design-system';
+import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
@@ -40,12 +38,13 @@ export type Database = {
 };
 
 interface TableManagerProps {
-    onRowsSubmit: (rows: any[]) => void;
+    onRowsSubmit: (rows: Set<string>) => void;
     onSelectedConnection: (value: string) => void;
 }
 
 export function TableManager({
     onSelectedConnection,
+    onRowsSubmit,
 }: TableManagerProps) {
     const { t } = useTranslation();
     const { showErrorToast } = useToast();
@@ -59,6 +58,9 @@ export function TableManager({
     const [previewColumns, setPreviewColumns] = useState<Array<any>>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [action, setAction] = useState('overwrite');
+    const [selectedTables, setSelectedTables] = useState<Set<string>>(
+        new Set()
+    );
 
     useEffect(() => {
         const getConnections = async () => {
@@ -74,9 +76,30 @@ export function TableManager({
         getConnections();
     }, []);
 
-    const handleConnectionSelect = async (connectionName: string) => {
-        console.log(connectionName);
+    const handleCheckTableSelect = (tableName: string) => {
+        setSelectedTables((prevSelectedTables) => {
+            const newSelectedTables = new Set(prevSelectedTables);
+            if (newSelectedTables.has(tableName)) {
+                newSelectedTables.delete(tableName); // Remove if already selected
+            } else {
+                newSelectedTables.add(tableName); // Add if not selected
+            }
+            return newSelectedTables;
+        });
+    };
 
+    const handleSelectAll = (isSelected: boolean) => {
+        if (isSelected) {
+            // Add all table names to the selectedTables set
+            const allTableNames = tables.map((table) => table.tableName);
+            setSelectedTables(new Set(allTableNames));
+        } else {
+            // Clear the selectedTables set
+            setSelectedTables(new Set());
+        }
+    };
+
+    const handleConnectionSelect = async (connectionName: string) => {
         setSelectedConnection(connectionName);
         onSelectedConnection(connectionName);
 
@@ -92,8 +115,8 @@ export function TableManager({
                 await window.api.getTables(connectionName);
             if (success) {
                 const tablesArr = tables
-                    .filter((table) => !ignoreTables.includes(table))
-                    .map((table) => {
+                    .filter((table: string) => !ignoreTables.includes(table))
+                    .map((table: string) => {
                         return {
                             tableName: table,
                             id: table,
@@ -118,10 +141,11 @@ export function TableManager({
         if (!success) showErrorToast(message);
         setPreviewColumns(structure);
     };
-/* 
-    const handleChangeRows = (value) => {
-        onRowsSubmit(value);
-    }; */
+
+    useEffect(() => {
+        console.log(selectedTables);
+        onRowsSubmit(selectedTables);
+    }, [selectedTables]);
 
     const columns: ColumnDef<Database>[] = [
         {
@@ -134,7 +158,10 @@ export function TableManager({
                         (table.getIsSomePageRowsSelected() && 'indeterminate')
                     }
                     onCheckedChange={(value) =>
+                       {
                         table.toggleAllPageRowsSelected(!!value)
+                        handleSelectAll(!!value);
+                       }
                     }
                     aria-label={t('selectAll')}
                 />
@@ -145,6 +172,7 @@ export function TableManager({
                     onCheckedChange={(value) => {
                         row.toggleSelected(!!value);
                         handleTableSelect(row.original.tableName);
+                        handleCheckTableSelect(row.original.tableName);
                     }}
                     aria-label={t('selectRow')}
                 />
@@ -175,7 +203,6 @@ export function TableManager({
                     <IGRPCombobox
                         value={selectedConnection}
                         onChange={(selected) => {
-                            console.log(selected);
                             handleConnectionSelect(selected);
                         }}
                         placeholder={t('selectConnection')}
@@ -196,8 +223,8 @@ export function TableManager({
                     />
                 </div>
             </div>
-            <div className="flex mt-3 space-x-3">
-                <div className="w-1/2 space-y-4">
+            <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="space-y-4">
                     <div className="rounded border">
                         <h4 className="p-2 text-sm">{t('databaseTable')}</h4>
                         <Separator />
@@ -210,14 +237,12 @@ export function TableManager({
                                 <IGRPDataTable
                                     columns={columns}
                                     data={tables}
-                                    //onRowSelectionChange={handleChangeRows}
-                                   // rowId="id"
                                 />
                             )}
                         </ScrollArea>
                     </div>
                 </div>
-                <div className="w-1/2 space-y-3">
+                <div className="space-y-3">
                     {selectedTable ? (
                         <>
                             <h3 className="text-sm text-muted-foreground">
@@ -225,7 +250,7 @@ export function TableManager({
                                     tableName: selectedTable,
                                 })}
                             </h3>
-                            <ScrollArea className="h-[450px] w-full rounded-md border">
+                            <ScrollArea className="h-[450px] rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>

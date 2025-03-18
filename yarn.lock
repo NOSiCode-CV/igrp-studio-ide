@@ -1285,10 +1285,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.52":
-  version "0.0.0-alpha.52"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.52.tgz#ca5ab24077dafaeaefdb0bb9ecb66264c2d3fbbb"
-  integrity sha512-/ffmE09WhnrcotBbp7kOrhqIGGIHM6HBs13XcBFzTlM1pIyMNnVly1tYvGT/ZNSF/KsEAZFb37Lg2WEgsYXBQw==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.56":
+  version "0.0.0-alpha.56"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.56.tgz#d89c7d89c048209559085cb314c4b9f67b0b3c8c"
+  integrity sha512-gZ3QjKAE2F8QBuwqKEKhvXmYFw705LqZbqHP3IT9W8C6Cxcu3TqQp5BfEGJYjvIufK1xBLrDqS5n06tQ7ThLVg==
   dependencies:
     "@hookform/resolvers" "^4.1.3"
     "@radix-ui/react-accordion" "^1.2.3"
@@ -5968,10 +5968,10 @@ globalthis@^1.0.1, globalthis@^1.0.4:
     define-properties "^1.2.1"
     gopd "^1.0.1"
 
-gojs@^3.0.19:
-  version "3.0.19"
-  resolved "https://registry.yarnpkg.com/gojs/-/gojs-3.0.19.tgz#3be5de80da30174a63213cfacc90cf0c1f8936e3"
-  integrity sha512-q8PAcGYOe5eZgh3nBWAoRjrq1OkLUykNPOvP7foSzfOGinzVmdSdJcKjrrlg62rN+xiL60q2dk6y0LviHn9Gew==
+gojs@^3.0.20:
+  version "3.0.20"
+  resolved "https://registry.yarnpkg.com/gojs/-/gojs-3.0.20.tgz#faa29e1e0f178a7d08c1670ac5f73eaa096ce5d3"
+  integrity sha512-ySc+c5lJqYC4D49UfS6NZo0v45lPzMnP5uwH5nXweou80CEDtSohgbTf7KaBxYVi43FocI3VtwMHUJR58cwyGQ==
 
 gopd@^1.0.1, gopd@^1.2.0:
   version "1.2.0"

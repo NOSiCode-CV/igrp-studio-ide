@@ -13,6 +13,10 @@ function createKnexConnection(config: Connection) {
             password: config.password,
             database: config.database,
         },
+        pool: {
+            min: 2,
+            max: 10,
+        },
     });
 }
 
@@ -26,4 +30,8 @@ async function getTableStructure(knex: any, tableName: string) {
     return await inspector.columnInfo(tableName);
 }
 
-export { createKnexConnection, getTables, getTableStructure }
+async function closeKnexConnection(knex: any) {
+    await knex.destroy();
+}
+
+export { createKnexConnection, closeKnexConnection, getTables, getTableStructure }

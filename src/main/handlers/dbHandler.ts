@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import { Connection, DatabaseResponse } from "../types";
-import { createKnexConnection, getTables, getTableStructure } from "../helpers/Knex";
+import { closeKnexConnection, createKnexConnection, getTables, getTableStructure } from "../helpers/Knex";
 import { ConnectionRepository } from "../repo/database-data";
 
 const repoConnection = new ConnectionRepository()
@@ -35,6 +35,7 @@ ipcMain.handle('get-tables', async (_event, connectionName): Promise<DatabaseRes
         const connectionConfig: Connection = await repoConnection.findOne(connectionName)
         const knex = globalKnex || await createKnexConnection(connectionConfig)
         const tables = await getTables(knex);
+        closeKnexConnection(knex)
         return { success: true, tables };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -47,6 +48,7 @@ ipcMain.handle('get-table-structure', async (_event, connectionName, tableName) 
         const connectionConfig: Connection = await repoConnection.findOne(connectionName)
         const knex = globalKnex || await createKnexConnection(connectionConfig)
         const structure = await getTableStructure(knex, tableName);
+        closeKnexConnection(knex)
         return { success: true, structure };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred';

@@ -418,5 +418,6 @@
   "remoteRepositoryUrlPlaceholder": "https://github.com/username/repository.git",
   "addRemote": "Add Remote",
   "fetchType": "Fetch Type",
-  "module": "Module"
+  "module": "Module",
+  "selectRow":"Select Row"
 }

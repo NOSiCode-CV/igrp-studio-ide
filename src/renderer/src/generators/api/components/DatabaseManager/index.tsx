@@ -24,6 +24,7 @@ import { getId, toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 import { useGit } from '@renderer/hooks/useGit';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean;
@@ -58,12 +59,14 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     item,
     basePath,
 }) => {
-    const [selectedRows, setSelectedRows] = useState({}); // Track selected rows
+    const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set()); // Track selected rows
     const [selectedConnection, setSelectedConnection] = useState<string>('');
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const dispatch: any = useDispatch();
+
+    const { module } = item;
 
     const handleClickSubmit = async () => {
         if (!basePath) return;
@@ -85,7 +88,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 if (success) {
                     // Map the attributes
                     const attributes = structure
-                        .filter(() => true) // Add filter logic here if needed
+                        .filter(() => true)
                         .map((column) => {
                             const relation = column.foreign_key_table
                                 ? {
@@ -98,6 +101,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                                       joinTable: '',
                                       inverseJoinColumn: '',
                                       cardinality: 'oneWay',
+                                      module,
                                   }
                                 : null;
 
@@ -127,11 +131,10 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         const foreignKeyTable = column.foreign_key_table;
                         if (!selectedRows[foreignKeyTable]) {
                             selectedRows[foreignKeyTable] = true; // Add to the list
-                            await processTable(foreignKeyTable); // Recursive call
+                            await processTable(foreignKeyTable);
                         }
                     }
 
-                    // Final table object
                     const tableJson = {
                         ...initialValues,
                         id: getId(),
@@ -139,13 +142,14 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         attributes,
                         name:
                             tableName.charAt(0).toUpperCase() +
-                            tableName.slice(1), // Capitalize table name
+                            tableName.slice(1),
                     };
 
-                    const values = getValuesToSubmit(tableJson, item.module);
+                    const values = getValuesToSubmit(tableJson, module);
 
-                    const { error } = await window.api.createModel(
+                    const { error } = await window.engine.createModel(
                         values,
+                        ENV_TYPES.SPRING,
                         basePath
                     );
 
@@ -165,10 +169,8 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
         };
 
         // Process all initially selected rows
-        for (const key in selectedRows) {
-            if (Object.hasOwn(selectedRows, key)) {
-                await processTable(key);
-            }
+        for (const tableName of selectedRows) {
+            processTable(tableName);
         }
 
         if (errorMessages.length > 0) {

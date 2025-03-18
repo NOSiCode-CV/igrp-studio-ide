@@ -11,41 +11,6 @@ const handleError = (error: unknown): HandlerResponse => ({
 // Custom APIs for renderer
 const api = {
 
-	/* createModule: async (moduleConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-module', moduleConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createModel: async (modelConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-model', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createDto: async (dtoConfig: DTOConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-dto', dtoConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createController: async (
-		controllerConfig: ControllerConfig,
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-controller', controllerConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	}, */
-
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
