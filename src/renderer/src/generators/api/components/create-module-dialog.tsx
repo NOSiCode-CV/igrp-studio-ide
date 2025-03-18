@@ -24,7 +24,7 @@ import {
 } from '@renderer/components/ui/tooltip';
 import { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { PATTERNS } from '@renderer/constants/appConstants';
+import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
@@ -76,8 +76,9 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
     const onCreateModule = async (): Promise<void> => {
         try {
-            const { error } = await window.api.createModule(
+            const { error } = await window.engine.createModule(
                 formik.values,
+                ENV_TYPES.SPRING,
                 basePath
             );
 

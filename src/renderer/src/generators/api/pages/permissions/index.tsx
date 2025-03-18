@@ -12,24 +12,23 @@ import { usePermisisonValidation } from './validation';
 import { FormList } from '../../components/form-list';
 import { getTablesColumns, defaultInitialValues } from './config';
 import { PermissionConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface PermissionsProps {
-    basePath: string;
     selectors: Array<any>;
     currentItem: any;
-    permissions: Array<any>;
     onCloseTab: () => void;
 }
 
 export const PermissionsLayout = ({
-    basePath,
     currentItem,
-    permissions,
 }: PermissionsProps) => {
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
+
+    const { basePath, permissions } = useStudioAPI(currentItem?.module);
 
     const [title, _setTitle] = useState('');
 
@@ -99,16 +98,6 @@ export const PermissionsLayout = ({
 
         getJsonData();
     }, [permissions]);
-
-    const onSubmit = async () => {
-        const errors = await formik.validateForm();
-        if (Object.keys(errors).length === 0) {
-            formik.handleSubmit();
-        } else {
-            // Handle validation errors (optional)
-            console.error('Validation errors:', errors);
-        }
-    };
 
     const handleSave = async (permissions: PermissionConfig[]) => {
         try {
@@ -189,10 +178,9 @@ export const PermissionsLayout = ({
     console.log(tablesColumns[tabName]);
 
     return (
-        <>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={() => console.log('')}
-                onSubmit={onSubmit}
                 isNew={!data}
                 title={title || t('createNewPermission')}
                 showSourceCode={onClickSourceCode}
@@ -219,6 +207,6 @@ export const PermissionsLayout = ({
                     />
                 )}
             </div>
-        </>
+        </form>
     );
 };

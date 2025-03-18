@@ -21,24 +21,17 @@ import AttributesCard from './attributes';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface DtoProps {
-    basePath: string;
     selectors: Array<any>;
-    models?: Array<any>;
-    dto?: Array<any>;
-    enums?: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
 
 const DtoLayout = ({
-    basePath,
     selectors,
-    dto,
-    models,
-    enums,
     currentItem,
     onCloseTab,
     onUpdateTab,
@@ -48,6 +41,8 @@ const DtoLayout = ({
     const dispatch: any = useDispatch();
 
     const { createGitCommit } = useGit();
+
+    const { models, basePath, dto, enums } = useStudioAPI(currentItem?.module);
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -131,7 +126,11 @@ const DtoLayout = ({
                 id: currentItem.id,
             };
 
-            const { error } = await window.api.createDto(config, basePath);
+            const { error } = await window.engine.createDto(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
 
             console.log(config, error);
 

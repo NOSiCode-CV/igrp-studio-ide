@@ -16,9 +16,9 @@ import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { TextInput } from '../../components/inputs-form';
 import { Card } from '@renderer/components/ui/card';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface EnumProps {
-    basePath: string;
     selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
@@ -31,7 +31,6 @@ const validationSchema = Yup.object({
 });
 
 export const EnumLayout = ({
-    basePath,
     selectors,
     currentItem,
     onCloseTab,
@@ -41,6 +40,8 @@ export const EnumLayout = ({
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
+    const { basePath } = useStudioAPI(currentItem?.module);
+
     const [title, setTitle] = useState('');
 
     const [data, setData] = useState<any>(null);
@@ -158,7 +159,7 @@ export const EnumLayout = ({
             const config = {
                 name: formik.values.name,
                 type: 'enum',
-                module: currentItem.module
+                module: currentItem.module,
             };
 
             const { error } = await window.engine.delete(

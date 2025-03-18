@@ -41,7 +41,7 @@ export function RelationPopover({
             type: 'OneToOne',
             entity: '',
             referencedColumnName: '',
-            cardinality: 'oneWay',
+            cardinality: 'twoWay',
             inverseJoinColumn: '',
             joinTable: '',
             fetchType: 'lazy',

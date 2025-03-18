@@ -9,11 +9,6 @@ import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
 
 interface CustomAPI {
 
-    createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
-    createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
-    createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
-    createController: (controllerConfig: ControllerConfig, basePath: string) => Promise<HandlerResponse>;
-
     createPage: (modelConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     deletePage: (pageConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     addComponentToPage: (pageConfig: PageConfig, components: Component[], basePath: string) => Promise<HandlerResponse>;
@@ -45,7 +40,13 @@ interface CustomAPI {
 interface BaseEngine {
     createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
     createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createModule: (moduleConfig: ModuleConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createModel: (modelConfig: ModelConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createDto: (dtoConfig: DTOConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createController: (controllerConfig: ControllerConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;

@@ -25,11 +25,11 @@ import { useResponseValidation } from './validation';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/required';
 import { SelectInput, TextInput } from '../../components/inputs-form';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 const contentType = 'application/json';
 
 interface ResponseProps {
-    basePath: string;
     selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
@@ -46,7 +46,6 @@ const initialValues = {
 };
 
 export const ResponseLayout = ({
-    basePath,
     selectors,
     currentItem,
     onCloseTab,
@@ -56,6 +55,8 @@ export const ResponseLayout = ({
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
+
+    const { basePath } = useStudioAPI(currentItem?.module);
 
     const [title, setTitle] = useState('');
 
@@ -132,6 +133,7 @@ export const ResponseLayout = ({
                 basePath
             );
 
+            console.log(error, values);
             onUpdateTab(formik.values.name);
 
             if (error) {

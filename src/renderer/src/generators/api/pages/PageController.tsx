@@ -5,7 +5,6 @@ import ControllerLayout from './controller';
 import EmptyPage from './EmptyPage';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { extractByType, getMergedFiles, getModulesArray } from '../helpers';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
@@ -42,32 +41,12 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
     const selectState = (state: any): PageBuilderState => state.PageBuilder;
 
     const selectProperties = createSelector(selectState, (studio) => {
-        const moduleData = getMergedFiles(studio, module);
-
         return {
             basePath: studio.basePath,
-            config: studio.config,
-            models: extractByType(moduleData, OPTION_TYPE.MODELS),
-            dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
-            controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
-            responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
-            enums: extractByType(moduleData, OPTION_TYPE.ENUM),
-            permissions: extractByType(moduleData, OPTION_TYPE.PERMISSIONS),
-            modules: getModulesArray(studio.filesThree),
-            filesThree: studio.filesThree,
         };
     });
 
-    const {
-        basePath,
-        config,
-        models,
-        dto,
-        modules,
-        responses,
-        enums,
-        permissions,
-    } = useSelector(selectProperties);
+    const { basePath } = useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -123,24 +102,16 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
             )}
             {option === OPTION_TYPE.MODEL && (
                 <ModelLayout
-                    basePath={basePath}
                     selectors={selectors}
-                    models={models}
                     currentItem={tab.item}
-                    config={config}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
                 />
             )}
             {option === OPTION_TYPE.ACTION && (
                 <ControllerLayout
-                    basePath={basePath}
                     selectors={selectors}
                     currentItem={tab.item}
-                    modules={modules}
-                    dto={dto}
-                    responses={responses}
-                    enums={enums}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
                 />
@@ -153,11 +124,7 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
             )}
             {option === OPTION_TYPE.DATA_OBJECTS && (
                 <DtoLayout
-                    basePath={basePath}
                     selectors={selectors}
-                    dto={dto}
-                    models={models}
-                    enums={enums}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
                     onUpdateTab={handleUpdate}
@@ -165,7 +132,6 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
             )}
             {option === OPTION_TYPE.RESPONSE && (
                 <ResponseLayout
-                    basePath={basePath}
                     selectors={selectors}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
@@ -174,7 +140,6 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
             )}
             {option === OPTION_TYPE.ENUM && (
                 <EnumLayout
-                    basePath={basePath}
                     selectors={selectors}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
@@ -182,14 +147,14 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
             )}
             {option === OPTION_TYPE.PERMISSIONS && (
                 <PermissionsLayout
-                    basePath={basePath}
                     selectors={selectors}
-                    permissions={permissions}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}
                 />
             )}
-            {option === OPTION_TYPE.ERDDiagram && <ERDLayout models={models} />}
+            {option === OPTION_TYPE.ERDDiagram && (
+                <ERDLayout currentItem={tab.item} />
+            )}
         </>
     );
 };

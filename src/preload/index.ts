@@ -1,10 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import {
-	ControllerConfig,
-	DTOConfig,
-	ModelConfig
-} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 const backend = require('i18next-electron-fs-backend')
@@ -16,7 +11,7 @@ const handleError = (error: unknown): HandlerResponse => ({
 // Custom APIs for renderer
 const api = {
 
-	createModule: async (moduleConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
+	/* createModule: async (moduleConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke('spring-engine:create-module', moduleConfig, basePath)
 		} catch (error) {
@@ -49,7 +44,7 @@ const api = {
 		} catch (error) {
 			return handleError(error)
 		}
-	},
+	}, */
 
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
@@ -103,6 +98,34 @@ const engine = {
 	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_RESPONSE, response, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createDto: async (dtoConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_DTO, dtoConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createModule: async (moduleConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_MODULE, moduleConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createController: async (controllerConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_CONTROLLER, controllerConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createModel: async (modelConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_MODEL, modelConfig, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}

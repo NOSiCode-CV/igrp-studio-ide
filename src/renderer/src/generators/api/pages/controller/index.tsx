@@ -42,33 +42,28 @@ import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface ControllerProps {
-    basePath: string;
     selectors: Array<any>;
     currentItem: any;
-    modules: Array<any>;
-    dto: Array<any>;
-    responses: Array<any>;
-    enums: Array<any>;
     onCloseTab: () => void;
     onUpdateTab: (newId: string) => void;
 }
 
 const ControllerLayout: React.FC<ControllerProps> = ({
-    basePath,
     selectors,
     currentItem,
-    modules,
-    dto,
     onCloseTab,
     onUpdateTab,
-    responses,
-    enums,
 }: ControllerProps) => {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
+
+    const { modules, dto, basePath, enums, responses } = useStudioAPI(
+        currentItem?.module
+    );
 
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
@@ -256,8 +251,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
             const values = await getValuesToSubmit();
 
-            const { error } = await window.api.createController(
+            const { error } = await window.engine.createController(
                 values,
+                ENV_TYPES.SPRING,
                 basePath
             );
 
@@ -316,8 +312,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
                 const updatedValues = { ...values, actions: updatedActions };
 
-                const { error } = await window.api.createController(
+                const { error } = await window.engine.createController(
                     updatedValues,
+                    ENV_TYPES.SPRING,
                     basePath
                 );
 

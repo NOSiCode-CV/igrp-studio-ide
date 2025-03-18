@@ -18,7 +18,13 @@ export interface BaseEngine {
     createProject(project: ProjectData, basePath: string): Promise<void>;
     delete(config: DeleteConfig, basePath: string): Promise<void>;
     createResponse?(config: ResponseConfig, basePath: string): Promise<void>;
+    
     createEnum?(data: EnumConfig, basePath: string): Promise<void>;
+    createModule?(data: EnumConfig, basePath: string): Promise<void>;
+    createModel?(data: EnumConfig, basePath: string): Promise<void>;
+    createDto?(data: EnumConfig, basePath: string): Promise<void>;
+    createController?(data: EnumConfig, basePath: string): Promise<void>;
+
     serializeElement?: (data: any, basePath: string) => Promise<void>;
     createPermission?: (data: any, basePath: string) => Promise<void>;
 

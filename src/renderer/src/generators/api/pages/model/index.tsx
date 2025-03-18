@@ -30,40 +30,42 @@ import { FormList } from '../../components/form-list';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { ProjectData } from 'src/main/types';
-import { RelationReference } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import {
+    ModelConfig,
+    RelationReference,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface ModelProps {
-    basePath: string;
     selectors: Array<any>;
-    models?: Array<any>;
     currentItem: any;
-    config: ProjectData;
     onCloseTab: () => void;
     onUpdateTab: (tabId: string) => void;
 }
 
 const ModelLayout = ({
-    basePath,
     selectors,
-    models,
     currentItem,
-    config,
     onCloseTab,
     onUpdateTab,
 }: ModelProps) => {
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
+    const { showErrorToast, showSuccessToast } = useToast();
+    const { models, basePath, config, findModelsByName, getJsonData } =
+        useStudioAPI(currentItem?.module);
+
     const { t } = useTranslation();
+    const validationSchema = useModelValidation({ t });
+
     const dispatch: any = useDispatch();
+
     const [tablesColumns, setTableColumns] = useState<{
         [value: string]: IColumnsTabelProps[];
     }>({});
-    const { showErrorToast, showSuccessToast } = useToast();
+
     const [data, setData] = useState<any>(null);
     const [enableEntityRevision, hasEnableEntityRevision] = useState(false);
-
-    const validationSchema = useModelValidation({ t });
 
     const formik: any = useFormik({
         enableReinitialize: true,
@@ -98,10 +100,11 @@ const ModelLayout = ({
     ): Promise<void> => {
         formik.handleBlur(e);
         const name = e.target.value;
-        if (!formik.values.tableName) {
-            const value = await suggestTableName(name);
-            formik.setFieldValue('tableName', value);
-        }
+
+        if (formik.values.tableName) return;
+
+        const value = await suggestTableName(name);
+        formik.setFieldValue('tableName', value);
     };
 
     useEffect(() => {
@@ -122,23 +125,21 @@ const ModelLayout = ({
     }, [selectors, formik.values]);
 
     useEffect(() => {
-        const getJsonData = async () => {
+        const load = async () => {
             if (!currentItem) return;
 
-            try {
-                const data = await window.api.getJsonContent(currentItem.path);
+            await getJsonData(currentItem.path).then((data) => {
                 setData(data);
-            } catch (error) {
-                console.error('Failed to load JSON content:', error);
-            }
+            });
         };
 
-        getJsonData();
+        load();
     }, [currentItem]);
 
     useEffect(() => {
         if (data) {
             const {
+                revision,
                 name,
                 tableName,
                 attributes,
@@ -177,6 +178,7 @@ const ModelLayout = ({
                     ? indexes
                     : [defaultValues.indexes];
 
+            formik.setFieldValue('revision', revision || false);
             formik.setFieldValue('name', name || '');
             formik.setFieldValue('tableName', tableName || '');
             formik.setFieldValue('crud', crud || false);
@@ -206,12 +208,18 @@ const ModelLayout = ({
 
     const handleSave = async (): Promise<void> => {
         try {
+            const data = await getJsonData(currentItem.path);
+
             const values = getValuesToSubmit(
-                { ...formik.values, id: currentItem.id },
+                { ...data, ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
 
-            const { error } = await window.api.createModel(values, basePath);
+            const { error } = await window.engine.createModel(
+                values,
+                ENV_TYPES.SPRING,
+                basePath
+            );
 
             console.log('error', error);
             console.log('values', values);
@@ -220,6 +228,8 @@ const ModelLayout = ({
                 showErrorToast(error);
                 return;
             }
+
+            createRelationReference(values);
 
             dispatch(onSetChangeStatus(true));
 
@@ -231,6 +241,82 @@ const ModelLayout = ({
         } catch (error) {
             showErrorToast(error);
         }
+    };
+
+    const createRelationReference = async (values: ModelConfig) => {
+        const { attributes } = values;
+
+        await Promise.all(
+            attributes.map(async (attribute) => {
+                const { relation, type, name } = attribute;
+
+                if (type === 'relation' && relation) {
+                    const {
+                        mappedBy,
+                        fetchType,
+                        type: relationType,
+                        entity,
+                        cardinality,
+                    } = relation;
+
+                    if (cardinality === 'twoWay') {
+                        const relationReference: RelationReference = {
+                            type: relationType,
+                            entity,
+                            fetchType,
+                            fieldName: mappedBy,
+                            mappedBy: name,
+                        };
+
+                        const schemaRef = findModelsByName(entity);
+
+                        try {
+                            const data = await window.api.getJsonContent(
+                                schemaRef.path
+                            );
+
+                            const existingRelationReferences = Array.isArray(
+                                data.relationReference
+                            )
+                                ? data.relationReference
+                                : [];
+
+                            const isDuplicate = existingRelationReferences.some(
+                                (ref) =>
+                                    ref.mappedBy === relationReference.mappedBy
+                            );
+
+                            if (!isDuplicate) {
+                                const newJson = {
+                                    ...data,
+                                    relationReference: [
+                                        ...existingRelationReferences,
+                                        relationReference,
+                                    ],
+                                };
+
+                                const { error } =
+                                    await window.engine.createModel(
+                                        newJson,
+                                        ENV_TYPES.SPRING,
+                                        basePath
+                                    );
+
+                                if (error) {
+                                    showErrorToast(error);
+                                    return;
+                                }
+                            }
+                        } catch (error) {
+                            console.error(
+                                'Failed to fetch JSON content:',
+                                error
+                            );
+                        }
+                    }
+                }
+            })
+        );
     };
 
     const deleteModel = async (): Promise<void> => {
@@ -246,9 +332,6 @@ const ModelLayout = ({
                 ENV_TYPES.SPRING,
                 basePath
             );
-
-            console.log('error', error);
-            console.log('config', config);
 
             if (error) return showErrorToast(error);
 

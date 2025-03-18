@@ -11,7 +11,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { PATTERNS } from '@renderer/constants/appConstants';
+import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import useToast from '@renderer/components/useToast';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
@@ -92,8 +92,9 @@ export function CreateEndpointDialog({
         actions: any
     ) => {
         try {
-            const { error } = await window.api.createController(
+            const { error } = await window.engine.createController(
                 values,
+                ENV_TYPES.SPRING,
                 basePath
             );
             if (error) {

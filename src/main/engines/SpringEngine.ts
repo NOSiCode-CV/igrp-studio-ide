@@ -1,12 +1,29 @@
 // engines/SpringEngine.ts
-import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement } from '@igrp/igrp-studio-springboot-engine';
+import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController } from '@igrp/igrp-studio-springboot-engine';
 import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
-import { BaseApiConfig, DeleteConfig, EnumConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import { BaseApiConfig, ControllerConfig, DeleteConfig, DTOConfig, EnumConfig, ModelConfig, ModuleConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
 
 export class SpringEngine implements BaseEngine {
-  createPermission (_data: any, _basePath: string) : Promise<void>{
+
+  async createController(config: ControllerConfig, basePath: string): Promise<void> {
+    await addController(config, basePath)
+  }
+
+  async createModel(config: ModelConfig, basePath: string): Promise<void> {
+    await addModel(config, basePath)
+  }
+
+  async createModule(config: ModuleConfig, basePath: string): Promise<void> {
+    await addModule(config, basePath)
+  }
+
+  async createDto(config: DTOConfig, basePath: string): Promise<void> {
+    await addDTO(config, basePath)
+  }
+
+  createPermission(_data: any, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
   async delete(config: DeleteConfig, basePath: string): Promise<void> {
