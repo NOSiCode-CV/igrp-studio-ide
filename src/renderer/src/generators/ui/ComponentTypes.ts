@@ -50,6 +50,8 @@ import {
     ChartPie,
     Ellipsis,
     DollarSign,
+    Heading1,
+    Heading,
 } from 'lucide-react';
 
 // Constants
@@ -64,7 +66,8 @@ export const GROUP_COMPONET: Record<string, string> = {
     dataDisplay: "Data Display",
     layout: "Layout",
     widget: "Widgets",
-    advanced: "Advanced"
+    advanced: "Advanced",
+    typography: "Typograpgy"
 };
 
 export const COMPONENT: Record<string, string> = {
@@ -183,4 +186,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableTextCell: FormInput,
     tableExpanderCell: ChevronDown,
     tableBadgeCell: Badge,
+    headline: Heading1,
+    pageHeader: Heading
 };

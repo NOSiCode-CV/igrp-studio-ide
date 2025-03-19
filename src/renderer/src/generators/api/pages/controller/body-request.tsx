@@ -76,6 +76,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     useEffect(() => {
         const content = formik.values.requestBody?.content;
 
+        if (!content) return;
+
         const contentType = Object.keys(content)[0];
 
         const schema = content?.[contentType]?.['schema'];
@@ -83,15 +85,13 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         setLocalSchema(schema);
 
         setBodyType(contentType as TbodyType);
-
     }, [formik.values.requestBody]);
 
-    useEffect(()=>{
+    useEffect(() => {
         const data = jsonSchemaToArray(localSchema);
 
         if (bodyType === 'multipart/form-data') setData(data);
-
-    },[bodyType])
+    }, [bodyType]);
 
     const onChangeBody = (element: string, position: number, value: string) => {
         setData((prev) =>
@@ -112,14 +112,13 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     const handleChangeEditor = (value: string) => {
-    
         const content = {
             [contentType]: {
-                schema: JSON.parse(value)
+                schema: JSON.parse(value),
             },
         };
-     
-        updateFormik(content)
+
+        updateFormik(content);
     };
 
     useEffect(() => {

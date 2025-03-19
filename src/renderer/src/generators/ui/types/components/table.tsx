@@ -245,7 +245,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                     return (
                         <div
                             key={index}
-                            className="bg-card rounded-lg border p-2 group/table"
+                            className="bg-card rounded-lg border p-2 group/table overflow-x-auto"
                         >
                             <TableTool
                                 parentComp={comp}
@@ -256,7 +256,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     type={getLabel(componentName).toUpperCase()}
                                 />
                             ) : (
-                                <Table>
+                                <Table className='overflow-x-auto'>
                                     <TableHeader>
                                         <TableRow>
                                             {renderTableHeaders(componentName)}

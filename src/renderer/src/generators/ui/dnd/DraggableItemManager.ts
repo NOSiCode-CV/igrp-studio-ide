@@ -41,7 +41,7 @@ const handleDropComponent = (
         children: [], // Initialize children array
     };
 
-    childrenTypes && childrenTypes.map((child: ComponentRegisterConfig) => {
+    childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
         const { name, label, properties } = child
         const childId = generateId(name);
         const childComponent: StructuredComponent = {
@@ -53,35 +53,6 @@ const handleDropComponent = (
         };
         component.children?.push(childComponent);
     });
-
-    // Handle Columns component
-    if (draggableId === COMPONENT.Columns) {
-
-        // Create two child columns and add them to the parent's children array
-        for (let i = 0; i < 2; i++) {
-            const childColumnId = generateId(`column_${i + 1}`);
-            const childColumn: StructuredComponent = {
-                id: childColumnId,
-                componentName: COMPONENT.Column,
-                label: `Column ${i + 1}`,
-                properties: { variant: 'span6' },
-                children: [],
-            };
-            component.children?.push(childColumn);
-        }
-    }
-
-    if (draggableId === COMPONENT.Form) {
-        const childColumnId = generateId(COMPONENT.Grid);
-        const childColumn: StructuredComponent = {
-            id: childColumnId,
-            componentName: COMPONENT.Grid,
-            label: COMPONENT.Grid,
-            properties: { variant: 'cols4' },
-            children: [],
-        };
-        component.children?.push(childColumn);
-    }
 
     // Add the component to the row
     handleAddChildToComponent(destination, component);
