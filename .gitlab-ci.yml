@@ -5,7 +5,7 @@ cache:
   paths:
     - node_modules/
 build_packagedev:
-  image: node:slim
+  image: node
   stage: build
   only:
     - master
@@ -18,6 +18,9 @@ build_packagedev:
   script:
     - yarn install
     - yarn build:win
+    - yarn build:linux
+    - yarn build:mac
+    - yarn build:mac:x64
   artifacts:
     paths:
       - dist/
@@ -47,9 +50,10 @@ release:
             ]
           }
         }' \
-        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
-  #only:
-   # - tags
+        "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/releases"
+        # $CI_API_V4_URL equals http://git.nosi.cv/api/v4. As per the curl standard, this results in a redirection from POST (http) to GET (https). Therefore, cannot be used here.
+  # only:
+    # - tags
   dependencies:
     - build_packagedev
   needs:
