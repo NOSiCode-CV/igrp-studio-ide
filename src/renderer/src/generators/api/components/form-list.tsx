@@ -169,7 +169,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
-                                            onClick={() => addRow()}
+                                            onClick={(e) => {e.preventDefault() ;addRow()}}
                                             variant="ghost"
                                             size="sm"
                                             className="text-igrp h-6 w-6"
@@ -205,7 +205,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 return (
                     <IGRPCombobox
                         key={`${index}-${key}`}
-                        placeholder={`Select ${name}`}
+                        placeholder={`Select ${key}`}
                         options={dynamicOptions[`${index}-${key}`] || options}
                         value={selectValue}
                         onChange={(selectedOption) => handleDependentChange(key, index, selectedOption)}
@@ -288,7 +288,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
                     {(provided: any) => (
                         <TableRow className={`group/item`} ref={provided.innerRef} {...provided.draggableProps}>
-                            {columns.map(({ name, key, type, options, items }, index2) => {
+                            {columns.map(({  key, type, options, items }, index2) => {
                                 const selectValue = ['select'].includes(type)
                                     ? (dynamicOptions?.[`${index}-${key}`] || options)?.filter((d) => row[key] && d.value === row[key])[0]?.value
                                     : '';
@@ -386,7 +386,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                         variant="ghost"
                                         size="icon"
                                         className={`text-red-500 opacity-0 group-hover/item:opacity-100`}
-                                        onClick={() => removeRow(index)}
+                                        onClick={(e) =>{e.preventDefault(); removeRow(index)}}
                                     >
                                         <Trash />
                                     </Button>

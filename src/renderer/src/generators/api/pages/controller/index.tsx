@@ -48,14 +48,12 @@ interface ControllerProps {
     selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
-    onUpdateTab: (newId: string) => void;
 }
 
 const ControllerLayout: React.FC<ControllerProps> = ({
     selectors,
     currentItem,
-    onCloseTab,
-    onUpdateTab,
+    onCloseTab
 }: ControllerProps) => {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
@@ -144,6 +142,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             );
             formik.setFieldValue('method', method || initialValues.method);
             formik.setFieldValue('path', path || initialValues.path);
+       
             formik.setFieldValue('requestBody', requestBody || '');
             formik.setFieldValue(
                 'pathVariables',
@@ -253,8 +252,6 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             );
 
             console.log(values, error);
-
-            onUpdateTab(formik.values.name);
 
             if (error) {
                 showErrorToast(error);

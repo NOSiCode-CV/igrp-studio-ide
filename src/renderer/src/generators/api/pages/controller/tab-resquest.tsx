@@ -7,7 +7,6 @@ import {
     IGRPTabsList,
     IGRPTabsTrigger,
 } from '@renderer/components/tabs';
-import { JSONSchema } from '../../types/schema';
 import { BodyRequest } from './body-request';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@renderer/components/ui/card';
@@ -27,12 +26,6 @@ export const TabRequest: React.FC<TabRequestProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const [bodyType, setBodyType] = useState<
-        'none' | 'multipart/form-data' | 'application/json'
-    >();
-
-    const [contentType, setContentType] = useState('application/json');
-
     const tabQueryParams = 'requestParams';
     const tabPathVariables = 'pathVariables';
     const tabHeaders = 'headers';
@@ -40,87 +33,6 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     const columnsQuery = tablesColumns[tabQueryParams];
     const columnsVariables = tablesColumns[tabPathVariables];
     const columnsHeaders = tablesColumns[tabHeaders];
-
-    const [localSchema, setLocalSchema] = useState({
-        type: 'Object',
-        properties: {},
-    });
-
-    useEffect(() => {
-        const type =
-            (formik.values.requestBody?.content &&
-                Object.keys(formik.values.requestBody.content)?.[0]) ||
-            'none';
-        setBodyType(type);
-    }, []);
-
-    useEffect(() => {
-        if (bodyType === 'none') {
-            formik.setFieldValue('requestBody', '');
-        } else if (bodyType === 'multipart/form-data') {
-            const data =
-                formik.values.requestBody?.content?.[bodyType]?.schema ||
-                localSchema;
-            const content = {
-                'multipart/form-data': {
-                    schema: data,
-                },
-            };
-
-            formik.setFieldValue('requestBody', { content });
-        } else if (bodyType === 'application/json') {
-            const data =
-                formik.values.requestBody?.content?.[bodyType]?.schema ||
-                localSchema;
-            formik.setFieldValue('requestBody', {
-                content: {
-                    [contentType]: {
-                        schema: data,
-                    },
-                },
-            });
-        }
-    }, [bodyType]);
-
-    const handleSchemaChange = (newSchema: JSONSchema) => {
-
-        if (!formik.values.requestBody) return;
-
-        const currentSchema = formik.values.requestBody?.content[contentType];
-
-        const properties = newSchema.properties || {};
-        const firstKey = Object.keys(properties)[0];
-
-        const extractedSchema = firstKey ? properties[firstKey] : newSchema;
-
-        if (
-            currentSchema &&
-            JSON.stringify(currentSchema.schema) ===
-                JSON.stringify(extractedSchema)
-        ) {
-            return;
-        }
-
-        const content = {
-            [contentType]: {
-                schema: extractedSchema,
-            },
-        };
-
-        setLocalSchema(newSchema);
-
-        formik.setFieldValue('requestBody', { content });
-    };
-
-    const handleChangeEditor = (value) => {
-        const content = {
-            [contentType]: {
-                schema: value,
-            },
-        };
-
-        formik.setFieldValue('requestBody', { content });
-    };
 
     return (
         <>
@@ -210,17 +122,10 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                 </IGRPTabsContent>
                 <IGRPTabsContent value="body">
                     <BodyRequest
-                        bodyType={bodyType}
-                        contentType={contentType}
                         formik={formik}
                         contentTypes={contentTypes}
                         schemaTypes={schemaTypes}
                         columnsBody={tablesColumns['requestBody']}
-                        handleSchemaChange={handleSchemaChange}
-                        handleChangeEditor={handleChangeEditor}
-                        setLocalSchema={setLocalSchema}
-                        setContentType={setContentType}
-                        setBodyType={setBodyType}
                     />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">

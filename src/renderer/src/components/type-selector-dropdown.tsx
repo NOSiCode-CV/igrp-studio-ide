@@ -48,9 +48,6 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
         }
         return null;
     };
-
-    console.log(schemaTypes);
-
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
