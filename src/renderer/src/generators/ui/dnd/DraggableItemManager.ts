@@ -1,5 +1,4 @@
 import { generateId } from "@renderer/utils/helpers";
-import { COMPONENT } from "../ComponentTypes";
 import { Destination, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 

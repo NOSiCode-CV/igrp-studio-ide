@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
-import { Switch } from '@renderer/components/ui/switch';
 import { Button } from '@renderer/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
+import { Switch } from '@renderer/components/ui/switch';
 
 interface Shortcut {
     name: string;

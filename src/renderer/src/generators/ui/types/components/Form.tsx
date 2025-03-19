@@ -93,12 +93,6 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
             className="border-none hover:border-dashed"
         >
             <div className="border-gray-900/10">
-                <h2 className="text-base/7 font-semibold text-gray-900">
-                    {'Form Title'}
-                </h2>
-                <p className="mt-1 text-sm/6 text-gray-600">
-                    {'Form description'}
-                </p>
                 <div
                     className={cn(formVariants({ variant, className }), 'mt-2')}
                 >

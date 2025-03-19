@@ -67,22 +67,23 @@ export const EditComponent = ({
 
     // Handle adding a component
     const handleAddComponent = useCallback(
-        (item: any) => {
+        (item: any, droppableId: string) => {
             const result: DragEndResult = {
                 type: '',
                 draggableId: item.name,
                 source: item,
                 destination: {
-                    droppableId: id,
+                    droppableId,
                     index: children.length + 1,
                 },
                 mode: 'DROP',
             };
+         
             handleDragEnd(result, {
                 handleAddChildToComponent,
             });
         },
-        [id, children.length, handleAddChildToComponent]
+        [handleAddChildToComponent]
     );
 
     const onEdit = (component: StructuredComponent) => {
@@ -122,6 +123,7 @@ export const EditComponent = ({
                                 <div className="justify-end">
                                     {renderAddComponents(
                                         components,
+                                        id,
                                         handleAddComponent
                                     )}
                                 </div>
@@ -160,12 +162,16 @@ export const EditComponent = ({
 
 const renderAddComponents = (
     components: ComponentRegisterConfig[],
-    handleAddComponent: (comp: ComponentRegisterConfig) => void
+    droppableId: string,
+    handleAddComponent: (
+        comp: ComponentRegisterConfig,
+        droppableId: string
+    ) => void
 ) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" size={'sm'}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Component
                 </Button>
@@ -174,7 +180,7 @@ const renderAddComponents = (
                 {components.map((comp) => (
                     <DropdownMenuItem
                         key={comp.name}
-                        onSelect={() => handleAddComponent(comp)}
+                        onSelect={() => handleAddComponent(comp, droppableId)}
                     >
                         {comp.label}
                     </DropdownMenuItem>
@@ -188,10 +194,9 @@ const renderCreatedComponents = (
     components: StructuredComponent[],
     registryComponents: ComponentRegisterConfig[],
     onEdit: (comp: StructuredComponent) => void,
-    handleAddComponent: (item: any) => void
+    handleAddComponent: (item: any, droppableId: string) => void
 ) => {
-    const { handleRemoveChildFromComponent } =
-        useDroppedComponents();
+    const { handleRemoveChildFromComponent } = useDroppedComponents();
 
     const handleEditComponent = (component: StructuredComponent) => {
         onEdit(component);
@@ -220,6 +225,8 @@ const renderCreatedComponents = (
         );
         return registryComponent ? registryComponent.acceptedChildren : [];
     };
+
+    console.log(components)
 
     return (
         <Table>
@@ -265,11 +272,15 @@ const renderCreatedComponents = (
                                 {canAcceptChildren(component) &&
                                     renderAddComponents(
                                         getAcceptedChildren(component),
+                                        component.id,
                                         handleAddComponent
                                     )}
                             </div>
                         </TableCell>
                     </TableRow>
+
+        
+
                 ))}
             </TableBody>
         </Table>

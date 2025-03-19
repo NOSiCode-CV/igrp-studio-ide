@@ -19,7 +19,7 @@ import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
-import { Page } from './types/components/page';
+import { Page } from './types/components/Page';
 
 interface FormEngineProps {
     basePath: string;

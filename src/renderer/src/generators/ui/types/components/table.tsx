@@ -217,7 +217,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
         <Droppable
             component={comp}
             onDrop={onDragEnd}
-            className="border-none p-2"
+            className="border-none p-0"
         >
             <div className="w-full flex flex-col gap-3">
                 {/* Render TableFilter first */}
