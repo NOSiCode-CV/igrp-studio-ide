@@ -133,7 +133,6 @@ export function GitCommitsSidebar({
 }
 
 function CommitItem({ commit, isSelected, onSelect }: CommitItemProps) {
-    const { t } = useTranslation();
 
     return (
         <div

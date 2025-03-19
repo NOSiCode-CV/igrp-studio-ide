@@ -190,7 +190,7 @@ const renderCreatedComponents = (
     onEdit: (comp: StructuredComponent) => void,
     handleAddComponent: (item: any) => void
 ) => {
-    const { handleRemoveChildFromComponent, handleAddChildToComponent } =
+    const { handleRemoveChildFromComponent } =
         useDroppedComponents();
 
     const handleEditComponent = (component: StructuredComponent) => {

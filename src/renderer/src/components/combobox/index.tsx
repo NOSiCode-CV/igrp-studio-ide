@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import {  useState } from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 
 import { Button } from '@renderer/components/ui/button'
@@ -41,10 +41,8 @@ function IGRPCombobox({
   placeholder = 'Select items...',
   className,
   disabled = false,
-  required = false,
 }: IGRPComboboxProps) {
   
-  const id = useId()
   
   const [open, setOpen] = useState(false)
 

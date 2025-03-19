@@ -29,7 +29,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
-            parentComp: comp,
+            path: '',
             component,
         });
     };

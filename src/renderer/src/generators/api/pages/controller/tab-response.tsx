@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
 import { IGRPCombobox } from '@renderer/components/combobox';

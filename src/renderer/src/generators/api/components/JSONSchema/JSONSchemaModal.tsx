@@ -12,7 +12,6 @@ import { FileJson } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
-    TooltipProvider,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { TooltipContent } from '@radix-ui/react-tooltip';

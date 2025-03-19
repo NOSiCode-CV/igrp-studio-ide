@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { FormList } from '../../components/form-list';
 import {

@@ -6,7 +6,6 @@ import { useState, useRef, useEffect } from "react"
 import { TerminalIcon, X, Minimize, Copy } from "lucide-react"
 import { Button } from "@renderer/components/ui/button"
 import { ScrollArea } from "@renderer/components/ui/scroll-area"
-import { useSidebar } from "@renderer/components/ui/sidebar"
 
 interface TerminalSimulatorProps {
   isOpen: boolean

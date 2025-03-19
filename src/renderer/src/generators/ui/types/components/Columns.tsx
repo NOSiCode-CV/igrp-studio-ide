@@ -28,7 +28,7 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
-            parentComp: comp,
+            path: '',
             component,
         });
     };

@@ -70,7 +70,7 @@ const Section = ({
             });
         } else
             setEditingComponent({
-                parentComp: comp,
+                path: '',
                 component,
             });
     };

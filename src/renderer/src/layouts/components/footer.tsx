@@ -11,11 +11,10 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { Separator } from '@renderer/components/ui/separator';
-import { TerminalSimulator } from '@renderer/pages/terminal-simulator';
 
 export function Footer() {
     const [isOnline, setIsOnline] = useState(true);
-    const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+    const [_isTerminalOpen, setIsTerminalOpen] = useState(false);
 
     // Monitor online status
     useEffect(() => {
@@ -114,10 +113,10 @@ export function Footer() {
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-                <TerminalSimulator
+               {/*  <TerminalSimulator
                     isOpen={isTerminalOpen}
                     onClose={() => setIsTerminalOpen(false)}
-                />
+                /> */}
             </div>
         </footer>
     );

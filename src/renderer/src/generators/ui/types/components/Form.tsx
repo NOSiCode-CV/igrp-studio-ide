@@ -44,7 +44,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
-            parentComp: comp,
+            path: '',
             component,
         });
     };

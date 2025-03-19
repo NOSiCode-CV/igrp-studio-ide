@@ -26,7 +26,6 @@ import { TextPropertiesPanel } from './EditComponent/text-properties';
 import useStudio from '@renderer/hooks/useStudio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;

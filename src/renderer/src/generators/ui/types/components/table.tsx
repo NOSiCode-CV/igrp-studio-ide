@@ -18,7 +18,7 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { COMPONENT } from '../../ComponentTypes';
 import { Button } from '@renderer/components/ui/button';
-import { Ellipsis, Pointer } from 'lucide-react';
+import { Ellipsis } from 'lucide-react';
 import BoxField from '../tools/BoxFields';
 import { DropdownItem } from './dropdownitem';
 import TableTool from '../tools/tableTool';
