@@ -217,7 +217,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
         <Droppable
             component={comp}
             onDrop={onDragEnd}
-            className="border-none p-2"
+            className="border-none p-0"
         >
             <div className="w-full flex flex-col gap-3">
                 {/* Render TableFilter first */}
@@ -245,7 +245,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                     return (
                         <div
                             key={index}
-                            className="bg-card rounded-lg border p-2 group/table"
+                            className="bg-card rounded-lg border p-2 group/table overflow-x-auto"
                         >
                             <TableTool
                                 parentComp={comp}
@@ -256,7 +256,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     type={getLabel(componentName).toUpperCase()}
                                 />
                             ) : (
-                                <Table>
+                                <Table className='overflow-x-auto'>
                                     <TableHeader>
                                         <TableRow>
                                             {renderTableHeaders(componentName)}

@@ -455,7 +455,6 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                             formik.errors.path &&
                                             'border-red-500'
                                     )}
-                                    required
                                 />
                                 {formik.errors.path && formik.touched.path && (
                                     <p className="text-xs text-red-500">
