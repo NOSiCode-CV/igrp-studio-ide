@@ -14,7 +14,7 @@ import {
 } from '@renderer/components/ui/tooltip';
 import useStudio from '@renderer/hooks/useStudio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ICON_MAP } from '../../ComponentTypes';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../../dnd/DraggableItemManager';
@@ -78,7 +78,7 @@ export const EditComponent = ({
                 },
                 mode: 'DROP',
             };
-         
+
             handleDragEnd(result, {
                 handleAddChildToComponent,
             });
@@ -86,7 +86,7 @@ export const EditComponent = ({
         [handleAddChildToComponent]
     );
 
-    const onEdit = (component: StructuredComponent) => {
+    const onEditComponent = (component: StructuredComponent) => {
         setCurrentComponent(component);
         setCurrentPath(`${path}/${comp.componentName}`);
     };
@@ -133,12 +133,14 @@ export const EditComponent = ({
                             <div className="space-y-3">
                                 <div>
                                     {children.length > 0 ? (
-                                        renderCreatedComponents(
-                                            children,
-                                            components,
-                                            onEdit,
-                                            handleAddComponent
-                                        )
+                                        <ComponentTable
+                                            components={children}
+                                            registryComponents={components}
+                                            onEdit={onEditComponent}
+                                            handleAddComponent={
+                                                handleAddComponent
+                                            }
+                                        />
                                     ) : (
                                         <>
                                             <EmptyList description="" />
@@ -194,7 +196,8 @@ const renderCreatedComponents = (
     components: StructuredComponent[],
     registryComponents: ComponentRegisterConfig[],
     onEdit: (comp: StructuredComponent) => void,
-    handleAddComponent: (item: any, droppableId: string) => void
+    handleAddComponent: (item: any, droppableId: string) => void,
+    level: number = 0 // Add a level parameter to track nesting depth
 ) => {
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
@@ -226,20 +229,33 @@ const renderCreatedComponents = (
         return registryComponent ? registryComponent.acceptedChildren : [];
     };
 
-    console.log(components)
+    // Recursively render child components
+    const renderChildComponents = (
+        children: StructuredComponent[],
+        level: number
+    ) => {
+        return (
+            <>
+                {renderCreatedComponents(
+                    children,
+                    registryComponents,
+                    onEdit,
+                    handleAddComponent,
+                    level + 1
+                )}
+            </>
+        );
+    };
 
     return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {components.map((component, index) => (
-                    <TableRow key={index}>
-                        <TableCell className="font-medium">
+        <>
+            {components.map((component, index) => (
+                <React.Fragment key={index}>
+                    <TableRow>
+                        <TableCell
+                            className="font-medium"
+                            style={{ paddingLeft: `${level * 20}px` }}
+                        >
                             <div className="flex items-center gap-2">
                                 {renderIcon(component.properties?.iconClass)}
                                 <span>{component.label}</span>
@@ -278,10 +294,42 @@ const renderCreatedComponents = (
                             </div>
                         </TableCell>
                     </TableRow>
+                    {component.children &&
+                        component.children.length > 0 &&
+                        renderChildComponents(component.children, level)}
+                </React.Fragment>
+            ))}
+        </>
+    );
+};
 
-        
-
-                ))}
+// Main component that renders the table with a single header
+const ComponentTable = ({
+    components,
+    registryComponents,
+    onEdit,
+    handleAddComponent,
+}: {
+    components: StructuredComponent[];
+    registryComponents: ComponentRegisterConfig[];
+    onEdit: (comp: StructuredComponent) => void;
+    handleAddComponent: (item: any, droppableId: string) => void;
+}) => {
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {renderCreatedComponents(
+                    components,
+                    registryComponents,
+                    onEdit,
+                    handleAddComponent
+                )}
             </TableBody>
         </Table>
     );

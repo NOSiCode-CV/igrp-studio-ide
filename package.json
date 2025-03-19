@@ -131,14 +131,21 @@
 		"productName": "IGRP Studio",
 		"appId": "cv.nosi.igrpstudio.beta",
 		"win": {
-			"icon": "resources/icons/icon.ico"
+			"icon": "resources/icons/icon.ico",
+			"target": "nsis",
+			"certificateFile": "${CERTIFICATE_FILE}", 
+			"certificatePassword": "${CERTIFICATE_PASSWORD}", 
+			"signingHashAlgorithms": ["sha256"],
+			"rfc3161TimeStampServer": "http://timestamp.digicert.com"
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
 			"category": "cv.nosi.igrpstudio.category.developer-tools"
 		},
 		"linux": {
-			"icon": "resources/icons/icon.png"
+			"icon": "resources/icons/icon.png",
+			"target": ["AppImage", "snap"],
+   			"category": "Development"
 		},
 		"protocols": [
 			{
