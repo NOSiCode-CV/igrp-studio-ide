@@ -33,36 +33,30 @@ export function JSONSchemaModal({ generateJSONSchema }: JSONSchemaModalProps) {
     }, [isOpen, generateJSONSchema]);
 
     return (
-        <TooltipProvider>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size={'sm'}
-                                className="h-6 w-6"
-                            >
-                                <FileJson className="h-4 w-4" />
-                            </Button>
-                        </DialogTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('jsonSchemaPreview')}</TooltipContent>
-                </Tooltip>
-                <DialogContent className="md:max-h-[70vh] md:max-w-[700px] max-w-[800px]">
-                    <DialogHeader>
-                        <DialogTitle>{t('jsonSchemaPreview')}</DialogTitle>
-                        <DialogDescription>
-                            {t('jsonSchemaPreview')}{' '}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="my-1">
-                        <pre className="p-4 rounded overflow-auto max-h-[60vh]">
-                            {jsonSchema}
-                        </pre>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </TooltipProvider>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size={'sm'} className="h-6 w-6">
+                            <FileJson className="h-4 w-4" />
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{t('jsonSchemaPreview')}</TooltipContent>
+            </Tooltip>
+            <DialogContent className="md:max-h-[70vh] md:max-w-[700px] max-w-[800px]">
+                <DialogHeader>
+                    <DialogTitle>{t('jsonSchemaPreview')}</DialogTitle>
+                    <DialogDescription>
+                        {t('jsonSchemaPreview')}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="my-1">
+                    <pre className="p-4 rounded overflow-auto max-h-[60vh]">
+                        {jsonSchema}
+                    </pre>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }

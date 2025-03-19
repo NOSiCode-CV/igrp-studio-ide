@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
 import { IGRPCombobox } from '@renderer/components/combobox';
@@ -41,7 +41,10 @@ export const TabResponse: React.FC<TabResponseProps> = ({
     const { t } = useTranslation();
 
     const [activeResponseTab, setActiveResponseTab] = useState<string>('200');
-    const [responses, setResponses] = useState(formik.values.responses);
+
+    const { values } = formik;
+
+    const { responses } = values;
 
     const handleAddResponse = (response: {
         name: string;
@@ -82,7 +85,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                         schema: {
                             type,
                             objectType,
-                            name: '',
+                            name: 'data',
                             collectionType,
                             module,
                         },
@@ -94,10 +97,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         formik.setFieldValue('responses', updatedResponses);
 
         setActiveResponseTab(statusCode);
-        setResponses((prevResponses) => ({
-            ...prevResponses,
-            [statusCode]: updatedResponses[statusCode],
-        }));
     };
 
     const handleSchemaChange = (
@@ -111,9 +110,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
         // Garantir que há propriedades antes de acessar
         const properties = newSchema.properties || {};
+
         const firstKey = Object.keys(properties)[0];
 
-        // Se houver pelo menos uma propriedade, extraia o schema, senão mantenha o original
         const extractedSchema = firstKey ? properties[firstKey] : newSchema;
 
         if (
@@ -121,14 +120,14 @@ export const TabResponse: React.FC<TabResponseProps> = ({
             JSON.stringify(currentSchema.schema) ===
                 JSON.stringify(extractedSchema)
         ) {
-            return; // Não há mudanças, então não faça nada
+            return;
         }
 
         // Atualizar os responses
         const updatedResponses = {
             ...formik.values.responses,
             [statusCode]: {
-                ...formik.values.responses[statusCode], // Retain existing response details
+                ...formik.values.responses[statusCode],
                 content: {
                     ...formik.values.responses[statusCode]?.content,
                     [contentType]: {
@@ -153,7 +152,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         delete updatedResponses[statusCode];
 
         formik.setFieldValue('responses', updatedResponses);
-        setResponses(updatedResponses);
 
         if (activeResponseTab === statusCode) {
             const remainingTabs = Object.keys(updatedResponses);
@@ -209,15 +207,14 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                     const collectionType =
                         (schema && schema.collectionType) || 'none';
 
-                    const contentData =
-                        schema && schema.name !== 'undefined'
-                            ? {
-                                  type: '',
-                                  properties: {
-                                      [schema.name]: schema,
-                                  },
-                              }
-                            : null;
+                    const contentData = schema
+                        ? {
+                              type: '',
+                              properties: {
+                                  [schema.name]: schema,
+                              },
+                          }
+                        : null;
 
                     return (
                         <div
@@ -229,7 +226,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     : 'hidden'
                             )}
                         >
-                            <div className="grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-4">
+                            <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
                                 <div className="flex flex-col gap-3">
                                     <LabelRequired>
                                         {t('httpStatusCode')}
@@ -335,14 +332,19 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 </div>
 
                                 {Object.keys(responses).length > 1 && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="absolute right-3"
-                                        onClick={() => handleClose(statusCode)}
-                                    >
-                                        <Trash />
-                                    </Button>
+                                    <div className="absolute right-3">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="relative -top-3"
+                                            onClick={() =>
+                                                handleClose(statusCode)
+                                            }
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
 

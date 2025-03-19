@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import ModelLayout from './model';
 import DtoLayout from './dto';
-import ControllerLayout from './controller';
 import EmptyPage from './EmptyPage';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
@@ -15,6 +14,7 @@ import { EditorLayout } from './EditorLayout';
 import { FileTree, ProjectData } from 'src/main/types';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import { PermissionsLayout } from './permissions';
+import { ControllerLayout } from './controller';
 
 interface PageBuilderState {
     basePath: string;

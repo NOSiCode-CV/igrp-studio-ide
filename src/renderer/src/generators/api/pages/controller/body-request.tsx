@@ -118,7 +118,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 schema: JSON.parse(value)
             },
         };
-        console.log(content)
+     
         updateFormik(content)
     };
 

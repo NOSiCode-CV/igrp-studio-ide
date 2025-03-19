@@ -419,5 +419,7 @@
   "addRemote": "Add Remote",
   "fetchType": "Fetch Type",
   "module": "Module",
-  "selectRow":"Select Row"
+  "selectRow": "Select Row",
+  "addSubNewField": "Add Sub Field",
+  "NofieldsdefinedAdd": " No fields defined. Add"
 }

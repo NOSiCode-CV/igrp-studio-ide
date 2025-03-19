@@ -257,7 +257,7 @@ function Three({
     basePath: string;
     activeMenuGroup?: string;
 }) {
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(false);
 
     const handleOpenChange = (newState) => {
         setOpen(newState);

@@ -50,10 +50,10 @@ interface ControllerProps {
     onCloseTab: () => void;
 }
 
-const ControllerLayout: React.FC<ControllerProps> = ({
+export const ControllerLayout: React.FC<ControllerProps> = ({
     selectors,
     currentItem,
-    onCloseTab
+    onCloseTab,
 }: ControllerProps) => {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
@@ -62,6 +62,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     const { modules, dto, basePath, enums, responses, getJsonData } =
         useStudioAPI(currentItem?.module);
 
+    const [id, setId] = useState('');
     const [oldActionName, setOldActionName] = useState('');
     const [title, setTitle] = useState('');
     const [name, setName] = useState('');
@@ -112,8 +113,9 @@ const ControllerLayout: React.FC<ControllerProps> = ({
 
     useEffect(() => {
         if (data) {
-            const { name, basePath, description } = data;
+            const { name, basePath, description, id } = data;
 
+            setId(id);
             setTitle(`${name}(${basePath})`);
             setName(name);
             setPathController(basePath);
@@ -142,7 +144,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             );
             formik.setFieldValue('method', method || initialValues.method);
             formik.setFieldValue('path', path || initialValues.path);
-       
+
             formik.setFieldValue('requestBody', requestBody || '');
             formik.setFieldValue(
                 'pathVariables',
@@ -215,7 +217,7 @@ const ControllerLayout: React.FC<ControllerProps> = ({
             description,
             basePath: pathController,
             actions: finalActions,
-            id: currentItem.id,
+            id,
         };
 
         return newValues;
@@ -388,7 +390,12 @@ const ControllerLayout: React.FC<ControllerProps> = ({
     };
 
     return (
-        <form onSubmit={formik.handleSubmit}>
+        <form
+            onSubmit={(e) => {
+                e.preventDefault();
+                formik.handleSubmit();
+            }}
+        >
             <NavigationBar
                 onDelete={handleDelete}
                 isNew={!data}
@@ -501,5 +508,3 @@ const ControllerLayout: React.FC<ControllerProps> = ({
         </form>
     );
 };
-
-export default ControllerLayout;

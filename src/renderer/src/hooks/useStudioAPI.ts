@@ -26,7 +26,7 @@ const makeSelectProperties = (module: string) =>
             models: extractByType(moduleData, OPTION_TYPE.MODELS),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
-            responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
+            responses: extractByType(moduleData, OPTION_TYPE.RESPONSES),
             enums: extractByType(moduleData, OPTION_TYPE.ENUM),
             permissions: extractByType(moduleData, OPTION_TYPE.PERMISSIONS),
             modules: getModulesArray(studio.filesThree),
