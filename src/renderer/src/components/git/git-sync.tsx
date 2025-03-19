@@ -9,8 +9,10 @@ import useToast from '../useToast';
 import { useGit } from '@renderer/hooks/useGit';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
+import { useTranslation } from 'react-i18next';
 
 const SyncButton = ({ basePath }: { basePath: string }) => {
+    const { t } = useTranslation();
     const { syncChanges } = useGit();
     const { activeBranch } = useSelector((state: RootState) => state.git);
     const [isSyncing, setIsSyncing] = useState(false);
@@ -26,7 +28,7 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
           if (error.name === 'NO_REMOTE_CONFIGURED') {
               setShowRemoteDialog(true);
           } else {
-              showErrorToast(error.message || 'Failed to sync changes');
+              showErrorToast(error.message || t('failedSyncChanges'));
           }
       } finally {
           setIsSyncing(false);
@@ -42,7 +44,7 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
         });
         handleSync();
       } catch (error: any) {
-        showErrorToast('Failed to add remote - ivalid url');
+        showErrorToast(t('failedAddRemoteInvalidUrl'));
       }
     };
 
@@ -62,11 +64,11 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
                               isSyncing && 'animate-spin'
                             )}
                         />
-                        {isSyncing && 'Syncing...'}
+                        {isSyncing && t('syncing')}
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Pull and push changes</p>
+                    <p>{t('pullAndPushChanges')}</p>
                 </TooltipContent>
             </Tooltip>
 

@@ -1,31 +1,37 @@
 import { useRef, useState } from 'react';
-import classnames from 'classnames';
 import FormEngine from '../FormEngine';
-import { File } from 'src/main/types';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
-import { Layers2, X } from 'lucide-react';
 import { Separator } from '@renderer/components/ui/separator';
 import NavigationBar from './NavigationBar';
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { cn } from '@renderer/lib/utils';
+import {
+    TAB_DEFAULT,
+    useTabs,
+} from '@renderer/components/navigation/TabContext';
+import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
+import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
+import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
+import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout';
+import { OPTION_TYPE } from '@renderer/constants/appConstants';
 
 interface ContentProps {
-    basePath?: string;
-    tabs: string[];
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
-    onPageClick: (page: string) => void;
-    onCloseTab: (tab: string) => void;
+    basePath: string;
 }
 
-export default function Component({
-    basePath,
-    tabs,
-    activeTab,
-    setActiveTab,
-    onPageClick,
-    onCloseTab,
-}: ContentProps) {
-    const [currentPage, setCurrentPage] = useState<File | null>(null);
+interface FormEngineRef {
+    handleSave: () => void;
+}
+
+export default function TabManager({ basePath }: ContentProps) {
+    const {
+        activeTab,
+        tabs,
+        initializeTabFromCurrentItem,
+        setActiveTab,
+        newTab,
+    } = useTabs();
 
     // Track the isDesign state for each tab
     const [isDesignStates, setIsDesignStates] = useState<{
@@ -34,12 +40,15 @@ export default function Component({
 
     // Ref to hold the handleSave function from FormEngine
     const formEngineRefs = useRef<{
-        [key: string]: { handleSave: () => void } | null;
+        [key: string]: FormEngineRef | null;
     }>({});
 
-    const handleClickOpenGerador = (pageFile: File) => {
-        onPageClick(pageFile.name);
-        setCurrentPage(pageFile);
+    const handleClickOpenGerador = (page: any) => {
+        initializeTabFromCurrentItem({
+            ...page,
+            label: page.content.pageName || page.content.name,
+            id: page.content.id,
+        });
     };
 
     const handleSave = () => {
@@ -55,77 +64,77 @@ export default function Component({
     };
 
     return (
-        <>
-            <nav className="flex justify-between border-t border-gray-200 pr-6">
-                <div className="flex">
-                    {tabs.map((tab) => (
-                        <div
-                            key={tab}
-                            className={classnames(
-                                'px-4 py-2 text-sm font-medium focus:outline-none cursor-pointer',
-                                {
-                                    'bg-white text-igrp border-t-2 border-igrp':
-                                        activeTab === tab,
-                                    'text-gray-500 hover:text-gray-700 bg-gray-100':
-                                        activeTab !== tab,
-                                }
-                            )}
-                            onClick={() => setActiveTab(tab)}
-                        >
-                            {tab !== 'PageBuilder' ? (
-                                <div className="flex items-center">
-                                    <span>{tab}</span>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onCloseTab(tab);
-                                        }}
-                                        className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                                    >
-                                        <X className="h-3" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <button className='w-12 text-center items-center flex flex-1 justify-center'>
-                                    <Layers2 className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                </div>
-                {activeTab !== 'PageBuilder' && (
+        <div className='flex-1'>
+            <TabsNavigation
+                tabs={tabs}
+                activeTab={activeTab}
+                newTab={newTab}
+                setActiveTab={setActiveTab}
+                btnNew={false}
+            >
+                {activeTab !== TAB_DEFAULT && (
                     <NavigationBar
                         isDesign={isDesignStates[activeTab] ?? true}
                         onSave={handleSave}
                         onSwitch={handleSwitchClick}
+                        page={activeTab}
+                        basePath={basePath}
                     />
                 )}
-            </nav>
+            </TabsNavigation>
+
             <Separator />
 
             {tabs.map((tab) => (
                 <div
-                    key={tab}
-                    className={activeTab === tab ? 'block' : 'hidden'}
+                    key={tab.id}
+                    className={cn(
+                        'flex flex-1',
+                        activeTab === tab.id ? 'block' : 'hidden'
+                    )}
                 >
-                    {tab === 'PageBuilder' ? (
-                        <MainPageBuilder onPageClick={handleClickOpenGerador} />
+                    {tab.id === TAB_DEFAULT ? (
+                        <SidebarInset>
+                            <ContainerScrollArea>
+                                <div className="flex flex-1 flex-col gap-4 p-4">
+                                    <MainPageBuilder
+                                        onPageClick={handleClickOpenGerador}
+                                    />
+                                </div>
+                            </ContainerScrollArea>
+                        </SidebarInset>
                     ) : (
                         <DroppedComponentsProvider>
-                            <FormEngine
-                                ref={(ref) =>
-                                    (formEngineRefs.current[tab] = ref)
+                            <SidebarProvider
+                                style={
+                                    {
+                                        '--sidebar-width': '380px',
+                                    } as React.CSSProperties
                                 }
-                                basePath={basePath}
-                                page={tab}
-                                pagePath={currentPage?.path}
-                                isDesign={isDesignStates[tab] ?? true}
-                                onSave={handleSave}
-                            />
+                            >
+                                {tab.open === OPTION_TYPE.FILE_THREE ? (
+                                    <EditorLayout currentItem={tab.item} />
+                                ) : (
+                                    <DragProvider>
+                                        <FormEngine
+                                            ref={(ref) => {
+                                                formEngineRefs.current[tab.id] =
+                                                    ref;
+                                            }}
+                                            basePath={basePath}
+                                            page={tab.item}
+                                            isDesign={
+                                                isDesignStates[tab.id] ?? true
+                                            }
+                                            onSave={handleSave}
+                                        />
+                                    </DragProvider>
+                                )}
+                            </SidebarProvider>
                         </DroppedComponentsProvider>
                     )}
                 </div>
             ))}
-        </>
+        </div>
     );
 }

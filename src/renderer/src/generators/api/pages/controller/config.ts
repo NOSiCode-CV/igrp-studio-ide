@@ -48,7 +48,7 @@ export const TabList = [
     { label: 'Response', tabId: 'response' }
 ]
 
-export const getTablesColumns = (selectors: any, enumTypes: any): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [value: string]: IColumnsTabelProps[] } => {
     const headersTypes = formatMethods(
         (
             selectors.find((selector) => 'HTTP_HEADER_TYPES' in selector) as
@@ -67,57 +67,57 @@ export const getTablesColumns = (selectors: any, enumTypes: any): { [value: stri
 
     return {
         requestParams: [
-            { key: 'name', name: 'Name', type: 'text' },
-            { key: 'value', name: 'Value', type: 'text' },
+            { key: 'name', name: t('name'), type: 'text' },
+            { key: 'value', name: t('value'), type: 'text' },
             {
                 key: 'type',
-                name: 'Type',
+                name: t('type'),
                 type: 'select',
                 options: paramsTypesData,
             },
             {
                 key: 'group', name: '', type: 'group', items: [
-                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
                     { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
                 ]
             }
         ],
         pathVariables: [
-            { key: 'name', name: 'Name', type: 'text' },
-            { key: 'value', name: 'Value', type: 'text', },
+            { key: 'name', name: t('name'), type: 'text' },
+            { key: 'value', name: t('value'), type: 'text', },
             {
                 key: 'type',
-                name: 'Type',
+                name: t('type'),
                 type: 'select',
                 options: paramsTypesData,
             },
             {
                 key: 'group', name: '', type: 'group', items: [
 
-                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
                     { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
                 ]
             }
         ],
         headers: [
-            { key: 'header', name: 'Header', type: 'select', options: headersTypes, width: '25%' },
-            { key: 'value', name: 'Value', type: 'text', width: '25%' },
-            { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
+            { key: 'header', name: t('header'), type: 'select', options: headersTypes, width: '25%' },
+            { key: 'value', name: t('value'), type: 'text', width: '25%' },
+            { key: 'type', name: t('type'), type: 'select', options: paramsTypesData, width: '25%' },
             {
                 key: 'group', name: '', type: 'group', items: [
 
-                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
                     { key: 'advanced', name: '', type: 'popoverController', width: '25%', options: { enumTypes } }
                 ]
             }
         ],
         requestBody: [
-            { key: 'name', name: 'Name', type: 'text', width: '25%' },
-            { key: 'value', name: 'Value', type: 'text', width: '25%' },
-            { key: 'type', name: 'Type', type: 'select', options: paramsTypesData, width: '25%' },
+            { key: 'name', name: t('name'), type: 'text', width: '25%' },
+            { key: 'value', name: t('value'), type: 'text', width: '25%' },
+            { key: 'type', name: t('type'), type: 'select', options: paramsTypesData, width: '25%' },
             {
                 key: 'group', name: '', type: 'group', items: [
-                    { key: 'isRequired', name: 'Is Required?', type: 'checkbox', width: '25%' },
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
                     { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
                 ]
             }

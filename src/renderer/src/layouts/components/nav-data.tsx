@@ -137,7 +137,7 @@ const useNavdata = (filesThree: FileTree[]) => {
             const actions = file?.content?.actions;
             if (categoryName === OPTION_TYPE.CONTROLLER && actions) {
                 return actions.map((action) => ({
-                    id: action.actionName,
+                    id: `action-${action.actionName}`,
                     label: action.actionName,
                     path: path,
                     type: OPTION_TYPE.ACTION,
@@ -146,7 +146,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                     badgeName: action.method,
                     content: action,
                     module: folderName,
-                    link: ROUTES.PATH_PAGE_BUILDER_API,
                 }));
             }
             return [];
@@ -171,6 +170,11 @@ const useNavdata = (filesThree: FileTree[]) => {
                         actionType: OPTION_TYPE.MODEL,
                         icon: getIcon(OPTION_TYPE.MODELS),
                     },
+                    {
+                        label: t('newEnum'),
+                        actionType: OPTION_TYPE.ENUM,
+                        icon: getIcon(OPTION_TYPE.ENUM),
+                    },
                 ].filter(
                     (menu) =>
                         menu.actionType !== OPTION_TYPE.RESPONSE &&
@@ -186,9 +190,9 @@ const useNavdata = (filesThree: FileTree[]) => {
                             icon: getIcon(OPTION_TYPE.RESPONSE),
                         },
                         {
-                            label: t('newEnum'),
-                            actionType: OPTION_TYPE.ENUM,
-                            icon: getIcon(OPTION_TYPE.ENUM),
+                            label: t('newPermission'),
+                            actionType: OPTION_TYPE.PERMISSIONS,
+                            icon: getIcon(OPTION_TYPE.PERMISSIONS),
                         }
                     );
                 } else {
@@ -240,7 +244,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                                 file.content?.name || file.name,
                                             path: file.path,
                                             module: folder.name,
-                                            type: file.content?.type || 'file',
+                                            type: file.content?.type,
                                             link: ROUTES.PATH_PAGE_BUILDER_API,
                                             subItems: getSubItems(
                                                 file.content?.type,
@@ -272,7 +276,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                 label: folder.name,
                                 path: folder.path,
                                 module: folder.name,
-                                type: folder.content?.type || 'file',
+                                type: folder.content?.type,
                                 link: ROUTES.PATH_PAGE_BUILDER_API,
                                 subItems: getSubItems(
                                     folder.content?.type,

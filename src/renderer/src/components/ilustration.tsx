@@ -14,7 +14,7 @@ interface IllustrationProps {
   name: string;
 }
 
-const Illustration: React.FC<IllustrationProps> = ({ name }: IllustrationProps): JSX.Element => {
+const Illustration: React.FC<IllustrationProps> = ({ name }: IllustrationProps) => {
   return (
     <figure className="figure mb-0">
       <img src={IconMap[name]} className="figure-img img-fluid rounded"/>

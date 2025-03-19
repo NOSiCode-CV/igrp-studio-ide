@@ -2,8 +2,11 @@ import { convertModelData } from './convertModelData';
 import ERDDiagram from './ERDDiagram';
 import { useEffect, useState } from 'react';
 import { ModelData, RelationData } from './types';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
-export default function ERDLayout({ models }: { models: Array<any> }) {
+export default function ERDLayout({ currentItem }: { currentItem: any }) {
+    const { models } = useStudioAPI(currentItem?.module);
+
     const [convertedModelData, setConvertedModelData] = useState<
         ModelData[] | null
     >(null);
@@ -17,7 +20,7 @@ export default function ERDLayout({ models }: { models: Array<any> }) {
 
             setRelations(relations);
         }
-    }, [models]); // This will run every time 'models' changes
+    }, [models]);
 
     return (
         <>

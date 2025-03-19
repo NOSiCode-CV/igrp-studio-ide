@@ -4,8 +4,14 @@ import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { SchemaField } from '../../types/schema';
-import { TypeSelectorDropdown } from '@renderer/components/TypeSelectorDropdown';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 import { PopoverController } from '../../pages/controller/popover';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
 
 interface SchemaFieldRowProps {
     id: string;
@@ -35,6 +41,8 @@ export function SchemaFieldRow({
     enumTypes,
 }: SchemaFieldRowProps) {
     if (!field) return;
+
+    const { t } = useTranslation();
 
     const [isExpanded, setIsExpanded] = useState(
         field.type === 'object' || field.type === 'array'
@@ -108,7 +116,7 @@ export function SchemaFieldRow({
         const updatedField = {
             ...field,
             type,
-            objectType
+            objectType,
         };
 
         if (type === 'object') {
@@ -119,7 +127,7 @@ export function SchemaFieldRow({
                 ['Items']: { type: 'string', name: 'Item 1', description: '' },
             };
             setIsExpanded(true);
-        }else {
+        } else {
             delete updatedField.properties;
         }
 
@@ -170,9 +178,9 @@ export function SchemaFieldRow({
                             );
                         }}
                         onDelete={() => {
-                                // @ts-ignore - Suppress TypeScript error for subId
-                              const { [subId]: _, ...newProperties } =
-                                field.properties; 
+                            // @ts-ignore - Suppress TypeScript error for subId
+                            const { [subId]: _, ...newProperties } =
+                                field.properties;
                             onUpdate(
                                 { ...field, properties: newProperties },
                                 index
@@ -196,21 +204,29 @@ export function SchemaFieldRow({
             >
                 <TableCell
                     style={{ paddingLeft: `${depth * 28 + 8}px` }}
-                    className="flex  flex-1 !py-1"
+                    className="flex flex-1 py-1!"
                 >
                     {(type === 'object' || type === 'array') && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 mr-2"
-                            onClick={() => setIsExpanded(!isExpanded)}
-                        >
-                            {isExpanded ? (
-                                <ChevronDown size={14} />
-                            ) : (
-                                <ChevronRight size={14} />
-                            )}
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 mr-2"
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                >
+                                    {isExpanded ? (
+                                        <ChevronDown size={14} />
+                                    ) : (
+                                        <ChevronRight size={14} />
+                                    )}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {t('addSubNewField')}
+                            </TooltipContent>
+                        </Tooltip>
                     )}
                     <Input
                         ref={nameInputRef}
@@ -221,11 +237,11 @@ export function SchemaFieldRow({
                         placeholder={
                             index !== undefined && type === 'array'
                                 ? `Item ${index + 1}`
-                                : 'Enter field name'
+                                : 'fieldName'
                         }
                     />
                 </TableCell>
-                <TableCell className="!py-1">
+                <TableCell className="py-1!">
                     <div className="flex flex-1 items-center">
                         <TypeSelectorDropdown
                             type={type}
@@ -248,7 +264,7 @@ export function SchemaFieldRow({
                         />
                     </div>
                 </TableCell>
-                <TableCell className="!py-1">
+                <TableCell className="py-1!">
                     <Input
                         ref={descInputRef}
                         value={description}
@@ -257,27 +273,38 @@ export function SchemaFieldRow({
                         className="w-full text-sm h-8"
                     />
                 </TableCell>
-                <TableCell className="text-right !py-1">
+                <TableCell className="text-right py-1!">
                     <div className="flex justify-end space-x-1 opacity-0 group-hover/opt:opacity-100">
                         {(type === 'object' || type === 'array') && (
-                            <Button
-                                onClick={handleAddSubfield}
-                                size="icon"
-                                variant="ghost"
-                                className="h-6 w-6 text-green-500"
-                            >
-                                <Plus size={14} />
-                                <span className="sr-only">Add Subfield</span>
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        onClick={handleAddSubfield}
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-6 w-6 text-igrp"
+                                    >
+                                        <Plus size={14} />
+                                        <span className="sr-only">
+                                            {t('addSubNewField')}
+                                        </span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {t('addSubNewField')}
+                                </TooltipContent>
+                            </Tooltip>
                         )}
                         <Button
+                            type="button"
                             onClick={() => onDelete(index)}
                             size="icon"
                             variant="ghost"
                             className="h-6 w-6 text-red-500"
                         >
                             <Trash2 size={14} />
-                            <span className="sr-only">Delete</span>
+                            <span className="sr-only">{t('delete')}</span>
                         </Button>
                     </div>
                 </TableCell>
@@ -293,11 +320,12 @@ export function SchemaFieldRow({
                                 }}
                             >
                                 <Button
+                                    type="button"
                                     variant="ghost"
                                     className="h-6 w-full text-sm text-muted-foreground justify-start"
                                     onClick={handleAddSubfield}
                                 >
-                                    No fields defined. Add
+                                    {t('NofieldsdefinedAdd')}
                                 </Button>
                             </TableCell>
                         </TableRow>

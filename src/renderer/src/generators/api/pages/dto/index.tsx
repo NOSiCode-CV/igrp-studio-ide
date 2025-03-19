@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import useToast from '@renderer/components/useToast';
@@ -8,7 +8,7 @@ import {
     TemplateOptions,
     initialValues,
 } from './config';
-import { DTOConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { DTOConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
@@ -20,32 +20,27 @@ import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface DtoProps {
-    basePath: string;
     selectors: Array<any>;
-    models?: Array<any>;
-    dto?: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
-    onUpdateTab: (newId: string) => void;
 }
 
 const DtoLayout = ({
-    basePath,
     selectors,
-    dto,
-    models,
     currentItem,
-    onCloseTab,
-    onUpdateTab,
-}: DtoProps): JSX.Element => {
+    onCloseTab
+}: DtoProps) => {
     const { initializeTabFromCurrentItem } = useTabs();
 
     const dispatch: any = useDispatch();
 
     const { createGitCommit } = useGit();
+
+    const { models, basePath, dto, enums } = useStudioAPI(currentItem?.module);
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -99,11 +94,27 @@ const DtoLayout = ({
             selectors,
             dto,
             models,
-            currentDto: data?.name,
+            enums,
+            current: data,
             t,
         });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave(formik.values);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
@@ -113,7 +124,11 @@ const DtoLayout = ({
                 id: currentItem.id,
             };
 
-            const { error } = await window.api.createDto(config, basePath);
+            const { error } = await window.engine.createDto(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
 
             console.log(config, error);
 
@@ -124,8 +139,6 @@ const DtoLayout = ({
             createGitCommit(basePath, `Add dto ${newValues.name}`);
 
             dispatch(onSetChangeStatus(true));
-
-            onUpdateTab(formik.values.name);
 
             showSuccessToast(
                 t('createdSuccess', { name: t('dto'), value: newValues.name })
@@ -169,6 +182,37 @@ const DtoLayout = ({
         });
     };
 
+    const handleChangeValue = (
+        element: string,
+        position: number,
+        result: any,
+        value: string
+    ) => {
+        const isType = element === 'type';
+
+        const typeValue = isType ? result.value : result;
+
+        const typeModule = isType ? result.module : '';
+
+        const typeType = isType ? result.type : '';
+
+        if (isType)
+            formik.setFieldValue(
+                value,
+                formik.values[value].map((row: any, index: number) =>
+                    index === position
+                        ? {
+                              ...row,
+                              objectType: typeType,
+                              [element]: typeValue,
+                              module: typeModule,
+                          }
+                        : row
+                )
+            );
+        else changeValue(formik, element, position, typeValue, value);
+    };
+
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
         const data = formik?.values?.[value];
@@ -190,34 +234,7 @@ const DtoLayout = ({
                     addRow={() => addNewRow(formik, value, dValues)}
                     removeRow={(position) => removeRow(formik, value, position)}
                     changeValue={(element, position, result) => {
-                        const isType = element === 'type';
-
-                        const typeValue = isType ? result.value : result;
-
-                        const typeType = isType ? result.type : '';
-
-                        if (isType)
-                            formik.setFieldValue(
-                                value,
-                                formik.values[value].map(
-                                    (row: any, index: number) =>
-                                        index === position
-                                            ? {
-                                                  ...row,
-                                                  ['objectType']: typeType,
-                                                  [element]: typeValue,
-                                              }
-                                            : row
-                                )
-                            );
-                        else
-                            changeValue(
-                                formik,
-                                element,
-                                position,
-                                typeValue,
-                                value
-                            );
+                        handleChangeValue(element, position, result, value);
                     }}
                 />
             );
@@ -226,10 +243,9 @@ const DtoLayout = ({
     };
 
     return (
-        <React.Fragment>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={handleDelete}
-                onSubmit={formik.handleSubmit}
                 showSourceCode={onClickSourceCode}
                 isNew={!data}
                 title={t('dto')}
@@ -245,11 +261,8 @@ const DtoLayout = ({
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.name
-                                        ? formik.errors.name
-                                        : undefined
-                                }
+                                isTouched={formik.touched.name}
+                                error={formik.errors.name}
                                 isRequired
                             />
                             <SelectInput
@@ -260,7 +273,11 @@ const DtoLayout = ({
                                 onChange={(option) =>
                                     formik.setFieldValue('template', option)
                                 }
+                                onBlur={(option) =>
+                                    formik.setFieldValue('template', option)
+                                }
                                 error={formik.errors.template}
+                                isTouched={formik.touched.template}
                                 isRequired
                             />
                         </div>
@@ -272,7 +289,7 @@ const DtoLayout = ({
                     </div>
                 </Card>
             </div>
-        </React.Fragment>
+        </form>
     );
 };
 

@@ -30,6 +30,7 @@ export interface SpringConfigData {
     database: string;
     projectStructureStyle: 'technical' | 'domain';
     enableObservability: boolean;
+    enableEntityRevision: boolean;
     projectStructureStyle: string;
     igrpCoreVersion: string
 }
@@ -84,21 +85,6 @@ export interface MenuItem {
     content?: any,
 }
 
-type FolderFiles = { [folderName: string]: FolderFileStructure };
-
-export interface File {
-    name: string;
-    path: string;
-    config?: Object
-    content?: Object
-}
-
-export interface FolderFileStructure {
-    name: string;
-    files: Array<Record<string, File[]>>; // Group files by subfolder
-    path: string;
-}
-
 export interface FileTree {
     name: string; // Name of the file or folder
     path: string; // Full path of the file or folder
@@ -149,5 +135,6 @@ export interface Connection {
 export interface SchemaTypeItem {
     label: string;
     value: string;
+    module?: string;
     items?: SchemaTypeItem[]; // Optional submenu items
 }

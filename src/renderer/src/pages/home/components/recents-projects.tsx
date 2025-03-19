@@ -40,13 +40,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@renderer/components/ui/select';
-import { IGRPContainer } from '@igrp/igrp-design-system';
+import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
 import GitProject from '@renderer/components/git/git-project';
 import { ProjectDropdown } from './project-dropdown';
 import { enUS, pt } from 'date-fns/locale';
 
-const RecentsProjects = (): JSX.Element => {
+const RecentsProjects = () => {
     const [isDelete, setIdDelete] = useState(false);
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     const { i18n } = useTranslation();
 
@@ -133,8 +134,21 @@ const RecentsProjects = (): JSX.Element => {
     };
 
     useEffect(() => {
-        setTimeout(() => setIsLoading(false), 1500);
+        setTimeout(() => setIsLoading(false), 1000);
     }, []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+
+            // Update date only if the day changes
+            if (now.getDate() !== currentDate.getDate()) {
+                setCurrentDate(now);
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [currentDate]);
 
     const RenderProjectCard = (
         project: ProjectData,
@@ -168,7 +182,7 @@ const RecentsProjects = (): JSX.Element => {
                         />
                     </div>
                 </CardHeader>
-                <CardContent className={`flex-grow ${isCompact ? 'p-2' : ''}`}>
+                <CardContent className={`grow ${isCompact ? 'p-2' : ''}`}>
                     {project.config?.description && (
                         <p className="text-sm text-muted-foreground mb-2">
                             {project.config.description}
@@ -182,7 +196,7 @@ const RecentsProjects = (): JSX.Element => {
                                     {t('lastModified')}:{' '}
                                     {formatDistance(
                                         project.dt_updated,
-                                        new Date(),
+                                        currentDate,
                                         { addSuffix: true, locale: getLocale() }
                                     )}
                                 </span>

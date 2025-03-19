@@ -2,20 +2,21 @@
 
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import {
-    RadioGroup,
-    RadioGroupItem,
-} from '@renderer/components/ui/radio-group';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
 import { ProjectData, SpringConfigData } from 'src/main/types';
-import { Combobox } from '@igrp/igrp-design-system';
-import { DatabaseOptions } from '@renderer/constants/appConstants';
+import {
+    DatabaseOptions,
+    projectStructureStyle,
+} from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/required';
+import { Separator } from '@renderer/components/ui/separator';
+import { SelectInput } from '@renderer/generators/api/components/inputs-form';
+import { IGRPCombobox } from '@renderer/components/combobox';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -31,6 +32,7 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
+    enableEntityRevision: false,
     igrpCoreVersion: '',
 };
 
@@ -76,7 +78,7 @@ export function SpringConfig({
 
     return (
         <div className="space-y-6">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
                     id="apiName"
@@ -94,7 +96,7 @@ export function SpringConfig({
                 )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-3">
                 <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                     id="description"
@@ -107,7 +109,7 @@ export function SpringConfig({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('group')}</LabelRequired>
                     <Input
                         id="group"
@@ -125,7 +127,7 @@ export function SpringConfig({
                     )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('artifact')}</LabelRequired>
                     <Input
                         id="artifact"
@@ -146,10 +148,9 @@ export function SpringConfig({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 flex flex-col">
+                <div className="flex flex-col gap-3">
                     <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
-                    <Combobox
-                        name="database"
+                    <IGRPCombobox
                         value={data.database}
                         onChange={(value) =>
                             onChange({ ...data, database: value })
@@ -163,13 +164,10 @@ export function SpringConfig({
                         </p>
                     )}
                 </div>
-                <div className="space-y-2 flex flex-col">
-                    <LabelRequired>
-                        {t('igrpCoreVersion')}
-                    </LabelRequired>
-                    <Combobox
+                <div className="flex flex-col gap-3">
+                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
+                    <IGRPCombobox
                         options={versions || []}
-                        name="igrpCoreVersion"
                         value={data.igrpCoreVersion}
                         onChange={(value) =>
                             onChange({ ...data, igrpCoreVersion: value })
@@ -184,12 +182,16 @@ export function SpringConfig({
                 </div>
             </div>
 
-            <div className="grid grid-cols-2">
-                <div className="space-y-3">
-                    <Label>{t('projectStructureStyle')}</Label>
-                    <RadioGroup
+            <Separator orientation="horizontal" />
+
+            <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-3">
+                    <SelectInput
+                        id={'projectStructureStyle'}
+                        label={t('projectStructureStyle')}
+                        options={projectStructureStyle || []}
                         value={data.projectStructureStyle}
-                        onValueChange={(value) =>
+                        onChange={(value) =>
                             onChange({
                                 ...data,
                                 projectStructureStyle: value as
@@ -197,33 +199,49 @@ export function SpringConfig({
                                     | 'domain',
                             })
                         }
-                        className="flex gap-4"
-                    >
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="technical" id="technical" />
-                            <Label htmlFor="technical">{t('technical')}</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">{t('domainDriven')}</Label>
-                        </div>
-                    </RadioGroup>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="observability"
-                        checked={data.enableObservability}
-                        onCheckedChange={(checked) =>
+                        onBlur={(value) =>
                             onChange({
                                 ...data,
-                                enableObservability: checked as boolean,
+                                projectStructureStyle: value as
+                                    | 'technical'
+                                    | 'domain',
                             })
                         }
+                        className="w-full"
                     />
-                    <Label htmlFor="observability">
-                        {t('enableObservability')}
-                    </Label>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="observability"
+                            checked={data.enableObservability}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableObservability: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="observability">
+                            {t('enableObservability')}
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="enableEntityRevision"
+                            checked={data.enableEntityRevision}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableEntityRevision: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="enableEntityRevision">
+                            {t('enableEntityRevision')}
+                        </Label>
+                    </div>
                 </div>
             </div>
         </div>

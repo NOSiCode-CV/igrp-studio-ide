@@ -7,14 +7,14 @@ const useConfigComponent = (_componetName: string) => {
     }));
 
     const propsConfig = {
-        title: {
-            type: 'text',
-            label: 'Title'
-        },
         hasTitle: {
             type: 'boolean',
             label: 'Has Title',
             defaultValue: true
+        },
+        title: {
+            type: 'text',
+            label: 'Title'
         },
         colSize: {
             type: 'select',

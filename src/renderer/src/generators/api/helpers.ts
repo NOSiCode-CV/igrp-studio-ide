@@ -1,7 +1,7 @@
 import { FormikValues } from 'formik';
 import { FileTree } from 'src/main/types';
 
-export function formatMethods(elements: string[], toUpperCase=false): { label: string; value: string }[] {
+export function formatMethods(elements: string[], toUpperCase = false): { label: string; value: string }[] {
 	return elements.map((element) => ({
 		label: toUpperCase ? element.toUpperCase() : element,
 		value: element,
@@ -57,26 +57,28 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
 
 	// Helper function to recursively merge children
 	const mergeChildren = (existingChildren: FileTree[], newChildren: FileTree[]): FileTree[] => {
+
 		const childrenMap: Record<string, FileTree> = {};
 
 		// Add existing children to the map
 		existingChildren.forEach((child) => {
-			childrenMap[child.name] = child;
+			childrenMap[`${child.name}-${child.content.module}`] = child;
 		});
 
 		// Merge new children into the map
 		newChildren.forEach((child) => {
-			if (childrenMap[child.name]) {
+			const name = `${child.name}-${child.content.module}`
+			if (childrenMap[name]) {
 				// If the child already exists, merge their children recursively
-				if (child.children && childrenMap[child.name].children) {
-					childrenMap[child.name].children = mergeChildren(
-						childrenMap[child.name].children!,
+				if (child.children && childrenMap[name].children) {
+					childrenMap[name].children = mergeChildren(
+						childrenMap[name].children!,
 						child.children
 					);
 				}
 			} else {
 				// If the child doesn't exist, add it to the map
-				childrenMap[child.name] = child;
+				childrenMap[name] = child;
 			}
 		});
 

@@ -10,7 +10,7 @@ import {
     setConfig,
 } from '@renderer/redux/thunks';
 import RecentsProjects from './components/recents-projects';
-import { PageHeader } from '@igrp/igrp-design-system';
+import { IGRPHeaderPage } from '@igrp/igrp-framework-react-design-system';
 import { ProjectWizard } from '../project';
 import { IOpenProject } from 'src/main/types';
 import { CloneProjectModal } from '../../components/git/clone-project-modal';
@@ -55,8 +55,6 @@ const IDEInitialScreen = () => {
             token?: string;
         }
     ) => {
-        console.log(`Cloning project: ${name} from ${url} to ${location}`);
-        console.log(`Authentication type: ${auth.type}`);
         if (auth.type === 'basic') {
             console.log(`Using basic auth with username: ${auth.username}`);
         } else if (auth.type === 'token') {
@@ -69,14 +67,14 @@ const IDEInitialScreen = () => {
     };
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
-            <PageHeader title={t('welcome')}>
-                <div className="flex justify-end space-x-3 ">
+            <IGRPHeaderPage title={t('welcome')} variant={'h3'}>
+                <div className="flex justify-end space-x-3">
                     <ProjectWizard />
 
                     <CloneProjectModal handleCloneProject={handleCloneProject}>
                         <Button variant="outline">
                             <GitFork className="w-4 h-4 mr-2" />
-                            Clone Project
+                            {t('cloneProject')}
                         </Button>
                     </CloneProjectModal>
 
@@ -88,7 +86,7 @@ const IDEInitialScreen = () => {
                         {t('openProject')}
                     </Button>
                 </div>
-            </PageHeader>
+            </IGRPHeaderPage>
 
             <RecentsProjects />
         </div>

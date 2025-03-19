@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FocusEvent, useEffect, useState } from 'react';
 import useToast from '@renderer/components/useToast';
 import { useFormik } from 'formik';
 import {
@@ -29,36 +29,37 @@ import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
+import { useTabs } from '@renderer/components/navigation/TabContext';
+import {
+    ModelConfig,
+    RelationReference,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface ModelProps {
-    basePath: string;
     selectors: Array<any>;
-    models?: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
-    onUpdateTab: (tabId: string) => void;
 }
 
-const ModelLayout = ({
-    basePath,
-    selectors,
-    models,
-    currentItem,
-    onCloseTab,
-    onUpdateTab,
-}: ModelProps): JSX.Element => {
+const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
+    const { showErrorToast, showSuccessToast } = useToast();
+    const { models, basePath, config, findModelsByName, getJsonData } =
+        useStudioAPI(currentItem?.module);
+
     const { t } = useTranslation();
+    const validationSchema = useModelValidation({ t });
+
     const dispatch: any = useDispatch();
+
     const [tablesColumns, setTableColumns] = useState<{
         [value: string]: IColumnsTabelProps[];
     }>({});
-    const { showErrorToast, showSuccessToast } = useToast();
-    const [data, setData] = useState<any>(null);
 
-    const validationSchema = useModelValidation({ t });
+    const [data, setData] = useState<any>(null);
+    const [enableEntityRevision, hasEnableEntityRevision] = useState(false);
 
     const formik: any = useFormik({
         enableReinitialize: true,
@@ -70,49 +71,69 @@ const ModelLayout = ({
         },
     });
 
-    const suggestTableName = (name) => {
-        return `t_${name
+    const suggestTableName = async (name: string) => {
+        const errors = await formik.validateForm();
+
+        if (errors.name) {
+            return '';
+        }
+
+        const nameProcessed = name
             .replace(/([a-z])([A-Z])/g, '$1_$2')
             .trim()
             .toLowerCase()
-            .replace(/\s+/g, '_')}`;
+            .replace(/\s+/g, '_');
+
+        return nameProcessed.startsWith('t_')
+            ? nameProcessed
+            : `t_${nameProcessed}`;
     };
 
-    const handleNameBlur = (e) => {
+    const handleNameBlur = async (
+        e: FocusEvent<HTMLInputElement>
+    ): Promise<void> => {
         formik.handleBlur(e);
         const name = e.target.value;
-        if (!formik.values.tableName) {
-            formik.setFieldValue('tableName', suggestTableName(name));
-        }
+
+        if (formik.values.tableName) return;
+
+        const value = await suggestTableName(name);
+        formik.setFieldValue('tableName', value);
     };
 
     useEffect(() => {
+        hasEnableEntityRevision(config.config.enableEntityRevision);
+    }, [config]);
+
+    useEffect(() => {
+        const { attributes, name, revision } = formik.values;
         const res = getTablesColumns({
             selectors,
-            attributes: formik.values.attributes,
+            attributes,
+            revision,
             models,
+            name,
+            t,
         });
         setTableColumns(res);
     }, [selectors, formik.values]);
 
     useEffect(() => {
-        const getJsonData = async () => {
+        const load = async () => {
             if (!currentItem) return;
 
-            try {
-                const data = await window.api.getJsonContent(currentItem.path);
+            await getJsonData(currentItem.path).then((data) => {
                 setData(data);
-            } catch (error) {
-                console.error('Failed to load JSON content:', error);
-            }
+            });
         };
 
-        getJsonData();
+        load();
     }, [currentItem]);
 
     useEffect(() => {
         if (data) {
             const {
+                revision,
                 name,
                 tableName,
                 attributes,
@@ -151,6 +172,7 @@ const ModelLayout = ({
                     ? indexes
                     : [defaultValues.indexes];
 
+            formik.setFieldValue('revision', revision || false);
             formik.setFieldValue('name', name || '');
             formik.setFieldValue('tableName', tableName || '');
             formik.setFieldValue('crud', crud || false);
@@ -163,23 +185,47 @@ const ModelLayout = ({
         } else formik.resetForm();
     }, [data]);
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const handleSave = async (): Promise<void> => {
         try {
+            const data = await getJsonData(currentItem.path);
+
             const values = getValuesToSubmit(
-                { ...formik.values, id: currentItem.id },
+                { ...data, ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
 
-            const { error } = await window.api.createModel(values, basePath);
+            const { error } = await window.engine.createModel(
+                values,
+                ENV_TYPES.SPRING,
+                basePath
+            );
+
+            console.log('error', error);
+            console.log('values', values);
 
             if (error) {
                 showErrorToast(error);
                 return;
             }
 
-            dispatch(onSetChangeStatus(true));
+            createRelationReference(values);
 
-            onUpdateTab(formik.values.name);
+            dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
                 t('createdSuccess', { name: t('model'), value: values.name })
@@ -189,13 +235,89 @@ const ModelLayout = ({
         }
     };
 
+    const createRelationReference = async (values: ModelConfig) => {
+        const { attributes } = values;
+
+        await Promise.all(
+            attributes.map(async (attribute) => {
+                const { relation, type, name } = attribute;
+
+                if (type === 'relation' && relation) {
+                    const {
+                        mappedBy,
+                        fetchType,
+                        type: relationType,
+                        entity,
+                        cardinality,
+                    } = relation;
+
+                    if (cardinality === 'twoWay') {
+                        const relationReference: RelationReference = {
+                            type: relationType,
+                            entity,
+                            fetchType,
+                            fieldName: mappedBy,
+                            mappedBy: name,
+                            module: currentItem?.module,
+                        };
+
+                        const schemaRef = findModelsByName(entity);
+
+                        try {
+                            const data = await window.api.getJsonContent(
+                                schemaRef.path
+                            );
+
+                            const existingRelationReferences = Array.isArray(
+                                data.relationReference
+                            )
+                                ? data.relationReference
+                                : [];
+
+                            const isDuplicate = existingRelationReferences.some(
+                                (ref) =>
+                                    ref.mappedBy === relationReference.mappedBy
+                            );
+
+                            if (!isDuplicate) {
+                                const newJson = {
+                                    ...data,
+                                    relationReference: [
+                                        ...existingRelationReferences,
+                                        relationReference,
+                                    ],
+                                };
+
+                                const { error } =
+                                    await window.engine.createModel(
+                                        newJson,
+                                        ENV_TYPES.SPRING,
+                                        basePath
+                                    );
+
+                                if (error) {
+                                    showErrorToast(error);
+                                    return;
+                                }
+                            }
+                        } catch (error) {
+                            console.error(
+                                'Failed to fetch JSON content:',
+                                error
+                            );
+                        }
+                    }
+                }
+            })
+        );
+    };
+
     const deleteModel = async (): Promise<void> => {
         try {
             const config = {
                 name: formik.values.name,
                 type: 'model',
                 module: currentItem.module,
-                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(
@@ -205,8 +327,6 @@ const ModelLayout = ({
             );
 
             if (error) return showErrorToast(error);
-
-            createGitCommit(basePath, `Add schema ${formik.values.name}`);
 
             dispatch(onSetChangeStatus(true));
 
@@ -266,10 +386,9 @@ const ModelLayout = ({
     };
 
     return (
-        <>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={deleteModel}
-                onSubmit={formik.handleSubmit}
                 isNew={data === null}
                 title={t('model')}
                 showSourceCode={onClickSourceCode}
@@ -277,91 +396,90 @@ const ModelLayout = ({
             <div className="space-y-4 p-4">
                 <Card className="p-6 rounded-sm">
                     <div className="space-y-6">
-                        <div className="flex gap-4">
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <TextInput
-                                    label={t('name')}
-                                    id="name"
-                                    placeholder={t('nameOfTheModel')}
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    onBlur={handleNameBlur}
-                                    error={
-                                        formik.touched.name
-                                            ? formik.errors.name
-                                            : undefined
-                                    }
-                                    isRequired
-                                />
+                        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                            <TextInput
+                                label={t('name')}
+                                id="name"
+                                placeholder={t('nameOfTheModel')}
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={handleNameBlur}
+                                isTouched={formik.touched.name}
+                                error={formik.errors.name}
+                                isRequired
+                            />
 
-                                <TextInput
-                                    label={t('tableName')}
-                                    id="tableName"
-                                    placeholder={t('enterTableName')}
-                                    value={formik.values.tableName}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={
-                                        formik.touched.tableName
-                                            ? formik.errors.tableName
-                                            : undefined
-                                    }
-                                    isRequired
-                                />
-                            </div>
+                            <TextInput
+                                label={t('tableName')}
+                                id="tableName"
+                                placeholder={t('enterTableName')}
+                                value={formik.values.tableName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                isTouched={formik.touched.tableName}
+                                error={formik.errors.tableName}
+                                isRequired
+                            />
                         </div>
-                        <div className="flex">
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+                        <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="audit"
+                                    onCheckedChange={(checked) =>
+                                        formik.setFieldValue('audit', checked)
+                                    }
+                                    checked={formik.values.audit}
+                                />
+                                <Label htmlFor="audit">{t('auditModel')}</Label>
+                            </div>
+
+                            {enableEntityRevision && (
                                 <div className="flex items-center space-x-2">
                                     <Checkbox
-                                        id="audit"
+                                        id="revision"
                                         onCheckedChange={(checked) =>
                                             formik.setFieldValue(
-                                                'audit',
+                                                'revision',
                                                 checked
                                             )
                                         }
-                                        checked={formik.values.audit}
+                                        checked={formik.values.revision}
                                     />
-                                    <Label htmlFor="audit">
-                                        {t('auditModel')}
+                                    <Label htmlFor="revision">
+                                        {t('revision')}
                                     </Label>
                                 </div>
+                            )}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="crud"
+                                    onCheckedChange={(checked) =>
+                                        formik.setFieldValue('crud', checked)
+                                    }
+                                    checked={formik.values.crud}
+                                />
+                                <Label htmlFor="Crud">{t('crud')}</Label>
+                            </div>
+                            {/* New GraphQL Option (Coming Soon) */}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="graphql" disabled />
+                                <Label htmlFor="graphql">
+                                    {t('graphql')}
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                        ({t('comingSoon')})
+                                    </span>
+                                </Label>
+                            </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="crud"
-                                        onCheckedChange={(checked) =>
-                                            formik.setFieldValue(
-                                                'crud',
-                                                checked
-                                            )
-                                        }
-                                        checked={formik.values.crud}
-                                    />
-                                    <Label htmlFor="Crud">{t('crud')}</Label>
-                                </div>
-                                {/* New GraphQL Option (Coming Soon) */}
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox id="graphql" disabled />
-                                    <Label htmlFor="graphql">
-                                        {t('graphql')}
-                                        <span className="ml-2 text-xs text-muted-foreground">
-                                            ({t('comingSoon')})
-                                        </span>
-                                    </Label>
-                                </div>
-
-                                {/* New OData Option (Coming Soon) */}
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox id="odata" disabled />
-                                    <Label htmlFor="odata">
-                                        {t('odata')}
-                                        <span className="ml-2 text-xs text-muted-foreground">
-                                            ({t('comingSoon')})
-                                        </span>
-                                    </Label>
-                                </div>
+                            {/* New OData Option (Coming Soon) */}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="odata" disabled />
+                                <Label htmlFor="odata">
+                                    {t('odata')}
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                        ({t('comingSoon')})
+                                    </span>
+                                </Label>
                             </div>
                         </div>
                     </div>
@@ -385,7 +503,7 @@ const ModelLayout = ({
                     </Tabs>
                 </Card>
             </div>
-        </>
+        </form>
     );
 };
 

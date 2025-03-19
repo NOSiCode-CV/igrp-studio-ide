@@ -10,9 +10,9 @@ import { checkAndReadBaseApi, getJsonContent, openDirectory, readDirectory, read
 import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
-import { handleProtocolCallback, setupGitHubOAuth } from './helpers/git-auth/github-auth'
+import { githubAuth } from './helpers/git-auth/github-auth'
 import { GitLabService } from './services/gitlab-service'
-import { setupGitLabOAuth } from './helpers/git-auth/gitlab-auth'
+import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
 import { GitService } from './services/git-service'
 import { TokenService } from './services/token-service';
 import { GitHubService } from './services/github-service';
@@ -22,16 +22,21 @@ import './handlers/dbHandler';
 import { updateApp } from './helpers/update'
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
+import NextJsManager from './helpers/nextjsManager'
+import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
+import dotenv from 'dotenv';
 
 const backend = require('i18next-electron-fs-backend')
 
+
 let mainWindow: BrowserWindow
 
-const repo = new ProjectRepository()
+let nextJsManager: NextJsManager;
 
+let repo;
 // Load the initial language configuration
 loadConfig();
-
+dotenv.config();
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -51,6 +56,10 @@ function createWindow(): void {
     titleBarStyle: "hidden",
     icon: path.join(__dirname, 'resources/icons', 'icon.icns'), // Set icon for the window
   })
+
+  repo = new ProjectRepository()
+
+  nextJsManager = new NextJsManager(mainWindow);
 
   mainWindow.maximize()
 
@@ -105,23 +114,35 @@ app.whenReady().then(async () => {
     } else {
       app.on('second-instance', (_event, argv) => {
         const url = argv[argv.length - 1];
-
+  
         if (url.startsWith('igrp-studio://') && mainWindow) {
           if (mainWindow.isMinimized()) mainWindow.restore();
           mainWindow.focus();
-          handleProtocolCallback(url, mainWindow);
+          
+          // Identificar o provedor e chamar o handler apropriado
+          if (url.includes('github')) {
+            githubAuth.handleProtocolCallback(url, mainWindow);
+          } else if (url.includes('gitlab')) {
+            gitlabAuth.handleProtocolCallback(url, mainWindow);
+          }
         }
       });
 
       if (process.argv.length > 1) {
         const url = process.argv[process.argv.length - 1];
         if (url.startsWith('igrp-studio://')) {
-          handleProtocolCallback(url, mainWindow);
+          if (url.includes('github')) {
+            githubAuth.handleProtocolCallback(url, mainWindow);
+          } else if (url.includes('gitlab')) {
+            gitlabAuth.handleProtocolCallback(url, mainWindow);
+          }
         }
       }
     }
 
     buildTaskbar()
+
+    initComponents()
 
   }
 
@@ -143,21 +164,19 @@ app.whenReady().then(async () => {
 
   // GitHub handlers
   ipcMain.on('github-oauth', async () => {
-    const mainWindow = BrowserWindow.getFocusedWindow();
-    if (!mainWindow) return;
+    const isDev = process.env.NODE_ENV === 'development';
     try {
-      await setupGitHubOAuth(mainWindow, process.env.NODE_ENV === 'development');
+      await githubAuth.setupOAuth(mainWindow, isDev);
     } catch (error) {
       console.error('GitHub OAuth failed:', error);
     }
   });
 
-  // GitLab handlers
+  // GitLab handler
   ipcMain.on('gitlab-oauth', async () => {
-    const mainWindow = BrowserWindow.getFocusedWindow();
-    if (!mainWindow) return;
+    const isDev = process.env.NODE_ENV === 'development';
     try {
-      await setupGitLabOAuth(mainWindow, process.env.NODE_ENV === 'development');
+      await gitlabAuth.setupOAuth(mainWindow, isDev);
     } catch (error) {
       console.error('GitLab OAuth failed:', error);
     }
@@ -345,7 +364,7 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
 
     // Retorna somente os números de versão
     return {
-      result: data.items.map((item: { version: string }) => item.version),
+      result: data.items.filter((item) => item.version !== null).map((item: { version: string, maven2: { version: string } }) => item.version || item.maven2?.version),
     };
   } catch (error) {
     console.error("Erro ao buscar versões:", error);
@@ -359,18 +378,23 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
 
 
 // GitHub
-ipcMain.handle('github-initialize', async (_event, token) => {
+ipcMain.handle('gitauth-initialize', async (_event, token) => {
   try {
     await GitHubService.initialize(token);
+    await GitLabService.initialize(token);
     TokenService.setToken('github', token);
+    TokenService.setToken('gitlab', token);
     return true;
   } catch (error) {
-    console.error('GitHub initialization failed:', error);
+    console.error('GitAuth initialization failed:', error);
     throw error;
   }
 });
 ipcMain.handle('logout-github', async () => {
   return TokenService.logoutGithub();
+});
+ipcMain.handle('logout-gitlab', async () => {
+  return TokenService.logoutGitlab();
 });
 ipcMain.handle('gitlab-initialize', async (_event, token) => {
   try {
@@ -385,23 +409,36 @@ ipcMain.handle('gitlab-initialize', async (_event, token) => {
 ipcMain.handle('add-cloned-repo', (_event, repoId: number) => {
   TokenService.addClonedRepo(repoId);
 });
+ipcMain.handle('get-cloned-repos', () => {
+  const repos = TokenService.getClonedRepos();
+  return repos;
+});
 
+ipcMain.handle('get-project-paths', () => {
+  return TokenService.getProjectPaths();
+});
 ipcMain.handle('set-project-path', (_event, { repoId, path }: { repoId: number; path: string }) => {
   TokenService.setProjectPath(repoId, path);
 });
-ipcMain.handle('check-git-remotes', async (_event, { projects, githubRepos }) => {
-  return GitService.checkGitRemotes(projects, githubRepos);
-});
-
 ipcMain.handle('github-user-info', async () => {
   return GitHubService.getUserInfo();
 });
+ipcMain.handle('gitlab-user-info', async () => {
+  return GitLabService.getUserInfo();
+});
 ipcMain.handle('github-repositories', async (event) => {
   const mainWindow = BrowserWindow.fromWebContents(event.sender);
-  return GitHubService.listIGRPStudioRepositories(mainWindow as BrowserWindow);
+  return GitHubService.listIGRPStudioRepositoriesGithub(mainWindow as BrowserWindow);
+});
+ipcMain.handle('gitlab-repositories', async (event) => {
+  const mainWindow = BrowserWindow.fromWebContents(event.sender);
+  return GitLabService.listIGRPStudioRepositoriesGitlab(mainWindow as BrowserWindow);
 });
 
 // Git
+ipcMain.handle('check-git-remotes', async (_event, { projects, githubRepos }) => {
+  return GitService.checkGitRemotes(projects, githubRepos);
+});
 ipcMain.handle('clone-repository', async (event, repoUrl) => {
   const mainWindow = BrowserWindow.fromWebContents(event.sender);
   return GitService.cloneRepository(repoUrl, mainWindow as BrowserWindow);
@@ -442,14 +479,6 @@ ipcMain.handle('add-git-remote', async (_event, { projectPath, remoteUrl }) => {
 ipcMain.handle('list-commits', async (_event, { projectPath, branch, limit }) => {
   return GitService.listCommits(projectPath, branch, limit);
 });
-ipcMain.handle('get-cloned-repos', () => {
-  const repos = TokenService.getClonedRepos();
-  return repos;
-});
-
-ipcMain.handle('get-project-paths', () => {
-  return TokenService.getProjectPaths();
-});
 
 ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
   try {
@@ -458,6 +487,17 @@ ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
   } catch (error) {
     console.error('Error checking project config:', error);
     return { folderExists: false, config: null };
+  }
+});
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  if (mainWindow) {
+    if (url.includes('github')) {
+      githubAuth.handleProtocolCallback(url, mainWindow);
+    } else if (url.includes('gitlab')) {
+      gitlabAuth.handleProtocolCallback(url, mainWindow);
+    }
   }
 });
 
@@ -472,10 +512,16 @@ ipcMain.handle('set-language', (_, lang: string) => {
   return lang; // Return the new language for confirmation
 });
 
-// GitLab
-// ipcMain.handle('gitlab-repositories', async () => {
-//   return GitLabService.listRepositories();
-// });
-// ipcMain.handle('gitlab-user-info', async () => {
-//   return GitLabService.getUserInfo();
-// });
+// NEXTJS
+ipcMain.on('start-nextjs', (_event, basePath) => {
+  nextJsManager.setNextJsPath(basePath);
+  nextJsManager.startNextJsServer();
+});
+
+ipcMain.on('open-preview', (_event, pageName) => {
+  nextJsManager.openPreviewWindow(pageName);
+});
+
+ipcMain.on('stop-nextjs', () => {
+  nextJsManager.stopNextJsServer();
+});

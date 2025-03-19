@@ -1,6 +1,6 @@
 import { Label } from '@renderer/components/ui/label';
 import { useState } from 'react';
-import { Combobox } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { useTranslation } from 'react-i18next';
 
 const languages = [
@@ -10,7 +10,9 @@ const languages = [
 
 export function LanguageSettings() {
     const { t, i18n } = useTranslation();
-    const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
+    const [currentLanguage, setCurrentLanguage] = useState<string>(
+        i18n.language
+    );
     const [_isPending, setIsPending] = useState<boolean>(false);
 
     // Atualizar o idioma dinamicamente
@@ -43,8 +45,7 @@ export function LanguageSettings() {
             <div className="space-y-4">
                 <div className="space-y-2 flex flex-col">
                     <Label htmlFor="language">{t('language_label')}</Label>
-                    <Combobox
-                        name="language"
+                    <IGRPCombobox
                         value={currentLanguage}
                         options={languages}
                         onChange={handleLanguageChange}

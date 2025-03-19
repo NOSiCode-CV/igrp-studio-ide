@@ -2,21 +2,22 @@ import { useEffect, useState } from 'react';
 import EmptyPage from './EmptyPage';
 import { OptionType } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
-import { PageHeader } from '@igrp/igrp-design-system';
+import { IGRPHeaderPage } from '@igrp/igrp-framework-react-design-system';
 import DashboardOverview from '../components/dashboard-overview';
 
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { ContainerScrollArea } from '../components/ContainerScrollArea';
-import { TabItem } from '@renderer/components/TabContext';
+import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
     open: OptionType;
 }
 
-const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
+const Overview = ({}: NewProps) => {
     const { t } = useTranslation();
+
+    const { newTab } = useTabs();
 
     // Initialize stats with useState
     const [stats, setStats] = useState({
@@ -27,19 +28,13 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     });
 
     const handleOptionClick = (opt: OptionType) => {
-        onOpenNew({
-            id: `tab-${Date.now()}`,
-            title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
-            open: opt,
-        });
+        newTab({ type: opt });
     };
 
     const selectStudioState = (state: any) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
-        (studio) => ({
-            filesThree: studio.filesThree,
-        })
+        (studio) => ({ filesThree: studio.filesThree })
     );
 
     const { filesThree } = useSelector(selectStudioProperties);
@@ -65,16 +60,14 @@ const Overview = ({ onOpenNew }: NewProps): JSX.Element => {
     }, [filesThree]);
 
     return (
-        <ContainerScrollArea>
-            <div className="w-full max-w-4xl mx-auto space-y-8 p-6 mb-10">
-                <PageHeader
-                    title={t('apiOverview')}
-                    description={t('manageApiEndpoints')}
-                />
-                <DashboardOverview stats={stats} />
-                <EmptyPage onClick={handleOptionClick} />
-            </div>
-        </ContainerScrollArea>
+        <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
+            <IGRPHeaderPage variant={'h3'}
+                title={t('apiOverview')}
+                description={t('manageApiEndpoints')}
+            />
+            <DashboardOverview stats={stats} />
+            <EmptyPage onClick={handleOptionClick} />
+        </div>
     );
 };
 

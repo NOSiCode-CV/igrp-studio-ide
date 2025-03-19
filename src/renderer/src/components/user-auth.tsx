@@ -6,27 +6,27 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import useGithubAuth from '@renderer/hooks/useGithubAuth';
+import useGitAuth from '@renderer/hooks/useGitAuth';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function GitConnectionMenu() {
-    const { loginGithub, user, logoutGithub } = useGithubAuth();
+    const { loginGithub, loginGitLab, userGitHub, userGitLab, logoutGithub, logoutGitLab } = useGitAuth();
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-            {user ? (
+            {userGitHub || userGitLab ? (
                 <Button variant="ghost" size="icon" className="p-0">
                     <Avatar className="h-8 w-8">
                         
                             <>
                                 <AvatarImage
-                                    src={user.avatar_url}
-                                    alt={user.login}
+                                    src={userGitHub.avatar_url || userGitLab.avatar_url}
+                                    alt={userGitHub.login || userGitLab.username}
                                 />
                                 <AvatarFallback>
-                                    {user.login.charAt(0).toUpperCase()}
+                                    {userGitHub.login.charAt(0).toUpperCase() || userGitLab.username.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </>
                         
@@ -40,14 +40,14 @@ function GitConnectionMenu() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem>
-                    {user ? (
+                    {userGitHub ? (
                         <div className="flex items-center justify-between gap-5 w-full">
                             <div className="flex flex-col space-y-1">
                                 <p className="text-sm font-medium leading-none">
-                                    {user.login}
+                                    {userGitHub.login}
                                 </p>
                                 <p className="text-xs leading-none text-muted-foreground">
-                                    {user.email}
+                                    {userGitHub.email}
                                 </p>
                             </div>
 
@@ -74,13 +74,38 @@ function GitConnectionMenu() {
                     )}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {}}>
+                    {userGitLab ? (
+                        <div className="flex items-center justify-between gap-5 w-full">
+                        <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-medium leading-none">
+                                {userGitLab.username}
+                            </p>
+                            <p className="text-xs leading-none text-muted-foreground">
+                                {userGitLab.email}
+                            </p>
+                        </div>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <LogOut
+                                    className="h-4 w-4 cursor-pointer"
+                                    onClick={logoutGitLab}
+                                />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Logout</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                    ) : (
                     <div
                         className="flex items-center"
-                        onClick={() => {}}
+                        onClick={loginGitLab}
                     >
                         <GitlabIcon className="mr-2 h-4 w-4" />
                         <span>Connect GitLab</span>
                     </div>
+                    )}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

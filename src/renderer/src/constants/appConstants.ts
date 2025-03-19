@@ -12,6 +12,9 @@ export const PATTERNS = {
     NAMESPACE_VALIDATION_PATTERN: /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/,
     PARAMS_VALIDATION: /^[a-zA-Z0-9_]+$/,
     PATH_VALIDATION: /^[a-zA-Z_/]+$/,
+    SPECIAL_CHARACTERS: /^[a-zA-Z0-9\s]*$/,
+    NO_SPACE_BUT_ALLOW_HYPHEN: /^[^\s]+$/,
+    NAME_APP_VALIDATION: /^[a-zA-Z_-]+$/
 };
 
 
@@ -23,14 +26,16 @@ export enum OPTION_TYPE {
     DATA_OBJECTS = "dto",
     ACTION = 'action',
     MODAL = 'modal',
-    RESPONSE = 'responses',
+    RESPONSES = 'responses',
+    RESPONSE = 'response',
     ENUM = 'enum',
     DELETE = 'delete',
     ERDDiagram = "ERDDiagram",
-    FILE_THREE = "filethree"
+    FILE_THREE = "filethree",
+    PERMISSIONS = "permissions"
 };
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree';
+export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree' | 'permissions';
 
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
@@ -86,5 +91,5 @@ export const DatabaseOptions = [
 
 export const projectStructureStyle = [
     { value: 'technical', label: 'Technical' },
-    { value: 'domain', label: 'Domain' },
+    { value: 'domain', label: 'Domain-Driven Design (DDD)' },
 ];

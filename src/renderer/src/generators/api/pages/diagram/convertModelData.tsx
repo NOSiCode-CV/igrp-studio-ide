@@ -49,7 +49,7 @@ export function convertModelData(inputModels: Array<any>): {
                 };
 
                 return {
-                    from: inputModel.name,
+                    from: inputModel.content?.name,
                     to: relation.entity,
                     text: mapping.text,
                     toText: mapping.toText,

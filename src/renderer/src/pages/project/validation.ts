@@ -5,9 +5,12 @@ export function useProjectValidation({ t, step }) {
     const validationSchema = Yup.object().shape({
         name: Yup.string().required(
             t('fieldRequired', { name: t('projectName') })
+        ).matches(
+            PATTERNS.SPECIAL_CHARACTERS,
+            t('msgSpecialCharactersRegex')
         ).max(
-            20,
-            t('maxLengthExceeded', { max: 20 })
+            50,
+            t('maxLengthExceeded', { max: 50 })
         ),
         type: Yup.string().oneOf(
             ['frontend', 'backend'],
@@ -35,7 +38,7 @@ export function useProjectValidation({ t, step }) {
                                         })
                                     )
                                     .matches(
-                                        PATTERNS.NO_SPACE_AND_HYPHEN,
+                                        PATTERNS.NAME_APP_VALIDATION,
                                         t('msgInfoAccpet')
                                     )
                                     .max(
@@ -82,8 +85,8 @@ export function useProjectValidation({ t, step }) {
                                     t('thisFieldRequired', { name: t('artifact') })
                                 )
                                 .matches(
-                                    PATTERNS.NO_SPACE_AND_HYPHEN,
-                                    t('msgInfoAccpet')
+                                    PATTERNS.NO_SPACE_BUT_ALLOW_HYPHEN,
+                                    t('msgNoSpacesAllowed')
                                 )
                                 .max(50, t('maxLengthExceeded', { max: 50 }))
                             : schema.notRequired();

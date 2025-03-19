@@ -1,17 +1,13 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
-import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { Connection, FileTree, IConnenctionRepository, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IProjectRepository } from 'src/main/interfaces';
+import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
 
 
 interface CustomAPI {
-
-    createModule: (moduleConfig: ModuleConfig, basePath: string) => Promise<HandlerResponse>;
-    createModel: (modelConfig: ModelConfig, basePath: string) => Promise<HandlerResponse>;
-    createDto: (dtoConfig: DTOConfig, basePath: string) => Promise<HandlerResponse>;
-    createController: (controllerConfig: ControllerConfig, basePath: string) => Promise<HandlerResponse>;
 
     createPage: (modelConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
     deletePage: (pageConfig: PageConfig, basePath: string) => Promise<HandlerResponse>;
@@ -44,9 +40,21 @@ interface CustomAPI {
 interface BaseEngine {
     createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
     createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createModule: (moduleConfig: ModuleConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createModel: (modelConfig: ModelConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createDto: (dtoConfig: DTOConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createController: (controllerConfig: ControllerConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    registryComponent: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    getComponent: (engineType: string) => Promise<HandlerResponse>;
+    getComponent: (engineType: string) => Promise<Record<string, Component>>;
 }
 
 interface CustomMenu {

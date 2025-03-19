@@ -19,27 +19,32 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ActionProps {
-    onDelete: () => void;
-    onSubmit: () => void;
-    showSourceCode?: () => void;
     title: string;
     isNew?: boolean;
+    onDelete: () => void;
+    showSourceCode?: () => void;
+    onClickBreadcrumbLink?: () => void;
 }
 
 const NavigationBar = ({
-    onSubmit,
     onDelete,
     showSourceCode,
+    onClickBreadcrumbLink,
     title,
     isNew,
 }: ActionProps) => {
+    const { t } = useTranslation();
+
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const handleSourceCode = () => {
-        if (showSourceCode) showSourceCode();
+        showSourceCode?.();
     };
 
-    const { t } = useTranslation();
+    const handleBreadcrumbLink = () => {
+        onClickBreadcrumbLink?.();
+    };
+
     return (
         <TooltipProvider>
             <div className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
@@ -57,8 +62,11 @@ const NavigationBar = ({
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="#/">
-                                <span className="font-semibold ">{title}</span>
+                            <BreadcrumbLink
+                                onClick={handleBreadcrumbLink}
+                                className="cursor-pointer"
+                            >
+                                <span className="font-semibold">{title}</span>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
@@ -86,9 +94,12 @@ const NavigationBar = ({
                                 <TooltipTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        onClick={() => setDeleteModal(true)}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setDeleteModal(true);
+                                        }}
                                         size={'sm'}
-                                        className="outline outline-1 outline-red-500 text-red-500"
+                                        className="outline-1 outline-red-500 text-red-500"
                                     >
                                         <Trash />
                                         <span className="sr-only">
@@ -102,11 +113,7 @@ const NavigationBar = ({
                     )}
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                color="success"
-                                onClick={onSubmit}
-                                type="submit"
-                            >
+                            <Button color="success" type="submit">
                                 {t('save')}
                             </Button>
                         </TooltipTrigger>

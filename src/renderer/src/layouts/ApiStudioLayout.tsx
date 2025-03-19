@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
+import { Footer } from './components/footer';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -25,7 +26,7 @@ interface LayoutProps {
     }>;
 }
 
-const Layout = (props: LayoutProps): JSX.Element => {
+const Layout = (props: LayoutProps) => {
     const dispatch: any = useDispatch();
     const navigate = useNavigate();
 
@@ -64,35 +65,37 @@ const Layout = (props: LayoutProps): JSX.Element => {
     }, [basePath, navigate]);
 
     return (
-        <SidebarProvider
-            style={
-                {
-                    '--sidebar-width': '380px',
-                } as React.CSSProperties
-            }
-        >
-            <div className="h-screen flex flex-col w-full">
-                <ToastContainer />
-                <Header config={config} basePath={basePath} />
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
+            <SidebarProvider
+                style={
+                    {
+                        '--sidebar-width': '380px',
+                    } as React.CSSProperties
+                }
+            >
+                <div className="h-screen flex flex-col w-full">
+                    <ToastContainer />
+                    <Header config={config} basePath={basePath} />
 
-                <div className="flex flex-1 overflow-hidden">
-                    <AppSidebar
-                        menuItems={menuItems}
-                        className="mt-10"
-                        config={config}
-                        basePath={basePath}
-                        header
-                    />
-                    <SidebarInset className="flex-1">
-                        {React.cloneElement(props.children, {
-                            basePath,
-                            currentItem,
-                            project: config,
-                        })}
-                    </SidebarInset>
+                    <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
+                        <AppSidebar
+                            menuItems={menuItems}
+                            config={config}
+                            basePath={basePath}
+                            header
+                        />
+                        <SidebarInset className="flex-1">
+                            {React.cloneElement(props.children, {
+                                basePath,
+                                currentItem,
+                                project: config,
+                            })}
+                        </SidebarInset>
+                    </div>
                 </div>
-            </div>
-        </SidebarProvider>
+                <Footer /> 
+            </SidebarProvider>
+        </div>
     );
 };
 

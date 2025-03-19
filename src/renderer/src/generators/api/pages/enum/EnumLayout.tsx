@@ -1,4 +1,3 @@
-import { Input } from '@renderer/components/ui/input';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -12,13 +11,14 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { FormList } from '../../components/form-list';
 import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
-import { EnumValue } from '@igrp/spring-engine/dist/interfaces/types';
+import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useGit } from '@renderer/hooks/useGit';
-import { useTabs } from '@renderer/components/TabContext';
-import { LabelRequired } from '@renderer/components/required';
+import { useTabs } from '@renderer/components/navigation/TabContext';
+import { TextInput } from '../../components/inputs-form';
+import { Card } from '@renderer/components/ui/card';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface EnumProps {
-    basePath: string;
     selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
@@ -31,7 +31,6 @@ const validationSchema = Yup.object({
 });
 
 export const EnumLayout = ({
-    basePath,
     selectors,
     currentItem,
     onCloseTab,
@@ -41,6 +40,8 @@ export const EnumLayout = ({
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
+    const { basePath } = useStudioAPI(currentItem?.module);
+
     const [title, setTitle] = useState('');
 
     const [data, setData] = useState<any>(null);
@@ -50,11 +51,11 @@ export const EnumLayout = ({
 
     const formik = useFormik({
         enableReinitialize: true,
-        initialValues, // Use the passed-in initial values
+        initialValues,
         validationSchema,
         onSubmit: (_values, actions) => {
             actions.setSubmitting(false);
-            handleSave(); // Pass values to the save handler
+            handleSave();
         },
     });
 
@@ -63,7 +64,6 @@ export const EnumLayout = ({
 
         try {
             const data = await window.api.getJsonContent(currentItem.path);
-            console.log(data);
             setData(data);
         } catch (error) {
             console.error('Failed to load JSON content:', error);
@@ -76,20 +76,41 @@ export const EnumLayout = ({
 
     useEffect(() => {
         if (data) {
-            setTitle(data.name);
-            formik.setValues(data);
+            const { name, values } = data;
+
+            setTitle(name);
+
+            formik.setFieldValue('name', name);
+            const attributes =
+                values &&
+                values.map((value) => {
+                    return {
+                        name: value.name,
+                        code: value.attributes ? value.attributes[0] : null,
+                        description: value.attributes
+                            ? value.attributes[1]
+                            : null,
+                    };
+                });
+
+            formik.setFieldValue('values', attributes || [defaultValue]);
         }
     }, [data]);
 
-    const onSubmit = async () => {
-        const errors = await formik.validateForm();
-        if (Object.keys(errors).length === 0) {
-            formik.handleSubmit();
-        } else {
-            // Handle validation errors (optional)
-            console.error('Validation errors:', errors);
-        }
-    };
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                handleSave();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     const handleSave = async (): Promise<void> => {
         try {
@@ -102,16 +123,13 @@ export const EnumLayout = ({
                 })
             );
 
-            const attributes = tablesColumns[tableName].map(
-                ({ type, name }) => {
+            const attributes = tablesColumns[tableName]
+                .filter((attr) => attr.name !== 'Name')
+                .map(({ type, name }) => {
                     return { type: type === 'text' ? 'string' : type, name };
-                }
-            );
-            const values = {
-                ...data,
-                values: convertedValues,
-                attributes,
-            };
+                });
+
+            const values = { ...data, values: convertedValues, attributes };
 
             const { error } = await window.engine.createEnum(
                 values,
@@ -129,10 +147,7 @@ export const EnumLayout = ({
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
-                t('createdSuccess', {
-                    name: t('enum'),
-                    value: values.name,
-                })
+                t('createdSuccess', { name: t('enum'), value: values.name })
             );
         } catch (error: unknown) {
             showErrorToast(error);
@@ -143,9 +158,8 @@ export const EnumLayout = ({
         try {
             const config = {
                 name: formik.values.name,
-                type: 'response',
+                type: 'enum',
                 module: currentItem.module,
-                id: currentItem.id,
             };
 
             const { error } = await window.engine.delete(
@@ -161,7 +175,6 @@ export const EnumLayout = ({
 
             createGitCommit(basePath, `Delete enum ${formik.values.name}`);
 
-            // Notify of successful deletion or update
             dispatch(onSetChangeStatus(true));
             onCloseTab();
             showSuccessToast(t('deletedSuccess', { name: t('response') }));
@@ -186,56 +199,53 @@ export const EnumLayout = ({
     const tableName = 'values';
 
     return (
-        <>
+        <form onSubmit={formik.handleSubmit}>
             <NavigationBar
                 onDelete={handleDelete}
-                onSubmit={onSubmit}
                 isNew={!data}
                 title={title || t('createNewEnum')}
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                {/* name */}
-                <div className="space-y-2">
-                    <LabelRequired>{t('name')}</LabelRequired>
-                    <Input
-                        type="text"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        className={`w-full  focus:ring-igrp focus:border-igrp ${
-                            formik.errors.name && formik.touched.name
-                                ? 'border-red-500'
-                                : 'border-gray-300'
-                        }`}
-                    />
-                    {formik.errors.name && formik.touched.name && (
-                        <div className="text-red-500 text-sm">
-                            {formik.errors.name}
-                        </div>
-                    )}
-                </div>
-                <FormList
-                    columns={tablesColumns.values || []}
-                    formik={formik}
-                    data={formik.values.values}
-                    changeValue={(element, position, result) =>
-                        changeValue(
-                            formik,
-                            element,
-                            position,
-                            result,
-                            tableName
-                        )
-                    }
-                    addRow={() => addNewRow(formik, tableName, defaultValue)}
-                    removeRow={(position) =>
-                        removeRow(formik, tableName, position)
-                    }
-                    btnLabels={'Enum'}
-                    name={tableName}
-                />
+                <Card className="rounded-sm p-6">
+                    <div className="flex flex-col gap-4">
+                        <TextInput
+                            id="name"
+                            label={t('name')}
+                            value={formik.values.name}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleChange}
+                            error={formik.errors.name}
+                            isTouched={formik.touched.name}
+                            isRequired
+                        />
+                        <Card className="rounded-sm">
+                            <FormList
+                                columns={tablesColumns.values || []}
+                                formik={formik}
+                                data={formik.values.values}
+                                changeValue={(element, position, result) =>
+                                    changeValue(
+                                        formik,
+                                        element,
+                                        position,
+                                        result,
+                                        tableName
+                                    )
+                                }
+                                addRow={() =>
+                                    addNewRow(formik, tableName, defaultValue)
+                                }
+                                removeRow={(position) =>
+                                    removeRow(formik, tableName, position)
+                                }
+                                btnLabels={'Enum'}
+                                name={tableName}
+                            />
+                        </Card>
+                    </div>
+                </Card>
             </div>
-        </>
+        </form>
     );
 };

@@ -36,7 +36,7 @@ import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
-import FileExplorerSidebar from '@renderer/components/FileExplorer';
+import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { useNavSettings } from './nav-data';
 
 interface AppSidebarProps {
@@ -94,11 +94,11 @@ export function AppSidebar({
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-        {
+      /*   {
             icon: FileText,
             label: t('documents'),
             id: 'documents',
-        },
+        }, */
         {
             icon: Badge,
             label: t('settings'),
@@ -116,7 +116,7 @@ export function AppSidebar({
             <Sidebar
                 collapsible="icon"
                 className={cn(
-                    'overflow-hidden [&>[data-sidebar=sidebar]]:flex-row mt-10',
+                    'overflow-hidden *:data-[sidebar=sidebar]:flex-row !top-(--header-height) h-[calc(100svh-var(--header-height-two))]',
                     className
                 )}
             >
@@ -124,8 +124,8 @@ export function AppSidebar({
                 <Sidebar
                     collapsible="none"
                     className={cn(
-                        '!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r',
-                        '!w-20'
+                        'w-[calc(var(--sidebar-width-icon)+1px)]! border-r',
+                        'w-20!'
                     )}
                 >
                     <SidebarHeader className="pr-0">
@@ -182,7 +182,7 @@ export function AppSidebar({
                         </SidebarGroup>
                     </SidebarContent>
                     <SidebarFooter className="items-center justify-center">
-                        <SidebarTrigger className="mb-14 items-center justify-center" />
+                        <SidebarTrigger className="items-center justify-center" />
                     </SidebarFooter>
                 </Sidebar>
 
@@ -197,10 +197,13 @@ export function AppSidebar({
                             handleSearch={handleSearch}
                         />
                     )}
-                    <SidebarContent className="mb-20">
+                    <SidebarContent>
                         <ScrollArea>
                             {activeMenuGroup === 'Explorer' ? (
-                                <FileExplorerSidebar basePath={basePath} />
+                                <FileExplorerSidebar
+                                    basePath={basePath}
+                                    searchTerm={searchQuery}
+                                />
                             ) : activeMenuGroup === 'Git' ? (
                                 <GitCommitsSidebar
                                     basePath={basePath}
@@ -254,7 +257,7 @@ function Three({
     basePath: string;
     activeMenuGroup?: string;
 }) {
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(false);
 
     const handleOpenChange = (newState) => {
         setOpen(newState);
@@ -328,7 +331,7 @@ function Three({
                     <TreeItem />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <SidebarMenuSub className="!pr-0 !mr-0">
+                    <SidebarMenuSub className="pr-0! mr-0!">
                         {item.subItems?.map((subItem, subIndex) => (
                             <Three
                                 key={subIndex}

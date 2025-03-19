@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import ModelLayout from './model';
 import DtoLayout from './dto';
-import ControllerLayout from './controller';
 import EmptyPage from './EmptyPage';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { extractByType, getMergedFiles, getModulesArray } from '../helpers';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
@@ -13,13 +11,16 @@ import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
 import { EnumLayout } from './enum/EnumLayout';
 import { EditorLayout } from './EditorLayout';
-import { FileTree } from 'src/main/types';
-import { TabItem, useTabs } from '@renderer/components/TabContext';
+import { FileTree, ProjectData } from 'src/main/types';
+import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
+import { PermissionsLayout } from './permissions';
+import { ControllerLayout } from './controller';
 
 interface PageBuilderState {
     basePath: string;
     currentItem: any;
     filesThree: FileTree[];
+    config: ProjectData;
 }
 
 interface NewProps {
@@ -28,41 +29,36 @@ interface NewProps {
     tab: TabItem;
 }
 
-const PageController = ({
-    onOpenNew,
-    open,
-    tab,
-}: NewProps): JSX.Element => {
+const componentMap = {
+    [OPTION_TYPE.FILE_THREE]: EditorLayout,
+    [OPTION_TYPE.MODEL]: ModelLayout,
+    [OPTION_TYPE.ACTION]: ControllerLayout,
+    [OPTION_TYPE.CONTROLLER]: ControllerOverview,
+    [OPTION_TYPE.DATA_OBJECTS]: DtoLayout,
+    [OPTION_TYPE.RESPONSE]: ResponseLayout,
+    [OPTION_TYPE.ENUM]: EnumLayout,
+    [OPTION_TYPE.PERMISSIONS]: PermissionsLayout,
+    [OPTION_TYPE.ERDDiagram]: ERDLayout,
+};
+
+const PageController = ({ onOpenNew, open, tab }: NewProps) => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
     const [module, setModule] = useState<string>('shared');
 
     const { t } = useTranslation();
 
-     const {
-            handleCloseTab,
-            handleUpdateTab,
-        } = useTabs();
+    const { handleCloseTab } = useTabs();
 
     const selectState = (state: any): PageBuilderState => state.PageBuilder;
 
     const selectProperties = createSelector(selectState, (studio) => {
-        const moduleData = getMergedFiles(studio, module);
-
         return {
             basePath: studio.basePath,
-            models: extractByType(moduleData, OPTION_TYPE.MODELS),
-            dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
-            controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
-            responses: extractByType(moduleData, OPTION_TYPE.RESPONSE),
-            enums: extractByType(moduleData, OPTION_TYPE.ENUM),
-            modules: getModulesArray(studio.filesThree),
-            filesThree: studio.filesThree,
         };
     });
 
-    const { basePath, models, dto, modules, responses, enums } =
-        useSelector(selectProperties);
+    const { basePath } = useSelector(selectProperties);
 
     useEffect(() => {
         const getAllSelectors = async () => {
@@ -99,9 +95,7 @@ const PageController = ({
         handleCloseTab(tab.id);
     };
 
-    const handleUpdate = (tabId: string) => {
-        handleUpdateTab(tab.id, `tab-${tab.item?.module}-${tabId}`);
-    };
+    const Component = componentMap[option];
 
     return (
         <>
@@ -113,70 +107,14 @@ const PageController = ({
                 </div>
             )}
 
-            {option === OPTION_TYPE.FILE_THREE ? (
-                <EditorLayout currentItem={tab.item} />
-            ) : (
-                <div className="mb-12">
-                    {option === OPTION_TYPE.MODEL && (
-                        <ModelLayout
-                            basePath={basePath}
-                            selectors={selectors}
-                            models={models}
-                            currentItem={tab.item}
-                            onCloseTab={hangleClose}
-                            onUpdateTab={handleUpdate}
-                        />
-                    )}
-                    {option === OPTION_TYPE.ACTION && (
-                        <ControllerLayout
-                            basePath={basePath}
-                            selectors={selectors}
-                            currentItem={tab.item}
-                            modules={modules}
-                            dto={dto}
-                            responses={responses}
-                            enums={enums}
-                            onCloseTab={hangleClose}
-                            onUpdateTab={handleUpdate}
-                        />
-                    )}
-                    {option === OPTION_TYPE.CONTROLLER && (
-                        <ControllerOverview
-                            basePath={basePath}
-                            currentItem={tab.item}
-                        />
-                    )}
-                    {option === OPTION_TYPE.DATA_OBJECTS && (
-                        <DtoLayout
-                            basePath={basePath}
-                            selectors={selectors}
-                            dto={dto}
-                            models={models}
-                            currentItem={tab.item}
-                            onCloseTab={hangleClose}
-                            onUpdateTab={handleUpdate}
-                        />
-                    )}
-                    {option === OPTION_TYPE.RESPONSE && (
-                        <ResponseLayout
-                            basePath={basePath}
-                            selectors={selectors}
-                            currentItem={tab.item}
-                            onCloseTab={hangleClose}
-                            onUpdateTab={handleUpdate}
-                        />
-                    )}
-                    {option === OPTION_TYPE.ENUM && (
-                        <EnumLayout
-                            basePath={basePath}
-                            selectors={selectors}
-                            currentItem={tab.item}
-                            onCloseTab={hangleClose}
-                        />
-                    )}
-                </div>
+            {Component && (
+                <Component
+                    selectors={selectors}
+                    currentItem={tab.item}
+                    onCloseTab={hangleClose}
+                    basePath={basePath}
+                />
             )}
-            {option === OPTION_TYPE.ERDDiagram && <ERDLayout models={models} />}
         </>
     );
 };

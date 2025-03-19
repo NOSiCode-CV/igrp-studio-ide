@@ -1,38 +1,29 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
-import RowContainer from './types/containers/rows';
-import { useDroppedComponents } from './dnd/DroppedComponentsContext';
-import { generateId } from '@renderer/utils/helpers';
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 
-import navdata from './data/ConfigData';
+import { useConfigdata } from './utils/useConfigData';
 import {
-    Component,
+    ComponentConfig,
     PageConfig,
-} from '@igrp/nextjs-engine/dist/interfaces/types';
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
-import { HierarchicalComponent } from './interfaces';
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 
-import { DragDropContext } from '@hello-pangea/dnd';
-import { handleDragEnd } from './dnd/DraggableItemManager';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { AppSidebar } from '@renderer/layouts/components/app-ui-sidebar';
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
+import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
 import CodeContent from './components/CodeContent';
-
-const addRow = () => {
-    const newRowId = generateId('row');
-    const newRow: HierarchicalComponent = {
-        id: newRowId,
-        columns: [{ id: generateId('col'), colSize: 12, components: [] }],
-    };
-
-    return newRow;
-};
+import { SidebarRight } from './components/sidebar-right';
+import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
+import { handleDragEnd } from './dnd/DraggableItemManager';
+import { useDroppedComponents } from './dnd/DroppedComponentsContext';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { useDispatch } from 'react-redux';
+import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
+import { Page } from './types/components/page';
 
 interface FormEngineProps {
-    basePath: string | undefined;
-    page: string;
-    pagePath: string | undefined;
+    basePath: string;
+    page: any;
     isDesign: boolean;
     onSave: () => void;
 }
@@ -42,31 +33,31 @@ interface FormEngineRef {
 }
 
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
-    ({ basePath, pagePath, page, isDesign }, ref) => {
+    ({ basePath, page, isDesign }, ref) => {
+        const { id, content, path: pagePath, label } = page;
+        const { type, path } = content;
+
         const {
-            reorderComponents,
-            moveComponent,
-            getComponentsByRow,
-            setInitComponents,
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
             getAllComponents,
             removeRow,
-            addDroppedComponent,
-            getComponent,
             setEditingComponent,
-            updateComponent,
+            clearEditingComponent,
+            currentComponent,
+            setInitComponents,
         } = useDroppedComponents();
 
-        const components = getAllComponents();
-
-        //const [isDesign, setIsDesign] = useState(true);
+        const components: StructuredLayout = getAllComponents();
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const navData = navdata().props.children;
+        const { menuItems } = useConfigdata();
+
+        const dispatch: any = useDispatch();
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
-            console.log('FormEngine save triggered');
             const jsonStructure = buildJsonStructure(components);
             handleSave(jsonStructure);
         };
@@ -76,45 +67,33 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             handleSave: internalHandleSave,
         }));
 
-        const handleClickAddControl = (id: string, type: string) => {
-            const newRow = addRow();
-            const rowIndex = components.findIndex((row) => row.id === id);
-
-            if (rowIndex !== -1) {
-                const newRows = [...components];
-                if (type === 'top') {
-                    newRows.splice(rowIndex, 0, newRow);
-                } else if (type === 'bottom') {
-                    newRows.splice(rowIndex + 1, 0, newRow);
-                }
-                setInitComponents(newRows);
-            }
-        };
-
-        const handleClickDeleteSection = (id: string) => {
-            removeRow(id);
-        };
-
         useEffect(() => {
-            if (components.length === 0) {
-                const newRow = addRow();
-                setInitComponents([newRow]);
-            }
-        }, [components]);
+            clearEditingComponent();
+        }, [isDesign]);
 
-        const handleSave = async (jsonStructure: Component[]) => {
+        const handleSave = async (jsonStructure: StructuredLayout) => {
             try {
-                if (pagePath === undefined || basePath === undefined) return;
+                if (basePath === undefined) return;
 
                 const pageConfig: PageConfig = {
-                    type: 'page',
-                    pageName: page,
-                    path: page,
+                    id,
+                    type,
+                    path,
+                    pageName: label,
+                    components: jsonStructure,
                 };
 
-                const { error } = await window.api.addComponentToPage(
-                    pageConfig,
-                    jsonStructure,
+                const compConfig: ComponentConfig = {
+                    id,
+                    type,
+                    path,
+                    name: label,
+                    components: jsonStructure,
+                };
+
+                const { error } = await window.engine.createPage(
+                    type === 'page' ? pageConfig : compConfig,
+                    ENV_TYPES.NEXTJS,
                     basePath
                 );
 
@@ -124,6 +103,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 }
 
                 showSuccessToast('Components added successfully');
+
+                dispatch(onSetChangeStatus(true));
             } catch (error) {
                 showErrorToast(error);
             }
@@ -137,27 +118,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                     const data = await window.api.getJsonContent(pagePath);
                     if (data.components) {
-                        let dataSaved: HierarchicalComponent[] = [];
-
-                        data.components.map((row) => {
-                            dataSaved = [
-                                ...dataSaved,
-                                {
-                                    id: generateId('row'),
-                                    columns: row.Row.map((col) => ({
-                                        id: col.id || generateId('col'),
-                                        colSize: 12,
-                                        components: col.Col.flatMap((c) =>
-                                            c.components.map((comp) => ({
-                                                ...comp,
-                                            }))
-                                        ),
-                                    })),
-                                },
-                            ];
-                        });
-
-                        setInitComponents(dataSaved);
+                        setInitComponents(data.components);
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
@@ -167,60 +128,31 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         }, [basePath, page]);
 
         const droppedComponentsMethods = {
-            reorderComponents,
-            getComponentsByRow,
-            addDroppedComponent,
-            getComponent,
             setEditingComponent,
-            setInitComponents,
             removeRow,
-            moveComponent,
-            updateComponent,
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
         };
 
-        const onDragEnd = (result: any) => {
+        const onDragEnd = useCallback((result: DragEndResult) => {
+            console.log('dropZone', result);
             handleDragEnd(result, droppedComponentsMethods);
-        };
+        }, []);
 
         return (
-            <DragDropContext onDragEnd={onDragEnd}>
-                <SidebarProvider
-                    style={
-                        {
-                            '--sidebar-width': '350px',
-                        } as React.CSSProperties
-                    }
-                >
-                    <AppSidebar data={navData} />
-                    <SidebarInset>
+            <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height-two))]">
+                <AppSidebar data={menuItems} basePath={basePath}/>
+                <SidebarInset className="flex-1">
+                    <ContainerScrollArea>
                         {isDesign ? (
-                            <div className="flex flex-1 flex-col gap-4 px-4">
-                                <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto pr-3">
-                                    <>
-                                        <div className="igrp-page-header"></div>
-                                        <div className="space-y-6 my-6">
-                                            {components.map((row) => (
-                                                <RowContainer
-                                                    key={row.id}
-                                                    id={row.id}
-                                                    onClickAddControl={
-                                                        handleClickAddControl
-                                                    }
-                                                    onClickDeleteSection={
-                                                        handleClickDeleteSection
-                                                    }
-                                                />
-                                            ))}
-                                        </div>
-                                    </>
-                                </ScrollArea>
-                            </div>
+                            <Page page={components} onDragEnd={onDragEnd} />
                         ) : (
-                            pagePath && <CodeContent pagePath={pagePath} />
+                            <CodeContent pagePath={pagePath} />
                         )}
-                    </SidebarInset>
-                </SidebarProvider>
-            </DragDropContext>
+                    </ContainerScrollArea>
+                </SidebarInset>
+                {currentComponent && <SidebarRight />}
+            </div>
         );
     }
 );

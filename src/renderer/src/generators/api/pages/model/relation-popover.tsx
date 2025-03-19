@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@renderer/components/ui/button';
 import {
     Popover,
@@ -11,10 +11,16 @@ import {
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { RelationTypeSelector } from './relation-type-selector';
-import { Switch } from '@renderer/components/ui/Switch';
-import { Relation } from '@igrp/spring-engine/dist/interfaces/types';
-import { Combobox } from '@igrp/igrp-design-system';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import {
+    Relation,
+    RelationshipTypes,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import { IGRPCombobox } from '@renderer/components/combobox';
+import { useTranslation } from 'react-i18next';
+import { formatMethods } from '../../helpers';
+import { Switch } from '@renderer/components/ui/switch';
+import { LabelRequired } from '@renderer/components/required';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 interface RelationPopoverProps {
     field: any;
@@ -27,23 +33,30 @@ export function RelationPopover({
     options,
     changeValue,
 }: RelationPopoverProps) {
-    const { t } = useTranslation(); // Hook for translations
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const { modelsOptions, models } = options;
+
     const [localRelation, setLocalRelation] = useState<Relation>(
         field.relation || {
             type: 'OneToOne',
             entity: '',
             referencedColumnName: '',
-            cardinality: 'oneWay',
+            cardinality: 'twoWay',
             inverseJoinColumn: '',
-            joinTable: '', // Name of the intermediate table
+            joinTable: '',
+            fetchType: 'lazy',
+            mappedBy: '',
+            module: '',
         }
     );
     const [availableColumns, setAvailableColumns] = useState<
         { value: string; label: string }[]
     >([]);
+
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const fetchTypes = formatMethods(['lazy', 'eager']);
 
     useEffect(() => {
         if (localRelation.entity) {
@@ -65,9 +78,14 @@ export function RelationPopover({
     }, [localRelation.entity, models]);
 
     const handleUpdate = () => {
-        // Validate required fields
         if (!localRelation.entity) {
             setErrors({ ['entity']: t('entityRequired') });
+            return;
+        }
+        if (!localRelation.fetchType) {
+            setErrors({
+                ['fetchType']: t('fieldRequired', { name: 'Fetch Type' }),
+            });
             return;
         }
         if (!localRelation.referencedColumnName) {
@@ -81,10 +99,8 @@ export function RelationPopover({
             return;
         }
 
-        // Clear any previous errors
         setErrors({});
 
-        // Update the relation
         changeValue('relation', localRelation);
         setOpen(false);
     };
@@ -114,60 +130,61 @@ export function RelationPopover({
                         onChange={(value) =>
                             setLocalRelation({
                                 ...localRelation,
-                                type: value as
-                                    | 'OneToOne'
-                                    | 'OneToMany'
-                                    | 'ManyToOne'
-                                    | 'ManyToMany',
+                                type: value as RelationshipTypes,
                             })
                         }
                         sourceField={field.name}
                         targetField={localRelation.entity || 'entity'}
                     />
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                         {localRelation.type === 'ManyToMany' && (
-                            <div className="col-span-2 gap-2">
+                            <div className="col-span-2 space-y-2 flex flex-col">
                                 <Label htmlFor="joinTable">
                                     {t('entityName')}
                                 </Label>
-                                <Input
-                                    id="joinTable"
-                                    value={localRelation.joinTable || ''}
-                                    onChange={(e) =>
-                                        setLocalRelation({
-                                            ...localRelation,
-                                            joinTable: e.target.value,
-                                        })
-                                    }
-                                    placeholder={t('entityNamePlaceholder')}
-                                />
-                                <p className="text-xs text-muted-foreground ">
-                                    {t('entityNameDescription')}
-                                </p>
-                                {errors.joinTable && (
-                                    <p className="text-xs text-foreground text-red-500">
-                                        {errors.joinTable}
+                                <div>
+                                    <Input
+                                        id="joinTable"
+                                        value={localRelation.joinTable || ''}
+                                        onChange={(e) =>
+                                            setLocalRelation({
+                                                ...localRelation,
+                                                joinTable: e.target.value,
+                                            })
+                                        }
+                                        placeholder={t('entityNamePlaceholder')}
+                                    />
+                                    <p className="text-xs text-muted-foreground ">
+                                        {t('entityNameDescription')}
                                     </p>
-                                )}
+                                    {errors.joinTable && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.joinTable}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         )}
                         <div className="space-y-2 flex flex-col">
                             <Label htmlFor="entity">{t('entity')}</Label>
-                            <Combobox
-                                name="entity"
-                                value={localRelation.entity}
-                                options={modelsOptions}
-                                placeholder={t('selectTargetTable')}
-                                onChange={(value) =>
+                            <TypeSelectorDropdown
+                                type={localRelation.entity}
+                                onTypeChange={({ value, module }) =>
                                     setLocalRelation({
                                         ...localRelation,
+                                        module,
                                         entity: value,
                                         referencedColumnName: '',
                                     })
                                 }
-                            />
+                                schemaTypes={modelsOptions}
+                                className={'w-full h-9 text-gray-500'}
+                                variant={'outline'}
+                            >
+                                <ChevronsUpDown />
+                            </TypeSelectorDropdown>
                             {errors.entity && (
-                                <p className="text-xs text-foreground text-red-500">
+                                <p className="text-xs text-red-500">
                                     {errors.entity}
                                 </p>
                             )}
@@ -176,11 +193,9 @@ export function RelationPopover({
                             <Label htmlFor="referencedColumnName">
                                 {t('referenceColumnName')}
                             </Label>
-                            <Combobox
-                                name="entity"
+                            <IGRPCombobox
                                 value={localRelation.referencedColumnName}
                                 options={availableColumns}
-                                placeholder={t('selectReferenceColumn')}
                                 onChange={(value) =>
                                     setLocalRelation({
                                         ...localRelation,
@@ -189,34 +204,75 @@ export function RelationPopover({
                                 }
                             />
                             {errors.referencedColumnName && (
-                                <p className="text-xs text-foreground text-red-500">
+                                <p className="text-xs text-red-500">
                                     {errors.referencedColumnName}
                                 </p>
                             )}
                         </div>
                     </div>
 
+                    {localRelation.cardinality === 'twoWay' &&
+                        localRelation.type === 'ManyToMany' && (
+                            <div className="space-y-2">
+                                <Label htmlFor="inverseJoinColumn">
+                                    {t('fieldNameIn')} {localRelation.joinTable}
+                                </Label>
+                                <Input
+                                    id="inverseJoinColumn"
+                                    value={
+                                        localRelation.inverseJoinColumn || ''
+                                    }
+                                    onChange={(e) =>
+                                        setLocalRelation({
+                                            ...localRelation,
+                                            inverseJoinColumn: e.target.value,
+                                        })
+                                    }
+                                    placeholder={t('fieldNamePlaceholder')}
+                                />
+                            </div>
+                        )}
+
                     {(localRelation.cardinality === 'twoWay' ||
-                        localRelation.type === 'ManyToMany') && (
-                        <div className="space-y-2">
-                            <Label htmlFor="inverseJoinColumn">
-                                {t('fieldNameIn')}{' '}
-                                {localRelation.joinTable ||
-                                    localRelation.entity}
-                            </Label>
-                            <Input
-                                id="inverseJoinColumn"
-                                value={localRelation.inverseJoinColumn || ''}
-                                onChange={(e) =>
-                                    setLocalRelation({
-                                        ...localRelation,
-                                        inverseJoinColumn: e.target.value,
-                                    })
-                                }
-                                placeholder={t('fieldNamePlaceholder')}
-                            />
-                        </div>
-                    )}
+                        localRelation.type === 'OneToMany') &&
+                        localRelation.type !== 'ManyToMany' && (
+                            <div className="space-y-2">
+                                <Label htmlFor="mappedBy">
+                                    {t('fieldNameIn')} {localRelation.entity}
+                                </Label>
+                                <Input
+                                    id="mappedBy"
+                                    value={localRelation.mappedBy || ''}
+                                    onChange={(e) =>
+                                        setLocalRelation({
+                                            ...localRelation,
+                                            mappedBy: e.target.value,
+                                        })
+                                    }
+                                    placeholder={t('fieldNamePlaceholder')}
+                                />
+                            </div>
+                        )}
+
+                    <div className="space-y-2 flex flex-col">
+                        <LabelRequired>{t('fetchType')}</LabelRequired>
+                        <IGRPCombobox
+                            value={localRelation.fetchType}
+                            options={fetchTypes}
+                            onChange={(value) =>
+                                setLocalRelation({
+                                    ...localRelation,
+                                    fetchType: value as 'lazy' | 'eager',
+                                })
+                            }
+                            required
+                        />
+                        {errors.fetchType && (
+                            <p className="text-xs text-red-500">
+                                {errors.fetchType}
+                            </p>
+                        )}
+                    </div>
                     <div className="flex items-center space-x-2">
                         <Switch
                             id="cardinality"

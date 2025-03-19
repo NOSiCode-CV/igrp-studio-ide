@@ -8,14 +8,16 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { Combobox, IGRPDataTable } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
-import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { useTranslation } from 'react-i18next';
+import { Connection } from 'src/main/types';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 
 const actions = [
     {
@@ -36,13 +38,13 @@ export type Database = {
 };
 
 interface TableManagerProps {
-    onRowsSubmit: (rows: any[]) => void;
+    onRowsSubmit: (rows: Set<string>) => void;
     onSelectedConnection: (value: string) => void;
 }
 
 export function TableManager({
-    onRowsSubmit,
     onSelectedConnection,
+    onRowsSubmit,
 }: TableManagerProps) {
     const { t } = useTranslation();
     const { showErrorToast } = useToast();
@@ -56,11 +58,14 @@ export function TableManager({
     const [previewColumns, setPreviewColumns] = useState<Array<any>>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [action, setAction] = useState('overwrite');
+    const [selectedTables, setSelectedTables] = useState<Set<string>>(
+        new Set()
+    );
 
     useEffect(() => {
         const getConnections = async () => {
             const connections = await window.repo.connection.findAll();
-            const maps = connections.map((conn) => {
+            const maps = connections.map((conn: Connection) => {
                 return {
                     label: conn.name,
                     value: conn.name,
@@ -70,6 +75,29 @@ export function TableManager({
         };
         getConnections();
     }, []);
+
+    const handleCheckTableSelect = (tableName: string) => {
+        setSelectedTables((prevSelectedTables) => {
+            const newSelectedTables = new Set(prevSelectedTables);
+            if (newSelectedTables.has(tableName)) {
+                newSelectedTables.delete(tableName); // Remove if already selected
+            } else {
+                newSelectedTables.add(tableName); // Add if not selected
+            }
+            return newSelectedTables;
+        });
+    };
+
+    const handleSelectAll = (isSelected: boolean) => {
+        if (isSelected) {
+            // Add all table names to the selectedTables set
+            const allTableNames = tables.map((table) => table.tableName);
+            setSelectedTables(new Set(allTableNames));
+        } else {
+            // Clear the selectedTables set
+            setSelectedTables(new Set());
+        }
+    };
 
     const handleConnectionSelect = async (connectionName: string) => {
         setSelectedConnection(connectionName);
@@ -87,8 +115,8 @@ export function TableManager({
                 await window.api.getTables(connectionName);
             if (success) {
                 const tablesArr = tables
-                    .filter((table) => !ignoreTables.includes(table))
-                    .map((table) => {
+                    .filter((table: string) => !ignoreTables.includes(table))
+                    .map((table: string) => {
                         return {
                             tableName: table,
                             id: table,
@@ -114,9 +142,10 @@ export function TableManager({
         setPreviewColumns(structure);
     };
 
-    const handleChangeRows = (value) => {
-        onRowsSubmit(value);
-    };
+    useEffect(() => {
+        console.log(selectedTables);
+        onRowsSubmit(selectedTables);
+    }, [selectedTables]);
 
     const columns: ColumnDef<Database>[] = [
         {
@@ -129,7 +158,10 @@ export function TableManager({
                         (table.getIsSomePageRowsSelected() && 'indeterminate')
                     }
                     onCheckedChange={(value) =>
+                       {
                         table.toggleAllPageRowsSelected(!!value)
+                        handleSelectAll(!!value);
+                       }
                     }
                     aria-label={t('selectAll')}
                 />
@@ -140,6 +172,7 @@ export function TableManager({
                     onCheckedChange={(value) => {
                         row.toggleSelected(!!value);
                         handleTableSelect(row.original.tableName);
+                        handleCheckTableSelect(row.original.tableName);
                     }}
                     aria-label={t('selectRow')}
                 />
@@ -167,10 +200,11 @@ export function TableManager({
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
                     <Label>{t('databaseConnections')}</Label>
-                    <Combobox
+                    <IGRPCombobox
                         value={selectedConnection}
-                        name="connection"
-                        onChange={handleConnectionSelect}
+                        onChange={(selected) => {
+                            handleConnectionSelect(selected);
+                        }}
                         placeholder={t('selectConnection')}
                         options={connections}
                         className="w-full"
@@ -180,9 +214,8 @@ export function TableManager({
                     <Label className="text-xs">
                         {t('whileMatchingSchema')}
                     </Label>
-                    <Combobox
+                    <IGRPCombobox
                         value={action}
-                        name="action"
                         onChange={(value) => setAction(value)}
                         placeholder={t('selectAction')}
                         options={actions}
@@ -190,8 +223,8 @@ export function TableManager({
                     />
                 </div>
             </div>
-            <div className="flex mt-3 space-x-3">
-                <div className="w-1/2 space-y-4">
+            <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="space-y-4">
                     <div className="rounded border">
                         <h4 className="p-2 text-sm">{t('databaseTable')}</h4>
                         <Separator />
@@ -204,26 +237,30 @@ export function TableManager({
                                 <IGRPDataTable
                                     columns={columns}
                                     data={tables}
-                                    onRowSelectionChange={handleChangeRows}
-                                    rowId="id"
                                 />
                             )}
                         </ScrollArea>
                     </div>
                 </div>
-                <div className="w-1/2 space-y-3">
+                <div className="space-y-3">
                     {selectedTable ? (
                         <>
                             <h3 className="text-sm text-muted-foreground">
-                                {t('previewTable', { tableName: selectedTable })}
+                                {t('previewTable', {
+                                    tableName: selectedTable,
+                                })}
                             </h3>
-                            <ScrollArea className="h-[450px] w-full rounded-md border">
+                            <ScrollArea className="h-[450px] rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>{t('column')}</TableHead>
-                                            <TableHead>{t('dataType')}</TableHead>
-                                            <TableHead>{t('isNullable')}</TableHead>
+                                            <TableHead>
+                                                {t('dataType')}
+                                            </TableHead>
+                                            <TableHead>
+                                                {t('isNullable')}
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>

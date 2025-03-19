@@ -1,5 +1,5 @@
-import { AlertDialog, IGRPContainer, IGRPDataTable } from '@igrp/igrp-design-system'
-import { ColumnDef } from '@igrp/igrp-design-system/dist/types'
+import { AlertDialog, IGRPContainer, IGRPDataTable } from '@igrp/igrp-framework-react-design-system'
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals'
 import { IGRPTabs, IGRPTabsContent, IGRPTabsList, IGRPTabsTrigger } from '@renderer/components/tabs'
 import { Button } from '@renderer/components/ui/button'
 import { getBadgeColor } from '@renderer/utils/helpers'

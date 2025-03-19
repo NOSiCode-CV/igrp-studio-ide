@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Globe, Home, Link, Settings } from 'lucide-react';
+import { Bell, Globe, Home, Keyboard, Link, Settings } from 'lucide-react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -30,7 +30,7 @@ import {
 import { AboutSettings } from './about-settings';
 import { LanguageSettings } from './language-settings';
 import { ConnectedAccountsSettings } from './connected-accounts-settings';
-import React, {  } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -39,6 +39,7 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import KeyboardShortcuts from './keyboard-shortcuts';
 
 const data = {
     nav: [
@@ -50,6 +51,7 @@ const data = {
             component: ConnectedAccountsSettings,
         },
         { name: 'notifications', icon: Bell },
+        { name: 'shortcuts', icon: Keyboard, component: KeyboardShortcuts },
     ],
 };
 
@@ -71,8 +73,8 @@ export function SettingsDialog() {
                 </TooltipTrigger>
                 <TooltipContent>{t('settings')}</TooltipContent>
             </Tooltip>
-            <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[800px] max-w-[900px]">
-                <DialogHeader className='pb-3'>
+            <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]">
+                <DialogHeader className="pb-3">
                     <DialogTitle className="sr-only">
                         {t('settings')}
                     </DialogTitle>
@@ -113,7 +115,7 @@ export function SettingsDialog() {
                     </Sidebar>
 
                     <main className="flex h-[480px] flex-1 flex-col">
-                        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                             <div className="flex items-center gap-2 px-4">
                                 <Breadcrumb>
                                     <BreadcrumbList>

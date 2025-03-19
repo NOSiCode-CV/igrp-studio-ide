@@ -45,11 +45,11 @@ export function AboutSettings() {
                             {t('found_new_version')} 1.0.1
                         </p> */}
                         <div className="flex items-center gap-2 pt-1">
-                            <Button className="gap-2">
+                            <Button className="gap-2" size={'sm'}>
                                 <CircleArrowUp className="h-4 w-4" />
                                 {t('check_update')}
                             </Button>
-                            <Button variant="link" className="h-8">
+                            <Button variant="link" className="h-8" size={'sm'}>
                                 {t('changelog')}
                             </Button>
                         </div>

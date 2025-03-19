@@ -1,6 +1,6 @@
 import { AlertCircle } from "lucide-react";
 import { Component, ErrorInfo, ReactNode } from "react";
-import logo from '@renderer/assets/images/igrp-blue.svg';
+import logo from '@renderer/assets/images/igrp-green.svg';
 import { ROUTES } from "@renderer/routes/routeConstants";
 import { useNavigate } from 'react-router-dom'; // Assuming you're using react-router for navigation
 

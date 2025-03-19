@@ -9,7 +9,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import * as Yup from 'yup';
-import { Combobox } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { Connection } from 'src/main/types';
 import useToast from '@renderer/components/useToast';
 
@@ -116,7 +116,7 @@ export function ConnectionForm({
                                     <Label htmlFor="databaseType">
                                         Database Type
                                     </Label>
-                                    <Combobox
+                                    <IGRPCombobox
                                         options={databaseTypes}
                                         value={values.databaseType}
                                         onChange={(value) => {
@@ -125,7 +125,6 @@ export function ConnectionForm({
                                                 value
                                             );
                                         }}
-                                        name="databaseType"
                                         className="w-full"
                                     />
                                     {errors.databaseType &&

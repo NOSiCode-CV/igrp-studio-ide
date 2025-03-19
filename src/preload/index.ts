@@ -1,12 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import {
-	ControllerConfig,
-	DTOConfig,
-	ModelConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
 import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
+import { EVENTS } from '../main/constants/events'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -15,74 +10,6 @@ const handleError = (error: unknown): HandlerResponse => ({
 
 // Custom APIs for renderer
 const api = {
-
-	createModule: async (moduleConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-module', moduleConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createModel: async (modelConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-model', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createDto: async (dtoConfig: DTOConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-dto', dtoConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createController: async (
-		controllerConfig: ControllerConfig,
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-controller', controllerConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deletePage: async (pageConfig: PageConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:delete-page', pageConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	addComponentToPage: async (
-		pageConfig: PageConfig,
-		components: Component[],
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke(
-				'next-engine:add-component-page',
-				pageConfig,
-				components,
-				basePath
-			)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
 
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
@@ -121,40 +48,98 @@ const api = {
 const engine = {
 	createProject: async (project: ProjectData, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-project', project, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PROJECT, project, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.DELETE_ELEMENT, config, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_RESPONSE, response, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createDto: async (dtoConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_DTO, dtoConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createModule: async (moduleConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_MODULE, moduleConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createController: async (controllerConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_CONTROLLER, controllerConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createModel: async (modelConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_MODEL, modelConfig, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createEnum: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-enum', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_ENUM, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	serializeElement: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:serialize-element', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.SERIALIZE_ELEMENT, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
-	}
+	},
+	createPermission: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PERMISSION, data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 
+	createPage: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PAGE, data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	registryComponent: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getComponent: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_COMPONENT, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {

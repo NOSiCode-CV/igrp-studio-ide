@@ -1,13 +1,25 @@
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { cn } from '@renderer/lib/utils';
 import React from 'react';
 
 interface ContainerScrollAreaProps {
     children: React.ReactNode;
     size?: 'sm' | 'lg';
+    className?: string;
 }
 
 export const ContainerScrollArea: React.FC<ContainerScrollAreaProps> = ({
-    children
+    children,
+    className,
 }) => {
-    return <ScrollArea className="h-100">{children}</ScrollArea>;
+    return (
+        <ScrollArea
+            className={cn(
+                'h-[calc(100svh-var(--header-height-three))]',
+                className
+            )}
+        >
+            {children}
+        </ScrollArea>
+    );
 };
