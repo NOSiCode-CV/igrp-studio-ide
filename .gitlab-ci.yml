@@ -18,7 +18,6 @@ build_packagedev:
   script:
     - yarn install
     - yarn build:win
-    - yarn build:linux
   artifacts:
     paths:
       - dist/
