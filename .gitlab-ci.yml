@@ -50,8 +50,8 @@ release:
         }' \
         "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/releases"
         # $CI_API_V4_URL equals http://git.nosi.cv/api/v4. As per the curl standard, this results in a redirection from POST (http) to GET (https). Therefore, cannot be used here.
-  # only:
-    # - tags
+  only:
+    - tags
   dependencies:
     - build_packagedev
   needs:
