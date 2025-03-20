@@ -23,6 +23,9 @@ build_packagedev:
     paths:
       - dist/
     expire_in: 4 week
+  only:
+    - tags
+
 
 release:
   stage: release
