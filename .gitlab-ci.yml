@@ -34,7 +34,7 @@ release:
     - echo "Uploading artifacts to GitLab release..."
     - |
       # Upload artifacts to the release
-      for file in dist/*; do
+      for file in out/*; do
         curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
              --upload-file "$file" \
              "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/packages/generic/electron-builder/$CI_COMMIT_TAG/$(basename "$file")"
