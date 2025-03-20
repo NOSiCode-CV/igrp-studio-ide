@@ -1,7 +1,7 @@
 export interface SchemaField {
   name: string;
   type: string;
-  description: string;
+  description?: string;
   properties?: Record<string, SchemaField>;
   required?: boolean;
   nullable?: boolean;

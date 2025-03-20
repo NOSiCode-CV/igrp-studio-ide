@@ -46,6 +46,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const [data, setData] = useState<any[]>([]);
 
     const [localSchema, setLocalSchema] = useState({
+        name: 'data',
         type: 'object',
         properties: {},
     });
@@ -73,6 +74,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         }
     };
 
+    const updateLocalSchema = (schema) => {
+        setLocalSchema(schema);
+    };
+
     useEffect(() => {
         const content = formik.values.requestBody?.content;
 
@@ -82,7 +87,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
         const schema = content?.[contentType]?.['schema'];
 
-        setLocalSchema(schema);
+        updateLocalSchema(schema);
 
         setBodyType(contentType as TbodyType);
     }, [formik.values.requestBody]);
@@ -102,9 +107,15 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     const handleSchemaChange = (newSchema: JSONSchema) => {
+        const properties = newSchema.properties || {};
+
+        const firstKey = Object.keys(properties)[0];
+
+        const extractedSchema = firstKey ? properties[firstKey] : newSchema;
+
         const content = {
             [contentType]: {
-                schema: newSchema,
+                schema: extractedSchema,
             },
         };
 
@@ -142,6 +153,17 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
         updateFormik(content);
     }, [data]);
+
+    const getContentToSchemaProps = () => {
+        return localSchema
+            ? {
+                  type: '',
+                  properties: {
+                      [localSchema?.name || 'data']: localSchema,
+                  },
+              }
+            : null;
+    };
 
     return (
         <div>
@@ -241,7 +263,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                 <TabsContent value="schema">
                                     <JSONSchemaBuilder
                                         schemaTypes={schemaTypes}
-                                        initialSchema={localSchema || null}
+                                        initialSchema={getContentToSchemaProps()}
                                         onSchemaChange={handleSchemaChange}
                                     />
                                 </TabsContent>
