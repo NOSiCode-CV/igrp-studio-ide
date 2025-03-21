@@ -94,10 +94,44 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
             handleSave();
         },
     });
+
+    const loadAction = (content: ControllerAction) => {
+        const {
+            actionName,
+            path,
+            method,
+            pathVariables,
+            requestParams,
+            headers,
+            responses,
+            requestBody,
+        } = content;
+
+        setOldActionName(actionName);
+
+        formik.setFieldValue(
+            'actionName',
+            actionName || initialValues.actionName
+        );
+        formik.setFieldValue('method', method || initialValues.method);
+        formik.setFieldValue('path', path || initialValues.path);
+
+        formik.setFieldValue('requestBody', requestBody || '');
+
+        formik.setFieldValue(
+            'pathVariables',
+            pathVariables || initialValues.pathVariables
+        );
+        formik.setFieldValue(
+            'requestParams',
+            requestParams || initialValues.requestParams
+        );
+        formik.setFieldValue('responses', responses || initialValues.responses);
+        formik.setFieldValue('headers', headers || initialValues.headers);
+    };
+
     useEffect(() => {
         const load = async () => {
-            if (!currentItem) return;
-
             await getJsonData(currentItem.path).then((data) => {
                 setData(data);
             });
@@ -112,63 +146,27 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
     }, [selectors]);
 
     useEffect(() => {
+        
         if (data) {
-            const { name, basePath, description, id } = data;
+            const { name, basePath, description, module } = data;
 
-            setId(id);
             setTitle(`${name}(${basePath})`);
             setName(name);
             setPathController(basePath);
             setDescription(description);
+
+            setModule(module);
         }
     }, [data]);
 
     useEffect(() => {
-        if (currentItem && currentItem.content) {
-            const {
-                actionName,
-                path,
-                method,
-                pathVariables,
-                requestParams,
-                headers,
-                responses,
-                requestBody,
-            } = currentItem.content;
-
-            setOldActionName(actionName);
-
-            formik.setFieldValue(
-                'actionName',
-                actionName || initialValues.actionName
-            );
-            formik.setFieldValue('method', method || initialValues.method);
-            formik.setFieldValue('path', path || initialValues.path);
-
-            formik.setFieldValue('requestBody', requestBody || '');
-            formik.setFieldValue(
-                'pathVariables',
-                pathVariables || initialValues.pathVariables
-            );
-            formik.setFieldValue(
-                'requestParams',
-                requestParams || initialValues.requestParams
-            );
-            formik.setFieldValue(
-                'responses',
-                responses || initialValues.responses
-            );
-            formik.setFieldValue('headers', headers || initialValues.headers);
-        }
-        if (currentItem) {
-            setModule(currentItem.module);
-        }
+        const { content, id } = currentItem;
+        if (content) loadAction(content);
+        setId(id);
     }, [currentItem]);
 
     const getValuesToSubmit = async () => {
         const values = { ...formik.values };
-
-        if (!values.requestBody) delete values.requestBody;
 
         const data = await getJsonData(currentItem?.path);
 
@@ -178,7 +176,6 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
             values.pathVariables &&
             values.pathVariables.filter((item) => item.type && item.name);
 
-        // Filter out invalid requestParams
         const validRequestParams =
             values.requestParams &&
             values.requestParams.filter((item) => item.type && item.name);
@@ -194,18 +191,15 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
             headers: validHeaders,
         };
 
-        // Check if a matching action exists in data?.actions
         const existingActions = data?.actions || [];
         const isActionExisting = existingActions.some(
             (dataAction) => dataAction.actionName === oldActionName
         );
 
-        // Merge or replace actions
         const mergedActions = existingActions.map((dataAction) =>
             dataAction.actionName === actionName ? newAction : dataAction
         );
 
-        // If no matching action, add the new action
         const finalActions: ControllerAction[] = isActionExisting
             ? mergedActions
             : [...existingActions, newAction];

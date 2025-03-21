@@ -41,17 +41,16 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const { t } = useTranslation();
 
     const [bodyType, setBodyType] = useState<TbodyType>('none');
+
     const [contentType, setContentType] = useState('application/json');
 
     const [data, setData] = useState<any[]>([]);
 
-    const [localSchema, setLocalSchema] = useState({
-        name: 'data',
-        type: 'object',
-        properties: {},
-    });
+    const [localSchema, setLocalSchema] = useState<any>(null);
 
-    const jsonSchemaToArray = (schema: JSONSchema) => {
+    const requestBodyContent = formik.values.requestBody?.content;
+
+    const jsonSchemaToArray = (schema: JSONSchema | null) => {
         return Object.entries(schema?.properties || {}).map(
             ([name, properties]) => {
                 return {
@@ -62,35 +61,30 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         );
     };
 
-    const getCurrentDataSchema = () => {
-        return formik.values.requestBody?.content;
-    };
-
     const updateFormik = (content) => {
-        const currentValue = getCurrentDataSchema();
-
-        if (JSON.stringify(currentValue) !== JSON.stringify(content)) {
-            formik.setFieldValue(routeFormData, { content });
-        }
-    };
-
-    const updateLocalSchema = (schema) => {
-        setLocalSchema(schema);
-    };
-
-    useEffect(() => {
-        const content = formik.values.requestBody?.content;
-
-        if (!content) return;
 
         const contentType = Object.keys(content)[0];
 
         const schema = content?.[contentType]?.['schema'];
 
-        updateLocalSchema(schema);
+        if (JSON.stringify(requestBodyContent) !== JSON.stringify(content)) {
+            formik.setFieldValue(routeFormData, { content });
+
+            setLocalSchema(schema);
+        }
+    };
+
+    useEffect(() => {
+        if (!requestBodyContent) return;
+
+        const contentType = Object.keys(requestBodyContent)[0];
+
+        const schema = requestBodyContent?.[contentType]?.['schema'];
+
+        if (!localSchema) setLocalSchema(schema);
 
         setBodyType(contentType as TbodyType);
-    }, [formik.values.requestBody]);
+    }, [requestBodyContent]);
 
     useEffect(() => {
         const data = jsonSchemaToArray(localSchema);
@@ -159,7 +153,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             ? {
                   type: '',
                   properties: {
-                      [localSchema?.name || 'data']: localSchema,
+                      [localSchema?.name]: localSchema,
                   },
               }
             : null;
