@@ -135,7 +135,7 @@
 		"win": {
 			"icon": "resources/icons/icon.ico",
 			"target": "nsis",
-			"setupExe": "IGRP_Studio_Setup.exe",
+			"artifactName": "IGRP_Studio_Setup.exe",
 			"signtoolOptions": {
 				"certificateFile": "${CERTIFICATE_FILE}",
 				"certificatePassword": "${CERTIFICATE_PASSWORD}",
@@ -147,7 +147,8 @@
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
-			"category": "cv.nosi.igrpstudio.category.developer-tools"
+			"category": "cv.nosi.igrpstudio.category.developer-tools",
+			"artifactName": "IGRP_Studio_${version}.${ext}"
 		},
 		"linux": {
 			"icon": "resources/icons/icon.png",
