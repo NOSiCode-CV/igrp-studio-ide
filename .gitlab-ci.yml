@@ -33,11 +33,11 @@ release:
   script:
     - echo "Uploading artifacts to GitLab release..."
     - |
-      # Upload artifacts to the release
       for file in dist/*; do
+        echo "Uploading $file..."
         curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
              --upload-file "$file" \
-             "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/packages/generic/electron-builder/$CI_COMMIT_TAG/$(basename "$file")"
+             "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/packages/generic/electron-builder/${CI_COMMIT_TAG}/$(basename "$file")"
       done
 
     - echo "Creating a new release on GitLab..."
@@ -45,19 +45,20 @@ release:
       curl --request POST \
            --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
            --header "Content-Type: application/json" \
-           --data '{
-             "name": "Release $CI_COMMIT_TAG",
-             "tag_name": "$CI_COMMIT_TAG",
-             "description": "Release for commit $CI_COMMIT_SHA",
-             "assets": {
-               "links": [
+           --data "{
+             \"name\": \"Release ${CI_COMMIT_TAG}\",
+             \"tag_name\": \"${CI_COMMIT_TAG}\",
+             \"description\": \"Release for commit ${CI_COMMIT_SHA}\",
+             \"assets\": {
+               \"links\": [
                  {
-                   "name": "Download",
-                   "url": "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/packages/generic/electron-builder/$CI_COMMIT_TAG"
+                   \"name\": \"Download\",
+                   \"url\": \"https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/packages/generic/electron-builder/${CI_COMMIT_TAG}\"
                  }
                ]
              }
-           }' \
-           "https://git.nosi.cv/api/v4/projects/$CI_PROJECT_ID/releases"
+           }" \
+           "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/releases"
+
   needs:
     - build_packagedev
