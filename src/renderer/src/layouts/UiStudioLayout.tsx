@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from './components/header';
-import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { SidebarProvider } from '@renderer/components/ui/sidebar';
 import { Footer } from './components/footer';
+import { Toaster } from '@renderer/components/ui/sonner';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string }>;
@@ -40,7 +40,7 @@ const Layout = (props: LayoutProps) => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <ToastContainer />
+                    <Toaster position="top-right" richColors closeButton/>
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">

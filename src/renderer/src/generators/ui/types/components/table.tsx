@@ -229,10 +229,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             key={index}
                             className="bg-card rounded-lg border p-2 group/table"
                         >
-                            <TableTool
-                                parentComp={comp}
-                                comp={tableComp}
-                            />
+                            <TableTool parentComp={comp} comp={tableComp} />
                             {renderTableFilters(compName)}
                         </div>
                     );
@@ -245,25 +242,26 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                     return (
                         <div
                             key={index}
-                            className="bg-card rounded-lg border p-2 group/table overflow-x-auto"
+                            className="bg-card rounded-lg border p-2 group/table"
                         >
-                            <TableTool
-                                parentComp={comp}
-                                comp={tableComp}
-                            />
+                            <TableTool parentComp={comp} comp={tableComp} />
                             {columns.length === 0 ? (
                                 <GenNoInfoComp
                                     type={getLabel(componentName).toUpperCase()}
                                 />
                             ) : (
-                                <Table className='overflow-x-auto'>
-                                    <TableHeader>
-                                        <TableRow>
-                                            {renderTableHeaders(componentName)}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>{renderTableRows}</TableBody>
-                                </Table>
+                                <div className="relative w-full overflow-x-auto">
+                                    <Table className="table-auto">
+                                        <TableHeader>
+                                            <TableRow>
+                                                {renderTableHeaders(
+                                                    componentName
+                                                )}
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>{renderTableRows}</TableBody>
+                                    </Table>
+                                </div>
                             )}
                         </div>
                     );

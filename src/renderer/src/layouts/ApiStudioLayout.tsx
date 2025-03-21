@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +16,7 @@ import { ROUTES } from '@renderer/routes/routeConstants';
 import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 import { Footer } from './components/footer';
+import { Toaster } from '@renderer/components/ui/sonner';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -74,7 +74,7 @@ const Layout = (props: LayoutProps) => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <ToastContainer />
+                    <Toaster position="top-right" richColors closeButton/>
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
@@ -93,7 +93,7 @@ const Layout = (props: LayoutProps) => {
                         </SidebarInset>
                     </div>
                 </div>
-                <Footer /> 
+                <Footer />
             </SidebarProvider>
         </div>
     );

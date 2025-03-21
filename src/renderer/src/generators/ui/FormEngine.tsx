@@ -140,14 +140,14 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         }, []);
 
         return (
-            <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height-two))]">
+            <div className="flex flex-1 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath}/>
-                <SidebarInset className="flex-1">
+                <SidebarInset>
                     <ContainerScrollArea>
                         {isDesign ? (
                             <Page page={components} onDragEnd={onDragEnd} />
                         ) : (
-                            <CodeContent pagePath={pagePath} />
+                            <CodeContent pagePath={pagePath} />  
                         )}
                     </ContainerScrollArea>
                 </SidebarInset>

@@ -1,26 +1,12 @@
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'sonner';
 
 const useToast = () => {
 	const showSuccessToast = (message: string) => {
-		const toastId = toast.success(message, {
-			position: "top-right",
-			className: 'bg-success text-white',
-			autoClose: 5000,
-			hideProgressBar: false,
-		});
-		setTimeout(() => toast.dismiss(toastId), 5000);
+		toast.success(message)
 	};
 
 	const displayError = (message: string) => {
-		const toastId = toast.error(message, {
-			position: "top-right",
-			className: 'bg-danger text-white',
-			autoClose: 5000,
-			hideProgressBar: false,
-		});
-
-		setTimeout(() => toast.dismiss(toastId), 5000);
+		toast.error(message)
 	};
 
 	const showErrorToast = (error: any) => {
@@ -35,13 +21,7 @@ const useToast = () => {
 	};
 
 	const showWarningToast = (message: string) => {
-		const toastId = toast.warn(message, {
-			position: "top-right",
-			className: 'bg-warning text-dark',
-			autoClose: 5000,
-			hideProgressBar: false,
-		});
-		setTimeout(() => toast.dismiss(toastId), 5000);
+		toast.warning(message)
 	};
 
 	return {
