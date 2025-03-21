@@ -6,7 +6,7 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      outDir: 'dist/main',
+      outDir: 'out/main',
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/main/index.ts'),
@@ -17,7 +17,7 @@ export default defineConfig({
   preload: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      outDir: 'dist/preload',
+      outDir: 'out/preload',
     },
   },
   renderer: {
@@ -37,7 +37,7 @@ export default defineConfig({
       postcss: './postcss.config.mjs',
     },
     build: {
-      outDir: 'dist/renderer',
+      outDir: 'out/renderer',
       rollupOptions: {
         output: {
           manualChunks: {

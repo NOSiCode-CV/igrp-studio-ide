@@ -133,11 +133,14 @@ const useNavdata = (filesThree: FileTree[]) => {
     );
 
     const getSubItems = useCallback(
-        (categoryName: string, file: any, path: string, folderName: string) => {
-            const actions = file?.content?.actions;
-            if (categoryName === OPTION_TYPE.CONTROLLER && actions) {
+        (file: any, folderName: string) => {
+            const { path, content } = file;
+
+            const { actions, type, id } = content;
+
+            if (type === OPTION_TYPE.CONTROLLER && actions) {
                 return actions.map((action) => ({
-                    id: `action-${action.actionName}`,
+                    id,
                     label: action.actionName,
                     path: path,
                     type: OPTION_TYPE.ACTION,
@@ -239,7 +242,11 @@ const useNavdata = (filesThree: FileTree[]) => {
                                 child.children.forEach((file) => {
                                     if (!file.isDirectory) {
                                         const fileMenuItem: MenuItem = {
-                                            id: file.content?.id || file.name,
+                                            id:
+                                                file.content?.type ===
+                                                OPTION_TYPE.CONTROLLER
+                                                    ? `${file.content?.id}-CONTROLLER`
+                                                    : file.content?.id,
                                             label:
                                                 file.content?.name || file.name,
                                             path: file.path,
@@ -247,9 +254,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                             type: file.content?.type,
                                             link: ROUTES.PATH_PAGE_BUILDER_API,
                                             subItems: getSubItems(
-                                                file.content?.type,
                                                 file,
-                                                file.path,
                                                 folder.name
                                             ),
                                             click: onClickItem,
@@ -278,12 +283,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                 module: folder.name,
                                 type: folder.content?.type,
                                 link: ROUTES.PATH_PAGE_BUILDER_API,
-                                subItems: getSubItems(
-                                    folder.content?.type,
-                                    folder,
-                                    folder.path,
-                                    folder.name
-                                ),
+                                subItems: getSubItems(folder, folder.name),
                                 click: onClickItem,
                                 dropdownclick: onClickItem,
                                 dropdownMenus:

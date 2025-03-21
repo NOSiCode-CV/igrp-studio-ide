@@ -29,18 +29,14 @@ interface DtoProps {
     onCloseTab: () => void;
 }
 
-const DtoLayout = ({
-    selectors,
-    currentItem,
-    onCloseTab
-}: DtoProps) => {
+const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
     const { initializeTabFromCurrentItem } = useTabs();
 
     const dispatch: any = useDispatch();
 
     const { createGitCommit } = useGit();
 
-    const { models, basePath, dto, enums } = useStudioAPI(currentItem?.module);
+    const { models, basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module);
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -61,18 +57,13 @@ const DtoLayout = ({
     });
 
     useEffect(() => {
-        const getJsonData = async () => {
-            if (!currentItem) return;
-
-            try {
-                const data = await window.api.getJsonContent(currentItem.path);
+        const load = async () => {
+            await getJsonData(currentItem.path).then((data) => {
                 setData(data);
-            } catch (error) {
-                console.error('Failed to load JSON content:', error);
-            }
+            });
         };
 
-        getJsonData();
+        load();
     }, [currentItem]);
 
     useEffect(() => {

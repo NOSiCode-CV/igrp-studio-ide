@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "0.0.1-alpha",
 	"description": "IGRP Studio for development",
-	"main": "dist/main/index.js",
+	"main": "out/main/index.js",
 	"author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -11,11 +11,11 @@
 		"typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
 		"typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
 		"typecheck": "npm run typecheck:node && npm run typecheck:web",
-		"start": "electron-vite preview --outDir=dist",
-		"dev": "electron-vite dev --outDir=dist",
-		"package": "electron-vite build --outDir=dist && electron-forge package",
-		"make": "electron-vite build --outDir=dist && electron-forge make",
-		"build": "npm run typecheck && electron-vite build --outDir=dist",
+		"start": "electron-vite preview ",
+		"dev": "electron-vite dev ",
+		"package": "electron-vite build  && electron-forge package",
+		"make": "electron-vite build  && electron-forge make",
+		"build": "npm run typecheck && electron-vite build ",
 		"postinstall": "electron-builder install-app-deps",
 		"build:unpack": "npm run build && electron-builder --dir",
 		"build:win": "npm run build && electron-builder --win --config",
@@ -132,7 +132,15 @@
 		"appId": "cv.nosi.igrpstudio.beta",
 		"win": {
 			"icon": "resources/icons/icon.ico",
-			"target": "nsis"
+			"target": "nsis",
+			"signtoolOptions": {
+				"certificateFile": "${CERTIFICATE_FILE}",
+				"certificatePassword": "${CERTIFICATE_PASSWORD}",
+				"signingHashAlgorithms": [
+					"sha256"
+				],
+				"rfc3161TimeStampServer": "http://timestamp.digicert.com"
+			}
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
@@ -155,11 +163,8 @@
 			}
 		],
 		"files": [
-			"dist/**/*",
-			"!dist/**/*.map"
-		],
-		"directories": {
-			"output": "out"
-		}
+			"out/**/*",
+			"!out/**/*.map"
+		]
 	}
 }
