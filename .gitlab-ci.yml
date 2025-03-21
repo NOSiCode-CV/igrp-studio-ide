@@ -35,9 +35,17 @@ release:
     - |
       for file in dist/*; do
         echo "Uploading $file..."
-        curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-             --upload-file "$file" \
-             "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/packages/generic/electron-builder/${CI_COMMIT_TAG}/$(basename "$file")"
+        UPLOAD_URL="https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/packages/generic/electron-builder/${CI_COMMIT_TAG}/$(basename "$file")"
+        echo "Upload URL: $UPLOAD_URL"
+        
+        if [[ -n "${GITLAB_TOKEN}" && -n "${CI_PROJECT_ID}" && -n "${CI_COMMIT_TAG}" ]]; then
+          curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+               --upload-file "$file" \
+               "$UPLOAD_URL"
+        else
+          echo "Error: Missing required environment variables."
+          exit 1
+        fi
       done
 
     - echo "Creating a new release on GitLab..."
