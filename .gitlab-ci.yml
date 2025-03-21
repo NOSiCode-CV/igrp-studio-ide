@@ -34,6 +34,7 @@ release:
     - echo "Uploading artifacts to GitLab release..."
     - |
       for file in dist/*; do
+        filename=$(basename "$file" | sed 's/ /%20/g')
         echo "Uploading $file..."
         UPLOAD_URL="https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/packages/generic/electron-builder/${CI_COMMIT_TAG}/$(basename "$file")"
         echo "Upload URL: $UPLOAD_URL"
