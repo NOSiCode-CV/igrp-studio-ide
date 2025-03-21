@@ -2,7 +2,7 @@
 	"name": "igrp-studio",
 	"version": "0.0.1-alpha",
 	"description": "IGRP Studio for development",
-	"main": "dist/main/index.js",
+	"main": "out/main/index.js",
 	"author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
 	"homepage": "igrp.cv",
 	"scripts": {
@@ -11,11 +11,11 @@
 		"typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
 		"typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
 		"typecheck": "npm run typecheck:node && npm run typecheck:web",
-		"start": "electron-vite preview --outDir=dist",
-		"dev": "electron-vite dev --outDir=dist",
-		"package": "electron-vite build --outDir=dist && electron-forge package",
-		"make": "electron-vite build --outDir=dist && electron-forge make",
-		"build": "npm run typecheck && electron-vite build --outDir=dist",
+		"start": "electron-vite preview ",
+		"dev": "electron-vite dev ",
+		"package": "electron-vite build  && electron-forge package",
+		"make": "electron-vite build  && electron-forge make",
+		"build": "npm run typecheck && electron-vite build ",
 		"postinstall": "electron-builder install-app-deps",
 		"build:unpack": "npm run build && electron-builder --dir",
 		"build:win": "npm run build && electron-builder --win --config",
@@ -110,7 +110,6 @@
 		"@types/react": "^19.0.12",
 		"@types/react-dom": "^19.0.4",
 		"@vitejs/plugin-react": "^4.3.4",
-		"dmg-license": "^1.0.11",
 		"electron": "35.0.2",
 		"electron-builder": "^25.1.8",
 		"electron-builder-squirrel-windows": "25.1.8",
@@ -164,11 +163,8 @@
 			}
 		],
 		"files": [
-			"dist/**/*",
-			"!dist/**/*.map"
-		],
-		"directories": {
-			"output": "out"
-		}
+			"out/**/*",
+			"!out/**/*.map"
+		]
 	}
 }

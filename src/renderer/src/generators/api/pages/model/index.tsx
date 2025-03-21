@@ -120,8 +120,6 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
 
     useEffect(() => {
         const load = async () => {
-            if (!currentItem) return;
-
             await getJsonData(currentItem.path).then((data) => {
                 setData(data);
             });
