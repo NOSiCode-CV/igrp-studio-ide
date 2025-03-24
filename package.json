@@ -146,8 +146,7 @@
 		"mac": {
 			"icon": "resources/icons/icon.icns",
 			"category": "cv.nosi.igrpstudio.category.developer-tools",
-			"artifactName": "IGRP_Studio_${version}.${ext}",
-			"license": false
+			"artifactName": "IGRP_Studio_${version}.${ext}"
 		},
 		"linux": {
 			"icon": "resources/icons/icon.png",
