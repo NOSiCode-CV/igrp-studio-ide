@@ -19,12 +19,13 @@ import { GitHubService } from './services/github-service';
 
 import './handlers/apiHandler';
 import './handlers/dbHandler';
-import { updateApp } from './helpers/update'
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 import NextJsManager from './helpers/nextjsManager'
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 import dotenv from 'dotenv';
+import AppUpdater from './helpers/electron-updater'
+import { autoUpdater } from 'electron-updater'
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -114,11 +115,11 @@ app.whenReady().then(async () => {
     } else {
       app.on('second-instance', (_event, argv) => {
         const url = argv[argv.length - 1];
-  
+
         if (url.startsWith('igrp-studio://') && mainWindow) {
           if (mainWindow.isMinimized()) mainWindow.restore();
           mainWindow.focus();
-          
+
           // Identificar o provedor e chamar o handler apropriado
           if (url.includes('github')) {
             githubAuth.handleProtocolCallback(url, mainWindow);
@@ -190,7 +191,9 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  updateApp()
+  //updateApp()
+
+  new AppUpdater(mainWindow)
 
 })
 
@@ -524,4 +527,25 @@ ipcMain.on('open-preview', (_event, pageName) => {
 
 ipcMain.on('stop-nextjs', () => {
   nextJsManager.stopNextJsServer();
+});
+
+// 📌 IPC para UI chamar o check update manualmente
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    const updateCheckResult = await autoUpdater.checkForUpdates();
+    return updateCheckResult?.updateInfo?.version || null;
+  } catch (error) {
+    console.error('Update check failed:', error);
+    return null;
+  }
+});
+
+// 📌 IPC para iniciar o download manualmente
+ipcMain.handle('download-update', async () => {
+  return autoUpdater.downloadUpdate();
+});
+
+// 📌 IPC para instalar a atualização quando o usuário clicar
+ipcMain.handle('install-update', async () => {
+  autoUpdater.quitAndInstall();
 });

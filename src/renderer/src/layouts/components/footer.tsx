@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, HelpCircle, Terminal } from 'lucide-react';
+import { Wifi, WifiOff, HelpCircle, Terminal, AlertCircle } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -11,10 +11,14 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { Separator } from '@renderer/components/ui/separator';
-
+import { useTranslation } from 'react-i18next';
 export function Footer() {
     const [isOnline, setIsOnline] = useState(true);
     const [_isTerminalOpen, setIsTerminalOpen] = useState(false);
+    const [appVersion, setAppVersion] = useState('');
+    const [newVersion, setNewVersion] = useState<string>('');
+    const [log, setLog] = useState<string>('');
+    const { t } = useTranslation();
 
     // Monitor online status
     useEffect(() => {
@@ -34,16 +38,49 @@ export function Footer() {
         };
     }, []);
 
-    const [appVersion, setAppVersion] = useState('');
+    useEffect(() => {
+        const handleLog = (_event: any, message: string) => {
+            setLog(message);
+        };
+
+        window.electron.ipcRenderer.on('message-update', handleLog);
+
+        return () => {
+            window.electron.ipcRenderer.removeListener(
+                'message-update',
+                handleLog
+            );
+        };
+    }, []);
 
     useEffect(() => {
         // Fetch app version from Electron
         if (window.electron && window.electron.getAppVersion) {
-            window.electron.getAppVersion().then((version) => {
+            window.electron.getAppVersion().then((version: string) => {
                 setAppVersion(version);
             });
         }
     }, []);
+
+    useEffect(() => {
+        const handleCheckUpdate = async () => {
+            try {
+                await window.electron
+                    .checkForUpdates()
+                    .then((version: string) => {
+                        setNewVersion(version);
+                        if (version !== appVersion) {
+                            setLog(t('versionAvailable', { version }));
+                        } else {
+                            setLog('');
+                        }
+                    });
+            } catch (error) {
+                console.error('Error checking for updates:', error);
+            }
+        };
+        if (appVersion) handleCheckUpdate();
+    }, [appVersion]);
 
     return (
         <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0">
@@ -53,7 +90,16 @@ export function Footer() {
                     {new Date().getFullYear()}
                 </span>
 
-                <span className="text-muted-foreground">{`v${appVersion}`}</span>
+                <span className="text-muted-foreground">
+                    {(newVersion === appVersion) ? (
+                        `v${appVersion}`
+                    ) : (
+                        <span className="flex items-center space-x-1 text-amber-600">
+                            <AlertCircle className="h-4 w-4" />
+                            <span>{log}</span>
+                        </span>
+                    )}
+                </span>
             </div>
 
             <div className="flex items-center space-x-3">
@@ -113,7 +159,7 @@ export function Footer() {
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-               {/*  <TerminalSimulator
+                {/*  <TerminalSimulator
                     isOpen={isTerminalOpen}
                     onClose={() => setIsTerminalOpen(false)}
                 /> */}

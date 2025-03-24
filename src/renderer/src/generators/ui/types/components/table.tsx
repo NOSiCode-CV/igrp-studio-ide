@@ -250,8 +250,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     type={getLabel(componentName).toUpperCase()}
                                 />
                             ) : (
-                                <div className="relative w-full overflow-x-auto">
-                                    <Table className="table-auto">
+                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                    <Table className="w-full text-sm text-left rtl:text-right table-fixed">
                                         <TableHeader>
                                             <TableRow>
                                                 {renderTableHeaders(

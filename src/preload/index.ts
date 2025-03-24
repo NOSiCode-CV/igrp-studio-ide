@@ -184,7 +184,10 @@ if (process.contextIsolated) {
 			...electronAPI,
 			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 			getLanguage: () => ipcRenderer.invoke("get-language"),
-			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang)
+			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
+			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+			downloadUpdate: () => ipcRenderer.invoke('download-update'),
+			installUpdate: () => ipcRenderer.invoke('install-update')
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)

@@ -141,15 +141,17 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         return (
             <div className="flex flex-1 overflow-hidden">
-                <AppSidebar data={menuItems} basePath={basePath}/>
+                <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
-                    <ContainerScrollArea>
-                        {isDesign ? (
-                            <Page page={components} onDragEnd={onDragEnd} />
-                        ) : (
-                            <CodeContent pagePath={pagePath} />  
-                        )}
-                    </ContainerScrollArea>
+                    <div className="flex flex-1 flex-col gap-4 p-4">
+                        <ContainerScrollArea>
+                            {isDesign ? (
+                                <Page page={components} onDragEnd={onDragEnd} />
+                            ) : (
+                                <CodeContent pagePath={pagePath} />
+                            )}
+                        </ContainerScrollArea>
+                    </div>
                 </SidebarInset>
                 {currentComponent && <SidebarRight />}
             </div>

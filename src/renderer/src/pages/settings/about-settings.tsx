@@ -3,7 +3,7 @@
 import { Button } from '@renderer/components/ui/button';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Separator } from '@renderer/components/ui/separator';
-import { CircleArrowUp } from 'lucide-react';
+import { CircleArrowUp, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from '@renderer/assets/images/igrp-green.svg';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,20 @@ import { useTranslation } from 'react-i18next';
 export function AboutSettings() {
     const { t } = useTranslation();
     const [appVersion, setAppVersion] = useState('');
+    const [newVersion, setNewVersion] = useState<string>('');
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    const checkForUpdates = async () => {
+        const newVersion = await window.electron.checkForUpdates();
+        if (newVersion !== appVersion && appVersion) setNewVersion(newVersion);
+    };
+
+    const downloadAndInstall = async () => {
+        setIsDownloading(true);
+        await window.electron.downloadUpdate();
+        window.electron.installUpdate();
+        setIsDownloading(false);
+    };
 
     useEffect(() => {
         if (window.electron && window.electron.getAppVersion) {
@@ -19,6 +33,10 @@ export function AboutSettings() {
             });
         }
     }, []);
+
+    useEffect(() => {
+        checkForUpdates();
+    }, [appVersion]);
 
     return (
         <div>
@@ -39,19 +57,43 @@ export function AboutSettings() {
                     </div>
                     <div className="space-y-1">
                         <h2 className="text-xl font-semibold">
-                            {import.meta.env.VITE_APP_TITLE} {appVersion}
+                            {import.meta.env.VITE_APP_TITLE}
                         </h2>
-                     {/*    <p className="text-sm text-muted-foreground">
-                            {t('found_new_version')} 1.0.1
-                        </p> */}
+
+                        {newVersion ? (
+                            <p className="text-sm text-igrp">
+                                {t('found_new_version')} {newVersion}
+                            </p>
+                        ) : (
+                            <p className="text-muted-foreground">
+                                {t('currentVersion', {
+                                    version: appVersion,
+                                })}
+                            </p>
+                        )}
                         <div className="flex items-center gap-2 pt-1">
-                            <Button className="gap-2" size={'sm'}>
-                                <CircleArrowUp className="h-4 w-4" />
-                                {t('check_update')}
-                            </Button>
-                            <Button variant="link" className="h-8" size={'sm'}>
-                                {t('changelog')}
-                            </Button>
+                            {!newVersion ? (
+                                <Button
+                                    className="gap-2"
+                                    size="sm"
+                                    onClick={checkForUpdates}
+                                >
+                                    <CircleArrowUp className="h-4 w-4" />
+                                    {t('check_update')}
+                                </Button>
+                            ) : (
+                                <Button
+                                    className="gap-2"
+                                    size="sm"
+                                    onClick={downloadAndInstall}
+                                    disabled={isDownloading}
+                                >
+                                    <Download className="h-4 w-4" />
+                                    {isDownloading
+                                        ? t('downloading')
+                                        : t('downloadInstall')}
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -60,7 +102,9 @@ export function AboutSettings() {
 
                 {/* Software Update */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('software_update')}</h3>
+                    <h3 className="text-sm font-medium">
+                        {t('software_update')}
+                    </h3>
                     <div className="flex items-center space-x-2">
                         <Checkbox id="notifications" />
                         <label
@@ -76,17 +120,17 @@ export function AboutSettings() {
 
                 {/* Other Information */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('other_information')}</h3>
-                    <div className="space-y-2">
-                        <Button variant="link" className="h-8 p-0" size={'sm'}>
+                    <h3 className="text-sm font-medium">
+                        {t('other_information')}
+                    </h3>
+                    <div className="space-y-1">
+                        <Button variant="link" size={'sm'}>
                             {t('get_latest_version')}
                         </Button>
-                        <br />
-                        <Button variant="link" className="h-8 p-0" size={'sm'}>
+                        <Button variant="link" size={'sm'}>
                             {t('terms_of_service')}
                         </Button>
-                        <br />
-                        <Button variant="link" className="h-8 p-0" size={'sm'}>
+                        <Button variant="link"  size={'sm'}>
                             {t('privacy_policy')}
                         </Button>
                     </div>
