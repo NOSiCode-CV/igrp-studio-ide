@@ -19,7 +19,7 @@ build_packagedev:
     - apt-get install -y wine64 wine32
   script:
     - yarn install
-    - yarn build:win
+    - yarn release:mac
   artifacts:
     paths:
       - dist/
