@@ -118,8 +118,8 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
     };
 
     return (
-        <ScrollArea className="flex-1 p-2 overflow-x-auto">
-            <div className="p-2 max-w-[30rem]">
+        <ScrollArea className="flex-1 p-2 overflow-auto">
+        <div className="whitespace-nowrap p-2 max-w-[30rem]">
                 <SidebarMenu>{renderTree(fileTree)}</SidebarMenu>
             </div>
             <ScrollBar orientation='horizontal'/>
