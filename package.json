@@ -134,24 +134,14 @@
 		"typescript": "^5.8.2",
 		"vite": "^6.2.2"
 	},
-	"optionalDependencies": {
-		"dmg-license": "1.0.11"
-	},
+	"optionalDependencies": {},
 	"build": {
 		"productName": "IGRP Studio",
 		"appId": "cv.nosi.igrpstudio.alpha",
 		"win": {
 			"icon": "resources/icons/icon.ico",
 			"target": "nsis",
-			"artifactName": "IGRP_Studio_Setup.exe",
-			"signtoolOptions": {
-				"certificateFile": "${CERTIFICATE_FILE}",
-				"certificatePassword": "${CERTIFICATE_PASSWORD}",
-				"signingHashAlgorithms": [
-					"sha256"
-				],
-				"rfc3161TimeStampServer": "http://timestamp.digicert.com"
-			}
+			"artifactName": "IGRP_Studio_Setup.exe"
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
