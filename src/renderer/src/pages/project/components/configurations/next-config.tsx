@@ -6,7 +6,7 @@ import { NextConfigData, ProjectData } from 'src/main/types';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 
 interface NextConfigProps {
     data: NextConfigData;

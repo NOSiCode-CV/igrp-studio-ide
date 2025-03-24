@@ -1,5 +1,5 @@
 import { IGRPCombobox } from '@renderer/components/combobox';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { cn } from '@renderer/lib/utils';

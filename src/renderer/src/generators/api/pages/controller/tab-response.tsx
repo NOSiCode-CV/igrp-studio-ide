@@ -17,7 +17,7 @@ import {
 import { AddResponseMenu } from './add-response-menu';
 import { Button } from '@renderer/components/ui/button';
 import { ChevronsUpDown, Trash } from 'lucide-react';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 interface TabResponseProps {

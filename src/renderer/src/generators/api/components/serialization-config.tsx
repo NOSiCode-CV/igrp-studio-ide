@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useGit } from '@renderer/hooks/useGit';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 
 interface SerializationConfigModalProps {
     isOpen?: boolean;
