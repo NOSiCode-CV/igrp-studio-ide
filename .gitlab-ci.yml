@@ -18,8 +18,8 @@ build_packagedev:
     - apt-get update
     - apt-get install -y wine64 wine32
   script:
-    - yarn install --ignore-optional
-    - if [[ "$OSTYPE" == "darwin"* ]]; then yarn release:mac; fi
+    - yarn install
+    - yarn release:win
   artifacts:
     paths:
       - dist/
