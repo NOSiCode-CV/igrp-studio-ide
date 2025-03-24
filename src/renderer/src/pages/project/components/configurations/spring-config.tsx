@@ -13,7 +13,7 @@ import {
 import useCore from '@renderer/hooks/useCore';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 import { Separator } from '@renderer/components/ui/separator';
 import { SelectInput } from '@renderer/generators/api/components/inputs-form';
 import { IGRPCombobox } from '@renderer/components/combobox';

@@ -23,7 +23,7 @@ import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import useStudioAPI from '@renderer/hooks/useStudioAPI';
 import { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';

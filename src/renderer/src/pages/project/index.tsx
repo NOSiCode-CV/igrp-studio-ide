@@ -48,7 +48,7 @@ import {
 import { ProjectData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 export function ProjectWizard() {

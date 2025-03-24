@@ -15,7 +15,7 @@ import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/useCore';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
-import { LabelRequired } from '@renderer/components/required';
+import { LabelRequired } from '@renderer/components/label-required';
 
 interface DotNetConfigProps {
     data: DotNetConfigData;

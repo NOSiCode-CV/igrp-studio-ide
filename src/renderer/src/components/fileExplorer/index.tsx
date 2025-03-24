@@ -6,13 +6,14 @@ import {
     SidebarMenuSub,
     SidebarMenuItem,
     SidebarMenuButton,
+    useSidebar,
 } from '@renderer/components/ui/sidebar';
 import {
     Collapsible,
     CollapsibleTrigger,
     CollapsibleContent,
 } from '@renderer/components/ui/collapsible';
-import { ScrollArea } from '../ui/scroll-area';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
 import { useDispatch, useSelector } from 'react-redux';
@@ -73,7 +74,6 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
         });
     };
 
-
     const renderTree = (tree: FileTree[]) => {
         const filteredTree = searchTerm ? filterTree(tree, searchTerm) : tree;
         return filteredTree.map((item) => (
@@ -118,8 +118,11 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
     };
 
     return (
-        <ScrollArea className="flex-1 p-2">
-            <SidebarMenu>{renderTree(fileTree)}</SidebarMenu>
+        <ScrollArea className="flex-1 p-2 overflow-x-auto">
+            <div className="p-2 max-w-[30rem]">
+                <SidebarMenu>{renderTree(fileTree)}</SidebarMenu>
+            </div>
+            <ScrollBar orientation='horizontal'/>
         </ScrollArea>
     );
 };
