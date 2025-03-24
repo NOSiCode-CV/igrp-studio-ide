@@ -105,7 +105,7 @@ export const generateFakeDataForField = (properties: any) => {
 			return faker.internet.email();
 		// Add more cases for different field types as needed
 		default:
-			return faker.lorem.words(3); // Fallback to text if type is unknown
+			return faker.lorem.words(2); // Fallback to text if type is unknown
 	}
 };
 

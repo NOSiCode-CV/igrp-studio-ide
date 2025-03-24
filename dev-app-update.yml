@@ -1,3 +1,7 @@
-provider: generic
-url: https://example.com/auto-updates
+provider: "s3"
+bucket: "igrp-studio"
+region: "praia"
+path: "/"
+endpoint: "https://storage-api.nosi.cv"
+channel: "alpha"
 updaterCacheDirName: igrp-studio-updater

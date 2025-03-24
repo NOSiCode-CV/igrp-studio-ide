@@ -421,5 +421,10 @@
   "module": "Module",
   "selectRow": "Select Row",
   "addSubNewField": "Add Sub Field",
-  "NofieldsdefinedAdd": " No fields defined. Add"
+  "NofieldsdefinedAdd": " No fields defined. Add",
+  "checkingUpdate": "Checking Update",
+  "checkUpdate": "Check Update",
+  "downloadInstall": "Download and Install",
+  "currentVersion": "Current version {{version}}",
+  "versionAvailable":"New version available {{version}}"
 }
