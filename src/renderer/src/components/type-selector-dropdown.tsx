@@ -8,11 +8,11 @@ import {
     DropdownMenuSub,
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
-    DropdownMenuLabel,
 } from '@renderer/components/ui/dropdown-menu';
 import { SchemaTypeItem } from 'src/main/types';
 import { cn } from '@renderer/lib/utils';
 import { getLabel } from '@renderer/utils/helpers';
+import { ScrollArea } from './ui/scroll-area';
 
 interface TypeSelectorDropdownProps {
     type: string;
@@ -74,42 +74,55 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                         <DropdownMenuSubTrigger>
                                             {label}
                                         </DropdownMenuSubTrigger>
-                                        <DropdownMenuSubContent className="min-w-40">
-                                            {Object.entries(items).map(
-                                                ([category, subItems]) => (
-                                                    <React.Fragment
-                                                        key={category}
-                                                    >
-                                                       <DropdownMenuItem disabled>
-                                                            {getLabel(category)}
-                                                        </DropdownMenuItem>
-                                                        {(
-                                                            subItems as string[]
-                                                        ).map(
-                                                            (
-                                                                subItemValue,
-                                                                key
-                                                            ) => (
+                                        <DropdownMenuSubContent className="min-w-50">
+                                            <ScrollArea>
+                                                <div className="max-h-[60svh]">
+                                                    {Object.entries(items).map(
+                                                        ([
+                                                            category,
+                                                            subItems,
+                                                        ]) => (
+                                                            <React.Fragment
+                                                                key={category}
+                                                            >
                                                                 <DropdownMenuItem
-                                                                    key={key}
-                                                                    onClick={() =>
-                                                                        onTypeChange(
-                                                                            {
-                                                                                type: value,
-                                                                                value: subItemValue,
-                                                                            } as any
-                                                                        )
-                                                                    }
+                                                                    disabled
                                                                 >
-                                                                    {
-                                                                        getLabel(subItemValue)
-                                                                    }
+                                                                    {getLabel(
+                                                                        category
+                                                                    )}
                                                                 </DropdownMenuItem>
-                                                            )
-                                                        )}
-                                                    </React.Fragment>
-                                                )
-                                            )}
+                                                                {(
+                                                                    subItems as string[]
+                                                                ).map(
+                                                                    (
+                                                                        subItemValue,
+                                                                        key
+                                                                    ) => (
+                                                                        <DropdownMenuItem
+                                                                            key={
+                                                                                key
+                                                                            }
+                                                                            onClick={() =>
+                                                                                onTypeChange(
+                                                                                    {
+                                                                                        type: value,
+                                                                                        value: subItemValue,
+                                                                                    } as any
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            {getLabel(
+                                                                                subItemValue
+                                                                            )}
+                                                                        </DropdownMenuItem>
+                                                                    )
+                                                                )}
+                                                            </React.Fragment>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </ScrollArea>
                                         </DropdownMenuSubContent>
                                     </DropdownMenuSub>
                                 ) : items &&
@@ -120,22 +133,32 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                         <DropdownMenuSubTrigger>
                                             {label}
                                         </DropdownMenuSubTrigger>
-                                        <DropdownMenuSubContent className="min-w-40">
-                                            {items.map((subItem, key) => (
-                                                <DropdownMenuItem
-                                                    key={key}
-                                                    onClick={() =>
-                                                        onTypeChange({
-                                                            type: value,
-                                                            value: subItem.value,
-                                                            module: subItem.module,
-                                                        } as any)
-                                                    }
-                                                >
-                                                    {renderIcon(subItem)}
-                                                    {subItem.label}
-                                                </DropdownMenuItem>
-                                            ))}
+                                        <DropdownMenuSubContent className="min-w-50">
+                                            <ScrollArea>
+                                                <div className="max-h-[60svh]">
+                                                    {items.map(
+                                                        (subItem, key) => (
+                                                            <DropdownMenuItem
+                                                                key={key}
+                                                                onClick={() =>
+                                                                    onTypeChange(
+                                                                        {
+                                                                            type: value,
+                                                                            value: subItem.value,
+                                                                            module: subItem.module,
+                                                                        } as any
+                                                                    )
+                                                                }
+                                                            >
+                                                                {renderIcon(
+                                                                    subItem
+                                                                )}
+                                                                {subItem.label}
+                                                            </DropdownMenuItem>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </ScrollArea>
                                         </DropdownMenuSubContent>
                                     </DropdownMenuSub>
                                 ) : (
