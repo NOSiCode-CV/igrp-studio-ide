@@ -150,13 +150,6 @@
 			"icon": "resources/icons/icon.icns",
 			"category": "cv.nosi.igrpstudio.category.developer-tools",
 			"artifactName": "IGRP_Studio_${version}.${ext}",
-			"publish": {
-				"provider": "s3",
-				"bucket": "igrp-studio",
-				"region": "praia",
-				"endpoint": "https://storage-api.nosi.cv",
-				"path": "darwin/"
-			},
 			"notarize": false
 		},
 		"linux": {
