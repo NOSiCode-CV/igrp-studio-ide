@@ -94,7 +94,7 @@ export function AppSidebar({
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-      /*   {
+        /*   {
             icon: FileText,
             label: t('documents'),
             id: 'documents',
@@ -220,6 +220,7 @@ export function AppSidebar({
                                                 <SidebarMenu key={index}>
                                                     <Three
                                                         key={index}
+                                                        level={index}
                                                         item={item}
                                                         handleSubItemClick={
                                                             handleSubItemClick
@@ -245,21 +246,23 @@ export function AppSidebar({
 }
 
 function Three({
+    level,
     item,
     handleSubItemClick,
     activeItem,
     basePath,
     activeMenuGroup,
 }: {
+    level: number;
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
     basePath: string;
     activeMenuGroup?: string;
 }) {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(level < 1);
 
-    const handleOpenChange = (newState) => {
+    const handleOpenChange = (newState: boolean) => {
         setOpen(newState);
     };
 
@@ -332,9 +335,10 @@ function Three({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenuSub className="pr-0! mr-0!">
-                        {item.subItems?.map((subItem, subIndex) => (
+                        {item.subItems?.map((subItem, index) => (
                             <Three
-                                key={subIndex}
+                                key={index}
+                                level={index}
                                 item={subItem}
                                 handleSubItemClick={handleSubItemClick}
                                 activeItem={activeItem}

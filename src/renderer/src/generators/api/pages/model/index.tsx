@@ -22,7 +22,12 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Label } from '@renderer/components/ui/label';
-import { addNewRow, changeValue, removeRow } from '../../helpers';
+import {
+    addNewRow,
+    changeValue,
+    handleChangeValueObject,
+    removeRow,
+} from '../../helpers';
 import { TextInput } from '../../components/inputs-form';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
@@ -46,7 +51,7 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem } = useTabs();
     const { showErrorToast, showSuccessToast } = useToast();
-    const { models, basePath, config, findModelsByName, getJsonData } =
+    const { models, basePath, config, enums, findModelsByName, getJsonData } =
         useStudioAPI(currentItem?.module);
 
     const { t } = useTranslation();
@@ -106,13 +111,14 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
     }, [config]);
 
     useEffect(() => {
-        const { attributes, name, revision } = formik.values;
+        const { attributes, revision } = formik.values;
         const res = getTablesColumns({
             selectors,
             attributes,
             revision,
             models,
-            name,
+            currentItem,
+            enums,
             t,
         });
         setTableColumns(res);
@@ -359,7 +365,7 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                         formik={formik}
                         data={formik.values[value]}
                         changeValue={(element, position, result) =>
-                            changeValue(
+                            handleChangeValueObject(
                                 formik,
                                 element,
                                 position,

@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDtoValidation } from './validation';
 import { Card } from '@renderer/components/ui/card';
-import { addNewRow, changeValue, removeRow } from '../../helpers';
+import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
@@ -173,37 +173,6 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
         });
     };
 
-    const handleChangeValue = (
-        element: string,
-        position: number,
-        result: any,
-        value: string
-    ) => {
-        const isType = element === 'type';
-
-        const typeValue = isType ? result.value : result;
-
-        const typeModule = isType ? result.module : '';
-
-        const typeType = isType ? result.type : '';
-
-        if (isType)
-            formik.setFieldValue(
-                value,
-                formik.values[value].map((row: any, index: number) =>
-                    index === position
-                        ? {
-                              ...row,
-                              objectType: typeType,
-                              [element]: typeValue,
-                              module: typeModule,
-                          }
-                        : row
-                )
-            );
-        else changeValue(formik, element, position, typeValue, value);
-    };
-
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
         const data = formik?.values?.[value];
@@ -225,7 +194,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                     addRow={() => addNewRow(formik, value, dValues)}
                     removeRow={(position) => removeRow(formik, value, position)}
                     changeValue={(element, position, result) => {
-                        handleChangeValue(element, position, result, value);
+                        handleChangeValueObject(formik, element, position, result, value);
                     }}
                 />
             );
