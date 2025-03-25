@@ -20,7 +20,7 @@ build_packagedev:
   script:
     - yarn install
     - yarn release:win
-    - yarn release:linux
+    - yarn release:linux --no-cache
   artifacts:
     paths:
       - dist/
