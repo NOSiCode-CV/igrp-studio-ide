@@ -59,7 +59,7 @@
   "newObject": "New {{name}}",
   "deletedSuccess": "{{name}} deleted successfully!",
   "createdSuccess": "{{name}} {{value}} have been successfully added.",
-  "newDto": "New Data Transfer Object",
+  "newDto": "New DTOs",
   "newModels": "New Schema Object",
   "newControllers": "New Endpoint",
   "newAction": "New Action",
@@ -426,5 +426,6 @@
   "checkUpdate": "Check Update",
   "downloadInstall": "Download and Install",
   "currentVersion": "Current version {{version}}",
-  "versionAvailable":"New version available {{version}}"
+  "versionAvailable":"New version available {{version}}",
+  "convertToDTO":"Convert To DTO"
 }

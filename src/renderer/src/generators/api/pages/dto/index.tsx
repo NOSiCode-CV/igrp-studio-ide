@@ -22,6 +22,7 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/useGit';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import { getId } from '@renderer/utils/helpers';
 
 interface DtoProps {
     selectors: Array<any>;
@@ -36,10 +37,14 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
 
     const { createGitCommit } = useGit();
 
-    const { models, basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module);
+    const { models, basePath, dto, enums, getJsonData } = useStudioAPI(
+        currentItem?.module
+    );
 
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+
+    const [id, setId] = useState<string>('');
     const [data, setData] = useState<any>(null);
 
     const [tablesColumns, setTableColumns] = useState<{
@@ -67,16 +72,44 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
     }, [currentItem]);
 
     useEffect(() => {
-        if (data) {
-            const { name, template, attributes } = data;
-            formik.setFieldValue('name', name || '');
-            formik.setFieldValue('template', template || '');
+        if (!data) {
+            formik.resetForm();
+            return;
+        }
+        const { name, template, attributes, type } = data;
+
+        formik.setFieldValue('name', name || '');
+        formik.setFieldValue('template', template || '');
+
+        if (type === OPTION_TYPE.MODEL) {
+            setId(getId());
+
+            const baseAttributeFields = initialValues.attributes[0]
+                ? Object.keys(initialValues.attributes[0])
+                : [];
+
+            const baseAttributeDefaults = initialValues.attributes[0] || {};
+
+            const mergedAttributes = attributes.map((attr) => {
+                const mergedAttr = { ...baseAttributeDefaults };
+
+                baseAttributeFields.forEach((field) => {
+                    if (attr[field] !== undefined) {
+                        mergedAttr[field] = attr[field];
+                    }
+                });
+
+                return mergedAttr;
+            });
+
             formik.setFieldValue(
                 'attributes',
-                attributes || initialValues.attributes
+                mergedAttributes.length
+                    ? mergedAttributes
+                    : initialValues.attributes
             );
         } else {
-            formik.resetForm();
+            formik.setFieldValue('attributes', initialValues.attributes);
         }
     }, [data]);
 
@@ -112,7 +145,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
             const config = {
                 ...newValues,
                 module: currentItem?.module || 'shared',
-                id: currentItem.id,
+                id: id || currentItem.id,
             };
 
             const { error } = await window.engine.createDto(
@@ -194,7 +227,13 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                     addRow={() => addNewRow(formik, value, dValues)}
                     removeRow={(position) => removeRow(formik, value, position)}
                     changeValue={(element, position, result) => {
-                        handleChangeValueObject(formik, element, position, result, value);
+                        handleChangeValueObject(
+                            formik,
+                            element,
+                            position,
+                            result,
+                            value
+                        );
                     }}
                 />
             );

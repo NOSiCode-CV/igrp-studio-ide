@@ -32,7 +32,7 @@ const MainLayout = (props: LayoutProps) => {
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))]">
             <SidebarProvider>
                 <div className="flex flex-col w-full h-screen">
-                    <Toaster position="top-right" richColors closeButton/>
+                    <Toaster position="top-right" richColors closeButton expand/>
                     <Header />
 
                     <div className="flex flex-1 overflow-hidden">
