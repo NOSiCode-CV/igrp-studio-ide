@@ -427,5 +427,6 @@
   "downloadInstall": "Download and Install",
   "currentVersion": "Current version {{version}}",
   "versionAvailable":"New version available {{version}}",
-  "convertToDTO":"Convert To DTO"
+  "convertToDTO":"Convert To DTO",
+  "openOnEditor":"Open on Editor"
 }

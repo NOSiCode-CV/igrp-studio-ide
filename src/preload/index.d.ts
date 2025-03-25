@@ -23,7 +23,9 @@ interface CustomAPI {
 
     createAppNext: (appConfig: AppConfig, basePath: string) => Promise<HandlerResponse>;
 
-    openVSCode: (basePath: string | undefined) => Promise<void>;
+    openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<void>;
+    getIDEs: () => Promise<Array<{ key: string; config: IDEDetails }>>;
+
 
     getVersions: (endpoint: string) => Promise<HandlerResponse>,
 
