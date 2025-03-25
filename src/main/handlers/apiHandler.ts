@@ -2,7 +2,7 @@
 import { EngineFactory } from '../engines/EngineFactory';
 import { handleWithCustomErrors } from '../helpers';
 
-import {  engineTypes } from '@igrp/igrp-studio-springboot-engine'
+import { engineTypes } from '@igrp/igrp-studio-springboot-engine'
 
 import { ipcMain } from 'electron';
 import { ProjectData } from '../types';
@@ -114,12 +114,18 @@ handleWithCustomErrors(
     async (_event, engineType: string) => {
         const engine = EngineFactory.getEngine(engineType);
         const data = engine.getComponents?.();
-
         return data;
     }
 );
 
-
+handleWithCustomErrors(
+    EVENTS.ENGINE.GET_DEPENDENCIES,
+    async (_event, engineType: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        const data = engine.getDependencies?.();
+        return data;
+    }
+);
 
 ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
     return await engineTypes(module, basePath);

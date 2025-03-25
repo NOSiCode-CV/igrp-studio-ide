@@ -32,7 +32,9 @@ export interface SpringConfigData {
     enableObservability: boolean;
     enableEntityRevision: boolean;
     projectStructureStyle: string;
-    igrpCoreVersion: string
+    igrpCoreVersion: string;
+    springBootVersion: string;
+    dependencies: Array<any>
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;

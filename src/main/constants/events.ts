@@ -4,6 +4,7 @@ export const EVENTS = {
         CREATE_PERMISSION: 'engine:create-permission',
         DELETE_ELEMENT: 'engine:delete-element',
         SERIALIZE_ELEMENT: 'engine:serialize-element',
+        GET_DEPENDENCIES: 'engine:dependencies',
     },
     SPRING: {
         CREATE_MODULE: 'spring-engine:create-module',

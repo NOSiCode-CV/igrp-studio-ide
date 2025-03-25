@@ -1,3 +1,4 @@
+import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
 import { Connection, PageableProjects, ProjectData } from "./types";
 
 export interface IProjectRepository {
@@ -18,7 +19,7 @@ export interface BaseEngine {
     createProject(project: ProjectData, basePath: string): Promise<void>;
     delete(config: DeleteConfig, basePath: string): Promise<void>;
     createResponse?(config: ResponseConfig, basePath: string): Promise<void>;
-    
+
     createEnum?(data: EnumConfig, basePath: string): Promise<void>;
     createModule?(data: EnumConfig, basePath: string): Promise<void>;
     createModel?(data: EnumConfig, basePath: string): Promise<void>;
@@ -32,4 +33,6 @@ export interface BaseEngine {
 
     registryComponent?(basePath: string): Promise<void>;
     getComponents?(): Record<string, Component>;
+
+    getDependencies?(): Promise<Dependency[]>
 }

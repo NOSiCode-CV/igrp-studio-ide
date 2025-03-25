@@ -1,11 +1,16 @@
 // engines/SpringEngine.ts
-import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController } from '@igrp/igrp-studio-springboot-engine';
+import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController, getSpringDependencies } from '@igrp/igrp-studio-springboot-engine';
 import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
 import { BaseApiConfig, ControllerConfig, DeleteConfig, DTOConfig, EnumConfig, ModelConfig, ModuleConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
+import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 
 export class SpringEngine implements BaseEngine {
+
+  async getDependencies(): Promise<Dependency[]> {
+    return await getSpringDependencies()
+  }
 
   async createController(config: ControllerConfig, basePath: string): Promise<void> {
     await addController(config, basePath)

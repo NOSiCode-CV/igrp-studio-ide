@@ -140,6 +140,14 @@ const engine = {
 			return handleError(error)
 		}
 	},
+
+	getDependencies: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.GET_DEPENDENCIES, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {
