@@ -20,6 +20,8 @@ build_packagedev:
     - apt-get update
     - apt-get install -y wine64 wine32
     - mkdir -p "${ELECTRON_BUILDER_CACHE}"
+    - snap install snapcraft --classic
+    - export PATH=$PATH:/snap/bin
   script:
     - yarn install
     - yarn release:win
