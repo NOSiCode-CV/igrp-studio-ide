@@ -11,20 +11,27 @@ build_packagedev:
   stage: build
   only:
     - tags
+  variables:
+    ELECTRON_BUILDER_CACHE: "${CI_PROJECT_DIR}/.cache/electron-builder"
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine64 wine32
+    - mkdir -p "${ELECTRON_BUILDER_CACHE}"
   script:
     - yarn install
     - yarn release:win
-    - yarn release:linux --no-cache
+    - yarn release:linux
   artifacts:
     paths:
       - dist/
     expire_in: 4 weeks
+  cache:
+    paths:
+      - .cache/electron-builder
+      - node_modules/
 
 release:
   stage: release
