@@ -25,9 +25,7 @@ const useConfigdata = () => {
             acc[group].push(component);
             return acc;
         }, {});
-
-        console.log(groupedComponents)
-
+        
         return Object.keys(groupedComponents).map((group) => ({
             id: group,
             label: GROUP_COMPONET[group] || group,

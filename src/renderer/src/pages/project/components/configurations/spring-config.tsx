@@ -17,6 +17,7 @@ import { LabelRequired } from '@renderer/components/label-required';
 import { Separator } from '@renderer/components/ui/separator';
 import { SelectInput } from '@renderer/generators/api/components/inputs-form';
 import { IGRPCombobox } from '@renderer/components/combobox';
+import DependencySelector from '@renderer/components/dependency-selector';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -34,6 +35,8 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     enableObservability: false,
     enableEntityRevision: false,
     igrpCoreVersion: '',
+    springBootVersion: '',
+    dependencies: []
 };
 
 export function SpringConfig({
@@ -244,6 +247,14 @@ export function SpringConfig({
                     </div>
                 </div>
             </div>
+
+            <Separator orientation="horizontal" />
+
+            <DependencySelector
+                onSelectedDependencies={(dependencies) =>
+                    onChange({ ...data, dependencies })
+                }
+            />
         </div>
     );
 }

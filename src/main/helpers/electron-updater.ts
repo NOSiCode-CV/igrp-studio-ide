@@ -11,6 +11,8 @@ export default class AppUpdater {
 
         this.win = win;
 
+        this.configurePlatformSpecifics()
+
         this.initAutoUpdater()
     }
 
@@ -18,6 +20,16 @@ export default class AppUpdater {
         log.info(text)
         this.win.webContents.send('message-update', text);
     }
+
+     configurePlatformSpecifics() {
+        autoUpdater.setFeedURL({
+            provider: "s3",
+            bucket: "igrp-studio",
+            endpoint: "https://storage-api.nosi.cv",
+            path: process.platform,
+            channel: "alpha"
+          });
+      }
 
     initAutoUpdater() {
         autoUpdater.logger = log

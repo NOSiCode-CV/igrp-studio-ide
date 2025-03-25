@@ -25,7 +25,8 @@ const api = {
 
 	readProjectFile: (filePath: string) => ipcRenderer.invoke("read-file", filePath),
 
-	openVSCode: (basePath: string) => ipcRenderer.invoke('igrp-studio:open-vs-code', basePath),
+	openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => ipcRenderer.invoke('igrp-studio:open-ide', { basePath, ideType }),
+	getIDEs: () => ipcRenderer.invoke('igrp-studio:ides'),
 
 	getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
 
@@ -136,6 +137,14 @@ const engine = {
 	getComponent: async (engineType: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.NEXT.GET_COMPONENT, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getDependencies: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.GET_DEPENDENCIES, engineType)
 		} catch (error) {
 			return handleError(error)
 		}

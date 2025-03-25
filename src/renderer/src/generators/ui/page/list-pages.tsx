@@ -13,7 +13,7 @@ import { Input } from '@renderer/components/ui/input';
 import { PageCard } from './page-card';
 import {
     IGRPDataTable,
-    IGRPHeaderPage,
+    IGRPPageHeader,
 } from '@igrp/igrp-framework-react-design-system';
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
@@ -179,7 +179,7 @@ const MainPageBuilder = ({
 
     return (
         <div className="container mx-auto p-4">
-            <IGRPHeaderPage
+            <IGRPPageHeader
                 variant="h3"
                 title={project?.name}
                 description={project.config?.description}

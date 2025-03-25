@@ -26,6 +26,7 @@ import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 import dotenv from 'dotenv';
 import AppUpdater from './helpers/electron-updater'
 import { autoUpdater } from 'electron-updater'
+import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection'
 
 const backend = require('i18next-electron-fs-backend')
 
@@ -294,16 +295,23 @@ ipcMain.handle('igrp-studio:get-json-content', async (_event, filePath: string):
   return await getJsonContent(filePath)
 })
 
-ipcMain.handle('igrp-studio:open-vs-code', async (_event, basePath: string) => {
-  if (basePath) {
-    exec(`code "${basePath}"`, (err, _stdout, _stderr) => {
-      if (err) {
-        console.error(`Error: ${err}`)
-        return
-      }
-    })
-  }
-})
+ipcMain.handle('igrp-studio:open-ide', async (_event, { basePath, ideType }: { basePath: string; ideType: string }) => {
+  if (!basePath || !IDES[ideType]) return;
+
+  const ideConfig = IDES[ideType];
+  const command = `${ideConfig.command} "${basePath}"`;
+
+  exec(command, (err, _stdout, _stderr) => {
+    if (err) {
+      console.error(`Error opening ${ideConfig.name}:`, err);
+    }
+  });
+});
+
+
+ipcMain.handle('igrp-studio:ides', async (_event): Promise<Array<{ key: string; config: IDEDetails }>> => {
+  return await detectInstalledIDEs()
+});
 
 // Handle IPC events
 ipcMain.on('minimize-window', () => {

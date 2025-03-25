@@ -32,6 +32,14 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
+
+import * as Icons from 'lucide-react';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -47,6 +55,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
     const navigate = useNavigate();
+
+    const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
     const [isMaximized, setIsMaximized] = useState(false); // New state to track maximize status
 
@@ -68,13 +78,29 @@ const Header = ({ config, basePath }: HeaderProps) => {
         navigate(ROUTES.HOME);
     };
 
-    const openVSCode = async () => {
+    const openIDE = async (ideType: string) => {
+        if (!basePath) return;
         try {
-            await window.api.openVSCode(basePath);
+            await window.api.openIDE({ basePath, ideType });
         } catch (error) {
-            console.error('Error opening VS Code:', error);
+            console.error(error);
         }
     };
+
+    const renderIcon = (ide) => {
+        const IconComponent = Icons[ide.icon];
+
+        return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
+    };
+
+    useEffect(() => {
+        const laodIdes = async () => {
+            await window.api.getIDEs().then((data) => {
+                setInstalledIDEs(data);
+            });
+        };
+        laodIdes();
+    }, []);
 
     useEffect(() => {
         const checkMaximized = async () => {
@@ -176,16 +202,36 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             <ModeToggle />
 
                             {config?.name && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={openVSCode}
-                                >
-                                    <Code className="w-5 h-5" />
-                                    <span className="sr-only">
-                                        {t('openVSCode')}
-                                    </span>
-                                </Button>
+                                <DropdownMenu>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost">
+                                                    <Code />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{t('openOnEditor')}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <DropdownMenuContent align="end">
+                                        {installedIDEs.map(({key, config}, index) => {
+                                            return (
+                                                <DropdownMenuItem
+                                                    key={index}
+                                                    onClick={() => openIDE(key)}
+                                                    className="flex items-center"
+                                                >
+                                                    {renderIcon(config.icon)}
+                                                    <span>
+                                                        Open in {config.name}
+                                                    </span>
+                                                </DropdownMenuItem>
+                                            );
+                                        })}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             )}
 
                             {!config?.name && (

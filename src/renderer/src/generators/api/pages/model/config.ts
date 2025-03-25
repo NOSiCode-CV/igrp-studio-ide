@@ -1,6 +1,7 @@
 import { ModelConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
-import { formatMethods } from '../../helpers'
+import { formatMethods, getOptionsByObject } from '../../helpers'
 import { IColumnsTabelProps } from '../../types/Interfaces'
+import { SchemaTypeItem } from 'src/main/types'
 
 export const initialValues = {
 	type: 'model',
@@ -96,9 +97,12 @@ export const getTablesColumns = ({
 	attributes,
 	revision,
 	models,
-	name,
+	enums,
+	currentItem,
 	t
 }): { [value: string]: IColumnsTabelProps[] } => {
+
+	const { module } = currentItem || {}
 
 	const modelsOptions = (models || [])
 		.filter((model) => model.content?.name !== name)
@@ -113,28 +117,32 @@ export const getTablesColumns = ({
 		label: attribute.name
 	}))
 
-	const fieldTypeOptions = formatMethods(
-		(
-			selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
-			| {
-				MODEL_ATTRIBUTE_TYPES: string[]
-			}
-			| undefined
-		)?.MODEL_ATTRIBUTE_TYPES || []
+	const dataTypes = (
+		selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
+		| {
+			MODEL_ATTRIBUTE_TYPES: string[]
+		}
+		| undefined
+	)?.MODEL_ATTRIBUTE_TYPES || []
 
-
-	)
 	const generateTypes = formatMethods(
 		(
 			selectors.find((selector) => 'GENERATION_TYPES' in selector) as
 			| { GENERATION_TYPES: string[] }
 			| undefined
-		)?.GENERATION_TYPES || []
-	)
+		)?.GENERATION_TYPES || [])
+
+	const enumMap = getOptionsByObject(enums, module, null);
+
+	const fieldTypeOptions: SchemaTypeItem[] = [
+		{ label: t('dataTypes'), value: 'java', items: dataTypes },
+		{ label: t('enum'), value: 'enum', items: enumMap }
+	]
+
 	return {
 		attributes: [
 			{ key: 'name', name: t('name'), type: 'text' },
-			{ key: 'type', name: t('type'), type: 'select', options: fieldTypeOptions },
+			{ key: 'type', name: t('type'), type: 'typeSelectorDropdown', options: fieldTypeOptions },
 			{
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
@@ -166,7 +174,7 @@ export const getTablesColumns = ({
 	}
 }
 
-export const getValuesToSubmit = (values, module) => {
+export const getValuesToSubmit = (values: any, module: string) => {
 
 	const uniqueConstraints =
 		values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];

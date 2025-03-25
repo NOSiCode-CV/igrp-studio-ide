@@ -1,5 +1,5 @@
 import { DTOConfig } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/types"
-import { formatMethods } from "../../helpers"
+import { formatMethods, getOptionsByObject } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 import { SchemaTypeItem } from "src/main/types"
 
@@ -41,14 +41,6 @@ export const getTablesColumns = ({ selectors, dto, models, enums, current, t }):
 
     const { name: currentDto, module } = current || {}
 
-    const paramsTypesData = formatMethods(
-        (
-            selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
-            | { ATTRIBUTE_TYPES: string[] }
-            | undefined
-        )?.ATTRIBUTE_TYPES || []
-    )
-
     const collectionTypes = formatMethods(
         (
             selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
@@ -58,24 +50,19 @@ export const getTablesColumns = ({ selectors, dto, models, enums, current, t }):
         true
     )
 
-    const getOptions = (objects: any) => {
-        return objects !== undefined
-            ? objects
-                .filter((m: any) => {
-                    return !(m.content?.module === module && m.content?.name === currentDto)
-                }).map((item: any) => ({
-                    value: `${item.content?.name || item.name}`,
-                    label: `${item.content?.name || item.name}`,
-                    module: item.content?.module
-                }))
-            : []
-    }
+    const dataTypes = (
+		selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
+		| {
+			MODEL_ATTRIBUTE_TYPES: string[]
+		}
+		| undefined
+	)?.MODEL_ATTRIBUTE_TYPES || []
 
     const namespacesOptions: SchemaTypeItem[] = [
-        { label: t('dto'), value: 'dto', items: getOptions(dto) },
-        { label: t('model'), value: 'model', items: getOptions(models) },
-        { label: t('dataTypes'), value: 'java', items: paramsTypesData },
-        { label: t('enum'), value: 'enum', items: getOptions(enums) }
+        { label: t('dto'), value: 'dto', items: getOptionsByObject(dto, module, currentDto) },
+        { label: t('model'), value: 'model', items: getOptionsByObject(models, module, currentDto) },
+        { label: t('dataTypes'), value: 'java', items: dataTypes },
+        { label: t('enum'), value: 'enum', items: getOptionsByObject(enums, module, currentDto) }
     ]
 
     return {

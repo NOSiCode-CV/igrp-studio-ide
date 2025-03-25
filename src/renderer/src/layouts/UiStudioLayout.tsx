@@ -40,7 +40,7 @@ const Layout = (props: LayoutProps) => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <Toaster position="top-right" richColors closeButton/>
+                    <Toaster position="top-right" richColors closeButton expand/>
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">

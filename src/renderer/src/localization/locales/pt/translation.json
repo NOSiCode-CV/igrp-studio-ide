@@ -58,7 +58,7 @@
   "newObject": "Novo {{name}}",
   "deletedSuccess": "{{name}} eliminado com sucesso!",
   "createdSuccess": "{{name}} {{value}} foi adicionado com sucesso.",
-  "newDto": "Novo Objeto",
+  "newDto": "Novo DTOs",
   "newModels": "Novo Schema",
   "newControllers": "Novo Endpoint",
   "newAction": "Nova Ação",
