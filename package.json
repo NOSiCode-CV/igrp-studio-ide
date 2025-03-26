@@ -139,7 +139,7 @@
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
-			"category": "cv.nosi.igrpstudio.category.developer-tools",
+			"category": " public.app-category.developer-tools",
 			"artifactName": "IGRP_Studio_${version}.${ext}",
 			"publish": {
 				"provider": "s3",
@@ -158,6 +158,7 @@
 			],
 			"category": "Development",
 			"artifactName": "IGRP_Studio_${version}.${ext}",
+			"maintainer":"NOSi E.P.E <contact@nosi.cv>",
 			"publish": {
 				"provider": "s3",
 				"bucket": "igrp-studio",
