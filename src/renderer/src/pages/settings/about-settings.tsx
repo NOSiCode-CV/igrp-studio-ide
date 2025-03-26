@@ -7,16 +7,23 @@ import { CircleArrowUp, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from '@renderer/assets/images/igrp-green.svg';
 import { useTranslation } from 'react-i18next';
+import useToast from '@renderer/components/useToast';
 
 export function AboutSettings() {
     const { t } = useTranslation();
+    const { showWarningToast } = useToast();
     const [appVersion, setAppVersion] = useState('');
     const [newVersion, setNewVersion] = useState<string>('');
     const [isDownloading, setIsDownloading] = useState(false);
 
     const checkForUpdates = async () => {
         const newVersion = await window.electron.checkForUpdates();
-        if (newVersion !== appVersion && appVersion) setNewVersion(newVersion);
+        if (newVersion !== appVersion && appVersion) {
+            setNewVersion(newVersion);
+        } else
+            showWarningToast(
+                `Update for version ${appVersion} is not available`
+            );
     };
 
     const downloadAndInstall = async () => {
@@ -33,10 +40,6 @@ export function AboutSettings() {
             });
         }
     }, []);
-
-    useEffect(() => {
-        checkForUpdates();
-    }, [appVersion]);
 
     return (
         <div>
@@ -130,7 +133,7 @@ export function AboutSettings() {
                         <Button variant="link" size={'sm'}>
                             {t('terms_of_service')}
                         </Button>
-                        <Button variant="link"  size={'sm'}>
+                        <Button variant="link" size={'sm'}>
                             {t('privacy_policy')}
                         </Button>
                     </div>
