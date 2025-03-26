@@ -135,9 +135,6 @@
 		},
 		"mac": {
 			"target": "dmg",
-			"dmg": {
-			  "license": "license_en.txt"	
-			},
 			"icon": "resources/icons/icon.icns",
 			"category": "public.app-category.developer-tools",
 			"notarize": false
