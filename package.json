@@ -120,7 +120,8 @@
 		"tailwindcss": "^4.0.15",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.2",
-		"vite": "^6.2.3"
+		"vite": "^6.2.3",
+		"dmg-license": "^1.0.11"
 	},
 	"optionalDependencies": {
 		"dmg-license": "^1.0.11"
@@ -134,7 +135,6 @@
 			"target": "nsis"
 		},
 		"mac": {
-			"target": "dmg",
 			"icon": "resources/icons/icon.icns",
 			"category": "public.app-category.developer-tools",
 			"notarize": false
