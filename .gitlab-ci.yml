@@ -22,8 +22,8 @@ build_packagedev:
 
   script:
     - yarn install --frozen-lockfile
-    - yarn release:win
-    - yarn release:linux
+    #- yarn release:win
+    #- yarn release:linux
     - yarn release:mac
   artifacts:
     paths:
