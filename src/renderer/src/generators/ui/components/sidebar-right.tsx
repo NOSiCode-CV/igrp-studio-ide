@@ -9,7 +9,7 @@ import {
 import { Button } from '@renderer/components/ui/button';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { useTranslation } from 'react-i18next';
-import RenderPropsConfig from './EditComponent/RenderPropsConfig';
+import RenderPropsConfig from './EditComponent/render-props-config';
 import {
     Accordion,
     AccordionContent,
@@ -22,7 +22,6 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { TextPropertiesPanel } from './EditComponent/text-properties';
 import useStudio from '@renderer/hooks/useStudio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
@@ -185,7 +184,7 @@ export function SidebarRight({ ...props }: SidebarRightProps) {
                                         {t('textProperties')}
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                        <TextPropertiesPanel />
+                                        
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>

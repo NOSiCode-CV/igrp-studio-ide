@@ -6,14 +6,13 @@ import {
     SidebarMenuSub,
     SidebarMenuItem,
     SidebarMenuButton,
-    useSidebar,
 } from '@renderer/components/ui/sidebar';
 import {
     Collapsible,
     CollapsibleTrigger,
     CollapsibleContent,
 } from '@renderer/components/ui/collapsible';
-import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import { ScrollArea } from '../ui/scroll-area';
 
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
 import { useDispatch, useSelector } from 'react-redux';

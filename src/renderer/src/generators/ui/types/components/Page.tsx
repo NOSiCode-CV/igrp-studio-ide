@@ -78,7 +78,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         <div className="group/page relative !bg-custom-pattern min-h-[calc(100svh-var(--header-height-three))] overflow-x-auto">
             <PageTools onEdit={handleEditClick} />
             <div className="overflow-y-auto flex flex-col">
-                <div className="grid py-6 gap-3">
+                <div className="grid py-6 px-2 gap-3">
                     {components.map((row) => {
                         const Component = loadedComponents[row.id];
                         return Component ? (

@@ -40,6 +40,7 @@ import {
 } from '@renderer/components/ui/dropdown-menu';
 
 import * as Icons from 'lucide-react';
+import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -85,12 +86,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
         } catch (error) {
             console.error(error);
         }
-    };
-
-    const renderIcon = (ide) => {
-        const IconComponent = Icons[ide.icon];
-
-        return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
     };
 
     useEffect(() => {
@@ -216,20 +211,29 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                         </TooltipContent>
                                     </Tooltip>
                                     <DropdownMenuContent align="end">
-                                        {installedIDEs.map(({key, config}, index) => {
-                                            return (
-                                                <DropdownMenuItem
-                                                    key={index}
-                                                    onClick={() => openIDE(key)}
-                                                    className="flex items-center"
-                                                >
-                                                    {renderIcon(config.icon)}
-                                                    <span>
-                                                        Open in {config.name}
-                                                    </span>
-                                                </DropdownMenuItem>
-                                            );
-                                        })}
+                                        {installedIDEs.map(
+                                            ({ key, config }, index) => {
+                                                return (
+                                                    <DropdownMenuItem
+                                                        key={index}
+                                                        onClick={() =>
+                                                            openIDE(key)
+                                                        }
+                                                        className="flex items-center"
+                                                    >
+                                                        <IGRPIcon
+                                                            iconName={
+                                                                config.icon
+                                                            }
+                                                        />
+                                                        <span>
+                                                            Open in{' '}
+                                                            {config.name}
+                                                        </span>
+                                                    </DropdownMenuItem>
+                                                );
+                                            }
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             )}

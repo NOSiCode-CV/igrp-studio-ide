@@ -6,12 +6,11 @@ import {
     PageConfig,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/components/useToast';
-import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
+import CodeContent from './components/CodeContent';
 
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { buildJsonStructure } from '@renderer/utils/jsonStructureUtil';
-import CodeContent from './components/CodeContent';
 import { SidebarRight } from './components/sidebar-right';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
@@ -58,8 +57,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
-            const jsonStructure = buildJsonStructure(components);
-            handleSave(jsonStructure);
+            handleSave(components);
         };
 
         // Expose handleSave to parent via ref
@@ -143,7 +141,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             <div className="flex flex-1 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
-                    <div className="flex flex-1 flex-col gap-4 p-4">
+                    <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
                             {isDesign ? (
                                 <Page page={components} onDragEnd={onDragEnd} />

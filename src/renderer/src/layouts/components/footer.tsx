@@ -12,9 +12,10 @@ import {
 } from '@renderer/components/ui/tooltip';
 import { Separator } from '@renderer/components/ui/separator';
 import { useTranslation } from 'react-i18next';
+import { DebugTerminal } from '@renderer/components/debug-terminal';
+
 export function Footer() {
     const [isOnline, setIsOnline] = useState(true);
-    const [_isTerminalOpen, setIsTerminalOpen] = useState(false);
     const [appVersion, setAppVersion] = useState('');
     const [newVersion, setNewVersion] = useState<string>('');
     const [log, setLog] = useState<string>('');
@@ -83,47 +84,31 @@ export function Footer() {
     }, [appVersion]);
 
     return (
-        <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0">
-            <div className="flex items-center space-x-3">
-                <span className="text-muted-foreground">
-                    {`${import.meta.env.VITE_APP_TITLE}`} &copy;{' '}
-                    {new Date().getFullYear()}
-                </span>
+        <TooltipProvider>
+            <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
+                <div className="flex items-center space-x-3">
+                    <span className="text-muted-foreground">
+                        {`${import.meta.env.VITE_APP_TITLE}`} &copy;{' '}
+                        {new Date().getFullYear()}
+                    </span>
 
-                <span className="text-muted-foreground">
-                    {(newVersion === appVersion) ? (
-                        `v${appVersion}`
-                    ) : (
-                        <span className="flex items-center space-x-1 text-amber-600">
-                            <AlertCircle className="h-4 w-4" />
-                            <span>{log}</span>
-                        </span>
-                    )}
-                </span>
-            </div>
+                    <span className="text-muted-foreground">
+                        {newVersion === appVersion ? (
+                            `v${appVersion}`
+                        ) : (
+                            <span className="flex items-center space-x-1 text-amber-600">
+                                <AlertCircle className="h-4 w-4" />
+                                <span>{log}</span>
+                            </span>
+                        )}
+                    </span>
+                </div>
 
-            <div className="flex items-center space-x-3">
-                <Separator orientation="vertical" className="h-4" />
+                <div className="flex items-center space-x-3">
+                    <Separator orientation="vertical" className="h-4" />
 
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={() => setIsTerminalOpen(true)}
-                            >
-                                <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                            <p>Open Terminal</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                    <DebugTerminal/>
 
-                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="flex items-center space-x-1">
@@ -141,9 +126,7 @@ export function Footer() {
                             <p>Network Status</p>
                         </TooltipContent>
                     </Tooltip>
-                </TooltipProvider>
 
-                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
@@ -158,12 +141,8 @@ export function Footer() {
                             <p>Help Center</p>
                         </TooltipContent>
                     </Tooltip>
-                </TooltipProvider>
-                {/*  <TerminalSimulator
-                    isOpen={isTerminalOpen}
-                    onClose={() => setIsTerminalOpen(false)}
-                /> */}
-            </div>
-        </footer>
+                </div>
+            </footer>
+        </TooltipProvider>
     );
 }

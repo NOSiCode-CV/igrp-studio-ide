@@ -32,7 +32,7 @@ export class GitAuth {
     const scopes = this.config.scopes.join(' ');
     const redirectUri = isDev 
       ? `http://localhost:${DEV_PORT}/oauth/callback`
-      : process.env.GIT_REDIRECT_URI;
+      : process.env.MAIN_VITE_GIT_REDIRECT_URI;
 
     return `${this.config.authUrl}?client_id=${this.config.clientId}&redirect_uri=${redirectUri}` + 
            `${this.config.provider === 'gitlab' ? '&response_type=code' : ''}&scope=${scopes}`;

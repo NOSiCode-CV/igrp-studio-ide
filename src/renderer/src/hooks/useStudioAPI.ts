@@ -10,13 +10,15 @@ interface RootState {
         filesThree: FileTree[];
         basePath: string;
         config: ProjectData;
+        currentItem: any;
+        changeStatus: boolean
     };
 }
 
 const selectState = (state: RootState) => state.PageBuilder;
 
 // Create a selector factory that accepts `module` as a parameter
-const makeSelectProperties = (module: string) =>
+const makeSelectProperties = (module?: string) =>
     createSelector(selectState, (studio) => {
         const moduleData = getMergedFiles(studio, module || 'shared');
 
@@ -31,11 +33,13 @@ const makeSelectProperties = (module: string) =>
             permissions: extractByType(moduleData, OPTION_TYPE.PERMISSIONS),
             modules: getModulesArray(studio.filesThree),
             filesThree: studio.filesThree,
+            currentItem: studio.currentItem,
+            changeStatus: studio.changeStatus
         };
     });
 
 // Update the hook to accept `module` as a parameter
-const useStudioAPI = (module: string) => {
+const useStudioAPI = (module?: string) => {
     const selectProperties = useMemo(() => makeSelectProperties(module), [module]);
 
     const {
@@ -47,6 +51,9 @@ const useStudioAPI = (module: string) => {
         responses,
         enums,
         permissions,
+        filesThree,
+        currentItem,
+        changeStatus
     } = useSelector(selectProperties);
 
     const find = (data: any[], name: string) => {
@@ -75,6 +82,9 @@ const useStudioAPI = (module: string) => {
         responses,
         enums,
         permissions,
+        filesThree,
+        currentItem,
+        changeStatus,
         findModelsByName,
         getJsonData
     };

@@ -76,6 +76,8 @@ export const DropdownSidebarMenuButton: React.FC<
             basePath
         );
 
+        console.log(config)
+
         if (error) {
             showErrorToast(error);
         } else showSuccessToast(t('deletedSuccess', { name: item.label }));

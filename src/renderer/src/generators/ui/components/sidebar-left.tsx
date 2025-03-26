@@ -24,7 +24,6 @@ import {
     GripHorizontal,
     Home,
     ListTodo,
-    Terminal,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -40,7 +39,6 @@ import {
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import LogTerminal from './LogTerminal';
 import useStudio from '@renderer/hooks/useStudio';
 import NavigatorSidebar from './NavigatorSidebar';
 
@@ -94,11 +92,6 @@ export function AppSidebar({
             icon: GitBranch,
             label: t('git'),
             id: 'git',
-        },
-        {
-            icon: Terminal,
-            label: t('debug'),
-            id: 'debug',
         },
     ];
 
@@ -213,8 +206,6 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
-                        ) : activeMenuGroup === 'debug' ? (
-                            <LogTerminal basePath={basePath} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible

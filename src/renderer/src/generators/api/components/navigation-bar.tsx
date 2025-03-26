@@ -78,6 +78,7 @@ const NavigationBar = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
+                                        type="button"
                                         size="sm"
                                         variant={'secondary'}
                                         onClick={handleSourceCode}
@@ -93,6 +94,7 @@ const NavigationBar = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
+                                        type="button"
                                         variant="outline"
                                         onClick={(e) => {
                                             e.preventDefault();

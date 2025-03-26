@@ -3,5 +3,5 @@ bucket: "igrp-studio"
 region: "praia"
 path: "/"
 endpoint: "https://storage-api.nosi.cv"
-channel: "alpha"
+channel: "latest"
 updaterCacheDirName: igrp-studio-updater

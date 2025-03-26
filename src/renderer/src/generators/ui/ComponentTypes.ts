@@ -52,6 +52,9 @@ import {
     DollarSign,
     Heading1,
     Heading,
+    Link,
+    Phone,
+    WrapText,
 } from 'lucide-react';
 
 // Constants
@@ -125,10 +128,13 @@ export const COMPONENT: Record<string, string> = {
 export const ICON_MAP: Record<string, React.ElementType> = {
     input: FormInput,
     datePicker: Calendar,
-    timePicker: Clock,
-    password: Eye,
-    colorPicker: Palette,
-    textarea: FileText,
+    inputDatePicker: Calendar,
+    inputTime: Clock,
+    inputPassword: Eye,
+    inputColor: Palette,
+    inputTextarea: FileText,
+    inputPhone: Phone,
+    inputFile: Upload,
     select: List,
     checkbox: CheckSquare,
     radio: Radio,
@@ -140,6 +146,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     text: Type,
     image: Image,
     richTextEditor: Edit3,
+    url: Link,
     table: Table,
     charts: BarChart2,
     maps: Map,
@@ -187,5 +194,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableExpanderCell: ChevronDown,
     tableBadgeCell: Badge,
     headline: Heading1,
-    pageHeader: Heading
+    pageHeader: Heading,
+    paragraph: WrapText
 };

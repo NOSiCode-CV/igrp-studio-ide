@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import withRouter from '@renderer/common/withRouter';
-import { createSelector } from 'reselect';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import {
     getFileThree as onGetFolderFiles,
@@ -17,6 +16,7 @@ import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 import { Footer } from './components/footer';
 import { Toaster } from '@renderer/components/ui/sonner';
+import useStudioAPI from '@renderer/hooks/useStudioAPI';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -30,26 +30,15 @@ const Layout = (props: LayoutProps) => {
     const dispatch: any = useDispatch();
     const navigate = useNavigate();
 
-    const selectStudioState = (state: any) => state.PageBuilder;
-    const selectStudioProperties = createSelector(
-        selectStudioState,
-        (studio) => ({
-            config: studio.config,
-            filesThree: studio.filesThree,
-            basePath: studio.basePath,
-            changeStatus: studio.changeStatus,
-            currentItem: studio.currentItem,
-        })
-    );
-
     const { currentItem, changeStatus, config, basePath, filesThree } =
-        useSelector(selectStudioProperties);
+        useStudioAPI();
 
     useEffect(() => {
         dispatch(onGetFolderFiles(basePath));
     }, [basePath, dispatch]);
 
     useEffect(() => {
+        console.log(changeStatus)
         if (changeStatus) {
             dispatch(onGetFolderFiles(basePath));
             dispatch(onSetChangeStatus(false));
@@ -74,7 +63,12 @@ const Layout = (props: LayoutProps) => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <Toaster position="top-right" richColors closeButton expand/>
+                    <Toaster
+                        position="top-right"
+                        richColors
+                        closeButton
+                        expand
+                    />
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">

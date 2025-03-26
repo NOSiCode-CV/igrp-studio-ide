@@ -3,8 +3,8 @@ import { APP_COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/useStudio';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { GripHorizontal } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { EmptyList } from '@renderer/components/empty-list';
+import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 
 const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
     const { fetchComponents } = useStudio();
@@ -16,14 +16,6 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
         components.filter((comp) =>
             comp.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
-
-    // Render the icon component dynamically
-    const renderIcon = (iconName: string) => {
-        // @ts-ignore - Dynamic access to the icons
-        const IconComponent = LucideIcons[iconName];
-
-        return IconComponent ? <IconComponent className="h-6 w-6" /> : null;
-    };
 
     return (
         <>
@@ -50,7 +42,11 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
                                     <GripHorizontal className="w-4 h-4 text-gray-400" />
 
                                     <div className="flex flex-col items-center gap-2">
-                                        {renderIcon(item.content?.icon)}
+                                        {item.content?.icon && (
+                                            <IGRPIcon
+                                                iconName={item.content.icon}
+                                            />
+                                        )}
                                         <span className=" text-gray-700 text-center">
                                             {item.content?.name}
                                         </span>

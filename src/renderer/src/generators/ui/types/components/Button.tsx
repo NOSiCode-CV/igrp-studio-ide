@@ -10,13 +10,11 @@ export interface UiButtonProps {
 const UiButton = ({ comp }: UiButtonProps) => {
     const { properties, componentName } = comp;
 
-    const { variant, size, customClasses, label } = properties;
+    const { label } = properties;
 
-    return (
-        <IGRPButton variant={variant} size={size} className={customClasses}>
-            {label || componentName}
-        </IGRPButton>
-    );
+    const { commonProperties, iconProperties, ...args } = properties;
+
+    return <IGRPButton {...args}>{label || componentName}</IGRPButton>;
 };
 
 export default UiButton;

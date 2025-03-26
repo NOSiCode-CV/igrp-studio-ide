@@ -27,12 +27,13 @@ export default class AppUpdater {
             bucket: "igrp-studio",
             endpoint: "https://storage-api.nosi.cv",
             path: `${process.platform}/${process.arch}`,
-            channel: "alpha"
+            channel: "latest"
           });
       }
 
     initAutoUpdater() {
         autoUpdater.logger = log
+        //@ts-ignore
         autoUpdater.logger.transports.file.level = "info"
 
         autoUpdater.forceDevUpdateConfig = true;

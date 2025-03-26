@@ -185,7 +185,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     };
 
     const handleClose = () => {
-        if (setIsOpen) setIsOpen(false);
+        setIsOpen?.(false);
     };
 
     return (

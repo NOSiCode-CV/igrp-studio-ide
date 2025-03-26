@@ -7,8 +7,9 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
-import { AppWindowMac, Code, Eye } from 'lucide-react';
+import { AppWindowMac,  Eye, FileJsonIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import PreviewMenu from './preview-menu';
 
 interface NavigationBarProps {
     isDesign: boolean;
@@ -48,6 +49,7 @@ const NavigationBar = ({
     return (
         <TooltipProvider>
             <div className="flex flex-1 justify-end items-center space-x-2">
+                <PreviewMenu basePath={basePath}/>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
@@ -68,7 +70,7 @@ const NavigationBar = ({
                             className="hover:bg-igrp"
                             variant={'secondary'}
                         >
-                            {isDesign ? <Eye /> : <Code />}
+                            {isDesign ? <FileJsonIcon /> : <Eye />}
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>

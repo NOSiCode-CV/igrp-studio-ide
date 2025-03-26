@@ -24,7 +24,6 @@ import {
 import { Label } from '@renderer/components/ui/label';
 import {
     addNewRow,
-    changeValue,
     handleChangeValueObject,
     removeRow,
 } from '../../helpers';
