@@ -21,7 +21,7 @@ build_packagedev:
     - apt-get install -y wine64 wine32
 
   script:
-    - yarn install
+    - yarn install --frozen-lockfile
     - yarn release:win
     - yarn release:linux
     - yarn release:mac
