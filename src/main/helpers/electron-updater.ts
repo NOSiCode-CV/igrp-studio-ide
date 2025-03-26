@@ -26,7 +26,7 @@ export default class AppUpdater {
             provider: "s3",
             bucket: "igrp-studio",
             endpoint: "https://storage-api.nosi.cv",
-            path: process.platform,
+            path: `${process.platform}/${process.arch}`,
             channel: "alpha"
           });
       }
