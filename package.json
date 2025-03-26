@@ -65,7 +65,6 @@
 		"clsx": "^2.1.1",
 		"cmdk": "^1.1.1",
 		"date-fns": "^4.1.0",
-		"dmg-license": "^1.0.11",
 		"dotenv": "^16.4.7",
 		"electron-log": "^5.3.2",
 		"electron-store": "^10.0.1",
@@ -122,6 +121,9 @@
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.2",
 		"vite": "^6.2.3"
+	},
+	"optionalDependencies": {
+		"dmg-license": "^1.0.11"
 	},
 	"build": {
 		"productName": "IGRP Studio",
