@@ -22,7 +22,7 @@ build_packagedev:
 
   script:
     - yarn install --frozen-lockfile
-    - yarn add dmg-lecense --dev
+    - yarn add dmg-license --dev
     #- yarn release:win
     #- yarn release:linux
     - yarn release:mac
