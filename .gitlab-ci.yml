@@ -24,6 +24,7 @@ build_packagedev:
     - yarn install
     - yarn release:win
     - yarn release:linux
+    - yarn release:mac
   artifacts:
     paths:
       - dist/
