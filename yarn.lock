@@ -950,10 +950,10 @@
     vaul "^1.1.2"
     zod "^3.24.2"
 
-"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.86":
-  version "0.0.1-alpha.86"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.86.tgz#0d8dcea0685853ded33216e27b767e1cc49ab97c"
-  integrity sha512-qqfS7LNqUVGrLXcrnrYeMYFr2H1lA2URbsAW0u3o+sR/rHc7OusmFKxPHvAMsuQW7qA16EGM5WIy8NnUBADzVw==
+"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.87":
+  version "0.0.1-alpha.87"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.87.tgz#aff13f81794473a2a2de2854bcb810ed1c97b6db"
+  integrity sha512-NV3W6O++JtsVAlZfYa3vmHERH49jSPxUOk3FegAUKbY78P965+mJsWWZOFEqWgo/GoLKZdcqcNYXNHShPs2Lrg==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -973,10 +973,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.44":
-  version "0.0.1-alpha.44"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.44.tgz#e41b25f32796fabaf59e7257a523f5ea973f11ab"
-  integrity sha512-4TT1IQdBBkI+51nbt8u0bFE/UULkWhcBlvTIWecfIr20O8tLvfhfFcf9cE4+vOsVke+By6Pliw38vg0Njf6u0g==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.48":
+  version "0.0.1-alpha.48"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.48.tgz#799249f92f43455c19b100a5066e0d012d91c0df"
+  integrity sha512-jMYqp0p9tJLAO8UfBDqIyEwe8qGzKMVgp24x8yehMK/3GTnXdaXPUzI6ocejuZoUukQ5kG7gvBXZ0Xdy9dYq/g==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -4355,10 +4355,10 @@ electron-winstaller@5.4.0:
   optionalDependencies:
     "@electron/windows-sign" "^1.1.2"
 
-electron@35.1.0:
-  version "35.1.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-35.1.0.tgz#7109f4b298f904c94825d58e41d1126578ac461c"
-  integrity sha512-yHaKPlsgDgjkwsiXgJG5DAmr9BgD4wSxtDGL6aBmUaN7QTs6qppNgtGkjHsS/pXJb4ZZBIH4IpPAx9d59Epbeg==
+electron@35.1.1:
+  version "35.1.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-35.1.1.tgz#7c782040a0dd38278fddff640c9a0d34c02def9c"
+  integrity sha512-0c4q8SuYsec9uqb1d2B/FDP/pifAT/Rc7721EjUdRfTKABFqXgYKAtyEKIlmFPjxPbwQt2EMfL35zVmpEAGI3A==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"

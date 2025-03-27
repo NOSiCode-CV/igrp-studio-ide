@@ -25,14 +25,8 @@ export interface SidebarItem {
 export interface DragEndResult {
   draggableId: string
   type: string
-  source: {
-    index: number
-    droppableId: string
-  }
-  destination?: {
-    droppableId: string
-    index: number
-  } | null
+  source: Source
+  destination?: Destination | null
   mode: 'MOVE' | 'DROP'
 }
 

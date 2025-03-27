@@ -1,16 +1,29 @@
 import { generateId } from "@renderer/utils/helpers";
-import { Destination, Source, StructuredComponent } from "@renderer/lib/dnd/types";
+import { Destination, DragEndResult, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export const handleDragEnd = (
     result: any,
     { handleAddChildToComponent, handleReorderChildInComponent }: any
 ) => {
-    const { draggableId, source, destination, mode, type } = result;
+
+   // const { getAcceptedChildren } = useStudio()
+
+    const { draggableId, source, destination, mode, type }: DragEndResult = result;
+
+   // const { droppableId } = destination;
 
     if (!destination) {
         return;
     }
+
+
+   /*  useCallback(() => {
+        getAcceptedChildren(parentComponentName, componentName).then((data) => {
+            setComponents(data);
+        });
+    }, [parentComponentName, componentName, getAcceptedChildren]); */
+
 
     if (mode === 'MOVE') {
         handleReorderChildInComponent(draggableId, source, destination);
@@ -27,7 +40,7 @@ const handleDropComponent = (
     { handleAddChildToComponent }: any
 ) => {
     const { label, properties, childrenTypes } = source
-    // Generate a unique ID for the component
+
     const componentId = generateId(draggableId);
 
     // Create the component object
@@ -37,7 +50,7 @@ const handleDropComponent = (
         label,
         type,
         properties: setDefaultProperties(properties),
-        children: [], // Initialize children array
+        children: [],
     };
 
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {

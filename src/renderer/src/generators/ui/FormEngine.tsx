@@ -143,12 +143,11 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
-                            {isDesign ? (
-                                <Page page={components} onDragEnd={onDragEnd} />
-                            ) : (
-                                <CodeContent pagePath={pagePath} />
-                            )}
-                        </ContainerScrollArea>
+                        {isDesign ? (
+                            <Page page={components} onDragEnd={onDragEnd} />
+                        ) : (
+                            <CodeContent pagePath={pagePath} />
+                        )}</ContainerScrollArea>
                     </div>
                 </SidebarInset>
                 {currentComponent && <SidebarRight />}
