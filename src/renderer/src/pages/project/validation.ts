@@ -42,8 +42,8 @@ export function useProjectValidation({ t, step }) {
                                         t('msgInfoAccpet')
                                     )
                                     .max(
-                                        20,
-                                        t('maxLengthExceeded', { max: 20 })
+                                        50,
+                                        t('maxLengthExceeded', { max: 50 })
                                     )
                                 : schema.notRequired();
                         }
@@ -61,7 +61,7 @@ export function useProjectValidation({ t, step }) {
                                     PATTERNS.NO_SPACE_AND_HYPHEN,
                                     t('msgInfoAccpet')
                                 )
-                                .max(20, t('maxLengthExceeded', { max: 20 }))
+                                .max(50, t('maxLengthExceeded', { max: 50 }))
                             : schema.notRequired();
                     }),
                     // Validation for Spring-specific fields

@@ -24,8 +24,6 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
         }));
     };
 
-    console.log(formValues)
-
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault } = fieldConfig;
         const label = getLabel(key);
@@ -83,7 +81,6 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
             return (
                 <DomainForm
                     onAdd={(opt) => {
-                        console.log(opt);
                         handleInputChange(key, opt);
                     }}
                 />
