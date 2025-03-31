@@ -55,32 +55,30 @@ export const changeValue = (
 	);
 };
 
-export const handleChangeValueObject= (
+export const handleChangeValueObject = (
 	formik: FormikValues,
 	element: string,
 	position: number,
 	result: any,
 	value: string
 ) => {
-	const isType = element === 'type';
+	const isObject = typeof element === 'object'; 
 
-	const typeValue = isType ? result.value : result;
+	const typeValue = isObject ? result.value : result;
+	const typeModule = isObject ? result.module : '';
+	const typeType = isObject ? result.type : '';
 
-	const typeModule = isType ? result.module : '';
-
-	const typeType = isType ? result.type : '';
-
-	if (isType)
+	if (isObject && typeValue && typeType)
 		formik.setFieldValue(
 			value,
 			formik.values[value].map((row: any, index: number) =>
 				index === position
 					? {
-						  ...row,
-						  objectType: typeType,
-						  [element]: typeValue,
-						  module: typeModule,
-					  }
+						...row,
+						objectType: typeType,
+						[element]: typeValue,
+						module: typeModule,
+					}
 					: row
 			)
 		);

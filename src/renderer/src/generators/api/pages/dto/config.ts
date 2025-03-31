@@ -51,12 +51,12 @@ export const getTablesColumns = ({ selectors, dto, models, enums, current, t }):
     )
 
     const dataTypes = (
-		selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
+		selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
 		| {
-			MODEL_ATTRIBUTE_TYPES: string[]
+			ATTRIBUTE_TYPES: string[]
 		}
 		| undefined
-	)?.MODEL_ATTRIBUTE_TYPES || []
+	)?.ATTRIBUTE_TYPES || []
 
     const namespacesOptions: SchemaTypeItem[] = [
         { label: t('dto'), value: 'dto', items: getOptionsByObject(dto, module, currentDto) },

@@ -39,6 +39,7 @@ import {
     RelationReference,
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
+import { SpringConfigData } from 'src/main/types';
 
 interface ModelProps {
     selectors: Array<any>;
@@ -106,7 +107,10 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
     };
 
     useEffect(() => {
-        hasEnableEntityRevision(config.config.enableEntityRevision);
+        const { config: appConfig } = config;
+        const { enableEntityRevision } = appConfig;
+
+        hasEnableEntityRevision(enableEntityRevision);
     }, [config]);
 
     useEffect(() => {

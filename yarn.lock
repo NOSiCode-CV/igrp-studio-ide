@@ -951,10 +951,10 @@
     vaul "^1.1.2"
     zod "^3.24.2"
 
-"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.117":
-  version "0.0.1-alpha.117"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.117.tgz#5bf2d6a9909dc348d79c3a005abccf6add7d8c9a"
-  integrity sha512-/0CsUPS2K8s0BC43/cI0yMCc/GL8jWT7FiSbCkJdlUb3OoeeucQxlyf3TrRZ8leY5n9ZUKAvLXVCcCU9vlkFHg==
+"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.118":
+  version "0.0.1-alpha.118"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.118.tgz#e1c21ffeb7eb7afcaa470e4bd49541bd9695ee57"
+  integrity sha512-+23yBSf0f3zn6dKTLJ4qZuwmyG4kpAgX/MsXaQCRWiKrbN2Df73KGdIFndi2g6KTuFpn5kDN1Ak+DnvMkJ5Xdw==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -974,10 +974,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.54":
-  version "0.0.1-alpha.54"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.54.tgz#d7c6eac772ccd9294c5d026832dfa1ce81e1c778"
-  integrity sha512-Chs5Udw3PZeo6pXzIOzs5EZ2XW3dOhlD4I7dBj9+AuWBW85GYN0dG35B4KbRrmyby/84fGqRIiYuUodJYv0SfQ==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.55":
+  version "0.0.1-alpha.55"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.55.tgz#56c6e818ae18771169fe54981765c2e27be1dd9a"
+  integrity sha512-d9Cc/6yorHrOT87dHqN8vo42G675p9bEL3YV2FpNsi3TieB4DLdOjmYzA9BvNGur3tegcAJeoEKFHiQJ1krFgw==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -9024,10 +9024,10 @@ ts-api-utils@^2.0.1:
   resolved "https://registry.yarnpkg.com/ts-api-utils/-/ts-api-utils-2.0.1.tgz#660729385b625b939aaa58054f45c058f33f10cd"
   integrity sha512-dnlgjFSVetynI8nzgJ+qF62efpglpWRk8isUEWZGWlJYySCTD6aKvbUDu+zbPeDakk3bg5H4XpitHukgfL1m9w==
 
-ts-jest@^29.3.0:
-  version "29.3.0"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.3.0.tgz#8fc867616619dafeac150b818056badfe07708d5"
-  integrity sha512-4bfGBX7Gd1Aqz3SyeDS9O276wEU/BInZxskPrbhZLyv+c1wskDCqDFMJQJLWrIr/fKoAH4GE5dKUlrdyvo+39A==
+ts-jest@^29.3.1:
+  version "29.3.1"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.3.1.tgz#2e459e1f94a833bd8216ba4b045fac948e265937"
+  integrity sha512-FT2PIRtZABwl6+ZCry8IY7JZ3xMuppsEV9qFVHOVe8jDzggwUZ9TsM4chyJxL9yi6LvkqcZYU3LmapEE454zBQ==
   dependencies:
     bs-logger "^0.2.6"
     ejs "^3.1.10"
@@ -9037,7 +9037,7 @@ ts-jest@^29.3.0:
     lodash.memoize "^4.1.2"
     make-error "^1.3.6"
     semver "^7.7.1"
-    type-fest "^4.37.0"
+    type-fest "^4.38.0"
     yargs-parser "^21.1.1"
 
 ts-loader@^9.5.1:
@@ -9112,7 +9112,7 @@ type-fest@^4.18.2, type-fest@^4.20.0:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.37.0.tgz#7cf008bf77b63a33f7ca014fa2a3f09fd69e8937"
   integrity sha512-S/5/0kFftkq27FPNye0XM1e2NsnoD/3FS+pBmbjmmtLT6I+i344KoOf7pvXreaFsDamWeaJX55nczA1m5PsBDg==
 
-type-fest@^4.37.0:
+type-fest@^4.38.0:
   version "4.38.0"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.38.0.tgz#659fa14d1a71c2811400aa3b5272627e0c1e6b96"
   integrity sha512-2dBz5D5ycHIoliLYLi0Q2V7KRaDlH0uWIvmk7TYlAg5slqwiPv1ezJdZm1QEM0xgk29oYWMCbIG7E6gHpvChlg==

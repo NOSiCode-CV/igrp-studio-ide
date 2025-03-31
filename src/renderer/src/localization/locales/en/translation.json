@@ -426,9 +426,9 @@
   "checkUpdate": "Check Update",
   "downloadInstall": "Download and Install",
   "currentVersion": "Current version {{version}}",
-  "versionAvailable":"New version available {{version}}",
-  "convertToDTO":"Convert To DTO",
-  "openOnEditor":"Open on Editor",
+  "versionAvailable": "New version available {{version}}",
+  "convertToDTO": "Convert To DTO",
+  "openOnEditor": "Open on Editor",
   "workspace": {
     "createTitle": "Create New Workspace",
     "nameLabel": "Name",
@@ -443,6 +443,7 @@
     "createSuccess": "Workspace '{{name}}' created successfully!"
   },
   "creating": "Creating...",
-  "enableGraalVm":"Enable Graal Vm",
-  "clickToChangeIcon":"Click To Change Icon"
+  "enableGraalVm": "Enable Graal Vm",
+  "clickToChangeIcon": "Click To Change Icon",
+  "relation": "Relation"
 }

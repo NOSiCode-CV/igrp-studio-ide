@@ -118,12 +118,12 @@ export const getTablesColumns = ({
 	}))
 
 	const dataTypes = (
-		selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
+		selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
 		| {
-			MODEL_ATTRIBUTE_TYPES: string[]
+			ATTRIBUTE_TYPES: string[]
 		}
 		| undefined
-	)?.MODEL_ATTRIBUTE_TYPES || []
+	)?.ATTRIBUTE_TYPES || []
 
 	const generateTypes = formatMethods(
 		(
@@ -136,7 +136,8 @@ export const getTablesColumns = ({
 
 	const fieldTypeOptions: SchemaTypeItem[] = [
 		{ label: t('dataTypes'), value: 'java', items: dataTypes },
-		{ label: t('enum'), value: 'enum', items: enumMap }
+		{ label: t('enum'), value: 'enum', items: enumMap },
+		{ label: t('relation'), value: 'relation' }
 	]
 
 	return {
@@ -152,24 +153,22 @@ export const getTablesColumns = ({
 			}
 		],
 		indexes: [
-			{ key: 'name', name: t('name'), type: 'text', width: '25%' },
+			{ key: 'name', name: t('name'), type: 'text' },
 			{
 				key: 'columns',
 				name: t('columns'),
 				type: 'multiSelect',
 				options: columns,
-				width: '50%'
 			},
 			{
 				key: 'unique',
 				name: t('unique'),
 				type: 'checkbox',
-				width: '25%'
 			}
 		],
 		uniqueConstraints: [
-			{ key: 'name', name: t('name'), type: 'text', width: '25%' },
-			{ key: 'columns', name: t('columns'), type: 'multiSelect', options: columns, width: '50%' }
+			{ key: 'name', name: t('name'), type: 'text' },
+			{ key: 'columns', name: t('columns'), type: 'multiSelect', options: columns }
 		]
 	}
 }
