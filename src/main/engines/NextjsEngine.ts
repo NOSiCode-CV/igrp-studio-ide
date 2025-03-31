@@ -1,9 +1,9 @@
 // engines/NextjsEngine.ts
 import { deleteElement, initComponents, loadRegistry, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
-import { ProjectRepository } from '../repo/projects';
 import { AppConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { ProjectData } from '../types';
+import { NextConfigData, ProjectData } from '../types';
+import { ensureDirectoryExists } from '../helpers';
 
 
 export class NextjsEngine implements BaseEngine {
@@ -22,7 +22,6 @@ export class NextjsEngine implements BaseEngine {
   }
 
   async createPage(pageConfig: any, basePath: string): Promise<void> {
-
     if (pageConfig.type === 'component') {
       await newComponent(pageConfig as ComponentConfig, basePath);
     } else
@@ -31,20 +30,15 @@ export class NextjsEngine implements BaseEngine {
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    const repo = new ProjectRepository()
-
     const nextConfig: AppConfig = {
-      ...project.config,
+      ...project.config as NextConfigData,
       type: 'baseApp'
     }
 
+    // Ensure the basePath exists
+    await ensureDirectoryExists(basePath);
+
     await newApp(nextConfig, basePath);
 
-    await repo.save({
-      ...project,
-      path: basePath,
-      dt_created: new Date(),
-      location: 'local'
-    });
   }
 }

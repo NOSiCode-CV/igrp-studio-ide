@@ -54,6 +54,7 @@ export function ProjectWizard() {
     const { t } = useTranslation();
 
     const {
+        workspace,
         actions: { saveOrOpenProject },
     } = useWorkspace();
 
@@ -236,6 +237,13 @@ export function ProjectWizard() {
         };
     }, []);
 
+    React.useEffect(() => {
+        formik.setFieldValue(
+            'path',
+            `${workspace.path}/projects/${formik.values.name}`
+        );
+    }, [workspace, formik.values.name]);
+
     const renderStep1 = () => (
         <div className="space-y-4">
             <div className="space-y-2">
@@ -295,7 +303,11 @@ export function ProjectWizard() {
                                     variant="outline"
                                     size="sm"
                                     type="button"
-                                    onClick={() => document.getElementById('icon-upload')?.click()}
+                                    onClick={() =>
+                                        document
+                                            .getElementById('icon-upload')
+                                            ?.click()
+                                    }
                                 >
                                     {t('upload')}...
                                 </Button>
@@ -494,6 +506,7 @@ export function ProjectWizard() {
                             <Button
                                 variant="outline"
                                 size="icon"
+                                type="button"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     handleOpenDirectory();
@@ -610,7 +623,10 @@ export function ProjectWizard() {
                                 {step < STEPS.length ? (
                                     <Button
                                         type="button"
-                                        onClick={handleNext}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleNext();
+                                        }}
                                         disabled={!canNavigateToStep(step + 1)}
                                     >
                                         {t('next')}

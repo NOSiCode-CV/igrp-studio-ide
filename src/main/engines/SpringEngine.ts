@@ -1,10 +1,10 @@
 // engines/SpringEngine.ts
 import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController, getSpringDependencies } from '@igrp/igrp-studio-springboot-engine';
-import { ProjectRepository } from '../repo/projects';
 import { BaseEngine } from '../interfaces';
 import { BaseApiConfig, ControllerConfig, DeleteConfig, DTOConfig, EnumConfig, ModelConfig, ModuleConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ProjectData } from '../types';
+import { ProjectData, SpringConfigData } from '../types';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
+import { ensureDirectoryExists } from '../helpers';
 
 export class SpringEngine implements BaseEngine {
 
@@ -37,13 +37,13 @@ export class SpringEngine implements BaseEngine {
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    const { config, framework } = project
-
-    const appConfig : BaseApiConfig = {
-      ...config, type: framework
+    const appConfig: BaseApiConfig = {
+      ...project.config as SpringConfigData, type: 'springboot'
     }
 
-    // Lógica específica do Spring
+    // Ensure the basePath exists
+    await ensureDirectoryExists(basePath);
+
     await newApi(appConfig, basePath);
 
   }

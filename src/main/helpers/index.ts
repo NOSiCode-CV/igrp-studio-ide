@@ -43,19 +43,23 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
             const data = await readFile(baseApiPath, 'utf8');
             const parsedConfig = JSON.parse(data);
 
+            const { id, type } = parsedConfig
+
             if (baseApiPath.endsWith('baseApi.json')) {
                 config = {
+                    id,
                     name: parsedConfig.apiName,
                     type: 'backend',
-                    framework: parsedConfig.type,
+                    framework: type,
                     config: { ...parsedConfig },
                     path: folderPath
                 }
             } else if (baseApiPath.endsWith('baseApp.json')) {
                 config = {
+                    id,
                     name: parsedConfig.appName,
                     type: 'frontend',
-                    framework: parsedConfig.type,
+                    framework: type,
                     config: { ...parsedConfig },
                     path: folderPath
                 }
@@ -172,5 +176,11 @@ export async function readProjectFile(filePath: string): Promise<any> {
     } catch (err) {
         console.error('Error reading file:', err);
         return null;
+    }
+}
+
+export async function ensureDirectoryExists(dirPath: string): Promise<void> {
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
     }
 }
