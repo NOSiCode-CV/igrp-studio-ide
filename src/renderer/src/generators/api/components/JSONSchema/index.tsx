@@ -106,11 +106,11 @@ export function JSONSchemaBuilder({
     ): SchemaField => {
         const updatedField = { ...field };
 
-        if (parentField) {
+        /*  if (parentField) {
             updatedField.name = generateUniqueName(field.name, existingNames);
             existingNames.add(updatedField.name);
         }
-
+ */
         if (
             (updatedField.type === 'object' || updatedField.type === 'array') &&
             updatedField.properties
@@ -132,8 +132,7 @@ export function JSONSchemaBuilder({
     };
 
     const handleAddNewField = (parentId?: string) => {
-        const newFieldName = `field${Object.keys(schema.properties).length + Object.keys(newFields).length + 1}`;
-
+        const newFieldName = `field${parentId}${Object.keys(schema.properties?.[parentId]?.properties ?? {}).length + 1}`;
         const newFieldId = `new_field_${Date.now()}`;
 
         const newField: SchemaField = {
@@ -141,6 +140,8 @@ export function JSONSchemaBuilder({
             type: 'string',
             description: '',
         };
+
+        console.log(newField);
 
         if (!parentId) {
             setNewFields((prev) => ({ ...prev, [newFieldId]: newField }));
