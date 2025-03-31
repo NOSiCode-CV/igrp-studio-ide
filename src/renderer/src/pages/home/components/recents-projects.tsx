@@ -1,13 +1,6 @@
-import {
-    setConfig,
-    setBasePath,
-    navigateToNextPage,
-} from '@renderer/redux/thunks';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { PageableProjects, ProjectData } from 'src/main/types';
+import { ProjectData } from 'src/main/types';
 import { projectIcons } from '@renderer/constants/appConstants';
 import {
     Card,
@@ -44,94 +37,38 @@ import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
 import GitProject from '@renderer/components/git/git-project';
 import { ProjectDropdown } from './project-dropdown';
 import { enUS, pt } from 'date-fns/locale';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 const RecentsProjects = () => {
     const [isDelete, setIdDelete] = useState(false);
     const [currentDate, setCurrentDate] = useState(new Date());
 
+    const {
+        workspace,
+        actions: { saveOrOpenProject, findAllProjects },
+    } = useWorkspace();
+
     const { i18n } = useTranslation();
 
-    // Dynamically set the locale based on the current language in i18n
-    const getLocale = () => {
-        switch (i18n.language) {
-            case 'pt':
-                return pt;
-            default:
-                return enUS;
-        }
-    };
-
-    const navigate = useNavigate();
-    const dispatch: any = useDispatch();
-    const { t } = useTranslation(); // Hook for translations
+    const { t } = useTranslation();
 
     const [localSearchQuery, setLocalSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('local');
 
-    const [allProjects, setProjects] = useState<PageableProjects>({
-        data: [],
-        total: 0,
-    });
-    const [localProjects, setLocalProjects] = useState<ProjectData[]>([]);
-    const [_error, setError] = useState<string | null>(null);
+    const [allProjects, setProjects] = useState<ProjectData[]>([]);
 
     const [projectOrder] = useState<string>('lastModified');
     const [localProjectOrder, setLocalProjectOrder] =
         useState<string>('lastModified');
 
-    const sortProjects = (projects) => {
-        return [...projects].sort((a, b) => {
-            if (projectOrder === 'name') {
-                return a.name.localeCompare(b.name);
-            } else if (projectOrder === 'lastModified') {
-                return (
-                    new Date(b.lastModified).getTime() -
-                    new Date(a.lastModified).getTime()
-                );
-            }
-            return 0;
-        });
-    };
-
-    const fetchProjects = async () => {
-        setError(null);
-        try {
-            const res = await window.repo.project.findAllRecent();
-            setProjects(res);
-        } catch (err) {
-            setError(t('fetchProjectsError')); // Translated error message
-        } finally {
-        }
-    };
-
     useEffect(() => {
         fetchProjects();
-    }, []);
+    }, [workspace]);
 
     useEffect(() => {
         if (isDelete) fetchProjects();
     }, [isDelete]);
-
-    useEffect(() => {
-        const localProjects = allProjects.data.filter(
-            (project) =>
-                project?.location === undefined || project?.location === 'local'
-        );
-        setLocalProjects(localProjects);
-    }, [allProjects, isDelete]);
-
-    const handleOpenProject = async (p: ProjectData): Promise<void> => {
-        try {
-            await window.repo.project.save(p);
-        } catch (err) {}
-
-        dispatch(setBasePath(p.path));
-
-        dispatch(setConfig(p));
-
-        navigateToNextPage(navigate, p);
-    };
 
     useEffect(() => {
         setTimeout(() => setIsLoading(false), 1000);
@@ -150,6 +87,40 @@ const RecentsProjects = () => {
         return () => clearInterval(timer);
     }, [currentDate]);
 
+    const sortProjects = (projects) => {
+        return [...projects].sort((a, b) => {
+            if (projectOrder === 'name') {
+                return a.name.localeCompare(b.name);
+            } else if (projectOrder === 'lastModified') {
+                return (
+                    new Date(b.lastModified).getTime() -
+                    new Date(a.lastModified).getTime()
+                );
+            }
+            return 0;
+        });
+    };
+
+    const fetchProjects = async () => {
+        await findAllProjects().then((data) => {
+            setProjects(data);
+        });
+    };
+
+    const handleOpenProject = async (p: ProjectData): Promise<void> => {
+        saveOrOpenProject(p);
+    };
+
+    // Dynamically set the locale based on the current language in i18n
+    const getLocale = () => {
+        switch (i18n.language) {
+            case 'pt':
+                return pt;
+            default:
+                return enUS;
+        }
+    };
+
     const RenderProjectCard = (
         project: ProjectData,
         isCompact: boolean = false,
@@ -163,13 +134,23 @@ const RecentsProjects = () => {
                 <CardHeader className={isCompact ? 'p-2' : ''}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                            <img
-                                src={projectIcons[project.framework]}
-                                alt={`${project.framework} logo`}
-                                width={isCompact ? 16 : 20}
-                                height={isCompact ? 16 : 20}
-                                className="mr-2"
-                            />
+                            {project.icon ? (
+                                <img
+                                    src={project.icon}
+                                    alt="Project icon"
+                                    width={isCompact ? 16 : 20}
+                                    height={isCompact ? 16 : 20}
+                                    className="mr-2 rounded-full" 
+                                />
+                            ) : projectIcons[project.framework] ? (
+                                <img
+                                    src={projectIcons[project.framework]}
+                                    alt={`${project.framework} logo`}
+                                    width={isCompact ? 16 : 20}
+                                    height={isCompact ? 16 : 20}
+                                    className="mr-2"
+                                />
+                            ) : null}
                             <CardTitle
                                 className={`${isCompact ? 'text-sm' : 'text-lg'}`}
                             >
@@ -189,13 +170,13 @@ const RecentsProjects = () => {
                         </p>
                     )}
                     <div className="flex items-center text-xs text-muted-foreground">
-                        {project.dt_updated && (
+                        {project.updatedAt && (
                             <>
                                 <Calendar className="w-3 h-3 mr-1" />
                                 <span>
                                     {t('lastModified')}:{' '}
                                     {formatDistance(
-                                        project.dt_updated,
+                                        project.updatedAt,
                                         currentDate,
                                         { addSuffix: true, locale: getLocale() }
                                     )}
@@ -228,9 +209,9 @@ const RecentsProjects = () => {
                 </div>
                 {isLoading ? (
                     <LoadingSpinner />
-                ) : allProjects?.data?.length > 0 ? (
+                ) : allProjects.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {allProjects?.data
+                        {allProjects
                             ?.slice(0, 3)
                             .map((project, index) =>
                                 RenderProjectCard(project, true, index)
@@ -301,10 +282,10 @@ const RecentsProjects = () => {
                         </div>
                         {isLoading ? (
                             <LoadingSpinner />
-                        ) : localProjects.length > 0 ? (
+                        ) : allProjects.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {sortProjects(
-                                    localProjects.filter((project) =>
+                                    allProjects.filter((project) =>
                                         project?.name
                                             ?.toLowerCase()
                                             .includes(

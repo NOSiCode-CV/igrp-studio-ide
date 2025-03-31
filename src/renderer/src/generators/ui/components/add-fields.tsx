@@ -10,7 +10,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
@@ -61,45 +61,55 @@ export const AddField = ({
     };
 
     return (
-        <Popover>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
-                        <Badge
-                            variant={'secondary'}
-                            className="my-1 rounded-sm cursor-pointer"
-                        >
-                            <span className="text-xs">Add Comp</span>
-                        </Badge>
-                    </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p>Add Comp</p>
-                </TooltipContent>
-            </Tooltip>
+        <>
+            {' '}
+            {components.length > 0 ? (
+                <Popover>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <PopoverTrigger asChild>
+                                <Badge
+                                    variant={'secondary'}
+                                    className="my-1 rounded-sm cursor-pointer"
+                                >
+                                    <span className="text-xs">Add Comp</span>
+                                </Badge>
+                            </PopoverTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Add Comp</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-            <PopoverContent className="w-100 p-3 space-y-3">
-                <div className="p-2 border-b">
-                    <h3 className="text-lg font-semibold">Add Component</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Select a component to add to your {componentName}
-                    </p>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                    {components.map((component) => (
-                        <button
-                            key={component.name}
-                            className="flex flex-col items-center justify-center rounded-md border bg-background p-2 text-xs transition-colors hover:bg-muted aspect-square"
-                            onClick={() => handleAddComponent(component)}
-                        >
-                            <div className="mb-1">
-                                {renderIcon(component.name)}
-                            </div>
-                            {component.label}
-                        </button>
-                    ))}
-                </div>
-            </PopoverContent>
-        </Popover>
+                    <PopoverContent className="w-100 p-3 space-y-3">
+                        <div className="p-2 border-b">
+                            <h3 className="text-lg font-semibold">
+                                Add Component
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                                Select a component to add to your{' '}
+                                {componentName}
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                            {components.map((component) => (
+                                <button
+                                    key={component.name}
+                                    className="flex flex-col items-center justify-center rounded-md border bg-background p-2 text-xs transition-colors hover:bg-muted aspect-square"
+                                    onClick={() =>
+                                        handleAddComponent(component)
+                                    }
+                                >
+                                    <div className="mb-1">
+                                        {renderIcon(component.name)}
+                                    </div>
+                                    {component.label}
+                                </button>
+                            ))}
+                        </div>
+                    </PopoverContent>
+                </Popover>
+            ) : null}
+        </>
     );
 };

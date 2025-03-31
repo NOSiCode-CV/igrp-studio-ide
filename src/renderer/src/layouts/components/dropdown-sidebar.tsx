@@ -15,7 +15,7 @@ import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { DropdownItem } from './nav-data';
 
 interface DropdownSidebarMenuButtonProps {

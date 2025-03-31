@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import {
@@ -11,7 +11,6 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import Droppable from '@renderer/lib/dnd/Droppable';
 import { generateFakeDataForField, getLabel } from '@renderer/utils/helpers';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
@@ -214,60 +213,52 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
     );
 
     return (
-        <Droppable
-            component={comp}
-            onDrop={onDragEnd}
-            className="border-none p-0"
-        >
-            <div className="w-full flex flex-col gap-3">
-                {/* Render TableFilter first */}
-                {tableFilters.map((tableComp, index) => {
-                    const { componentName: compName } = tableComp;
+        <div className="w-full flex flex-col gap-3">
+            {/* Render TableFilter first */}
+            {tableFilters.map((tableComp, index) => {
+                const { componentName: compName } = tableComp;
 
-                    return (
-                        <div
-                            key={index}
-                            className="bg-card rounded-lg border p-2 group/table"
-                        >
-                            <TableTool parentComp={comp} comp={tableComp} />
-                            {renderTableFilters(compName)}
-                        </div>
-                    );
-                })}
+                return (
+                    <div
+                        key={index}
+                        className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
+                    >
+                        <TableTool parentComp={comp} comp={tableComp} onEdit={() => handleEdit(tableComp, componentName)}/>
+                        {renderTableFilters(compName)}
+                    </div>
+                );
+            })}
 
-                {/* Render TableColumn next */}
-                {tableColumns.map((tableComp, index) => {
-                    const { componentName } = tableComp;
+            {/* Render TableColumn next */}
+            {tableColumns.map((tableComp, index) => {
+                const { componentName } = tableComp;
 
-                    return (
-                        <div
-                            key={index}
-                            className="bg-card rounded-lg border p-2 group/table"
-                        >
-                            <TableTool parentComp={comp} comp={tableComp} />
-                            {columns.length === 0 ? (
-                                <GenNoInfoComp
-                                    type={getLabel(componentName).toUpperCase()}
-                                />
-                            ) : (
-                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                                    <Table className="w-full text-sm text-left rtl:text-right table-fixed">
-                                        <TableHeader>
-                                            <TableRow>
-                                                {renderTableHeaders(
-                                                    componentName
-                                                )}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>{renderTableRows}</TableBody>
-                                    </Table>
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-        </Droppable>
+                return (
+                    <div
+                        key={index}
+                        className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
+                    >
+                        <TableTool parentComp={comp} comp={tableComp} onEdit={() => handleEdit(tableComp, componentName)}/>
+                        {columns.length === 0 ? (
+                            <GenNoInfoComp
+                                type={getLabel(componentName).toUpperCase()}
+                            />
+                        ) : (
+                            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                <Table className="w-full text-sm text-left rtl:text-right table-fixed">
+                                    <TableHeader>
+                                        <TableRow>
+                                            {renderTableHeaders(componentName)}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>{renderTableRows}</TableBody>
+                                </Table>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
     );
 };
 

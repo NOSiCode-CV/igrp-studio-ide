@@ -30,7 +30,7 @@ import useToast from '@renderer/components/useToast';
 import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 
 interface CreateModuleDialogProps {
     basePath: string;

@@ -8,7 +8,7 @@ export interface CardComponentProps {
 const CardComponent = ({ comp }: CardComponentProps) => {
     const { componentName, properties } = comp;
 
-    const { commonProperties, iconProperties, ...args } = properties;
+    const { commonProperties, iconProperties, error, errorMessage, ...args } = properties;
 
     const Icon = ICON_MAP[componentName];
 

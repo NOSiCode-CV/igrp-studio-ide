@@ -73,7 +73,7 @@ declare global {
     interface Window {
         electron: ElectronAPI | getAppVersion | getLanguage | setLanguage
         api: CustomAPI,
-        repo: { project: IProjectRepository, connection: IConnenctionRepository },
+        igrpStudio: { workspace: IWorkspaceRepository, project: IProjectRepository, connection: IConnenctionRepository },
         menu: CustomMenu,
         engine: BaseEngine
     }

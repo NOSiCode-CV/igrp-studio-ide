@@ -6,7 +6,7 @@ import AlertDialogSync from './alert-dialog';
 import { RemoteUrlDialog } from './remote-url-dialog';
 import { useState } from 'react';
 import useToast from '../useToast';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
 import { useTranslation } from 'react-i18next';

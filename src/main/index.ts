@@ -4,21 +4,22 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeApp, installExtensions } from './helpers/utils'
 import fs from 'fs'
-import { FileTree, HandlerResponse, IOpenProject, ProjectData } from './types'
+import { FileTree, HandlerResponse, IOpenProject } from './types'
 
 import { checkAndReadBaseApi, getJsonContent, openDirectory, readDirectory, readIgrpStudioDirectory, readProjectFile } from './helpers'
-import { ProjectRepository } from './repo/projects'
 
 import { exec } from 'child_process'
 import { githubAuth } from './helpers/git-auth/github-auth'
 import { GitLabService } from './services/gitlab-service'
 import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
-import { GitService } from './services/git-service'
-import { TokenService } from './services/token-service';
+import { GitStore } from './services/git-store';
 import { GitHubService } from './services/github-service';
 
-import './handlers/apiHandler';
-import './handlers/dbHandler';
+import './handlers/api-handler';
+import './handlers/db-handler';
+import './handlers/workspace-handler';
+import './handlers/git-handler';
+
 import { buildTaskbar } from './helpers/taskbar'
 import { getCurrentLanguage, loadConfig, setCurrentLanguage } from './helpers/language'
 import NextJsManager from './helpers/nextjsManager'
@@ -30,12 +31,10 @@ import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection'
 
 const backend = require('i18next-electron-fs-backend')
 
-
 let mainWindow: BrowserWindow
 
 let nextJsManager: NextJsManager;
 
-let repo;
 // Load the initial language configuration
 loadConfig();
 dotenv.config();
@@ -58,8 +57,6 @@ function createWindow(): void {
     titleBarStyle: "hidden",
     icon: path.join(__dirname, 'resources/icons', 'icon.icns'), // Set icon for the window
   })
-
-  repo = new ProjectRepository()
 
   nextJsManager = new NextJsManager(mainWindow);
 
@@ -158,7 +155,7 @@ app.whenReady().then(async () => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  await TokenService.initialize();
+  await GitStore.initialize();
   await Promise.all([
     GitHubService.initializeServices(),
     GitLabService.initializeServices()
@@ -263,21 +260,6 @@ ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<I
 })
 
 ipcMain.handle(
-  'igrp-studio:repo:project.findAllRecent',
-  async (_event) => {
-    return await repo.findAllRecent()
-  }
-)
-
-ipcMain.handle('igrp-studio:repo:project.save', async (_event, project: ProjectData) => {
-  await repo.save(project)
-})
-
-ipcMain.handle('igrp-studio:repo:project.delete', async (_event, project: ProjectData, index: number) => {
-  await repo.delete(project, index)
-})
-
-ipcMain.handle(
   'igrp-studio:fetch-files',
   async (_event, basePath: string): Promise<FileTree[] | { error: string }> => {
 
@@ -352,8 +334,6 @@ ipcMain.on('start-drag', (_event) => {
         height: displayBounds.height / 2
       })
     }
-
-    // Add other snapping conditions for top-right, bottom-left, and bottom-right
   })
 })
 
@@ -387,110 +367,7 @@ ipcMain.handle("get-versions", async (_event, endpoint: string): Promise<Handler
   }
 });
 
-
-// GitHub
-ipcMain.handle('gitauth-initialize', async (_event, token) => {
-  try {
-    await GitHubService.initialize(token);
-    await GitLabService.initialize(token);
-    TokenService.setToken('github', token);
-    TokenService.setToken('gitlab', token);
-    return true;
-  } catch (error) {
-    console.error('GitAuth initialization failed:', error);
-    throw error;
-  }
-});
-ipcMain.handle('logout-github', async () => {
-  return TokenService.logoutGithub();
-});
-ipcMain.handle('logout-gitlab', async () => {
-  return TokenService.logoutGitlab();
-});
-ipcMain.handle('gitlab-initialize', async (_event, token) => {
-  try {
-    await GitLabService.initialize(token);
-    TokenService.setToken('gitlab', token);
-    return true;
-  } catch (error) {
-    console.error('GitLab initialization failed:', error);
-    throw error;
-  }
-});
-ipcMain.handle('add-cloned-repo', (_event, repoId: number) => {
-  TokenService.addClonedRepo(repoId);
-});
-ipcMain.handle('get-cloned-repos', () => {
-  const repos = TokenService.getClonedRepos();
-  return repos;
-});
-
-ipcMain.handle('get-project-paths', () => {
-  return TokenService.getProjectPaths();
-});
-ipcMain.handle('set-project-path', (_event, { repoId, path }: { repoId: number; path: string }) => {
-  TokenService.setProjectPath(repoId, path);
-});
-ipcMain.handle('github-user-info', async () => {
-  return GitHubService.getUserInfo();
-});
-ipcMain.handle('gitlab-user-info', async () => {
-  return GitLabService.getUserInfo();
-});
-ipcMain.handle('github-repositories', async (event) => {
-  const mainWindow = BrowserWindow.fromWebContents(event.sender);
-  return GitHubService.listIGRPStudioRepositoriesGithub(mainWindow as BrowserWindow);
-});
-ipcMain.handle('gitlab-repositories', async (event) => {
-  const mainWindow = BrowserWindow.fromWebContents(event.sender);
-  return GitLabService.listIGRPStudioRepositoriesGitlab(mainWindow as BrowserWindow);
-});
-
-// Git
-ipcMain.handle('check-git-remotes', async (_event, { projects, githubRepos }) => {
-  return GitService.checkGitRemotes(projects, githubRepos);
-});
-ipcMain.handle('clone-repository', async (event, repoUrl) => {
-  const mainWindow = BrowserWindow.fromWebContents(event.sender);
-  return GitService.cloneRepository(repoUrl, mainWindow as BrowserWindow);
-});
-ipcMain.handle('list-branches', async (_event, projectPath) => {
-  return GitService.listBranches(projectPath);
-});
-ipcMain.handle('checkout-branch', async (_event, { projectPath, branchName }) => {
-  return GitService.checkoutBranch(projectPath, branchName);
-});
-ipcMain.handle('create-branch', async (_event, { projectPath, branchName }) => {
-  return GitService.createBranch(projectPath, branchName);
-});
-ipcMain.handle('create-commit', async (_event, { projectPath, message }) => {
-  return GitService.createCommit(projectPath, message);
-});
-ipcMain.handle('pull-changes', async (_event, { projectPath, branch }) => {
-  return GitService.pull(projectPath, branch);
-});
-ipcMain.handle('push-changes', async (_event, { projectPath, branch }) => {
-  return GitService.push(projectPath, branch);
-});
-ipcMain.handle('sync-changes', async (_event, { projectPath, branch }) => {
-  return GitService.sync(projectPath, branch);
-});
-ipcMain.handle('get-changes-count', async (_event, projectPath: string) => {
-  return GitService.getChangesCount(projectPath);
-});
-ipcMain.handle('is-git-initialized', async (_event, projectPath: string) => {
-  return GitService.isGitInitialized(projectPath);
-});
-ipcMain.handle('initialize-git', async (_event, projectPath: string) => {
-  return GitService.initializeGit(projectPath);
-});
-ipcMain.handle('add-git-remote', async (_event, { projectPath, remoteUrl }) => {
-  return GitService.addRemote(projectPath, remoteUrl);
-});
-ipcMain.handle('list-commits', async (_event, { projectPath, branch, limit }) => {
-  return GitService.listCommits(projectPath, branch, limit);
-});
-
+  
 ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
   try {
     const { folderExists, config } = await checkAndReadBaseApi(targetDir);
@@ -500,6 +377,7 @@ ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
     return { folderExists: false, config: null };
   }
 });
+
 
 app.on('open-url', (event, url) => {
   event.preventDefault();
@@ -511,7 +389,6 @@ app.on('open-url', (event, url) => {
     }
   }
 });
-
 
 // IPC handlers for language management
 ipcMain.handle('get-language', () => {

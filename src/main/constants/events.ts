@@ -20,5 +20,50 @@ export const EVENTS = {
         DELETE_PAGE: 'next-engine:delete-page',
         REGISTRY_COMPONENT: 'engine:registry-component',
         GET_COMPONENT: 'engine:get-component'
+    },
+    REPOSITORY: {
+        INITIALIZE: 'repository:initialize',
+        WORKSPACE: {
+            GET_CURRENT: 'repository:workspace:get-current',
+            CREATE: 'repository:workspace:create',
+            UPDATE: 'repository:workspace:update',
+            DELETE: 'repository:workspace:delete',
+            GET: 'repository:workspace:get',
+            FIND_ALL: 'repository:workspace:find-all',
+            FIND_RECENT: 'repository:workspace:find-recent'
+        },
+        PROJECT: {
+            CREATE: 'repository:project:create',
+            UPDATE: 'repository:project:update',
+            DELETE: 'repository:project:delete',
+            GET: 'repository:project:get',
+            FIND_ALL: 'repository:project:find-all',
+            FIND_RECENT: 'repository:project:find-recent'
+        },
+        BACKUP: {
+            CREATE: 'repository:backup:create',
+            RESTORE: 'repository:backup:restore'
+        }
+    },
+    ERROR: 'error'
+};
+
+
+export const ERROR_CODES = {
+    WORKSPACE: {
+        CREATE_FAILED: 'workspace:create-failed',
+        UPDATE_FAILED: 'workspace:update-failed',
+        DELETE_FAILED: 'workspace:delete-failed',
+        NOT_FOUND: 'workspace:not-found'
+    },
+    PROJECT: {
+        CREATE_FAILED: 'project:create-failed',
+        UPDATE_FAILED: 'project:update-failed',
+        DELETE_FAILED: 'project:delete-failed',
+        NOT_FOUND: 'project:not-found'
+    },
+    BACKUP: {
+        FAILED: 'backup:failed',
+        RESTORE_FAILED: 'backup:restore-failed'
     }
 };

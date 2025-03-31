@@ -2,7 +2,7 @@ import { convertModelData } from './convertModelData';
 import ERDDiagram from './ERDDiagram';
 import { useEffect, useState } from 'react';
 import { ModelData, RelationData } from './types';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 export default function ERDLayout({ currentItem }: { currentItem: any }) {
     const { models } = useStudioAPI(currentItem?.module);

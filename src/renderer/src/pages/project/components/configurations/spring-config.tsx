@@ -10,7 +10,7 @@ import {
     DatabaseOptions,
     projectStructureStyle,
 } from '@renderer/constants/appConstants';
-import useCore from '@renderer/hooks/useCore';
+import useCore from '@renderer/hooks/use-core';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/label-required';
@@ -21,7 +21,7 @@ import DependencySelector from '@renderer/components/dependency-selector';
 
 interface SpringConfigProps {
     data: SpringConfigData;
-    errors?: FormikErrors<ProjectData> | null;
+    errors?: FormikErrors<ProjectData>;
     onChange: (data: SpringConfigData) => void;
 }
 
@@ -36,7 +36,8 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     enableEntityRevision: false,
     igrpCoreVersion: '',
     springBootVersion: '',
-    dependencies: []
+    dependencies: [],
+    enableGraalVm: false,
 };
 
 export function SpringConfig({
@@ -243,6 +244,21 @@ export function SpringConfig({
                         />
                         <Label htmlFor="enableEntityRevision">
                             {t('enableEntityRevision')}
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="enableGraalVm"
+                            checked={data.enableGraalVm}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableGraalVm: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="enableGraalVm">
+                            {t('enableGraalVm')}
                         </Label>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { IGRPButton, IGRPChat, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPTextarea } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButton, IGRPChat, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPRadioButton, IGRPTextarea } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -55,7 +55,6 @@ import {
     WrapText,
     LayoutList,
     Code,
-    LucideApple,
     Heart,
 } from 'lucide-react';
 
@@ -133,6 +132,10 @@ export const COMPONENT: Record<string, string> = {
     Ratings: 'ratings',
 
     EmbedVideo: 'embedVideo',
+
+    CardContent: "cardContent",
+    CardFooter: "cardFooter",
+    CardHeader: "cardHeader"
 };
 
 // Icon Mapping
@@ -167,7 +170,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Maps]: Map,
     [COMPONENT.Carousel]: Play,
     [COMPONENT.Fingerprint]: Fingerprint,
-    
+
     [COMPONENT.Panel]: Layout,
     [COMPONENT.Card]: CreditCard,
     [COMPONENT.Tabs]: Tabs,
@@ -237,7 +240,8 @@ export const COMPONENT_MAP = {
     [COMPONENT.Button]: IGRPButton,
     [COMPONENT.Label]: IGRPLabel,
     [COMPONENT.Checkbox]: IGRPCheckbox,
-    // [COMPONENT.Icon]: IGRPIcon,
+    [COMPONENT.Radio]: IGRPRadioButton,
+    [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
     [COMPONENT.Chat]: IGRPChat
 };

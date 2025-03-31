@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 const backend = require('i18next-electron-fs-backend')
 
@@ -152,15 +152,51 @@ const engine = {
 }
 
 const repo = {
-	project: {
-		findAllRecent: (page: Page) => {
-			return ipcRenderer.invoke('igrp-studio:repo:project.findAllRecent', page)
-		},
-		save: (p: ProjectData) => {
-			return ipcRenderer.invoke('igrp-studio:repo:project.save', p)
-		},
-		delete: (p: ProjectData, index: number) => {
-			return ipcRenderer.invoke('igrp-studio:repo:project.delete', p, index)
+	workspace: {
+		// Initialization
+		initialize: () => ipcRenderer.invoke(EVENTS.REPOSITORY.INITIALIZE),
+
+		// Project methods
+		findAllRecentProjects: (limit?: number) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, limit),
+		saveProject: (project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>, workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project),
+		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
+		deleteProject: (projectId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId),
+		getProject: (projectId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.GET, projectId),
+		findAllProjects: (workspaceId?: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_ALL, workspaceId),
+
+		// Workspace methods
+		findAllWorkspaces: () =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_ALL),
+		findRecentWorkspaces: (limit?: number) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, limit),
+		createWorkspace: (workspace: Omit<IWorkspace, 'id' | 'createdAt'>) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace),
+		updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.UPDATE, workspaceId, updates),
+		deleteWorkspace: (workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.DELETE, workspaceId),
+		getWorkspace: (workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET, workspaceId),
+		getLastAccessedWorkspace: () => ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT),
+
+		// Backup methods
+		createBackup: (backupPath?: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.BACKUP.CREATE, backupPath),
+		restoreBackup: (backupPath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.BACKUP.RESTORE, backupPath),
+
+		onError: (callback: (error: {
+			code: string;
+			message: string
+		}) => void) => {
+			ipcRenderer.on(EVENTS.ERROR, (_event, error) => callback(error));
+			return () => ipcRenderer.removeAllListeners(EVENTS.ERROR);
 		}
 	},
 	connection: {
@@ -200,7 +236,7 @@ if (process.contextIsolated) {
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)
-		contextBridge.exposeInMainWorld('repo', repo)
+		contextBridge.exposeInMainWorld('igrpStudio', repo)
 		contextBridge.exposeInMainWorld('menu', window)
 	} catch (error) {
 		console.error(error)

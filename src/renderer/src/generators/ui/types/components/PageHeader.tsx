@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { cn } from '@renderer/lib/utils';

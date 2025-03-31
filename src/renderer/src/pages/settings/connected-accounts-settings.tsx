@@ -1,5 +1,5 @@
 import { Button } from '@renderer/components/ui/button';
-import useGithubAuth from '@renderer/hooks/useGitAuth';
+import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

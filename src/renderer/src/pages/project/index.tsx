@@ -31,14 +31,7 @@ import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { projectIcons } from '@renderer/constants/appConstants';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import useToast from '@renderer/components/useToast';
-import {
-    setConfig,
-    setBasePath,
-    navigateToNextPage,
-} from '@renderer/redux/thunks';
 import {
     backendFrameworks,
     frontendFrameworks,
@@ -50,23 +43,29 @@ import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
 import { LabelRequired } from '@renderer/components/label-required';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 export function ProjectWizard() {
     const [open, setOpen] = React.useState(false);
     const [step, setStep] = React.useState(1);
+    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
 
-    const navigate = useNavigate();
-    const dispatch: any = useDispatch();
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
 
+    const {
+        actions: { saveOrOpenProject },
+    } = useWorkspace();
+
     const initialValues: ProjectData = {
+        id: '',
         name: '',
         type: undefined,
-        framework: '',
+        framework: 'springboot',
         config: undefined,
         path: '',
         themeColor: '#000000',
+        icon: '',
     };
 
     const validationSchema = useProjectValidation({ t, step });
@@ -105,14 +104,25 @@ export function ProjectWizard() {
                 handleClose();
             }
 
-            const config: ProjectData = formik.values;
+            const config: ProjectData = { ...formik.values };
 
-            dispatch(setBasePath(formik.values.path));
-            dispatch(setConfig(config));
-            navigateToNextPage(navigate, config);
+            saveOrOpenProject(config);
         } catch (error) {
             showErrorToast(error);
         }
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64String = e.target?.result as string;
+            formik.setFieldValue('icon', base64String);
+            setPreviewUrl(base64String);
+        };
+        reader.readAsDataURL(file);
     };
 
     const componentsMap: Record<
@@ -249,20 +259,50 @@ export function ProjectWizard() {
                 )}
             </div>
 
+            {/* Project Icon Upload with Preview */}
             <div className="space-y-2">
                 <Label>{t('projectIcon')}</Label>
-                <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2">
-                    <Upload className="w-8 h-8 mx-auto text-gray-400" />
-                    <div className="text-sm text-gray-600">
-                        {t('clickOrDragToUploadIcon')}
-                        <div className="text-xs text-gray-400">
-                            {t('recommendedSize')}
-                        </div>
+                <input
+                    type="file"
+                    id="icon-upload"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                />
+                <label htmlFor="icon-upload" className="block">
+                    <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2 cursor-pointer hover:border-primary/50">
+                        {previewUrl ? (
+                            <div className="flex flex-col items-center gap-2">
+                                <img
+                                    src={previewUrl}
+                                    alt="Project icon preview"
+                                    className="w-16 h-16 rounded-full object-cover"
+                                />
+                                <span className="text-sm text-gray-600">
+                                    {t('clickToChangeIcon')}
+                                </span>
+                            </div>
+                        ) : (
+                            <>
+                                <Upload className="w-8 h-8 mx-auto text-gray-400" />
+                                <div className="text-sm text-gray-600">
+                                    {t('clickOrDragToUploadIcon')}
+                                    <div className="text-xs text-gray-400">
+                                        {t('recommendedSize')}
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    type="button"
+                                    onClick={() => document.getElementById('icon-upload')?.click()}
+                                >
+                                    {t('upload')}...
+                                </Button>
+                            </>
+                        )}
                     </div>
-                    <Button variant="outline" size="sm">
-                        {t('upload')}...
-                    </Button>
-                </div>
+                </label>
             </div>
 
             <div className="space-y-2">
@@ -525,7 +565,7 @@ export function ProjectWizard() {
                 </Button>
             </DialogTrigger>
             <DialogContent
-                className="overflow-hidden max-h-[80svh] md:max-w-[700px] lg:max-w-[800px] p-0"
+                className="overflow-hidden max-h-[80svh] md:max-w-[700px] lg:max-w-[800px] p-0 max-w-2xl"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >

@@ -12,11 +12,11 @@ import { FormList } from '../../components/form-list';
 import { defaultValue, getTablesColumns, initialValues } from './config';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { TextInput } from '../../components/inputs-form';
 import { Card } from '@renderer/components/ui/card';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 interface EnumProps {
     selectors: Array<any>;

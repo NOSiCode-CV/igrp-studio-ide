@@ -1,95 +1,71 @@
-import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
-import { FolderOpen, GitFork } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import useToast from '@renderer/components/useToast';
-import {
-    navigateToNextPage,
-    setBasePath,
-    setConfig,
-} from '@renderer/redux/thunks';
+import { useEffect, useState } from 'react';
 import RecentsProjects from './components/recents-projects';
-import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
-import { ProjectWizard } from '../project';
-import { IOpenProject } from 'src/main/types';
-import { CloneProjectModal } from '../../components/git/clone-project-modal';
+import WelcomeHeader from './components/welcome-header';
+import CreateWorkspace from './components/create-workspace';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import useToast from '@renderer/components/useToast';
+import Loader from '@renderer/components/loader';
+import { IWorkspace } from 'src/main/types';
 
 const IDEInitialScreen = () => {
-    const { t } = useTranslation();
+    const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
+    const [hasWorkspace, setHasWorkspace] = useState(false);
+    const { showSuccessToast } = useToast();
 
-    const navigate = useNavigate();
-    const dispatch: any = useDispatch();
-    const { showErrorToast } = useToast();
+    const {
+        workspace,
+        loading: workspacesLoading,
+        actions: { refreshWorkspaces },
+    } = useWorkspace();
 
-    const onHandleOpenProjectClick = async (): Promise<void> => {
-        const result: IOpenProject = await window.api.openDirectory('');
+    useEffect(() => {
+        const checkWorkspaces = async () => {
+            setHasWorkspace(workspace !== null);
 
-        const { canceled, basePath, config, folderExists } = result;
+            setShowWorkspaceDialog(
+                workspace === null || workspace === undefined
+            );
+        };
 
-        if (canceled || !basePath || !config) {
-            return;
-        }
+        checkWorkspaces();
+    }, [workspace, workspacesLoading]);
 
-        if (!folderExists || !config.framework) {
-            showErrorToast(t('notFoundProject'));
-            return;
-        }
+    useEffect(() => {
+        refreshWorkspaces();
+    }, []);
 
-        dispatch(setBasePath(basePath));
-
-        dispatch(setConfig(config));
-
-        await window.repo.project.save(config);
-
-        // Navigate to the next page
-        navigateToNextPage(navigate, config);
+    const handleCreationSuccess = (newWorkspace: IWorkspace) => {
+        setShowWorkspaceDialog(false);
+        setHasWorkspace(true);
+        refreshWorkspaces();
+        showSuccessToast(`Workspace "${newWorkspace.name}" created`);
     };
 
-    const handleCloneProject = async (
-        url: string,
-        auth: {
-            type: string;
-            username?: string;
-            password?: string;
-            token?: string;
-        }
-    ) => {
-        if (auth.type === 'basic') {
-            console.log(`Using basic auth with username: ${auth.username}`);
-        } else if (auth.type === 'token') {
-            console.log('Using token authentication');
-        }
+    if (workspacesLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Loader />
+            </div>
+        );
+    }
 
-        try {
-            await window.electron.ipcRenderer.invoke('clone-repository', url);
-        } catch (error) {}
-    };
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
-            <IGRPPageHeader title={t('welcome')} variant={'h3'}>
-                <div className="flex justify-end space-x-3">
-                    <ProjectWizard />
+            {showWorkspaceDialog && (
+                <CreateWorkspace
+                    open={showWorkspaceDialog}
+                    onSuccess={handleCreationSuccess}
+                />
+            )}
 
-                    <CloneProjectModal handleCloneProject={handleCloneProject}>
-                        <Button variant="outline">
-                            <GitFork className="w-4 h-4 mr-2" />
-                            {t('cloneProject')}
-                        </Button>
-                    </CloneProjectModal>
-
-                    <Button
-                        variant="outline"
-                        onClick={onHandleOpenProjectClick}
-                    >
-                        <FolderOpen className="w-4 h-4 mr-2" />
-                        {t('openProject')}
-                    </Button>
-                </div>
-            </IGRPPageHeader>
-
-            <RecentsProjects />
+            {hasWorkspace && workspace && (
+                <>
+                    <WelcomeHeader />
+                    <RecentsProjects />
+                </>
+            )}
         </div>
     );
 };
+
 export default IDEInitialScreen;

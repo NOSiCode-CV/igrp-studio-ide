@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MousePointer, Settings, X } from 'lucide-react';
+import { Settings, X } from 'lucide-react';
 
 import {
     Sidebar,
@@ -22,85 +22,104 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
+import Interactions from './EditComponent/interactions';
 
 interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
     path?: string;
 }
 
-export function SidebarRight({ ...props }: SidebarRightProps) {
-    const { comp, path } = props;
-
+export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     const { t } = useTranslation();
-    const [formValues, setFormValues] = React.useState({});
-
     const { getPropertiesComponent } = useStudio();
-
-    const [propsComponent, setPropsComponents] = React.useState({});
-
     const {
-        currentComponent,
+        currentComponent: editingComponentParams,
         handleUpdateChildComponent,
         clearEditingComponent,
     } = useDroppedComponents();
 
-    const { component, path: currentPath } = currentComponent || {};
-
+    // Memoized derived state
+    const currentComp = React.useMemo(
+        () => comp || editingComponentParams?.component,
+        [comp, editingComponentParams]
+    );
+    const currentPath = path || editingComponentParams?.path || '';
     const {
         componentName,
         id: componentId,
-        properties,
-    } = comp || component || {};
+        properties = {},
+    } = currentComp || {};
 
+    // State management
+    const [formValues, setFormValues] = React.useState<Record<string, any>>({});
+    const [propsComponent, setPropsComponent] = React.useState<
+        Record<string, any>
+    >({});
+
+    // Load properties component
     React.useEffect(() => {
-        if (componentName)
-            getPropertiesComponent(path || currentPath, componentName).then(
-                (data) => setPropsComponents(data)
-            );
-    }, [getPropertiesComponent, comp, currentComponent]);
+        if (!componentName) return;
 
-    const handleInputChange = (name: string, value: string) => {
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            [name]: value,
-        }));
-    };
+        const loadProps = async () => {
+            try {
+                const data = await getPropertiesComponent(
+                    currentPath,
+                    componentName
+                );
+                setPropsComponent(data);
 
-    const handleClose = () => {
-        clearEditingComponent();
-    };
+                // Initialize form values
+                const initialValues = Object.entries(data).reduce(
+                    (acc, [key, config]) => {
+                        acc[key] = properties[key] ?? config.defaultValue;
+                        return acc;
+                    },
+                    {} as Record<string, any>
+                );
 
-    React.useEffect(() => {
-        if (propsComponent) {
-            const initialFormValues = Object.keys(propsComponent).reduce(
-                (acc, key) => {
-                    acc[key] =
-                        properties?.[key] ??
-                        propsComponent[key].defaultValue ??
-                        '';
-                    return acc;
-                },
-                {}
-            );
-
-            setFormValues(initialFormValues);
-        }
-    }, [propsComponent]);
-
-    React.useEffect(() => {
-        const updatedConfig = { ...properties, ...formValues };
-
-        const updatedComponent: Partial<StructuredComponent> = {
-            ...currentComponent,
-            properties: updatedConfig,
+                setFormValues(initialValues);
+            } catch (error) {
+                console.error('Error loading properties component:', error);
+            }
         };
 
-        if (componentId)
-            handleUpdateChildComponent(componentId, updatedComponent);
-    }, [formValues]);
+        loadProps();
+    }, [componentName, currentPath, getPropertiesComponent, properties]);
+
+    // Debounced component update
+    React.useEffect(() => {
+        if (!componentId || Object.keys(formValues).length === 0) return;
+
+        const timer = setTimeout(() => {
+            handleUpdateChildComponent(componentId, {
+                ...currentComp,
+                properties: { ...properties, ...formValues },
+            });
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [
+        formValues,
+        componentId,
+        currentComp,
+        handleUpdateChildComponent,
+        properties,
+    ]);
+
+    // Event handlers
+    const handleInputChange = React.useCallback(
+        (name: string, value: string) => {
+            setFormValues((prev) => ({ ...prev, [name]: value }));
+        },
+        []
+    );
+
+    const handleClose = React.useCallback(() => {
+        clearEditingComponent();
+    }, [clearEditingComponent]);
 
     return (
         <Sidebar
@@ -183,21 +202,17 @@ export function SidebarRight({ ...props }: SidebarRightProps) {
                                     <AccordionTrigger>
                                         {t('textProperties')}
                                     </AccordionTrigger>
-                                    <AccordionContent>
-                                        
-                                    </AccordionContent>
+                                    <AccordionContent></AccordionContent>
                                 </AccordionItem>
                             </Accordion>
                         </TabsContent>
                         <TabsContent value="interactions" className="space-y-6">
-                            <div className="p-3">
-                                <EmptyList
-                                    title="Element Trigger"
-                                    description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
-                                    className="py-12"
-                                    icon={<MousePointer />}
+                            {currentComp && (
+                                <Interactions
+                                    comp={currentComp}
+                                    path={currentPath}
                                 />
-                            </div>
+                            )}
                         </TabsContent>
                     </Tabs>
                 )}

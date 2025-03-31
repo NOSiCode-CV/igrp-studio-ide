@@ -1,4 +1,4 @@
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
 

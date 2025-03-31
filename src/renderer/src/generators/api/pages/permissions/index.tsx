@@ -12,7 +12,7 @@ import { usePermisisonValidation } from './validation';
 import { FormList } from '../../components/form-list';
 import { getTablesColumns, defaultInitialValues } from './config';
 import { PermissionConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 interface PermissionsProps {
     selectors: Array<any>;

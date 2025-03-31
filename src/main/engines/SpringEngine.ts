@@ -37,22 +37,15 @@ export class SpringEngine implements BaseEngine {
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    const repo = new ProjectRepository()
+    const { config, framework } = project
 
-    const config: BaseApiConfig = {
-      ...project.config,
-      type: project.framework
+    const appConfig : BaseApiConfig = {
+      ...config, type: framework
     }
 
     // Lógica específica do Spring
-    await newApi(config, basePath);
+    await newApi(appConfig, basePath);
 
-    await repo.save({
-      ...project,
-      path: basePath,
-      dt_created: new Date(),
-      location: 'local'
-    });
   }
 
   async createResponse(config: ResponseConfig, basePath: string): Promise<void> {

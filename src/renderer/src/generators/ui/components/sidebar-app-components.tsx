@@ -1,6 +1,6 @@
 import { SidebarMenu, SidebarMenuItem } from '@renderer/components/ui/sidebar';
 import { APP_COMPONENT } from '../ComponentTypes';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { GripHorizontal } from 'lucide-react';
 import { EmptyList } from '@renderer/components/empty-list';

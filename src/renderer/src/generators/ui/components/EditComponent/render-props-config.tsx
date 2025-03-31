@@ -1,11 +1,15 @@
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import DomainForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
 import { Switch } from '@renderer/components/ui/switch';
 import { cn } from '@renderer/lib/utils';
-import { getLabel } from '@renderer/utils/helpers';
+import {
+    getLabel,
+    toFullCamelCaseFromSnakeCase,
+} from '@renderer/utils/helpers';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import React, { useState } from 'react';
@@ -21,10 +25,10 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     };
 
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
-        const { enum: enumValues, type: typeValue } = fieldConfig;
+        const { enum: enumValues, type: typeDefault } = fieldConfig;
         const label = getLabel(key);
-        const type = enumValues ? 'enum' : typeValue;
-        const value = formValues[key] || '';
+        const type = enumValues ? 'enum' : typeDefault;
+        const value = formValues[key];
 
         if (key === 'commonProperties' || key === 'iconProperties') {
             return (
@@ -73,8 +77,9 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                     }}
                 />
             );
+        } else if (key === 'options') {
+            return <DomainForm />;
         }
-
         return (
             <div
                 className={cn(
@@ -106,7 +111,9 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     }
                                     options={enumValues.map((value) => ({
                                         value,
-                                        label: getLabel(value),
+                                        label: toFullCamelCaseFromSnakeCase(
+                                            value
+                                        ),
                                     }))}
                                     className="w-full"
                                 />
@@ -135,6 +142,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     }
                                 />
                             );
+
                         default:
                             return null;
                     }

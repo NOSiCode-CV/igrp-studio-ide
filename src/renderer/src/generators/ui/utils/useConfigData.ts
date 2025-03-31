@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { GROUP_COMPONET, ICON_MAP } from '../ComponentTypes';
 

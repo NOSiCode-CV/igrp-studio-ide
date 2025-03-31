@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import useGitAuth from '@renderer/hooks/useGitAuth';
+import useGitAuth from '@renderer/hooks/use-git-auth';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 

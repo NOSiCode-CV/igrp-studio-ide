@@ -24,7 +24,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { LabelRequired } from '@renderer/components/label-required';
 

@@ -1,12 +1,20 @@
 let store: any = null;
 
-export const TokenService = {
+export const GitStore = {
   async initialize() {
     const Store = (await import('electron-store')).default;
     store = new Store({
       name: 'igrp-studio-auth',
       clearInvalidConfig: true
     });
+  },
+
+  setAutoCommit(prompt: boolean) {
+    store?.set(`auto-commit`, prompt);
+  },
+
+  isAutoCommit(): boolean {
+    return store?.get(`auto-commit`);
   },
 
   setToken(service: 'github' | 'gitlab', token: any) {

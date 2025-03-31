@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MenuItem } from 'src/main/types';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
@@ -39,8 +39,9 @@ import {
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import SidebarAppComponents from './sidebar-app-components';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import NavigatorSidebar from './NavigatorSidebar';
+import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -58,6 +59,8 @@ export function AppSidebar({
     const [activeMenuGroup, setActiveMenuGroup] =
         useState<string>('widgetPalette');
 
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const [filteredData, setFilteredData] = useState(initialData);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -69,6 +72,19 @@ export function AppSidebar({
     useEffect(() => {
         setFilteredData(filterSubItems(initialData, searchQuery));
     }, [searchQuery, initialData]);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+                searchInputRef.current?.select();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -176,13 +192,12 @@ export function AppSidebar({
                             {t(activeMenuGroup)}
                         </div>
                     </div>
-                    {activeMenuGroup !== 'terminal' && (
-                        <SidebarInput
-                            placeholder="Type to search..."
-                            value={searchQuery}
-                            onChange={handleInputChange}
-                        />
-                    )}
+                    <SidebarInput
+                        placeholder={`Search (${SHORTCUTS.FIND})`}
+                        value={searchQuery}
+                        onChange={handleInputChange}
+                        ref={searchInputRef}
+                    />
                 </SidebarHeader>
                 <SidebarContent>
                     <ScrollArea>

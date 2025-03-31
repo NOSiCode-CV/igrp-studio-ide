@@ -1,5 +1,5 @@
 import { GitAuth } from './git-auth';
-import { TokenService } from '../../services/token-service';
+import { GitStore } from '../../services/git-store';
 import { GitHubService } from '../../services/github-service';
 
 const githubConfig = {
@@ -11,4 +11,4 @@ const githubConfig = {
   provider: 'github' as const
 };
 
-export const githubAuth = new GitAuth(githubConfig, TokenService, GitHubService);
+export const githubAuth = new GitAuth(githubConfig, GitStore, GitHubService);

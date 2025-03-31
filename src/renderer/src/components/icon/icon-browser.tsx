@@ -44,14 +44,14 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                 <div className="relative" ref={commandRef}>
                     <Command className="rounded-lg border shadow-md">
                         <CommandInput
-                            placeholder="Type to filter ..."
+                            placeholder="Type to search icon ..."
                             onFocus={() => setOpen(true)}
                             className="h-9"
                         />
                         {open && (
                             <CommandList className="max-h-[200px] overflow-auto">
                                 <CommandEmpty>
-                                    No dependencies found.
+                                    No icons found.
                                 </CommandEmpty>
                                 <CommandGroup>
                                     <div className="grid grid-cols-[repeat(auto-fill,_minmax(30px,_1fr))] gap-4 w-full">

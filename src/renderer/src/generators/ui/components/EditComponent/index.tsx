@@ -12,7 +12,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import React, { useEffect, useState, useCallback } from 'react';
 import { ICON_MAP } from '../../ComponentTypes';

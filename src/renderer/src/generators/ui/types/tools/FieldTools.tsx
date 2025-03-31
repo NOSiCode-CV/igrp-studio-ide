@@ -8,7 +8,7 @@ import {
 } from '@renderer/components/ui/tooltip';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { EditComponent } from '../../components/EditComponent';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useEffect, useState } from 'react';
 

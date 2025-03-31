@@ -13,7 +13,7 @@ import {
     DialogTitle,
 } from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils/helpers';
 

@@ -16,7 +16,7 @@ import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 import { Footer } from './components/footer';
 import { Toaster } from '@renderer/components/ui/sonner';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -38,7 +38,6 @@ const Layout = (props: LayoutProps) => {
     }, [basePath, dispatch]);
 
     useEffect(() => {
-        console.log(changeStatus)
         if (changeStatus) {
             dispatch(onGetFolderFiles(basePath));
             dispatch(onSetChangeStatus(false));

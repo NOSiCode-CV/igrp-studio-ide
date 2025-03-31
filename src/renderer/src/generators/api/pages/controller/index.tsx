@@ -38,11 +38,11 @@ import {
     OPTION_TYPE,
 } from '@renderer/constants/appConstants';
 import { SchemaTypeItem } from 'src/main/types';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 interface ControllerProps {
     selectors: Array<any>;

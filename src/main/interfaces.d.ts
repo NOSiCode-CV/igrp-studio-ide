@@ -1,6 +1,29 @@
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
 import { Connection, PageableProjects, ProjectData } from "./types";
 
+export interface IWorkspaceRepository {
+    // Workspace Operations
+    createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<IWorkspace>;
+    updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>;
+    deleteWorkspace(id: string): Promise<void>;
+    getWorkspace(id: string): Promise<IWorkspace | undefined>;
+    listWorkspaces(): Promise<IWorkspace[]>;
+    getRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
+
+    // Project Operations
+    addProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData>;
+    updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
+    deleteProject(projectId: string): Promise<void>;
+    getProject(id: string): Promise<ProjectData | undefined>;
+    listProjects(workspaceId?: string): Promise<ProjectData[]>;
+    getRecentProjects(workspaceId: string, limit?: number): Promise<ProjectData[]>;
+
+    // Utility Methods
+    initialize(): Promise<void>;
+    backupData(backupPath: string): Promise<void>;
+    restoreData(backupPath: string): Promise<void>;
+}
+
 export interface IProjectRepository {
     async save(project: ProjectData): Promise<ProjectData>;
     async delete(project: ProjectData): Promise<void>;

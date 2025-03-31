@@ -1,5 +1,5 @@
 import { Gitlab } from '@gitbeaker/node';
-import { TokenService } from './token-service';
+import { GitStore } from './git-store';
 import { BrowserWindow } from 'electron';
 
 let gitlab: any = null;
@@ -7,7 +7,7 @@ let gitlab: any = null;
 export const GitLabService = {
   async initializeServices() {
     try {
-      const token = TokenService.getToken('gitlab');
+      const token = GitStore.getToken('gitlab');
       
       if (token) {
         await this.initialize(token);
@@ -26,7 +26,7 @@ export const GitLabService = {
         host: 'https://gitlab.com'
       });
 
-      TokenService.setToken('gitlab', token);
+      GitStore.setToken('gitlab', token);
       
       return true;
     } catch (error) {

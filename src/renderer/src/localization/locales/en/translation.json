@@ -428,5 +428,21 @@
   "currentVersion": "Current version {{version}}",
   "versionAvailable":"New version available {{version}}",
   "convertToDTO":"Convert To DTO",
-  "openOnEditor":"Open on Editor"
+  "openOnEditor":"Open on Editor",
+  "workspace": {
+    "createTitle": "Create New Workspace",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter workspace name",
+    "nameRequired": "Workspace name is required",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Select a directory",
+    "pathRequired": "Please select a directory",
+    "browseButton": "Browse",
+    "createButton": "Create Workspace",
+    "createError": "Failed to create workspace",
+    "createSuccess": "Workspace '{{name}}' created successfully!"
+  },
+  "creating": "Creating...",
+  "enableGraalVm":"Enable Graal Vm",
+  "clickToChangeIcon":"Click To Change Icon"
 }

@@ -3,7 +3,7 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxContainer from '../tools/BoxContainer';

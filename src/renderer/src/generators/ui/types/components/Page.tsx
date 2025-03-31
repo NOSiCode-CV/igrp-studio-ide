@@ -2,7 +2,7 @@ import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import PageTools from '../tools/PageTools';
 import { useEffect, useRef, useState } from 'react';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { COMPONENT } from '../../ComponentTypes';
 
 interface PageProps {

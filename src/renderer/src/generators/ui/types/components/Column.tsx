@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/useStudio';
+import useStudio from '@renderer/hooks/use-studio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';

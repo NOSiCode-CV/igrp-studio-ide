@@ -32,13 +32,13 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';
 import { FormList } from '../../components/form-list';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import {
     ModelConfig,
     RelationReference,
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 interface ModelProps {
     selectors: Array<any>;

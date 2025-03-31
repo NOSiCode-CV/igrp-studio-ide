@@ -19,9 +19,9 @@ import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { getId } from '@renderer/utils/helpers';
 
 interface DtoProps {
@@ -80,6 +80,10 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
 
         formik.setFieldValue('name', name || '');
         formik.setFieldValue('template', template || '');
+        formik.setFieldValue(
+            'attributes',
+            attributes || initialValues.attributes
+        );
 
         if (type === OPTION_TYPE.MODEL) {
             setId(getId());
@@ -108,8 +112,6 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                     ? mergedAttributes
                     : initialValues.attributes
             );
-        } else {
-            formik.setFieldValue('attributes', initialValues.attributes);
         }
     }, [data]);
 

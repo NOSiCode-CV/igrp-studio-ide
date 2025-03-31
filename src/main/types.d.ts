@@ -27,7 +27,7 @@ export interface SpringConfigData {
     description: string;
     group: string;
     artifact: string;
-    database: string;
+    database: "MySQL" | "Oracle" | "Postgresql" | "H2";
     projectStructureStyle: 'technical' | 'domain';
     enableObservability: boolean;
     enableEntityRevision: boolean;
@@ -35,26 +35,35 @@ export interface SpringConfigData {
     igrpCoreVersion: string;
     springBootVersion: string;
     dependencies: Array<any>
+    enableGraalVm: boolean
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;
 
 export interface ProjectData {
+    id: string;
     name: string;
-    icon?: File;
-    type?: 'frontend' | 'backend';
-    framework: string;
-    config: ConfigData | undefinedF;
+    icon?: string;
+    type?: 'frontend' | 'backend' | 'fullstack';
+    framework: 'springboot' | 'nextjs' | 'dotnet';
+    config?: ConfigData;
     path: string;
     themeColor?: string;
-    dt_created?: Date,
-    dt_updated?: Date,
-    location?: location
+    location?: location,
+    createdAt?: string;
+    updatedAt?: string;
+    workspaceId?: string;
 }
 
-export type Page = {
-    page: number,
-    size: number
+export interface IWorkspace {
+    id: string;
+    name: string;
+    path: string;
+    description?: string;
+    createdAt: string;
+    updatedAt?: string;
+    lastOpenedAt?: string;
+    projects?: ProjectData[];
 }
 
 export interface IOpenProject {

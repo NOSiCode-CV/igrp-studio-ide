@@ -25,7 +25,7 @@ import { useResponseValidation } from './validation';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { LabelRequired } from '@renderer/components/label-required';
 import { SelectInput, TextInput } from '../../components/inputs-form';
-import useStudioAPI from '@renderer/hooks/useStudioAPI';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 
 const contentType = 'application/json';

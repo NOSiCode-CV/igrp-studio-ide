@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { IGRPCombobox } from '@renderer/components/combobox';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
-import useCore from '@renderer/hooks/useCore';
+import useCore from '@renderer/hooks/use-core';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/label-required';

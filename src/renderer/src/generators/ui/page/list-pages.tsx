@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react';
 import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-    getFileThree as onGetPages,
-    deletePage as onDeletePage,
-} from '@renderer/redux/thunks';
+import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import { Edit, LayoutGrid, Plus, TableIcon, Trash } from 'lucide-react';
@@ -39,6 +36,7 @@ import {
     ToggleGroupItem,
 } from '@renderer/components/ui/toggle-group';
 import { EmptyList } from '@renderer/components/empty-list';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: FileTree) => void;
@@ -79,12 +77,12 @@ const MainPageBuilder = ({
         setPage(page);
     };
 
-    const confirmDeletion = () => {
+    const confirmDeletion = async () => {
         const pageConfig: DeleteConfig = {
             type: page.content.type,
             name: page.content.pageName || page.content.name,
         };
-        dispatch(onDeletePage(pageConfig, basePath));
+        await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
         isLoadingTable(true);
         setPage(null);
@@ -178,7 +176,7 @@ const MainPageBuilder = ({
     ];
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 space-y-6">
             <IGRPPageHeader
                 variant="h3"
                 title={project?.name}

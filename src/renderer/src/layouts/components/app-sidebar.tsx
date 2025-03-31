@@ -147,7 +147,7 @@ export function AppSidebar({
                     </SidebarHeader>
                     <SidebarContent>
                         <SidebarGroup>
-                            <SidebarGroupContent className="px-1.5 md:px-0">
+                            <SidebarGroupContent className="md:px-0">
                                 <SidebarMenu>
                                     {menuIcons.map((item, index) => (
                                         <SidebarMenuItem key={index}>
@@ -199,7 +199,7 @@ export function AppSidebar({
                     )}
                     <SidebarContent>
                         <ScrollArea className="w-[300px]">
-                            <div className="flex w-max">
+                            <div className="flex">
                                 {activeMenuGroup === 'Explorer' ? (
                                     <FileExplorerSidebar
                                         basePath={basePath}

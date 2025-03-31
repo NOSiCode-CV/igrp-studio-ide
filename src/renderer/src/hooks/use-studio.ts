@@ -132,11 +132,18 @@ const useStudio = () => {
         return component ? component.properties : [];
     }, [findComponent]);
 
+    // Get properties for a component
+    const getInteractionsComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
+        return component ? component.interactions : [];
+    }, [findComponent]);
+
     return {
         basePath,
         getAcceptedChildren,
         getPropertiesComponent,
         getRegistryComponent,
+        getInteractionsComponent,
         getComponentData,
         getPageData,
         fetchComponents,

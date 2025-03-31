@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { TokenService } from './token-service';
+import { GitStore } from './git-store';
 
 let octokit: any = null;
 
@@ -7,7 +7,7 @@ export const GitHubService = {
   
   async initializeServices() {
     try {
-      const token = TokenService.getToken('github');
+      const token = GitStore.getToken('github');
       
       if (token) {
         await this.initialize(token);

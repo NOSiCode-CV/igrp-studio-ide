@@ -898,10 +898,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.108":
-  version "0.0.0-alpha.108"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.108.tgz#f0e7136dc4c8013acb6e22e571f6c7df44c35120"
-  integrity sha512-fbwIrEK+6sRzeXt5rLtsxrdQqsEkRb8YNz9PaZilJkxgmlmDfdL81hByIB/8PlAmc/czQIc5yWRmBI4POPbmPw==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.115":
+  version "0.0.0-alpha.115"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.115.tgz#db7f2ef0b1adfcb935263d5428fbcf554ea7cd74"
+  integrity sha512-85bhLPlP1DhuBitIRHPHhWHTusRQHRoeVXOad/PjKC3SjycfjdEwQmLWOu8zMAehJbs+506RbBd0iUx+VlmxMA==
   dependencies:
     "@hookform/resolvers" "^4.1.3"
     "@radix-ui/react-accordion" "^1.2.3"
@@ -930,6 +930,7 @@
     "@radix-ui/react-tabs" "^1.1.3"
     "@radix-ui/react-toggle" "^1.1.2"
     "@radix-ui/react-tooltip" "^1.1.8"
+    "@react-input/mask" "^2.0.4"
     "@tanstack/react-table" "^8.21.2"
     class-variance-authority "^0.7.1"
     clsx "^2.1.1"
@@ -950,10 +951,10 @@
     vaul "^1.1.2"
     zod "^3.24.2"
 
-"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.87":
-  version "0.0.1-alpha.87"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.87.tgz#aff13f81794473a2a2de2854bcb810ed1c97b6db"
-  integrity sha512-NV3W6O++JtsVAlZfYa3vmHERH49jSPxUOk3FegAUKbY78P965+mJsWWZOFEqWgo/GoLKZdcqcNYXNHShPs2Lrg==
+"@igrp/igrp-studio-nextjs-engine@^0.0.1-alpha.109":
+  version "0.0.1-alpha.109"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.109.tgz#60e781dfa4a200b028941e96227a5800ff91ffa0"
+  integrity sha512-MwzRtuP+FZXXuSOVl1j6MFLPx9f4400Cqea8IQTmTCx6pAidLv6AhZZKOaIj+37VGYHAj2dkYtXeocaqIiGIFw==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -973,10 +974,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.48":
-  version "0.0.1-alpha.48"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.48.tgz#799249f92f43455c19b100a5066e0d012d91c0df"
-  integrity sha512-jMYqp0p9tJLAO8UfBDqIyEwe8qGzKMVgp24x8yehMK/3GTnXdaXPUzI6ocejuZoUukQ5kG7gvBXZ0Xdy9dYq/g==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.53":
+  version "0.0.1-alpha.53"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.53.tgz#a77c56af2ccc92ccdb25057c938975ea75992afc"
+  integrity sha512-BYU2V9gaONIfzp8mnRAzF+ni4ciDQ7LR3Z79osMOHRi24FoM8hVa4Dac4qHMC/bZ/zuHuSCuO03XDVhP3xxW3w==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -2098,6 +2099,18 @@
   resolved "https://registry.yarnpkg.com/@radix-ui/rect/-/rect-1.1.0.tgz#f817d1d3265ac5415dadc67edab30ae196696438"
   integrity sha512-A9+lCBZoaMJlVKcRBz2YByCG+Cp2t6nAnMnNba+XiWxnj6r4JUFqfsgwocMBZU9LPtdxC6wB56ySYpc7LQIoJg==
 
+"@react-input/core@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@react-input/core/-/core-2.0.2.tgz#c7094c5ab955e740d4c34777688aff54785024a1"
+  integrity sha512-xLLBueYFbant9308uv3cIJQz5NYSixeGspjP3Nt6jogRHTcHYMRmlVFUuSzQiP8Z8/5BdnPkudRSsN0/AJ1fbw==
+
+"@react-input/mask@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@react-input/mask/-/mask-2.0.4.tgz#0a8df2694962ac10a76a329469d91f6ed01037b8"
+  integrity sha512-NOielvQSBOlGLVuEcxtkjaGneC0GJFXjC7KOF99ed9H9XSDruWnQirjht5uSbWqLeeiOup0VD2YjM+6FH+aWBg==
+  dependencies:
+    "@react-input/core" "^2.0.2"
+
 "@reduxjs/toolkit@^2.6.1":
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-2.6.1.tgz#532ef3d3f1656461b421f0ba0a4fa1628163a0c5"
@@ -2633,10 +2646,10 @@
   dependencies:
     undici-types "~6.20.0"
 
-"@types/node@^22.13.13":
-  version "22.13.13"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.13.tgz#5e7d110fb509b0d4a43fbf48fa9d6e0f83e1b1e7"
-  integrity sha512-ClsL5nMwKaBRwPcCvH8E7+nU4GxHVx1axNvMZTFHMEfNI7oahimt26P5zjVCRrjiIWj6YFXfE1v3dEp94wLcGQ==
+"@types/node@^22.13.14":
+  version "22.13.14"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.14.tgz#70d84ec91013dcd2ba2de35532a5a14c2b4cc912"
+  integrity sha512-Zs/Ollc1SJ8nKUAgc7ivOEdIBM8JAKgrqqUYi2J997JuKO7/tpQC+WCetQ1sypiKCQWHdvdg9wBNpUPEWZae7w==
   dependencies:
     undici-types "~6.20.0"
 
@@ -4355,10 +4368,10 @@ electron-winstaller@5.4.0:
   optionalDependencies:
     "@electron/windows-sign" "^1.1.2"
 
-electron@35.1.1:
-  version "35.1.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-35.1.1.tgz#7c782040a0dd38278fddff640c9a0d34c02def9c"
-  integrity sha512-0c4q8SuYsec9uqb1d2B/FDP/pifAT/Rc7721EjUdRfTKABFqXgYKAtyEKIlmFPjxPbwQt2EMfL35zVmpEAGI3A==
+electron@35.1.2:
+  version "35.1.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-35.1.2.tgz#48c4e45650691d5baad624716bf5230c363867b7"
+  integrity sha512-ipYSDZEV3+PpHfJ8/oWlpMCvxwutX6xLvBz2HRPgEzSFzgLmGO7YXTjEow4DhDtCpGE+b95NTGoJaRAVQi5n7A==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"
@@ -6812,6 +6825,11 @@ lucide-react@^0.484.0:
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.484.0.tgz#b746deb6576be178628a9e2c575432ab53ba6a1b"
   integrity sha512-oZy8coK9kZzvqhSgfbGkPtTgyjpBvs3ukLgDPv14dSOZtBtboryWF5o8i3qen7QbGg7JhiJBz5mK1p8YoMZTLQ==
 
+lucide-react@^0.485.0:
+  version "0.485.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.485.0.tgz#96079022f766e7feabcc1b1d9c084bc529802ff6"
+  integrity sha512-NvyQJ0LKyyCxL23nPKESlr/jmz8r7fJO1bkuptSNYSy0s8VVj4ojhX0YAgmE1e0ewfxUZjIlZpvH+otfTnla8Q==
+
 magic-string@^0.30.17:
   version "0.30.17"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.17.tgz#450a449673d2460e5bbcfba9a61916a1714c7453"
@@ -7822,10 +7840,10 @@ raw-body@2.5.2:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-react-day-picker@^9.6.3:
-  version "9.6.3"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.6.3.tgz#df9b84c1c224e8f342fffcc725dcdda4dd9a42c0"
-  integrity sha512-rDqCSKAl5MLX0z1fLkYcBenQK4ANlYaAhUR0ruVSVAhAa7/ZmKQqgDpXPoS7bYEkgBRH06LO1qNFP1Ki8uiZpw==
+react-day-picker@^9.6.4:
+  version "9.6.4"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.6.4.tgz#9f3b2a181076572f783ebe80f175e4ed12b33384"
+  integrity sha512-OekyAWfaypSFN5zms4CD6Bcas5R0KbWdARkWTyQ2phJHQOolDfpLwrN6Q+U3ifPGNmKLf9ngXuSz25NKHMkR6w==
   dependencies:
     "@date-fns/tz" "^1.2.0"
     date-fns "^4.1.0"
@@ -7839,12 +7857,12 @@ react-dom@^18.3.1:
     loose-envify "^1.1.0"
     scheduler "^0.23.2"
 
-react-dom@^19.0.0:
-  version "19.0.0"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.0.0.tgz#43446f1f01c65a4cd7f7588083e686a6726cfb57"
-  integrity sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==
+react-dom@^19.1.0:
+  version "19.1.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.1.0.tgz#133558deca37fa1d682708df8904b25186793623"
+  integrity sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g==
   dependencies:
-    scheduler "^0.25.0"
+    scheduler "^0.26.0"
 
 react-dropzone@^14.3.8:
   version "14.3.8"
@@ -7951,10 +7969,27 @@ react-router-dom@^7.4.0:
   dependencies:
     react-router "7.4.0"
 
+react-router-dom@^7.4.1:
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-7.4.1.tgz#fd913abb488364859c343881ecb7b7bc84b902f2"
+  integrity sha512-L3/4tig0Lvs6m6THK0HRV4eHUdpx0dlJasgCxXKnavwhh4tKYgpuZk75HRYNoRKDyDWi9QgzGXsQ1oQSBlWpAA==
+  dependencies:
+    react-router "7.4.1"
+
 react-router@7.4.0:
   version "7.4.0"
   resolved "https://registry.yarnpkg.com/react-router/-/react-router-7.4.0.tgz#9787041425bc4bf52e6d472b6ccfd78a43ace133"
   integrity sha512-Y2g5ObjkvX3VFeVt+0CIPuYd9PpgqCslG7ASSIdN73LwA1nNWzcMLaoMRJfP3prZFI92svxFwbn7XkLJ+UPQ6A==
+  dependencies:
+    "@types/cookie" "^0.6.0"
+    cookie "^1.0.1"
+    set-cookie-parser "^2.6.0"
+    turbo-stream "2.4.0"
+
+react-router@7.4.1:
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-7.4.1.tgz#0e6af1eefb8370d2cd79c961b87708afdb50fe64"
+  integrity sha512-Vmizn9ZNzxfh3cumddqv3kLOKvc7AskUT0dC1prTabhiEi0U4A33LmkDOJ79tXaeSqCqMBXBU/ySX88W85+EUg==
   dependencies:
     "@types/cookie" "^0.6.0"
     cookie "^1.0.1"
@@ -8010,10 +8045,10 @@ react@^18.3.1:
   dependencies:
     loose-envify "^1.1.0"
 
-react@^19.0.0:
-  version "19.0.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-19.0.0.tgz#6e1969251b9f108870aa4bff37a0ce9ddfaaabdd"
-  integrity sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==
+react@^19.1.0:
+  version "19.1.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-19.1.0.tgz#926864b6c48da7627f004795d6cce50e90793b75"
+  integrity sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==
 
 reactstrap@^9.2.2:
   version "9.2.3"
@@ -8364,10 +8399,10 @@ scheduler@^0.23.2:
   dependencies:
     loose-envify "^1.1.0"
 
-scheduler@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.25.0.tgz#336cd9768e8cceebf52d3c80e3dcf5de23e7e015"
-  integrity sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==
+scheduler@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.26.0.tgz#4ce8a8c2a2095f13ea11bf9a445be50c555d6337"
+  integrity sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==
 
 semver-compare@^1.0.0:
   version "1.0.0"
@@ -8590,6 +8625,11 @@ sonner@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/sonner/-/sonner-2.0.1.tgz#f41774b2e0ee770152458a336570a4d577d03e6f"
   integrity sha512-FRBphaehZ5tLdLcQ8g2WOIRE+Y7BCfWi5Zyd8bCvBjiW8TxxAyoWZIxS661Yz6TGPqFQ4VLzOF89WEYhfynSFQ==
+
+sonner@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/sonner/-/sonner-2.0.2.tgz#d31316f5b93ecfbfa6c32c0ef4b856a651f5b167"
+  integrity sha512-xOeXErZ4blqQd11ZnlDmoRmg+ctUJBkTU8H+HVh9rnWi9Ke28xiL39r4iCTeDX31ODTe/s1MaiaY333dUzLCtA==
 
 "source-map-js@>=0.6.2 <2.0.0", source-map-js@^1.0.2, source-map-js@^1.2.1:
   version "1.2.1"
@@ -9390,10 +9430,10 @@ victory-vendor@^36.6.8:
     d3-time "^3.0.0"
     d3-timer "^3.0.1"
 
-vite@^6.2.3:
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.2.3.tgz#249e92d32886981ab46bc1f049ac72abc6fa81e2"
-  integrity sha512-IzwM54g4y9JA/xAeBPNaDXiBF8Jsgl3VBQ2YQ/wOY6fyW3xMdSoltIV3Bo59DErdqdE6RxUfv8W69DvUorE4Eg==
+vite@^6.2.4:
+  version "6.2.4"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-6.2.4.tgz#05809de3f918fded87f73a838761995a4d66a680"
+  integrity sha512-veHMSew8CcRzhL5o8ONjy8gkfmFJAd5Ac16oxBUjlwgX3Gq2Wqr+qNC3TjPIpy7TPV/KporLga5GT9HqdrCizw==
   dependencies:
     esbuild "^0.25.0"
     postcss "^8.5.3"

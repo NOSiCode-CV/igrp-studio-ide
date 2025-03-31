@@ -7,9 +7,9 @@ import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
-import useGitAuth from '@renderer/hooks/useGitAuth';
+import useGitAuth from '@renderer/hooks/use-git-auth';
 import { LoadingSpinner } from '../loading-spinner';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 

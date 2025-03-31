@@ -2,6 +2,7 @@ import useToast from '@renderer/components/useToast';
 import { useCallback } from 'react';
 import { Repository } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
+import { useWorkspace } from './use-workspace';
 
 type GitErrorType =
     | 'INVALID_REMOTE_URL'
@@ -13,6 +14,8 @@ type GitErrorType =
 export const useGit = () => {
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+
+    const { actions: { findAllProjects } } = useWorkspace()
 
     const getGitErrorType = (error: Error): GitErrorType | null => {
         const message = error.message.toUpperCase();
@@ -34,6 +37,11 @@ export const useGit = () => {
     const createGitCommit = useCallback(
         async (projectPath: string, message: string) => {
             try {
+
+                const prompt = await checkIsAutoCommit()
+
+                if (!prompt) return true
+
                 await window.electron.ipcRenderer.invoke('create-commit', {
                     projectPath,
                     message,
@@ -153,7 +161,7 @@ export const useGit = () => {
 
     const checkLocalProjects = useCallback(
         async (githubRepos: Repository[]) => {
-            const localProjects = await window.repo.project.findAllRecent();
+            const localProjects = await findAllProjects();
             const results = await window.electron.ipcRenderer.invoke(
                 'check-git-remotes',
                 { projects: localProjects, githubRepos }
@@ -164,6 +172,37 @@ export const useGit = () => {
         []
     );
 
+    const setAutoCommit = useCallback(async (prompt: boolean) => {
+        try {
+            await window.electron.ipcRenderer.invoke(
+                'set-auto-commit',
+                prompt
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                showErrorToast(error.message || t('gitFailedOperation'));
+            } else {
+                showErrorToast(t('gitFailedOperation'));
+            }
+        }
+    }, []);
+
+    const checkIsAutoCommit = useCallback(async () => {
+        try {
+            return await window.electron.ipcRenderer.invoke(
+                'is-auto-commit'
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                showErrorToast(error.message || t('gitFailedOperation'));
+            } else {
+                showErrorToast(t('gitFailedOperation'));
+            }
+        }
+        return true
+    }, []);
+
+
     return {
         createGitCommit,
         pullChanges,
@@ -172,5 +211,7 @@ export const useGit = () => {
         getChangesCount,
         listCommits,
         checkLocalProjects,
+        setAutoCommit,
+        checkIsAutoCommit
     };
 };

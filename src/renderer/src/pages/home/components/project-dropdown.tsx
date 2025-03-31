@@ -34,7 +34,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
         setIsDialogOpen(false);
 
         try {
-            await window.repo.project.delete(project);
+            await window.igrpStudio.workspace.deleteProject(project.id);
             showSuccessToast(t('deletedSuccess', { name: project.name }));
             onDelete(true);
         } catch (error: unknown) {
