@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import {
     Table,
@@ -12,22 +12,27 @@ import {
 } from '@renderer/components/ui/table';
 import { Plus, Trash2 } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
+import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
 
 interface KeyValuePair {
     id: string;
-    key: string;
+    label: string;
     value: string;
 }
 
-export default function DomainForm() {
+export default function DomainForm({
+    onAdd,
+}: {
+    onAdd: (domains: IGRPOptionsProps[]) => void;
+}) {
     const [pairs, setPairs] = useState<KeyValuePair[]>([
-        { id: '1', key: '', value: '' },
+        { id: '1', value: '', label: '' },
     ]);
 
     const addPair = () => {
         const newPair: KeyValuePair = {
             id: Date.now().toString(),
-            key: '',
+            label: '',
             value: '',
         };
 
@@ -38,7 +43,11 @@ export default function DomainForm() {
         setPairs(pairs.filter((pair) => pair.id !== id));
     };
 
-    const updatePair = (id: string, field: 'key' | 'value', value: string) => {
+    const updatePair = (
+        id: string,
+        field: 'label' | 'value',
+        value: string
+    ) => {
         setPairs(
             pairs.map((pair) =>
                 pair.id === id ? { ...pair, [field]: value } : pair
@@ -46,13 +55,20 @@ export default function DomainForm() {
         );
     };
 
+    useEffect(() => {
+        const options: IGRPOptionsProps[] = pairs
+            .filter((pair) => pair.value && pair.label)
+            .map(({ id, ...rest }) => rest);
+        onAdd(options);
+    }, [pairs]);
+
     return (
         <div className="w-full max-w-3xl mx-auto border bg-card rounded-lg space-y-6 px-2">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Key</TableHead>
                         <TableHead>Value</TableHead>
+                        <TableHead>Label</TableHead>
                         <TableHead>
                             <Button
                                 onClick={addPair}
@@ -71,20 +87,6 @@ export default function DomainForm() {
                         <TableRow key={pair.id}>
                             <TableCell>
                                 <Input
-                                    value={pair.key}
-                                    onChange={(e) =>
-                                        updatePair(
-                                            pair.id,
-                                            'key',
-                                            e.target.value
-                                        )
-                                    }
-                                    placeholder="Enter key"
-                                    className="border-0 focus-visible:ring-0 p-0 h-8"
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <Input
                                     value={pair.value}
                                     onChange={(e) =>
                                         updatePair(
@@ -94,6 +96,20 @@ export default function DomainForm() {
                                         )
                                     }
                                     placeholder="Enter value"
+                                    className="border-0 focus-visible:ring-0 p-0 h-8"
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <Input
+                                    value={pair.label}
+                                    onChange={(e) =>
+                                        updatePair(
+                                            pair.id,
+                                            'label',
+                                            e.target.value
+                                        )
+                                    }
+                                    placeholder="Enter Label"
                                     className="border-0 focus-visible:ring-0 p-0 h-8"
                                 />
                             </TableCell>

@@ -17,12 +17,14 @@ import React, { useState } from 'react';
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     const [collapsed, setCollapsed] = useState({});
 
-    const toggleCollapse = (key) => {
+    const toggleCollapse = (key: string) => {
         setCollapsed((prev) => ({
             ...prev,
             [key]: !prev[key],
         }));
     };
+
+    console.log(formValues)
 
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault } = fieldConfig;
@@ -78,7 +80,14 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                 />
             );
         } else if (key === 'options') {
-            return <DomainForm />;
+            return (
+                <DomainForm
+                    onAdd={(opt) => {
+                        console.log(opt);
+                        handleInputChange(key, opt);
+                    }}
+                />
+            );
         }
         return (
             <div
