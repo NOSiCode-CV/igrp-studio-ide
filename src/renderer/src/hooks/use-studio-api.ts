@@ -1,5 +1,5 @@
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
-import { extractByType, getMergedFiles, getModulesArray } from '@renderer/generators/api/helpers';
+import { extractByType, getMergedFiles, getModulesArray } from '@renderer/generators/api/helpers/helpers';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';

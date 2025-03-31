@@ -7,22 +7,22 @@ export const handleDragEnd = (
     { handleAddChildToComponent, handleReorderChildInComponent }: any
 ) => {
 
-   // const { getAcceptedChildren } = useStudio()
+    // const { getAcceptedChildren } = useStudio()
 
     const { draggableId, source, destination, mode, type }: DragEndResult = result;
 
-   // const { droppableId } = destination;
+    // const { droppableId } = destination;
 
     if (!destination) {
         return;
     }
 
 
-   /*  useCallback(() => {
-        getAcceptedChildren(parentComponentName, componentName).then((data) => {
-            setComponents(data);
-        });
-    }, [parentComponentName, componentName, getAcceptedChildren]); */
+    /*  useCallback(() => {
+         getAcceptedChildren(parentComponentName, componentName).then((data) => {
+             setComponents(data);
+         });
+     }, [parentComponentName, componentName, getAcceptedChildren]); */
 
 
     if (mode === 'MOVE') {
@@ -39,7 +39,7 @@ const handleDropComponent = (
     type: string,
     { handleAddChildToComponent }: any
 ) => {
-    const { label, properties, childrenTypes } = source
+    const { label, properties, childrenTypes, interactions } = source
 
     const componentId = generateId(draggableId);
 
@@ -51,10 +51,11 @@ const handleDropComponent = (
         type,
         properties: setDefaultProperties(properties),
         children: [],
+        interactions: setDefaultInteractions(interactions)
     };
 
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
-        const { name, label, properties } = child
+        const { name, label, properties, interactions } = child
         const childId = generateId(name);
         const childComponent: StructuredComponent = {
             id: childId,
@@ -62,6 +63,7 @@ const handleDropComponent = (
             label: label,
             properties: setDefaultProperties(properties),
             children: [],
+            interactions: setDefaultInteractions(interactions)
         };
         component.children?.push(childComponent);
     });
@@ -81,4 +83,17 @@ const setDefaultProperties = (schema: any) => {
         }
     }
     return properties;
+};
+
+// Utility function to set default values based on the schema
+const setDefaultInteractions = (schema: any) => {
+    const interactions: any = {};
+    for (const key in schema) {
+        if (schema[key].properties.fnCustomSet.default !== undefined) {
+            interactions[key] = {
+                ['fnCustomSet']: schema[key].properties.fnCustomSet.default
+            };
+        }
+    }
+    return interactions;
 };

@@ -51,6 +51,9 @@ export interface StructuredComponent {
     [key: string]: any;
   };
   children: StructuredComponent[]
+  interactions: {
+    [key: string]: any;
+  }
 }
 
 export type StructuredLayout = StructuredComponent
@@ -67,6 +70,9 @@ export interface Source {
     [key: string]: any;
   };
   childrenTypes?: ComponentRegisterConfig[]
+  interactions: {
+    [key: string]: any;
+  }
 }
 
 export interface EditingComponentParams {

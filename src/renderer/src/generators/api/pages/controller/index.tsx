@@ -24,7 +24,7 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { formatMethods } from '../../helpers';
+import { formatMethods } from '../../helpers/helpers';
 import { TabRequest } from './tab-resquest';
 
 import useToast from '@renderer/components/useToast';
@@ -43,6 +43,7 @@ import { useTabs } from '@renderer/components/navigation/TabContext';
 import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
+import useSchemaTypes from '../../helpers/useSchemaTypes';
 
 interface ControllerProps {
     selectors: Array<any>;
@@ -70,7 +71,6 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
     const [pathController, setPathController] = useState('');
     const [module, setModule] = useState<string | undefined>();
     const [data, setData] = useState<any>(null);
-    const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
     const [enumTypes, setEnumTypes] = useState<SchemaTypeItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -146,7 +146,6 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
     }, [selectors]);
 
     useEffect(() => {
-        
         if (data) {
             const { name, basePath, description, module } = data;
 
@@ -348,32 +347,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
         setEnumTypes(enumTypes);
     }, [enums]);
 
-    useEffect(() => {
-        const types = formatMethods(
-            (
-                selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
-                    | { SCHEMA_TYPES: string[] }
-                    | undefined
-            )?.SCHEMA_TYPES || []
-        );
-
-        setSchemaTypes(types);
-
-        // Map DTO into the expected format
-        const targetDto = dto.map((d) => ({
-            value: d.content?.name || d.name,
-            label: d.content?.name || d.name,
-            module: d.content?.module,
-        }));
-
-        setSchemaTypes((prevSchemaTypes) =>
-            prevSchemaTypes.map((schemaType) =>
-                schemaType.value === 'Reference other Object'
-                    ? { ...schemaType, value: 'dto', items: targetDto }
-                    : schemaType
-            )
-        );
-    }, [dto, selectors]);
+    const schemaTypes = useSchemaTypes(selectors, dto);
 
     const onClickSourceCode = () => {
         initializeTabFromCurrentItem({

@@ -92,7 +92,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     // Debounced component update
     React.useEffect(() => {
         if (!componentId || Object.keys(formValues).length === 0) return;
-console.log(formValues)
+
         const timer = setTimeout(() => {
             handleUpdateChildComponent(componentId, {
                 ...currentComp,

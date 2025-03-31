@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDtoValidation } from './validation';
 import { Card } from '@renderer/components/ui/card';
-import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
+import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers/helpers';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import AttributesCard from './attributes';

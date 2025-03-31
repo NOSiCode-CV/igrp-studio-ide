@@ -5,7 +5,7 @@ import {
     OPTION_TYPE,
 } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
-import { formatMethods } from '../../helpers';
+import { formatMethods } from '../../helpers/helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
 import { useDispatch } from 'react-redux';
@@ -27,6 +27,7 @@ import { LabelRequired } from '@renderer/components/label-required';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import useSchemaTypes from '../../helpers/useSchemaTypes';
 
 const contentType = 'application/json';
 
@@ -57,7 +58,7 @@ export const ResponseLayout = ({
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
 
-    const { basePath, getJsonData } = useStudioAPI(currentItem?.module);
+    const { basePath, dto, getJsonData } = useStudioAPI(currentItem?.module);
 
     const [title, setTitle] = useState('');
 
@@ -77,6 +78,8 @@ export const ResponseLayout = ({
         },
     });
 
+    const schemaTypes = useSchemaTypes(selectors, dto);
+
     useEffect(() => {
         const load = async () => {
             if (!currentItem) return;
@@ -92,8 +95,6 @@ export const ResponseLayout = ({
     useEffect(() => {
         if (data) {
             const schema = data.content[contentType]?.schema;
-
-            console.log(schema)
 
             const dataSchema =
                 schema && schema.name
@@ -189,18 +190,9 @@ export const ResponseLayout = ({
         }
     };
 
-    const schemaTypes = formatMethods(
-        (
-            selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
-                | { SCHEMA_TYPES: string[] }
-                | undefined
-        )?.SCHEMA_TYPES || []
-    );
-
     const handleSchemaChange = (newSchema: JSONSchema) => {
         // Verificar se o schema realmente mudou antes de atualizar
         const currentSchema = formik.values.content[contentType];
-
 
         const properties = newSchema.properties || {};
         const firstKey = Object.keys(properties)[0];

@@ -26,7 +26,7 @@ import {
     addNewRow,
     handleChangeValueObject,
     removeRow,
-} from '../../helpers';
+} from '../../helpers/helpers';
 import { TextInput } from '../../components/inputs-form';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import NavigationBar from '../../components/navigation-bar';

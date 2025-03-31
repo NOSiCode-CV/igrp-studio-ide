@@ -1,4 +1,4 @@
-import { formatMethods } from "../../helpers"
+import { formatMethods } from "../../helpers/helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 
 export const initialValues = {

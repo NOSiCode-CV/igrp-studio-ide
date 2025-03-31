@@ -1,5 +1,5 @@
 import { DTOConfig } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/types"
-import { formatMethods, getOptionsByObject } from "../../helpers"
+import { formatMethods, getOptionsByObject } from "../../helpers/helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 import { SchemaTypeItem } from "src/main/types"
 
