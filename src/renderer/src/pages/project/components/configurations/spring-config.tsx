@@ -91,7 +91,7 @@ export function SpringConfig({
                         onChange({ ...data, apiName: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
-                    maxLength={20}
+                    maxLength={50}
                 />
                 {errors?.config && errors.config.apiName && (
                     <p className="text-xs text-destructive">
