@@ -118,6 +118,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                 menuItemsConfig.newDto,
                 menuItemsConfig.newModels,
                 menuItemsConfig.newEnum,
+                menuItemsConfig.newResponses,
             ],
             schemas: [
                 menuItemsConfig.newModels,
@@ -133,7 +134,6 @@ const useNavdata = (filesThree: FileTree[]) => {
             modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.delete],
             defaultMenus: [menuItemsConfig.delete],
             sharedExtension: [
-                menuItemsConfig.newResponses,
                 menuItemsConfig.newPermission,
             ],
             controllersExtension: [menuItemsConfig.newControllers],
