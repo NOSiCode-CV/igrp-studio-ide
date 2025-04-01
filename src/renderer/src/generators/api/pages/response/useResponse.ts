@@ -6,7 +6,7 @@ import { useTabs } from '@renderer/components/navigation/TabContext';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
+import { ENV_TYPES, httpStatusCodes, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
@@ -25,7 +25,7 @@ const initialValues: ResponseConfig = {
     content: {},
 };
 
-export const useResponse = ({ currentItem }: { currentItem: any }) => {
+export const useResponse = ({ currentItem, selectors }: { currentItem: any, selectors: Array<any> }) => {
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
@@ -37,7 +37,8 @@ export const useResponse = ({ currentItem }: { currentItem: any }) => {
     const [data, setData] = useState<any>(null);
 
     const validationSchema = useResponseValidation({ t });
-    const schemaTypes = useSchemaTypes([], dto, enums);
+
+    const schemaTypes = useSchemaTypes(selectors, dto, enums); // Removed selectors dependency
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -53,8 +54,7 @@ export const useResponse = ({ currentItem }: { currentItem: any }) => {
         const load = async () => {
             if (!currentItem) return;
             try {
-                const data = await getJsonData(currentItem.path);
-                setData(data);
+                await getJsonData(currentItem.path).then((data) => setData(data));
             } catch (error) {
                 showErrorToast(t('loadError'));
             }
@@ -169,6 +169,7 @@ export const useResponse = ({ currentItem }: { currentItem: any }) => {
         dataSchema,
         schemaTypes,
         t,
+        httpStatusCodes,
         handleSave,
         handleDelete,
         handleChangeCode,

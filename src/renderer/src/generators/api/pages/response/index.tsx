@@ -13,11 +13,16 @@ import { useResponse } from './useResponse';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 
 interface ResponseProps {
+    selectors: Array<any>;
     currentItem: any;
     onCloseTab: () => void;
 }
 
-export const ResponseLayout = ({ currentItem, onCloseTab }: ResponseProps) => {
+export const ResponseLayout = ({
+    currentItem,
+    selectors,
+    onCloseTab,
+}: ResponseProps) => {
     const {
         formik,
         title,
@@ -29,7 +34,7 @@ export const ResponseLayout = ({ currentItem, onCloseTab }: ResponseProps) => {
         handleChangeCode,
         handleSchemaChange,
         onClickSourceCode,
-    } = useResponse({ currentItem });
+    } = useResponse({ currentItem, selectors });
 
     return (
         <form onSubmit={formik.handleSubmit}>

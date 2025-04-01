@@ -113,10 +113,13 @@ export function SchemaFieldRow({
 
         const objectType = isValueObject ? newType.type : '';
 
+        const module = isValueObject ? newType.module : '';
+
         const updatedField = {
             ...field,
             type,
             objectType,
+            module
         };
 
         if (type === 'object') {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SchemaTypeItem } from 'src/main/types';
-import { getMapOptions } from '.';
+import { formatMethods, getMapOptions } from '.';
 
 interface Selector {
     SCHEMA_TYPES?: string[];
@@ -19,12 +19,6 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
     const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
 
     useEffect(() => {
-        const formatMethods = (types: string[]): SchemaTypeItem[] => {
-            return types.map(type => ({
-                value: type,
-                label: type,
-            }));
-        };
 
         // Obter os tipos básicos do seletor
         const baseTypes = formatMethods(
@@ -61,6 +55,7 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
                     : schemaType
             )
         );
+
     }, [dto, enums, selectors]);
 
     return schemaTypes;
