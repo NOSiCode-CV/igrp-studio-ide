@@ -39,7 +39,6 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 
-import * as Icons from 'lucide-react';
 import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 
 interface HeaderProps {

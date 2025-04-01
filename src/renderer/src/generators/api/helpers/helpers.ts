@@ -62,13 +62,13 @@ export const handleChangeValueObject = (
 	result: any,
 	value: string
 ) => {
-	const isObject = typeof element === 'object'; 
+	const isObject = typeof result === 'object'; 
 
 	const typeValue = isObject ? result.value : result;
 	const typeModule = isObject ? result.module : '';
 	const typeType = isObject ? result.type : '';
 
-	if (isObject && typeValue && typeType)
+	if (isObject)
 		formik.setFieldValue(
 			value,
 			formik.values[value].map((row: any, index: number) =>

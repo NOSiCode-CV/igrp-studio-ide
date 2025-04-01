@@ -5,7 +5,6 @@ import {
     OPTION_TYPE,
 } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
-import { formatMethods } from '../../helpers/helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
 import { useDispatch } from 'react-redux';
@@ -58,7 +57,9 @@ export const ResponseLayout = ({
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem } = useTabs();
 
-    const { basePath, dto, getJsonData } = useStudioAPI(currentItem?.module);
+    const { basePath, dto, enums, getJsonData } = useStudioAPI(
+        currentItem?.module
+    );
 
     const [title, setTitle] = useState('');
 
@@ -78,7 +79,7 @@ export const ResponseLayout = ({
         },
     });
 
-    const schemaTypes = useSchemaTypes(selectors, dto);
+    const schemaTypes = useSchemaTypes(selectors, dto, enums);
 
     useEffect(() => {
         const load = async () => {

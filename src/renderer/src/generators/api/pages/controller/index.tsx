@@ -347,7 +347,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
         setEnumTypes(enumTypes);
     }, [enums]);
 
-    const schemaTypes = useSchemaTypes(selectors, dto);
+    const schemaTypes = useSchemaTypes(selectors, dto, enums);
 
     const onClickSourceCode = () => {
         initializeTabFromCurrentItem({
