@@ -178,12 +178,13 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
 
                 try {
                     const modelData = await window.api.getJsonContent(schemaRef.path);
-                    const existingRefs = Array.isArray(data.relationReference)
-                        ? data.relationReference
+                    const existingRefs = Array.isArray(modelData.relationReference)
+                        ? modelData.relationReference
                         : [];
 
                     const existingIndex = existingRefs.findIndex(existingRef =>
-                        existingRef.fieldName === relationReference.fieldName
+                        existingRef.fieldName === relationReference.fieldName &&
+                        existingRef.mappedBy === relationReference.mappedBy
                     );
 
                     let updatedReferences;
