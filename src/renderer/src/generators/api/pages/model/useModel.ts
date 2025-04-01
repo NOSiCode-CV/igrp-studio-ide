@@ -59,8 +59,8 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
     };
 
     useEffect(() => {
-        const { config: appConfig } = config;
-        setEnableEntityRevision(appConfig?.enableEntityRevision || false);
+        const appConfig = config.config as { enableEntityRevision?: boolean };
+        setEnableEntityRevision(appConfig.enableEntityRevision || false);
     }, [config]);
 
     useEffect(() => {

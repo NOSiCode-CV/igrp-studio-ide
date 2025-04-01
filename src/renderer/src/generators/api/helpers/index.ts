@@ -8,6 +8,21 @@ export function formatMethods(elements: string[], toUpperCase = false): { label:
 	}));
 }
 
+export function toMap(items: any) {
+	return items.map((d) => ({
+		value: d.content?.name || d.name,
+		label: d.content?.name || d.name
+	}));
+}
+
+export function getMapOptions(items: any) {
+	return items.map((d) => ({
+		value: d.content?.name || d.name,
+		label: d.content?.name || d.name,
+		module: d.content?.module,
+	}));
+}
+
 export function getOptionsByObject(objects: any, module: string, currentItem: string | null) {
 	return objects !== undefined
 		? objects
@@ -63,7 +78,7 @@ export const handleChangeValueObject = (
 	value: string
 ) => {
 
-	const isObject = typeof result === 'object' && element !== 'relation'; 
+	const isObject = typeof result === 'object' && element !== 'relation';
 
 	const typeValue = isObject ? result.value : result;
 	const typeModule = isObject ? result.module : '';

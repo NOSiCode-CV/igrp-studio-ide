@@ -17,7 +17,7 @@ import {
 } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { IGRPCombobox } from '@renderer/components/combobox';
 import { useTranslation } from 'react-i18next';
-import { formatMethods } from '../../helpers/helpers';
+import { formatMethods } from '../../helpers';
 import { Switch } from '@renderer/components/ui/switch';
 import { LabelRequired } from '@renderer/components/label-required';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';

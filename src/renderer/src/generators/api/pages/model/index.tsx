@@ -11,7 +11,7 @@ import { TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import { useModel } from './useModel';
 import { FormList } from '../../components/form-list';
-import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers/helpers';
+import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
 import { btnLabels, defaultValues, TabList } from './config';
 
 interface ModelProps {

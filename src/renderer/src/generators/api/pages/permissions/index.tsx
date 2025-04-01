@@ -1,6 +1,6 @@
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
-import { changeValue } from '../../helpers/helpers';
+import { changeValue } from '../../helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
 import { useDispatch } from 'react-redux';

@@ -1,7 +1,7 @@
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { addNewRow, changeValue, removeRow } from '../../helpers/helpers';
+import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
 import { useDispatch } from 'react-redux';

@@ -5,7 +5,7 @@ import {
     addNewRow,
     handleChangeValueObject,
     removeRow,
-} from '../../helpers/helpers';
+} from '../../helpers';
 import { useDto } from './useDTO';
 import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
