@@ -43,3 +43,42 @@ export function ModeToggle() {
         </DropdownMenu>
     );
 }
+
+{/* <div className="bg-background/80 backdrop-blur-sm border rounded-lg flex items-center">
+            <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                    'rounded-full w-8 h-8',
+                    theme === 'light' && 'bg-background text-primary'
+                )}
+                onClick={() => setTheme('light')}
+                aria-label="Light mode"
+            >
+                <Sun className="h-4 w-4" />
+            </Button>
+            <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                    'rounded-full w-8 h-8',
+                    theme === 'dark' && 'bg-background text-primary'
+                )}
+                onClick={() => setTheme('dark')}
+                aria-label="Dark mode"
+            >
+                <Moon className="h-4 w-4" />
+            </Button>
+            <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                    'rounded-full w-8 h-8',
+                    theme === 'system' && 'bg-background text-primary'
+                )}
+                onClick={() => setTheme('system')}
+                aria-label="System mode"
+            >
+                <Monitor className="h-4 w-4" />
+            </Button>
+        </div> */}

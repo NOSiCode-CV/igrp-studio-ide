@@ -183,7 +183,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                         : [];
 
                     const isDuplicate = existingRelationReferences.some(
-                        ref => ref.mappedBy === relationReference.mappedBy
+                        ref => ref.fieldName === relationReference.fieldName
                     );
 
                     if (!isDuplicate) {
