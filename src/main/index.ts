@@ -162,7 +162,7 @@ app.whenReady().then(async () => {
 
   // GitHub handlers
   ipcMain.on('github-oauth', async () => {
-    const isDev = process.env.NODE_ENV === 'development';
+    const isDev = import.meta.env.NODE_ENV === 'development';
     try {
       await githubAuth.setupOAuth(mainWindow, isDev);
     } catch (error) {
@@ -172,7 +172,7 @@ app.whenReady().then(async () => {
 
   // GitLab handler
   ipcMain.on('gitlab-oauth', async () => {
-    const isDev = process.env.NODE_ENV === 'development';
+    const isDev = import.meta.env.NODE_ENV === 'development';
     try {
       await gitlabAuth.setupOAuth(mainWindow, isDev);
     } catch (error) {

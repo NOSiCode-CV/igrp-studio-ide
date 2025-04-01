@@ -5,6 +5,7 @@ import { Card } from '../ui/card';
 import useToast from '../useToast';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { useEffect } from 'react';
 
 type CardGitProjectProps = {
     repo: Repository;
@@ -29,8 +30,6 @@ export function CardGitProject({
 
     const isCloned = clonedRepos.includes(repo.id);
     const projectPath = projectPaths[repo.id];
-
-    console.log('isCloreponed', repo);
 
     const handleOpen = async () => {
         if (!projectPath) {

@@ -15,7 +15,7 @@ interface GitService {
   initialize: (token: string) => void;
 }
 
-const DEV_PORT = process.env.DEV_PORT || 3333;
+const DEV_PORT = import.meta.env.VITE_DEV_PORT || 4000;
 
 export class GitAuth {
   private config: GitProviderConfig;

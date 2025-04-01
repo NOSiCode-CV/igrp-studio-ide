@@ -1,8 +1,14 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly VITE_DEV_PORT: string
+  readonly VITE_NODE_ENV: string
     readonly VITE_GIT_REDIRECT_URI: string;
-    // Add other environment variables here if needed
+    
+    readonly VITE_GITHUB_CLIENT_ID: string;
+    readonly VITE_GITHUB_CLIENT_SECRET: string;
+    readonly VITE_GITLAB_CLIENT_ID: string;
+    readonly VITE_GITLAB_CLIENT_SECRET: string;
   }
   
   interface ImportMeta {
