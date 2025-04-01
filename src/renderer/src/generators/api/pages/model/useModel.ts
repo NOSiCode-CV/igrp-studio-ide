@@ -177,29 +177,40 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 if (!schemaRef) return;
 
                 try {
-                    const data = await window.api.getJsonContent(schemaRef.path);
-                    const existingRelationReferences = Array.isArray(data.relationReference)
+                    const modelData = await window.api.getJsonContent(schemaRef.path);
+                    const existingRefs = Array.isArray(data.relationReference)
                         ? data.relationReference
                         : [];
 
-                    const isDuplicate = existingRelationReferences.some(
-                        ref => ref.fieldName === relationReference.fieldName
+                    const existingIndex = existingRefs.findIndex(existingRef =>
+                        existingRef.fieldName === relationReference.fieldName
                     );
 
-                    if (!isDuplicate) {
-                        const newJson = {
-                            ...data,
-                            relationReference: [...existingRelationReferences, relationReference],
+                    let updatedReferences;
+                    if (existingIndex >= 0) {
+                        updatedReferences = [...existingRefs];
+                        updatedReferences[existingIndex] = {
+                            ...updatedReferences[existingIndex],
+                            ...relationReference,
                         };
-
-                        const { error } = await window.engine.createModel(
-                            newJson,
-                            ENV_TYPES.SPRING,
-                            basePath
-                        );
-
-                        if (error) showErrorToast(error);
+                    } else {
+                        updatedReferences = [...existingRefs, relationReference];
                     }
+
+                    const updatedModel = {
+                        ...modelData,
+                        relationReference: updatedReferences,
+                    };
+
+
+                    const { error } = await window.engine.createModel(
+                        updatedModel,
+                        ENV_TYPES.SPRING,
+                        basePath
+                    );
+
+                    if (error) showErrorToast(error);
+
                 } catch (error) {
                     console.error('Failed to fetch JSON content:', error);
                 }
