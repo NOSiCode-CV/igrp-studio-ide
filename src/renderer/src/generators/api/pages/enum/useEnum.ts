@@ -166,7 +166,6 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
         title,
         data,
         tablesColumns,
-        t,
         handleSave,
         handleDelete,
         onClickSourceCode,

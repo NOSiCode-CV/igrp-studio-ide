@@ -55,6 +55,12 @@ const TabsNavigation = ({
         tabsToClose.forEach((tab) => handleCloseTab(tab.id));
     };
 
+    const handleCloseLeft = (tabId: string) => {
+        const tabIndex = tabs.findIndex((tab) => tab.id === tabId);
+        const tabsToClose = tabs.slice(0, tabIndex);
+        tabsToClose.forEach((tab) => handleCloseTab(tab.id));
+    };
+
     const handleCloseOthers = (tabId: string) => {
         tabs.forEach((tab) => {
             if (tab.id !== tabId && tab.id !== TAB_DEFAULT) {
@@ -152,6 +158,13 @@ const TabsNavigation = ({
                                                     }
                                                 >
                                                     {t('closeRight')}
+                                                </ContextMenuItem>
+                                                <ContextMenuItem
+                                                    onClick={() =>
+                                                        handleCloseLeft(tab.id)
+                                                    }
+                                                >
+                                                    {t('closeLeft')}
                                                 </ContextMenuItem>
                                                 <ContextMenuItem
                                                     onClick={() =>

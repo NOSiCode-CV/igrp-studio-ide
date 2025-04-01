@@ -162,7 +162,6 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
         tablesColumns,
         data,
         id,
-        t,
         handleSave,
         handleDelete,
         onClickSourceCode,

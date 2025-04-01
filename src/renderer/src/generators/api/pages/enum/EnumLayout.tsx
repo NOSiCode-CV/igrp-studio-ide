@@ -5,6 +5,7 @@ import { FormList } from '../../components/form-list';
 import { useEnum } from './useEnum';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { defaultValue } from './config';
+import { useTranslation } from 'react-i18next';
 
 interface EnumProps {
     selectors: Array<any>;
@@ -18,10 +19,11 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
         title,
         data,
         tablesColumns,
-        t,
         handleDelete,
         onClickSourceCode,
     } = useEnum({ currentItem });
+
+    const { t } = useTranslation();
 
     const tableName = 'values';
 

@@ -6,7 +6,7 @@ import { useTabs } from '@renderer/components/navigation/TabContext';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ENV_TYPES, httpStatusCodes, OPTION_TYPE } from '@renderer/constants/appConstants';
+import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
@@ -168,8 +168,6 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
         data,
         dataSchema,
         schemaTypes,
-        t,
-        httpStatusCodes,
         handleSave,
         handleDelete,
         handleChangeCode,

@@ -11,6 +11,7 @@ import { SelectInput, TextInput } from '../../components/inputs-form';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { useResponse } from './useResponse';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
+import { useTranslation } from 'react-i18next';
 
 interface ResponseProps {
     selectors: Array<any>;
@@ -29,12 +30,13 @@ export const ResponseLayout = ({
         data,
         dataSchema,
         schemaTypes,
-        t,
         handleDelete,
         handleChangeCode,
         handleSchemaChange,
         onClickSourceCode,
     } = useResponse({ currentItem, selectors });
+
+    const { t } = useTranslation();
 
     return (
         <form onSubmit={formik.handleSubmit}>
