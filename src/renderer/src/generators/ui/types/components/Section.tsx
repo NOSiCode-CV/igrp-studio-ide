@@ -6,7 +6,7 @@ import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/use-studio';
 import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxContainer from '../tools/BoxContainer';
+import BoxContainer from '../tools/BoxWrapper';
 import { APP_COMPONENT } from '../../ComponentTypes';
 import { ComponentRenderer } from '../ComponentRenderer';
 import { useTabs } from '@renderer/components/navigation/TabContext';

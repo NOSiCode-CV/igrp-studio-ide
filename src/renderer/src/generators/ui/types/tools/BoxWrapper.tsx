@@ -14,7 +14,7 @@ interface BoxContainerProps {
     children: React.ReactElement;
 }
 
-const BoxContainer = ({
+const BoxWrapper = ({
     comp,
     children,
     group,
@@ -113,4 +113,4 @@ const BoxContainer = ({
     );
 };
 
-export default BoxContainer;
+export default BoxWrapper;

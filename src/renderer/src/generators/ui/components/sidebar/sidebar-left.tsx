@@ -37,11 +37,11 @@ import {
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import SidebarAppComponents from './sidebar-app-components';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import useStudio from '@renderer/hooks/use-studio';
-import NavigatorSidebar from './NavigatorSidebar';
+import NavigatorSidebar from './sidebar-navigator';
 import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
+import SidebarAppComponents from './sidebar-app-components';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -147,7 +147,7 @@ export function AppSidebar({
                 </SidebarHeader>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupContent className="px-1.5 md:px-0">
+                        <SidebarGroupContent className="md:px-0">
                             <SidebarMenu>
                                 {navegations.map((item) => (
                                     <SidebarMenuItem key={item.id}>
@@ -164,7 +164,7 @@ export function AppSidebar({
                                                 activeMenuGroup === item.id
                                             }
                                             size="lg"
-                                            className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
+                                            className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
                                         >
                                             <div className="w-8 h-8 flex items-center justify-center">
                                                 <item.icon size={20} />

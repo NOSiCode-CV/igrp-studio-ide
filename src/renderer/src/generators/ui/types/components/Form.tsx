@@ -7,7 +7,7 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { formVariants } from '../../utils/layout-mapping';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
-import BoxContainer from '../tools/BoxContainer';
+import BoxContainer from '../tools/BoxWrappertsx';
 
 export interface FormComponentProps {
     isDisabled?: boolean;

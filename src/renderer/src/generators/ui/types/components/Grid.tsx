@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import BoxContainer from '../tools/BoxContainer';
+import BoxContainer from '../tools/BoxWrappertsx';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/use-studio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';

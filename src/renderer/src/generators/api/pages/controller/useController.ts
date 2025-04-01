@@ -153,6 +153,7 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
             }
 
             const values = await getValuesToSubmit();
+            console.log(values)
 
             const { error } = await window.engine.createController(values, ENV_TYPES.SPRING, basePath);
 

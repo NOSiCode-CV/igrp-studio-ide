@@ -9,9 +9,9 @@ import useToast from '@renderer/components/useToast';
 import CodeContent from './components/CodeContent';
 
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { AppSidebar } from '@renderer/generators/ui/components/sidebar-left';
+import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { SidebarRight } from './components/sidebar-right';
+import { SidebarRight } from './components/sidebar/sidebar-right';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';

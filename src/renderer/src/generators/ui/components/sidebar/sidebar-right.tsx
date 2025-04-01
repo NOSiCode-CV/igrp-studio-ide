@@ -7,9 +7,9 @@ import {
     SidebarHeader,
 } from '@renderer/components/ui/sidebar';
 import { Button } from '@renderer/components/ui/button';
-import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { useTranslation } from 'react-i18next';
-import RenderPropsConfig from './EditComponent/render-props-config';
+import RenderPropsConfig from '../EditComponent/properties';
 import {
     Accordion,
     AccordionContent,
@@ -25,7 +25,8 @@ import {
 import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
-import Interactions from './EditComponent/interactions';
+import Interactions from '../EditComponent/Interactions';
+import { StyleTab } from '../EditComponent/style';
 
 interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -192,19 +193,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                             </Accordion>
                         </TabsContent>
                         <TabsContent value="styles" className="space-y-6">
-                            <Accordion
-                                type="single"
-                                collapsible
-                                className="w-full"
-                                defaultValue="item-1"
-                            >
-                                <AccordionItem value="item-1" className="px-3">
-                                    <AccordionTrigger>
-                                        {t('textProperties')}
-                                    </AccordionTrigger>
-                                    <AccordionContent></AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
+                            <StyleTab />
                         </TabsContent>
                         <TabsContent value="interactions" className="space-y-6">
                             {currentComp && (
