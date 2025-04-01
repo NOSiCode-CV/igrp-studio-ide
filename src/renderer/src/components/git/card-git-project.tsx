@@ -2,10 +2,9 @@ import { Repository } from 'src/main/types';
 import { Button } from '../ui/button';
 import { GitFork } from 'lucide-react';
 import { Card } from '../ui/card';
-import { useNavigate } from 'react-router-dom';
 import useToast from '../useToast';
-import { navigateToNextPage } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 type CardGitProjectProps = {
     repo: Repository;
@@ -22,12 +21,16 @@ export function CardGitProject({
     projectPaths,
     isCloning,
 }: CardGitProjectProps) {
-    const navigate = useNavigate();
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
-    
+    const {
+        actions: { saveOrOpenProject },
+    } = useWorkspace();
+
     const isCloned = clonedRepos.includes(repo.id);
     const projectPath = projectPaths[repo.id];
+
+    console.log('isCloreponed', repo);
 
     const handleOpen = async () => {
         if (!projectPath) {
@@ -36,23 +39,22 @@ export function CardGitProject({
         }
 
         try {
-            const { folderExists, config } = await window.electron.ipcRenderer.invoke(
-                'check-project-config',
-                projectPath
-            );
+            const { folderExists, config } =
+                await window.electron.ipcRenderer.invoke(
+                    'check-project-config',
+                    projectPath
+                );
 
             if (!folderExists || !config) {
                 throw new Error(t('invalidProjectStructure'));
             }
 
             const projectData = {
-                name: config.name,
+                ...config,
                 path: projectPath,
-                framework: config.framework,
-                config: config.config
             };
 
-            navigateToNextPage(navigate, projectData);
+            saveOrOpenProject(projectData);
         } catch (error) {
             showErrorToast(t('failedOpenProjectStructure'));
             console.error(t('failedOpenProject'), error);
@@ -85,19 +87,23 @@ export function CardGitProject({
                         {t('view')}
                     </Button>
                     {isCloned ? (
-                        <Button size="sm" variant="outline" onClick={handleOpen}>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleOpen}
+                        >
                             {t('open')}
                         </Button>
                     ) : (
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleClone(repo)}
-                        disabled={isCloning}
-                    >
-                        <GitFork className="w-4 h-4 mr-2" />
-                        {isCloning ? t('cloning') : t('clone')}
-                    </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleClone(repo)}
+                            disabled={isCloning}
+                        >
+                            <GitFork className="w-4 h-4 mr-2" />
+                            {isCloning ? t('cloning') : t('clone')}
+                        </Button>
                     )}
                 </div>
             </div>

@@ -133,22 +133,21 @@ const RecentsProjects = () => {
             >
                 <CardHeader className={isCompact ? 'p-2' : ''}>
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center">
+                        <div className="flex items-center space-x-2">
                             {project.icon ? (
                                 <img
                                     src={project.icon}
                                     alt="Project icon"
-                                    width={isCompact ? 16 : 20}
-                                    height={isCompact ? 16 : 20}
-                                    className="mr-2 rounded-full" 
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full" 
                                 />
                             ) : projectIcons[project.framework] ? (
                                 <img
                                     src={projectIcons[project.framework]}
                                     alt={`${project.framework} logo`}
-                                    width={isCompact ? 16 : 20}
-                                    height={isCompact ? 16 : 20}
-                                    className="mr-2"
+                                    width={20}
+                                    height={20}
                                 />
                             ) : null}
                             <CardTitle

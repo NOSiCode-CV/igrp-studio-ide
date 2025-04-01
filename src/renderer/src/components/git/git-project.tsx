@@ -6,23 +6,34 @@ import { CardGitProject } from './card-git-project';
 import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { navigateToNextPage, setBasePath, setConfig } from '@renderer/redux/thunks';
+import {
+    navigateToNextPage,
+    setBasePath,
+    setConfig,
+} from '@renderer/redux/thunks';
 import useGitAuth from '@renderer/hooks/use-git-auth';
 import { LoadingSpinner } from '../loading-spinner';
 import { useGit } from '@renderer/hooks/use-git';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { getUUID } from '@renderer/utils/helpers';
 
 export default function GitProject() {
     const { t } = useTranslation();
     const { showErrorToast, showSuccessToast } = useToast();
     const [cloningRepoId, setCloningRepoId] = useState<number | null>(null);
     const [clonedRepos, setClonedRepos] = useState<number[]>([]);
-    const [projectPaths, setProjectPaths] = useState<Record<number, string>>({});
+    const [projectPaths, setProjectPaths] = useState<Record<number, string>>(
+        {}
+    );
     const [activeTab, setActiveTab] = useState('github');
-    
-    const navigate = useNavigate()
-    const dispatch: any = useDispatch()
+    const {
+        actions: { saveOrOpenProject },
+    } = useWorkspace();
+
+    const navigate = useNavigate();
+    const dispatch: any = useDispatch();
 
     const [nameDialog, setNameDialog] = useState({
         isOpen: false,
@@ -34,44 +45,61 @@ export default function GitProject() {
     const { checkLocalProjects } = useGit();
 
     useEffect(() => {
-        window.electron.ipcRenderer.on('clone-progress', async (_event, data) => {
-            if (data.status === 'success' || data.status === 'error') {
-                setCloningRepoId(null);
-            } 
-            if (data.status === 'success') {
-                showSuccessToast(t('repositoryClonedSuccessfully', { path: data.path }));
-                try {
-                    await window.repo.project.save({
-                        name: data.config.name,
-                        framework: data.config.type,
-                        config: data.config.config,
-                        path: data.path
-                    });
-
-                    await window.electron.ipcRenderer.invoke('add-cloned-repo', cloningRepoId);
-                    await window.electron.ipcRenderer.invoke('set-project-path', {
-                        repoId: cloningRepoId,
-                        path: data.path
-                    });
-
-                    // Update local states
-                    setClonedRepos(prevRepos => [...prevRepos, cloningRepoId!]);
-                    setProjectPaths(prevPaths => ({
-                        ...prevPaths,
-                        [cloningRepoId!]: data.path
-                    }));
-                    
-                    dispatch(setBasePath(data.path));
-                    dispatch(setConfig(data.config));
-                    navigateToNextPage(navigate, data.config);
-                } catch (error) {
-                    showErrorToast(t('failedOpenProjectAfterCloning'));
-                    console.error(t('errorOpeningProject'), error);
+        window.electron.ipcRenderer.on(
+            'clone-progress',
+            async (_event, data) => {
+                if (data.status === 'success' || data.status === 'error') {
+                    setCloningRepoId(null);
                 }
-            } else if (data.status === 'error') {
-                showErrorToast(t('failedCloneRepository', { message: data.message }));
+                if (data.status === 'success') {
+                    showSuccessToast(
+                        t('repositoryClonedSuccessfully', { path: data.path })
+                    );
+                    try {
+                        await saveOrOpenProject({
+                            name: data.config.name,
+                            framework: data.config.type,
+                            config: data.config.config,
+                            path: data.path,
+                            id: getUUID(),
+                        });
+
+                        await window.electron.ipcRenderer.invoke(
+                            'add-cloned-repo',
+                            cloningRepoId
+                        );
+                        await window.electron.ipcRenderer.invoke(
+                            'set-project-path',
+                            {
+                                repoId: cloningRepoId,
+                                path: data.path,
+                            }
+                        );
+
+                        // Update local states
+                        setClonedRepos((prevRepos) => [
+                            ...prevRepos,
+                            cloningRepoId!,
+                        ]);
+                        setProjectPaths((prevPaths) => ({
+                            ...prevPaths,
+                            [cloningRepoId!]: data.path,
+                        }));
+
+                        dispatch(setBasePath(data.path));
+                        dispatch(setConfig(data.config));
+                        navigateToNextPage(navigate, data.config);
+                    } catch (error) {
+                        showErrorToast(t('failedOpenProjectAfterCloning'));
+                        console.error(t('errorOpeningProject'), error);
+                    }
+                } else if (data.status === 'error') {
+                    showErrorToast(
+                        t('failedCloneRepository', { message: data.message })
+                    );
+                }
             }
-        });
+        );
 
         window.electron.ipcRenderer.on(
             'request-project-name',
@@ -89,12 +117,21 @@ export default function GitProject() {
                 });
             }
         );
-    
+
         return () => {
             window.electron.ipcRenderer.removeAllListeners('clone-progress');
-            window.electron.ipcRenderer.removeAllListeners('request-project-name');
+            window.electron.ipcRenderer.removeAllListeners(
+                'request-project-name'
+            );
         };
-    }, [dispatch, navigate, showSuccessToast, showErrorToast, t, cloningRepoId]);
+    }, [
+        dispatch,
+        navigate,
+        showSuccessToast,
+        showErrorToast,
+        t,
+        cloningRepoId,
+    ]);
 
     const handleClone = async (repo: Repository) => {
         setCloningRepoId(repo.id);
@@ -113,7 +150,7 @@ export default function GitProject() {
             try {
                 const [cloned, paths] = await Promise.all([
                     window.electron.ipcRenderer.invoke('get-cloned-repos'),
-                    window.electron.ipcRenderer.invoke('get-project-paths')
+                    window.electron.ipcRenderer.invoke('get-project-paths'),
                 ]);
                 setClonedRepos(cloned);
                 setProjectPaths(paths);
@@ -122,36 +159,44 @@ export default function GitProject() {
                 showErrorToast(t('failedLoadRepositoryData'));
             }
         };
-        
+
         loadClonedReposData();
     }, [t, showErrorToast]);
 
     useEffect(() => {
         const checkLocalProjectsExist = async () => {
             if (!repositoriesGitHub && !repositoriesGitLab) return;
-            
+
             // Check GitHub repositories
             if (repositoriesGitHub?.length > 0) {
-                const githubResults = await checkLocalProjects(repositoriesGitHub);
-                setClonedRepos(prev => [...prev, ...Object.keys(githubResults).map(Number)]);
-                setProjectPaths(prev => ({ ...prev, ...githubResults }));
+                const githubResults =
+                    await checkLocalProjects(repositoriesGitHub);
+                setClonedRepos((prev) => [
+                    ...prev,
+                    ...Object.keys(githubResults).map(Number),
+                ]);
+                setProjectPaths((prev) => ({ ...prev, ...githubResults }));
             }
-            
+
             // Check GitLab repositories
             if (repositoriesGitLab?.length > 0) {
-                const gitlabResults = await checkLocalProjects(repositoriesGitLab);
-                setClonedRepos(prev => [...prev, ...Object.keys(gitlabResults).map(Number)]);
-                setProjectPaths(prev => ({ ...prev, ...gitlabResults }));
+                const gitlabResults =
+                    await checkLocalProjects(repositoriesGitLab);
+                setClonedRepos((prev) => [
+                    ...prev,
+                    ...Object.keys(gitlabResults).map(Number),
+                ]);
+                setProjectPaths((prev) => ({ ...prev, ...gitlabResults }));
             }
         };
-    
+
         checkLocalProjectsExist();
     }, [repositoriesGitHub, repositoriesGitLab, checkLocalProjects]);
 
     // Check if we have any repositories
     const hasGithubRepos = repositoriesGitHub && repositoriesGitHub.length > 0;
     const hasGitlabRepos = repositoriesGitLab && repositoriesGitLab.length > 0;
-    
+
     // If only one provider has repositories, set the active tab accordingly
     useEffect(() => {
         if (!hasGithubRepos && hasGitlabRepos) {
@@ -177,12 +222,16 @@ export default function GitProject() {
         <div>
             {/* Only show tabs if both GitHub and GitLab have repositories */}
             {hasGithubRepos && hasGitlabRepos ? (
-                <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
+                <Tabs
+                    defaultValue={activeTab}
+                    onValueChange={setActiveTab}
+                    className="mb-6"
+                >
                     <TabsList className="grid w-[400px] grid-cols-2">
                         <TabsTrigger value="github">GitHub</TabsTrigger>
                         <TabsTrigger value="gitlab">GitLab</TabsTrigger>
                     </TabsList>
-                    
+
                     <TabsContent value="github">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {repositoriesGitHub?.map((repo) => (
@@ -197,7 +246,7 @@ export default function GitProject() {
                             ))}
                         </div>
                     </TabsContent>
-                    
+
                     <TabsContent value="gitlab">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {repositoriesGitLab?.map((repo) => (
@@ -213,36 +262,34 @@ export default function GitProject() {
                         </div>
                     </TabsContent>
                 </Tabs>
+            ) : // If only GitHub has repositories
+            hasGithubRepos ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {repositoriesGitHub?.map((repo) => (
+                        <CardGitProject
+                            repo={repo}
+                            key={repo.id}
+                            handleClone={handleClone}
+                            clonedRepos={clonedRepos}
+                            projectPaths={projectPaths}
+                            isCloning={cloningRepoId === repo.id}
+                        />
+                    ))}
+                </div>
             ) : (
-                // If only GitHub has repositories
-                hasGithubRepos ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {repositoriesGitHub?.map((repo) => (
-                            <CardGitProject
-                                repo={repo}
-                                key={repo.id}
-                                handleClone={handleClone}
-                                clonedRepos={clonedRepos}
-                                projectPaths={projectPaths}
-                                isCloning={cloningRepoId === repo.id}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    // If only GitLab has repositories
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {repositoriesGitLab?.map((repo) => (
-                            <CardGitProject
-                                repo={repo}
-                                key={repo.id}
-                                handleClone={handleClone}
-                                clonedRepos={clonedRepos}
-                                projectPaths={projectPaths}
-                                isCloning={cloningRepoId === repo.id}
-                            />
-                        ))}
-                    </div>
-                )
+                // If only GitLab has repositories
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {repositoriesGitLab?.map((repo) => (
+                        <CardGitProject
+                            repo={repo}
+                            key={repo.id}
+                            handleClone={handleClone}
+                            clonedRepos={clonedRepos}
+                            projectPaths={projectPaths}
+                            isCloning={cloningRepoId === repo.id}
+                        />
+                    ))}
+                </div>
             )}
 
             <ProjectNameDialog

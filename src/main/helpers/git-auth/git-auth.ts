@@ -30,12 +30,12 @@ export class GitAuth {
 
   getAuthUrl(isDev: boolean): string {
     const scopes = this.config.scopes.join(' ');
-    const redirectUri = isDev 
+    const redirectUri = isDev
       ? `http://localhost:${DEV_PORT}/oauth/callback`
-      : process.env.MAIN_VITE_GIT_REDIRECT_URI;
+      : import.meta.env.VITE_GIT_REDIRECT_URI;
 
-    return `${this.config.authUrl}?client_id=${this.config.clientId}&redirect_uri=${redirectUri}` + 
-           `${this.config.provider === 'gitlab' ? '&response_type=code' : ''}&scope=${scopes}`;
+    return `${this.config.authUrl}?client_id=${this.config.clientId}&redirect_uri=${redirectUri}` +
+      `${this.config.provider === 'gitlab' ? '&response_type=code' : ''}&scope=${scopes}`;
   }
 
   async setupOAuth(mainWindow: BrowserWindow, isDev: boolean) {
@@ -56,12 +56,12 @@ export class GitAuth {
 
       app.get('/oauth/callback', async (req, res) => {
         const { code } = req.query;
-        
+
         if (code) {
           try {
             const token = await this.exchangeCodeForToken(code as string, true);
             this.handleAuthSuccess(token, mainWindow);
-            
+
             res.send(`
               <html>
                 <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
@@ -71,7 +71,7 @@ export class GitAuth {
                 </body>
               </html>
             `);
-            
+
             server.close();
             resolve(token);
           } catch (error) {
@@ -88,7 +88,7 @@ export class GitAuth {
         try {
           const urlObj = new URL(url);
           const code = urlObj.searchParams.get('code');
-          
+
           if (code) {
             const token = await this.exchangeCodeForToken(code, false);
             this.handleAuthSuccess(token, mainWindow);
@@ -107,16 +107,16 @@ export class GitAuth {
       };
 
       electronApp.on('open-url', urlHandler);
-      
+
       const authUrl = this.getAuthUrl(false);
       shell.openExternal(authUrl);
     });
   }
 
   private async exchangeCodeForToken(code: string, isDev: boolean) {
-    const redirectUri = isDev 
+    const redirectUri = isDev
       ? `http://localhost:${DEV_PORT}/oauth/callback`
-      : process.env.GIT_REDIRECT_URI;
+      : import.meta.env.VITE_GIT_REDIRECT_URI;
 
     const body: any = {
       client_id: this.config.clientId,
@@ -162,7 +162,7 @@ export class GitAuth {
     try {
       const urlObj = new URL(url);
       const code = urlObj.searchParams.get('code');
-      
+
       if (code) {
         const token = await this.exchangeCodeForToken(code, false);
         this.handleAuthSuccess(token, mainWindow);
@@ -179,7 +179,7 @@ export class GitAuth {
     mainWindow.webContents.send(`${this.config.provider}-oauth-error`, {
       message: error.message || `Failed to authenticate with ${this.config.provider}`
     });
-    
+
     if (res) {
       res.status(500).send(`
         <html>

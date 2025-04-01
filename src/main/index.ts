@@ -38,12 +38,13 @@ let nextJsManager: NextJsManager;
 // Load the initial language configuration
 loadConfig();
 dotenv.config();
+
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1160, //900,
-    height: 650, //670,
-    minWidth: 960, //768,
+    width: 1160,
+    height: 650, 
+    minWidth: 960,
     minHeight: 620,
     show: false,
     autoHideMenuBar: true,
@@ -51,8 +52,6 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      //nodeIntegration: true, // Enable Node.js in the renderer process
-      // contextIsolation: false // Allow the `process` global
     },
     titleBarStyle: "hidden",
     icon: path.join(__dirname, 'resources/icons', 'icon.icns'), // Set icon for the window

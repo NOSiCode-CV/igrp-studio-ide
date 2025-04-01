@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
-
+import { v4 as uuidv4 } from 'uuid';
 
 export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
@@ -77,6 +77,10 @@ export function generateRowId() {
 
 export function getId() {
 	return Math.random().toString(36).slice(2, 12)
+}
+
+export function getUUID() {
+	return uuidv4()
 }
 
 export function generateId(componentName: string) {
@@ -153,18 +157,18 @@ export function toFullCamelCaseFromSnakeCase(str: string) {
 }
 
 export function getLabel(name: string): string {
-    if (!name) return ''; // Handle empty string
+	if (!name) return ''; // Handle empty string
 
-    // Split on hyphens or uppercase letters
-    const parts = name
-        .replace(/([A-Z])/g, ' $1') // Add a space before uppercase letters
-        .split(/[- ]+/); // Split on hyphens or spaces
+	// Split on hyphens or uppercase letters
+	const parts = name
+		.replace(/([A-Z])/g, ' $1') // Add a space before uppercase letters
+		.split(/[- ]+/); // Split on hyphens or spaces
 
-    // Capitalize the first letter of each part and join with spaces
-    return parts
-        .filter((part) => part.length > 0) // Remove empty parts
-        .map(
-            (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-        )
-        .join(' ');
+	// Capitalize the first letter of each part and join with spaces
+	return parts
+		.filter((part) => part.length > 0) // Remove empty parts
+		.map(
+			(part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+		)
+		.join(' ');
 }

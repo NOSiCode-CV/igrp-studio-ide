@@ -13,6 +13,7 @@ export default defineConfig({
         },
       },
     },
+    envPrefix: 'VITE_',
   },
   preload: {
     plugins: [externalizeDepsPlugin()],

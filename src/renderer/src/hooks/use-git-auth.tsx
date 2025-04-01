@@ -18,6 +18,7 @@ const useGitAuth = () => {
                 window.electron.ipcRenderer.invoke('github-repositories'),
                 window.electron.ipcRenderer.invoke('gitlab-repositories'),
             ]);
+       
             dispatch(setRepositoriesGitHub(repoGithub as Repository[]));
             dispatch(setRepositoriesGitLab(repoGitlab as Repository[]));
             dispatch(setUserGithub(userGitHub));
