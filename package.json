@@ -29,7 +29,7 @@
 		"@gitbeaker/node": "^35.8.1",
 		"@hello-pangea/dnd": "^18.0.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
-		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.1119",
+		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.121",
 		"@igrp/igrp-studio-nextjs-engine": "^0.0.1-alpha.118",
 		"@igrp/igrp-studio-springboot-engine": "0.0.1-alpha.61",
 		"@monaco-editor/react": "^4.7.0",

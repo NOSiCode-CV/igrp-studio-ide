@@ -898,10 +898,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.1119":
-  version "0.0.0-alpha.1119"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.1119.tgz#0ad90eaa69858bd8f6b1c05c84a58274dcf7750a"
-  integrity sha512-khkLw/1AycQxrcmFpWdNhhzUApGtqwEuENlWJifP1PGY7DDf1L9K4ycOu+Dw6G1J04BU10lXR2aeNIx++cCBZA==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.121":
+  version "0.0.0-alpha.121"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.121.tgz#50d19a291a4306b75f2b341ec9c0a40b839271d7"
+  integrity sha512-EfHNpnpFaQkTFUSOMpN+7vn6hL2qCa7KPKyo+K3Uf8wsGM6zV/TItG2zC0pzIhxH8zOYHnYS5vPjFyZAnMpkGA==
   dependencies:
     "@hookform/resolvers" "^5.0.0"
     "@radix-ui/react-accordion" "^1.2.3"
@@ -946,7 +946,7 @@
     react-router-dom "^7.4.1"
     recharts "^2.15.1"
     sonner "^2.0.3"
-    tailwindcss "^4.0.17"
+    tailwindcss "^4.1.0"
     tailwindcss-animate "^1.0.7"
     vaul "^1.1.2"
     zod "^3.24.2"
@@ -8893,15 +8893,10 @@ tailwindcss-animate@^1.0.7:
   resolved "https://registry.yarnpkg.com/tailwindcss-animate/-/tailwindcss-animate-1.0.7.tgz#318b692c4c42676cc9e67b19b78775742388bef4"
   integrity sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==
 
-tailwindcss@4.1.1, tailwindcss@^4.1.1:
+tailwindcss@4.1.1, tailwindcss@^4.1.0, tailwindcss@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.1.tgz#f2bae12b32687e63afa37c4f638b89520104e83f"
   integrity sha512-QNbdmeS979Efzim2g/bEvfuh+fTcIdp1y7gA+sb6OYSW74rt7Cr7M78AKdf6HqWT3d5AiTb7SwTT3sLQxr4/qw==
-
-tailwindcss@^4.0.17:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.0.tgz#f51694989c82116a07049db6c0c110aec4d7298c"
-  integrity sha512-vBYstoFnvUZCDxaauNGQQEvJNQgCd1vSMDRYuZZMH1xRRcTboOk1rJrW5yFkEabU9X6Yx1C4LQ+QvPOvQj4Daw==
 
 tapable@^2.2.0:
   version "2.2.1"
