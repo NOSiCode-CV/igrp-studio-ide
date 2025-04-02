@@ -19,6 +19,7 @@ build_packagedev:
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine64 wine32
+    - apt-get install -y openssl libssl1.1 
 
     # Download the certificate file from GitLab repository
     - >
