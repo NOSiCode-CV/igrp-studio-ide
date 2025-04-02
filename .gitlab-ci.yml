@@ -30,8 +30,7 @@ build_packagedev:
 
   script:
     - yarn install --frozen-lockfile
-    - export ELECTRON_BUILDER_CERTIFICATE_PASSWORD="${CERTIFICATE_PASSWORD}"
-    - yarn release:win
+    - CSC_KEY_PASSWORD="${CERTIFICATE_PASSWORD}" yarn release:win
     - yarn release:linux
     #- yarn release:mac
   artifacts:
