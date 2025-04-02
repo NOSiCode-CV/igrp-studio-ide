@@ -22,11 +22,11 @@ function GitConnectionMenu() {
                         
                             <>
                                 <AvatarImage
-                                    src={userGitHub.avatar_url || userGitLab.avatar_url}
-                                    alt={userGitHub.login || userGitLab.username}
+                                    src={userGitHub?.avatar_url || userGitLab?.avatar_url}
+                                    alt={userGitHub?.login || userGitLab?.username}
                                 />
                                 <AvatarFallback>
-                                    {userGitHub.login.charAt(0).toUpperCase() || userGitLab.username.charAt(0).toUpperCase()}
+                                    {userGitHub?.login.charAt(0).toUpperCase() || userGitLab?.username.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </>
                         
@@ -44,10 +44,10 @@ function GitConnectionMenu() {
                         <div className="flex items-center justify-between gap-5 w-full">
                             <div className="flex flex-col space-y-1">
                                 <p className="text-sm font-medium leading-none">
-                                    {userGitHub.login}
+                                    {userGitHub?.login}
                                 </p>
                                 <p className="text-xs leading-none text-muted-foreground">
-                                    {userGitHub.email}
+                                    {userGitHub?.email}
                                 </p>
                             </div>
 
