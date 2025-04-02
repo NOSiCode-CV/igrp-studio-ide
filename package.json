@@ -132,7 +132,15 @@
 		"artifactName": "IGRP-Studio-${version}-${arch}.${ext}",
 		"win": {
 			"icon": "resources/icons/icon.ico",
-			"target": "nsis"
+			"target": "nsis",
+			"signtoolOptions": {
+				"certificateFile": "${CERTIFICATE_FILE}",
+				"certificatePassword": "${CERTIFICATE_PASSWORD}",
+				"signingHashAlgorithms": [
+					"sha256"
+				],
+				"rfc3161TimeStampServer": "http://timestamp.digicert.com"
+			}
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
