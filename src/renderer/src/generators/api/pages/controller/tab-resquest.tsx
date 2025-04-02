@@ -59,7 +59,8 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                 newPathVariables.push({
                     name: param,
                     type: 'string',
-                    required: true,
+                    value:'',
+                    isRequired: true,
                     description: '',
                 });
             }

@@ -5,7 +5,7 @@ export const initialValues = {
     actionName: '',
     path: '',
     method: 'GET',
-    requestBody: "",
+    requestBody: undefined,
     responses: {
         '200': {
             description: null,
@@ -19,17 +19,19 @@ export const initialValues = {
     },
     requestParams: [
         {
-            type: '',
+            type: 'string',
             name: '',
-            value: '',
+            value: "",
+            description: '',
             isRequired: true
         }
     ],
     pathVariables: [
         {
-            type: '',
+            type: 'string',
             name: '',
-            value: '',
+            value: "",
+            description: '',
             isRequired: true
         }
     ],
@@ -70,55 +72,58 @@ export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [val
             { key: 'name', name: t('name'), type: 'text' },
             { key: 'value', name: t('value'), type: 'text' },
             {
-                key: 'type',
-                name: t('type'),
-                type: 'select',
-                options: paramsTypesData,
-            },
-            {
                 key: 'group', name: '', type: 'group', items: [
-                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
+                    {
+                        key: 'type',
+                        name: t('type'),
+                        type: 'select',
+                        options: paramsTypesData,
+                    },
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox' },
+                    { key: 'advanced', name: '', type: 'popoverController' }
                 ]
-            }
+            },
+            { key: 'description', name: t('Description'), type: 'text', },
+
         ],
         pathVariables: [
             { key: 'name', name: t('name'), type: 'text' },
-            { key: 'value', name: t('value'), type: 'text', },
-            {
-                key: 'type',
-                name: t('type'),
-                type: 'select',
-                options: paramsTypesData,
-            },
+            { key: 'value', name: t('value'), type: 'text' },
             {
                 key: 'group', name: '', type: 'group', items: [
-
-                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
+                    {
+                        key: 'type',
+                        name: t('type'),
+                        type: 'select',
+                        options: paramsTypesData,
+                    },
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox' },
+                    { key: 'advanced', name: '', type: 'popoverController' }
                 ]
-            }
+            },
+            { key: 'description', name: t('Description'), type: 'text' },
+
         ],
         headers: [
-            { key: 'header', name: t('header'), type: 'select', options: headersTypes, width: '25%' },
-            { key: 'value', name: t('value'), type: 'text', width: '25%' },
-            { key: 'type', name: t('type'), type: 'select', options: paramsTypesData, width: '25%' },
+            { key: 'header', name: t('header'), type: 'select', options: headersTypes },
+            { key: 'value', name: t('value'), type: 'text' },
+            { key: 'type', name: t('type'), type: 'select', options: paramsTypesData },
             {
                 key: 'group', name: '', type: 'group', items: [
 
-                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popoverController', width: '25%', options: { enumTypes } }
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox' },
+                    { key: 'advanced', name: '', type: 'popoverController', options: { enumTypes } }
                 ]
             }
         ],
         requestBody: [
-            { key: 'name', name: t('name'), type: 'text', width: '25%' },
-            { key: 'value', name: t('value'), type: 'text', width: '25%' },
-            { key: 'type', name: t('type'), type: 'select', options: paramsTypesData, width: '25%' },
+            { key: 'name', name: t('name'), type: 'text' },
+            { key: 'value', name: t('value'), type: 'text' },
+            { key: 'type', name: t('type'), type: 'select', options: paramsTypesData },
             {
                 key: 'group', name: '', type: 'group', items: [
-                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox', width: '25%' },
-                    { key: 'advanced', name: '', type: 'popoverController', width: '25%' }
+                    { key: 'isRequired', name: t('isRequired'), type: 'checkbox' },
+                    { key: 'advanced', name: '', type: 'popoverController' }
                 ]
             }
         ],

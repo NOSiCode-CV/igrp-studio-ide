@@ -38,8 +38,8 @@ export function useActionValidation({ t }) {
             methodConditions(method, schema, ['POST', 'PUT', 'PATCH'], 'Accepts is required for POST, PUT, PATCH')
         ),
         response: Yup.string().required('Response Type is required'), */
-        requestParams: Yup.array().of(conditionalValidation),
-        pathVariables: Yup.array().of(conditionalValidation),
+        //requestParams: Yup.array().of(conditionalValidation),
+        //pathVariables: Yup.array().of(conditionalValidation),
     })
 
 }
