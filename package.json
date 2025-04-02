@@ -134,7 +134,7 @@
 			"icon": "resources/icons/icon.ico",
 			"target": "nsis",
 			"signtoolOptions": {
-				"certificateFile": "certificate/certificate.pfx",
+				"certificateFile": "/certificate/certificate.pfx",
 				"certificatePassword": "${CERTIFICATE_PASSWORD}",
 				"signingHashAlgorithms": [
 					"sha256"
