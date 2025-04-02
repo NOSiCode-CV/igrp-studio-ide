@@ -19,7 +19,8 @@ build_packagedev:
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine64 wine32
-    - apt-get install -y openssl libssl1.1 
+    - wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb
+    - dpkg -i libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb
 
     # Download the certificate file from GitLab repository
     - >
