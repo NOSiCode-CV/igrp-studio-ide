@@ -133,14 +133,14 @@
 		"win": {
 			"icon": "resources/icons/icon.ico",
 			"target": "nsis",
-			"publisherName":"NOSi E.P.E <contact@nosi.cv>",
 			"signtoolOptions": {
 				"certificateFile": "certificate/certificate.pfx",
 				"certificatePassword": "${CERTIFICATE_PASSWORD}",
 				"signingHashAlgorithms": [
 					"sha256"
 				],
-				"rfc3161TimeStampServer": "http://timestamp.digicert.com"
+				"rfc3161TimeStampServer": "http://timestamp.digicert.com",
+				"publisherName":"NOSi E.P.E <contact@nosi.cv>"
 			}
 		},
 		"mac": {
