@@ -15,7 +15,7 @@ interface GitService {
   initialize: (token: string) => void;
 }
 
-const DEV_PORT = process.env.DEV_PORT || 3333;
+const DEV_PORT = import.meta.env.VITE_DEV_PORT || 4000;
 
 export class GitAuth {
   private config: GitProviderConfig;
@@ -159,18 +159,30 @@ export class GitAuth {
   }
 
   async handleProtocolCallback(url: string, mainWindow: BrowserWindow) {
+    
     try {
       const urlObj = new URL(url);
       const code = urlObj.searchParams.get('code');
-
+      
       if (code) {
-        const token = await this.exchangeCodeForToken(code, false);
-        this.handleAuthSuccess(token, mainWindow);
+        try {
+          const token = await this.exchangeCodeForToken(code, false);
+          
+          if (token && token.access_token) {
+            this.handleAuthSuccess(token, mainWindow);
+            return token;
+          } else {
+            throw new Error('No access_token in response');
+          }
+        } catch (tokenError) {
+          throw tokenError;
+        }
+      } else {
+        throw new Error('No authorization code found in callback URL');
       }
     } catch (error) {
-      console.error(`Error handling ${this.config.provider} protocol callback:`, error);
       mainWindow.webContents.send(`${this.config.provider}-oauth-error`, {
-        message: 'Failed to authenticate'
+        message: error instanceof Error ? error.message : 'Failed to authenticate'
       });
     }
   }

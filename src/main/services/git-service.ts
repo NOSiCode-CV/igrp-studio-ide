@@ -427,7 +427,7 @@ export const GitService = {
         try {
             const results = {};
 
-            for (const project of projects.data) {
+            for (const project of projects?.data) {
                 const remoteUrl = await this.getRemoteUrl(project.path);
                 if (remoteUrl) {
                     const matchingRepo = githubRepos.find(repo => 

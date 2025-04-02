@@ -11,27 +11,73 @@ const useGitAuth = () => {
 
     const loadGithubData = async () => {
         setIsLoading(true);
-        try {
-            const [userGitHub, userGitLab, repoGithub, repoGitlab] = await Promise.all([
-                window.electron.ipcRenderer.invoke('github-user-info'),
-                window.electron.ipcRenderer.invoke('gitlab-user-info'),
-                window.electron.ipcRenderer.invoke('github-repositories'),
-                window.electron.ipcRenderer.invoke('gitlab-repositories'),
-            ]);
-       
-            dispatch(setRepositoriesGitHub(repoGithub as Repository[]));
-            dispatch(setRepositoriesGitLab(repoGitlab as Repository[]));
-            dispatch(setUserGithub(userGitHub));
-            dispatch(setUserGitLab(userGitLab));
-            setIsLoading(false);
-        } catch (error) {
-            setIsLoading(false);
-        }
+        
+        const processGitHubUserInfo = async () => {
+            try {
+                const userGitHub = await window.electron.ipcRenderer.invoke('github-user-info');
+                console.log("userGitHub", userGitHub);
+                if (userGitHub) {
+                    dispatch(setUserGithub(userGitHub));
+                }
+            } catch (error) {
+                console.error('Falha ao carregar informações do usuário GitHub:', error);
+            }
+        };
+        
+        const processGitLabUserInfo = async () => {
+            try {
+                const userGitLab = await window.electron.ipcRenderer.invoke('gitlab-user-info');
+                console.log("userGitLab", userGitLab);
+                if (userGitLab) {
+                    dispatch(setUserGitLab(userGitLab));
+                }
+            } catch (error) {
+                console.error('Falha ao carregar informações do usuário GitLab:', error);
+            }
+        };
+        
+        const processGitHubRepositories = async () => {
+            try {
+                const repoGithub = await window.electron.ipcRenderer.invoke('github-repositories');
+                if (repoGithub) {
+                    dispatch(setRepositoriesGitHub(repoGithub as Repository[]));
+                }
+            } catch (error) {
+                console.error('Falha ao carregar repositórios do GitHub:', error);
+            }
+        };
+        
+        const processGitLabRepositories = async () => {
+            try {
+                const repoGitlab = await window.electron.ipcRenderer.invoke('gitlab-repositories');
+                if (repoGitlab) {
+                    dispatch(setRepositoriesGitLab(repoGitlab as Repository[]));
+                }
+            } catch (error) {
+                console.error('Falha ao carregar repositórios do GitLab:', error);
+            }
+        };
+        
+        const promises = [
+            processGitHubUserInfo(),
+            processGitLabUserInfo(),
+            processGitHubRepositories(),
+            processGitLabRepositories()
+        ];
+        
+        await Promise.allSettled(promises);
+        
+        setIsLoading(false);
     };
-
+    
     useEffect(() => {
         window.electron.ipcRenderer.on('github-oauth-success', async (_event, data) => {
             await window.electron.ipcRenderer.invoke('gitauth-initialize', data.access_token);
+            await loadGithubData();
+        });
+
+        window.electron.ipcRenderer.on('gitlab-oauth-success', async (_event, data) => {
+            await window.electron.ipcRenderer.invoke('gitlab-initialize', data.access_token);
             await loadGithubData();
         });
 
@@ -41,6 +87,7 @@ const useGitAuth = () => {
 
         return () => {
             window.electron.ipcRenderer.removeAllListeners('github-oauth-success');
+            window.electron.ipcRenderer.removeAllListeners('gitlab-oauth-success');
         };
     }, [isInitialized, dispatch]);
 
@@ -79,5 +126,4 @@ const useGitAuth = () => {
     };
 };
 
-
-export default useGitAuth
+export default useGitAuth;
