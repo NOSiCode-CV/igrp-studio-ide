@@ -21,7 +21,7 @@ build_packagedev:
     - apt-get install -y wine64 wine32
 
     # Download the certificate file from GitLab repository
-    - curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" -o certificate.pfx \ "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
+    - curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" -o certificate.pfx "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
 
   script:
     - yarn install --frozen-lockfile
