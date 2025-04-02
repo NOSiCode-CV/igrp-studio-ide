@@ -133,6 +133,7 @@
 		"win": {
 			"icon": "resources/icons/icon.ico",
 			"target": "nsis",
+			"publisherName":"NOSi E.P.E <contact@nosi.cv>",
 			"signtoolOptions": {
 				"certificateFile": "certificate/certificate.pfx",
 				"certificatePassword": "${CERTIFICATE_PASSWORD}",
