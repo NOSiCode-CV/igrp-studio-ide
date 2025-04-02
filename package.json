@@ -134,7 +134,7 @@
 			"icon": "resources/icons/icon.ico",
 			"target": "nsis",
 			"signtoolOptions": {
-				"certificateFile": "https://git.nosi.cv/igrp-3_0/igrp-studio-horizon/-/raw/master/certificate/certificate.pfx?inline=false",
+				"certificateFile": "certificate.pfx",
 				"certificatePassword": "${CERTIFICATE_PASSWORD}",
 				"signingHashAlgorithms": [
 					"sha256"
