@@ -1,14 +1,11 @@
 import { Card } from '@renderer/components/ui/card';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
-import {
-    addNewRow,
-    handleChangeValueObject,
-    removeRow,
-} from '../../helpers/helpers';
+import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
 import { useDto } from './useDTO';
 import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
+import { useTranslation } from 'react-i18next';
 
 interface DtoProps {
     selectors: Array<any>;
@@ -17,8 +14,10 @@ interface DtoProps {
 }
 
 const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
-    const { formik, tablesColumns, data, t, handleDelete, onClickSourceCode } =
+    const { formik, tablesColumns, data, handleDelete, onClickSourceCode } =
         useDto({ selectors, currentItem });
+
+    const { t } = useTranslation();
 
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];

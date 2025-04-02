@@ -41,7 +41,7 @@ const componentMap = {
     [OPTION_TYPE.ERDDiagram]: ERDLayout,
 };
 
-const PageController = ({ onOpenNew, open, tab }: NewProps) => {
+const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
     const [selectors, setSelectors] = useState<any[]>([]);
     const [option, setOption] = useState<OptionType>(open);
     const [module, setModule] = useState<string>('shared');
@@ -119,4 +119,4 @@ const PageController = ({ onOpenNew, open, tab }: NewProps) => {
     );
 };
 
-export default PageController;
+export default PageWrapper;

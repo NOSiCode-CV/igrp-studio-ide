@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Separator } from '@renderer/components/ui/separator';
 import { ContainerScrollArea } from './ContainerScrollArea';
-import PageController from '../pages/PageController';
+import PageController from '../pages/PageWrapper';
 import Overview from '../pages/overview';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation';

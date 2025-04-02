@@ -22,7 +22,7 @@ import { Button } from '@renderer/components/ui/button';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { SidebarRight } from '../sidebar-right';
+import { SidebarRight } from '../sidebar/sidebar-right';
 import {
     Table,
     TableBody,

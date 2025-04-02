@@ -160,16 +160,15 @@ export function AppSidebar({
                                                     setOpen(true);
                                                     handleClickMenu(item);
                                                 }}
-                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
                                                 isActive={
                                                     item.label ===
                                                     activeMenuGroup
                                                 }
+                                                size="lg"
+                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
-                                                    {item.icon && (
-                                                        <item.icon size={20} />
-                                                    )}
+                                                    <item.icon size={20} />
                                                 </div>
                                                 <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
                                                     {item.label}

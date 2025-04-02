@@ -59,8 +59,8 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
     };
 
     useEffect(() => {
-        const { config: appConfig } = config;
-        setEnableEntityRevision(appConfig?.enableEntityRevision || false);
+        const appConfig = config.config as { enableEntityRevision?: boolean };
+        setEnableEntityRevision(appConfig.enableEntityRevision || false);
     }, [config]);
 
     useEffect(() => {
@@ -137,7 +137,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 { ...currentData, ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
-
+console.log(values)
             const { error } = await window.engine.createModel(values, ENV_TYPES.SPRING, basePath);
 
             if (error) {
@@ -177,29 +177,41 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 if (!schemaRef) return;
 
                 try {
-                    const data = await window.api.getJsonContent(schemaRef.path);
-                    const existingRelationReferences = Array.isArray(data.relationReference)
-                        ? data.relationReference
+                    const modelData = await window.api.getJsonContent(schemaRef.path);
+                    const existingRefs = Array.isArray(modelData.relationReference)
+                        ? modelData.relationReference
                         : [];
 
-                    const isDuplicate = existingRelationReferences.some(
-                        ref => ref.mappedBy === relationReference.mappedBy
+                    const existingIndex = existingRefs.findIndex(existingRef =>
+                        existingRef.fieldName === relationReference.fieldName &&
+                        existingRef.mappedBy === relationReference.mappedBy
                     );
 
-                    if (!isDuplicate) {
-                        const newJson = {
-                            ...data,
-                            relationReference: [...existingRelationReferences, relationReference],
+                    let updatedReferences;
+                    if (existingIndex >= 0) {
+                        updatedReferences = [...existingRefs];
+                        updatedReferences[existingIndex] = {
+                            ...updatedReferences[existingIndex],
+                            ...relationReference,
                         };
-
-                        const { error } = await window.engine.createModel(
-                            newJson,
-                            ENV_TYPES.SPRING,
-                            basePath
-                        );
-
-                        if (error) showErrorToast(error);
+                    } else {
+                        updatedReferences = [...existingRefs, relationReference];
                     }
+
+                    const updatedModel = {
+                        ...modelData,
+                        relationReference: updatedReferences,
+                    };
+
+
+                    const { error } = await window.engine.createModel(
+                        updatedModel,
+                        ENV_TYPES.SPRING,
+                        basePath
+                    );
+
+                    if (error) showErrorToast(error);
+
                 } catch (error) {
                     console.error('Failed to fetch JSON content:', error);
                 }
@@ -239,7 +251,6 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
         tablesColumns,
         data,
         enableEntityRevision,
-        t,
         handleSave,
         deleteModel,
         onClickSourceCode,

@@ -20,29 +20,23 @@ import { useEffect } from 'react';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 
 interface CreateEndpointDialogProps {
-    defaultModule: string | undefined;
     basePath: string;
-    pathController: string;
-    endpointName: string;
-    description: string;
+    controller: any;
     isOpen: boolean;
     modules: Array<any>;
     mode?: 'self' | 'formik';
     onClose: () => void;
-    onConfirm?: (values: ControllerConfig) => void;
+    onConfirm?: (values: any) => void;
 }
 
 export function CreateEndpointDialog({
-    defaultModule,
+    controller,
     basePath,
-    pathController,
-    endpointName,
-    description,
     isOpen,
-    onClose,
     modules,
     mode = 'self',
     onConfirm,
+    onClose,
 }: CreateEndpointDialogProps) {
     const { t } = useTranslation();
 
@@ -67,7 +61,7 @@ export function CreateEndpointDialog({
         initialValues: {
             type: 'controller',
             name: '',
-            basePath: 'api',
+            path: 'api',
             actions: [],
             module: '',
             description: '',
@@ -116,11 +110,12 @@ export function CreateEndpointDialog({
     };
 
     useEffect(() => {
-        formik.setFieldValue('name', endpointName);
-        formik.setFieldValue('basePath', pathController);
-        formik.setFieldValue('module', defaultModule);
+        const { name, path, module, description } = controller;
+        formik.setFieldValue('name', name);
+        formik.setFieldValue('path', path);
+        formik.setFieldValue('module', module);
         formik.setFieldValue('description', description);
-    }, [defaultModule, endpointName, pathController, description]);
+    }, [controller]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -148,13 +143,13 @@ export function CreateEndpointDialog({
                             </div>
                             <div className="col-span-12 gap-3 flex-col flex">
                                 <TextInput
-                                    id="basePath"
+                                    id="path"
                                     label={t('basePath')}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.basePath}
-                                    error={formik.errors.basePath}
-                                    isTouched={formik.touched.basePath}
+                                    value={formik.values.path}
+                                    error={formik.errors.path}
+                                    isTouched={formik.touched.path}
                                 />
                             </div>
                             <div className="col-span-12 flex flex-col gap-3">

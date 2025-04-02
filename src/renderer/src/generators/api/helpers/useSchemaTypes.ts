@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SchemaTypeItem } from 'src/main/types';
+import { formatMethods, getMapOptions } from '.';
 
 interface Selector {
     SCHEMA_TYPES?: string[];
@@ -18,12 +19,6 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
     const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
 
     useEffect(() => {
-        const formatMethods = (types: string[]): SchemaTypeItem[] => {
-            return types.map(type => ({
-                value: type,
-                label: type,
-            }));
-        };
 
         // Obter os tipos básicos do seletor
         const baseTypes = formatMethods(
@@ -35,18 +30,9 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
         );
 
         // Mapear DTO para o formato esperado
-        const targetDto = dto.map((d) => ({
-            value: d.content?.name || d.name,
-            label: d.content?.name || d.name,
-            module: d.content?.module,
-        }));
-
+        const targetDto = getMapOptions(dto);
         // Mapear Enums para o formato esperado
-        const targetEnums = enums.map((d) => ({
-            value: d.content?.name || d.name,
-            label: d.content?.name || d.name,
-            module: d.content?.module,
-        }));
+        const targetEnums = getMapOptions(enums);
 
         // Criar a lista completa de tipos de schema
         const completeSchemaTypes = [
@@ -69,6 +55,7 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
                     : schemaType
             )
         );
+
     }, [dto, enums, selectors]);
 
     return schemaTypes;

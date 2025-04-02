@@ -6,7 +6,7 @@ import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import BoxContainer from '../tools/BoxContainer';
+import BoxContainer from '../tools/BoxWrappertsx';
 
 export interface ColProps {
     comp: StructuredComponent;

@@ -5,7 +5,7 @@ import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { columnsVariants, columnVariants } from '../../utils/layout-mapping';
-import BoxContainer from '../tools/BoxContainer';
+import BoxContainer from '../tools/BoxWrappertsx';
 
 export interface ColProps {
     isDisabled?: boolean;

@@ -1,16 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useFormik } from 'formik';
-import { IColumnsTabelProps } from '../../types/Interfaces';
-import { getTablesColumns, TabList, initialValues } from './config';
-
-import { useDispatch } from 'react-redux';
-import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { useActionValidation } from './validation';
-import { useTranslation } from 'react-i18next';
-import {
-    ControllerAction,
-    ControllerConfig,
-} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import React from 'react';
 import {
     Card,
     CardContent,
@@ -24,26 +12,17 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { formatMethods } from '../../helpers/helpers';
-import { TabRequest } from './tab-resquest';
-
-import useToast from '@renderer/components/useToast';
-import NavigationBar from '../../components/navigation-bar';
-import { CreateEndpointDialog } from './create-endpoint-dialog';
-import { TextInput } from '../../components/inputs-form';
-import { TabResponse } from './tab-response';
-import {
-    ENV_TYPES,
-    httpMethods,
-    OPTION_TYPE,
-} from '@renderer/constants/appConstants';
-import { SchemaTypeItem } from 'src/main/types';
-import { useGit } from '@renderer/hooks/use-git';
-import { useTabs } from '@renderer/components/navigation/TabContext';
 import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
-import useStudioAPI from '@renderer/hooks/use-studio-api';
-import useSchemaTypes from '../../helpers/useSchemaTypes';
+import { TextInput } from '../../components/inputs-form';
+import NavigationBar from '../../components/navigation-bar';
+import { CreateEndpointDialog } from './create-endpoint-dialog';
+import { TabRequest } from './tab-resquest';
+import { TabResponse } from './tab-response';
+import { useController } from './useController';
+import { TabList } from './config';
+import { httpMethods } from '@renderer/constants/appConstants';
+import { useTranslation } from 'react-i18next';
 
 interface ControllerProps {
     selectors: Array<any>;
@@ -55,307 +34,27 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
     selectors,
     currentItem,
     onCloseTab,
-}: ControllerProps) => {
+}) => {
+    const {
+        basePath,
+        formik,
+        title,
+        controller,
+        setController,
+        isModalOpen,
+        setIsModalOpen,
+        tablesColumns,
+        typesData,
+        collectionType,
+        schemaTypes,
+        enumTypes,
+        responses,
+        modules,
+        handleDelete,
+        onClickSourceCode,
+    } = useController({ selectors, currentItem });
+
     const { t } = useTranslation();
-    const { createGitCommit } = useGit();
-    const { initializeTabFromCurrentItem } = useTabs();
-
-    const { modules, dto, basePath, enums, responses, getJsonData } =
-        useStudioAPI(currentItem?.module);
-
-    const [id, setId] = useState('');
-    const [oldActionName, setOldActionName] = useState('');
-    const [title, setTitle] = useState('');
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [pathController, setPathController] = useState('');
-    const [module, setModule] = useState<string | undefined>();
-    const [data, setData] = useState<any>(null);
-    const [enumTypes, setEnumTypes] = useState<SchemaTypeItem[]>([]);
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const dispatch: any = useDispatch();
-
-    const [tablesColumns, setTableColumns] = useState<{
-        [value: string]: IColumnsTabelProps[];
-    }>({});
-
-    const { showErrorToast, showSuccessToast } = useToast();
-
-    const validationSchema = useActionValidation({ t });
-
-    const formik: any = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: (_values, actions) => {
-            actions.setSubmitting(false);
-            handleSave();
-        },
-    });
-
-    const loadAction = (content: ControllerAction) => {
-        const {
-            actionName,
-            path,
-            method,
-            pathVariables,
-            requestParams,
-            headers,
-            responses,
-            requestBody,
-        } = content;
-
-        setOldActionName(actionName);
-
-        formik.setFieldValue(
-            'actionName',
-            actionName || initialValues.actionName
-        );
-        formik.setFieldValue('method', method || initialValues.method);
-        formik.setFieldValue('path', path || initialValues.path);
-
-        formik.setFieldValue('requestBody', requestBody || '');
-
-        formik.setFieldValue(
-            'pathVariables',
-            pathVariables || initialValues.pathVariables
-        );
-        formik.setFieldValue(
-            'requestParams',
-            requestParams || initialValues.requestParams
-        );
-        formik.setFieldValue('responses', responses || initialValues.responses);
-        formik.setFieldValue('headers', headers || initialValues.headers);
-    };
-
-    useEffect(() => {
-        const load = async () => {
-            await getJsonData(currentItem.path).then((data) => {
-                setData(data);
-            });
-        };
-
-        load();
-    }, [currentItem]);
-
-    useEffect(() => {
-        const res = getTablesColumns(selectors, enumTypes, t);
-        setTableColumns(res);
-    }, [selectors]);
-
-    useEffect(() => {
-        if (data) {
-            const { name, basePath, description, module } = data;
-
-            setTitle(`${name}(${basePath})`);
-            setName(name);
-            setPathController(basePath);
-            setDescription(description);
-
-            setModule(module);
-        }
-    }, [data]);
-
-    useEffect(() => {
-        const { content, id } = currentItem;
-        if (content) loadAction(content);
-        setId(id);
-    }, [currentItem]);
-
-    const getValuesToSubmit = async () => {
-        const values = { ...formik.values };
-
-        const data = await getJsonData(currentItem?.path);
-
-        const actionName = oldActionName || values.actionName;
-
-        const validPathVariables =
-            values.pathVariables &&
-            values.pathVariables.filter((item) => item.type && item.name);
-
-        const validRequestParams =
-            values.requestParams &&
-            values.requestParams.filter((item) => item.type && item.name);
-
-        const validHeaders =
-            values.headers &&
-            values.headers.filter((item) => item.type && item.header);
-
-        const newAction = {
-            ...values,
-            pathVariables: validPathVariables,
-            requestParams: validRequestParams,
-            headers: validHeaders,
-        };
-
-        const existingActions = data?.actions || [];
-        const isActionExisting = existingActions.some(
-            (dataAction) => dataAction.actionName === oldActionName
-        );
-
-        const mergedActions = existingActions.map((dataAction) =>
-            dataAction.actionName === actionName ? newAction : dataAction
-        );
-
-        const finalActions: ControllerAction[] = isActionExisting
-            ? mergedActions
-            : [...existingActions, newAction];
-
-        const newValues: ControllerConfig = {
-            type: 'controller',
-            name,
-            module,
-            description,
-            basePath: pathController,
-            actions: finalActions,
-            id,
-        };
-
-        return newValues;
-    };
-
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                formik.handleSubmit();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-
-    const handleSave = async (): Promise<void> => {
-        try {
-            if (!name || !module || !description) {
-                setIsModalOpen(true);
-                return;
-            }
-
-            const values = await getValuesToSubmit();
-
-            const { error } = await window.engine.createController(
-                values,
-                ENV_TYPES.SPRING,
-                basePath
-            );
-
-            console.log(values, error);
-
-            if (error) {
-                showErrorToast(error);
-                return;
-            }
-
-            createGitCommit(basePath, `Add action ${formik.values.actionName}`);
-
-            dispatch(onSetChangeStatus(true));
-
-            showSuccessToast(
-                t('createdSuccess', {
-                    name: t('controller'),
-                    value: values.name,
-                })
-            );
-        } catch (error: unknown) {
-            showErrorToast(error);
-        }
-    };
-
-    const handleDelete = async (): Promise<void> => {
-        try {
-            const values = await getValuesToSubmit();
-            const countActions = values.actions.length;
-
-            if (countActions === 1) {
-                const config = {
-                    name,
-                    type: 'controller',
-                    module: currentItem.module,
-                };
-
-                const { error } = await window.engine.delete(
-                    config,
-                    ENV_TYPES.SPRING,
-                    basePath
-                );
-
-                if (error) {
-                    showErrorToast(error);
-                    return;
-                }
-            } else {
-                // Remove only the current action and save the updated actions
-                const updatedActions = values.actions.filter(
-                    (dataAction) =>
-                        dataAction.actionName !== formik.values.actionName
-                );
-
-                const updatedValues = { ...values, actions: updatedActions };
-
-                const { error } = await window.engine.createController(
-                    updatedValues,
-                    ENV_TYPES.SPRING,
-                    basePath
-                );
-
-                console.log(updatedValues, error);
-
-                if (error) {
-                    showErrorToast(error);
-                    return;
-                }
-            }
-
-            createGitCommit(basePath, `Delete action ${formik.values.name}`);
-
-            // Notify of successful deletion or update
-            dispatch(onSetChangeStatus(true));
-            onCloseTab();
-            showSuccessToast(t('deletedSuccess', { name: t('controller') }));
-        } catch (error) {
-            showErrorToast(error);
-        }
-    };
-
-    const typesData = formatMethods(
-        (
-            selectors.find((selector) => 'MYME_TYPES' in selector) as
-                | { MYME_TYPES: string[] }
-                | undefined
-        )?.MYME_TYPES || []
-    );
-
-    const collectionType = formatMethods(
-        (
-            selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
-                | { COLLECTION_TYPES: string[] }
-                | undefined
-        )?.COLLECTION_TYPES || []
-    );
-
-    useEffect(() => {
-        const enumTypes = enums.map((enumItem) => {
-            return { label: enumItem.name, value: enumItem.name };
-        });
-        setEnumTypes(enumTypes);
-    }, [enums]);
-
-    const schemaTypes = useSchemaTypes(selectors, dto, enums);
-
-    const onClickSourceCode = () => {
-        initializeTabFromCurrentItem({
-            path: `${currentItem.path}`,
-            type: OPTION_TYPE.FILE_THREE,
-            label: `${currentItem.label}.json`,
-        });
-    };
 
     return (
         <form
@@ -365,8 +64,11 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
             }}
         >
             <NavigationBar
-                onDelete={handleDelete}
-                isNew={!data}
+                onDelete={() => {
+                    handleDelete();
+                    onCloseTab();
+                }}
+                isNew={!title}
                 title={title || t('createNewAction')}
                 showSourceCode={onClickSourceCode}
                 onClickBreadcrumbLink={() => setIsModalOpen(true)}
@@ -377,15 +79,14 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                 basePath={basePath}
                 mode="formik"
                 modules={modules}
-                defaultModule={module}
-                pathController={pathController}
-                endpointName={name}
-                description={description}
+                controller={controller}
                 onConfirm={(values) => {
-                    setName(values.name);
-                    setPathController(values.basePath);
-                    setModule(values.module);
-                    setDescription(values.description);
+                    setController({
+                        name: values.name,
+                        description: values.description,
+                        path: values.path,
+                        module: values.module,
+                    });
                     formik.handleSubmit();
                 }}
                 onClose={() => setIsModalOpen(false)}
@@ -408,15 +109,15 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                     options={httpMethods}
                                     placeholder={'posts'}
                                     onBlur={formik.handleBlur}
-                                    onChange={(e) => {
+                                    onChange={(e) =>
                                         formik.setFieldValue(
                                             'path',
                                             e.target.value
-                                        );
-                                    }}
-                                    onSelectValueChange={(value) => {
-                                        formik.setFieldValue('method', value);
-                                    }}
+                                        )
+                                    }
+                                    onSelectValueChange={(value) =>
+                                        formik.setFieldValue('method', value)
+                                    }
                                     classNameGlobal={cn(
                                         'w-full h-8 mb-6',
                                         formik.touched.path &&

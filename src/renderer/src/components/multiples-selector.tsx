@@ -12,6 +12,7 @@ import {
 } from './ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@renderer/lib/utils';
+import { ScrollArea } from './ui/scroll-area';
 
 type Option = {
     value: string;
@@ -41,7 +42,7 @@ export default function MultipleSelector({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                    {value.length > 0 ? (
+                    {value && value.length > 0 ? (
                         value.map((item) => (
                             <Badge
                                 key={item}
@@ -77,43 +78,57 @@ export default function MultipleSelector({
                     )}
                 </div>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-                <Command>
-                    <CommandInput placeholder={placeholder} />
-                    <CommandEmpty>No item found.</CommandEmpty>
-                    <CommandGroup>
-                        {options.map((option) => (
-                            <CommandItem
-                                key={option.value}
-                                onSelect={() => {
-                                    onChange(
-                                        value.includes(option.value)
-                                            ? value.filter(
-                                                  (item) =>
-                                                      item !== option.value
-                                              )
-                                            : [...value, option.value]
-                                    );
-                                    setOpen(true);
-                                }}
-                            >
-                                <div
-                                    className={cn(
-                                        `mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary`,
-                                        value.includes(option.value)
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'opacity-50'
-                                    )}
-                                >
-                                    {value.includes(option.value) && (
-                                        <X className="h-3 w-3" />
-                                    )}
-                                </div>
-                                {option.label}
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                </Command>
+            <PopoverContent className="w-[200px] p-0 min-w-50">
+                <ScrollArea>
+                    <div className="max-h-[60svh]">
+                        <Command>
+                            <CommandInput placeholder={placeholder} />
+                            <CommandEmpty>No item found.</CommandEmpty>
+                            <CommandGroup>
+                                {options.map((option) => (
+                                    <CommandItem
+                                        key={option.value}
+                                        onSelect={() => {
+                                            onChange(
+                                                value
+                                                    ? value.includes(
+                                                          option.value
+                                                      )
+                                                        ? value.filter(
+                                                              (item) =>
+                                                                  item !==
+                                                                  option.value
+                                                          )
+                                                        : [
+                                                              ...value,
+                                                              option.value,
+                                                          ]
+                                                    : []
+                                            );
+                                            setOpen(true);
+                                        }}
+                                    >
+                                        <div
+                                            className={cn(
+                                                `mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary`,
+                                                value &&
+                                                    value.includes(option.value)
+                                                    ? 'bg-primary text-primary-foreground'
+                                                    : 'opacity-50'
+                                            )}
+                                        >
+                                            {value &&
+                                                value.includes(
+                                                    option.value
+                                                ) && <X className="h-3 w-3" />}
+                                        </div>
+                                        {option.label}
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </Command>
+                    </div>
+                </ScrollArea>
             </PopoverContent>
         </Popover>
     );

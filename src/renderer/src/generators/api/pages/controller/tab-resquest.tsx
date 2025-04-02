@@ -1,5 +1,5 @@
-import React from 'react';
-import { addNewRow, changeValue, removeRow } from '../../helpers/helpers';
+import React, { useEffect } from 'react';
+import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { FormList } from '../../components/form-list';
 import {
     IGRPTabs,
@@ -18,6 +18,18 @@ interface TabRequestProps {
     schemaTypes?: { label: string; value: string }[];
 }
 
+const extractPathParameters = (path: string) => {
+    const paramRegex = /\{([^}]+)\}/g;
+    const parameters: string[] = [];
+    let match;
+
+    while ((match = paramRegex.exec(path)) !== null) {
+        parameters.push(match[1]);
+    }
+
+    return parameters;
+};
+
 export const TabRequest: React.FC<TabRequestProps> = ({
     formik,
     tablesColumns,
@@ -33,6 +45,37 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     const columnsQuery = tablesColumns[tabQueryParams];
     const columnsVariables = tablesColumns[tabPathVariables];
     const columnsHeaders = tablesColumns[tabHeaders];
+
+    useEffect(() => {
+        if (!formik.values.path) return;
+
+        const parameters = extractPathParameters(formik.values.path);
+        const newPathVariables = [...formik.values.pathVariables];
+
+        parameters.forEach((param) => {
+            const exists = newPathVariables.some((pv) => pv.name === param);
+
+            if (!exists) {
+                newPathVariables.push({
+                    name: param,
+                    type: 'string',
+                    value:'',
+                    isRequired: true,
+                    description: '',
+                });
+            }
+        });
+
+        const filteredVariables = newPathVariables.filter((pv) =>
+            parameters.includes(pv.name)
+        );
+
+        if (filteredVariables.length !== formik.values.pathVariables.length) {
+            formik.setFieldValue('pathVariables', filteredVariables);
+        }
+    }, [formik.values.path]);
+
+    const hasVariables = formik.values.pathVariables.length > 0;
 
     return (
         <>
@@ -83,40 +126,37 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                     name={tabQueryParams}
                                 />
                             </Card>
-                            <p className="text-sm">{t('variables')}</p>
-                            <Card className="rounded-sm">
-                                <FormList
-                                    formik={formik}
-                                    columns={columnsVariables}
-                                    data={formik.values[tabPathVariables]}
-                                    changeValue={(element, position, value) =>
-                                        changeValue(
-                                            formik,
-                                            element,
-                                            position,
-                                            value,
-                                            tabPathVariables
-                                        )
-                                    }
-                                    addRow={() =>
-                                        addNewRow(
-                                            formik,
-                                            tabPathVariables,
-                                            tabPathVariables
-                                        )
-                                    }
-                                    removeRow={(position) =>
-                                        removeRow(
-                                            formik,
-                                            tabPathVariables,
-                                            position
-                                        )
-                                    }
-                                    errors={formik.errors[tabPathVariables]}
-                                    btnLabels={t('variable')}
-                                    name={tabPathVariables}
-                                />
-                            </Card>
+                            {hasVariables && (
+                                <>
+                                    <p className="text-sm">{t('variables')}</p>
+                                    <Card className="rounded-sm">
+                                        <FormList
+                                            formik={formik}
+                                            columns={columnsVariables}
+                                            data={
+                                                formik.values[tabPathVariables]
+                                            }
+                                            changeValue={(
+                                                element,
+                                                position,
+                                                value
+                                            ) =>
+                                                changeValue(
+                                                    formik,
+                                                    element,
+                                                    position,
+                                                    value,
+                                                    tabPathVariables
+                                                )
+                                            }
+                                            errors={
+                                                formik.errors[tabPathVariables]
+                                            }
+                                            name={tabPathVariables}
+                                        />
+                                    </Card>
+                                </>
+                            )}
                         </div>
                     )}
                 </IGRPTabsContent>

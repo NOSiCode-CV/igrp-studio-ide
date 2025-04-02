@@ -11,8 +11,9 @@ import { TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import { useModel } from './useModel';
 import { FormList } from '../../components/form-list';
-import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers/helpers';
+import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
 import { btnLabels, defaultValues, TabList } from './config';
+import { useTranslation } from 'react-i18next';
 
 interface ModelProps {
     selectors: Array<any>;
@@ -25,12 +26,13 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
         formik,
         data,
         enableEntityRevision,
-        t,
         tablesColumns,
         deleteModel,
         onClickSourceCode,
         handleNameBlur
     } = useModel({ selectors, currentItem });
+
+    const { t } = useTranslation();
 
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];

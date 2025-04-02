@@ -270,7 +270,8 @@
   "manageApiEndpoints": "Manage your API endpoints",
   "newEndpoint": "New Endpoint",
   "closeSelectedTab": "Close Selected Tab",
-  "closeRight": "Close Right",
+  "closeRight": "Close to the Right",
+  "closeLeft": "Close to the Left",
   "closeOthers": "Close Others",
   "closeAll": "Close All",
   "createNewEndpoint": "Create New Endpoint",
@@ -292,8 +293,8 @@
   "params": "Params",
   "body": "Body",
   "headers": "Headers",
-  "queryParameters": "Query Parameters",
-  "variables": "Variables",
+  "queryParameters": "Query Params",
+  "variables": "Path Params",
   "queryParameter": "Query Parameter",
   "variable": "Variable",
   "addResponse": "Add a Response",
@@ -445,5 +446,7 @@
   "creating": "Creating...",
   "enableGraalVm": "Enable Graal Vm",
   "clickToChangeIcon": "Click To Change Icon",
-  "relation": "Relation"
+  "relation": "Relation",
+  "cascadeType":"Cascade Type",
+  "orphanRemoval":"Orphan Removal"
 }

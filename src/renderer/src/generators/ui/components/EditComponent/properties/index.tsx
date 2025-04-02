@@ -1,18 +1,23 @@
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import DomainForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
+import MultipleSelector from '@renderer/components/multiples-selector';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
 import { Switch } from '@renderer/components/ui/switch';
 import { cn } from '@renderer/lib/utils';
-import {
-    getLabel,
-    toFullCamelCaseFromSnakeCase,
-} from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils/helpers';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import React, { useState } from 'react';
+
+const toMap = (items: any) => {
+    return items.map((value: string) => ({
+        value,
+        label: value,
+    }));
+};
 
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     const [collapsed, setCollapsed] = useState({});
@@ -25,7 +30,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     };
 
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
-        const { enum: enumValues, type: typeDefault } = fieldConfig;
+        const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const label = getLabel(key);
         const type = enumValues ? 'enum' : typeDefault;
         const value = formValues[key];
@@ -115,12 +120,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     onChange={(value) =>
                                         handleInputChange(key, value)
                                     }
-                                    options={enumValues.map((value) => ({
-                                        value,
-                                        label: toFullCamelCaseFromSnakeCase(
-                                            value
-                                        ),
-                                    }))}
+                                    options={toMap(enumValues)}
                                     className="w-full"
                                 />
                             );
@@ -146,6 +146,16 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     onChange={(e) =>
                                         handleInputChange(key, e.target.value)
                                     }
+                                />
+                            );
+                        case 'array':
+                            return (
+                                <MultipleSelector
+                                    value={value}
+                                    onChange={(value) =>
+                                        handleInputChange(key, value)
+                                    }
+                                    options={toMap(items?.enum)}
                                 />
                             );
 
