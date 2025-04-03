@@ -30,6 +30,7 @@ build_packagedev:
 
   script:
     - yarn install --frozen-lockfile
+    - echo "CERTIFICATE_PASSWORD is set"
     - CSC_KEY_PASSWORD="${CERTIFICATE_PASSWORD}" yarn release:win
     - yarn release:linux
     #- yarn release:mac
