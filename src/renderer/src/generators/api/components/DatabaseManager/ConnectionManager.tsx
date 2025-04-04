@@ -33,14 +33,14 @@ export function ConnectionManager({ title }: { title?: string }) {
 
     useEffect(() => {
         const getConnections = async () => {
-            const connections = await window.repo.connection.findAll();
+            const connections = await window.igrpStudio.connection.findAll();
             setConnections(connections);
         };
         getConnections();
     }, []);
 
     const handleAddConnection = async (values: Connection) => {
-        await window.repo.connection.save(values);
+        await window.igrpStudio.connection.save(values);
 
         setConnections((prev) => [...prev, { ...values } as Connection]);
 
@@ -59,7 +59,7 @@ export function ConnectionManager({ title }: { title?: string }) {
 
     const handleDeleteConnection = async (name: string) => {
         setConnections((prev) => prev.filter((conn) => conn.name !== name));
-        await window.repo.connection.delete(name);
+        await window.igrpStudio.connection.delete(name);
     };
 
     const columns: ColumnDef<Connection>[] = [

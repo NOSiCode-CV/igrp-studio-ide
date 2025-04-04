@@ -14,6 +14,7 @@ import useToast from '@renderer/components/useToast';
 import { FolderOpen } from 'lucide-react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IWorkspace } from 'src/main/types';
+import { Textarea } from '@renderer/components/ui/textarea';
 
 interface CreateWorkspaceProps {
     open: boolean;
@@ -30,6 +31,8 @@ const CreateWorkspace = ({
     const { showErrorToast } = useToast();
     const [isCreating, setIsCreating] = useState(false);
     const [workspaceName, setWorkspaceName] = useState('My Workspace');
+    const [slug, setSlug] = useState('my-workspace');
+    const [workspaceDescription, setWorkspaceDescription] = useState('');
     const [directoryPath, setDirectoryPath] = useState('');
     const {
         actions: { validateWorkspaceName, createWorkspace },
@@ -61,8 +64,13 @@ const CreateWorkspace = ({
             const workspace: IWorkspace = await createWorkspace({
                 name: workspaceName,
                 path: directoryPath,
+                slug,
+                description: workspaceDescription,
             });
-            if (workspace) onSuccess(workspace);
+            if (workspace) {
+                onSuccess(workspace);
+                onOpenChange?.(false);
+            }
         } catch (error) {
             console.error('Workspace creation failed:', error);
             showErrorToast(t('workspace.createError'));
@@ -81,26 +89,13 @@ const CreateWorkspace = ({
         });
     };
 
-    // Fixed the hydration error by using div instead of nested p tags
-    const descriptionContent = (
-        <div className="space-y-2 text-sm">
-            <div>
-                This is a <strong>desktop development environment</strong> where you can create and manage multiple
-                applications using different frameworks.
-            </div>
-            <div>
-                Each workspace can contain one or more projects of different types (Spring boot, Nextjs, etc.).
-            </div>
-        </div>
-    );
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange} modal>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>{t('workspace.createTitle')}</DialogTitle>
-                    <DialogDescription asChild>
-                        {descriptionContent}
+                    <DialogDescription className="text-xs">
+                        Create a new workspace to organize your projects.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -115,6 +110,29 @@ const CreateWorkspace = ({
                             onChange={(e) => setWorkspaceName(e.target.value)}
                             placeholder={t('workspace.namePlaceholder')}
                             autoFocus
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="slug">{t('workspace.slug')}</Label>
+                        <Input
+                            id="slug"
+                            value={slug}
+                            onChange={(e) => setSlug(e.target.value)}
+                            placeholder={t('workspace.slug')}
+                        />
+                    </div>
+
+                    <div className="compact-form-field space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                            id="description"
+                            placeholder="Describe your workspace..."
+                            value={workspaceDescription}
+                            onChange={(e) =>
+                                setWorkspaceDescription(e.target.value)
+                            }
+                            className="h-20 text-sm py-1.5 px-2"
                         />
                     </div>
 

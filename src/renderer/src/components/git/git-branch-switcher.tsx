@@ -32,6 +32,7 @@ import {
 import { RootState } from '@renderer/redux';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '../ui/badge';
 
 export interface Branch {
     name: string;
@@ -57,7 +58,7 @@ export function BranchSwitcher({
 }: BranchSwitcherProps) {
     const dispatch = useDispatch();
     const { t } = useTranslation();
-    
+
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreatingBranch, setIsCreatingBranch] = useState(false);
@@ -123,14 +124,13 @@ export function BranchSwitcher({
         return (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button
-                        variant="ghost"
+                    <button
                         onClick={handleInitGit}
-                        className="justify-between"
+                        className="flex items-center border rounded px-1.5 py-0.5 text-xs gap-1 ml-2"
                     >
-                        <GitFork className="mr-2 h-4 w-4" />
+                        <GitFork className="mr-2 h-3 w-3" />
                         {t('initGit')}
-                    </Button>
+                    </button>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{t('initializeGit')}</p>
@@ -193,16 +193,15 @@ export function BranchSwitcher({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="ghost"
+                <button
                     role="combobox"
                     aria-expanded={open}
-                    className="justify-between"
+                    className="flex items-center border rounded px-1.5 py-0.5 text-xs gap-1 ml-2"
                 >
                     <GitBranch className="mr-2 h-4 w-4" />
                     {activeBranch || t('selectBranch')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
+                </button>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">
                 <Command>

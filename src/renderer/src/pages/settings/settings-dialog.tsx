@@ -73,7 +73,7 @@ export function SettingsDialog() {
                 </TooltipTrigger>
                 <TooltipContent>{t('settings')}</TooltipContent>
             </Tooltip>
-            <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px] max-w-2xl">
+            <DialogContent className="overflow-hidden p-0 md:max-h-[500px] sm:max-w-[600px] md:max-w-[700px] max-w-4xl">
                 <DialogHeader className="pb-3">
                     <DialogTitle className="sr-only">
                         {t('settings')}

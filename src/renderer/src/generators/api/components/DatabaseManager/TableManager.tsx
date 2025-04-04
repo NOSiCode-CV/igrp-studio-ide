@@ -64,7 +64,7 @@ export function TableManager({
 
     useEffect(() => {
         const getConnections = async () => {
-            const connections = await window.repo.connection.findAll();
+            const connections = await window.igrpStudio.connection.findAll();
             const maps = connections.map((conn: Connection) => {
                 return {
                     label: conn.name,
@@ -112,7 +112,7 @@ export function TableManager({
 
         try {
             const { success, tables, message } =
-                await window.api.getTables(connectionName);
+                await window.igrpStudio.connection.getTables(connectionName);
             if (success) {
                 const tablesArr = tables
                     .filter((table: string) => !ignoreTables.includes(table))
@@ -137,7 +137,10 @@ export function TableManager({
     const handleTableSelect = async (table: string) => {
         setSelectedTable(table);
         const { success, message, structure } =
-            await window.api.getTableStructure(selectedConnection, table);
+            await window.igrpStudio.connection.getTableStructure(
+                selectedConnection,
+                table
+            );
         if (!success) showErrorToast(message);
         setPreviewColumns(structure);
     };
@@ -157,12 +160,10 @@ export function TableManager({
                         table.getIsAllPageRowsSelected() ||
                         (table.getIsSomePageRowsSelected() && 'indeterminate')
                     }
-                    onCheckedChange={(value) =>
-                       {
-                        table.toggleAllPageRowsSelected(!!value)
+                    onCheckedChange={(value) => {
+                        table.toggleAllPageRowsSelected(!!value);
                         handleSelectAll(!!value);
-                       }
-                    }
+                    }}
                     aria-label={t('selectAll')}
                 />
             ),

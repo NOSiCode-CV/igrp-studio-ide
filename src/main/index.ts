@@ -16,6 +16,7 @@ import { FileTree, HandlerResponse, IOpenProject } from './types';
 
 import {
     checkAndReadBaseApi,
+    getFileContent,
     getJsonContent,
     openDirectory,
     readDirectory,
@@ -34,6 +35,7 @@ import './handlers/api-handler';
 import './handlers/db-handler';
 import './handlers/workspace-handler';
 import './handlers/git-handler';
+import './handlers/docker-handler';
 
 import { buildTaskbar } from './helpers/taskbar';
 import {
@@ -190,13 +192,13 @@ app.whenReady().then(async () => {
     const initializeGitHubService = async () => {
         try {
             await GitHubService.initializeServices();
-        } catch {}
+        } catch { }
     };
 
     const initializeGitLabService = async () => {
         try {
             await GitLabService.initializeServices();
-        } catch {}
+        } catch { }
     };
 
     const initializeAllServices = async () => {
@@ -354,6 +356,13 @@ ipcMain.handle(
     'igrp-studio:get-json-content',
     async (_event, filePath: string): Promise<any> => {
         return await getJsonContent(filePath);
+    }
+);
+
+ipcMain.handle(
+    'igrp-studio:get-file-content',
+    async (_event, filePath: string): Promise<any> => {
+        return await getFileContent(filePath);
     }
 );
 

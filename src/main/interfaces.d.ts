@@ -7,21 +7,26 @@ export interface IWorkspaceRepository {
     updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>;
     deleteWorkspace(id: string): Promise<void>;
     getWorkspace(id: string): Promise<IWorkspace | undefined>;
-    listWorkspaces(): Promise<IWorkspace[]>;
-    getRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
+    findAllWorkspaces(): Promise<IWorkspace[]>;
+    findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
 
     // Project Operations
-    addProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData>;
+    saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData>;
     updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
     deleteProject(projectId: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
-    listProjects(workspaceId?: string): Promise<ProjectData[]>;
+    findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
     getRecentProjects(workspaceId: string, limit?: number): Promise<ProjectData[]>;
 
     // Utility Methods
     initialize(): Promise<void>;
     backupData(backupPath: string): Promise<void>;
     restoreData(backupPath: string): Promise<void>;
+
+    onError (callback: (error: {
+        code: string;
+        message: string
+    }) => void) ;
 }
 
 export interface IProjectRepository {
@@ -36,6 +41,10 @@ export interface IConnenctionRepository {
     async delete(connectionName: string): Promise<void>;
     async findAll(): Promise<Array<Connection>>;
     async findOne(name: string): Promise<Connection>;
+
+    connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
+    getTables: (connectionName: string) => Promise<DatabaseResponse>,
+    getTableStructure: (connectionName: string, tableName: string) => Promise<DatabaseResponse>,
 }
 
 export interface BaseEngine {
@@ -58,4 +67,33 @@ export interface BaseEngine {
     getComponents?(): Record<string, Component>;
 
     getDependencies?(): Promise<Dependency[]>
+}
+
+
+export interface IBaseEngine {
+    createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
+    createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createModule: (moduleConfig: ModuleConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createModel: (modelConfig: ModelConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createDto: (dtoConfig: DTOConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createController: (controllerConfig: ControllerConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+
+    createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    registryComponent: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    getComponent: (engineType: string) => Promise<HandlerResponse>;
+    getComponent: (engineType: string) => Promise<Record<string, Component>>;
+
+    getDependencies: (engineType: string) => Promise<HandlerResponse>;
+}
+
+export interface IDocker {
+    up: (projectPath: string) => Promise<ContainerInfo[]>;
+    down: (projectPath: string) => Promise<ContainerInfo[]>;
+    status: (projectPath: string) => Promise<ContainerInfo[]>;
 }

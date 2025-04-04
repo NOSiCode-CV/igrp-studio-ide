@@ -21,6 +21,9 @@ const api = {
 	getJsonContent: (filePath: string) =>
 		ipcRenderer.invoke('igrp-studio:get-json-content', filePath),
 
+	getFileContent: (filePath: string) =>
+		ipcRenderer.invoke('igrp-studio:get-file-content', filePath),
+
 	readDirectory: (basePath: string) => ipcRenderer.invoke("read-directory", basePath),
 
 	readProjectFile: (filePath: string) => ipcRenderer.invoke("read-file", filePath),
@@ -29,19 +32,6 @@ const api = {
 	getIDEs: () => ipcRenderer.invoke('igrp-studio:ides'),
 
 	getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
-
-	//Database
-	connectToDatabase: async (config: Connection): Promise<DatabaseResponse> => {
-		return await ipcRenderer.invoke('connect-database', config)
-	},
-
-	getTables: async (connectionName: string): Promise<DatabaseResponse> => {
-		return await ipcRenderer.invoke('get-tables', connectionName)
-	},
-
-	getTableStructure: async (connectionName: string, tableName: string): Promise<DatabaseResponse> => {
-		return await ipcRenderer.invoke('get-table-structure', connectionName, tableName)
-	},
 
 	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
 }
@@ -159,7 +149,7 @@ const repo = {
 		// Project methods
 		findAllRecentProjects: (limit?: number) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, limit),
-		saveProject: (project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>, workspaceId: string) =>
+		saveProject: (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project),
 		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
@@ -208,7 +198,23 @@ const repo = {
 		},
 		delete: (connection: Connection) => {
 			return ipcRenderer.invoke('igrp-studio:repo:connection.delete', connection)
-		}
+		},
+		connectToDatabase: async (config: Connection): Promise<DatabaseResponse> => {
+			return await ipcRenderer.invoke('connect-database', config)
+		},
+
+		getTables: async (connectionName: string): Promise<DatabaseResponse> => {
+			return await ipcRenderer.invoke('get-tables', connectionName)
+		},
+
+		getTableStructure: async (connectionName: string, tableName: string): Promise<DatabaseResponse> => {
+			return await ipcRenderer.invoke('get-table-structure', connectionName, tableName)
+		},
+	},
+	docker: {
+		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
+		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
+		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
 	}
 }
 

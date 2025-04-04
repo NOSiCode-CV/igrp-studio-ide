@@ -18,7 +18,6 @@ const selectState = (state: RootState) => state.PageBuilder;
 export const useWorkspace = () => {
     const { showSuccessToast, showErrorToast } = useToast();
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
-    const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const dispatch: any = useDispatch()
@@ -32,6 +31,8 @@ export const useWorkspace = () => {
     );
 
     const { workspace } = useSelector(selectProperties);
+
+    const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(workspace)
 
     // Setup workspace and error handling
     useEffect(() => {
@@ -53,12 +54,7 @@ export const useWorkspace = () => {
 
         initialize();
 
-        const handleUpdate = () => refreshWorkspaces();
-        window.addEventListener('workspace-updated', handleUpdate);
-
-        return () => {
-            window.removeEventListener('workspace-updated', handleUpdate);
-        };
+        refreshWorkspaces()
     }, []);
 
     const getWorkspaces = async () => {
@@ -72,9 +68,10 @@ export const useWorkspace = () => {
     const refreshWorkspaces = async () => {
         setLoading(true);
         try {
-            const data = await getWorkspaces();
-            setWorkspaces(data);
-            markWorkspaceAccessed(data)
+            await getWorkspaces().then((data) => {
+                setWorkspaces(data);
+                markWorkspaceAccessed(data)
+            });
         } catch (err) {
             showErrorToast('Failed to load workspaces');
         } finally {
@@ -92,7 +89,7 @@ export const useWorkspace = () => {
 
             setWorkspaces(prev => [...prev, newWorkspace]);
 
-            setCurrentWorkspace(newWorkspace);
+            dispatch(setWorkspace(newWorkspace))
 
             showSuccessToast(`Workspace "${newWorkspace.name}" created`);
 
@@ -118,16 +115,12 @@ export const useWorkspace = () => {
     const updateWorkspace = async (id: string, updates: Partial<IWorkspace>) => {
         setLoading(true);
         try {
+
             const updated = await window.igrpStudio.workspace.updateWorkspace(id, updates);
+
             setWorkspaces(prev =>
                 prev.map(w => w.id === id ? updated : w)
             );
-
-            if (currentWorkspace?.id === id) {
-                setCurrentWorkspace(updated);
-            }
-
-            showSuccessToast(`Workspace "${updated.name}" saved`);
 
             return updated;
         } catch (err) {
@@ -144,11 +137,6 @@ export const useWorkspace = () => {
         try {
             await window.igrpStudio.workspace.deleteWorkspace(id);
             setWorkspaces(prev => prev.filter(w => w.id !== id));
-
-            if (currentWorkspace?.id === id) {
-                setCurrentWorkspace(null);
-            }
-
             showSuccessToast('Workspace removed');
         } catch (err) {
             setError('Failed to delete workspace');
@@ -159,11 +147,12 @@ export const useWorkspace = () => {
         }
     };
 
-    const switchWorkspace = async (workspace: IWorkspace) => {
-        if (!workspace) return
-        setCurrentWorkspace(workspace);
-        dispatch(setWorkspace(workspace))
-        await window.igrpStudio.workspace.updateWorkspace(workspace.id, workspace);
+    const switchWorkspace = async (upWorkspace: IWorkspace) => {
+        if (currentWorkspace?.id === upWorkspace.id) return
+
+        setCurrentWorkspace(upWorkspace)
+        dispatch(setWorkspace(upWorkspace))
+        updateWorkspace(upWorkspace.id, upWorkspace)
     };
 
     const validateWorkspaceName = (name: string) => {
@@ -179,7 +168,7 @@ export const useWorkspace = () => {
         if (id)
             await window.igrpStudio.workspace.updateProject(id, project);
         else
-            await window.igrpStudio.workspace.saveProject(project, workspace?.id);
+            await window.igrpStudio.workspace.saveProject(workspace?.id, project);
 
         dispatch(setBasePath(project.path));
 

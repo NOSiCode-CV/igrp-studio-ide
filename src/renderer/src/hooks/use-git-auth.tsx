@@ -15,7 +15,6 @@ const useGitAuth = () => {
         const processGitHubUserInfo = async () => {
             try {
                 const userGitHub = await window.electron.ipcRenderer.invoke('github-user-info');
-                console.log("userGitHub", userGitHub);
                 if (userGitHub) {
                     dispatch(setUserGithub(userGitHub));
                 }
@@ -27,7 +26,6 @@ const useGitAuth = () => {
         const processGitLabUserInfo = async () => {
             try {
                 const userGitLab = await window.electron.ipcRenderer.invoke('gitlab-user-info');
-                console.log("userGitLab", userGitLab);
                 if (userGitLab) {
                     dispatch(setUserGitLab(userGitLab));
                 }

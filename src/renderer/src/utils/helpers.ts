@@ -4,6 +4,8 @@ import { ROUTES } from '@renderer/routes/routeConstants'
 import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 import { v4 as uuidv4 } from 'uuid';
+import i18next from 'i18next';
+import { enUS, pt } from 'date-fns/locale';
 
 export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
@@ -172,3 +174,12 @@ export function getLabel(name: string): string {
 		)
 		.join(' ');
 }
+
+export const getLocale = () => {
+	switch (i18next.language) {
+		case 'pt':
+			return pt;
+		default:
+			return enUS;
+	}
+};

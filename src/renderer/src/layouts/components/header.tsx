@@ -3,13 +3,12 @@ import { useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
+    ArrowLeftCircle,
     Bell,
-    Book,
     Code,
-    Github,
     Maximize2,
-    MessageCircle,
     Minus,
+    Play,
     Square,
     X,
 } from 'lucide-react';
@@ -38,8 +37,17 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@renderer/components/ui/breadcrumb';
 import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { useDocker } from '@renderer/hooks/use-docker';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -53,6 +61,9 @@ const Header = ({ config, basePath }: HeaderProps) => {
     const { showErrorToast, showSuccessToast } = useToast();
     const isMac =
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
+
+    const { workspace } = useWorkspace();
+    const { startContainers } = useDocker();
 
     const navigate = useNavigate();
 
@@ -128,25 +139,17 @@ const Header = ({ config, basePath }: HeaderProps) => {
         </button>
     );
 
-    const handleDiscord = () => {
-        window.electron.ipcRenderer.send(
-            'open-external-url',
-            'https://discord.com/invite/dywFBFaCQr'
-        );
-    };
-    const handleGithub = () => {
-        window.electron.ipcRenderer.send(
-            'open-external-url',
-            'https://github.com/NOSiCode-CV/igrp-studio-ide'
-        );
+    const handleRun = async () => {
+        if (!workspace?.path) return;
+        try {
+            await startContainers(workspace.path);
+        } catch (error) {
+            console.error(error);
+            showErrorToast(t('runProjectError'));
+        }
     };
 
-    const handleDocumentation = () => {
-        window.electron.ipcRenderer.send(
-            'open-external-url',
-            'https://docs.igrp.cv'
-        );
-    };
+    const isProjectAtive = config?.name !== undefined && config?.name !== null;
 
     return (
         <>
@@ -170,130 +173,97 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                     {import.meta.env.VITE_APP_TITLE}
                                 </p>
                             </div>
-                            <div>
-                                {config?.name && (
-                                    <div className="flex justify-center gap-2 items-center">
-                                        <BranchSwitcher
-                                            projectPath={basePath || ''}
-                                            onError={showErrorToast}
-                                            onSuccess={showSuccessToast}
-                                            onBranchChange={() => {
-                                                dispatch(
-                                                    onGetPages(basePath || '')
-                                                );
-                                            }}
-                                        />
-                                        {isGitEnabled && (
-                                            <SyncButton
-                                                basePath={basePath || ''}
-                                            />
-                                        )}
-                                    </div>
-                                )}
-                            </div>
+
+                            {isProjectAtive && (
+                                <Breadcrumb>
+                                    <BreadcrumbList>
+                                        <BreadcrumbItem>
+                                            <BreadcrumbLink href="/#">
+                                                <ArrowLeftCircle className="h-4 w-4" />
+                                            </BreadcrumbLink>
+                                        </BreadcrumbItem>
+                                        <BreadcrumbItem>
+                                            <BreadcrumbPage>
+                                                {workspace?.name}
+                                            </BreadcrumbPage>
+                                        </BreadcrumbItem>
+                                        <BreadcrumbSeparator />
+                                        <BreadcrumbItem>
+                                            <BreadcrumbPage>
+                                                {config?.name}
+                                            </BreadcrumbPage>
+                                        </BreadcrumbItem>
+                                    </BreadcrumbList>
+                                </Breadcrumb>
+                            )}
                         </div>
                         <div className="flex items-center space-x-2 ">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 text-xs gap-1"
+                                        onClick={handleRun}
+                                    >
+                                        <Play className="h-3 w-3 text-green-500" />
+                                        Run
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{t('Run')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <BranchSwitcher
+                                projectPath={basePath || ''}
+                                onError={showErrorToast}
+                                onSuccess={showSuccessToast}
+                                onBranchChange={() => {
+                                    dispatch(onGetPages(basePath || ''));
+                                }}
+                            />
+
+                            {isGitEnabled && (
+                                <SyncButton basePath={basePath || ''} />
+                            )}
+
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost">
+                                                <Code />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{t('openOnEditor')}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <DropdownMenuContent align="end">
+                                    {installedIDEs.map(
+                                        ({ key, config }, index) => {
+                                            return (
+                                                <DropdownMenuItem
+                                                    key={index}
+                                                    onClick={() => openIDE(key)}
+                                                    className="flex items-center"
+                                                >
+                                                    <IGRPIcon
+                                                        iconName={config.icon}
+                                                    />
+                                                    <span>
+                                                        Open in {config.name}
+                                                    </span>
+                                                </DropdownMenuItem>
+                                            );
+                                        }
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
                             <ModeToggle />
-
-                            {config?.name && (
-                                <DropdownMenu>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost">
-                                                    <Code />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{t('openOnEditor')}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                    <DropdownMenuContent align="end">
-                                        {installedIDEs.map(
-                                            ({ key, config }, index) => {
-                                                return (
-                                                    <DropdownMenuItem
-                                                        key={index}
-                                                        onClick={() =>
-                                                            openIDE(key)
-                                                        }
-                                                        className="flex items-center"
-                                                    >
-                                                        <IGRPIcon
-                                                            iconName={
-                                                                config.icon
-                                                            }
-                                                        />
-                                                        <span>
-                                                            Open in{' '}
-                                                            {config.name}
-                                                        </span>
-                                                    </DropdownMenuItem>
-                                                );
-                                            }
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            )}
-
-                            {!config?.name && (
-                                <>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={handleGithub}
-                                            >
-                                                <Github className="w-5 h-5" />
-                                                <span className="sr-only">
-                                                    {t('github')}
-                                                </span>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{t('github')}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={handleDiscord}
-                                            >
-                                                <MessageCircle className="w-5 h-5" />
-                                                <span className="sr-only">
-                                                    {t('discord')}
-                                                </span>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{t('discord')}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={handleDocumentation}
-                                            >
-                                                <Book className="w-5 h-5" />
-                                                <span className="sr-only">
-                                                    {t('documentation')}
-                                                </span>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{t('documentation')}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </>
-                            )}
 
                             <SettingsDialog />
 

@@ -2,7 +2,7 @@
   "welcome": "Welcome to IGRP Studio",
   "selectProject": "Select Project",
   "start": "Start",
-  "createNewProject": "Create New Project",
+  "createNewProject": "New Project",
   "openProject": "Open Project",
   "recent": "Recent Projects",
   "loadMore": "••• Load More •••",
@@ -447,6 +447,9 @@
   "enableGraalVm": "Enable Graal Vm",
   "clickToChangeIcon": "Click To Change Icon",
   "relation": "Relation",
-  "cascadeType":"Cascade Type",
-  "orphanRemoval":"Orphan Removal"
+  "cascadeType": "Cascade Type",
+  "orphanRemoval": "Orphan Removal",
+  "projects": "Projects",
+  "newService": "New Service",
+  "services": "Services"
 }

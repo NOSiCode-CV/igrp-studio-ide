@@ -157,7 +157,7 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.GET, async (event, projectId: string) =
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_ALL, async (_, workspaceId?: string) => {
     try {
-        return await repo.listProjects(workspaceId);
+        return workspaceId ? await repo.listProjects(workspaceId) : []
     } catch (error) {
         console.error('Failed to fetch projects:', error);
         return [];

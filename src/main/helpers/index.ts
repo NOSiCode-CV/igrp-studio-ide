@@ -83,6 +83,15 @@ export async function getJsonContent(filePath: string): Promise<any> {
     }
 }
 
+export async function getFileContent(filePath: string): Promise<any> {
+    try {
+        return fs.readFileSync(filePath, 'utf-8');
+    } catch (err) {
+        console.error('Error reading JSON file:', err);
+        return null;
+    }
+}
+
 export function addNumbers(a: number, b: number) {
     return a + b;
 }

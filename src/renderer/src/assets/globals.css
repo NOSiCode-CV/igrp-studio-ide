@@ -6,12 +6,11 @@
 */
 @custom-variant dark (&:is(.dark *));
 
-
 @layer utilities {
     header {
       -webkit-app-region: drag;
     }
-  
+
     header button,
     header .home {
       -webkit-app-region: no-drag;
@@ -53,7 +52,6 @@
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
 
-  
     --custom-pattern: linear-gradient(90deg, #fcfcfc 9px, transparent 1%) center, 
     linear-gradient(#fcfcfc 9px, transparent 1%) center, 
     #9DADC3;
@@ -69,7 +67,7 @@
     --igrp-default: #008054;
     --igrp-dark: #3AA0D9;
   }
-  
+
   .dark {
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
@@ -104,7 +102,7 @@
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
   }
-  
+
   @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -147,7 +145,7 @@
 
      /* Custom Colors */
     --color-igrp:var(--igrp-default);
-  
+
     @keyframes accordion-down {
       from {
         height: 0;
@@ -156,7 +154,7 @@
         height: var(--radix-accordion-content-height);
       }
     }
-  
+
     @keyframes accordion-up {
       from {
         height: var(--radix-accordion-content-height);
@@ -166,7 +164,7 @@
       }
     }
   }
-  
+
   @layer base {
     * {
       @apply border-border outline-ring/50;

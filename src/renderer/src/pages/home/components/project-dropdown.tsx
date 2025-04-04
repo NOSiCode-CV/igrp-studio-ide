@@ -46,7 +46,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
     return (
         <>
             <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-center rounded-md p-2 hover:bg-igrp-light">
+                <DropdownMenuTrigger className="flex items-center justify-center rounded-md p-2 hover:bg-igrp hover:text-white text-muted-foreground">
                     <EllipsisVertical className="w-4 h-4" />
                 </DropdownMenuTrigger>
 

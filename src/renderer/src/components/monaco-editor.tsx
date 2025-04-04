@@ -124,6 +124,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
 
     return (
         <Editor
+            path={filePath}
             height={height}
             theme={editorTheme}
             value={content}

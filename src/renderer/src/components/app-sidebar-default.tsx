@@ -88,19 +88,22 @@ const IGRPSidebarContent = React.forwardRef<
     );
 
     return (
-        <SidebarContent ref={ref} {...props} className={cn('gap-0', className)}>
-            <ScrollArea className="h-[calc(100vh-16rem)]">
+        <SidebarContent ref={ref} {...props} className={cn('gap-0 py-3', className)}>
+            <ScrollArea className="h-[calc(100svh-var(--header-height-two))]">
                 <div className="flex flex-col h-full px-3">
-                    {children}
                     {searchActive && (
-                        <div className="mb-4 group-data-[collapsible=icon]:hidden">
+                        <div className="group-data-[collapsible=icon]:hidden">
                             <IGRPInputSearch
                                 name="inputseach"
                                 value={searchTerm}
+                                showSubmitButton={false}
+                                placeholder='Search'
                                 onChange={(value) => setSearchTerm(value)}
                             />
                         </div>
                     )}
+
+                    {children}
 
                     {renderMenu(filteredItems, null)}
                 </div>

@@ -45,7 +45,33 @@ import { LabelRequired } from '@renderer/components/label-required';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 
-export function ProjectWizard() {
+interface ConfigComponentProps {
+    data: any; // Replace `any` with a specific type if possible (e.g., `ProjectData`)
+    errors?: FormikErrors<ProjectData>;
+    onChange: (config: any) => void;
+}
+
+type ConfigComponent = React.FC<ConfigComponentProps>;
+
+const componentsMap: Record<string, ConfigComponent> = {
+    springboot: SpringConfig,
+    nextjs: NextConfig,
+    dotnet: DotNetConfig,
+};
+
+export const ProjectConfigForm = ({
+    type,
+    data,
+    errors,
+    onChange,
+}: {
+    type: string;
+} & ConfigComponentProps) => {
+    const Component = componentsMap[type];
+    return <Component data={data} errors={errors} onChange={onChange} />;
+};
+
+export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     const [open, setOpen] = React.useState(false);
     const [step, setStep] = React.useState(1);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
@@ -125,15 +151,6 @@ export function ProjectWizard() {
         };
         reader.readAsDataURL(file);
     };
-
-    const componentsMap: Record<
-        string,
-        React.FC<{
-            data: any;
-            errors?: FormikErrors<ProjectData>;
-            onChange: (config: any) => void;
-        }>
-    > = { springboot: SpringConfig, nextjs: NextConfig, dotnet: DotNetConfig };
 
     const isFrontend = formik.values.type === 'frontend';
 
@@ -453,7 +470,8 @@ export function ProjectWizard() {
                 <>
                     <Label>{t('frameworkConfiguration')}</Label>
                     <div className="mt-3">
-                        <SelectedComponent
+                        <ProjectConfigForm
+                            type={formik.values.framework}
                             data={formik.values.config}
                             errors={formik.errors}
                             onChange={(config) =>
@@ -572,13 +590,20 @@ export function ProjectWizard() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    {t('createNewProject')}
-                </Button>
+                {children ? (
+                    children
+                ) : (
+                    <Button
+                        variant="outline"
+                        className="bg-igrp text-primary-foreground"
+                    >
+                        <PlusCircle className="w-4 h-4" />
+                        {t('createNewProject')}
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent
-                className="overflow-hidden max-h-[80svh] md:max-w-[700px] lg:max-w-[800px] p-0 max-w-2xl"
+                className="overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] p-0 max-w-4xl"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >

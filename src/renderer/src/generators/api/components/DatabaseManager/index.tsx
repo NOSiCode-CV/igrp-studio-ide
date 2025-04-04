@@ -80,7 +80,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
 
             try {
                 const { success, message, structure } =
-                    await window.api.getTableStructure(
+                    await window.igrpStudio.connection.getTableStructure(
                         selectedConnection,
                         tableName
                     );

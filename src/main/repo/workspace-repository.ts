@@ -4,13 +4,12 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { IWorkspace, ProjectData } from '../types';
-import { IWorkspaceRepository } from '../interfaces';
 import { newWorkspace as engineNewWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
 
-export class WorkspaceRepository implements IWorkspaceRepository {
+export class WorkspaceRepository {
 
     private async ensureFileExists(filePath: string, defaultContent: string): Promise<void> {
         if (!fs.existsSync(filePath)) {
@@ -45,12 +44,12 @@ export class WorkspaceRepository implements IWorkspaceRepository {
             projects: []
         };
 
-        const {path,createdAt, ...baseConfigWorkspace }=newWorkspace;
+        const { path, createdAt, ...baseConfigWorkspace } = newWorkspace;
 
         data.workspaces.push(newWorkspace);
 
         try {
-            await engineNewWorkspace({...baseConfigWorkspace, id: Math.random().toString(36).slice(2, 12)}, workspace.path)
+            await engineNewWorkspace({ ...baseConfigWorkspace, id: Math.random().toString(36).slice(2, 12) }, workspace.path)
         } catch (error) {
             throw error
         }
@@ -59,12 +58,12 @@ export class WorkspaceRepository implements IWorkspaceRepository {
         return newWorkspace;
     }
 
-    async updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace> {
+    async updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace | null> {
         const data = await this.loadData();
         const workspace = data.workspaces.find(w => w.id === id);
 
         if (!workspace) {
-            throw new Error(`Workspace ${id} not found`);
+            return null
         }
 
         const updatedWorkspace = {
@@ -217,7 +216,7 @@ export class WorkspaceRepository implements IWorkspaceRepository {
     }
 
     async getRecentProjects(workspaceId: string, limit = 5): Promise<ProjectData[]> {
-        const projects = await this.listProjects(workspaceId);
+        const projects: any = await this.listProjects(workspaceId);
         return projects
             .sort((a, b) => {
                 const dateA = new Date(a.updatedAt || a.createdAt);

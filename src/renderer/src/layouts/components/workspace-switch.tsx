@@ -1,7 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, DiamondIcon, Plus } from 'lucide-react';
+import {
+    Check,
+    FolderKanban,
+    ListFilter,
+    Plus,
+} from 'lucide-react';
 
 import {
     DropdownMenu,
@@ -23,13 +28,15 @@ import CreateWorkspace from '@renderer/pages/home/components/create-workspace';
 export function WorkspaceSwitcher({
     workspaces,
     defaultWorkspace,
+    onWorkspaceChange,
 }: {
     workspaces: IWorkspace[];
     defaultWorkspace: IWorkspace;
+    onWorkspaceChange: (workspace: IWorkspace) => void;
 }) {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = React.useState(false);
 
-    const [selectedVersion, setSelectedVersion] =
+    const [selectedWorkspace, setSelectedWorkspace] =
         React.useState<IWorkspace>(defaultWorkspace);
     const [searchTerm, setSearchTerm] = React.useState<string>('');
     const [filteredWorkspaces, setFilteredWorkspaces] = React.useState<
@@ -42,51 +49,48 @@ export function WorkspaceSwitcher({
         );
         setFilteredWorkspaces(result);
 
-        setSelectedVersion(defaultWorkspace)
+        setSelectedWorkspace(defaultWorkspace);
     }, [searchTerm, defaultWorkspace]);
 
     const handleCreationSuccess = () => {};
 
     return (
         <>
-            <SidebarMenu className="mt-2">
+            <SidebarMenu className='mt-3'>
                 <SidebarMenuItem>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <SidebarMenuButton
-                                size="lg"
-                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5"
                             >
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground">
-                                    <DiamondIcon className="size-4" />
-                                </div>
-                                <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="">
-                                        {selectedVersion.name}
-                                    </span>
-                                </div>
-                                <ChevronsUpDown className="ml-auto" />
+                                <FolderKanban className="h-4 w-4 flex-shrink-0" />
+                                <span className="">{selectedWorkspace.name}</span>
+                                <ListFilter className="ml-auto h-3 w-3" />
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                            className="w-[--radix-dropdown-menu-trigger-width] min-w-72 rounded-lg"
                             align="start"
+                            side={'right'}
+                            sideOffset={4}
                         >
                             <IGRPInputSearch
                                 name="inputseach"
                                 value={searchTerm}
+                                showSubmitButton={false}
+                                placeholder='Search workspaces'
                                 onChange={(value) => setSearchTerm(value)}
                             />
                             {filteredWorkspaces.map((workspace, index) => (
                                 <DropdownMenuItem
                                     key={index}
                                     onSelect={() =>
-                                        setSelectedVersion(workspace)
+                                        onWorkspaceChange(workspace)
                                     }
                                 >
                                     {workspace.name}
 
-                                    {workspace.name === selectedVersion.name ? (
+                                    {workspace.name === selectedWorkspace.name ? (
                                         <Check className="ml-auto" />
                                     ) : (
                                         <DropdownMenuShortcut>

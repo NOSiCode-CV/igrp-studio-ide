@@ -36,6 +36,12 @@ export const supportChannels = [
         icon: 'https://www.svgrepo.com/show/521128/email-1.svg',
         iconClassName: 'hover:opacity-80',
     },
+    {
+        name: 'Github',
+        href: 'https://github.com/NOSiCode-CV/igrp-studio-ide',
+        icon: 'https://www.svgrepo.com/show/475654/github-color.svg',
+        iconClassName: 'hover:opacity-80',
+    },
 ];
 
 export interface SupportContentProps {
@@ -62,7 +68,7 @@ export default function SupportContent({}: SupportContentProps) {
                     <p className="text-muted-foreground">
                         {t('supportDescription')}
                     </p>
-                    <div className="mt-4 flex justify-center gap-6">
+                    <div className="mt-4 flex justify-center gap-2">
                         {supportChannels.map((channel) => (
                             <Tooltip key={channel.name}>
                                 <TooltipTrigger asChild>
@@ -81,7 +87,7 @@ export default function SupportContent({}: SupportContentProps) {
                                                 '/placeholder.svg'
                                             }
                                             alt={channel.name}
-                                            className="h-6 w-6"
+                                            className="h-5 w-5"
                                         />
                                     </Button>
                                 </TooltipTrigger>

@@ -59,6 +59,7 @@ export interface IWorkspace {
     id: string;
     name: string;
     path: string;
+    slug: string;
     description?: string;
     createdAt: string;
     updatedAt?: string;
