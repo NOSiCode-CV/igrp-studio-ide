@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { FormList } from '../../components/form-list';
 import {
@@ -7,8 +7,9 @@ import {
     IGRPTabsList,
     IGRPTabsTrigger,
 } from '@renderer/components/tabs';
-import { JSONSchema } from '../../types/schema';
 import { BodyRequest } from './body-request';
+import { useTranslation } from 'react-i18next';
+import { Card } from '@renderer/components/ui/card';
 
 interface TabRequestProps {
     formik: any;
@@ -17,17 +18,25 @@ interface TabRequestProps {
     schemaTypes?: { label: string; value: string }[];
 }
 
+const extractPathParameters = (path: string) => {
+    const paramRegex = /\{([^}]+)\}/g;
+    const parameters: string[] = [];
+    let match;
+
+    while ((match = paramRegex.exec(path)) !== null) {
+        parameters.push(match[1]);
+    }
+
+    return parameters;
+};
+
 export const TabRequest: React.FC<TabRequestProps> = ({
     formik,
     tablesColumns,
     contentTypes,
     schemaTypes,
 }) => {
-    const [bodyType, setBodyType] = useState<
-        'none' | 'multipart/form-data' | 'application/json'
-    >();
-
-    const [contentType, setContentType] = useState('application/json');
+    const { t } = useTranslation();
 
     const tabQueryParams = 'requestParams';
     const tabPathVariables = 'pathVariables';
@@ -37,168 +46,126 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     const columnsVariables = tablesColumns[tabPathVariables];
     const columnsHeaders = tablesColumns[tabHeaders];
 
-    const [localSchema, setLocalSchema] = useState({
-        type: 'Object',
-        properties: {},
-    });
-
     useEffect(() => {
-        const type =
-            formik.values.requestBody?.content &&
-            Object.keys(formik.values.requestBody.content)?.[0];
-        setBodyType(type || 'none');
-    }, [formik.values.requestBody]);
+        if (!formik.values.path) return;
 
-    useEffect(() => {
-        // Clear formik values for body content when type changes
-        if (bodyType === 'none') {
-            formik.setFieldValue('requestBody', '');
-        } else if (bodyType === 'multipart/form-data') {
-            const data =
-                formik.values.requestBody?.content?.[bodyType]?.schema ||
-                localSchema;
-            const content = {
-                'multipart/form-data': {
-                    schema: data,
-                },
-            };
+        const parameters = extractPathParameters(formik.values.path);
+        const newPathVariables = [...formik.values.pathVariables];
 
-            formik.setFieldValue('requestBody', { content });
-        } else if (bodyType === 'application/json') {
-            const data =
-                formik.values.requestBody?.content?.[bodyType]?.schema ||
-                localSchema;
-            formik.setFieldValue('requestBody', {
-                content: {
-                    [contentType]: {
-                        schema: data,
-                    },
-                },
-            });
+        parameters.forEach((param) => {
+            const exists = newPathVariables.some((pv) => pv.name === param);
+
+            if (!exists) {
+                newPathVariables.push({
+                    name: param,
+                    type: 'string',
+                    value:'',
+                    isRequired: true,
+                    description: '',
+                });
+            }
+        });
+
+        const filteredVariables = newPathVariables.filter((pv) =>
+            parameters.includes(pv.name)
+        );
+
+        if (filteredVariables.length !== formik.values.pathVariables.length) {
+            formik.setFieldValue('pathVariables', filteredVariables);
         }
-    }, [bodyType]);
+    }, [formik.values.path]);
 
-    const handleSchemaChange = (newSchema: JSONSchema) => {
-        const currentSchema = formik.values.requestBody?.content[contentType];
-
-        // Se o schema for o mesmo, não faça nada
-        if (
-            (currentSchema &&
-                JSON.stringify(currentSchema.schema) ===
-                    JSON.stringify(newSchema)) ||
-            bodyType === 'none'
-        ) {
-            return; // Não há mudanças, então não faça nada
-        }
-
-        const content = {
-            [contentType]: {
-                schema: newSchema,
-            },
-        };
-
-        setLocalSchema(newSchema);
-
-        formik.setFieldValue('requestBody', { content });
-    };
-
-    const handleChangeEditor = (value) => {
-        const content = {
-            [contentType]: {
-                schema: value,
-            },
-        };
-
-        formik.setFieldValue('requestBody', { content });
-    };
+    const hasVariables = formik.values.pathVariables.length > 0;
 
     return (
         <>
             <IGRPTabs defaultValue="params">
                 <IGRPTabsList className="w-full">
-                    <IGRPTabsTrigger value="params">Params</IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="body">Body</IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="headers">Headers</IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="params">
+                        {t('params')}
+                    </IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="body">{t('body')}</IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="headers">
+                        {t('headers')}
+                    </IGRPTabsTrigger>
                 </IGRPTabsList>
                 <IGRPTabsContent value="params">
                     {columnsQuery && (
                         <div className="space-y-3">
-                            <p className="text-sm">Query Parameters</p>
-                            <FormList
-                                formik={formik}
-                                columns={columnsQuery}
-                                data={formik.values[tabQueryParams]}
-                                changeValue={(element, position, value) =>
-                                    changeValue(
-                                        formik,
-                                        element,
-                                        position,
-                                        value,
-                                        tabQueryParams
-                                    )
-                                }
-                                addRow={() =>
-                                    addNewRow(
-                                        formik,
-                                        tabQueryParams,
-                                        tabQueryParams
-                                    )
-                                }
-                                removeRow={(position) =>
-                                    removeRow(formik, tabQueryParams, position)
-                                }
-                                errors={formik.errors[tabQueryParams]}
-                                btnLabels={'Query Parameter'}
-                                name={tabQueryParams}
-                            />
-                            <p className="text-sm">Variables</p>
-                            <FormList
-                                formik={formik}
-                                columns={columnsVariables}
-                                data={formik.values[tabPathVariables]}
-                                changeValue={(element, position, value) =>
-                                    changeValue(
-                                        formik,
-                                        element,
-                                        position,
-                                        value,
-                                        tabPathVariables
-                                    )
-                                }
-                                addRow={() =>
-                                    addNewRow(
-                                        formik,
-                                        tabPathVariables,
-                                        tabPathVariables
-                                    )
-                                }
-                                removeRow={(position) =>
-                                    removeRow(
-                                        formik,
-                                        tabPathVariables,
-                                        position
-                                    )
-                                }
-                                errors={formik.errors[tabPathVariables]}
-                                btnLabels={'Variable'}
-                                name={tabPathVariables}
-                            />
+                            <p className="text-sm">{t('queryParameters')}</p>
+                            <Card className="rounded-sm">
+                                <FormList
+                                    formik={formik}
+                                    columns={columnsQuery}
+                                    data={formik.values[tabQueryParams]}
+                                    changeValue={(element, position, value) =>
+                                        changeValue(
+                                            formik,
+                                            element,
+                                            position,
+                                            value,
+                                            tabQueryParams
+                                        )
+                                    }
+                                    addRow={() =>
+                                        addNewRow(
+                                            formik,
+                                            tabQueryParams,
+                                            tabQueryParams
+                                        )
+                                    }
+                                    removeRow={(position) =>
+                                        removeRow(
+                                            formik,
+                                            tabQueryParams,
+                                            position
+                                        )
+                                    }
+                                    errors={formik.errors[tabQueryParams]}
+                                    btnLabels={t('queryParameter')}
+                                    name={tabQueryParams}
+                                />
+                            </Card>
+                            {hasVariables && (
+                                <>
+                                    <p className="text-sm">{t('variables')}</p>
+                                    <Card className="rounded-sm">
+                                        <FormList
+                                            formik={formik}
+                                            columns={columnsVariables}
+                                            data={
+                                                formik.values[tabPathVariables]
+                                            }
+                                            changeValue={(
+                                                element,
+                                                position,
+                                                value
+                                            ) =>
+                                                changeValue(
+                                                    formik,
+                                                    element,
+                                                    position,
+                                                    value,
+                                                    tabPathVariables
+                                                )
+                                            }
+                                            errors={
+                                                formik.errors[tabPathVariables]
+                                            }
+                                            name={tabPathVariables}
+                                        />
+                                    </Card>
+                                </>
+                            )}
                         </div>
                     )}
                 </IGRPTabsContent>
                 <IGRPTabsContent value="body">
                     <BodyRequest
-                        bodyType={bodyType}
-                        contentType={contentType}
                         formik={formik}
                         contentTypes={contentTypes}
                         schemaTypes={schemaTypes}
                         columnsBody={tablesColumns['requestBody']}
-                        handleSchemaChange={handleSchemaChange}
-                        handleChangeEditor={handleChangeEditor}
-                        setLocalSchema={setLocalSchema}
-                        setContentType={setContentType}
-                        setBodyType={setBodyType}
                     />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">
@@ -223,7 +190,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                 removeRow(formik, tabQueryParams, position)
                             }
                             errors={formik.errors[tabHeaders]}
-                            btnLabels={tabHeaders}
+                            btnLabels={t('headers')}
                             name={tabHeaders}
                         />
                     )}

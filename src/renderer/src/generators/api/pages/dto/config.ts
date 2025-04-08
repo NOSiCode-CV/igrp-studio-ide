@@ -1,5 +1,5 @@
-import { DTOConfig } from "@igrp/spring-engine/dist/interfaces/types"
-import { formatMethods } from "../../helpers"
+import { DTOConfig } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/types"
+import { formatMethods, getOptionsByObject } from "../../helpers"
 import { IColumnsTabelProps } from "../../types/Interfaces"
 import { SchemaTypeItem } from "src/main/types"
 
@@ -37,47 +37,40 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
-export const getTablesColumns = ({ selectors, dto, models, currentDto }): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = ({ selectors, dto, models, enums, current, t }): { [value: string]: IColumnsTabelProps[] } => {
 
-    const paramsTypesData = formatMethods(
-        (
-            selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
-            | { ATTRIBUTE_TYPES: string[] }
-            | undefined
-        )?.ATTRIBUTE_TYPES || []
-    )
+    const { name: currentDto, module } = current || {}
 
     const collectionTypes = formatMethods(
         (
             selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
             | { COLLECTION_TYPES: string[] }
             | undefined
-        )?.COLLECTION_TYPES || []
+        )?.COLLECTION_TYPES || [],
+        true
     )
 
-    const getOptions = (objects) => {
-        return objects !== undefined
-            ? objects
-                .filter((m) => m.name !== currentDto)
-                .map((item) => ({
-                    label: item.name,
-                    value: item.name
-                }))
-            : []
-    }
+    const dataTypes = (
+		selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+		| {
+			ATTRIBUTE_TYPES: string[]
+		}
+		| undefined
+	)?.ATTRIBUTE_TYPES || []
 
     const namespacesOptions: SchemaTypeItem[] = [
-        { label: 'Data Transfer Object', value: 'dto', items: getOptions(dto) },
-        { label: 'Schema', value: 'model', items: getOptions(models) },
-        { label: 'Data Type', value: 'java', items: paramsTypesData }
+        { label: t('dto'), value: 'dto', items: getOptionsByObject(dto, module, currentDto) },
+        { label: t('model'), value: 'model', items: getOptionsByObject(models, module, currentDto) },
+        { label: t('dataTypes'), value: 'java', items: dataTypes },
+        { label: t('enum'), value: 'enum', items: getOptionsByObject(enums, module, currentDto) }
     ]
 
     return {
         attributes: [
-            { key: 'name', name: 'Name', type: 'text' },
+            { key: 'name', name: t('name'), type: 'text' },
             {
                 key: 'type',
-                name: 'Type',
+                name: t('type'),
                 type: 'typeSelectorDropdown',
                 options: namespacesOptions
             },

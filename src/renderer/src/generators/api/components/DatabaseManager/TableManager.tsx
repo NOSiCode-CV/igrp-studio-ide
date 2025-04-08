@@ -8,13 +8,16 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { Combobox, IGRPDataTable } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
-import { ColumnDef } from '@igrp/igrp-design-system/dist/types';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
+import { useTranslation } from 'react-i18next';
+import { Connection } from 'src/main/types';
+import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 
 const actions = [
     {
@@ -35,14 +38,15 @@ export type Database = {
 };
 
 interface TableManagerProps {
-    onRowsSubmit: (rows: any[]) => void;
+    onRowsSubmit: (rows: Set<string>) => void;
     onSelectedConnection: (value: string) => void;
 }
 
 export function TableManager({
-    onRowsSubmit,
     onSelectedConnection,
+    onRowsSubmit,
 }: TableManagerProps) {
+    const { t } = useTranslation();
     const { showErrorToast } = useToast();
 
     const [connections, setConnections] = useState<
@@ -54,11 +58,14 @@ export function TableManager({
     const [previewColumns, setPreviewColumns] = useState<Array<any>>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [action, setAction] = useState('overwrite');
+    const [selectedTables, setSelectedTables] = useState<Set<string>>(
+        new Set()
+    );
 
     useEffect(() => {
         const getConnections = async () => {
-            const connections = await window.repo.connection.findAll();
-            const maps = connections.map((conn) => {
+            const connections = await window.igrpStudio.connection.findAll();
+            const maps = connections.map((conn: Connection) => {
                 return {
                     label: conn.name,
                     value: conn.name,
@@ -68,6 +75,29 @@ export function TableManager({
         };
         getConnections();
     }, []);
+
+    const handleCheckTableSelect = (tableName: string) => {
+        setSelectedTables((prevSelectedTables) => {
+            const newSelectedTables = new Set(prevSelectedTables);
+            if (newSelectedTables.has(tableName)) {
+                newSelectedTables.delete(tableName); // Remove if already selected
+            } else {
+                newSelectedTables.add(tableName); // Add if not selected
+            }
+            return newSelectedTables;
+        });
+    };
+
+    const handleSelectAll = (isSelected: boolean) => {
+        if (isSelected) {
+            // Add all table names to the selectedTables set
+            const allTableNames = tables.map((table) => table.tableName);
+            setSelectedTables(new Set(allTableNames));
+        } else {
+            // Clear the selectedTables set
+            setSelectedTables(new Set());
+        }
+    };
 
     const handleConnectionSelect = async (connectionName: string) => {
         setSelectedConnection(connectionName);
@@ -82,11 +112,11 @@ export function TableManager({
 
         try {
             const { success, tables, message } =
-                await window.api.getTables(connectionName);
+                await window.igrpStudio.connection.getTables(connectionName);
             if (success) {
                 const tablesArr = tables
-                    .filter((table) => !ignoreTables.includes(table))
-                    .map((table) => {
+                    .filter((table: string) => !ignoreTables.includes(table))
+                    .map((table: string) => {
                         return {
                             tableName: table,
                             id: table,
@@ -107,14 +137,18 @@ export function TableManager({
     const handleTableSelect = async (table: string) => {
         setSelectedTable(table);
         const { success, message, structure } =
-            await window.api.getTableStructure(selectedConnection, table);
+            await window.igrpStudio.connection.getTableStructure(
+                selectedConnection,
+                table
+            );
         if (!success) showErrorToast(message);
         setPreviewColumns(structure);
     };
 
-    const handleChangeRows = (value) => {
-        onRowsSubmit(value);
-    };
+    useEffect(() => {
+        console.log(selectedTables);
+        onRowsSubmit(selectedTables);
+    }, [selectedTables]);
 
     const columns: ColumnDef<Database>[] = [
         {
@@ -126,10 +160,11 @@ export function TableManager({
                         table.getIsAllPageRowsSelected() ||
                         (table.getIsSomePageRowsSelected() && 'indeterminate')
                     }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
-                    aria-label="Select all"
+                    onCheckedChange={(value) => {
+                        table.toggleAllPageRowsSelected(!!value);
+                        handleSelectAll(!!value);
+                    }}
+                    aria-label={t('selectAll')}
                 />
             ),
             cell: ({ row }) => (
@@ -138,15 +173,16 @@ export function TableManager({
                     onCheckedChange={(value) => {
                         row.toggleSelected(!!value);
                         handleTableSelect(row.original.tableName);
+                        handleCheckTableSelect(row.original.tableName);
                     }}
-                    aria-label="Select row"
+                    aria-label={t('selectRow')}
                 />
             ),
             enableSorting: false,
             enableHiding: false,
         },
         {
-            header: 'Data table name',
+            header: t('dataTableName'),
             accessorKey: 'tableName',
             cell: ({ row }) => (
                 <div onClick={() => handleTableSelect(row.original.tableName)}>
@@ -155,7 +191,7 @@ export function TableManager({
             ),
         },
         {
-            header: 'Modified schema name',
+            header: t('modifiedSchemaName'),
             accessorKey: 'schemaName',
         },
     ];
@@ -164,64 +200,68 @@ export function TableManager({
         <>
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
-                    <Label>Database Connections</Label>
-                    <Combobox
+                    <Label>{t('databaseConnections')}</Label>
+                    <IGRPCombobox
                         value={selectedConnection}
-                        name="connection"
-                        onChange={handleConnectionSelect}
-                        placeholder="Select a connection"
+                        onChange={(selected) => {
+                            handleConnectionSelect(selected);
+                        }}
+                        placeholder={t('selectConnection')}
                         options={connections}
                         className="w-full"
                     />
                 </div>
                 <div className="space-y-2">
                     <Label className="text-xs">
-                        While matching the same shcema
+                        {t('whileMatchingSchema')}
                     </Label>
-                    <Combobox
+                    <IGRPCombobox
                         value={action}
-                        name="action"
                         onChange={(value) => setAction(value)}
-                        placeholder="Select a action"
+                        placeholder={t('selectAction')}
                         options={actions}
                         className="w-full"
                     />
                 </div>
             </div>
-            <div className="flex mt-3 space-x-3">
-                <div className="w-1/2 space-y-4">
+            <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="space-y-4">
                     <div className="rounded border">
-                        <h4 className="p-2 text-sm">Database table</h4>
+                        <h4 className="p-2 text-sm">{t('databaseTable')}</h4>
                         <Separator />
                         <ScrollArea className="h-[450px] w-full px-2">
                             {isLoading ? (
                                 <div className="text-center">
-                                    Loading tables...
+                                    {t('loadingTables')}
                                 </div>
                             ) : (
                                 <IGRPDataTable
                                     columns={columns}
                                     data={tables}
-                                    onRowSelectionChange={handleChangeRows}
-                                    rowId="id"
                                 />
                             )}
                         </ScrollArea>
                     </div>
                 </div>
-                <div className="w-1/2 space-y-3">
+                <div className="space-y-3">
                     {selectedTable ? (
                         <>
                             <h3 className="text-sm text-muted-foreground">
-                                Preview - {selectedTable}
+                                {t('previewTable', {
+                                    tableName: selectedTable,
+                                })}
                             </h3>
-                            <ScrollArea className="h-[450px] w-full rounded-md border">
+                            <ScrollArea className="h-[450px] rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Columnn</TableHead>
-                                            <TableHead>Data Type</TableHead>
-                                            <TableHead>IsNullable</TableHead>
+                                            <TableHead>{t('column')}</TableHead>
+                                            <TableHead>
+                                                {t('dataType')}
+                                            </TableHead>
+                                            <TableHead>
+                                                {t('isNullable')}
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -235,8 +275,8 @@ export function TableManager({
                                                 </TableCell>
                                                 <TableCell>
                                                     {column?.is_nullable
-                                                        ? 'Yes'
-                                                        : 'NO'}
+                                                        ? t('yes')
+                                                        : t('no')}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -246,7 +286,7 @@ export function TableManager({
                         </>
                     ) : (
                         <div className="h-[500px] flex items-center justify-center text-muted-foreground text-sm">
-                            Select a table to preview
+                            {t('selectTableToPreview')}
                         </div>
                     )}
                 </div>

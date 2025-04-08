@@ -1,5 +1,3 @@
-'use client';
-
 import * as Yup from 'yup';
 
 import { Button } from '@renderer/components/ui/button';
@@ -7,41 +5,38 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogFooter,
 } from '@renderer/components/ui/dialog';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
-import { ControllerConfig } from '@igrp/spring-engine/dist/interfaces/types';
+import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { PATTERNS } from '@renderer/constants/appConstants';
+import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
 import useToast from '@renderer/components/useToast';
-import { cn } from '@renderer/lib/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import { Combobox } from '@igrp/igrp-design-system';
 import { useEffect } from 'react';
+import { SelectInput, TextInput } from '../../components/inputs-form';
 
 interface CreateEndpointDialogProps {
-    defaultModule: string | undefined;
     basePath: string;
+    controller: any;
     isOpen: boolean;
     modules: Array<any>;
-    mode?: 'self' | 'formik'; // 'self' = submits its own data, 'formik' = updates Formik
+    mode?: 'self' | 'formik';
     onClose: () => void;
-    onConfirm?: (values: ControllerConfig) => void; // Callback for Formik updates
+    onConfirm?: (values: any) => void;
 }
 
 export function CreateEndpointDialog({
-    defaultModule,
+    controller,
     basePath,
     isOpen,
-    onClose,
     modules,
     mode = 'self',
     onConfirm,
+    onClose,
 }: CreateEndpointDialogProps) {
     const { t } = useTranslation();
 
@@ -51,30 +46,34 @@ export function CreateEndpointDialog({
 
     const validationSchema = Yup.object({
         name: Yup.string()
-            .required(t('thisFieldRequired', { name: 'Name' }))
-            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+            .required(t('thisFieldRequired', { name: t('endpointName') }))
+            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccept'))
             .max(20, t('maxLengthExceeded', { max: 20 })),
         module: Yup.string().required(
-            t('thisFieldRequired', { name: 'Module' })
+            t('thisFieldRequired', { name: t('module') })
         ),
+        description: Yup.string()
+            .required(t('thisFieldRequired', { name: t('description') }))
+            .max(100, t('maxLengthExceeded', { max: 100 })),
     });
 
     const formik = useFormik({
         initialValues: {
             type: 'controller',
             name: '',
-            basePath: '',
+            path: 'api',
             actions: [],
-            module: defaultModule,
+            module: '',
+            description: '',
         },
         validationSchema,
         onSubmit: (values, actions) => {
-            const cValues: ControllerConfig = { ...values, type: 'controller' };
+            const cValues: any = { ...values, type: 'controller' };
 
             if (mode === 'self') {
                 handleCreateEndpoint(cValues, actions);
             } else if (mode === 'formik' && onConfirm) {
-                onConfirm(cValues); // Pass values to parent Formik
+                onConfirm(cValues);
                 actions.setSubmitting(false);
                 formik.resetForm();
                 onClose();
@@ -87,8 +86,9 @@ export function CreateEndpointDialog({
         actions: any
     ) => {
         try {
-            const { error } = await window.api.createController(
+            const { error } = await window.engine.createController(
                 values,
+                ENV_TYPES.SPRING,
                 basePath
             );
             if (error) {
@@ -97,7 +97,9 @@ export function CreateEndpointDialog({
                 return;
             }
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(`Endpoint ${values.name} successfully created.`);
+            showSuccessToast(
+                t('endpointCreatedSuccess', { name: values.name })
+            );
             actions.setSubmitting(false);
             formik.resetForm();
             onClose();
@@ -108,99 +110,81 @@ export function CreateEndpointDialog({
     };
 
     useEffect(() => {
-        formik.setFieldValue('module', defaultModule);
-    }, [defaultModule]);
+        const { name, path, module, description } = controller;
+        formik.setFieldValue('name', name);
+        formik.setFieldValue('path', path);
+        formik.setFieldValue('module', module);
+        formik.setFieldValue('description', description);
+    }, [controller]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create New Endpoint</DialogTitle>
+                    <DialogTitle>{t('createNewEndpoint')}</DialogTitle>
                     <DialogDescription>
                         {t('endpointDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={formik.handleSubmit}>
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <div className="col-span-12 space-y-3">
-                                <Label htmlFor="name" className="text-right">
-                                    Endpoint Name
-                                </Label>
-                                <Input
+                        <div className="grid grid-cols-1 items-center gap-4">
+                            <div className="col-span-12 flex flex-col gap-3">
+                                <TextInput
                                     id="name"
+                                    label={t('endpointName')}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.name || ''}
-                                    className={cn(
-                                        formik.touched.name &&
-                                            formik.errors.name
-                                            ? 'border-red-500'
-                                            : ''
-                                    )}
+                                    value={formik.values.name}
+                                    error={formik.errors.name}
+                                    isTouched={formik.touched.name}
+                                    isRequired
                                 />
-                                {formik.errors.name && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.name}
-                                    </p>
-                                )}
                             </div>
-                            <div className="col-span-12 space-y-3">
-                                <Label
-                                    htmlFor="basePath"
-                                    className="text-right"
-                                >
-                                    Base path
-                                </Label>
-                                <Input
-                                    id="basePath"
+                            <div className="col-span-12 gap-3 flex-col flex">
+                                <TextInput
+                                    id="path"
+                                    label={t('basePath')}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.basePath || ''}
-                                    className={cn(
-                                        formik.touched.basePath &&
-                                            formik.errors.basePath
-                                            ? 'border-red-500'
-                                            : ''
-                                    )}
+                                    value={formik.values.path}
+                                    error={formik.errors.path}
+                                    isTouched={formik.touched.path}
                                 />
-                                {formik.errors.basePath && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.basePath}
-                                    </p>
-                                )}
                             </div>
-                            <div className="col-span-12 space-y-3">
-                                <Label htmlFor="module" className="text-right">
-                                    Module Name
-                                </Label>
-                                <Combobox
-                                    name="module"
+                            <div className="col-span-12 flex flex-col gap-3">
+                                <SelectInput
+                                    id={'module'}
+                                    label={t('moduleName')}
                                     options={modules}
-                                    value={
-                                        formik.values.module || defaultModule
-                                    }
+                                    value={formik.values.module}
+                                    error={formik.errors.module}
+                                    isTouched={formik.touched.module}
                                     onChange={(value) =>
                                         formik.setFieldValue('module', value)
                                     }
-                                    className={cn(
-                                        'w-full',
-                                        formik.touched.module &&
-                                            formik.errors.module
-                                            ? 'border-red-500'
-                                            : ''
-                                    )}
+                                    onBlur={(value) =>
+                                        formik.setFieldValue('module', value)
+                                    }
+                                    isRequired
                                 />
-                                {formik.errors.module && (
-                                    <p className="text-sm text-red-600">
-                                        {formik.errors.module}
-                                    </p>
-                                )}
+                            </div>
+                            <div className="col-span-12 gap-3 flex-col flex">
+                                <TextInput
+                                    id="description"
+                                    label={t('description')}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.description}
+                                    error={formik.errors.description}
+                                    isTouched={formik.touched.description}
+                                    isRequired
+                                />
                             </div>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Save</Button>
+                        <Button type="submit">{t('save')}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

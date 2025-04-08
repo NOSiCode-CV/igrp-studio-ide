@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
-import { Combobox } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@renderer/components/ui/input';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
@@ -16,7 +16,9 @@ import {
 } from '@renderer/components/ui/card';
 import { AddResponseMenu } from './add-response-menu';
 import { Button } from '@renderer/components/ui/button';
-import { Trash } from 'lucide-react';
+import { ChevronsUpDown, Trash } from 'lucide-react';
+import { LabelRequired } from '@renderer/components/label-required';
+import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 interface TabResponseProps {
     formik: any;
@@ -24,6 +26,7 @@ interface TabResponseProps {
     contentTypes: any;
     responseTypes: Array<any>;
     enumTypes: Array<any>;
+    collectionTypes: any;
 }
 
 export const TabResponse: React.FC<TabResponseProps> = ({
@@ -32,20 +35,45 @@ export const TabResponse: React.FC<TabResponseProps> = ({
     schemaTypes,
     responseTypes,
     enumTypes,
+    collectionTypes,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useTranslation();
 
     const [activeResponseTab, setActiveResponseTab] = useState<string>('200');
-    const [responses, setResponses] = useState(formik.values.responses);
+
+    const { values } = formik;
+
+    const { responses } = values;
 
     const handleAddResponse = (response: {
         name: string;
         statusCode: string;
         contentType: string;
         description?: string;
+        type?: any;
+        collectionType?: any;
     }) => {
-        const { name, description, statusCode, contentType } = response;
+        const {
+            name,
+            description,
+            statusCode,
+            contentType,
+            type: newType,
+            collectionType = 'none',
+        } = response;
+
+        const isValueObject = typeof newType === 'object' && newType !== null;
+
+        const type = isValueObject ? newType.value : newType;
+
+        const module = isValueObject ? newType.module : '';
+
+        const objectType = isValueObject
+            ? newType.type
+            : newType === 'object'
+              ? 'dto'
+              : '';
 
         const updatedResponses = {
             ...formik.values.responses,
@@ -54,7 +82,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                 description,
                 content: {
                     [contentType]: {
-                        schema: null,
+                        schema: {
+                            type,
+                            objectType,
+                            name: 'data',
+                            collectionType,
+                            module,
+                        },
                     },
                 },
             },
@@ -63,10 +97,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         formik.setFieldValue('responses', updatedResponses);
 
         setActiveResponseTab(statusCode);
-        setResponses((prevResponses) => ({
-            ...prevResponses,
-            [statusCode]: updatedResponses[statusCode],
-        }));
     };
 
     const handleSchemaChange = (
@@ -78,26 +108,33 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         const currentSchema =
             formik.values.responses[statusCode]?.content[contentType];
 
-        // Se o schema for o mesmo, não faça nada
+        // Garantir que há propriedades antes de acessar
+        const properties = newSchema.properties || {};
+
+        const firstKey = Object.keys(properties)[0];
+
+        const extractedSchema = firstKey ? properties[firstKey] : newSchema;
+
         if (
             currentSchema &&
-            JSON.stringify(currentSchema.schema) === JSON.stringify(newSchema)
+            JSON.stringify(currentSchema.schema) ===
+                JSON.stringify(extractedSchema)
         ) {
-            return; // Não há mudanças, então não faça nada
+            return;
         }
 
-        // Update the content for the given statusCode
+        // Atualizar os responses
         const updatedResponses = {
             ...formik.values.responses,
             [statusCode]: {
-                ...formik.values.responses[statusCode], // Retain existing response details
+                ...formik.values.responses[statusCode],
                 content: {
                     ...formik.values.responses[statusCode]?.content,
                     [contentType]: {
                         ...formik.values.responses[statusCode]?.content[
                             contentType
                         ],
-                        schema: newSchema,
+                        schema: extractedSchema,
                     },
                 },
             },
@@ -115,7 +152,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         delete updatedResponses[statusCode];
 
         formik.setFieldValue('responses', updatedResponses);
-        setResponses(updatedResponses);
 
         if (activeResponseTab === statusCode) {
             const remainingTabs = Object.keys(updatedResponses);
@@ -132,13 +168,15 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                         <button
                             key={statusCode}
                             onClick={() => setActiveResponseTab(statusCode)}
-                            className={`px-4 py-2 ${
-                                activeResponseTab === statusCode
-                                    ? 'border-b-2 border-igrp text-igrp'
-                                    : ''
-                            }`}
+                            className={cn(
+                                `px-4 py-2`,
+                                activeResponseTab === statusCode &&
+                                    'border-b-2 border-igrp text-igrp'
+                            )}
                         >
-                            {`${responses[statusCode].name} (${statusCode})`}
+                            {responses[statusCode]?.name
+                                ? `${responses[statusCode].name} (${statusCode})`
+                                : `${statusCode}`}
                         </button>
                     ))}
                 </div>
@@ -158,18 +196,25 @@ export const TabResponse: React.FC<TabResponseProps> = ({
             {/* Response Tab Content */}
             <div>
                 {Object.keys(responses).map((statusCode) => {
-                    const description = responses[statusCode].description;
+                    const description = responses[statusCode].description || '';
                     const name = responses[statusCode].name;
                     const content = responses[statusCode].content;
                     const contentType = Object.keys(content)[0];
 
                     const schema = content?.[contentType]?.['schema'];
-                    const properties = schema?.properties;
-                    
-                    const contentData =
-                        properties && Object.keys(properties).length > 0
-                            ? schema
-                            : null;
+
+                    const type = (schema && schema.type) || 'string';
+                    const collectionType =
+                        (schema && schema.collectionType) || 'none';
+
+                    const contentData = schema
+                        ? {
+                              type: '',
+                              properties: {
+                                  [schema.name]: schema,
+                              },
+                          }
+                        : null;
 
                     return (
                         <div
@@ -181,14 +226,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     : 'hidden'
                             )}
                         >
-                            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor={'statusCode'}>
-                                        {'HTTP Status Code'}
-                                    </Label>
-                                    <Combobox
+                            <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                                <div className="flex flex-col gap-3">
+                                    <LabelRequired>
+                                        {t('httpStatusCode')}
+                                    </LabelRequired>
+                                    <IGRPCombobox
                                         options={httpStatusCodes}
-                                        name="statusCode"
                                         value={statusCode}
                                         onChange={(value) =>
                                             handleAddResponse({
@@ -196,16 +240,18 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 description,
                                                 name,
                                                 contentType,
+                                                type,
+                                                collectionType,
                                             })
                                         }
                                         className="w-full focus:ring-igrp focus:border-igrp h-9"
-                                        placeholder="e.g., 200, 400"
+                                        placeholder={t(
+                                            'httpStatusCodePlaceholder'
+                                        )}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor={'name'}>
-                                        {'Name'}
-                                    </Label>
+                                <div className="flex flex-col gap-3">
+                                    <Label>{t('name')}</Label>
                                     <Input
                                         name={t('name')}
                                         value={name}
@@ -215,24 +261,27 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 description,
                                                 name: e.target.value,
                                                 contentType,
+                                                type,
+                                                collectionType,
                                             })
                                         }
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor={'contentType'}>
-                                        {'Content Type'}
-                                    </Label>
-                                    <Combobox
-                                        name={t('contentType')}
+                                <div className="flex flex-col gap-3">
+                                    <LabelRequired>
+                                        {t('contentType')}
+                                    </LabelRequired>
+                                    <IGRPCombobox
                                         value={contentType}
-                                        placeholder="Select Content Type"
+                                        placeholder={t('selectContentType')}
                                         onChange={(value) =>
                                             handleAddResponse({
                                                 statusCode,
                                                 description,
                                                 name,
                                                 contentType: value,
+                                                type,
+                                                collectionType,
                                             })
                                         }
                                         options={contentTypes}
@@ -240,21 +289,68 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
 
-                                {Object.keys(responses).length > 1 && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="absolute right-3"
-                                        onClick={() => handleClose(statusCode)}
+                                <div className="flex flex-col gap-3">
+                                    <LabelRequired>{t('type')}</LabelRequired>
+                                    <TypeSelectorDropdown
+                                        type={type}
+                                        onTypeChange={(type) =>
+                                            handleAddResponse({
+                                                statusCode,
+                                                description,
+                                                name,
+                                                contentType,
+                                                type,
+                                                collectionType,
+                                            })
+                                        }
+                                        schemaTypes={schemaTypes}
+                                        className={'w-full h-9 text-gray-500'}
+                                        variant={'outline'}
                                     >
-                                        <Trash />
-                                    </Button>
+                                        <ChevronsUpDown />
+                                    </TypeSelectorDropdown>
+                                </div>
+
+                                <div className="flex flex-col gap-3">
+                                    <Label>{t('collectionType')}</Label>
+                                    <IGRPCombobox
+                                        options={collectionTypes}
+                                        value={collectionType}
+                                        onChange={(collectionType) =>
+                                            handleAddResponse({
+                                                statusCode,
+                                                description,
+                                                name,
+                                                contentType,
+                                                type,
+                                                collectionType,
+                                            })
+                                        }
+                                        className="w-full focus:ring-igrp focus:border-igrp h-9"
+                                        placeholder={t('selectCollectionType')}
+                                    />
+                                </div>
+
+                                {Object.keys(responses).length > 1 && (
+                                    <div className="absolute right-3">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="relative -top-3"
+                                            onClick={() =>
+                                                handleClose(statusCode)
+                                            }
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
 
                             {/* Descritpion */}
-                            <div className="space-y-2">
-                                <Label>Descritpion</Label>
+                            <div className="flex flex-col gap-3">
+                                <Label>{t('description')}</Label>
                                 <Input
                                     type="text"
                                     name="description"
@@ -265,31 +361,33 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                             description: e.target.value,
                                             name,
                                             contentType,
+                                            type,
                                         })
                                     }
                                     className="w-full"
                                 />
                             </div>
-
-                            <Card className="rounded">
-                                <CardHeader>
-                                    <CardTitle>Data Schema</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <JSONSchemaBuilder
-                                        schemaTypes={schemaTypes}
-                                        enumTypes={enumTypes}
-                                        initialSchema={contentData}
-                                        onSchemaChange={(value) => {
-                                            handleSchemaChange(
-                                                statusCode,
-                                                contentType,
-                                                value
-                                            );
-                                        }}
-                                    />
-                                </CardContent>
-                            </Card>
+                            {type === 'object' && (
+                                <Card className="rounded">
+                                    <CardHeader>
+                                        <CardTitle>{t('dataSchema')}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <JSONSchemaBuilder
+                                            schemaTypes={schemaTypes}
+                                            enumTypes={enumTypes}
+                                            initialSchema={contentData}
+                                            onSchemaChange={(value) => {
+                                                handleSchemaChange(
+                                                    statusCode,
+                                                    contentType,
+                                                    value
+                                                );
+                                            }}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            )}
                         </div>
                     );
                 })}

@@ -15,12 +15,19 @@ import useToast from '@renderer/components/useToast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { dropdownItem } from './nav-data';
-import { useGit } from '@renderer/hooks/useGit';
+import { useGit } from '@renderer/hooks/use-git';
+import { DropdownItem } from './nav-data';
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;
     basePath?: string;
+}
+
+interface ModalComponentProps {
+    item: any; 
+    basePath: string;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
 }
 
 export const DropdownSidebarMenuButton: React.FC<
@@ -69,6 +76,8 @@ export const DropdownSidebarMenuButton: React.FC<
             basePath
         );
 
+        console.log(config)
+
         if (error) {
             showErrorToast(error);
         } else showSuccessToast(t('deletedSuccess', { name: item.label }));
@@ -100,7 +109,7 @@ export const DropdownSidebarMenuButton: React.FC<
                     className="min-w-56 rounded-lg"
                 >
                     {menuItem.dropdownMenus.map(
-                        (menu: dropdownItem, idx: number) => {
+                        (menu: DropdownItem, idx: number) => {
                             return (
                                 <React.Fragment key={idx}>
                                     {menu.actionType === OPTION_TYPE.DELETE && (
@@ -139,7 +148,7 @@ export const DropdownSidebarMenuButton: React.FC<
             {/* Render the selected component */}
             {activeComponent && (
                 <div className="modal-container">
-                    {React.cloneElement(activeComponent as React.ReactElement, {
+                    {React.cloneElement(activeComponent as React.ReactElement<ModalComponentProps>, {
                         item: modalProps,
                         basePath: basePath,
                         isOpen,

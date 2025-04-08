@@ -10,9 +10,10 @@ import {
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import React, { useState } from 'react';
-import { Combobox } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { getStatusLabel } from '@renderer/utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface AddResponseModalProps {
     onSave: (response: {
@@ -31,7 +32,8 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
     contentTypes,
     isOpen,
 }) => {
-    // const [open, setOpen] = React.useState(false);
+    const { t } = useTranslation();
+
     const [name, setName] = useState('');
     const [statusCode, setStatusCode] = useState('');
     const [contentType, setContentType] = useState('');
@@ -53,12 +55,9 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            {/* <DialogTrigger asChild>
-        <button className="px-4 py-2 text-gray-500 hover:text-igrp">+ Add Status</button>
-      </DialogTrigger> */}
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Add a Response</DialogTitle>
+                    <DialogTitle>{t('addResponse')}</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
                 <form
@@ -68,45 +67,43 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                     }}
                 >
                     <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label className="">HTTP Status Code</Label>
-                            <Combobox
+                        <div className="flex flex-col gap-3">
+                            <Label className="">{t('httpStatusCode')}</Label>
+                            <IGRPCombobox
                                 options={httpStatusCodes}
-                                name="statusCode"
                                 value={statusCode}
                                 onChange={(value) => handleChangeCode(value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
-                                placeholder="e.g., 200, 400"
+                                className="w-full"
+                                placeholder={t('httpStatusCodePlaceholder')}
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="">Name</Label>
+                        <div className="flex flex-col gap-3">
+                            <Label className="">{t('name')}</Label>
                             <Input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
-                                placeholder="Response Name"
+                                className="w-full"
+                                placeholder={t('responseNamePlaceholder')}
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="">Content Type</Label>
-                            <Combobox
-                                name={'contentType'}
+                        <div className="flex flex-col gap-3">
+                            <Label className="">{t('contentType')}</Label>
+                            <IGRPCombobox
                                 options={contentTypes}
                                 value={contentType}
                                 onChange={(value) => setContentType(value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-igrp focus:border-igrp"
+                                className="w-full"
                             />
                         </div>
 
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button type="button" variant="secondary">
-                                    Close
+                                    {t('close')}
                                 </Button>
                             </DialogClose>
-                            <Button type="submit">Save</Button>
+                            <Button type="submit">{t('save')}</Button>
                         </DialogFooter>
                     </div>
                 </form>

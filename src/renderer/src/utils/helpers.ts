@@ -1,64 +1,11 @@
-import { FolderFiles, MenuItem } from 'src/main/types'
+import { MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Database, FileCode, FileText, Circle, LucideIcon, Zap } from 'lucide-react'
+import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
-
-
-// Function to convert folders into menuItems
-export function generateMenuItems(folders: FolderFiles): MenuItem[] {
-	const menuItems: MenuItem[] = [];
-
-	// Iterate through each folder in the folders object
-	Object.keys(folders).forEach((folderName: string) => {
-		// Create a folder menu item as a header
-		const folderMenuItem: MenuItem = {
-			label: folderName,
-			subItems: [],
-			isHeader: true,
-
-			dropdownMenus: [
-				{
-					label: 'dto',
-					type: "dto"
-				},
-				{
-					label: 'models',
-					type: "models"
-				},
-				{
-					label: 'controllers',
-					type: "controllers"
-				}
-			]
-		};
-
-		// Process each folder's content
-		folders[folderName].files.forEach((folder) => {
-			// Iterate through the categories (e.g., "dto", "controller") within the folder
-			Object.keys(folder).forEach((categoryName: string) => {
-				// Create a category menu item
-				const categoryMenuItem: MenuItem = createMenuHeader(categoryName, categoryName);
-
-				// Add each file in the category as a sub-item
-				categoryMenuItem.subItems = folder[categoryName].map((file: { name: string; path: string }) => ({
-					label: file.name,
-					path: file.path,
-					module: folderName,
-					type: categoryName,
-				}));
-
-				// Add the category menu item to the folder's sub-items
-				folderMenuItem.subItems!.push(categoryMenuItem);
-			});
-		});
-
-		// Add the folder's menu item to the main menu items
-		menuItems.push(folderMenuItem);
-	});
-
-	return menuItems;
-}
+import { v4 as uuidv4 } from 'uuid';
+import i18next from 'i18next';
+import { enUS, pt } from 'date-fns/locale';
 
 export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
@@ -130,6 +77,14 @@ export function generateRowId() {
 	return `row-${randomStr}`
 }
 
+export function getId() {
+	return Math.random().toString(36).slice(2, 12)
+}
+
+export function getUUID() {
+	return uuidv4()
+}
+
 export function generateId(componentName: string) {
 	// Generate a random string with 8 characters
 	const randomStr = Math.random().toString(36).slice(2, 8)
@@ -140,23 +95,26 @@ export function findComponentItem(menus: Array<any>, idFind: string) {
 	return menus.flatMap((menu) => menu.subItems || []).find((sub) => sub.id === idFind) || null
 }
 
-export const generateFakeDataForField = (field: any) => {
-	switch (field.config.type) {
+// Function to generate fake data for a field based on its type
+export const generateFakeDataForField = (properties: any) => {
+	const { type } = properties;
+	switch (type) {
 		case 'text':
-			return faker.lorem.words(3)
+			return faker.lorem.words(3);
 		case 'number':
-			return faker.number.int({ min: 1, max: 100 })
+			return faker.number.int({ min: 1, max: 100 });
 		case 'date':
-			return faker.date.past().toLocaleDateString() // or use any other date format
+			return faker.date.past().toLocaleDateString(); // or use any other date format
 		case 'boolean':
-			return faker.datatype.boolean()
+			return faker.datatype.boolean();
 		case 'email':
-			return faker.internet.email()
+			return faker.internet.email();
 		// Add more cases for different field types as needed
 		default:
-			return faker.lorem.words(3) // Fallback to text if type is unknown
+			return faker.lorem.words(2); // Fallback to text if type is unknown
 	}
-}
+};
+
 export const getBadgeColor = (method: string): string | undefined => {
 	return httpMethods.find((item) => item.value === method)?.color;
 };
@@ -180,6 +138,10 @@ export const getIcon = (folderName: string): LucideIcon => {
 			return FileText;
 		case 'action':
 			return Zap;
+		case 'responses':
+			return TextQuote;
+		case 'permissions':
+			return FileKey;
 		default:
 			return Circle;
 	}
@@ -195,3 +157,29 @@ export function toFullCamelCaseFromSnakeCase(str: string) {
 		.map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
 		.join(''));
 }
+
+export function getLabel(name: string): string {
+	if (!name) return ''; // Handle empty string
+
+	// Split on hyphens or uppercase letters
+	const parts = name
+		.replace(/([A-Z])/g, ' $1') // Add a space before uppercase letters
+		.split(/[- ]+/); // Split on hyphens or spaces
+
+	// Capitalize the first letter of each part and join with spaces
+	return parts
+		.filter((part) => part.length > 0) // Remove empty parts
+		.map(
+			(part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+		)
+		.join(' ');
+}
+
+export const getLocale = () => {
+	switch (i18next.language) {
+		case 'pt':
+			return pt;
+		default:
+			return enUS;
+	}
+};

@@ -19,17 +19,16 @@ import {
 import { PackageCheck } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toInitCap } from '@renderer/utils/helpers';
-import { Switch } from '@renderer/components/ui/Switch';
+import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
-import { Combobox } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
 
 interface PopoverProps {
     children?: ReactNode;
     index: number;
     row: any;
-    options: { label: string; value: string }[];
+    options: any;
     changeValue: (element: string, position: number, value: any) => void;
 }
 
@@ -58,13 +57,12 @@ export function PopoverModel({
                             size={'icon'}
                         >
                             <PackageCheck className="w-4 h-4" />
-                            {/* Settings icon */}
-                            <span className="sr-only">{t('Advanced')}</span>
+                            <span className="sr-only">{t('advanced')}</span>
                         </Button>
                     </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top" align="center">
-                    {t('Open advanced settings')}
+                    {t('openAdvancedSettings')}
                 </TooltipContent>
             </Tooltip>
             <PopoverContent className="w-100" align="end" side="bottom">
@@ -73,7 +71,7 @@ export function PopoverModel({
                         <Tabs defaultValue="dataType">
                             <TabsList className="grid w-full grid-cols-1">
                                 <TabsTrigger value="dataType">
-                                    {t('Data Type')}
+                                    {t('settings')}
                                 </TabsTrigger>
                             </TabsList>
 
@@ -88,7 +86,7 @@ export function PopoverModel({
                                                 <Label
                                                     htmlFor={`${field}-${index}`}
                                                 >
-                                                    {toInitCap(field)}
+                                                    {t(field)}
                                                 </Label>
                                                 <Switch
                                                     id={`${field}-${index}`}
@@ -109,18 +107,51 @@ export function PopoverModel({
                                         )
                                     )}
                                 </div>
+                                {options.revision && (
+                                    <>
+                                        <Separator orientation="horizontal" />
+
+                                        <div className="flex flex-1 gap-2">
+                                            <div className="flex flex-1 items-center gap-4">
+                                                <Label
+                                                    htmlFor={`skipFieldRevision`}
+                                                >
+                                                    {t('skipFieldRevision')}
+                                                </Label>
+                                                <Switch
+                                                    id={`skipFieldRevision-${index}`}
+                                                    onCheckedChange={(
+                                                        checked
+                                                    ) =>
+                                                        changeValue(
+                                                            'skipFieldRevision',
+                                                            index,
+                                                            checked
+                                                        )
+                                                    }
+                                                    checked={
+                                                        row?.[
+                                                            'skipFieldRevision'
+                                                        ] || false
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                                 <Separator orientation="horizontal" />
                                 <div className="grid grid-cols-2 gap-2">
                                     <>
                                         {isPrimary && (
                                             <div className="space-y-2 col-span-2 flex flex-col">
                                                 <Label htmlFor="generationType">
-                                                    Generation Type
+                                                    {t('generationType')}
                                                 </Label>
-                                                <Combobox
-                                                    name={'generationType'}
+                                                <IGRPCombobox
                                                     placeholder={`Select Generation Type`}
-                                                    options={options}
+                                                    options={
+                                                        options.generateTypes
+                                                    }
                                                     value={
                                                         row?.[
                                                             'generationType'
@@ -133,13 +164,13 @@ export function PopoverModel({
                                                             value
                                                         )
                                                     }
-                                                    className='w-full'
+                                                    className="w-full h-8"
                                                 />
                                             </div>
                                         )}
                                         <div className="space-y-2">
                                             <Label htmlFor="length">
-                                                Length
+                                                {t('length')}
                                             </Label>
                                             <Input
                                                 id="length"
@@ -156,7 +187,7 @@ export function PopoverModel({
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="defaultValue">
-                                                Default Value
+                                                {t('defaultValue')}
                                             </Label>
                                             <Input
                                                 id="defaultValue"

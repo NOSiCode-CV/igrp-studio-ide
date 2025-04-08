@@ -4,7 +4,7 @@ const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 
 
 export function updateApp() {
-    const path = 'https://storage-api.nosi.cv/igrp-package'
+    const path = 'https://storage-api.nosi.cv/igrp-studio'
 
     updateElectronApp({
         updateSource: {
@@ -13,7 +13,7 @@ export function updateApp() {
         }
     })
 
-    const url = `${path}/${process.platform}/${app.getVersion()}`
+    const url = `${path}${process.platform}/${app.getVersion()}`
 
     autoUpdater.setFeedURL({ url })
 

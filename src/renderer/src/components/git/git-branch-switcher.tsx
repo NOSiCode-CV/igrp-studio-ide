@@ -31,6 +31,8 @@ import {
 } from '@renderer/redux/git/reducer';
 import { RootState } from '@renderer/redux';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { useTranslation } from 'react-i18next';
+import { Badge } from '../ui/badge';
 
 export interface Branch {
     name: string;
@@ -55,7 +57,8 @@ export function BranchSwitcher({
     onBranchChange,
 }: BranchSwitcherProps) {
     const dispatch = useDispatch();
-    
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreatingBranch, setIsCreatingBranch] = useState(false);
@@ -80,7 +83,7 @@ export function BranchSwitcher({
                 loadBranches();
             }
         } catch (error) {
-            console.error('Failed to check git status:', error);
+            console.error(t('failedCheckGitStatus'), error);
         }
     };
 
@@ -98,7 +101,7 @@ export function BranchSwitcher({
                 dispatch(setActiveBranch(activeBranch.name));
             }
         } catch (error) {
-            onError?.('Failed to load branches');
+            onError?.(t('failedLoadBranches'));
         } finally {
             setIsLoading(false);
         }
@@ -110,10 +113,10 @@ export function BranchSwitcher({
                 'initialize-git',
                 projectPath
             );
-            onSuccess?.('Git initialized successfully');
+            onSuccess?.(t('gitInitialized'));
             await checkGitStatus();
         } catch (error) {
-            onError?.('Failed to initialize git');
+            onError?.(t('failedInitGit'));
         }
     };
 
@@ -121,17 +124,16 @@ export function BranchSwitcher({
         return (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button
-                        variant="ghost"
+                    <button
                         onClick={handleInitGit}
-                        className="justify-between"
+                        className="flex items-center border rounded px-1.5 py-0.5 text-xs gap-1 ml-2"
                     >
-                        <GitFork className="mr-2 h-4 w-4" />
-                        Init git
-                    </Button>
+                        <GitFork className="mr-2 h-3 w-3" />
+                        {t('initGit')}
+                    </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Initialize git</p>
+                    <p>{t('initializeGit')}</p>
                 </TooltipContent>
             </Tooltip>
         );
@@ -148,9 +150,9 @@ export function BranchSwitcher({
             setNewBranchName('');
             await loadBranches();
             setOpen(false);
-            onSuccess?.(`Branch "${newBranchName}" created successfully`);
+            onSuccess?.(t('branchCreated', { branchName: newBranchName }));
         } catch (error: any) {
-            onError?.(error.message || 'Failed to create branch');
+            onError?.(error.message || t('failedCreateBranch'));
         }
     };
 
@@ -163,13 +165,13 @@ export function BranchSwitcher({
 
             await loadBranches();
             setOpen(false);
-            onSuccess?.(`Switched to branch ${branchName}`);
+            onSuccess?.(t('switchedToBranch', { branchName }));
             onBranchChange?.(branchName);
         } catch (error) {
             if (error instanceof Error) {
-                onError?.('Commits pending. Please commit changes before switch branch.');
+                onError?.(t('commitsPendingSwitch'));
             } else {
-                onError?.('Failed to switch branch');
+                onError?.(t('failedSwitchBranch'));
             }
         }
     };
@@ -182,7 +184,7 @@ export function BranchSwitcher({
                 disabled
             >
                 <GitBranch className="mr-2 h-4 w-4" />
-                Loading branches...
+                {t('loadingBranches')}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         );
@@ -191,23 +193,22 @@ export function BranchSwitcher({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="ghost"
+                <button
                     role="combobox"
                     aria-expanded={open}
-                    className="justify-between"
+                    className="flex items-center border rounded px-1.5 py-0.5 text-xs gap-1 ml-2"
                 >
                     <GitBranch className="mr-2 h-4 w-4" />
-                    {activeBranch || 'Select branch'}
+                    {activeBranch || t('selectBranch')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
+                </button>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">
                 <Command>
-                    <CommandInput placeholder="Search branch..." />
+                    <CommandInput placeholder={t('searchBranch')} />
                     <CommandList>
-                        <CommandEmpty>No branch found.</CommandEmpty>
-                        <CommandGroup heading="Branches">
+                        <CommandEmpty>{t('noBranchFound')}</CommandEmpty>
+                        <CommandGroup heading={t('branches')}>
                             {branches.map((branch) => (
                                 <CommandItem
                                     key={branch.fullName}
@@ -230,12 +231,12 @@ export function BranchSwitcher({
                                                 {branch.name}
                                                 {branch.isActive && (
                                                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                                                        Current
+                                                        {t('current')}
                                                     </span>
                                                 )}
                                                 {branch.isRemote && (
                                                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                                        Remote
+                                                        {t('remote')}
                                                     </span>
                                                 )}
                                             </span>
@@ -256,7 +257,7 @@ export function BranchSwitcher({
                                 onSelect={() => setIsCreatingBranch(true)}
                             >
                                 <PlusCircle className="mr-2 h-4 w-4" />
-                                Create new branch
+                                {t('createNewBranch')}
                             </CommandItem>
 
                             {isCreatingBranch && (
@@ -267,8 +268,8 @@ export function BranchSwitcher({
                                         onChange={(e) =>
                                             setNewBranchName(e.target.value)
                                         }
-                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                                        placeholder="Branch name..."
+                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-ring"
+                                        placeholder={t('branchNamePlaceholder')}
                                         autoFocus
                                     />
                                     <Button
@@ -276,7 +277,7 @@ export function BranchSwitcher({
                                         disabled={!newBranchName.trim()}
                                         onClick={handleCreateBranch}
                                     >
-                                        Create
+                                        {t('create')}
                                     </Button>
                                 </div>
                             )}

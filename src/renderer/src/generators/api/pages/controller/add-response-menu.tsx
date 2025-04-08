@@ -13,6 +13,7 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from '@renderer/components/ui/hover-card';
+import { useTranslation } from 'react-i18next';
 
 interface AddResponseMenuProps {
     onAddBlankResponse: () => void;
@@ -29,6 +30,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
     responseTypes,
     onSave,
 }) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = React.useState(false);
 
     const handleClick = (resp: any) => {
@@ -55,7 +57,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                         handleClick(response.content);
                     }}
                 >
-                    <div className="flex items-center justify-center w-5 h-5 rounded bg-purple-50 text-igrp">
+                    <div className="flex items-center justify-center w-5 h-5 rounded bg-igrp/25 text-igrp">
                         R
                     </div>
                     {` ${response.content.name} (${response.content.statusCode})`}
@@ -70,7 +72,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                 <PopoverTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-8 px-2">
                         <Plus className="h-4 w-4" />
-                        Add
+                        {t('add')}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="p-0" align="end">
@@ -83,7 +85,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                 setIsOpen(false);
                             }}
                         >
-                            Add Blank Response
+                            {t('addBlankResponse')}
                         </Button>
                         <HoverCard openDelay={0} closeDelay={0}>
                             <HoverCardTrigger asChild>
@@ -91,11 +93,11 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                     variant="ghost"
                                     className="justify-between px-4 py-2 text-sm font-normal hover:bg-muted group"
                                 >
-                                    Reference Response Component
+                                    {t('referenceResponseComponent')}
                                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                 </Button>
                             </HoverCardTrigger>
-                            <HoverCardContent
+                           {responseTypes && responseTypes.length > 0 && <HoverCardContent
                                 className="w-60 p-0"
                                 align="start"
                                 sideOffset={-44}
@@ -104,7 +106,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                 <div className="border-t">
                                     <ErrorList />
                                 </div>
-                            </HoverCardContent>
+                            </HoverCardContent>}
                         </HoverCard>
                     </div>
                 </PopoverContent>

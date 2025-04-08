@@ -6,32 +6,52 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      outDir: 'dist/main', // Output directory for the main process
+      outDir: 'out/main',
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'src/main/index.ts'), // Entry file for the main process
+          index: resolve(__dirname, 'src/main/index.ts'),
         },
       },
     },
+    envPrefix: 'VITE_',
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      outDir: 'dist/preload', // Output directory for the preload script
+      outDir: 'out/preload',
     },
   },
   renderer: {
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
+        path: 'path-browserify',
       },
     },
     define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'), // Define the `process.env`
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     },
     plugins: [react()],
+    optimizeDeps: {
+      exclude: ['monaco-editor']
+    },
+    css: {
+      postcss: './postcss.config.mjs',
+    },
     build: {
-      outDir: 'dist/renderer', // Output directory for the renderer process
+      outDir: 'out/renderer',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'monaco-editor': ['monaco-editor']
+          }
+        },
+      },
+    },
+    server: {
+      fs: {
+        strict: false,
+      },
     },
   },
 });

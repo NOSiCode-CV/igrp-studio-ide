@@ -34,7 +34,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
         setIsDialogOpen(false);
 
         try {
-            await window.repo.project.delete(project);
+            await window.igrpStudio.workspace.deleteProject(project.id);
             showSuccessToast(t('deletedSuccess', { name: project.name }));
             onDelete(true);
         } catch (error: unknown) {
@@ -46,11 +46,11 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
     return (
         <>
             <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-center rounded-md p-2 hover:bg-gray-100">
+                <DropdownMenuTrigger className="flex items-center justify-center rounded-md p-2 hover:bg-igrp hover:text-white text-muted-foreground">
                     <EllipsisVertical className="w-4 h-4" />
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="">
+                <DropdownMenuContent>
                     {project.framework === ENV_TYPES.DOTNET && (
                         <DropdownMenuItem
                             onClick={onConvertToSpringBoot}

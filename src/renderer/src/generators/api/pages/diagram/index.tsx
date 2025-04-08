@@ -2,16 +2,17 @@ import { convertModelData } from './convertModelData';
 import ERDDiagram from './ERDDiagram';
 import { useEffect, useState } from 'react';
 import { ModelData, RelationData } from './types';
-import { IGRPContainer } from '@igrp/igrp-design-system';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
-export default function ERDLayout({ models }: { models: Array<any> }) {
+export default function ERDLayout({ currentItem }: { currentItem: any }) {
+    const { models } = useStudioAPI(currentItem?.module);
+
     const [convertedModelData, setConvertedModelData] = useState<
         ModelData[] | null
     >(null);
     const [relations, setRelations] = useState<RelationData[] | null>(null);
 
     useEffect(() => {
-
         if (models) {
             const { models: modelData, relations } = convertModelData(models);
 
@@ -19,20 +20,15 @@ export default function ERDLayout({ models }: { models: Array<any> }) {
 
             setRelations(relations);
         }
-    }, [models]); // This will run every time 'models' changes
+    }, [models]);
 
     return (
-        <div className="p-4">
-            <IGRPContainer>
-                {convertedModelData && relations ? (
-                    <ERDDiagram
-                        models={convertedModelData}
-                        relations={relations}
-                    />
-                ) : (
-                    <p className="text-foreground">Loading diagram...</p>
-                )}
-            </IGRPContainer>
-        </div>
+        <>
+            {convertedModelData && relations ? (
+                <ERDDiagram models={convertedModelData} relations={relations} />
+            ) : (
+                <p className="text-foreground">Loading diagram...</p>
+            )}
+        </>
     );
 }

@@ -2,9 +2,10 @@ import { Repository } from 'src/main/types';
 import { Button } from '../ui/button';
 import { GitFork } from 'lucide-react';
 import { Card } from '../ui/card';
-import { useNavigate } from 'react-router-dom';
 import useToast from '../useToast';
-import { navigateToNextPage } from '@renderer/redux/thunks';
+import { useTranslation } from 'react-i18next';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { useEffect } from 'react';
 
 type CardGitProjectProps = {
     repo: Repository;
@@ -21,39 +22,41 @@ export function CardGitProject({
     projectPaths,
     isCloning,
 }: CardGitProjectProps) {
-    const navigate = useNavigate();
     const { showErrorToast } = useToast();
-    
+    const { t } = useTranslation();
+    const {
+        actions: { saveOrOpenProject },
+    } = useWorkspace();
+
     const isCloned = clonedRepos.includes(repo.id);
     const projectPath = projectPaths[repo.id];
 
     const handleOpen = async () => {
         if (!projectPath) {
-            showErrorToast('Project path not found');
+            showErrorToast(t('projectPathNotFound'));
             return;
         }
 
         try {
-            const { folderExists, config } = await window.electron.ipcRenderer.invoke(
-                'check-project-config',
-                projectPath
-            );
+            const { folderExists, config } =
+                await window.electron.ipcRenderer.invoke(
+                    'check-project-config',
+                    projectPath
+                );
 
             if (!folderExists || !config) {
-                throw new Error('Invalid project structure');
+                throw new Error(t('invalidProjectStructure'));
             }
 
             const projectData = {
-                name: config.name,
+                ...config,
                 path: projectPath,
-                framework: config.framework,
-                config: config.config
             };
 
-            navigateToNextPage(navigate, projectData);
+            saveOrOpenProject(projectData);
         } catch (error) {
-            showErrorToast('Failed to open project: Invalid project structure');
-            console.error('Failed to open project:', error);
+            showErrorToast(t('failedOpenProjectStructure'));
+            console.error(t('failedOpenProject'), error);
         }
     };
 
@@ -66,12 +69,12 @@ export function CardGitProject({
                 <h3 className="font-semibold text-lg">{repo.name}</h3>
                 {repo.private && (
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                        Private
+                        {t('private')}
                     </span>
                 )}
             </div>
             <p className="text-gray-600 text-sm mb-4">
-                {repo.description || 'No description'}
+                {repo.description || t('noDescription')}
             </p>
             <div className="flex justify-end space-x-2">
                 <div className="mt-4 flex justify-between gap-2 items-center">
@@ -80,22 +83,26 @@ export function CardGitProject({
                         variant="outline"
                         onClick={() => window.open(repo.html_url)}
                     >
-                        View
+                        {t('view')}
                     </Button>
                     {isCloned ? (
-                        <Button size="sm" variant="outline" onClick={handleOpen}>
-                            Open
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleOpen}
+                        >
+                            {t('open')}
                         </Button>
                     ) : (
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleClone(repo)}
-                        disabled={isCloning}
-                    >
-                        <GitFork className="w-4 h-4 mr-2" />
-                        {isCloning ? 'Cloning...' : 'Clone'}
-                    </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleClone(repo)}
+                            disabled={isCloning}
+                        >
+                            <GitFork className="w-4 h-4 mr-2" />
+                            {isCloning ? t('cloning') : t('clone')}
+                        </Button>
                     )}
                 </div>
             </div>

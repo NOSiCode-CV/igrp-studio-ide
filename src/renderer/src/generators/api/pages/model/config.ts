@@ -1,6 +1,7 @@
-import { ModelConfig } from '@igrp/spring-engine/dist/interfaces/types'
-import { formatMethods } from '../../helpers'
+import { ModelConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types'
+import { formatMethods, getOptionsByObject } from '../../helpers'
 import { IColumnsTabelProps } from '../../types/Interfaces'
+import { SchemaTypeItem } from 'src/main/types'
 
 export const initialValues = {
 	type: 'model',
@@ -9,6 +10,7 @@ export const initialValues = {
 	tableName: '',
 	audit: true,
 	crud: false,
+	revision: false,
 	attributes: [
 		{
 			name: 'id',
@@ -18,7 +20,8 @@ export const initialValues = {
 			nullable: false,
 			unique: false,
 			primaryKey: true,
-			generationType: 'IDENTITY'
+			generationType: 'IDENTITY',
+			skipFieldRevision: false
 		},
 		{
 			name: '',
@@ -27,7 +30,8 @@ export const initialValues = {
 			defaultValue: '',
 			nullable: true,
 			unique: false,
-			primaryKey: false
+			primaryKey: false,
+			skipFieldRevision: false
 		}
 	],
 	indexes: [
@@ -41,7 +45,7 @@ export const initialValues = {
 	uniqueConstraints: [
 		{
 			name: '',
-			columns:[]
+			columns: []
 		}
 	]
 }
@@ -54,7 +58,8 @@ export const defaultValues: any = {
 		defaultValue: '',
 		nullable: false,
 		unique: false,
-		primaryKey: false
+		primaryKey: false,
+		skipFieldRevision: false
 	},
 	indexes: {
 		name: '',
@@ -90,13 +95,21 @@ export const indexOptionsOptions = [{ label: 'Unique', value: 'unique' }]
 export const getTablesColumns = ({
 	selectors,
 	attributes,
-	models
+	revision,
+	models,
+	enums,
+	currentItem,
+	t
 }): { [value: string]: IColumnsTabelProps[] } => {
 
+	const { module } = currentItem || {}
+
 	const modelsOptions = (models || [])
+		.filter((model) => model.content?.name !== name)
 		.map((model) => ({
-			value: model.name,
-			label: model.name,
+			value: model.content?.name || model.name,
+			label: model.content?.name || model.name,
+			module: model.content?.module
 		}));
 
 	const columns = attributes.map((attribute) => ({
@@ -104,60 +117,63 @@ export const getTablesColumns = ({
 		label: attribute.name
 	}))
 
-	const fieldTypeOptions = formatMethods(
-		(
-			selectors.find((selector) => 'MODEL_ATTRIBUTE_TYPES' in selector) as
-			| {
-				MODEL_ATTRIBUTE_TYPES: string[]
-			}
-			| undefined
-		)?.MODEL_ATTRIBUTE_TYPES || []
+	const dataTypes = (
+		selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+		| {
+			ATTRIBUTE_TYPES: string[]
+		}
+		| undefined
+	)?.ATTRIBUTE_TYPES || []
 
-
-	)
 	const generateTypes = formatMethods(
 		(
 			selectors.find((selector) => 'GENERATION_TYPES' in selector) as
 			| { GENERATION_TYPES: string[] }
 			| undefined
-		)?.GENERATION_TYPES || []
-	)
+		)?.GENERATION_TYPES || [])
+
+	const enumMap = getOptionsByObject(enums, module, null);
+
+	const fieldTypeOptions: SchemaTypeItem[] = [
+		{ label: t('dataTypes'), value: 'java', items: dataTypes },
+		{ label: t('enum'), value: 'enum', items: enumMap },
+		{ label: t('relation'), value: 'relation' }
+	]
+
 	return {
 		attributes: [
-			{ key: 'name', name: 'Name', type: 'text' },
-			{ key: 'type', name: 'Type', type: 'select', options: fieldTypeOptions },
+			{ key: 'name', name: t('name'), type: 'text' },
+			{ key: 'type', name: t('type'), type: 'typeSelectorDropdown', options: fieldTypeOptions },
 			{
 				key: 'group', name: '', type: 'group', items: [
 					{ key: 'primaryKey', name: 'Primary Key', type: 'checkbox' },
-					{ key: 'advanced', name: '', type: 'popoverModel', options: generateTypes },
+					{ key: 'advanced', name: '', type: 'popoverModel', options: { generateTypes, revision } },
 					{ key: 'relation', name: 'Relation', type: 'popoverRelation', options: { modelsOptions, models } },
 				]
 			}
 		],
 		indexes: [
-			{ key: 'name', name: 'Name', type: 'text', width: '25%' },
+			{ key: 'name', name: t('name'), type: 'text' },
 			{
 				key: 'columns',
-				name: 'Columns',
+				name: t('columns'),
 				type: 'multiSelect',
 				options: columns,
-				width: '50%'
 			},
 			{
 				key: 'unique',
-				name: 'Unique',
+				name: t('unique'),
 				type: 'checkbox',
-				width: '25%'
 			}
 		],
 		uniqueConstraints: [
-			{ key: 'name', name: 'Name', type: 'text', width: '25%' },
-			{ key: 'columns', name: 'Columns', type: 'multiSelect', options: columns, width: '50%' }
+			{ key: 'name', name: t('name'), type: 'text' },
+			{ key: 'columns', name: t('columns'), type: 'multiSelect', options: columns }
 		]
 	}
 }
 
-export const getValuesToSubmit = (values, module) => {
+export const getValuesToSubmit = (values: any, module: string) => {
 
 	const uniqueConstraints =
 		values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
@@ -177,7 +193,7 @@ export const getValuesToSubmit = (values, module) => {
 			type,
 		}));
 
-	const hasListPk = primaryKey.length > 1 ? true : false;
+	const hasListPk = primaryKey.length > 1;
 
 	const filteredAttributes = hasListPk
 		? attributes.filter((attribute) => attribute.primaryKey !== true)

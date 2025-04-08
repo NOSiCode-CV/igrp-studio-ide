@@ -19,12 +19,12 @@ import {
 import { PackageCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@renderer/components/ui/Switch';
+import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
 import { toInitCap } from '@renderer/utils/helpers';
-import CodeEditor from '@renderer/components/code-editor';
-import { Combobox } from '@igrp/igrp-design-system';
+import { IGRPCombobox } from '@renderer/components/combobox';
+import MonacoEditor from '@renderer/components/monaco-editor';
 
 interface PopoverProps {
     row: any;
@@ -64,24 +64,23 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             className="flex items-center"
                             size={'icon'}
                         >
-                            <PackageCheck className="w-4 h-4" />{' '}
-                            <span className="sr-only">{t('Advanced')}</span>
+                            <PackageCheck className="w-4 h-4" />
+                            <span className="sr-only">{t('advanced')}</span>
                         </Button>
                     </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top" align="center">
-                    {t('Open advanced settings')}
+                    {t('openAdvancedSettings')}
                 </TooltipContent>
             </Tooltip>
             <PopoverContent className="w-[425px]" align="end" side="bottom">
                 <Tabs defaultValue="dataType">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="dataType">
-                            {' '}
-                            {t('Data Type')}
+                            {t('dataType')}
                         </TabsTrigger>
                         <TabsTrigger value="jsonSchema">
-                            {t('JSON Schema')}
+                            {t('jsonSchema')}
                         </TabsTrigger>
                     </TabsList>
 
@@ -147,16 +146,12 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                         }
                                     />
                                 )}
-                                 {isEnum && (
-                                    <Combobox
-                                        name="enum"
+                                {isEnum && (
+                                    <IGRPCombobox
                                         className="h-8"
                                         value={row?.['enum'] || ''}
                                         onChange={(ev) =>
-                                            changeValue(
-                                                'enum',
-                                                ev
-                                            )
+                                            changeValue('enum', ev)
                                         }
                                         options={enumTypes}
                                     />
@@ -301,10 +296,11 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         </div>
                     </TabsContent>
                     <TabsContent value="jsonSchema">
-                        <CodeEditor
-                            value={JSON.stringify(row, null, 2)}
+                        <MonacoEditor
+                            content={JSON.stringify(row, null, 2)}
+                            filePath=""
                             onChange={handleChangeEditor}
-                            className="w-100"
+                            height="20vh"
                         />
                     </TabsContent>
                 </Tabs>

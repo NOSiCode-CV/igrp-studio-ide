@@ -1,14 +1,15 @@
-'use client'
+'use client';
 
-import { IGRPContainer } from '@igrp/igrp-design-system'
-import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
-import { Database, FileCode, FileText, Boxes } from 'lucide-react'
+import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card';
+import { Database, FileCode, FileText, Boxes } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 interface StatsCardProps {
-  title: string
-  value: number
-  icon: React.ReactNode
-  description?: string
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  description?: string;
 }
 
 function StatsCard({ title, value, icon, description }: StatsCardProps) {
@@ -23,49 +24,51 @@ function StatsCard({ title, value, icon, description }: StatsCardProps) {
         {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface DashboardOverviewProps {
   stats: {
-    modules: number
-    controllers: number
-    schemas: number
-    dtos: number
-  }
+    modules: number;
+    controllers: number;
+    models: number;
+    dto: number;
+  };
 }
 
 export default function DashboardOverview({ stats }: DashboardOverviewProps) {
+  const { t } = useTranslation(); // Hook for translations
+
   const overviewCards = [
     {
-      title: 'Modules',
+      title: t('modules'),
       value: stats.modules,
       icon: <Boxes className="h-4 w-4 text-muted-foreground" />,
-      description: 'Total application modules'
+      description: t('modulesDescription'),
     },
     {
-      title: 'Endpoints',
+      title: t('endpoints'),
       value: stats.controllers,
       icon: <FileCode className="h-4 w-4 text-muted-foreground" />,
-      description: 'API endpoints controllers'
+      description: t('endpointsDescription'),
     },
     {
-      title: 'Schemas',
-      value: stats.schemas,
+      title: t('schemas'),
+      value: stats.models,
       icon: <Database className="h-4 w-4 text-muted-foreground" />,
-      description: 'Data models and schemas'
+      description: t('schemasDescription'),
     },
     {
-      title: 'DTOs',
-      value: stats.dtos,
+      title: t('dtos'),
+      value: stats.dto,
       icon: <FileText className="h-4 w-4 text-muted-foreground" />,
-      description: 'Data transfer objects'
-    }
-  ]
+      description: t('dtosDescription'),
+    },
+  ];
 
   return (
     <IGRPContainer>
-      <p>Overview</p>
+      <p>{t('overview')}</p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {overviewCards.map((card) => (
           <StatsCard
@@ -76,7 +79,7 @@ export default function DashboardOverview({ stats }: DashboardOverviewProps) {
             description={card.description}
           />
         ))}
-      </div>{' '}
+      </div>
     </IGRPContainer>
-  )
+  );
 }

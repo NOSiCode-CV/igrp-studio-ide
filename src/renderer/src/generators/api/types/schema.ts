@@ -1,9 +1,7 @@
-import { SchemaType } from "@igrp/spring-engine/dist/interfaces/types";
-
 export interface SchemaField {
   name: string;
-  type: SchemaType;
-  description: string;
+  type: string;
+  description?: string;
   properties?: Record<string, SchemaField>;
   required?: boolean;
   nullable?: boolean;
@@ -23,7 +21,7 @@ export interface SchemaField {
 }
 
 export interface JSONSchema {
-  type: SchemaType;
+  type: string;
   properties: Record<string, SchemaField>
   required?: string[];
 }

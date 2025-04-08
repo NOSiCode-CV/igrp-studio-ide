@@ -1,35 +1,28 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from "react";
-import RowContainer from "./types/containers/rows";
-import { useDroppedComponents } from "./dnd/DroppedComponentsContext";
-import { generateId } from "@renderer/utils/helpers";
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 
-import navdata from "./data/ConfigData";
-import CodeMirrorContent from "./components/CodeMirrorContent";
-import { Component, PageConfig } from "@igrp/nextjs-engine/dist/interfaces/types";
-import useToast from "@renderer/components/useToast";
-import { HierarchicalComponent } from "./interfaces";
+import { useConfigdata } from './utils/useConfigData';
+import {
+    ComponentConfig,
+    PageConfig,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import useToast from '@renderer/components/useToast';
+import CodeContent from './components/CodeContent';
 
-import { DragDropContext } from '@hello-pangea/dnd';
-import { handleDragEnd } from "./dnd/DraggableItemManager";
-import { ScrollArea } from "@renderer/components/ui/scroll-area";
-import { AppSidebar } from "@renderer/layouts/components/app-ui-sidebar";
-import { SidebarInset, SidebarProvider } from "@renderer/components/ui/sidebar";
-import { buildJsonStructure } from "@renderer/utils/jsonStructureUtil";
-
-const addRow = () => {
-    const newRowId = generateId("row");
-    const newRow: HierarchicalComponent = {
-        id: newRowId,
-        columns: [{ id: generateId("col"), colSize: 12, components: [] }],
-    };
-
-    return newRow;
-};
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
+import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
+import { SidebarInset } from '@renderer/components/ui/sidebar';
+import { SidebarRight } from './components/sidebar/sidebar-right';
+import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
+import { handleDragEnd } from './dnd/DraggableItemManager';
+import { useDroppedComponents } from './dnd/DroppedComponentsContext';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { useDispatch } from 'react-redux';
+import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
+import { Page } from './types/components/Page';
 
 interface FormEngineProps {
-    basePath: string | undefined;
-    page: string;
-    pagePath: string | undefined;
+    basePath: string;
+    page: any;
     isDesign: boolean;
     onSave: () => void;
 }
@@ -38,168 +31,128 @@ interface FormEngineRef {
     handleSave: () => void;
 }
 
-const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(({ basePath, pagePath, page, isDesign }, ref) => {
+const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
+    ({ basePath, page, isDesign }, ref) => {
+        const { id, content, path: pagePath, label } = page;
+        const { type, path } = content;
 
-    const { reorderComponents, moveComponent, getComponentsByRow, setInitComponents, getAllComponents, removeRow, addDroppedComponent, getComponent, setEditingComponent, updateComponent } = useDroppedComponents();
+        const {
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
+            getAllComponents,
+            removeRow,
+            setEditingComponent,
+            clearEditingComponent,
+            currentComponent,
+            setInitComponents,
+        } = useDroppedComponents();
 
-    const components = getAllComponents();
+        const components: StructuredLayout = getAllComponents();
 
-    //const [isDesign, setIsDesign] = useState(true);
+        const { showErrorToast, showSuccessToast } = useToast();
 
-    const { showErrorToast, showSuccessToast } = useToast();
+        const { menuItems } = useConfigdata();
 
-    const navData = navdata().props.children;
+        const dispatch: any = useDispatch();
 
-    // Internal handleSave function in FormEngine
-    const internalHandleSave = () => {
-        console.log("FormEngine save triggered");
-        const jsonStructure = buildJsonStructure(components);
-        handleSave(jsonStructure)
-    };
+        // Internal handleSave function in FormEngine
+        const internalHandleSave = () => {
+            handleSave(components);
+        };
 
-    // Expose handleSave to parent via ref
-    useImperativeHandle(ref, () => ({
-        handleSave: internalHandleSave,
-    }));
+        // Expose handleSave to parent via ref
+        useImperativeHandle(ref, () => ({
+            handleSave: internalHandleSave,
+        }));
 
-    const handleClickAddControl = (id: string, type: string) => {
-        const newRow = addRow();
-        const rowIndex = components.findIndex(row => row.id === id);
+        useEffect(() => {
+            clearEditingComponent();
+        }, [isDesign]);
 
-        if (rowIndex !== -1) {
-            const newRows = [...components];
-            if (type === "top") {
-                newRows.splice(rowIndex, 0, newRow);
-            } else if (type === "bottom") {
-                newRows.splice(rowIndex + 1, 0, newRow);
-            }
-            setInitComponents(newRows);
-        }
-    };
-
-    const handleClickDeleteSection = (id: string) => {
-        removeRow(id)
-    }
-
-    useEffect(() => {
-        if (components.length === 0) {
-            const newRow = addRow();
-            setInitComponents([newRow]);
-        }
-    }, [components])
-
-    const handleSave = async (jsonStructure: Component[]) => {
-        try {
-
-            if (pagePath === undefined || basePath === undefined) return;
-
-            const pageConfig: PageConfig = {
-                type: 'page',
-                pageName: page,
-                path: page
-            }
-
-            const { error } = await window.api.addComponentToPage(pageConfig, jsonStructure, basePath);
-
-            if (error) {
-                showErrorToast(error);
-                return;
-            }
-
-            showSuccessToast('Components added successfully');
-        } catch (error) {
-            showErrorToast(error);
-        }
-    };
-
-    //TODO for refactor after accert new json model
-    useEffect(() => {
-        const getJsonData = async () => {
+        const handleSave = async (jsonStructure: StructuredLayout) => {
             try {
+                if (basePath === undefined) return;
 
-                if (pagePath === undefined) return;
+                const pageConfig: PageConfig = {
+                    id,
+                    type,
+                    path,
+                    pageName: label,
+                    components: jsonStructure,
+                };
 
-                const data = await window.api.getJsonContent(pagePath);
-                if (data.components) {
+                const compConfig: ComponentConfig = {
+                    id,
+                    type,
+                    path,
+                    name: label,
+                    components: jsonStructure,
+                };
 
-                    let dataSaved: HierarchicalComponent[] = [];
+                const { error } = await window.engine.createPage(
+                    type === 'page' ? pageConfig : compConfig,
+                    ENV_TYPES.NEXTJS,
+                    basePath
+                );
 
-                    data.components.map(row => {
-                        dataSaved = [
-                            ...dataSaved,
-                            {
-                                id: generateId("row"),
-                                columns: row.Row.map(col => ({
-                                    id: col.id || generateId("col"),
-                                    colSize: 12,
-                                    components: col.Col.flatMap(c => c.components.map(comp => ({ ...comp })))
-                                }))
-                            }
-                        ]
-                    })
-
-                    setInitComponents(dataSaved)
-
+                if (error) {
+                    showErrorToast(error);
+                    return;
                 }
 
+                showSuccessToast('Components added successfully');
+
+                dispatch(onSetChangeStatus(true));
             } catch (error) {
-                console.error('Failed to load JSON content:', error);
+                showErrorToast(error);
             }
-        }
-        getJsonData();
-    }, [basePath, page])
+        };
 
-    const droppedComponentsMethods = {
-        reorderComponents,
-        getComponentsByRow,
-        addDroppedComponent,
-        getComponent,
-        setEditingComponent,
-        setInitComponents,
-        removeRow,
-        moveComponent,
-        updateComponent
-    };
+        //TODO for refactor after accert new json model
+        useEffect(() => {
+            const getJsonData = async () => {
+                try {
+                    if (pagePath === undefined) return;
 
-    const onDragEnd = (result: any) => {
-        handleDragEnd(result, droppedComponentsMethods);
-    };
-
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <SidebarProvider
-                style={
-                    {
-                        "--sidebar-width": "350px",
-                    } as React.CSSProperties
+                    const data = await window.api.getJsonContent(pagePath);
+                    if (data.components) {
+                        setInitComponents(data.components);
+                    }
+                } catch (error) {
+                    console.error('Failed to load JSON content:', error);
                 }
-            >
-                <AppSidebar data={navData} />
+            };
+            getJsonData();
+        }, [basePath, page]);
+
+        const droppedComponentsMethods = {
+            setEditingComponent,
+            removeRow,
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
+        };
+
+        const onDragEnd = useCallback((result: DragEndResult) => {
+            console.log('dropZone', result);
+            handleDragEnd(result, droppedComponentsMethods);
+        }, []);
+
+        return (
+            <div className="flex flex-1 overflow-hidden">
+                <AppSidebar data={menuItems} basePath={basePath} />
                 <SidebarInset>
-                    <div className="flex flex-1 flex-col gap-4 px-4">
-                        <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto pr-3">
-                            {isDesign ? (
-                                <>
-                                    <div className="igrp-page-header"></div>
-                                    <div className="space-y-6 my-6" >
-                                        {components.map(row => (
-                                            <RowContainer
-                                                key={row.id}
-                                                id={row.id}
-                                                onClickAddControl={handleClickAddControl}
-                                                onClickDeleteSection={handleClickDeleteSection}
-                                            />
-                                        ))}
-                                    </div>
-                                </>
-                            ) : (
-                                <CodeMirrorContent />
-                            )}
-                        </ScrollArea>
+                    <div className="flex flex-1 flex-col gap-4 p-2">
+                        <ContainerScrollArea>
+                        {isDesign ? (
+                            <Page page={components} onDragEnd={onDragEnd} />
+                        ) : (
+                            <CodeContent pagePath={pagePath} />
+                        )}</ContainerScrollArea>
                     </div>
                 </SidebarInset>
-            </SidebarProvider>
-        </DragDropContext>
-    );
-});
+                {currentComponent && <SidebarRight />}
+            </div>
+        );
+    }
+);
 export default FormEngine;

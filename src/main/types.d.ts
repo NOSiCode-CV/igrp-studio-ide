@@ -5,9 +5,15 @@ type HandlerResponse<T = any> = {
     error?: string;
 };
 
+export type ProjectType = "frontend" | "backend"
+
+export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet';
+
 export interface NextConfigData {
     appName: string
     description?: string
+    workspaceId: string;
+    id: string;
 }
 
 export interface DotNetConfigData {
@@ -27,31 +33,44 @@ export interface SpringConfigData {
     description: string;
     group: string;
     artifact: string;
-    database: string;
+    database: "MySQL" | "Oracle" | "Postgresql" | "H2";
     projectStructureStyle: 'technical' | 'domain';
     enableObservability: boolean;
+    enableEntityRevision: boolean;
     projectStructureStyle: string;
-    igrpCoreVersion: string
+    igrpCoreVersion: string;
+    springBootVersion: string;
+    dependencies: Array<any>
+    enableGraalVm: boolean
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;
 
 export interface ProjectData {
+    id: string;
     name: string;
-    icon?: File;
-    type?: 'frontend' | 'backend';
-    framework: string;
-    config: ConfigData | undefinedF;
+    icon?: string;
+    type?: ProjectType
+    framework: FrameworkType
+    config?: ConfigData;
     path: string;
     themeColor?: string;
-    dt_created?: Date,
-    dt_updated?: Date,
-    location?: location
+    location?: location,
+    createdAt?: string;
+    updatedAt?: string;
+    workspaceId: string;
 }
 
-export type Page = {
-    page: number,
-    size: number
+export interface IWorkspace {
+    id: string;
+    name: string;
+    path: string;
+    slug: string;
+    description?: string;
+    createdAt: string;
+    updatedAt?: string;
+    lastOpenedAt?: string;
+    projects?: ProjectData[];
 }
 
 export interface IOpenProject {
@@ -64,17 +83,17 @@ export interface IOpenProject {
 export type PageableProjects = { data: Array<ProjectData>, total: number }
 
 export interface MenuItem {
-    id?: string; 
+    id?: string;
     label: string;
-    isHeader?: boolean; 
-    icon?: any; 
-    link?: string; 
-    stateVariables?: boolean; 
-    click?: (e: any) => void; 
-    subItems?: MenuItem[]; 
+    isHeader?: boolean;
+    icon?: any;
+    link?: string;
+    stateVariables?: boolean;
+    click?: (e: any) => void;
+    subItems?: MenuItem[];
     parentId?: string;
     badgeColor?: string;
-    badgeName?: string; 
+    badgeName?: string;
     type?: string;
     component?: React.ReactNode,
     path?: string,
@@ -84,30 +103,23 @@ export interface MenuItem {
     content?: any,
 }
 
-type FolderFiles = { [folderName: string]: FolderFileStructure };
-
-export interface File {
-    name: string;
-    path: string;
-    config?: Object
-    content?: Object
-}
-
-export interface FolderFileStructure {
-    name: string;
-    files: Array<Record<string, File[]>>; // Group files by subfolder
-    path: string;
+export interface FileTree {
+    name: string; // Name of the file or folder
+    path: string; // Full path of the file or folder
+    isDirectory: boolean; // Whether it's a directory
+    children?: FileTree[]; // Array of children (only for directories)
+    content?: any
 }
 
 export interface Repository {
-  id: number;
-  name: string;
-  full_name: string;
-  description: string | null;
-  private: boolean;
-  html_url: string;
-  clone_url: string;
-  updated_at: string | null;
+    id: number;
+    name: string;
+    full_name: string;
+    description: string | null;
+    private: boolean;
+    html_url: string;
+    clone_url: string;
+    updated_at: string | null;
 }
 
 interface Commit {
@@ -141,5 +153,41 @@ export interface Connection {
 export interface SchemaTypeItem {
     label: string;
     value: string;
+    module?: string;
     items?: SchemaTypeItem[]; // Optional submenu items
+}
+
+export interface DockerComposeConfig {
+    version: string;
+    services: Record<string, DockerComposeService>;
+    networks?: Record<string, DockerComposeNetwork>;
+    volumes?: Record<string, DockerComposeVolume>;
+    name: string
+}
+
+export interface DockerComposeService {
+    image: string;
+    containerName?: string;
+    ports?: string[];
+    volumes?: string[];
+    environment?: { name: string; value: string }[]
+    dependsOn?: string[];
+    networks?: string[];
+    hostname?: string;
+    restart?: string;
+    host_config?: Record<string, any>;
+    status: string
+}
+
+export interface DockerComposeNetwork {
+    name?: string;
+    driver?: string;
+    external?: boolean;
+    internal?: boolean;
+}
+
+export interface DockerComposeVolume {
+    name?: string;
+    driver?: string;
+    external?: boolean;
 }

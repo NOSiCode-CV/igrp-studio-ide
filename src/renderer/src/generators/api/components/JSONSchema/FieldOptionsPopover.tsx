@@ -7,7 +7,7 @@ import {
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { Switch } from '@renderer/components/ui/Switch';
+import { Switch } from '@renderer/components/ui/switch';
 import { SchemaField } from '../../types/schema';
 import { PackageCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Separator } from '@renderer/components/ui/separator';
-import CodeEditor from '@renderer/components/code-editor';
+import MonacoEditor from '@renderer/components/monaco-editor';
 
 interface FieldOptionsPopoverProps {
     field: SchemaField;
@@ -43,7 +43,7 @@ export function FieldOptionsPopover({
         onUpdate(updatedField);
     };
 
-    const handleChangeEditor = (_value)=>{
+    const handleChangeEditor = (_)=>{
 
     }
 
@@ -320,8 +320,8 @@ export function FieldOptionsPopover({
                         </div>
                     </TabsContent>
                     <TabsContent value="jsonSchema">
-                        <CodeEditor
-                            value={JSON.stringify(field, null, 2)}
+                        <MonacoEditor
+                            content={JSON.stringify(field, null, 2)}
                             onChange={handleChangeEditor}
                         />
                     </TabsContent>

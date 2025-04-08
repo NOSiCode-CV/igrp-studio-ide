@@ -1,60 +1,98 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Header from './components/header';
-import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import {
     IGRPSidebar,
     IGRPSidebarContent,
     IGRPSidebarFooter,
-    SidebarProvider,
-} from '@igrp/igrp-design-system';
-import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { Home, Settings } from 'lucide-react';
-import { SidebarProps } from '@igrp/igrp-design-system/dist/types';
-import Footer from './components/footer';
+} from '@renderer/components/app-sidebar-default';
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
+import { Database, Folder } from 'lucide-react';
+import FooterSidebar from './components/footer-sidebar';
+import { Footer } from './components/footer';
+import { Toaster } from '@renderer/components/ui/sonner';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { IWorkspace } from 'src/main/types';
+import { WorkspaceSwitcher } from './components/workspace-switch';
 
 interface LayoutProps {
     children: React.ReactNode;
 }
 
-const navData: SidebarProps[] = [
-    {
-        name: 'Home',
-        href: '#/',
-        icon: Home,
-    },
-    {
-        name: 'Settings',
-        href: '#/',
-        icon: Settings,
-    },
-];
+const MainLayout = (props: LayoutProps) => {
+    const {
+        workspace,
+        workspaces,
+        actions: { switchWorkspace },
+    } = useWorkspace();
 
-const MainLayout = (props: LayoutProps): JSX.Element => {
+    const workspaceItems = useMemo(() => {
+        return workspaces.map((workspace: IWorkspace) => ({
+            name: workspace.name,
+            icon: Folder,
+            badge: workspace.projects?.length || 0,
+            onClick: () => switchWorkspace(workspace),
+            contextMenu: [
+                { label: 'Rename', action: () => console.log(workspace.id) },
+                { label: 'Delete', action: () => console.log(workspace.id) },
+            ],
+            href:"#"
+        }));
+    }, [workspaces, switchWorkspace]);
+
+    const navData = useMemo(
+        () => [
+            {
+                name: 'Database',
+                type: 'item',
+                items: workspaceItems,
+                icon: Database,
+                href:"#"
+            },
+        ],
+        [workspaceItems]
+    );
+
     return (
-        <div className="h-screen flex flex-col">
-            <ToastContainer />
-            <Header />
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))]">
+            <SidebarProvider>
+                <div className="flex flex-col w-full h-screen">
+                    <Toaster
+                        position="top-right"
+                        richColors
+                        closeButton
+                        expand
+                    />
+                    <Header />
 
-            <div className="flex flex-1 overflow-hidden">
-                <SidebarProvider>
-                    <IGRPSidebar className="mt-10">
-                        <IGRPSidebarContent items={navData} />
-                        <IGRPSidebarFooter
-                            items={[]}
-                            className="mb-10 items-center text-xs text-muted-foreground"
-                        >
-                            <Footer />
-                        </IGRPSidebarFooter>
-                    </IGRPSidebar>
-                    <SidebarInset>
-                        <ScrollArea className="h-full">
-                            {props.children}
-                        </ScrollArea>
-                    </SidebarInset>
-                </SidebarProvider>
-            </div>
+                    <div className="flex flex-1 overflow-hidden">
+                        <IGRPSidebar className="!top-(--header-height)  h-[calc(100svh-var(--header-height-two))]">
+                            <IGRPSidebarContent items={navData}>
+                                {workspace && (
+                                    <WorkspaceSwitcher
+                                        workspaces={workspaces}
+                                        defaultWorkspace={workspace}
+                                        onWorkspaceChange={switchWorkspace}
+                                    />
+                                )}
+                            </IGRPSidebarContent>
+                            <IGRPSidebarFooter
+                                items={[]}
+                                className="items-center text-xs text-muted-foreground"
+                            >
+                                <FooterSidebar />
+                            </IGRPSidebarFooter>
+                        </IGRPSidebar>
+                        <SidebarInset className="flex-1">
+                            <ScrollArea className="h-[calc(100svh-var(--header-height-two))]">
+                                {props.children}
+                            </ScrollArea>
+                        </SidebarInset>
+                    </div>
+                    <Footer />
+                </div>
+            </SidebarProvider>
         </div>
     );
 };

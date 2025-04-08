@@ -17,6 +17,7 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { TooltipContent } from '@radix-ui/react-tooltip';
+import { useTranslation } from 'react-i18next';
 
 interface JSONSchemaBuilderProps {
     schemaTypes?: { label: string; value: string }[];
@@ -34,6 +35,8 @@ export function JSONSchemaBuilder({
     const [newFields, setNewFields] = useState<Record<string, SchemaField>>({});
     const [_alert, setAlert] = useState<string | null>(null);
 
+    const { t } = useTranslation();
+
     const [schema, setSchema] = useState<JSONSchema>(() => {
         if (initialSchema) {
             return {
@@ -45,7 +48,7 @@ export function JSONSchemaBuilder({
                 ),
             };
         }
-        return { type: 'object', properties: {} };
+        return { type: '', properties: {} };
     });
 
     const [fieldOrder, setFieldOrder] = useState<string[]>(() =>
@@ -71,18 +74,16 @@ export function JSONSchemaBuilder({
     }, [initialSchema]);
 
     useEffect(() => {
-        if (onSchemaChange) {
-            const orderedProperties = fieldOrder.reduce(
-                (acc, key) => {
-                    if (schema.properties[key]) {
-                        acc[key] = schema.properties[key];
-                    }
-                    return acc;
-                },
-                {} as Record<string, SchemaField>
-            );
-            onSchemaChange({ ...schema, properties: orderedProperties });
-        }
+        const orderedProperties = fieldOrder.reduce(
+            (acc, key) => {
+                if (schema.properties[key]) {
+                    acc[key] = schema.properties[key];
+                }
+                return acc;
+            },
+            {} as Record<string, SchemaField>
+        );
+        onSchemaChange?.({ ...schema, properties: orderedProperties });
     }, [schema, fieldOrder, onSchemaChange]);
 
     const generateUniqueName = (
@@ -105,11 +106,11 @@ export function JSONSchemaBuilder({
     ): SchemaField => {
         const updatedField = { ...field };
 
-        if (parentField) {
+        /*  if (parentField) {
             updatedField.name = generateUniqueName(field.name, existingNames);
             existingNames.add(updatedField.name);
         }
-
+ */
         if (
             (updatedField.type === 'object' || updatedField.type === 'array') &&
             updatedField.properties
@@ -131,8 +132,7 @@ export function JSONSchemaBuilder({
     };
 
     const handleAddNewField = (parentId?: string) => {
-        const newFieldName = `field${Object.keys(schema.properties).length + Object.keys(newFields).length + 1}`;
-
+        const newFieldName = `field${parentId}${Object.keys(schema.properties?.[parentId]?.properties ?? {}).length + 1}`;
         const newFieldId = `new_field_${Date.now()}`;
 
         const newField: SchemaField = {
@@ -140,6 +140,8 @@ export function JSONSchemaBuilder({
             type: 'string',
             description: '',
         };
+
+        console.log(newField);
 
         if (!parentId) {
             setNewFields((prev) => ({ ...prev, [newFieldId]: newField }));
@@ -204,9 +206,11 @@ export function JSONSchemaBuilder({
                     );
                 };
 
+                const properties = updateProperties(prev.properties);
+
                 return {
                     ...prev,
-                    properties: updateProperties(prev.properties),
+                    properties,
                 };
             });
         }
@@ -221,18 +225,20 @@ export function JSONSchemaBuilder({
             const updateProperties = (
                 properties: Record<string, SchemaField>
             ): Record<string, SchemaField> => {
-
                 if (id in properties) {
                     const { [id]: oldField, ...rest } = properties; // Remove the old field
                     return {
                         ...rest, // Keep the rest of the properties
-                        [updatedField.name]: { // Add the updated field with the new key
+                        [updatedField.name]: {
+                            // Add the updated field with the new key
                             ...oldField, // Preserve the old field's properties
                             ...updatedField, // Apply updates
                             properties: updatedField.properties
                                 ? Object.fromEntries(
-                                      Object.entries(updatedField.properties).map(([_key, field]) => [
-                                        field.name,
+                                      Object.entries(
+                                          updatedField.properties
+                                      ).map(([_key, field]) => [
+                                          field.name,
                                           {
                                               ...field,
                                           },
@@ -344,6 +350,8 @@ export function JSONSchemaBuilder({
                     };
                 });
             }
+
+            setFieldOrder(Object.keys(schema.properties));
         },
         []
     );
@@ -383,73 +391,81 @@ export function JSONSchemaBuilder({
     }, [schema, newFields]);
 
     return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right flex flex-1 items-center">
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={() => handleAddNewField()}
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-green-500 h-6 w-6"
-                                    >
-                                        <Plus size={14} />
-                                        <span className="sr-only">
-                                            Add new field
-                                        </span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Add new field</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+        <TooltipProvider>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('name')}</TableHead>
+                        <TableHead>{t('type')}</TableHead>
+                        <TableHead>{t('description')}</TableHead>
+                        <TableHead className="text-right flex flex-1 items-center">
+                            {fieldOrder.length === 0 &&
+                                Object.entries(newFields).length === 0 && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleAddNewField()
+                                                }
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-igrp h-6 w-6"
+                                            >
+                                                <Plus size={14} />
+                                                <span className="sr-only">
+                                                    {t('addNewField')}
+                                                </span>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t('addNewField')}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
 
-                        <JSONSchemaModal
-                            generateJSONSchema={generateJSONSchema}
+                            <JSONSchemaModal
+                                generateJSONSchema={generateJSONSchema}
+                            />
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {fieldOrder.map((id) => (
+                        <SchemaFieldRow
+                            key={id}
+                            id={id}
+                            field={schema.properties[id]}
+                            depth={0}
+                            onUpdate={(updatedField, _index) =>
+                                handleUpdateField(id, updatedField, false)
+                            }
+                            onDelete={() => handleDeleteField(id, false)}
+                            onAddSubfield={handleAddNewField}
+                            onAlert={setAlert}
+                            schemaTypes={schemaTypes}
+                            enumTypes={enumTypes}
                         />
-                    </TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {fieldOrder.map((id) => (
-                    <SchemaFieldRow
-                        key={id}
-                        id={id}
-                        field={schema.properties[id]}
-                        depth={0}
-                        onUpdate={(updatedField, _index) =>
-                            handleUpdateField(id, updatedField, false)
-                        }
-                        onDelete={() => handleDeleteField(id, false)}
-                        onAddSubfield={handleAddNewField}
-                        onAlert={setAlert}
-                        schemaTypes={schemaTypes}
-                        enumTypes={enumTypes}
-                    />
-                ))}
-                {Object.entries(newFields).map(([id, field]) => (
-                    <SchemaFieldRow
-                        key={id}
-                        id={id}
-                        field={field}
-                        depth={0}
-                        onUpdate={(updatedField) =>
-                            handleUpdateField(id, updatedField, true)
-                        }
-                        onDelete={() => handleDeleteField(id, true)}
-                        onAddSubfield={handleAddNewField}
-                        onAlert={setAlert}
-                        isNew={true}
-                        schemaTypes={schemaTypes}
-                        enumTypes={enumTypes}
-                    />
-                ))}
-            </TableBody>
-        </Table>
+                    ))}
+                    {Object.entries(newFields).map(([id, field]) => (
+                        <SchemaFieldRow
+                            key={id}
+                            id={id}
+                            field={field}
+                            depth={0}
+                            onUpdate={(updatedField) =>
+                                handleUpdateField(id, updatedField, true)
+                            }
+                            onDelete={() => handleDeleteField(id, true)}
+                            onAddSubfield={handleAddNewField}
+                            onAlert={setAlert}
+                            isNew={true}
+                            schemaTypes={schemaTypes}
+                            enumTypes={enumTypes}
+                        />
+                    ))}
+                </TableBody>
+            </Table>
+        </TooltipProvider>
     );
 }

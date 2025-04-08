@@ -1,0 +1,180 @@
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import fs from 'fs';
+import yaml from 'js-yaml';
+import path from 'path';
+import { DockerComposeConfig, DockerComposeService } from '../../types';
+
+const execAsync = promisify(exec);
+
+export class DockerService {
+    private composeCache: Record<string, DockerComposeConfig> = {};
+
+    private escapePath(pathString: string): string {
+        // Escape spaces and special characters in paths
+        return `"${pathString.replace(/"/g, '\\"')}"`;
+    }
+
+    async loadComposeFile(projectPath: string): Promise<DockerComposeConfig> {
+        const composePath = path.join(projectPath, 'igrp-compose.yaml');
+        const fileContents = fs.readFileSync(composePath, 'utf8');
+        this.composeCache[projectPath] = yaml.load(fileContents) as DockerComposeConfig;
+        return this.composeCache[projectPath];
+    }
+
+    async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
+        const composeFile = path.join(projectPath, 'igrp-compose.yaml');
+        const escapedComposeFile = this.escapePath(composeFile);
+        const serviceParam = service || '';
+
+        const envFilePath = path.join(projectPath, '.igrp.env');
+        const escapedEnvFilePath = this.escapePath(envFilePath);
+
+        if (!fs.existsSync(envFilePath)) {
+            throw new Error(`Environment file not found: ${envFilePath}`);
+        }
+
+        try {
+            const { stdout } = await execAsync(
+                `docker compose -f ${escapedComposeFile} --env-file ${escapedEnvFilePath} ${command} ${serviceParam}`
+            );
+            return stdout;
+        } catch (error: any) {
+            throw new Error(`Docker compose command failed: ${error.stderr || error.message}`);
+        }
+    }
+
+    async up(projectPath: string): Promise<DockerComposeService[]> {
+        try {
+            await this.executeComposeCommand(projectPath, `up -d --quiet-pull`);
+            return this.status(projectPath);
+        } catch (error: any) {
+            throw new Error(`Failed to start containers: ${error.message}`);
+        }
+    }
+
+    async down(projectPath: string): Promise<void> {
+        try {
+            await this.executeComposeCommand(projectPath, 'down --remove-orphans');
+        } catch (error: any) {
+            throw new Error(`Failed to stop containers: ${error.message}`);
+        }
+    }
+
+    async status(projectPath: string): Promise<DockerComposeService[]> {
+        try {
+            // Load compose file first to get all services
+            const compose = await this.loadComposeFile(projectPath);
+            const allServices = compose.services;
+            const serviceNames = Object.keys(allServices);
+
+            try {
+                // Get running containers
+                const stdout = await this.executeComposeCommand(projectPath, 'ps --format json');
+                const runningContainers = stdout.trim()
+                    .split('\n')
+                    .filter(line => line.trim())
+                    .map(line => JSON.parse(line));
+
+                // Create a map of running services for quick lookup
+                const runningServicesMap = new Map(
+                    runningContainers.map(container => [container.Service, container])
+                );
+
+                // Return all services with status info
+                return serviceNames.map(serviceName => {
+                    const serviceDef = allServices[serviceName];
+                    const containerInfo = runningServicesMap.get(serviceName);
+
+                    if (containerInfo) {
+                        // Service is running
+                        return {
+                            ...serviceDef,
+                            name: serviceName,
+                            id: containerInfo.ID,
+                            status: containerInfo.State,
+                            containerName: containerInfo.Name,
+                            ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
+                            // Include original compose configuration
+                            volumes: serviceDef.volumes || [],
+                            environment: this.parseEnvironmentToArray(serviceDef.environment),
+                            // Additional runtime info
+                            createdAt: containerInfo.CreatedAt,
+                            statusMessage: containerInfo.Status,
+                            dependsOn: containerInfo.depends_on,
+                        };
+                    } else {
+                        // Service is not running
+                        return {
+                            ...serviceDef,
+                            name: serviceName,
+                            id: '',
+                            status: 'not_running',
+                            containerName: serviceDef.containerName || `${compose.name}_${serviceName}`,
+                            ports: serviceDef.ports || [],
+                            volumes: serviceDef.volumes || [],
+                            environment: this.parseEnvironmentToArray(serviceDef.environment)
+                        };
+                    }
+                });
+
+            } catch (parseError) {
+                console.error('Error parsing container info, returning compose services:', parseError);
+                // Fallback to all services from compose file marked as not running
+                return serviceNames.map(serviceName => ({
+                    ...allServices[serviceName],
+                    name: serviceName,
+                    id: '',
+                    status: 'not_running',
+                    containerName: allServices[serviceName].containerName || `${compose.name}_${serviceName}`,
+                    ports: allServices[serviceName].ports || [],
+                    volumes: allServices[serviceName].volumes || [],
+                    environment: this.parseEnvironmentToArray(allServices[serviceName].environment)
+                }));
+            }
+        } catch (error: any) {
+            console.error('Error getting status:', error);
+            throw new Error(`Failed to get service status: ${error.message}`);
+        }
+    }
+
+    private parseEnvironmentToArray(
+        env?: Record<string, string> | string[] | Array<{ name: string; value: string }>
+    ): Array<{ name: string; value: string }> {
+        if (!env) return [];
+
+        // Handle array of {name, value} objects (already in correct format)
+        if (Array.isArray(env) && env.length > 0 && typeof env[0] === 'object' && 'name' in env[0]) {
+            return env as Array<{ name: string; value: string }>;
+        }
+
+        // Handle other formats and convert to array of objects
+        const envObj = this.parseEnvironment(env); // Reuse existing parsing logic
+        return Object.entries(envObj).map(([name, value]) => ({ name, value }));
+    } 
+    private parseEnvironment(env?: Record<string, string> | string[]): Record<string, string> {
+        if (!env) return {};
+        if (Array.isArray(env)) {
+            return env.reduce((acc, e) => {
+                const [key, ...value] = e.split('=');
+                acc[key] = value.join('=');
+                return acc;
+            }, {} as Record<string, string>);
+        }
+        return env;
+    }
+
+    async logs(projectPath: string, service?: string): Promise<string> {
+        return this.executeComposeCommand(projectPath, 'logs --no-color', service);
+    }
+
+    async restart(projectPath: string, service: string): Promise<void> {
+        await this.executeComposeCommand(projectPath, 'restart', service);
+    }
+
+    async build(projectPath: string): Promise<void> {
+        await this.executeComposeCommand(projectPath, 'build');
+    }
+}
+
+export const dockerService = new DockerService();

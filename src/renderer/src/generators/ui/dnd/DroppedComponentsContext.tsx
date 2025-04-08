@@ -5,146 +5,231 @@ import React, {
     ReactNode,
     useCallback,
 } from 'react';
-import { Column, DroppedComponent, HierarchicalComponent } from '../interfaces';
-import { ColProps } from '../types/containers/rows/ColContainer';
-import { reorder } from './helpers';
-
-export interface ComponentProps {
-    data: ColProps;
-    componentId?: string | null;
-    props?: Object;
-    index?: number;
-}
+import { useSidebar } from '@renderer/components/ui/sidebar';
+import {
+    Destination,
+    EditingComponentParams,
+    StructuredComponent,
+    StructuredLayout,
+} from '@renderer/lib/dnd/types';
+import { generateId } from '@renderer/utils/helpers';
+import { COMPONENT } from '../ComponentTypes';
 
 interface DroppedComponentsContextType {
-    setInitComponents: (components: HierarchicalComponent[]) => void;
-    getAllComponents: () => HierarchicalComponent[];
-    getComponents: (rowId: string, columnId: string) => DroppedComponent[];
-    getRow: (rowId: string) => HierarchicalComponent[];
-    addDroppedComponent: (props: ComponentProps) => void;
-    updateComponent: (
-        id: string,
-        updatedComponent: Partial<DroppedComponent>
+    newStructure: (name: string) => StructuredComponent;
+    setInitComponents: (components: StructuredLayout) => void;
+    getAllComponents: () => StructuredLayout;
+
+    handleAddChildToComponent: (
+        destination: Destination,
+        childComponent: StructuredComponent
     ) => void;
+
+    handleRemoveChildFromComponent: (destination: Destination) => void;
+
+    handleReorderChildInComponent: (
+        draggableId: string,
+        source: Destination,
+        destination: Destination
+    ) => void;
+
+    handleUpdateChildComponent: (
+        componentId: string,
+        updates: Partial<StructuredComponent>
+    ) => void;
+
     removeRow: (rowId: string) => void;
-    getComponentsByRow: (rowId: string) => Column[];
-    setEditingComponent: (component: Partial<DroppedComponent>) => void;
+    setEditingComponent: ({
+        path,
+        component,
+    }: EditingComponentParams) => void;
     clearEditingComponent: () => void;
-    currentComponent: Partial<DroppedComponent> | null;
-    getComponent: (
-        componentId: string
-    ) => Partial<DroppedComponent> | undefined;
-    removeColumn: (columnId: string) => void;
-    removeComponent: (componentId: string) => void;
-    removeComponentField: (fieldId: string) => void;
-    reorderComponents: ({ rowId, columnId, startIndex, endIndex }) => void;
-    moveComponent: ({
-        sourceRowId,
-        sourceColumnId,
-        destinationRowId,
-        destinationColumnId,
-        sourceIndex,
-        destinationIndex,
-    }) => void;
+    currentComponent: EditingComponentParams | null;
 }
 
 const DroppedComponentsContext = createContext<
     DroppedComponentsContextType | undefined
 >(undefined);
 
+const newStructuredComponent = (
+    name: string,
+    children?: Array<StructuredComponent>
+) => {
+    const newRowId = generateId(name);
+    const newRow: StructuredComponent = {
+        id: newRowId,
+        componentName: name,
+        label: name,
+        properties: {
+            variant: 'default',
+        },
+        children: children || [],
+    };
+
+    return newRow;
+};
+
 export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
-    const [components, setComponents] = useState<HierarchicalComponent[]>([]);
+    const { toggleSidebar, setOpen } = useSidebar();
+
+    const [components, setComponents] = useState<StructuredLayout>(
+        newStructuredComponent(COMPONENT.Container, [
+            newStructuredComponent(COMPONENT.Section),
+        ])
+    );
     const [currentComponent, setCurrentComponent] =
-        useState<Partial<DroppedComponent> | null>(null);
+        useState<EditingComponentParams | null>(null);
 
-    // Função que adiciona componentes na coluna correta
-    const addDroppedComponent = useCallback(
-        ({ data, index, componentId, props }: ComponentProps) => {
-            const newComponent: DroppedComponent | null = componentId
-                ? {
-                      id: componentId,
-                      ...props,
-                  }
-                : null;
+    const setInitComponents = (components: StructuredLayout) => {
+        setComponents(components);
+    };
 
-            setComponents((prevComponents) => {
-                const updatedComponents = [...prevComponents];
+    const newStructure = (name: string) => {
+        return newStructuredComponent(name);
+    };
 
-                // Verificar se a linha já existe (rowId)
-                const rowIndex = updatedComponents.findIndex(
-                    (row) => row.id === data.rowId
-                );
+    const handleAddChildToComponent = useCallback(
+        (
+            destination: Destination, // Contains droppableId (component ID) and index
+            childComponent: StructuredComponent
+        ) => {
+            // Validate inputs
+            if (!childComponent || !destination || !destination.droppableId) {
+                console.error('Invalid child component or destination');
+                return;
+            }
 
-                if (rowIndex === -1) {
-                    // Se a linha não existir, cria uma nova linha com uma coluna
-                    return [
-                        ...updatedComponents,
-                        {
-                            id: data.rowId,
-                            columns: [
-                                {
-                                    id: data.columnId,
-                                    colSize: data.colSize,
-                                    components: newComponent
-                                        ? [newComponent]
-                                        : [], // Se não houver componente, cria array vazio
-                                },
-                            ],
-                        },
-                    ];
+            // Recursive function to find and update the target component
+            const updateComponentTree = (
+                component: StructuredComponent
+            ): StructuredComponent => {
+                // If the current component matches the destination ID, add the child
+                if (component.id === destination.droppableId) {
+                    const updatedChildren = [...(component.children || [])];
+                    updatedChildren.splice(
+                        destination.index,
+                        0,
+                        childComponent
+                    );
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
                 }
 
-                const updatedRow = { ...updatedComponents[rowIndex] };
+                // If the current component has children, search recursively
+                if (component.children) {
+                    const updatedChildren =
+                        component.children.map(updateComponentTree);
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
 
-                // Verificar se a coluna já existe na linha
-                const columnIndex = updatedRow.columns.findIndex(
-                    (col) => col.id === data.columnId
-                );
+                // If no match is found, return the component unchanged
+                return component;
+            };
 
-                if (columnIndex === -1) {
-                    // Se a coluna não existir, adicionar uma nova coluna com array de componentes vazio ou com o novo componente
-                    updatedRow.columns = [
-                        ...updatedRow.columns,
-                        {
-                            id: data.columnId,
-                            colSize: data.colSize,
-                            components: newComponent ? [newComponent] : [],
-                        },
-                    ];
-                } else {
-                    let updatedColumn = { ...updatedRow.columns[columnIndex] };
+            // Update the components state
+            setComponents((prev) => ({
+                ...prev,
+                children: (prev.children || []).map(updateComponentTree),
+            }));
+        },
+        []
+    );
 
-                    // Se a coluna já existir e o componente não for nulo, adicionar o novo componente
-                    if (updatedColumn.components.length > 0 && newComponent) {
-                        const insertIndex =
-                            typeof index === 'number'
-                                ? index
-                                : updatedColumn.components.length;
+    const handleReorderChildInComponent = useCallback(
+        (
+            _draggableId: string,
+            source: Destination,
+            destination: Destination
+        ) => {
+            // Validate inputs
+            if (
+                !source ||
+                !destination ||
+                !source.droppableId ||
+                !destination.droppableId
+            ) {
+                console.error('Invalid source or destination');
+                return;
+            }
 
-                        updatedColumn.components = [
-                            ...updatedColumn.components.slice(0, insertIndex),
-                            newComponent,
-                            ...updatedColumn.components.slice(insertIndex),
-                        ];
-                    } else if (newComponent) {
-                        // No components yet, just add the new component
-                        updatedColumn.components = [newComponent];
-                    } else {
-                        updatedColumn = {
-                            ...updatedColumn,
-                            colSize: data.colSize,
-                        };
+            let movedComponent: StructuredComponent | null = null;
+
+            // Recursive function to find and remove the source component
+            const removeComponentFromSource = (
+                component: StructuredComponent
+            ): StructuredComponent => {
+                if (component.id === source.droppableId) {
+                    const updatedChildren = [...(component.children || [])];
+                    // Capture the moved component
+                    [movedComponent] = updatedChildren.splice(source.index, 1);
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+
+                if (component.children) {
+                    const updatedChildren = component.children.map(
+                        removeComponentFromSource
+                    );
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+
+                return component;
+            };
+
+            // Recursive function to insert the component into the destination
+            const insertComponentIntoDestination = (
+                component: StructuredComponent
+            ): StructuredComponent => {
+                if (component.id === destination.droppableId) {
+                    const updatedChildren = [...(component.children || [])];
+                    // Insert the moved component into the destination
+                    if (movedComponent) {
+                        updatedChildren.splice(
+                            destination.index,
+                            0,
+                            movedComponent
+                        );
                     }
-
-                    updatedRow.columns[columnIndex] = updatedColumn;
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
                 }
 
-                // Atualizar a linha no array de componentes and size row
-                updatedComponents[rowIndex] = {
-                    ...updatedRow,
-                };
+                if (component.children) {
+                    const updatedChildren = component.children.map(
+                        insertComponentIntoDestination
+                    );
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+
+                return component;
+            };
+
+            // Update the components state
+            setComponents((prev) => {
+                // First, remove the component from the source
+                const componentsAfterRemoval = removeComponentFromSource(prev);
+
+                // Then, insert the component into the destination
+                const updatedComponents = insertComponentIntoDestination(
+                    componentsAfterRemoval
+                );
 
                 return updatedComponents;
             });
@@ -152,278 +237,150 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         []
     );
 
+    const handleRemoveChildFromComponent = useCallback(
+        (destination: Destination) => {
+            // Validate inputs
+            if (!destination || !destination.droppableId) {
+                console.error('Invalid destination');
+                return;
+            }
+
+            // Recursive function to find and remove the target component by ID
+            const updateComponentTree = (
+                component: StructuredComponent
+            ): StructuredComponent | null => {
+                // If the current component matches the target ID, return null to remove it
+                if (component.id === destination.droppableId) {
+                    return null;
+                }
+
+                // If the current component has children, search for the target ID
+                if (component.children) {
+                    const updatedChildren = component.children
+                        .map(updateComponentTree) // Recursively update the children
+                        .filter(
+                            (child): child is StructuredComponent =>
+                                child !== null
+                        ); // Filter out null values
+
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+
+                // If no match is found, return the component unchanged
+                return component;
+            };
+
+            // Update the components state
+            setComponents((prev) => {
+                const updatedComponents = {
+                    ...prev,
+                    children: (prev.children || [])
+                        .map(updateComponentTree)
+                        .filter(
+                            (child): child is StructuredComponent =>
+                                child !== null
+                        ), // Filter out null values
+                };
+
+                return updatedComponents;
+            });
+        },
+        []
+    );
     //Funcao para fazer update de um component
-    const updateComponent = (
-        id: string,
-        updatedComponent: Partial<DroppedComponent>
-    ) => {
-        setComponents((prevComponents) =>
-            prevComponents.map((row) => ({
-                ...row,
-                columns: row.columns.map((column) => ({
-                    ...column,
-                    components: column.components.map((comp) =>
-                        comp.id === id ? { ...comp, ...updatedComponent } : comp
-                    ),
-                })),
-            }))
-        );
-    };
+    const handleUpdateChildComponent = useCallback(
+        (
+            componentId: string, // ID of the component to update
+            updates: Partial<StructuredComponent> // Partial updates to apply
+        ) => {
+            // Validate inputs
+            if (!componentId || !updates) {
+                console.error('Invalid component ID or updates');
+                return;
+            }
+
+            // Recursive function to find and update the target component
+            const updateComponentTree = (
+                component: StructuredComponent
+            ): StructuredComponent => {
+                // If the current component matches the target ID, apply the updates
+                if (component.id === componentId) {
+                    return {
+                        ...component,
+                        ...updates,
+                    };
+                }
+
+                // If the current component has children, search recursively
+                if (component.children) {
+                    const updatedChildren =
+                        component.children.map(updateComponentTree);
+                    return {
+                        ...component,
+                        children: updatedChildren,
+                    };
+                }
+
+                // If no match is found, return the component unchanged
+                return component;
+            };
+
+            // Update the components state
+            setComponents((prev) => ({
+                ...prev,
+                children: (prev.children || []).map(updateComponentTree),
+            }));
+        },
+        []
+    );
 
     // Função que remove uma linha
     const removeRow = useCallback((rowId: string) => {
         setComponents((prevComponents) => {
-            return prevComponents.filter((row) => row.id !== rowId);
+            const updatedComponents = {
+                ...prevComponents,
+                children: (prevComponents.children || []).filter(
+                    (row) => row.id !== rowId
+                ),
+            };
+
+            return updatedComponents;
         });
     }, []);
-
-    // Função que remove uma linha
-    const removeColumn = useCallback((columnId: string) => {
-        setComponents((prevComponents) => {
-            return prevComponents.map((row) => {
-                return {
-                    ...row,
-                    columns: row.columns.filter((col) => col.id !== columnId),
-                };
-            });
-        });
-    }, []);
-
-    // Função que remove uma components
-    const removeComponent = useCallback((componentId: string) => {
-        setComponents((prevComponents) => {
-            return prevComponents.map((row) => {
-                return {
-                    ...row,
-                    columns: row.columns.map((column) => ({
-                        ...column,
-                        components: column.components.filter(
-                            (comp) => comp.id !== componentId
-                        ),
-                    })),
-                };
-            });
-        });
-    }, []);
-
-    // Função que remove uma components
-    const removeComponentField = useCallback((fieldId: string) => {
-        setComponents((prevComponents) => {
-            return prevComponents.map((row) => {
-                return {
-                    ...row,
-                    columns: row.columns.map((column) => ({
-                        ...column,
-                        components: column.components.map((comp) => ({
-                            ...comp,
-                            fields: comp.fields
-                                ? comp.fields.filter(
-                                      (field) => field.id !== fieldId
-                                  )
-                                : comp.fields,
-                        })),
-                    })),
-                };
-            });
-        });
-    }, []);
-
-    // Função que obtém componentes de uma coluna específica
-    const getComponents = (
-        rowId: string,
-        columnId: string
-    ): DroppedComponent[] => {
-        const row = components.find((comp) => comp.id === rowId);
-        if (!row) return [];
-        const column = row.columns.find((col) => col.id === columnId);
-        return column && column.components ? column.components : [];
-    };
-
-    // Função que obtém todos os componentes de uma linha específica
-    const getComponentsByRow = (rowId: string): Column[] => {
-        const row = components.filter((comp) => comp.id === rowId);
-        if (row.length > 0) return row[0].columns;
-        return [];
-    };
-
-    const getRow = (rowId: string): HierarchicalComponent[] => {
-        return components.filter((comp) => comp.id === rowId);
-    };
 
     // Função que obtém todos os componentes
-    const getAllComponents = (): HierarchicalComponent[] => components;
+    const getAllComponents = (): StructuredLayout => components;
 
-    const setEditingComponent = (component: Partial<DroppedComponent>) => {
-        setCurrentComponent(component);
+    const setEditingComponent = ({
+        path,
+        component,
+    }: EditingComponentParams) => {
+        setCurrentComponent({ path, component });
+        toggleSidebar();
+        setOpen(false);
     };
 
     const clearEditingComponent = () => {
         setCurrentComponent(null);
     };
 
-    const getComponent = (
-        componentId: string
-    ): DroppedComponent | undefined => {
-        const foundComponent = components
-            .flatMap((row) => row.columns)
-            .flatMap((column) => column.components)
-            .find((comp) => comp.id === componentId);
-
-        return foundComponent;
-    };
-
-    const setInitComponents = (components: HierarchicalComponent[]) => {
-        setComponents(components);
-    };
-
-    const reorderComponents = ({ rowId, columnId, startIndex, endIndex }) => {
-        setComponents((prevComponents) => {
-            const updatedComponents = [...prevComponents];
-
-            // Find the index of the row to update
-            const rowIndex = updatedComponents.findIndex(
-                (row) => row.id === rowId
-            );
-
-            console.log(rowId, rowIndex);
-
-            // Make a copy of the row you want to reorder components in
-            const updatedRow = { ...updatedComponents[rowIndex] };
-
-            console.log(updatedRow);
-
-            const columnIndex = updatedRow.columns.findIndex(
-                (col) => col.id === columnId
-            );
-
-            // Make a copy of the column to update its components
-            const updatedColumn = { ...updatedRow.columns[columnIndex] };
-
-            // Ensure you're reordering the correct list of components inside the row
-            const listToReorder: DroppedComponent[] = [
-                ...updatedColumn.components,
-            ]; // Assuming components are stored as an array inside the row object
-
-            // Reorder the components within the column
-            const reorderedList: DroppedComponent[] = reorder(
-                listToReorder,
-                startIndex,
-                endIndex
-            );
-            console.log(reorderedList);
-
-            // Update the column's components with the reordered list
-            updatedColumn.components = reorderedList;
-
-            // Replace the updated column back into the row's columns array
-            updatedRow.columns[columnIndex] = updatedColumn;
-
-            // Replace the updated row back into the array of components
-            updatedComponents[rowIndex] = updatedRow;
-
-            return updatedComponents;
-        });
-    };
-
-    const moveComponent = ({
-        sourceRowId,
-        sourceColumnId,
-        destinationRowId,
-        destinationColumnId,
-        sourceIndex,
-        destinationIndex,
-    }) => {
-        setComponents((prevComponents) => {
-            const updatedComponents = [...prevComponents];
-
-            // Find the index of the source row
-            const sourceRowIndex = updatedComponents.findIndex(
-                (row) => row.id === sourceRowId
-            );
-            const sourceRow = { ...updatedComponents[sourceRowIndex] };
-
-            console.log(sourceRow);
-            if (!sourceRow.columns) return updatedComponents;
-
-            // Find the index of the source column within the source row
-            const sourceColumnIndex = sourceRow.columns.findIndex(
-                (col) => col.id === sourceColumnId
-            );
-            const sourceColumn = { ...sourceRow.columns[sourceColumnIndex] };
-
-            console.log(sourceColumn);
-
-            // Find the component to move
-            const sourceComponent = sourceColumn.components[sourceIndex];
-
-            console.log(sourceComponent);
-
-            // Remove the component from the source column
-            const updatedSourceComponents = [...sourceColumn.components];
-            updatedSourceComponents.splice(sourceIndex, 1); // Remove the component
-            sourceColumn.components = updatedSourceComponents;
-
-            // Update the source row's column
-            sourceRow.columns[sourceColumnIndex] = sourceColumn;
-
-            // Find the index of the destination row
-            const destinationRowIndex = updatedComponents.findIndex(
-                (row) => row.id === destinationRowId
-            );
-            const destinationRow = {
-                ...updatedComponents[destinationRowIndex],
-            };
-
-            // Find the index of the destination column within the destination row
-            const destinationColumnIndex = destinationRow.columns.findIndex(
-                (col) => col.id === destinationColumnId
-            );
-            const destinationColumn = {
-                ...destinationRow.columns[destinationColumnIndex],
-            };
-
-            // Insert the component into the destination column
-            const updatedDestinationComponents = [
-                ...destinationColumn.components,
-            ];
-            updatedDestinationComponents.splice(
-                destinationIndex,
-                0,
-                sourceComponent
-            ); // Add the component at the new index
-            destinationColumn.components = updatedDestinationComponents;
-
-            // Update the destination row's column
-            destinationRow.columns[destinationColumnIndex] = destinationColumn;
-
-            // Update the updatedComponents array with the modified source and destination rows
-            updatedComponents[sourceRowIndex] = sourceRow;
-            updatedComponents[destinationRowIndex] = destinationRow;
-
-            return updatedComponents;
-        });
-    };
-
     return (
         <DroppedComponentsContext.Provider
             value={{
+                newStructure,
                 setInitComponents,
-                addDroppedComponent,
-                updateComponent,
-                getRow,
-                getComponents,
+                handleAddChildToComponent,
+                handleRemoveChildFromComponent,
+                handleReorderChildInComponent,
+                handleUpdateChildComponent,
                 removeRow,
                 getAllComponents,
-                getComponentsByRow,
                 setEditingComponent,
                 clearEditingComponent,
                 currentComponent,
-                getComponent,
-                removeComponent,
-                removeColumn,
-                removeComponentField,
-                reorderComponents,
-                moveComponent,
             }}
         >
             {children}

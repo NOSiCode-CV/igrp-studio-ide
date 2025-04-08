@@ -1,3 +1,4 @@
+import { Button } from '@renderer/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip';
 import { cn } from '@renderer/lib/utils';
 import React from 'react';
@@ -87,18 +88,18 @@ export function RelationTypeSelector({
                             <React.Fragment key={type}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <button
-                                            type="button"
+                                        <Button
+                                            size="icon"
                                             onClick={() => onChange(type)}
                                             className={cn(
-                                                'p-2 rounded-md transition-colors relative',
+                                                'transition-colors relative',
                                                 value === type
                                                     ? 'bg-igrp text-white'
-                                                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800'
+                                                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800'
                                             )}
                                         >
                                             {relationTypeIcons[type]}
-                                        </button>
+                                        </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>{type}</p>

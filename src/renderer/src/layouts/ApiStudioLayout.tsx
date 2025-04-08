@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
 import withRouter from '@renderer/common/withRouter';
-import { createSelector } from 'reselect';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import {
-    getPages as onGetFolderFiles,
+    getFileThree as onGetFolderFiles,
     setChangeStatus as onSetChangeStatus,
 } from '@renderer/redux/thunks';
 
@@ -14,8 +12,11 @@ import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { AppSidebar } from './components/app-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { Navdata } from './components/nav-data';
+import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
+import { Footer } from './components/footer';
+import { Toaster } from '@renderer/components/ui/sonner';
+import useStudioAPI from '@renderer/hooks/use-studio-api';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -25,24 +26,12 @@ interface LayoutProps {
     }>;
 }
 
-const Layout = (props: LayoutProps): JSX.Element => {
+const Layout = (props: LayoutProps) => {
     const dispatch: any = useDispatch();
     const navigate = useNavigate();
 
-    const selectStudioState = (state: any) => state.PageBuilder;
-    const selectStudioProperties = createSelector(
-        selectStudioState,
-        (studio) => ({
-            config: studio.config,
-            folders: studio.folderFiles,
-            basePath: studio.basePath,
-            changeStatus: studio.changeStatus,
-            currentItem: studio.currentItem,
-        })
-    );
-
-    const { currentItem, changeStatus, config, basePath, folders } =
-        useSelector(selectStudioProperties);
+    const { currentItem, changeStatus, config, basePath, filesThree } =
+        useStudioAPI();
 
     useEffect(() => {
         dispatch(onGetFolderFiles(basePath));
@@ -55,7 +44,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
         }
     }, [changeStatus, basePath, dispatch]);
 
-    const menuItems = Navdata(folders).menuItems;
+    const { menuItems } = useNavdata(filesThree);
 
     useEffect(() => {
         if (!basePath) {
@@ -64,35 +53,42 @@ const Layout = (props: LayoutProps): JSX.Element => {
     }, [basePath, navigate]);
 
     return (
-        <SidebarProvider
-            style={
-                {
-                    '--sidebar-width': '380px',
-                } as React.CSSProperties
-            }
-        >
-            <div className="h-screen flex flex-col w-full">
-                <ToastContainer />
-                <Header config={config} basePath={basePath} />
-
-                <div className="flex flex-1 overflow-hidden">
-                    <AppSidebar
-                        menuItems={menuItems}
-                        className="mt-10"
-                        config={config}
-                        basePath={basePath}
-                        header
+        <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
+            <SidebarProvider
+                style={
+                    {
+                        '--sidebar-width': '380px',
+                    } as React.CSSProperties
+                }
+            >
+                <div className="h-screen flex flex-col w-full">
+                    <Toaster
+                        position="top-right"
+                        richColors
+                        closeButton
+                        expand
                     />
-                    <SidebarInset className="flex-1">
-                        {React.cloneElement(props.children, {
-                            basePath,
-                            currentItem,
-                            project: config,
-                        })}
-                    </SidebarInset>
+                    <Header config={config} basePath={basePath} />
+
+                    <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
+                        <AppSidebar
+                            menuItems={menuItems}
+                            config={config}
+                            basePath={basePath}
+                            header
+                        />
+                        <SidebarInset className="flex-1">
+                            {React.cloneElement(props.children, {
+                                basePath,
+                                currentItem,
+                                project: config,
+                            })}
+                        </SidebarInset>
+                    </div>
                 </div>
-            </div>
-        </SidebarProvider>
+                <Footer />
+            </SidebarProvider>
+        </div>
     );
 };
 

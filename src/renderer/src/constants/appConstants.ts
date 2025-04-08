@@ -12,6 +12,9 @@ export const PATTERNS = {
     NAMESPACE_VALIDATION_PATTERN: /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/,
     PARAMS_VALIDATION: /^[a-zA-Z0-9_]+$/,
     PATH_VALIDATION: /^[a-zA-Z_/]+$/,
+    SPECIAL_CHARACTERS: /^[a-zA-Z0-9\s]*$/,
+    NO_SPACE_BUT_ALLOW_HYPHEN: /^[^\s]+$/,
+    NAME_APP_VALIDATION: /^[a-zA-Z_-]+$/
 };
 
 
@@ -22,19 +25,22 @@ export enum OPTION_TYPE {
     CONTROLLER = "controller",
     DATA_OBJECTS = "dto",
     ACTION = 'action',
-    IMPORT_TABLE_DB = 'import_table_db',
-    RESPONSE = 'responses',
+    MODAL = 'modal',
+    RESPONSES = 'responses',
+    RESPONSE = 'response',
     ENUM = 'enum',
     DELETE = 'delete',
-    ERDDiagram= "ERDDiagram"
+    ERDDiagram = "ERDDiagram",
+    FILE_THREE = "filethree",
+    PERMISSIONS = "permissions"
 };
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum';
+export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree' | 'permissions';
 
 export const projectIcons = {
     nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
     springboot: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-    dotnet: 'https://www.christianfindlay.com/assets/images/blog/dotnet/logo.svg',
+    dotnet: 'https://www.svgrepo.com/show/376369/dotnet.svg',
     vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
     angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
     laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
@@ -78,12 +84,12 @@ export enum ENV_TYPES {
 };
 
 export const DatabaseOptions = [
-    { value: 'Postgresql', label: 'PostgreSQL' },
-    { value: 'Oracle', label: 'Oracle' },
     { value: 'MySQL', label: 'MySQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'Postgresql', label: 'PostgreSQL' },
 ];
 
 export const projectStructureStyle = [
     { value: 'technical', label: 'Technical' },
-    { value: 'domain', label: 'Domain' },
+    { value: 'domain', label: 'Domain-Driven Design (DDD)' },
 ];

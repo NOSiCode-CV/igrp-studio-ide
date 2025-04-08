@@ -1,13 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import {
-	ControllerConfig,
-	DTOBaseConfig,
-	DTOConfig,
-	ModelConfig
-} from '@igrp/spring-engine/dist/interfaces/types'
-import { AppConfig, Component, PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types'
-import { Connection, DatabaseResponse, HandlerResponse, Page, ProjectData } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
+import { EVENTS } from '../main/constants/events'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -16,101 +10,6 @@ const handleError = (error: unknown): HandlerResponse => ({
 
 // Custom APIs for renderer
 const api = {
-
-	createModule: async (moduleConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-module', moduleConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createModel: async (modelConfig: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-model', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createDto: async (dtoConfig: DTOConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-dto', dtoConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createController: async (
-		controllerConfig: ControllerConfig,
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:create-controller', controllerConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deleteDTO: async (config: DTOBaseConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:delete-dto', config, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deleteModel: async (config: ModelConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:delete-model', config, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deleteController: async (
-		config: ControllerConfig,
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('spring-engine:delete-controller', config, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	createPage: async (modelConfig: AppConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:create-page', modelConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	deletePage: async (pageConfig: PageConfig, basePath: string): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke('next-engine:delete-page', pageConfig, basePath)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
-
-	addComponentToPage: async (
-		pageConfig: PageConfig,
-		components: Component[],
-		basePath: string
-	): Promise<HandlerResponse> => {
-		try {
-			return await ipcRenderer.invoke(
-				'next-engine:add-component-page',
-				pageConfig,
-				components,
-				basePath
-			)
-		} catch (error) {
-			return handleError(error)
-		}
-	},
 
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
@@ -122,22 +21,17 @@ const api = {
 	getJsonContent: (filePath: string) =>
 		ipcRenderer.invoke('igrp-studio:get-json-content', filePath),
 
-	openVSCode: (basePath: string) => ipcRenderer.invoke('igrp-studio:open-vs-code', basePath),
+	getFileContent: (filePath: string) =>
+		ipcRenderer.invoke('igrp-studio:get-file-content', filePath),
+
+	readDirectory: (basePath: string) => ipcRenderer.invoke("read-directory", basePath),
+
+	readProjectFile: (filePath: string) => ipcRenderer.invoke("read-file", filePath),
+
+	openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => ipcRenderer.invoke('igrp-studio:open-ide', { basePath, ideType }),
+	getIDEs: () => ipcRenderer.invoke('igrp-studio:ides'),
 
 	getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
-
-	//Database
-	connectToDatabase: async (config: Connection): Promise<DatabaseResponse> => {
-		return await ipcRenderer.invoke('connect-database', config)
-	},
-
-	getTables: async (connectionName: string): Promise<DatabaseResponse> => {
-		return await ipcRenderer.invoke('get-tables', connectionName)
-	},
-
-	getTableStructure: async (connectionName: string, tableName: string): Promise<DatabaseResponse> => {
-		return await ipcRenderer.invoke('get-table-structure', connectionName, tableName)
-	},
 
 	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
 }
@@ -145,45 +39,157 @@ const api = {
 const engine = {
 	createProject: async (project: ProjectData, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-project', project, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PROJECT, project, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:delete-element', config, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.ENGINE.DELETE_ELEMENT, config, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-response', response, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_RESPONSE, response, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createDto: async (dtoConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_DTO, dtoConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createModule: async (moduleConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_MODULE, moduleConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createController: async (controllerConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_CONTROLLER, controllerConfig, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createModel: async (modelConfig: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_MODEL, modelConfig, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 	createEnum: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke('engine:create-enum', data, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_ENUM, data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	serializeElement: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.SERIALIZE_ELEMENT, data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	createPermission: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.CREATE_PERMISSION, data, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
 	},
 
+	createPage: async (data: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PAGE, data, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	registryComponent: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getComponent: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_COMPONENT, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getDependencies: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.GET_DEPENDENCIES, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {
-	project: {
-		findAllRecent: (page: Page) => {
-			return ipcRenderer.invoke('igrp-studio:repo:project.findAllRecent', page)
+	workspace: {
+		// Initialization
+		initialize: () => ipcRenderer.invoke(EVENTS.REPOSITORY.INITIALIZE),
+
+		// Project methods
+		findAllRecentProjects: (limit?: number) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, limit),
+		saveProject: async (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) => {
+			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project) } catch (error) {
+				return handleError(error)
+			}
 		},
-		save: (p: ProjectData) => {
-			return ipcRenderer.invoke('igrp-studio:repo:project.save', p)
-		},
-		delete: (p: ProjectData, index: number) => {
-			return ipcRenderer.invoke('igrp-studio:repo:project.delete', p, index)
+		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
+		deleteProject: (projectId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId),
+		getProject: (projectId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.GET, projectId),
+		findAllProjects: (workspaceId?: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_ALL, workspaceId),
+
+		// Workspace methods
+		findAllWorkspaces: () =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_ALL),
+		findRecentWorkspaces: (limit?: number) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, limit),
+		createWorkspace: (workspace: Omit<IWorkspace, 'id' | 'createdAt'>) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace),
+		updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.UPDATE, workspaceId, updates),
+		deleteWorkspace: (workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.DELETE, workspaceId),
+		getWorkspace: (workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET, workspaceId),
+		getLastAccessedWorkspace: () => ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT),
+
+		// Backup methods
+		createBackup: (backupPath?: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.BACKUP.CREATE, backupPath),
+		restoreBackup: (backupPath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.BACKUP.RESTORE, backupPath),
+
+		onError: (callback: (error: {
+			code: string;
+			message: string
+		}) => void) => {
+			ipcRenderer.on(EVENTS.ERROR, (_event, error) => callback(error));
+			return () => ipcRenderer.removeAllListeners(EVENTS.ERROR);
 		}
 	},
 	connection: {
@@ -195,7 +201,24 @@ const repo = {
 		},
 		delete: (connection: Connection) => {
 			return ipcRenderer.invoke('igrp-studio:repo:connection.delete', connection)
-		}
+		},
+		connectToDatabase: async (config: Connection): Promise<DatabaseResponse> => {
+			return await ipcRenderer.invoke('connect-database', config)
+		},
+
+		getTables: async (connectionName: string): Promise<DatabaseResponse> => {
+			return await ipcRenderer.invoke('get-tables', connectionName)
+		},
+
+		getTableStructure: async (connectionName: string, tableName: string): Promise<DatabaseResponse> => {
+			return await ipcRenderer.invoke('get-table-structure', connectionName, tableName)
+		},
+	},
+	docker: {
+		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
+		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
+		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
+		check: () => ipcRenderer.invoke('docker-check')
 	}
 }
 
@@ -217,10 +240,13 @@ if (process.contextIsolated) {
 			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 			getLanguage: () => ipcRenderer.invoke("get-language"),
 			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
+			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+			downloadUpdate: () => ipcRenderer.invoke('download-update'),
+			installUpdate: () => ipcRenderer.invoke('install-update')
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)
-		contextBridge.exposeInMainWorld('repo', repo)
+		contextBridge.exposeInMainWorld('igrpStudio', repo)
 		contextBridge.exposeInMainWorld('menu', window)
 	} catch (error) {
 		console.error(error)

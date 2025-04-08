@@ -1,42 +1,95 @@
-import { Copy, Move, Settings, Trash } from "lucide-react";
+import { Copy, Move, Settings, Trash } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import StructureDropdown from '../../components/StructureDropdown';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { COMPONENT } from '../../ComponentTypes';
 
 interface ToolsProps {
-    tag: string,
-    dragHandleProps?: any,
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
-    id: string
+    handleClickStructComp: (layout: string) => void;
+    comp: StructuredComponent;
 }
-const CompTools = ({ handleClickBtnEdition, handleClickDeleteComp, dragHandleProps, tag }: ToolsProps) => {
+
+const CompTools = ({
+    handleClickBtnEdition,
+    handleClickDeleteComp,
+    handleClickStructComp,
+    comp,
+}: ToolsProps) => {
+    const { componentName, label } = comp;
+
+    const isGrids = [COMPONENT.Columns].includes(componentName);
 
     return (
-        <div className="flex justify-content-end shadow-lg align-middle">
-            <div className="flex align-middle">
-                <span className="gen-c-copy-i" title="Container Copied">*</span>
-                <span className="c-holder-loading"></span>
-                <span className="c-type me-2 text-xs">{tag}</span>
+        <TooltipProvider>
+            <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
+                <div className="flex align-middle items-center">
+                    <span className="text-xs">{label}</span>
+                </div>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded">
+                            <Move className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Move</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded">
+                            <Copy className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Clone</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                {isGrids && (
+                    <StructureDropdown
+                        onClickStructure={handleClickStructComp}
+                    />
+                )}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            className="cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            onClick={handleClickBtnEdition}
+                        >
+                            <Settings className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Edit</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            onClick={handleClickDeleteComp}
+                        >
+                            <Trash className="h-4" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Delete</p>
+                    </TooltipContent>
+                </Tooltip>
             </div>
+        </TooltipProvider>
+    );
+};
 
-            <button className="container-mover cursor-pointer" {...dragHandleProps}>
-                <Move className="h-4" />
-            </button>
-
-            <button className="container-clone cursor-pointer" title="Clonar">
-                <Copy className="h-4" />
-            </button>
-
-            <button className="container-edit gen-edition-btn cursor-pointer" title="Editar"
-                onClick={handleClickBtnEdition}>
-                <Settings className="h-4" />
-            </button>
-
-            <button className="container-remove cursor-pointer" title="Remover"
-                onClick={handleClickDeleteComp}>
-                <Trash className="h-4" />
-            </button>
-
-        </div>
-    )
-}
-
-export default CompTools
+export default CompTools;

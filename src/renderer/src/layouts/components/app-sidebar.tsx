@@ -12,7 +12,14 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@renderer/components/ui/sidebar';
-import { Badge, ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
+import {
+    Badge,
+    ChevronRight,
+    FileText,
+    GitBranch,
+    Home,
+    Server,
+} from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -24,12 +31,13 @@ import {
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
 import { ProjectData, MenuItem } from 'src/main/types';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
-import { NavSettings } from './nav-data';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
+import FileExplorerSidebar from '@renderer/components/fileExplorer';
+import { useNavSettings } from './nav-data';
 
 interface AppSidebarProps {
     className?: string;
@@ -53,6 +61,8 @@ export function AppSidebar({
     const [activeItem, setActiveItem] = useState('');
     const menuApp = filterSubItems(menuItems, searchQuery);
 
+    const { menuItems: othersMenus } = useNavSettings();
+
     const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
     const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
@@ -75,20 +85,20 @@ export function AppSidebar({
     const handleClickMenu = (item: MenuItem) => {
         setActiveMenuGroup(item.label);
         if (item.id === 'apis') setActiveMenu(menuApp);
-        else {
-            const menus = NavSettings().menuItems;
-            const menuApp = filterSubItems(menus, searchQuery);
+        else if (item.id === 'settings') {
+            const menuApp = filterSubItems(othersMenus, searchQuery);
             setActiveMenu(menuApp);
-        }
+        } else setActiveMenu([]);
     };
 
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
-        {
+        { icon: FileText, label: t('explorer'), id: 'explorer' },
+        /*   {
             icon: FileText,
             label: t('documents'),
             id: 'documents',
-        },
+        }, */
         {
             icon: Badge,
             label: t('settings'),
@@ -98,7 +108,7 @@ export function AppSidebar({
             icon: GitBranch,
             label: t('git'),
             id: 'git',
-        }
+        },
     ];
 
     return (
@@ -106,7 +116,7 @@ export function AppSidebar({
             <Sidebar
                 collapsible="icon"
                 className={cn(
-                    'overflow-hidden [&>[data-sidebar=sidebar]]:flex-row mt-10',
+                    'overflow-hidden *:data-[sidebar=sidebar]:flex-row !top-(--header-height) h-[calc(100svh-var(--header-height-two))]',
                     className
                 )}
             >
@@ -114,8 +124,8 @@ export function AppSidebar({
                 <Sidebar
                     collapsible="none"
                     className={cn(
-                        '!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r',
-                        '!w-20'
+                        'w-[calc(var(--sidebar-width-icon)+1px)]! border-r',
+                        'w-20!'
                     )}
                 >
                     <SidebarHeader className="pr-0">
@@ -137,7 +147,7 @@ export function AppSidebar({
                     </SidebarHeader>
                     <SidebarContent>
                         <SidebarGroup>
-                            <SidebarGroupContent className="px-1.5 md:px-0">
+                            <SidebarGroupContent className="md:px-0">
                                 <SidebarMenu>
                                     {menuIcons.map((item, index) => (
                                         <SidebarMenuItem key={index}>
@@ -150,18 +160,17 @@ export function AppSidebar({
                                                     setOpen(true);
                                                     handleClickMenu(item);
                                                 }}
-                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg"
                                                 isActive={
                                                     item.label ===
                                                     activeMenuGroup
                                                 }
+                                                size="lg"
+                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
-                                                    {item.icon && (
-                                                        <item.icon size={20} />
-                                                    )}
+                                                    <item.icon size={20} />
                                                 </div>
-                                                <span className="text-xs text-center">
+                                                <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
                                                     {item.label}
                                                 </span>
                                             </SidebarMenuButton>
@@ -172,7 +181,7 @@ export function AppSidebar({
                         </SidebarGroup>
                     </SidebarContent>
                     <SidebarFooter className="items-center justify-center">
-                        <SidebarTrigger className="mb-14 items-center justify-center" />
+                        <SidebarTrigger className="items-center justify-center" />
                     </SidebarFooter>
                 </Sidebar>
 
@@ -187,38 +196,56 @@ export function AppSidebar({
                             handleSearch={handleSearch}
                         />
                     )}
-                    <SidebarContent className="mb-10">
-                        <ScrollArea>
-                        {activeMenuGroup !== 'Git' ? (
-                            <SidebarGroup>
-                                <SidebarGroupContent>
-                                    {activeMenu.map(
-                                        (item: MenuItem, index: number) => (
-                                            <SidebarMenu key={index}>
-                                                <Three
-                                                    key={index}
-                                                    item={item}
-                                                    handleSubItemClick={
-                                                        handleSubItemClick
-                                                    }
-                                                    activeItem={activeItem}
-                                                    basePath={basePath}
-                                                    activeMenuGroup={activeMenuGroup}
-                                                />
-                                            </SidebarMenu>
-                                        )
-                                    )}
-                                </SidebarGroupContent>
-                            </SidebarGroup>
-                            ) : (
-                                <GitCommitsSidebar
-                                    basePath={basePath}
-                                    onSelectCommit={(commit) => { 
-                                        // Optional: Handle commit selection
-                                        console.log('Selected Commit:', commit); 
-                                    }} 
-                                />
-                            )}
+                    <SidebarContent>
+                        <ScrollArea className="w-[300px]">
+                            <div className="flex">
+                                {activeMenuGroup === 'Explorer' ? (
+                                    <FileExplorerSidebar
+                                        basePath={basePath}
+                                        searchTerm={searchQuery}
+                                    />
+                                ) : activeMenuGroup === 'Git' ? (
+                                    <GitCommitsSidebar
+                                        basePath={basePath}
+                                        onSelectCommit={(commit) => {
+                                            console.log(
+                                                'Selected Commit:',
+                                                commit
+                                            );
+                                        }}
+                                    />
+                                ) : (
+                                    <SidebarGroup>
+                                        <SidebarGroupContent>
+                                            {activeMenu.map(
+                                                (
+                                                    item: MenuItem,
+                                                    index: number
+                                                ) => (
+                                                    <SidebarMenu key={index}>
+                                                        <Three
+                                                            key={index}
+                                                            level={index}
+                                                            item={item}
+                                                            handleSubItemClick={
+                                                                handleSubItemClick
+                                                            }
+                                                            activeItem={
+                                                                activeItem
+                                                            }
+                                                            basePath={basePath}
+                                                            activeMenuGroup={
+                                                                activeMenuGroup
+                                                            }
+                                                        />
+                                                    </SidebarMenu>
+                                                )
+                                            )}
+                                        </SidebarGroupContent>
+                                    </SidebarGroup>
+                                )}
+                            </div>
+                            <ScrollBar orientation="horizontal" />
                         </ScrollArea>
                     </SidebarContent>
                 </Sidebar>
@@ -228,21 +255,23 @@ export function AppSidebar({
 }
 
 function Three({
+    level,
     item,
     handleSubItemClick,
     activeItem,
     basePath,
-    activeMenuGroup
+    activeMenuGroup,
 }: {
+    level: number;
     item: MenuItem;
     handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
     activeItem: string;
     basePath: string;
-    activeMenuGroup?: string
+    activeMenuGroup?: string;
 }) {
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(level < 1);
 
-    const handleOpenChange = (newState) => {
+    const handleOpenChange = (newState: boolean) => {
         setOpen(newState);
     };
 
@@ -283,7 +312,8 @@ function Three({
                     <span>
                         {item.label}
                         {item.subItems &&
-                            item.subItems.length > 0  && activeMenuGroup === 'APIs' &&
+                            item.subItems.length > 0 &&
+                            activeMenuGroup === 'APIs' &&
                             `(${item.subItems.length})`}
                     </span>
                 </div>
@@ -313,10 +343,11 @@ function Three({
                     <TreeItem />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <SidebarMenuSub className="!pr-0 !mr-0">
-                        {item.subItems?.map((subItem, subIndex) => (
+                    <SidebarMenuSub className="pr-0! mr-0!">
+                        {item.subItems?.map((subItem, index) => (
                             <Three
-                                key={subIndex}
+                                key={index}
+                                level={index}
                                 item={subItem}
                                 handleSubItemClick={handleSubItemClick}
                                 activeItem={activeItem}

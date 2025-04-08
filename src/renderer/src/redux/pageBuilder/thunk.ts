@@ -3,13 +3,12 @@ import { ROUTES } from '@renderer/routes/routeConstants';
 import {
   setConfigAction,
   setBasePathAction,
-  setFolderFilesAction,
   setChangeStatusAction,
-  setCurrentItemAction
+  setCurrentItemAction,
+  setFilesThreeAction,
+  setWorkspaceAction
 } from './reducer';
-import { PageConfig } from '@igrp/nextjs-engine/dist/interfaces/types';
-import useToast from '@renderer/components/useToast';
-import { ProjectData, FolderFiles } from 'src/main/types';
+import { FileTree, IWorkspace, ProjectData } from 'src/main/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 /**
  * set BasePath
@@ -51,14 +50,25 @@ export const setCurrentItem = (item: any) => async (dispatch: any) => {
   } catch (error) { }
 };
 
+/**
+ * set status
+ * @param {*} param0
+ */
+export const setWorkspace = (workspace: IWorkspace) => async (dispatch: any) => {
+  try {
+    dispatch(setWorkspaceAction(workspace));
+  } catch (error) { }
+};
+
 
 /**
  * set BasePath
  * @param {*} param0
  */
-export const navigateToNextPage = (navigate, appConfig: ProjectData) => {
+export const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
   try {
     if (appConfig.framework === ENV_TYPES.NEXTJS) {
+      await window.engine.registryComponent(ENV_TYPES.NEXTJS, appConfig.path)
       navigate(ROUTES.PATH_PAGE_BUILDER_UI);
     } else if (appConfig.framework === ENV_TYPES.SPRING) {
       navigate(ROUTES.PATH_PAGE_BUILDER_API);
@@ -68,35 +78,16 @@ export const navigateToNextPage = (navigate, appConfig: ProjectData) => {
   }
 };
 
-/**
+/* /**
 *  fetch  pages
 * @param {*} param0
 */
-export const getPages = (basePath: string) => async (dispatch: any) => {
+
+export const getFileThree = (basePath: string) => async (dispatch: any) => {
   try {
-    let folderFiles: FolderFiles = await window.api.fetchFiles(basePath)
-    dispatch(setFolderFilesAction(folderFiles));
+    let filesThree: FileTree[] = await window.api.fetchFiles(`${basePath}/.igrpstudio`)
+    dispatch(setFilesThreeAction(filesThree));
   } catch (error) {
     console.error('error:', error);
-  }
-};
-
-/**
-*  delete  page file
-* @param {*} param0
-*/
-export const deletePage = (pageConfig: PageConfig, basePath: string) => async () => {
-  const { showErrorToast, showSuccessToast } = useToast();
-  try {
-    const { error } = await window.api.deletePage(pageConfig, basePath)
-
-    if (error) {
-      showErrorToast(error);
-    }
-
-    showSuccessToast('Page removed successfully');
-
-  } catch (error) {
-    showErrorToast(error);
   }
 };

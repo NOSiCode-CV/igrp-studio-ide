@@ -9,14 +9,17 @@ import {
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
-import { DotNetConfigData } from 'src/main/types';
-import { Combobox } from '@igrp/igrp-design-system';
+import { DotNetConfigData, ProjectData } from 'src/main/types';
+import { IGRPCombobox } from '@renderer/components/combobox';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
-import useCore from '@renderer/hooks/useCore';
-import { useTranslation } from 'react-i18next'; 
+import useCore from '@renderer/hooks/use-core';
+import { useTranslation } from 'react-i18next';
+import { FormikErrors } from 'formik';
+import { LabelRequired } from '@renderer/components/label-required';
 
 interface DotNetConfigProps {
     data: DotNetConfigData;
+    errors?: FormikErrors<ProjectData>;
     onChange: (data: DotNetConfigData) => void;
 }
 
@@ -57,7 +60,7 @@ export function DotNetConfig({
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="apiName">{t('projectName')}</Label>
+                <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
                     id="apiName"
                     value={data.apiName}
@@ -65,6 +68,7 @@ export function DotNetConfig({
                         onChange({ ...data, apiName: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
+                    maxLength={20}
                 />
             </div>
 
@@ -81,7 +85,7 @@ export function DotNetConfig({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="artifact">{t('artifact')}</Label>
+                <LabelRequired>{t('artifact')}</LabelRequired>
                 <Input
                     id="artifact"
                     value={data.artifact}
@@ -89,14 +93,14 @@ export function DotNetConfig({
                         onChange({ ...data, artifact: e.target.value })
                     }
                     placeholder={t('enterArtifact')}
+                    maxLength={20}
                 />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label>{t('chooseDbEngine')}</Label>
-                    <Combobox
-                        name="database"
+                    <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
+                    <IGRPCombobox
                         value={data.database}
                         onChange={(value) =>
                             onChange({ ...data, database: value })
@@ -106,10 +110,9 @@ export function DotNetConfig({
                     />
                 </div>
                 <div className="space-y-2 flex flex-col">
-                    <Label>{t('igrpCoreVersion')}</Label>
-                    <Combobox
+                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
+                    <IGRPCombobox
                         options={versions || []}
-                        name="igrpCoreVersion"
                         value={data.igrpCoreVersion}
                         onChange={(value) =>
                             onChange({ ...data, igrpCoreVersion: value })

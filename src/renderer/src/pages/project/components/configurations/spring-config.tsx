@@ -2,21 +2,26 @@
 
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import {
-    RadioGroup,
-    RadioGroupItem,
-} from '@renderer/components/ui/radio-group';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/Textarea';
 import { useEffect, useState } from 'react';
-import { SpringConfigData } from 'src/main/types';
-import { Combobox } from '@igrp/igrp-design-system';
-import { DatabaseOptions } from '@renderer/constants/appConstants';
-import useCore from '@renderer/hooks/useCore';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { ProjectData, SpringConfigData } from 'src/main/types';
+import {
+    DatabaseOptions,
+    projectStructureStyle,
+} from '@renderer/constants/appConstants';
+import useCore from '@renderer/hooks/use-core';
+import { useTranslation } from 'react-i18next';
+import { FormikErrors } from 'formik';
+import { LabelRequired } from '@renderer/components/label-required';
+import { Separator } from '@renderer/components/ui/separator';
+import { SelectInput } from '@renderer/generators/api/components/inputs-form';
+import { IGRPCombobox } from '@renderer/components/combobox';
+import DependencySelector from '@renderer/components/dependency-selector';
 
 interface SpringConfigProps {
     data: SpringConfigData;
+    errors?: FormikErrors<ProjectData>;
     onChange: (data: SpringConfigData) => void;
 }
 
@@ -28,11 +33,16 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
+    enableEntityRevision: false,
     igrpCoreVersion: '',
+    springBootVersion: '',
+    dependencies: [],
+    enableGraalVm: false,
 };
 
 export function SpringConfig({
     data = DEFAULT_SPRING_CONFIG,
+    errors,
     onChange,
 }: SpringConfigProps) {
     const [versions, setVersions] = useState([]);
@@ -72,8 +82,8 @@ export function SpringConfig({
 
     return (
         <div className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="apiName">{t('projectName')}</Label>
+            <div className="flex flex-col gap-3">
+                <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
                     id="apiName"
                     value={data.apiName}
@@ -81,10 +91,16 @@ export function SpringConfig({
                         onChange({ ...data, apiName: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
+                    maxLength={50}
                 />
+                {errors?.config && errors.config.apiName && (
+                    <p className="text-xs text-destructive">
+                        {errors.config.apiName}
+                    </p>
+                )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-3">
                 <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                     id="description"
@@ -97,8 +113,8 @@ export function SpringConfig({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="group">{t('group')}</Label>
+                <div className="flex flex-col gap-3">
+                    <LabelRequired>{t('group')}</LabelRequired>
                     <Input
                         id="group"
                         value={data.group}
@@ -106,11 +122,17 @@ export function SpringConfig({
                             onChange({ ...data, group: e.target.value })
                         }
                         placeholder={t('enterGroup')}
+                        maxLength={20}
                     />
+                    {errors?.config && errors.config.group && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.group}
+                        </p>
+                    )}
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="artifact">{t('artifact')}</Label>
+                <div className="flex flex-col gap-3">
+                    <LabelRequired>{t('artifact')}</LabelRequired>
                     <Input
                         id="artifact"
                         value={data.artifact}
@@ -118,16 +140,21 @@ export function SpringConfig({
                             onChange({ ...data, artifact: e.target.value })
                         }
                         placeholder={t('enterArtifact')}
+                        maxLength={20}
                     />
+                    {errors?.config && errors.config.artifact && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.artifact}
+                        </p>
+                    )}
                 </div>
                 <PackageName />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 flex flex-col">
-                    <Label>{t('chooseDbEngine')}</Label>
-                    <Combobox
-                        name="database"
+                <div className="flex flex-col gap-3">
+                    <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
+                    <IGRPCombobox
                         value={data.database}
                         onChange={(value) =>
                             onChange({ ...data, database: value })
@@ -135,27 +162,40 @@ export function SpringConfig({
                         options={DatabaseOptions}
                         className="w-full"
                     />
+                    {errors?.config && errors.config.database && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.database}
+                        </p>
+                    )}
                 </div>
-                <div className="space-y-2 flex flex-col">
-                    <Label>{t('igrpCoreVersion')}</Label>
-                    <Combobox
+                <div className="flex flex-col gap-3">
+                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
+                    <IGRPCombobox
                         options={versions || []}
-                        name="igrpCoreVersion"
                         value={data.igrpCoreVersion}
                         onChange={(value) =>
                             onChange({ ...data, igrpCoreVersion: value })
                         }
                         className="w-full"
                     />
+                    {errors?.config && errors.config.igrpCoreVersion && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.igrpCoreVersion}
+                        </p>
+                    )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-2">
-                <div className="space-y-3">
-                    <Label>{t('projectStructureStyle')}</Label>
-                    <RadioGroup
+            <Separator orientation="horizontal" />
+
+            <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-3">
+                    <SelectInput
+                        id={'projectStructureStyle'}
+                        label={t('projectStructureStyle')}
+                        options={projectStructureStyle || []}
                         value={data.projectStructureStyle}
-                        onValueChange={(value) =>
+                        onChange={(value) =>
                             onChange({
                                 ...data,
                                 projectStructureStyle: value as
@@ -163,35 +203,74 @@ export function SpringConfig({
                                     | 'domain',
                             })
                         }
-                        className="flex gap-4"
-                    >
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="technical" id="technical" />
-                            <Label htmlFor="technical">{t('technical')}</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">{t('domainDriven')}</Label>
-                        </div>
-                    </RadioGroup>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="observability"
-                        checked={data.enableObservability}
-                        onCheckedChange={(checked) =>
+                        onBlur={(value) =>
                             onChange({
                                 ...data,
-                                enableObservability: checked as boolean,
+                                projectStructureStyle: value as
+                                    | 'technical'
+                                    | 'domain',
                             })
                         }
+                        className="w-full"
                     />
-                    <Label htmlFor="observability">
-                        {t('enableObservability')}
-                    </Label>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="observability"
+                            checked={data.enableObservability}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableObservability: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="observability">
+                            {t('enableObservability')}
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="enableEntityRevision"
+                            checked={data.enableEntityRevision}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableEntityRevision: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="enableEntityRevision">
+                            {t('enableEntityRevision')}
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="enableGraalVm"
+                            checked={data.enableGraalVm}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableGraalVm: checked as boolean,
+                                })
+                            }
+                        />
+                        <Label htmlFor="enableGraalVm">
+                            {t('enableGraalVm')}
+                        </Label>
+                    </div>
                 </div>
             </div>
+
+            <Separator orientation="horizontal" />
+
+            <DependencySelector
+                onSelectedDependencies={(dependencies) =>
+                    onChange({ ...data, dependencies })
+                }
+            />
         </div>
     );
 }

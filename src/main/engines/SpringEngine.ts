@@ -1,34 +1,54 @@
 // engines/SpringEngine.ts
-import { addEnum, addResponse, deleteElement, newApi } from '@igrp/spring-engine';
-import { ProjectRepository } from '../repo/projects';
+import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController, getSpringDependencies } from '@igrp/igrp-studio-springboot-engine';
 import { BaseEngine } from '../interfaces';
-import { BaseApiConfig, DeleteConfig, EnumConfig, ResponseConfig } from '@igrp/spring-engine/dist/interfaces/types';
-import { ProjectData } from '../types';
+import { BaseApiConfig, ControllerConfig, DeleteConfig, DTOConfig, EnumConfig, ModelConfig, ModuleConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import { ProjectData, SpringConfigData } from '../types';
+import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
+import { ensureDirectoryExists } from '../helpers';
 
 export class SpringEngine implements BaseEngine {
 
+  async getDependencies(): Promise<Dependency[]> {
+    return await getSpringDependencies()
+  }
+
+  async createController(config: ControllerConfig, basePath: string): Promise<void> {
+    await addController(config, basePath)
+  }
+
+  async createModel(config: ModelConfig, basePath: string): Promise<void> {
+    await addModel(config, basePath)
+  }
+
+  async createModule(config: ModuleConfig, basePath: string): Promise<void> {
+    await addModule(config, basePath)
+  }
+
+  async createDto(config: DTOConfig, basePath: string): Promise<void> {
+    await addDTO(config, basePath)
+  }
+
+  createPermission(_data: any, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   async delete(config: DeleteConfig, basePath: string): Promise<void> {
     await deleteElement(config, basePath)
   }
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    const repo = new ProjectRepository()
-
-    const config: BaseApiConfig = {
-      ...project.config,
-      type: project.framework
+    const appConfig: BaseApiConfig = {
+      ...project.config as SpringConfigData,
+      workspaceId: project.workspaceId,
+      id: project.id,
+      type: 'springboot',
     }
 
-    // Lógica específica do Spring
-    await newApi(config, basePath);
+    // Ensure the basePath exists
+    await ensureDirectoryExists(basePath);
 
-    await repo.save({
-      ...project,
-      path: basePath,
-      dt_created: new Date(),
-      location: 'local'
-    });
+    await newApi(appConfig, basePath);
+
   }
 
   async createResponse(config: ResponseConfig, basePath: string): Promise<void> {
@@ -37,6 +57,10 @@ export class SpringEngine implements BaseEngine {
 
   async createEnum(data: EnumConfig, basePath: string): Promise<void> {
     await addEnum(data, basePath);
+  }
+
+  async serializeElement(data: any, basePath: string): Promise<void> {
+    await createElement(data, basePath);
   }
 
 }

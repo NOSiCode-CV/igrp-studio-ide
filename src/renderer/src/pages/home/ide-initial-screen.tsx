@@ -1,68 +1,125 @@
-import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
-import { FolderOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import WelcomeHeader from './components/welcome-header';
+import CreateWorkspace from './components/create-workspace';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 import useToast from '@renderer/components/useToast';
+import Loader from '@renderer/components/loader';
+import { IWorkspace } from 'src/main/types';
 import {
-    navigateToNextPage,
-    setBasePath,
-    setConfig,
-} from '@renderer/redux/thunks';
-import RecentsProjects from './components/recents-projects';
-import { PageHeader } from '@igrp/igrp-design-system';
-import { ProjectWizard } from '../project';
-import { IOpenProject } from 'src/main/types';
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from '@renderer/components/ui/tabs';
+import { Container, FolderKanban, Network, Settings } from 'lucide-react';
+import Resources from './components/Resources';
+import { WorkspaceSettings } from './components/workspace-settings';
+import { WorkspaceDocker } from './components/workspace-docker';
 
-const IDEInitialScreen = (): JSX.Element => {
-    const { t } = useTranslation();
+const IDEInitialScreen = () => {
+    const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
+    const [hasWorkspace, setHasWorkspace] = useState(false);
+    const { showSuccessToast } = useToast();
 
-    const navigate = useNavigate();
-    const dispatch: any = useDispatch();
-    const { showErrorToast } = useToast();
+    const {
+        workspace,
+        loading: workspacesLoading,
+        actions: { refreshWorkspaces },
+    } = useWorkspace();
 
-    const onHandleOpenProjectClick = async (): Promise<void> => {
-        const result: IOpenProject = await window.api.openDirectory('');
+    useEffect(() => {
+        const checkWorkspaces = async () => {
+            setHasWorkspace(workspace !== null);
 
-        const { canceled, basePath, config, folderExists } = result;
+            setShowWorkspaceDialog(
+                workspace === null || workspace === undefined
+            );
+        };
 
-        if (canceled || !basePath || !config) {
-            return;
-        }
+        checkWorkspaces();
+    }, [workspace, workspacesLoading]);
 
-        if (!folderExists || !config.framework) {
-            showErrorToast(t('notFoundProject'));
-            return;
-        }
+    useEffect(() => {
+        refreshWorkspaces();
+    }, []);
 
-        dispatch(setBasePath(basePath));
-
-        dispatch(setConfig(config));
-
-        await window.repo.project.save(config);
-
-        // Navigate to the next page
-        navigateToNextPage(navigate, config);
+    const handleCreationSuccess = (newWorkspace: IWorkspace) => {
+        setShowWorkspaceDialog(false);
+        setHasWorkspace(true);
+        refreshWorkspaces();
+        showSuccessToast(`Workspace "${newWorkspace.name}" created`);
     };
 
-    return (
-        <div className="max-w-6xl mx-auto p-6 space-y-6 mb-10">
-            <PageHeader title={t('welcome')}>
-                <div className="flex justify-end space-x-3 ">
-                    <ProjectWizard />
-                    
-                    <Button
-                        variant="outline"
-                        onClick={onHandleOpenProjectClick}
-                    >
-                        <FolderOpen className="w-4 h-4 mr-2" />
-                        {t('openProject')}
-                    </Button>
-                    
-                </div>
-            </PageHeader>
+    if (workspacesLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Loader />
+            </div>
+        );
+    }
 
-            <RecentsProjects />
+    return (
+        <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
+            {!workspace ? (
+                <div className="p-3">
+                    <h1 className="text-lg font-medium">Workspace not found</h1>
+                    <p className="text-sm text-muted-foreground">
+                        The workspace you're looking for doesn't exist.
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <WelcomeHeader />
+                    <Tabs defaultValue="resources">
+                        <TabsList className="mb-3">
+                            <TabsTrigger value="resources">
+                                <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
+                                Resources
+                            </TabsTrigger>
+                            <TabsTrigger value="diagram">
+                                <Network className="h-3.5 w-3.5 mr-1.5" />
+                                Diagram
+                            </TabsTrigger>
+                            <TabsTrigger value="config">
+                                <Container className="h-3.5 w-3.5 mr-1.5" />
+                                Docker
+                            </TabsTrigger>
+                            <TabsTrigger value="settings">
+                                <Settings className="h-3.5 w-3.5 mr-1.5" />
+                                Settings
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent
+                            value="resources"
+                            className="mt-0 space-y-6"
+                        >
+                            {hasWorkspace && workspace && <Resources />}
+                        </TabsContent>
+
+                        <TabsContent value="diagram" className="mt-0">
+                            {/*  <ProjectDiagram workspace={workspaceWithServices} /> */}
+                        </TabsContent>
+
+                        <TabsContent value="config" className="mt-0">
+                            <WorkspaceDocker
+                                workspace={workspace}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="settings" className="mt-0">
+                            <WorkspaceSettings workspace={workspace} />
+                        </TabsContent>
+                    </Tabs>
+                </>
+            )}
+
+            {showWorkspaceDialog && (
+                <CreateWorkspace
+                    open={showWorkspaceDialog}
+                    onSuccess={handleCreationSuccess}
+                />
+            )}
         </div>
     );
 };
