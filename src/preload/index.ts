@@ -218,6 +218,8 @@ const repo = {
 		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
 		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
 		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
+		stop: (projectPath: string, services: string[]) => ipcRenderer.invoke('docker-stop', projectPath, services),
+		restart: (projectPath: string, services: string[], timeout?: number) => ipcRenderer.invoke('docker-restart', projectPath, services, timeout),
 		check: () => ipcRenderer.invoke('docker-check')
 	}
 }

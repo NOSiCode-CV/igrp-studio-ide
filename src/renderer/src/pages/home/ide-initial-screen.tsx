@@ -12,9 +12,9 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Container, FolderKanban, Network, Settings } from 'lucide-react';
-import Resources from './components/Resources';
 import { WorkspaceSettings } from './components/workspace-settings';
 import { WorkspaceDocker } from './components/workspace-docker';
+import Resources from './components/Resources';
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);

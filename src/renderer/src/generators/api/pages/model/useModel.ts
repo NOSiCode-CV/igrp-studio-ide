@@ -137,7 +137,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 { ...currentData, ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
-console.log(values)
+            console.log(values)
             const { error } = await window.engine.createModel(values, ENV_TYPES.SPRING, basePath);
 
             if (error) {

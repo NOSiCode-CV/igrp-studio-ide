@@ -10,7 +10,6 @@ import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectData } from 'src/main/types';
 import { ProjectDropdown } from './project-dropdown';
 import { Clock, ExternalLink } from 'lucide-react';
-import { projectIcons } from '@renderer/constants/appConstants';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
 import { ProjectConfigurationDialog } from './project-configuration-dialog';

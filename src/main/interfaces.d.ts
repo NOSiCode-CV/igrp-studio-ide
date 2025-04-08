@@ -23,10 +23,10 @@ export interface IWorkspaceRepository {
     backupData(backupPath: string): Promise<void>;
     restoreData(backupPath: string): Promise<void>;
 
-    onError (callback: (error: {
+    onError(callback: (error: {
         code: string;
         message: string
-    }) => void) ;
+    }) => void);
 }
 
 export interface IProjectRepository {
@@ -93,8 +93,10 @@ export interface IBaseEngine {
 }
 
 export interface IDocker {
-    up: (projectPath: string) => Promise<DockerComposeService[]>;
-    down: (projectPath: string) => Promise<DockerComposeService[]>;
-    status: (projectPath: string) => Promise<DockerComposeService[]>;
+    up: (projectPath: string) => Promise<ServiceInfo[]>;
+    down: (projectPath: string) => Promise<void>;
+    status: (projectPath: string) => Promise<ServiceInfo[]>;
+    stop: (projectPath: string, services: string[]) => Promise<void>;
+    restart: (projectPath: string, services: string[], timeout?: number) => Promise<void>;
     check: () => Promise<boolean>
 }

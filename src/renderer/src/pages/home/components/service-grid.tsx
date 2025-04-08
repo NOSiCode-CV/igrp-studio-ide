@@ -1,7 +1,5 @@
 'use client';
 
-import type React from 'react';
-
 import { Badge } from '@renderer/components/ui/badge';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -14,6 +12,8 @@ import {
     Power,
     Edit,
     Layers,
+    FileArchive,
+    IdCard,
 } from 'lucide-react';
 import {
     Card,
@@ -30,9 +30,7 @@ interface ServiceGridProps {
 }
 
 export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
-    const handleServiceClick = (service: any, e: React.MouseEvent) => {};
-
-    const { getServiceUrl } = useDocker();
+    const { getServiceUrl, stopService, restartService } = useDocker();
 
     const handleServiceUrl = (service: any) => {
         const url = getServiceUrl(service);
@@ -49,6 +47,10 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                 return <Globe className="h-4 w-4" />;
             case 'cache':
                 return <Server className="h-4 w-4" />;
+            case 'file':
+                return <FileArchive className="h-4 w-4" />;
+            case 'auth':
+                return <IdCard className="h-4 w-4" />;
             default:
                 return <Layers className="h-4 w-4" />;
         }
@@ -62,6 +64,8 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                 return 'bg-blue-500';
             case 'cache':
                 return 'bg-purple-500';
+            case 'file':
+                return 'bg-red-500';
             default:
                 return 'bg-green-500';
         }
@@ -79,16 +83,12 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                 return 'bg-yellow-500 text-white';
         }
     };
-   
+
     return (
         <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {services.map((service, index) => (
-                    <Card
-                        key={index}
-                        className="group cursor-pointer"
-                        onClick={(e) => handleServiceClick(service, e)}
-                    >
+                    <Card key={index} className="group">
                         <CardHeader>
                             <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-1">
@@ -189,7 +189,10 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                         size="icon"
                                         className="h-7 w-7"
                                         title="Stop"
-                                        onClick={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            stopService([service.name]);
+                                        }}
                                     >
                                         <Square className="h-4 w-4 text-red-500" />
                                     </Button>
@@ -199,7 +202,10 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                         size="icon"
                                         className="h-7 w-7"
                                         title="Start"
-                                        onClick={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            restartService([service.name], 300);
+                                        }}
                                     >
                                         <Play className="h-4 w-4 text-green-500" />
                                     </Button>

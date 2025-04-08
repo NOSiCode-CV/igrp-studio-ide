@@ -56,9 +56,10 @@ const Resources = () => {
     const {
         workspace,
         actions: { findAllProjects, saveOrOpenProject },
+        state: { changeStatus },
     } = useWorkspace();
 
-    const { services } = useDocker();
+    const { services, refreshContainers } = useDocker();
 
     const { t } = useTranslation();
 
@@ -103,6 +104,11 @@ const Resources = () => {
                 .includes(serviceSearchQuery.toLowerCase())
     );
 
+    useEffect(() => {
+        if (changeStatus) {
+            refreshContainers();
+        }
+    }, [changeStatus, refreshContainers]);
     const onHandleOpenProjectClick = async (): Promise<void> => {
         const result: IOpenProject = await window.api.openDirectory('');
 
@@ -144,7 +150,7 @@ const Resources = () => {
     const serviceQueryText = serviceSearchQuery
         ? ` matching "${serviceSearchQuery}"`
         : '';
-   
+
     return (
         <div className="space-y-6">
             {/* Projects Section */}

@@ -68,8 +68,7 @@ export const defaultValues: any = {
 	},
 	uniqueConstraints: {
 		name: '',
-		columns: [],
-		unique: false
+		columns: []
 	}
 }
 

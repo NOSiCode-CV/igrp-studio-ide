@@ -9,7 +9,8 @@ import { createSelector } from 'reselect';
 
 interface RootState {
     PageBuilder: {
-        workspace: IWorkspace
+        workspace: IWorkspace,
+        changeStatus: boolean
     };
 }
 
@@ -26,11 +27,12 @@ export const useWorkspace = () => {
     const selectProperties = createSelector(
         selectState,
         (studio) => ({
-            workspace: studio.workspace
+            workspace: studio.workspace,
+            changeStatus: studio.changeStatus
         })
     );
 
-    const { workspace } = useSelector(selectProperties);
+    const { workspace, changeStatus } = useSelector(selectProperties);
 
     const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(workspace)
 
@@ -211,7 +213,8 @@ export const useWorkspace = () => {
             getRecentWorkspaces
         },
         state: {
-            hasWorkspaces: workspaces.length > 0
+            hasWorkspaces: workspaces.length > 0,
+            changeStatus
         }
     };
 };

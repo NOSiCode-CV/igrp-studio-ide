@@ -4,8 +4,10 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { IWorkspace, ProjectData } from '../types';
-import { newWorkspace as engineNewWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import { addProjectsToWorkspace, newWorkspace as engineNewWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
+import { WorkspaceConfig, WorkspaceProjectsConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { getJsonContent } from '../helpers';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
@@ -50,7 +52,7 @@ export class WorkspaceRepository {
         data.workspaces.push(newWorkspace);
 
         try {
-            await engineNewWorkspace({ ...baseConfigWorkspace, id: Math.random().toString(36).slice(2, 12) }, workspace.path)
+            await engineNewWorkspace({ ...baseConfigWorkspace }, workspace.path)
         } catch (error) {
             throw error
         }
@@ -107,13 +109,14 @@ export class WorkspaceRepository {
 
     // Project CRUD Operations
     async addProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData> {
+
         const data = await this.loadData();
         const workspace = data.workspaces.find(w => w.id === workspaceId);
 
         if (!workspace) {
             throw new Error(`Workspace ${workspaceId} not found`);
         }
-        
+
         const newProject: ProjectData = {
             ...project,
             id: uuidv4(),
@@ -122,8 +125,9 @@ export class WorkspaceRepository {
             updatedAt: new Date().toISOString()
         };
 
+        await this.addProjectToStudioWorkspace(workspace, newProject);
+
         const engine = EngineFactory.getEngine(project.framework);
-        
         await engine.createProject(newProject, project.path);
 
         workspace.projects = workspace.projects || [];
@@ -132,6 +136,28 @@ export class WorkspaceRepository {
 
         await this.saveData(data);
         return newProject;
+    }
+
+    async addProjectToStudioWorkspace(workspace: IWorkspace, newProject: ProjectData) {
+
+        const { config, id: projectId } = newProject
+
+        const { path: workspacePath } = workspace
+
+        const workspaceConfigPath = path.join(workspace.path, '.igrpstudio/workspace.json');
+
+        const workspaceData = await getJsonContent(workspaceConfigPath);
+
+        workspaceData.projects.push({ ...config, id: projectId });
+
+        const workspaceConfig: WorkspaceProjectsConfig = {
+            ...workspaceData,
+            projects: workspaceData.projects,
+        }
+
+        console.log('workspaceConfig', workspaceConfig)
+
+        await addProjectsToWorkspace(workspaceConfig, workspacePath);
     }
 
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {

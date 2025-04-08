@@ -167,16 +167,18 @@ export interface DockerComposeConfig {
 
 export interface DockerComposeService {
     image: string;
-    containerName?: string;
+    container_name?: string;
     ports?: string[];
     volumes?: string[];
     environment?: { name: string; value: string }[]
-    dependsOn?: string[];
+    depends_on?: string[];
     networks?: string[];
     hostname?: string;
     restart?: string;
     host_config?: Record<string, any>;
-    status: string
+    status: string,
+    type?: string,
+    labels?: Record<string, string>
 }
 
 export interface DockerComposeNetwork {
@@ -190,4 +192,21 @@ export interface DockerComposeVolume {
     name?: string;
     driver?: string;
     external?: boolean;
+}
+
+
+export interface ServiceInfo {
+    image: string;
+    containerName?: string;
+    ports?: string[];
+    volumes?: string[];
+    environment?: { name: string; value: string }[]
+    dependsOn?: string[];
+    networks?: string[];
+    hostname?: string;
+    restart?: string;
+    hostConfig?: Record<string, any>;
+    status: string,
+    type?: string,
+    labels?: Record<string, string>
 }

@@ -218,7 +218,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         placeholder={`Select ${name}`}
                         options={dynamicOptions[`${index}-${key}`] || options}
                         value={selectMultiValues}
-                        onChange={(selectedOption) => changeValue(key, index, selectedOption)}
+                        onChange={(selectedOption) => {console.log(key, index, selectedOption);changeValue(key, index, selectedOption)}}
                     />
                 );
             case 'checkbox':

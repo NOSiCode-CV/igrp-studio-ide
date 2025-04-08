@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import yaml from 'js-yaml';
 import path from 'path';
-import { DockerComposeConfig, DockerComposeService } from '../../types';
+import { DockerComposeConfig, DockerComposeService, ServiceInfo } from '../../types';
 
 const execAsync = promisify(exec);
 
@@ -61,7 +61,7 @@ export class DockerService {
         }
     }
 
-    async status(projectPath: string): Promise<DockerComposeService[]> {
+    async status(projectPath: string): Promise<ServiceInfo[]> {
         try {
             // Load compose file first to get all services
             const compose = await this.loadComposeFile(projectPath);
@@ -102,6 +102,7 @@ export class DockerService {
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
                             dependsOn: containerInfo.depends_on,
+                            type: serviceDef?.labels?.['type']
                         };
                     } else {
                         // Service is not running
@@ -109,11 +110,13 @@ export class DockerService {
                             ...serviceDef,
                             name: serviceName,
                             id: '',
-                            status: 'not_running',
-                            containerName: serviceDef.containerName || `${compose.name}_${serviceName}`,
+                            status: 'stopped',
+                            containerName: serviceDef.container_name,
+                            dependsOn: allServices[serviceName].depends_on,
                             ports: serviceDef.ports || [],
                             volumes: serviceDef.volumes || [],
-                            environment: this.parseEnvironmentToArray(serviceDef.environment)
+                            environment: this.parseEnvironmentToArray(serviceDef.environment),
+                            type: serviceDef?.labels?.['type']
                         };
                     }
                 });
@@ -125,16 +128,56 @@ export class DockerService {
                     ...allServices[serviceName],
                     name: serviceName,
                     id: '',
-                    status: 'not_running',
-                    containerName: allServices[serviceName].containerName || `${compose.name}_${serviceName}`,
+                    status: 'error',
+                    containerName: allServices[serviceName].container_name,
+                    dependsOn: allServices[serviceName].depends_on,
                     ports: allServices[serviceName].ports || [],
                     volumes: allServices[serviceName].volumes || [],
-                    environment: this.parseEnvironmentToArray(allServices[serviceName].environment)
+                    environment: this.parseEnvironmentToArray(allServices[serviceName].environment),
+                    type: allServices[serviceName]?.labels?.['type']
                 }));
             }
         } catch (error: any) {
             console.error('Error getting status:', error);
             throw new Error(`Failed to get service status: ${error.message}`);
+        }
+    }
+
+    /**
+     * Stop specific services (containers remain but are stopped)
+     * @param projectPath Path to the project
+     * @param services Array of service names to stop
+     */
+    async stop(projectPath: string, services: string[]): Promise<void> {
+        try {console.log("services", services)
+            await this.executeComposeCommand(
+                projectPath,
+                `stop ${services.join(' ')}`
+            );
+        } catch (error: any) {
+            throw new Error(`Failed to stop services: ${error.message}`);
+        }
+    }
+
+    /**
+     * Restart specific services
+     * @param projectPath Path to the project
+     * @param services Array of service names to restart
+     * @param timeout Optional timeout in seconds for shutdown
+     */
+    async restart(
+        projectPath: string,
+        services: string[],
+        timeout?: number
+    ): Promise<void> {
+        try {
+            const timeoutFlag = timeout ? `--timeout ${timeout}` : '';
+            await this.executeComposeCommand(
+                projectPath,
+                `restart ${timeoutFlag} ${services.join(' ')}`
+            );
+        } catch (error: any) {
+            throw new Error(`Failed to restart services: ${error.message}`);
         }
     }
 
@@ -147,29 +190,11 @@ export class DockerService {
         if (Array.isArray(env) && env.length > 0 && typeof env[0] === 'object' && 'name' in env[0]) {
             return env as Array<{ name: string; value: string }>;
         }
-
-        // Handle other formats and convert to array of objects
-        const envObj = this.parseEnvironment(env); // Reuse existing parsing logic
-        return Object.entries(envObj).map(([name, value]) => ({ name, value }));
-    } 
-    private parseEnvironment(env?: Record<string, string> | string[]): Record<string, string> {
-        if (!env) return {};
-        if (Array.isArray(env)) {
-            return env.reduce((acc, e) => {
-                const [key, ...value] = e.split('=');
-                acc[key] = value.join('=');
-                return acc;
-            }, {} as Record<string, string>);
-        }
-        return env;
+        return []
     }
 
     async logs(projectPath: string, service?: string): Promise<string> {
         return this.executeComposeCommand(projectPath, 'logs --no-color', service);
-    }
-
-    async restart(projectPath: string, service: string): Promise<void> {
-        await this.executeComposeCommand(projectPath, 'restart', service);
     }
 
     async build(projectPath: string): Promise<void> {

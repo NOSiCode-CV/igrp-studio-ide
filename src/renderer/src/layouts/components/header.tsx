@@ -140,9 +140,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
     );
 
     const handleRun = async () => {
-        if (!workspace?.path) return;
         try {
-            await startContainers(workspace.path);
+            await startContainers();
         } catch (error) {
             console.error(error);
             showErrorToast(t('runProjectError'));

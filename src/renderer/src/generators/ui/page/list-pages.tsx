@@ -37,6 +37,7 @@ import {
 } from '@renderer/components/ui/toggle-group';
 import { EmptyList } from '@renderer/components/empty-list';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: FileTree) => void;
@@ -175,6 +176,12 @@ const MainPageBuilder = ({
         },
     ];
 
+    const tableCountText = `${tableData.length} ${
+        tableData.length === 1 ? 'page' : 'pages'
+    }`;
+
+    const tableQueryText = searchTerm ? ` matching "${searchTerm}"` : '';
+
     return (
         <div className="container mx-auto p-4 space-y-6">
             <IGRPPageHeader
@@ -191,12 +198,18 @@ const MainPageBuilder = ({
                         {t('settings')}
                     </IGRPTabsTrigger>
                 </IGRPTabsList>
-                <IGRPTabsContent value="pages" className="space-y-4">
-                    <div className="space-y-4 py-3">
+                <IGRPTabsContent value="pages" className="space-y-4 pt-3">
+                    <>
                         <div className="flex justify-between">
-                            <div className="flex items-center text-foreground">
-                                <h1 className="">{t('pageLists')}</h1>
-                            </div>
+                            <SubHeadline
+                                title={t('pageLists')}
+                                description={
+                                    <>
+                                        {tableCountText}
+                                        {tableQueryText}
+                                    </>
+                                }
+                            />
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button size="sm" variant="default">
@@ -220,11 +233,11 @@ const MainPageBuilder = ({
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
-                        <div className="flex flex-col sm:flex-row justify-between gap-4">
-                            <Input
+                        <div className="flex flex-1 gap-3">
+                            <SearchInput
                                 placeholder={t('seachPages')}
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(value) => setSearchTerm(value)}
                             />
                             <ToggleGroup
                                 type="single"
@@ -237,14 +250,16 @@ const MainPageBuilder = ({
                                 <ToggleGroupItem
                                     value="table"
                                     aria-label="Table view"
+                                    className="h-8 w-8"
                                 >
-                                    <TableIcon className="h-4 w-4" />
+                                    <TableIcon className="h-3.5 w-3.5" />
                                 </ToggleGroupItem>
                                 <ToggleGroupItem
                                     value="card"
                                     aria-label="Card view"
+                                    className="h-8 w-8"
                                 >
-                                    <LayoutGrid className="h-4 w-4" />
+                                    <LayoutGrid className="h-3.5 w-3.5" />
                                 </ToggleGroupItem>
                             </ToggleGroup>
                         </div>
@@ -273,7 +288,7 @@ const MainPageBuilder = ({
                         ) : (
                             <IGRPDataTable columns={columns} data={tableData} />
                         )}
-                    </div>
+                    </>
                 </IGRPTabsContent>
                 <IGRPTabsContent value="settings" className="space-y-4">
                     <ProjectSettings
