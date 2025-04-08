@@ -37,19 +37,12 @@ export const useWorkspace = () => {
     // Setup workspace and error handling
     useEffect(() => {
         const initialize = async () => {
-            try {
-                await window.igrpStudio.workspace.initialize();
+            await window.igrpStudio.workspace.initialize();
 
-                window.igrpStudio.workspace.onError(({ code, message }) => {
-                    console.error(`[${code}] ${message}`);
-                    showErrorToast(message);
-                });
-
-            } catch (err) {
-                console.error('Workspace initialization failed:', err);
-                showErrorToast('Failed to initialize workspace system');
-                setError('Initialization failed');
-            }
+            /*  window.igrpStudio.workspace.onError(({ code, message }) => {
+                 console.error(`[${code}] ${message}`);
+                 setError(message);
+             }); */
         };
 
         initialize();
@@ -148,38 +141,57 @@ export const useWorkspace = () => {
     };
 
     const switchWorkspace = async (upWorkspace: IWorkspace) => {
-        if (currentWorkspace?.id === upWorkspace.id) return
+        if (!upWorkspace || currentWorkspace?.id === upWorkspace.id) return
 
         setCurrentWorkspace(upWorkspace)
         dispatch(setWorkspace(upWorkspace))
         updateWorkspace(upWorkspace.id, upWorkspace)
     };
 
-    const validateWorkspaceName = (name: string) => {
+    const validateWorkspaceName = (name: string, slug: string) => {
         if (!name.trim()) return 'Name is required';
-        if (workspaces.some(w => w.name === name)) return 'Name already exists';
+        if (workspaces.some(w => w.name === name || w.slug === slug)) return 'Name already exists';
         return null;
     };
 
     const saveOrOpenProject = async (project: ProjectData) => {
+        try {
+            const { id } = project
+            let result: any = {};
 
-        const { id } = project
+            if (id)
+                await window.igrpStudio.workspace.updateProject(id, project);
+            else
+                result = await window.igrpStudio.workspace.saveProject(workspace?.id, project);
 
-        if (id)
-            await window.igrpStudio.workspace.updateProject(id, project);
-        else
-            await window.igrpStudio.workspace.saveProject(workspace?.id, project);
+            if (result?.error) {
+                showErrorToast(result.error);
+                return
+            }
 
-        dispatch(setBasePath(project.path));
+            dispatch(setBasePath(project.path));
 
-        dispatch(setConfig(project));
+            dispatch(setConfig(project));
 
-        navigateToNextPage(navigate, project);
+            navigateToNextPage(navigate, project);
+        } catch (err) {
+            showErrorToast(err);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
     }
 
     const findAllProjects = async () => {
         return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
     }
+
+    useEffect(() => {
+        if (error) {
+            showErrorToast(error);
+            setError(null);
+        }
+    }, [error]);
 
     return {
         workspaces,

@@ -17,13 +17,16 @@ import { useDocker } from '@renderer/hooks/use-docker';
 
 interface WorkspaceConfigProps {
     workspace: IWorkspace;
-    services?: any[];
 }
 
 export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
     const [copied, setCopied] = useState(false);
 
-    const { fileContent: content, services, loadComposeFile } = useDocker();
+    const {
+        fileContent: content,
+        services,
+        loadComposeFile,
+    } = useDocker();
 
     const handleCopyYaml = () => {
         if (!content) return;
@@ -32,9 +35,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleSaveService = (service: any) => {
-        console.log('Service updated:', service);
-        // In a real app, this would update the service in the workspace
+    const handleSaveService = (_service: any) => {
     };
 
     useEffect(() => {
@@ -77,7 +78,11 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                 </CardContent>
                 <CardFooter className="compact-card-footer flex justify-between">
                     <div className="text-xs text-muted-foreground">
-                        {services.length} services enabled
+                        {
+                            services.filter((s) => s.status === 'running')
+                                .length
+                        }{' '}
+                        services enabled
                     </div>
                     <div className="flex gap-2">
                         <Button

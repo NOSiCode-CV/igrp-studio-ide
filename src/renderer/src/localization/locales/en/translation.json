@@ -441,7 +441,8 @@
     "browseButton": "Browse",
     "createButton": "Create Workspace",
     "createError": "Failed to create workspace",
-    "createSuccess": "Workspace '{{name}}' created successfully!"
+    "createSuccess": "Workspace '{{name}}' created successfully!",
+    "slug": "Slug"
   },
   "creating": "Creating...",
   "enableGraalVm": "Enable Graal Vm",

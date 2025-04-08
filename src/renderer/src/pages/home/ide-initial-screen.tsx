@@ -60,43 +60,59 @@ const IDEInitialScreen = () => {
 
     return (
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
-            <WelcomeHeader />
-            <Tabs defaultValue="resources">
-                <TabsList className="mb-3">
-                    <TabsTrigger value="resources">
-                        <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
-                        Resources
-                    </TabsTrigger>
-                    <TabsTrigger value="diagram">
-                        <Network className="h-3.5 w-3.5 mr-1.5" />
-                        Diagram
-                    </TabsTrigger>
-                    <TabsTrigger value="config">
-                        <Container className="h-3.5 w-3.5 mr-1.5" />
-                        Docker
-                    </TabsTrigger>
-                    <TabsTrigger value="settings">
-                        <Settings className="h-3.5 w-3.5 mr-1.5" />
-                        Settings
-                    </TabsTrigger>
-                </TabsList>
+            {!workspace ? (
+                <div className="p-3">
+                    <h1 className="text-lg font-medium">Workspace not found</h1>
+                    <p className="text-sm text-muted-foreground">
+                        The workspace you're looking for doesn't exist.
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <WelcomeHeader />
+                    <Tabs defaultValue="resources">
+                        <TabsList className="mb-3">
+                            <TabsTrigger value="resources">
+                                <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
+                                Resources
+                            </TabsTrigger>
+                            <TabsTrigger value="diagram">
+                                <Network className="h-3.5 w-3.5 mr-1.5" />
+                                Diagram
+                            </TabsTrigger>
+                            <TabsTrigger value="config">
+                                <Container className="h-3.5 w-3.5 mr-1.5" />
+                                Docker
+                            </TabsTrigger>
+                            <TabsTrigger value="settings">
+                                <Settings className="h-3.5 w-3.5 mr-1.5" />
+                                Settings
+                            </TabsTrigger>
+                        </TabsList>
 
-                <TabsContent value="resources" className="mt-0 space-y-6">
-                    {hasWorkspace && workspace && <Resources />}
-                </TabsContent>
+                        <TabsContent
+                            value="resources"
+                            className="mt-0 space-y-6"
+                        >
+                            {hasWorkspace && workspace && <Resources />}
+                        </TabsContent>
 
-                <TabsContent value="diagram" className="mt-0">
-                    {/*  <ProjectDiagram workspace={workspaceWithServices} /> */}
-                </TabsContent>
+                        <TabsContent value="diagram" className="mt-0">
+                            {/*  <ProjectDiagram workspace={workspaceWithServices} /> */}
+                        </TabsContent>
 
-                <TabsContent value="config" className="mt-0">
-                    <WorkspaceDocker workspace={workspace} services={[]} />
-                </TabsContent>
+                        <TabsContent value="config" className="mt-0">
+                            <WorkspaceDocker
+                                workspace={workspace}
+                            />
+                        </TabsContent>
 
-                <TabsContent value="settings" className="mt-0">
-                    <WorkspaceSettings workspace={workspace} />
-                </TabsContent>
-            </Tabs>
+                        <TabsContent value="settings" className="mt-0">
+                            <WorkspaceSettings workspace={workspace} />
+                        </TabsContent>
+                    </Tabs>
+                </>
+            )}
 
             {showWorkspaceDialog && (
                 <CreateWorkspace

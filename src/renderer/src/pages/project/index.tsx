@@ -93,6 +93,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         path: '',
         themeColor: '#000000',
         icon: '',
+        workspaceId: workspace.id,
     };
 
     const validationSchema = useProjectValidation({ t, step });
@@ -104,7 +105,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         onSubmit: (values, actions) => {
             console.log('Form submitted with values:', values);
             actions.setSubmitting(false);
-            createProject();
+            saveOrOpenProject({ ...formik.values });
         },
     });
 
@@ -116,28 +117,6 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             inputRef.current.select();
         }
     }, []);
-
-    const createProject = async (): Promise<void> => {
-        try {
-            const { error } = await window.engine.createProject(
-                formik.values,
-                formik.values.path
-            );
-
-            if (error) {
-                showErrorToast(error);
-                return;
-            } else {
-                handleClose();
-            }
-
-            const config: ProjectData = { ...formik.values };
-
-            saveOrOpenProject(config);
-        } catch (error) {
-            showErrorToast(error);
-        }
-    };
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];

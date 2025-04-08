@@ -120,7 +120,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                         <p>Create new module</p>
                     </TooltipContent>
                 </Tooltip>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>Create New Module</DialogTitle>
                         <DialogDescription>

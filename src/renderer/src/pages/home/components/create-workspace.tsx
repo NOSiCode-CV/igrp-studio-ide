@@ -32,7 +32,9 @@ const CreateWorkspace = ({
     const [isCreating, setIsCreating] = useState(false);
     const [workspaceName, setWorkspaceName] = useState('My Workspace');
     const [slug, setSlug] = useState('my-workspace');
-    const [workspaceDescription, setWorkspaceDescription] = useState('');
+    const [workspaceDescription, setWorkspaceDescription] = useState(
+        'My development workspace with Docker projects'
+    );
     const [directoryPath, setDirectoryPath] = useState('');
     const {
         actions: { validateWorkspaceName, createWorkspace },
@@ -53,7 +55,7 @@ const CreateWorkspace = ({
             return;
         }
 
-        const validationError = validateWorkspaceName(workspaceName);
+        const validationError = validateWorkspaceName(workspaceName, slug);
         if (validationError) {
             showErrorToast(validationError);
             return;

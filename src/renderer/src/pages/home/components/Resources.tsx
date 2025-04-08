@@ -38,6 +38,7 @@ import { Toggle } from '@renderer/components/ui/toggle';
 import { ServiceGrid } from './service-grid';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import { ServiceConfigurationDialog } from './service-configuration-dialog';
+import { useDocker } from '@renderer/hooks/use-docker';
 
 const Resources = () => {
     const [isDelete, setIdDelete] = useState(false);
@@ -57,9 +58,9 @@ const Resources = () => {
         actions: { findAllProjects, saveOrOpenProject },
     } = useWorkspace();
 
-    const { t } = useTranslation();
+    const { services } = useDocker();
 
-    const [selectedService, setSelectedService] = useState<any>(null);
+    const { t } = useTranslation();
 
     const [projectSearchQuery, setProjectSearchQuery] = useState('');
 
@@ -94,7 +95,13 @@ const Resources = () => {
                 .includes(projectSearchQuery.toLowerCase())
     );
 
-    const filteredServices = [];
+    const filteredServices = services.filter(
+        (service) =>
+            service.containerName &&
+            service.containerName
+                .toLowerCase()
+                .includes(serviceSearchQuery.toLowerCase())
+    );
 
     const onHandleOpenProjectClick = async (): Promise<void> => {
         const result: IOpenProject = await window.api.openDirectory('');
@@ -122,12 +129,6 @@ const Resources = () => {
         }
     };
 
-    const handleSaveService = (service: any) => {
-        // Handle saving the service
-        console.log('Service saved:', service);
-        setSelectedService(null); // Close the dialog
-    };
-
     const projectCountText = `${filteredProjects.length} ${
         filteredProjects.length === 1 ? 'project' : 'projects'
     }`;
@@ -136,14 +137,14 @@ const Resources = () => {
         ? ` matching "${projectSearchQuery}"`
         : '';
 
-    const serviceCountText = `${filteredProjects.length} ${
-        filteredProjects.length === 1 ? 'project' : 'projects'
+    const serviceCountText = `${filteredServices.length} ${
+        filteredServices.length === 1 ? 'service' : 'services'
     }`;
 
     const serviceQueryText = serviceSearchQuery
         ? ` matching "${serviceSearchQuery}"`
         : '';
-
+   
     return (
         <div className="space-y-6">
             {/* Projects Section */}
@@ -284,9 +285,7 @@ const Resources = () => {
                         }
                     />
                     <ServiceConfigurationDialog
-                        service={selectedService}
                         services={filteredServices}
-                        onSave={handleSaveService}
                         isNew={true}
                     ></ServiceConfigurationDialog>
                 </div>
@@ -347,7 +346,7 @@ const Resources = () => {
                 </div>
 
                 {filteredServices.length === 0 ? (
-                    <div className="border rounded-md p-6 text-center">
+                    <div className="border border-dashed rounded-md p-6 text-center">
                         <Server className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                         <h3 className="text-sm font-medium">
                             No services found
@@ -359,12 +358,10 @@ const Resources = () => {
                         </p>
 
                         <ServiceConfigurationDialog
-                            service={selectedService}
                             services={filteredServices}
-                            onSave={handleSaveService}
-                            isNew={!selectedService}
+                            isNew={true}
                         >
-                            <Button size="sm" /* onClick={handleAddService} */>
+                            <Button size="sm">
                                 <PlusCircle className="h-3.5 w-3.5 mr-1" />
                                 Add New Service
                             </Button>

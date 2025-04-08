@@ -22,19 +22,24 @@ import {
     CardHeader,
 } from '@renderer/components/ui/card';
 import { ServiceConfigurationDialog } from './service-configuration-dialog';
-
+import { useDocker } from '@renderer/hooks/use-docker';
 interface ServiceGridProps {
     services: any[];
     onEdit?: (service: any) => void;
     workspaceId?: string;
 }
 
-export function ServiceGrid({
-    services,
-    onEdit,
-    workspaceId,
-}: ServiceGridProps) {
+export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
     const handleServiceClick = (service: any, e: React.MouseEvent) => {};
+
+    const { getServiceUrl } = useDocker();
+
+    const handleServiceUrl = (service: any) => {
+        const url = getServiceUrl(service);
+        if (url) {
+            window.electron.ipcRenderer.send('open-external-url', url);
+        }
+    };
 
     const getServiceIcon = (type: string) => {
         switch (type) {
@@ -74,13 +79,13 @@ export function ServiceGrid({
                 return 'bg-yellow-500 text-white';
         }
     };
-
+   
     return (
         <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {services.map((service) => (
+                {services.map((service, index) => (
                     <Card
-                        key={service.id}
+                        key={index}
                         className="group cursor-pointer"
                         onClick={(e) => handleServiceClick(service, e)}
                     >
@@ -174,7 +179,7 @@ export function ServiceGrid({
                         </CardContent>
                         <CardFooter className="justify-between">
                             <div className="text-xs text-muted-foreground flex items-center">
-                                <Power className="mr-1 h-2.5 w-2.5" />
+                                <Power className="mr-1 h-3 w-3" />
                                 {service.enabled ? 'Enabled' : 'Disabled'}
                             </div>
                             <div className="flex gap-1">
@@ -213,21 +218,44 @@ export function ServiceGrid({
                                         <Edit className="h-4 w-4" />
                                     </Button>
                                 )}
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7"
-                                    title="Open"
-                                    onClick={(e) => e.stopPropagation()}
+
+                                <ServiceConfigurationDialog
+                                    service={service}
+                                    services={services}
+                                    isNew={false}
                                 >
-                                    <ExternalLink className="h-4 w-4" />
-                                </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7"
+                                        title="Edit"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                </ServiceConfigurationDialog>
+
+                                {getServiceUrl(service) && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7"
+                                        title="Open"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleServiceUrl(service);
+                                        }}
+                                    >
+                                        <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                )}
                             </div>
                         </CardFooter>
                     </Card>
                 ))}
             </div>
-
         </>
     );
 }

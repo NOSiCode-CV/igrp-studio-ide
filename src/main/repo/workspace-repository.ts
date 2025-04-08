@@ -5,6 +5,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { IWorkspace, ProjectData } from '../types';
 import { newWorkspace as engineNewWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import { EngineFactory } from '../engines/EngineFactory';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
@@ -112,13 +113,18 @@ export class WorkspaceRepository {
         if (!workspace) {
             throw new Error(`Workspace ${workspaceId} not found`);
         }
-
+        
         const newProject: ProjectData = {
             ...project,
             id: uuidv4(),
             workspaceId,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
+
+        const engine = EngineFactory.getEngine(project.framework);
+        
+        await engine.createProject(newProject, project.path);
 
         workspace.projects = workspace.projects || [];
         workspace.projects.push(newProject);

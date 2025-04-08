@@ -1,5 +1,5 @@
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
-import { Connection, PageableProjects, ProjectData } from "./types";
+import { Connection, DockerComposeService, Handler, HandlerResponse, PageableProjects, ProjectData } from "./types";
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -11,7 +11,7 @@ export interface IWorkspaceRepository {
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
 
     // Project Operations
-    saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData>;
+    saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
     updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
     deleteProject(projectId: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
@@ -93,7 +93,8 @@ export interface IBaseEngine {
 }
 
 export interface IDocker {
-    up: (projectPath: string) => Promise<ContainerInfo[]>;
-    down: (projectPath: string) => Promise<ContainerInfo[]>;
-    status: (projectPath: string) => Promise<ContainerInfo[]>;
+    up: (projectPath: string) => Promise<DockerComposeService[]>;
+    down: (projectPath: string) => Promise<DockerComposeService[]>;
+    status: (projectPath: string) => Promise<DockerComposeService[]>;
+    check: () => Promise<boolean>
 }

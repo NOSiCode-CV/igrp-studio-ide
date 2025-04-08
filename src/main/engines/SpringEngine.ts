@@ -38,7 +38,10 @@ export class SpringEngine implements BaseEngine {
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
     const appConfig: BaseApiConfig = {
-      ...project.config as SpringConfigData, type: 'springboot'
+      ...project.config as SpringConfigData,
+      workspaceId: project.workspaceId,
+      id: project.id,
+      type: 'springboot',
     }
 
     // Ensure the basePath exists

@@ -107,7 +107,6 @@ const networkTypes = [
 interface ServiceConfigurationDialogProps {
     service?: any;
     services?: any[];
-    onSave: (service: any) => void;
     isNew?: boolean;
     children?: React.ReactNode;
 }
@@ -115,15 +114,14 @@ interface ServiceConfigurationDialogProps {
 export function ServiceConfigurationDialog({
     service,
     services = [],
-    onSave,
     isNew = true,
     children,
 }: ServiceConfigurationDialogProps) {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('basic');
     const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
     const [image, setImage] = useState('');
+    const [description, setDescription] = useState('');
     const [type, setType] = useState('database');
     const [ports, setPorts] = useState<string[]>([]);
     const [newPort, setNewPort] = useState('');
@@ -143,7 +141,6 @@ export function ServiceConfigurationDialog({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [open, setOpen] = useState(false);
 
-    // Reset form when dialog opens/closes or service changes
     useEffect(() => {
         if (open && service) {
             // Edit mode
@@ -271,7 +268,7 @@ export function ServiceConfigurationDialog({
         setTimeout(() => {
             onSave(serviceData);
             setIsSubmitting(false);
-            onOpenChange(false);
+            setOpen(false);
         }, 500);
     };
 
@@ -286,6 +283,8 @@ export function ServiceConfigurationDialog({
                 return <Server className="h-4 w-4" />;
         }
     };
+
+    const onSave = (data: any) => {};
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -338,7 +337,7 @@ export function ServiceConfigurationDialog({
                         <div className="pb-4">
                             <TabsContent
                                 value="basic"
-                                className="mt-0 space-y-4 px-1" 
+                                className="mt-0 space-y-4 px-1"
                             >
                                 {isNew && (
                                     <div className="space-y-2">
@@ -850,10 +849,7 @@ export function ServiceConfigurationDialog({
                 </Tabs>
 
                 <DialogFooter className="pt-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                    >
+                    <Button variant="outline" onClick={() => setOpen(false)}>
                         Cancel
                     </Button>
                     <Button

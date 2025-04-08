@@ -30,15 +30,21 @@ export class NextjsEngine implements BaseEngine {
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    const nextConfig: AppConfig = {
-      ...project.config as NextConfigData,
-      type: 'baseApp'
+    console.log('Creating Next.js project with config:', project);
+
+    const { id, config, workspaceId } = project
+
+    const appConfig: AppConfig = {
+      ...config as NextConfigData,
+      type: 'nextjs',
+      workspaceId,
+      id: Math.random().toString(36).slice(2, 12)
     }
 
     // Ensure the basePath exists
     await ensureDirectoryExists(basePath);
 
-    await newApp(nextConfig, basePath);
+    await newApp(appConfig, basePath);
 
   }
 }

@@ -5,9 +5,15 @@ type HandlerResponse<T = any> = {
     error?: string;
 };
 
+export type ProjectType = "frontend" | "backend"
+
+export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet';
+
 export interface NextConfigData {
     appName: string
     description?: string
+    workspaceId: string;
+    id: string;
 }
 
 export interface DotNetConfigData {
@@ -44,15 +50,15 @@ export interface ProjectData {
     id: string;
     name: string;
     icon?: string;
-    type?: 'frontend' | 'backend' | 'fullstack';
-    framework: 'springboot' | 'nextjs' | 'dotnet';
+    type?: ProjectType
+    framework: FrameworkType
     config?: ConfigData;
     path: string;
     themeColor?: string;
     location?: location,
     createdAt?: string;
     updatedAt?: string;
-    workspaceId?: string;
+    workspaceId: string;
 }
 
 export interface IWorkspace {
@@ -149,4 +155,39 @@ export interface SchemaTypeItem {
     value: string;
     module?: string;
     items?: SchemaTypeItem[]; // Optional submenu items
+}
+
+export interface DockerComposeConfig {
+    version: string;
+    services: Record<string, DockerComposeService>;
+    networks?: Record<string, DockerComposeNetwork>;
+    volumes?: Record<string, DockerComposeVolume>;
+    name: string
+}
+
+export interface DockerComposeService {
+    image: string;
+    containerName?: string;
+    ports?: string[];
+    volumes?: string[];
+    environment?: { name: string; value: string }[]
+    dependsOn?: string[];
+    networks?: string[];
+    hostname?: string;
+    restart?: string;
+    host_config?: Record<string, any>;
+    status: string
+}
+
+export interface DockerComposeNetwork {
+    name?: string;
+    driver?: string;
+    external?: boolean;
+    internal?: boolean;
+}
+
+export interface DockerComposeVolume {
+    name?: string;
+    driver?: string;
+    external?: boolean;
 }

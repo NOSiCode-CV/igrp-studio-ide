@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import { IWorkspace, ProjectData } from '../types';
 import { WorkspaceRepository } from '../repo/workspace-repository';
 import { ERROR_CODES, EVENTS } from '../constants/events';
+import { handleWithCustomErrors } from '../helpers';
 
 const repo = new WorkspaceRepository();
 
@@ -32,15 +33,15 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT, async (event) => {
     }
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
+ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (_event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
     try {
         return await repo.createWorkspace(workspace);
     } catch (error) {
         console.error('Workspace creation failed:', error);
-        event.sender.send(EVENTS.ERROR, {
+       /*  event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
             message: error instanceof Error ? error.message : 'Failed to create workspace'
-        });
+        }); */
         throw error;
     }
 });
@@ -103,27 +104,28 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, async (_, limit = 5) => 
 });
 
 // Project Handlers
-ipcMain.handle(EVENTS.REPOSITORY.PROJECT.CREATE, async (event, workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt'>) => {
-    try {
+handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.CREATE, async (_event, workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt'>) => {
+    return await repo.addProject(workspaceId, project);
+   /*  try {
         return await repo.addProject(workspaceId, project);
-    } catch (error) {
-        console.error('Project creation failed:', error);
+    } catch (error: any) {
+         console.error('Project creation failed:', error);
         event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.PROJECT.CREATE_FAILED,
-            message: error instanceof Error ? error.message : 'Failed to create project'
-        });
+            message: error
+        }); 
         throw error;
-    }
+    } */
 });
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.UPDATE, async (event, projectId: string, updates: Partial<ProjectData>) => {
     try {
         return await repo.updateProject(projectId, updates);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Project update failed:', error);
         event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.PROJECT.UPDATE_FAILED,
-            message: error instanceof Error ? error.message : 'Failed to update project'
+            message: error
         });
         throw error;
     }
@@ -132,11 +134,11 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.UPDATE, async (event, projectId: string
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.DELETE, async (event, projectId: string) => {
     try {
         await repo.deleteProject(projectId);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Project deletion failed:', error);
         event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.PROJECT.DELETE_FAILED,
-            message: error instanceof Error ? error.message : 'Failed to delete project'
+            message: error
         });
         throw error;
     }
@@ -145,11 +147,11 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.DELETE, async (event, projectId: string
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.GET, async (event, projectId: string) => {
     try {
         return await repo.getProject(projectId);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Project fetch failed:', error);
         event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.PROJECT.NOT_FOUND,
-            message: error instanceof Error ? error.message : 'Project not found'
+            message: error
         });
         return null;
     }
@@ -177,11 +179,11 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, async (_, limit = 5) => {
 ipcMain.handle(EVENTS.REPOSITORY.BACKUP.CREATE, async (event, backupPath?: string) => {
     try {
         await repo.backupData(backupPath);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Backup failed:', error);
         event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.BACKUP.FAILED,
-            message: error instanceof Error ? error.message : 'Failed to create backup'
+            message: error
         });
         throw error;
     }
@@ -190,11 +192,11 @@ ipcMain.handle(EVENTS.REPOSITORY.BACKUP.CREATE, async (event, backupPath?: strin
 ipcMain.handle(EVENTS.REPOSITORY.BACKUP.RESTORE, async (event, backupPath: string) => {
     try {
         await repo.restoreData(backupPath);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Restore failed:', error);
         event.sender.send(EVENTS.ERROR, {
             code: ERROR_CODES.BACKUP.RESTORE_FAILED,
-            message: error instanceof Error ? error.message : 'Failed to restore backup'
+            message: error
         });
         throw error;
     }

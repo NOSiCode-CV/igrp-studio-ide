@@ -67,7 +67,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
         const type = isValueObject ? newType.value : newType;
 
-        const module = isValueObject ? newType.moduel : '';
+        const module = isValueObject ? newType.module : '';
 
         const objectType = isValueObject
             ? newType.type

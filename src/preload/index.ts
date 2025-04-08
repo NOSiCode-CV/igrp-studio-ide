@@ -149,8 +149,11 @@ const repo = {
 		// Project methods
 		findAllRecentProjects: (limit?: number) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, limit),
-		saveProject: (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) =>
-			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project),
+		saveProject: async (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) => {
+			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project) } catch (error) {
+				return handleError(error)
+			}
+		},
 		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
 		deleteProject: (projectId: string) =>
@@ -215,6 +218,7 @@ const repo = {
 		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
 		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
 		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
+		check: () => ipcRenderer.invoke('docker-check')
 	}
 }
 
