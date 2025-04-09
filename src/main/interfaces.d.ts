@@ -13,7 +13,7 @@ export interface IWorkspaceRepository {
     // Project Operations
     saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
     updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
-    deleteProject(projectId: string): Promise<void>;
+    deleteProject(projectId: string, basePath: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
     getRecentProjects(workspaceId: string, limit?: number): Promise<ProjectData[]>;

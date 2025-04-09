@@ -52,7 +52,7 @@ export interface ProjectData {
     icon?: string;
     type?: ProjectType
     framework: FrameworkType
-    config?: ConfigData;
+    config: ConfigData | any;
     path: string;
     themeColor?: string;
     location?: location,
@@ -178,7 +178,7 @@ export interface DockerComposeService {
     host_config?: Record<string, any>;
     status: string,
     type?: string,
-    labels?: Record<string, string>
+    labels?: Record<string, string | boolean>
 }
 
 export interface DockerComposeNetwork {
@@ -194,6 +194,9 @@ export interface DockerComposeVolume {
     external?: boolean;
 }
 
+interface DependencyConfig {
+    condition?: string;
+}
 
 export interface ServiceInfo {
     image: string;
@@ -201,12 +204,12 @@ export interface ServiceInfo {
     ports?: string[];
     volumes?: string[];
     environment?: { name: string; value: string }[]
-    dependsOn?: string[];
+    dependsOn?: string[] | Record<string, DependencyConfig>[];
     networks?: string[];
     hostname?: string;
     restart?: string;
     hostConfig?: Record<string, any>;
     status: string,
     type?: string,
-    labels?: Record<string, string>
+    isProject?: boolean
 }

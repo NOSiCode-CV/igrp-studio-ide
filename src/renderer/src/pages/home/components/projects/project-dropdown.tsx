@@ -18,6 +18,7 @@ interface ProjectDropdownProps {
     onConvertToSpringBoot?: () => void;
     onConvertToDotNet?: () => void;
     project: ProjectData;
+    basePath: string;
 }
 
 export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
@@ -25,16 +26,20 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
     onConvertToSpringBoot,
     onConvertToDotNet,
     project,
+    basePath,
 }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { showErrorToast, showSuccessToast } = useToast();
-    const { t } = useTranslation(); // Hook for translations
+    const { t } = useTranslation();
 
     const handleDelete = async () => {
         setIsDialogOpen(false);
 
         try {
-            await window.igrpStudio.workspace.deleteProject(project.id);
+            await window.igrpStudio.workspace.deleteProject(
+                project.id,
+                basePath
+            );
             showSuccessToast(t('deletedSuccess', { name: project.name }));
             onDelete(true);
         } catch (error: unknown) {
@@ -73,7 +78,12 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDialogOpen(true);
+                        }}
+                    >
                         <Trash className="mr-2 h-4 w-4 text-red-500" />
                         {t('removeProject')}
                     </DropdownMenuItem>

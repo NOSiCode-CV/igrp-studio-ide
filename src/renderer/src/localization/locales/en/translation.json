@@ -58,7 +58,7 @@
   "comonDialogtDescription": "Enter the name for your new {{name}}. Click save when you're done.",
   "newObject": "New {{name}}",
   "deletedSuccess": "{{name}} deleted successfully!",
-  "createdSuccess": "{{name}} {{value}} have been successfully added.",
+  "createdSuccess": "{{name}} \"{{value}}\" have been successfully added.",
   "newDto": "New DTOs",
   "newModels": "New Schema Object",
   "newControllers": "New Endpoint",

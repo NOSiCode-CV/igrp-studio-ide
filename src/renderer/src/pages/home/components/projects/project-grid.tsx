@@ -8,13 +8,13 @@ import {
 } from '@renderer/components/ui/card';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectData } from 'src/main/types';
-import { ProjectDropdown } from './project-dropdown';
 import { Clock, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
-import { ProjectConfigurationDialog } from './project-configuration-dialog';
 import { Button } from '@renderer/components/ui/button';
 import { ProjectIcon } from '@renderer/components/shared-ui';
+import { ProjectDropdown } from './project-dropdown';
+import { ProjectConfigurationDialog } from './project-configuration-dialog';
 
 interface ProjectProps {
     projects: ProjectData[];
@@ -25,6 +25,7 @@ interface ProjectProps {
 }
 const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
     const {
+        workspace,
         actions: { saveOrOpenProject },
     } = useWorkspace();
 
@@ -47,33 +48,36 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
     };
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {sortProjects(
                 projects.map((project, index) => {
                     return (
                         <Card
                             key={index}
-                            className="cursor-pointer group gap-1"
+                            className="cursor-pointer group gap-1 border rounded-lg shadow-sm"
                             onClick={(e) => {
                                 e.preventDefault();
                                 handleOpenProject(project);
                             }}
                         >
                             <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <ProjectIcon project={project} />
-                                        <CardTitle className={'text-sm'}>
-                                            {project.name}
-                                        </CardTitle>
+                                <CardTitle>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-2">
+                                            <ProjectIcon project={project} />
+                                            <span className="text-xs truncate text-ellipsis">
+                                                {project.name}
+                                            </span>
+                                        </div>
+                                        <ProjectDropdown
+                                            project={project}
+                                            basePath={workspace.path}
+                                            onDelete={(success) =>
+                                                onDelete(success)
+                                            }
+                                        />
                                     </div>
-                                    <ProjectDropdown
-                                        project={project}
-                                        onDelete={(success) =>
-                                            onDelete(success)
-                                        }
-                                    />
-                                </div>
+                                </CardTitle>
                                 <CardDescription>
                                     {project.config?.description && (
                                         <p className="text-sm text-muted-foreground mb-2">

@@ -156,8 +156,8 @@ const repo = {
 		},
 		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
-		deleteProject: (projectId: string) =>
-			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId),
+		deleteProject: (projectId: string, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId, basePath),
 		getProject: (projectId: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.GET, projectId),
 		findAllProjects: (workspaceId?: string) =>

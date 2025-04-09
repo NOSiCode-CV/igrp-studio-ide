@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
-    ArrowLeftCircle,
+    ArrowLeft,
     Bell,
     Code,
     Maximize2,
@@ -154,8 +154,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
         <>
             <TooltipProvider>
                 <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
-                    <div className="flex h-(--header-height) w-full items-center gap-2 px-4 justify-between">
-                        <div className="flex items-center space-x-2 home cursor-pointer">
+                    <div className="flex h-(--header-height) w-full items-center  px-4 justify-between">
+                        <div className="flex items-center space-x-4 home cursor-pointer">
                             <div
                                 onClick={openPage}
                                 className={cn(
@@ -178,7 +178,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                     <BreadcrumbList>
                                         <BreadcrumbItem>
                                             <BreadcrumbLink href="/#">
-                                                <ArrowLeftCircle className="h-4 w-4" />
+                                                <ArrowLeft className="h-4 w-4" />
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
                                         <BreadcrumbItem>

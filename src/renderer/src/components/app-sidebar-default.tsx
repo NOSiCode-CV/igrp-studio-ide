@@ -22,6 +22,7 @@ import {
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { cn } from '@renderer/lib/utils';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
+import { SearchInput } from './shared-ui';
 
 export interface SidebarItem {
     name: string; // Title of the navigation item
@@ -93,12 +94,11 @@ const IGRPSidebarContent = React.forwardRef<
                 <div className="flex flex-col h-full px-3">
                     {searchActive && (
                         <div className="group-data-[collapsible=icon]:hidden">
-                            <IGRPInputSearch
-                                name="inputseach"
+                            <SearchInput
                                 value={searchTerm}
-                                showSubmitButton={false}
                                 placeholder='Search'
                                 onChange={(value) => setSearchTerm(value)}
+                                className='lg:w-auto'
                             />
                         </div>
                     )}

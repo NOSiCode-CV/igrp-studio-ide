@@ -95,14 +95,13 @@ export class DockerService {
                             status: containerInfo.State,
                             containerName: containerInfo.Name,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
-                            // Include original compose configuration
                             volumes: serviceDef.volumes || [],
                             environment: this.parseEnvironmentToArray(serviceDef.environment),
-                            // Additional runtime info
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
-                            dependsOn: containerInfo.depends_on,
-                            type: serviceDef?.labels?.['type']
+                            dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
+                            type: serviceDef?.labels?.['type'] as string,
+                            isProject: serviceDef?.labels?.['is_project'] as boolean
                         };
                     } else {
                         // Service is not running
@@ -112,11 +111,12 @@ export class DockerService {
                             id: '',
                             status: 'stopped',
                             containerName: serviceDef.container_name,
-                            dependsOn: allServices[serviceName].depends_on,
+                            dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
                             ports: serviceDef.ports || [],
                             volumes: serviceDef.volumes || [],
                             environment: this.parseEnvironmentToArray(serviceDef.environment),
-                            type: serviceDef?.labels?.['type']
+                            type: serviceDef?.labels?.['type'] as string,
+                            isProject: serviceDef?.labels?.['is_project'] as boolean
                         };
                     }
                 });
@@ -124,18 +124,24 @@ export class DockerService {
             } catch (parseError) {
                 console.error('Error parsing container info, returning compose services:', parseError);
                 // Fallback to all services from compose file marked as not running
-                return serviceNames.map(serviceName => ({
-                    ...allServices[serviceName],
-                    name: serviceName,
-                    id: '',
-                    status: 'error',
-                    containerName: allServices[serviceName].container_name,
-                    dependsOn: allServices[serviceName].depends_on,
-                    ports: allServices[serviceName].ports || [],
-                    volumes: allServices[serviceName].volumes || [],
-                    environment: this.parseEnvironmentToArray(allServices[serviceName].environment),
-                    type: allServices[serviceName]?.labels?.['type']
-                }));
+                return serviceNames.map(serviceName => {
+                    const serviceDef = allServices[serviceName]
+                    return (
+                        {
+                            ...serviceDef,
+                            name: serviceName,
+                            id: '',
+                            status: 'error',
+                            containerName: serviceDef.container_name,
+                            dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
+                            ports: serviceDef.ports || [],
+                            volumes: serviceDef.volumes || [],
+                            environment: this.parseEnvironmentToArray(serviceDef.environment),
+                            type: serviceDef?.labels?.['type'] as string,
+                            isProject: allServices?.labels?.['is_project'] as boolean
+                        }
+                    )
+                });
             }
         } catch (error: any) {
             console.error('Error getting status:', error);
@@ -149,7 +155,7 @@ export class DockerService {
      * @param services Array of service names to stop
      */
     async stop(projectPath: string, services: string[]): Promise<void> {
-        try {console.log("services", services)
+        try {
             await this.executeComposeCommand(
                 projectPath,
                 `stop ${services.join(' ')}`

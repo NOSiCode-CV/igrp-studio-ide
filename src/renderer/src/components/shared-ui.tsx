@@ -56,7 +56,7 @@ function SearchInput({
             <Input
                 type="text"
                 placeholder={placeholder}
-                className={`pl-8 h-8 text-xs w-[150px] lg:w-[250px] ${inputClassName}`}
+                className={`pl-8 h-8 text-xs ${inputClassName}`}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
             />

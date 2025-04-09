@@ -31,14 +31,13 @@ import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { projectIcons } from '@renderer/constants/appConstants';
-import useToast from '@renderer/components/useToast';
 import {
     backendFrameworks,
     frontendFrameworks,
     STEPS,
     THEME_COLORS,
 } from './data';
-import { ProjectData } from 'src/main/types';
+import { ProjectData, SpringConfigData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
 import { LabelRequired } from '@renderer/components/label-required';
@@ -76,7 +75,6 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     const [step, setStep] = React.useState(1);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
 
-    const { showErrorToast } = useToast();
     const { t } = useTranslation();
 
     const {
@@ -89,7 +87,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         name: '',
         type: undefined,
         framework: 'springboot',
-        config: undefined,
+        config: {},
         path: '',
         themeColor: '#000000',
         icon: '',
@@ -236,9 +234,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     React.useEffect(() => {
         formik.setFieldValue(
             'path',
-            `${workspace.path}/projects/${formik.values.name}`
+            `${workspace.path}/projects/${formik.values?.config?.apiName  ?? formik.values?.config?.appName ?? formik.values.name}`
         );
-    }, [workspace, formik.values.name]);
+    }, [workspace, formik.values.name, formik.values?.config]);
 
     const renderStep1 = () => (
         <div className="space-y-4">
@@ -473,7 +471,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-6">
             <div className="rounded-lg border p-4 space-y-6">
                 <div className="space-y-4">
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="name">{t('projectName')}</Label>
                         <Input
                             id="name"
@@ -489,7 +487,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         )}
                     </div>
 
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="path">{t('projectDirectory')}</Label>
                         <div className="flex gap-2">
                             <Input
@@ -520,7 +518,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     </div>
 
                     {isFrontend && (
-                        <div>
+                        <div className="space-y-2">
                             <Label>{t('themeColor')}</Label>
                             <div className="grid grid-cols-12 gap-2 mt-2">
                                 {THEME_COLORS.map((color) => (

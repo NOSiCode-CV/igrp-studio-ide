@@ -54,7 +54,7 @@ export const setCurrentItem = (item: any) => async (dispatch: any) => {
  * set status
  * @param {*} param0
  */
-export const setWorkspace = (workspace: IWorkspace) => async (dispatch: any) => {
+export const setWorkspace = (workspace: IWorkspace | null) => async (dispatch: any) => {
   try {
     dispatch(setWorkspaceAction(workspace));
   } catch (error) { }

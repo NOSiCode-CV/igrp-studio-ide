@@ -45,7 +45,7 @@ const MainLayout = (props: LayoutProps) => {
         () => [
             {
                 name: 'Database',
-                type: 'item',
+                type: "item" as const,
                 items: workspaceItems,
                 icon: Database,
                 href:"#"

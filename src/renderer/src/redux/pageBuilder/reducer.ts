@@ -38,7 +38,7 @@ const StudioSlice = createSlice({
         setCurrentItemAction(state, action: PayloadAction<null>) {
             state.currentItem = action.payload;
         },
-        setWorkspaceAction(state, action: PayloadAction<IWorkspace>) {
+        setWorkspaceAction(state, action: PayloadAction<IWorkspace | null>) {
             state.workspace = action.payload;
         },
     }

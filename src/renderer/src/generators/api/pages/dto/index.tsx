@@ -2,10 +2,10 @@ import { Card } from '@renderer/components/ui/card';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
-import { useDto } from './useDTO';
 import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
 import { useTranslation } from 'react-i18next';
+import { useDto } from './useDto';
 
 interface DtoProps {
     selectors: Array<any>;
@@ -92,7 +92,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                             />
                         </div>
                         {TabList.map(({ value }) => (
-                            <Card className="rounded-sm" key={value}>
+                            <Card className="rounded-sm gap-0" key={value}>
                                 {renderFormList(value)}
                             </Card>
                         ))}

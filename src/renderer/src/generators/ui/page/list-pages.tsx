@@ -238,6 +238,7 @@ const MainPageBuilder = ({
                                 placeholder={t('seachPages')}
                                 value={searchTerm}
                                 onChange={(value) => setSearchTerm(value)}
+                                className="lg:w-[250px]"
                             />
                             <ToggleGroup
                                 type="single"

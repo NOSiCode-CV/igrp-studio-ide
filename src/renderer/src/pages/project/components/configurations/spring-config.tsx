@@ -3,7 +3,7 @@
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Textarea } from '@renderer/components/ui/Textarea';
+import { Textarea } from '@renderer/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import { ProjectData, SpringConfigData } from 'src/main/types';
 import {
@@ -28,7 +28,7 @@ interface SpringConfigProps {
 const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     apiName: '',
     description: '',
-    group: '',
+    group: 'cv.igrp',
     artifact: '',
     database: 'Postgresql',
     projectStructureStyle: 'technical',

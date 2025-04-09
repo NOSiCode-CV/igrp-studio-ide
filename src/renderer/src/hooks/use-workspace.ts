@@ -111,13 +111,16 @@ export const useWorkspace = () => {
         setLoading(true);
         try {
 
-            const updated = await window.igrpStudio.workspace.updateWorkspace(id, updates);
+            await window.igrpStudio.workspace.updateWorkspace(id, updates).then((data) => {
+                if (!data) return;
+                setWorkspaces(prev =>
+                    prev.map(w => w.id === id ? data : w)
+                );
 
-            setWorkspaces(prev =>
-                prev.map(w => w.id === id ? updated : w)
-            );
+                return data;
+            });
 
-            return updated;
+
         } catch (err) {
             setError('Failed to update workspace');
             showErrorToast('Update failed');
@@ -132,6 +135,7 @@ export const useWorkspace = () => {
         try {
             await window.igrpStudio.workspace.deleteWorkspace(id);
             setWorkspaces(prev => prev.filter(w => w.id !== id));
+            dispatch(setWorkspace(null))
             showSuccessToast('Workspace removed');
         } catch (err) {
             setError('Failed to delete workspace');
@@ -168,6 +172,7 @@ export const useWorkspace = () => {
 
             if (result?.error) {
                 showErrorToast(result.error);
+                console.log(result.error)
                 return
             }
 

@@ -4,9 +4,9 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { IWorkspace, ProjectData } from '../types';
-import { addProjectsToWorkspace, newWorkspace as engineNewWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import { addProjectToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
-import { WorkspaceConfig, WorkspaceProjectsConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ProjectWorkspace, WorkspaceProjectsConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getJsonContent } from '../helpers';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
@@ -140,24 +140,16 @@ export class WorkspaceRepository {
 
     async addProjectToStudioWorkspace(workspace: IWorkspace, newProject: ProjectData) {
 
-        const { config, id: projectId } = newProject
+        const { config, id: projectId, framework } = newProject
 
-        const { path: workspacePath } = workspace
+        const { path: workspacePath, id: workspaceId } = workspace
 
-        const workspaceConfigPath = path.join(workspace.path, '.igrpstudio/workspace.json');
-
-        const workspaceData = await getJsonContent(workspaceConfigPath);
-
-        workspaceData.projects.push({ ...config, id: projectId });
-
-        const workspaceConfig: WorkspaceProjectsConfig = {
-            ...workspaceData,
-            projects: workspaceData.projects,
+        const workspaceConfig: ProjectWorkspace = {
+            config: { ...config, id: projectId, type: framework },
+            id: workspaceId,
         }
 
-        console.log('workspaceConfig', workspaceConfig)
-
-        await addProjectsToWorkspace(workspaceConfig, workspacePath);
+        await addProjectToWorkspace(workspaceConfig, workspacePath);
     }
 
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
@@ -187,7 +179,7 @@ export class WorkspaceRepository {
         return foundProject;
     }
 
-    async deleteProject(projectId: string): Promise<void> {
+    async deleteProject(projectId: string, basePath: string): Promise<void> {
         const data = await this.loadData();
         let deleted = false;
 
@@ -202,6 +194,8 @@ export class WorkspaceRepository {
                 }
             }
         }
+
+        await removeProjectFromWorkspace(projectId, basePath);
 
         if (!deleted) {
             throw new Error(`Project ${projectId} not found`);
@@ -233,7 +227,11 @@ export class WorkspaceRepository {
     async listProjects(workspaceId: string): Promise<ProjectData[]> {
         const data = await this.loadData();
         const workspace = data.workspaces.find(w => w.id === workspaceId);
-        return workspace?.projects || [];
+        return workspace?.projects?.sort((a, b) => {
+            const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z');
+            const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z');
+            return dateB.getTime() - dateA.getTime();
+        }) || [];
     }
 
     async getRecentWorkspaces(limit = 5): Promise<IWorkspace[]> {

@@ -210,7 +210,7 @@ export function PopoverDto({
                                                 );
                                                 if (value >= 0) {
                                                     changeValue(
-                                                        'minLength',
+                                                        'maxLength',
                                                         index,
                                                         value
                                                     );
