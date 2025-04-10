@@ -19,7 +19,8 @@ export const EVENTS = {
         CREATE_PAGE: 'next-engine:create-page',
         DELETE_PAGE: 'next-engine:delete-page',
         REGISTRY_COMPONENT: 'engine:registry-component',
-        GET_COMPONENT: 'engine:get-component'
+        GET_COMPONENT: 'engine:get-component',
+        GET_SERVICE: 'engine:get-service'
     },
     REPOSITORY: {
         INITIALIZE: 'repository:initialize',

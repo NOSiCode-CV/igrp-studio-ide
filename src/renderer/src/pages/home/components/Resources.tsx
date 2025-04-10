@@ -183,7 +183,7 @@ const Resources = () => {
         if (changeStatus) {
             refreshContainers();
         }
-    }, [changeStatus, refreshContainers]);
+    }, [changeStatus]);
 
     const fetchProjects = async () => {
         await findAllProjects().then((data) => {

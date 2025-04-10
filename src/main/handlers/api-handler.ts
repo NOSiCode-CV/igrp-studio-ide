@@ -105,7 +105,7 @@ handleWithCustomErrors(
     EVENTS.NEXT.REGISTRY_COMPONENT,
     async (_event, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);
-        await engine.registryComponent?.(basePath);
+        await engine.registry?.(basePath);
     }
 );
 
@@ -114,6 +114,15 @@ handleWithCustomErrors(
     async (_event, engineType: string) => {
         const engine = EngineFactory.getEngine(engineType);
         const data = engine.getComponents?.();
+        return data;
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.NEXT.GET_SERVICE,
+    async (_event, engineType: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        const data = engine.getServices?.();
         return data;
     }
 );

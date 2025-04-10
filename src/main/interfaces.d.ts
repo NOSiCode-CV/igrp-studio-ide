@@ -1,5 +1,6 @@
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
 import { Connection, DockerComposeService, Handler, HandlerResponse, PageableProjects, ProjectData } from "./types";
+import { ComponentRegistrationConfig, DockerServiceRegistrationConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -63,8 +64,9 @@ export interface BaseEngine {
 
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>;
 
-    registryComponent?(basePath: string): Promise<void>;
-    getComponents?(): Record<string, Component>;
+    registry?(basePath: string): Promise<void>;
+    getComponents?(): ComponentRegistrationConfig;
+    getServices?(): Promise<DockerServiceRegistrationConfig>;
 
     getDependencies?(): Promise<Dependency[]>
 }
@@ -85,9 +87,9 @@ export interface IBaseEngine {
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 
     createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    registryComponent: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    registry: (engineType: string, basePath: string) => Promise<HandlerResponse>;
     getComponent: (engineType: string) => Promise<HandlerResponse>;
-    getComponent: (engineType: string) => Promise<Record<string, Component>>;
+    getService: (engineType: string) => Promise<Record<string, Component>>;
 
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
 }

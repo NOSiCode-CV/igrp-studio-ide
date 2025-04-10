@@ -26,7 +26,7 @@ export function useProjectValidation({ t, step }) {
             // Only validate the config object when the step is 3
             if (step === 3) {
                 return Yup.object().shape({
-                    appName: Yup.string().when(
+                    name: Yup.string().when(
                         '$framework',
                         (framework, schema) => {
                             return framework &&
@@ -48,7 +48,7 @@ export function useProjectValidation({ t, step }) {
                                 : schema.notRequired();
                         }
                     ),
-                    apiName: Yup.string().when('$framework', (framework, schema) => {
+                    name: Yup.string().when('$framework', (framework, schema) => {
                         return framework &&
                             [ENV_TYPES.SPRING, ENV_TYPES.DOTNET].includes(
                                 framework[0]

@@ -6,6 +6,7 @@ import { navigateToNextPage, setBasePath, setConfig, setWorkspace } from '@rende
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
 
 interface RootState {
     PageBuilder: {
@@ -190,6 +191,12 @@ export const useWorkspace = () => {
         return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
     }
 
+    const getTemplatesService = async () => {
+        return await window.engine.getService(ENV_TYPES.NEXTJS).then(data => {
+            return data
+        });
+    }
+
     useEffect(() => {
         if (error) {
             showErrorToast(error);
@@ -212,7 +219,8 @@ export const useWorkspace = () => {
             getWorkspaces,
             saveOrOpenProject,
             findAllProjects,
-            getRecentWorkspaces
+            getRecentWorkspaces,
+            getTemplatesService
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

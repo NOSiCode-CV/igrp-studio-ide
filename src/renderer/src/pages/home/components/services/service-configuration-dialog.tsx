@@ -33,68 +33,7 @@ import { Trash2, Database, Server, Globe, X, PlusCircle } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
-
-// Service templates
-const serviceTemplates = [
-    {
-        id: 'postgres',
-        name: 'PostgreSQL',
-        image: 'postgres:14',
-        type: 'database',
-        ports: ['5432:5432'],
-        environment: [
-            { name: 'POSTGRES_USER', value: 'postgres' },
-            { name: 'POSTGRES_PASSWORD', value: 'postgres' },
-            { name: 'POSTGRES_DB', value: 'postgres' },
-        ],
-        volumes: ['postgres_data:/var/lib/postgresql/data'],
-    },
-    {
-        id: 'mysql',
-        name: 'MySQL',
-        image: 'mysql:8',
-        type: 'database',
-        ports: ['3306:3306'],
-        environment: [
-            { name: 'MYSQL_ROOT_PASSWORD', value: 'mysql' },
-            { name: 'MYSQL_DATABASE', value: 'mysql' },
-        ],
-        volumes: ['mysql_data:/var/lib/mysql'],
-    },
-    {
-        id: 'redis',
-        name: 'Redis',
-        image: 'redis:alpine',
-        type: 'cache',
-        ports: ['6379:6379'],
-        environment: [],
-        volumes: ['redis_data:/data'],
-    },
-    {
-        id: 'nginx',
-        name: 'Nginx',
-        image: 'nginx:latest',
-        type: 'web',
-        ports: ['80:80', '443:443'],
-        environment: [],
-        volumes: [
-            './nginx/conf:/etc/nginx/conf.d',
-            './nginx/html:/usr/share/nginx/html',
-        ],
-    },
-    {
-        id: 'mongodb',
-        name: 'MongoDB',
-        image: 'mongo:latest',
-        type: 'database',
-        ports: ['27017:27017'],
-        environment: [
-            { name: 'MONGO_INITDB_ROOT_USERNAME', value: 'mongo' },
-            { name: 'MONGO_INITDB_ROOT_PASSWORD', value: 'mongo' },
-        ],
-        volumes: ['mongodb_data:/data/db'],
-    },
-];
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 // Network types
 const networkTypes = [
@@ -139,6 +78,88 @@ export function ServiceConfigurationDialog({
     const [useCustomNetwork, setUseCustomNetwork] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [open, setOpen] = useState(false);
+    const [serviceTemplates, setServiceTemplates] = useState<any[]>([]);
+
+    const {
+        actions: { getTemplatesService },
+    } = useWorkspace();
+
+    useEffect(() => {
+        const fetchTemplates = async () => {
+            const { result } = await getTemplatesService();
+
+            const convertedTemplates =
+                result.services?.map((service) => {
+                    console.log(service);
+
+                    const {
+                        properties,
+                        name,
+                        label,
+                        restart,
+                        image,
+                        command,
+                        env_file,
+                    } = service;
+
+                    // Convert ports array to the string format "internal:external"
+                    const ports =
+                        service.properties.ports?.default?.map(
+                            (port) => `${port.external}:${port.internal}`
+                        ) || [];
+
+                    // Convert environments array to {name, value} format
+                    const environment =
+                        properties.environments?.default?.map((env) => ({
+                            name: env.key,
+                            value: env.value,
+                        })) || [];
+
+                    // Convert volumes array to "source:target" format
+                    const volumes =
+                        properties?.volumes?.default?.map(
+                            (vol) => `${vol.name}:${vol.path}`
+                        ) || [];
+
+                    // Convert dependsOn to depends_on array
+                    const depends_on =
+                        properties.dependsOn?.default?.map(
+                            (dep) => dep.service
+                        ) || [];
+
+                    // Convert labels array
+                    const labels =
+                        properties.labels?.default?.map((label) => ({
+                            key: label.key,
+                            value: label.value,
+                        })) || [];
+
+                    // Build the template object
+                    return {
+                        id: name,
+                        name: label || name,
+                        image: properties.image?.default || image?.required,
+                        type:
+                            labels?.default?.find((l) => l.key === 'type')
+                                ?.value || 'service',
+                        ports,
+                        environment,
+                        volumes,
+                        depends_on,
+                        labels,
+                        restart: restart?.default,
+                        command: command?.default?.map(
+                            (cmd) => cmd.instruction
+                        ),
+                        env_file: env_file?.default,
+                    };
+                }) || [];
+
+            setServiceTemplates(convertedTemplates);
+        };
+
+        fetchTemplates();
+    }, []);
 
     useEffect(() => {
         if (open && service) {

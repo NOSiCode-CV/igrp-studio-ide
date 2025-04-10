@@ -132,6 +132,14 @@ const engine = {
 		}
 	},
 
+	getService: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_SERVICE, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
 	getDependencies: async (engineType: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.ENGINE.GET_DEPENDENCIES, engineType)
