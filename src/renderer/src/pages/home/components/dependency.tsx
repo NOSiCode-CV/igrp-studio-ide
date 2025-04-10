@@ -35,10 +35,8 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                         variant="outline"
                         className="text-xs truncate"
                     >
-                        <span>
-                            {depId}
-                            {config?.condition ? ` (${config.condition})` : ''}
-                        </span>
+                      {depId}
+                      {config?.condition ? ` (${config.condition})` : ''}
                     </Badge>
                 ));
             })}

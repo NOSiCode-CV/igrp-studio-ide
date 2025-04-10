@@ -132,7 +132,6 @@ export function ServiceConfigurationDialog({
     const [newEnvValue, setNewEnvValue] = useState('');
     const [volumes, setVolumes] = useState<string[]>([]);
     const [newVolume, setNewVolume] = useState('');
-    const [enabled, setEnabled] = useState(true);
     const [template, setTemplate] = useState('');
     const [dependsOn, setDependsOn] = useState<string[]>([]);
     const [networkType, setNetworkType] = useState('bridge');
@@ -151,7 +150,6 @@ export function ServiceConfigurationDialog({
             setPorts(service.ports || []);
             setEnvironment(service.environment || []);
             setVolumes(service.volumes || []);
-            setEnabled(service.enabled !== undefined ? service.enabled : true);
             setTemplate(service.template || '');
             setDependsOn(service.dependsOn || []);
             setNetworkType(service.networkType || 'bridge');
@@ -166,7 +164,6 @@ export function ServiceConfigurationDialog({
             setPorts([]);
             setEnvironment([]);
             setVolumes([]);
-            setEnabled(true);
             setTemplate('');
             setDependsOn([]);
             setNetworkType('bridge');
@@ -256,7 +253,6 @@ export function ServiceConfigurationDialog({
             ports,
             environment,
             volumes,
-            enabled,
             template,
             dependsOn,
             networkType,
@@ -449,17 +445,6 @@ export function ServiceConfigurationDialog({
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                </div>
-
-                                <div className="flex items-center space-x-2">
-                                    <Switch
-                                        id="enabled"
-                                        checked={enabled}
-                                        onCheckedChange={setEnabled}
-                                    />
-                                    <Label htmlFor="enabled">
-                                        Enable service on startup
-                                    </Label>
                                 </div>
                             </TabsContent>
 

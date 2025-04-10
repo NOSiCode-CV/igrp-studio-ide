@@ -125,9 +125,6 @@ export function ProjectConfigurationDialog({
     isNew = true,
 }: ProjectConfigurationDialogProps) {
     const [activeTab, setActiveTab] = useState('basic');
-    const [status, setStatus] = useState<'active' | 'inactive' | 'archived'>(
-        'active'
-    );
     const [template, setTemplate] = useState('');
     const [repositoryUrl, setRepositoryUrl] = useState('');
     const [buildCommand, setBuildCommand] = useState('');
@@ -147,7 +144,6 @@ export function ProjectConfigurationDialog({
     // Reset form when dialog opens/closes or project changes
     useEffect(() => {
         if (open && project) {
-            setStatus(project.status || 'active');
             setTemplate(project.template || '');
             setRepositoryUrl(project.repositoryUrl || '');
             setBuildCommand(project.buildCommand || '');
@@ -243,9 +239,7 @@ export function ProjectConfigurationDialog({
 
         // Create project object
         const projectData: ProjectData = {
-            id: project?.id || `p-${Date.now()}`,
-            status,
-            // Additional fields
+            id: project?.id || '',
             template,
             repositoryUrl,
             buildCommand,
@@ -360,36 +354,6 @@ export function ProjectConfigurationDialog({
                                         }
                                     />
                                 )}
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="status">Status</Label>
-                                    <Select
-                                        value={status}
-                                        onValueChange={(value) =>
-                                            setStatus(
-                                                value as
-                                                    | 'active'
-                                                    | 'inactive'
-                                                    | 'archived'
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger className="h-8">
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="active">
-                                                Active
-                                            </SelectItem>
-                                            <SelectItem value="inactive">
-                                                Inactive
-                                            </SelectItem>
-                                            <SelectItem value="archived">
-                                                Archived
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
                             </TabsContent>
 
                             <TabsContent

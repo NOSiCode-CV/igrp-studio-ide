@@ -107,7 +107,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                     value={formik.values.path}
                                     labelText={t('methodType')}
                                     options={httpMethods}
-                                    placeholder={'posts'}
+                                    placeholder={'posts/{id}'}
                                     onBlur={formik.handleBlur}
                                     onChange={(e) =>
                                         formik.setFieldValue(

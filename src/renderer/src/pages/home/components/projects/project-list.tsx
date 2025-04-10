@@ -36,7 +36,6 @@ export function ProjectList({
                         <TableHead>Name</TableHead>
                         <TableHead>Framework</TableHead>
                         <TableHead>Dependencies</TableHead>
-                        <TableHead>Status</TableHead>
                         <TableHead>Last Updated</TableHead>
                         <TableHead className="w-[80px]"></TableHead>
                     </TableRow>
@@ -69,18 +68,6 @@ export function ProjectList({
                                     dependsOn={project.dependsOn}
                                     isTable
                                 />
-                            </TableCell>
-                            <TableCell>
-                                <Badge
-                                    variant={
-                                        project.status === 'active'
-                                            ? 'default'
-                                            : 'secondary'
-                                    }
-                                    className="capitalize"
-                                >
-                                    {project.status}
-                                </Badge>
                             </TableCell>
                             <TableCell className="text-muted-foreground text-xs">
                                 {project.updatedAt &&

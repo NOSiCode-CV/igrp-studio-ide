@@ -29,7 +29,6 @@ export function ServiceList({ services, onEdit }: ServiceListProps) {
                     <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Type</TableHead>
-                        <TableHead>Image</TableHead>
                         <TableHead>Ports</TableHead>
                         <TableHead>Dependencies</TableHead>
                         <TableHead>Status</TableHead>
@@ -62,9 +61,6 @@ export function ServiceList({ services, onEdit }: ServiceListProps) {
                                 >
                                     {service.type}
                                 </Badge>
-                            </TableCell>
-                            <TableCell className="text-xs font-mono  truncate">
-                                {service.image}
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-wrap gap-1">

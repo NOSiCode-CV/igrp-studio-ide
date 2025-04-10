@@ -2,13 +2,11 @@
 
 import { Badge } from '@renderer/components/ui/badge';
 import {
-    Power,
-} from 'lucide-react';
-import {
     Card,
     CardContent,
-    CardFooter,
+    CardDescription,
     CardHeader,
+    CardTitle,
 } from '@renderer/components/ui/card';
 import Dependency from '../dependency';
 import { ServiceActions } from './service-actions';
@@ -20,47 +18,43 @@ interface ServiceGridProps {
 }
 
 export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
-  
     return (
         <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4  xl:grid-cols-5 gap-3">
                 {services.map((service, index) => (
                     <Card
                         key={index}
-                        className="group border rounded-lg shadow-sm"
+                        className="group border rounded-lg shadow-sm gap-3"
                     >
                         <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1">
-                                    <div
-                                        className={`${getServiceColor(service.type)} rounded-sm p-1 text-white`}
-                                    >
-                                        {getServiceIcon(service.type)}
+                            <CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1">
+                                        <div
+                                            className={`${getServiceColor(service.type)} rounded-sm p-1 text-white`}
+                                        >
+                                            {getServiceIcon(service.type)}
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className="capitalize"
+                                        >
+                                            {service.type}
+                                        </Badge>
                                     </div>
-                                    <Badge
-                                        variant="outline"
-                                        className="capitalize"
-                                    >
-                                        {service.type}
-                                    </Badge>
+                                    <div className="flex items-center gap-1">
+                                        <ServiceActions
+                                            service={service}
+                                            services={services}
+                                            onEdit={onEdit}
+                                        />
+                                    </div>
                                 </div>
-                                <Badge
-                                    variant="outline"
-                                    className={` capitalize ${getStatusColor(service.status)}`}
-                                >
-                                    {service.status}
-                                </Badge>
-                            </div>
+                            </CardTitle>
+                            <CardDescription className='truncate'>{service.name}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <h3 className="text-xs font-medium mb-0.5">
-                                {service.name}
-                            </h3>
-                            <p className="text-xs text-muted-foreground line-clamp-1 mb-1.5 font-mono">
-                                {service.image}
-                            </p>
-
-                            <div className="grid grid-cols-1 gap-1 mb-1.5">
+                            <div className="grid grid-cols-1 gap-3">
                                 {service.ports && service.ports.length > 0 && (
                                     <div className="rounded-sm bg-muted p-1">
                                         <div className="text-xs text-muted-foreground">
@@ -82,19 +76,15 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                 )}
 
                                 <Dependency dependsOn={service.dependsOn} />
+
+                                <Badge
+                                    variant="outline"
+                                    className={`capitalize ${getStatusColor(service.status)}`}
+                                >
+                                    {service.status}
+                                </Badge>
                             </div>
                         </CardContent>
-                        <CardFooter className="justify-between">
-                            <div className="text-xs text-muted-foreground flex items-center">
-                                <Power className="mr-1 h-3 w-3" />
-                                {service.enabled ? 'Enabled' : 'Disabled'}
-                            </div>
-                            <ServiceActions
-                                service={service}
-                                services={services}
-                                onEdit={onEdit}
-                            />
-                        </CardFooter>
                     </Card>
                 ))}
             </div>
