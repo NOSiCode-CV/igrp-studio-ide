@@ -119,10 +119,10 @@ export function NewComponentModal({
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <IconBrowser
-                                title="Icon Display [IGRP Studio]?"
-                                onIconSelect={(icon) => {
+                                onSelectedIcon={(icon) => {
                                     formik.setFieldValue('icon', icon);
                                 }}
+                                selectedIcon={''}
                             />
                         </div>
                     </div>

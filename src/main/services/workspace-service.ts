@@ -148,10 +148,11 @@ export class WorkspaceRepository {
             id: workspaceId,
         }
 
-        console.log(workspacePath)
-        console.log(workspaceConfig, )
-
+        //call engine
         await addProjectToWorkspace(workspaceConfig, workspacePath);
+
+        await this.validateAndMoveProject(newProject, workspacePath)
+
     }
 
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
@@ -181,13 +182,13 @@ export class WorkspaceRepository {
                 throw new Error(`Workspace ${workspaceId} not found`);
             }
 
-            if (!(updates.framework as FrameworkType)) {
+            if (!(updates.framework as FrameworkType || !updates.config.name)) {
                 throw new Error(`Invalid project configuration`);
             }
 
             const updatedProject: ProjectData = {
                 ...updates,
-                name: updates.name || 'Unnamed Project',
+                name: updates.config.name || 'Unnamed Project',
                 path: updates.path as string,
                 workspaceId: updates.workspaceId as string,
                 framework: updates.framework as FrameworkType,
@@ -196,9 +197,8 @@ export class WorkspaceRepository {
                 config: updates.config || {},
             };
 
-            console.log(updatedProject)
-
             workspace.projects?.push(updatedProject as ProjectData);
+
             workspace.updatedAt = new Date().toISOString();
 
             await this.addProjectToStudioWorkspace(workspace, updatedProject);
@@ -287,6 +287,37 @@ export class WorkspaceRepository {
                 return dateB.getTime() - dateA.getTime();
             })
             .slice(0, limit);
+    }
+
+    async validateAndMoveProject(project: ProjectData, workspacePath: string): Promise<void> {
+        // Expected project path pattern: <workspacePath>/projects/<projectName>
+        const expectedPath = path.join(workspacePath, 'projects', project.config.name);
+
+        // If project is already in correct location, do nothing
+        if (project.path === expectedPath) {
+            return;
+        }
+
+        // Create projects directory if it doesn't exist
+        const projectsDir = path.join(workspacePath, 'projects');
+        if (!fs.existsSync(projectsDir)) {
+            await fs.promises.mkdir(projectsDir, { recursive: true });
+        }
+
+        // Check if target directory already exists
+        if (fs.existsSync(expectedPath)) {
+            throw new Error(`Target directory ${expectedPath} already exists`);
+        }
+
+        // Move the project
+        try {
+            await fs.promises.cp(project.path, expectedPath, { recursive: true });
+            await fs.promises.rm(project.path, { recursive: true, force: true });
+            project.path = expectedPath;
+            project.updatedAt = new Date().toISOString();
+        } catch (error: any) {
+            throw new Error(`Failed to move project: ${error.message}`);
+        }
     }
 
     // Backup Methods

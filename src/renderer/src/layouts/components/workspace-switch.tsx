@@ -1,12 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import {
-    Check,
-    FolderKanban,
-    ListFilter,
-    Plus,
-} from 'lucide-react';
+import { Check, FolderKanban, ListFilter, Plus } from 'lucide-react';
 
 import {
     DropdownMenu,
@@ -56,15 +51,15 @@ export function WorkspaceSwitcher({
 
     return (
         <>
-            <SidebarMenu className='mt-3'>
+            <SidebarMenu className="mt-3">
                 <SidebarMenuItem>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton
-                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5"
-                            >
+                            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5">
                                 <FolderKanban className="h-4 w-4 flex-shrink-0" />
-                                <span className="">{selectedWorkspace.name}</span>
+                                <span className="">
+                                    {selectedWorkspace.name}
+                                </span>
                                 <ListFilter className="ml-auto h-3 w-3" />
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
@@ -78,8 +73,10 @@ export function WorkspaceSwitcher({
                                 name="inputseach"
                                 value={searchTerm}
                                 showSubmitButton={false}
-                                placeholder='Search workspaces'
-                                onChange={(value) => setSearchTerm(value)}
+                                placeholder="Search workspaces"
+                                onChange={(value) =>
+                                    setSearchTerm(value.target.value)
+                                }
                             />
                             {filteredWorkspaces.map((workspace, index) => (
                                 <DropdownMenuItem
@@ -90,7 +87,8 @@ export function WorkspaceSwitcher({
                                 >
                                     {workspace.name}
 
-                                    {workspace.name === selectedWorkspace.name ? (
+                                    {workspace.name ===
+                                    selectedWorkspace.name ? (
                                         <Check className="ml-auto" />
                                     ) : (
                                         <DropdownMenuShortcut>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Variable, Plus, Trash2, RefreshCw } from 'lucide-react';
 
 interface CustomProperty {

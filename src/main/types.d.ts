@@ -10,14 +10,13 @@ export type ProjectType = "frontend" | "backend"
 export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet';
 
 export interface NextConfigData {
-    appName: string
+    name: string
     description?: string
     workspaceId: string;
     id: string;
 }
 
 export interface DotNetConfigData {
-    apiName: string;
     artifact: string;
     database: DatabaseTypes;
     description?: string;
@@ -29,7 +28,7 @@ export interface DotNetConfigData {
 }
 
 export interface SpringConfigData {
-    apiName: string;
+    name: string;
     description: string;
     group: string;
     artifact: string;

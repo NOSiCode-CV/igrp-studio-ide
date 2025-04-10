@@ -109,7 +109,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
                     <DropdownMenuItem
                         className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                        onClick={() => setIsDialogOpen(true)}
+                        onClick={(e) =>{e.stopPropagation(); setIsDialogOpen(true)}}
                     >
                         <Trash className="mr-2 h-4 w-4 text-red-600" />
                         Delete Project

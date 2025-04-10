@@ -32,7 +32,6 @@ import {
 import { RootState } from '@renderer/redux';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '../ui/badge';
 
 export interface Branch {
     name: string;

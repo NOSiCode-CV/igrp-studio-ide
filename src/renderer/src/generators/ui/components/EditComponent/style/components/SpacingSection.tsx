@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Terminal, Trash2, Code2, Keyboard } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Terminal, Code2, Keyboard } from 'lucide-react';
 
 type Side = 'top' | 'right' | 'bottom' | 'left';
 type SpacingType = 'margin' | 'padding';

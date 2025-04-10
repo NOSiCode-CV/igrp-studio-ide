@@ -21,7 +21,6 @@ import {
 } from '@renderer/components/ui/sidebar';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { cn } from '@renderer/lib/utils';
-import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
 import { SearchInput } from './shared-ui';
 
 export interface SidebarItem {

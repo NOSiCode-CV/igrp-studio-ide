@@ -2,21 +2,22 @@
 
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import { NextConfigData, ProjectData } from 'src/main/types';
-import { Textarea } from '@renderer/components/ui/Textarea';
+import { NextConfigData } from 'src/main/types';
+import { Textarea } from '@renderer/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
-import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/label-required';
 
 interface NextConfigProps {
     data: NextConfigData;
-    errors?: FormikErrors<ProjectData>;
+    errors?: any;
     onChange: (data: NextConfigData) => void;
 }
 
 const DEFAULT_NEXT_CONFIG: NextConfigData = {
-    appName: '',
+    name: '',
     description: '',
+    workspaceId: '',
+    id: '',
 };
 
 export function NextConfig({
@@ -30,17 +31,17 @@ export function NextConfig({
             <div className="space-y-2">
                 <LabelRequired>{t('applicationName')}</LabelRequired>
                 <Input
-                    id="appName"
-                    value={data.appName}
+                    id="name"
+                    value={data.name}
                     onChange={(e) =>
-                        onChange({ ...data, appName: e.target.value })
+                        onChange({ ...data, name: e.target.value })
                     }
                     placeholder="my-next-app"
                     maxLength={20}
                 />
-                {errors?.config && errors.config.appName && (
+                {errors?.config && errors.config.name && (
                     <p className="text-xs text-destructive">
-                        {errors.config.appName}
+                        {errors.config.name}
                     </p>
                 )}
             </div>

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import BoxContainer from '../tools/BoxWrappertsx';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/use-studio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
@@ -8,6 +7,7 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { gridVariants } from '../../utils/layout-mapping';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface GridProps {
     comp: StructuredComponent;
@@ -65,14 +65,14 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                         mode="MOVE"
                         className="p-1"
                     >
-                        <BoxContainer
+                        <BoxWrapper
                             comp={comp}
                             group="group/column-comp"
                             onEdit={() => handleEditClick(comp)}
                             className="opacity-0 group-hover/column-comp:opacity-100"
                         >
                             <Component comp={comp} onDragEnd={onDragEnd} />
-                        </BoxContainer>
+                        </BoxWrapper>
                     </Draggable>
                 ) : (
                     <div key={comp.id}>Loading...</div>

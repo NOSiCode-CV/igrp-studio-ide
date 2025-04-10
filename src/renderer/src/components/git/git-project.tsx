@@ -29,6 +29,7 @@ export default function GitProject() {
     );
     const [activeTab, setActiveTab] = useState('github');
     const {
+        workspace,
         actions: { saveOrOpenProject },
     } = useWorkspace();
 
@@ -57,6 +58,7 @@ export default function GitProject() {
                     );
                     try {
                         await saveOrOpenProject({
+                            workspaceId: workspace.id,
                             name: data.config.name,
                             framework: data.config.type,
                             config: data.config.config,

@@ -7,7 +7,7 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { formVariants } from '../../utils/layout-mapping';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
-import BoxContainer from '../tools/BoxWrappertsx';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface FormComponentProps {
     isDisabled?: boolean;
@@ -64,7 +64,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                             mode="MOVE"
                         >
                             {Component && (
-                                <BoxContainer
+                                <BoxWrapper
                                     comp={comp}
                                     group="group/comp-form"
                                     onEdit={() => handleEditClick(comp)}
@@ -74,7 +74,7 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                                         comp={comp}
                                         onDragEnd={onDragEnd}
                                     />
-                                </BoxContainer>
+                                </BoxWrapper>
                             )}
                         </Draggable>
                     );

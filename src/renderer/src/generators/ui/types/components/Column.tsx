@@ -6,7 +6,7 @@ import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import BoxContainer from '../tools/BoxWrappertsx';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface ColProps {
     comp: StructuredComponent;
@@ -60,14 +60,14 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     dropTargetId={componentId}
                     mode="MOVE"
                 >
-                    <BoxContainer
+                    <BoxWrapper
                         comp={comp}
                         group="group/column-comp"
                         onEdit={() => handleEditClick(comp)}
                         className="top-0 opacity-0 group-hover/column-comp:opacity-100"
                     >
                         <Component comp={comp} onDragEnd={onDragEnd} />
-                    </BoxContainer>
+                    </BoxWrapper>
                 </Draggable>
             ) : (
                 <div key={comp.id}>Loading...</div>

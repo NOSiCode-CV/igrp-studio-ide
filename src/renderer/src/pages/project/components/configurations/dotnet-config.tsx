@@ -7,7 +7,7 @@ import {
     RadioGroupItem,
 } from '@renderer/components/ui/radio-group';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Textarea } from '@renderer/components/ui/Textarea';
+import { Textarea } from '@renderer/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { IGRPCombobox } from '@renderer/components/combobox';
@@ -24,7 +24,7 @@ interface DotNetConfigProps {
 }
 
 const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
-    apiName: '',
+    name: '',
     description: '',
     artifact: '',
     database: 'Postgresql',
@@ -62,10 +62,10 @@ export function DotNetConfig({
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
-                    id="apiName"
-                    value={data.apiName}
+                    id="name"
+                    value={data.name}
                     onChange={(e) =>
-                        onChange({ ...data, apiName: e.target.value })
+                        onChange({ ...data, name: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
                     maxLength={20}

@@ -1,14 +1,7 @@
 import { EmptyList } from '@renderer/components/empty-list';
-import { Button } from '@renderer/components/ui/button';
-import {
-    DropdownMenuTrigger,
-    DropdownMenu,
-    DropdownMenuItem,
-    DropdownMenuContent,
-} from '@renderer/components/ui/dropdown-menu';
 import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import { MousePointer, Plus } from 'lucide-react';
+import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { TriggerControls } from './components/TriggerControls';
 import { ShadowValue } from '../style/components/effects/types';

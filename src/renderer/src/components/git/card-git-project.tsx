@@ -5,7 +5,6 @@ import { Card } from '../ui/card';
 import useToast from '../useToast';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { useEffect } from 'react';
 
 type CardGitProjectProps = {
     repo: Repository;

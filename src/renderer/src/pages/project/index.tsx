@@ -37,7 +37,7 @@ import {
     STEPS,
     THEME_COLORS,
 } from './data';
-import { ProjectData, SpringConfigData } from 'src/main/types';
+import { ProjectData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
 import { LabelRequired } from '@renderer/components/label-required';
@@ -174,12 +174,6 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     };
 
-    const handleClose = () => {
-        setOpen(false);
-        setStep(1);
-        formik.resetForm();
-    };
-
     const handleOpenDirectory = () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
 
@@ -234,7 +228,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     React.useEffect(() => {
         formik.setFieldValue(
             'path',
-            `${workspace.path}/projects/${formik.values?.config?.apiName  ?? formik.values?.config?.appName ?? formik.values.name}`
+            `${workspace.path}/projects/${formik.values?.config?.name ?? formik.values.name}`
         );
     }, [workspace, formik.values.name, formik.values?.config]);
 
