@@ -154,7 +154,7 @@
 					"sha256"
 				],
 				"rfc3161TimeStampServer": "http://timestamp.digicert.com",
-				"publisherName":"NOSi E.P.E <contact@nosi.cv>"
+				"publisherName": "NOSi E.P.E <contact@nosi.cv>"
 			}
 		},
 		"mac": {
