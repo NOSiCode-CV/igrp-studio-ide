@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import { Connection, DatabaseResponse } from "../types";
 import { closeKnexConnection, createKnexConnection, getTables, getTableStructure } from "../helpers/Knex";
-import { ConnectionRepository } from "../repo/database-data";
+import { ConnectionRepository } from "../services/database-service";
 
 const repoConnection = new ConnectionRepository()
 

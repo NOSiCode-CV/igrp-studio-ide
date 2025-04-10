@@ -8,25 +8,29 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { Badge } from '@renderer/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
-import { Button } from '@renderer/components/ui/button';
-import { ExternalLink, Edit } from 'lucide-react';
 import { ProjectData } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import Dependency from '../dependency';
+import { ProjectActions } from './project-actions';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 interface ProjectListProps {
     projects: ProjectData[];
-    onEdit?: (project: ProjectData) => void;
     workspaceId?: string;
+    onEdit?: (project: ProjectData) => void;
+    onDelete?: (prompt: boolean) => void;
 }
 
-export function ProjectList({
-    projects,
-    onEdit,
-}: ProjectListProps) {
-    const handleProjectClick = (project: ProjectData) => {};
+export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
+    const handleProjectClick = (project: ProjectData) => {
+        saveOrOpenProject(project);
+    };
+
+    const {
+        workspace,
+        actions: { saveOrOpenProject },
+    } = useWorkspace();
 
     return (
         <div className="rounded-md border overflow-hidden">
@@ -77,29 +81,16 @@ export function ProjectList({
                                     )}
                             </TableCell>
                             <TableCell>
-                                <div className="flex items-center gap-1">
-                                    {onEdit && (
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onEdit(project);
-                                            }}
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <ExternalLink className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                                <ProjectActions
+                                    project={project}
+                                    basePath={workspace.path}
+                                    onDelete={(success) => onDelete?.(success)}
+                                    onEdit={
+                                        onEdit
+                                            ? () => onEdit(project)
+                                            : undefined
+                                    }
+                                />
                             </TableCell>
                         </TableRow>
                     ))}

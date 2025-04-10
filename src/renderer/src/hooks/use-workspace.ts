@@ -166,14 +166,12 @@ export const useWorkspace = () => {
             let result: any = {};
 
             if (id)
-                await window.igrpStudio.workspace.updateProject(id, project);
+                result = await window.igrpStudio.workspace.updateProject(id, project);
             else
                 result = await window.igrpStudio.workspace.saveProject(workspace?.id, project);
 
             if (result?.error) {
-                showErrorToast(result.error);
-                console.log(result.error)
-                return
+                throw new Error(result.error);
             }
 
             dispatch(setBasePath(project.path));
@@ -183,7 +181,6 @@ export const useWorkspace = () => {
             navigateToNextPage(navigate, project);
         } catch (err) {
             showErrorToast(err);
-            throw err;
         } finally {
             setLoading(false);
         }

@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import yaml from 'js-yaml';
 import path from 'path';
-import { DockerComposeConfig, DockerComposeService, ServiceInfo } from '../../types';
+import { DockerComposeConfig, DockerComposeService, ServiceInfo } from '../types';
 
 const execAsync = promisify(exec);
 

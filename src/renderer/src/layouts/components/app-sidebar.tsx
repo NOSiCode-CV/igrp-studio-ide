@@ -165,12 +165,18 @@ export function AppSidebar({
                                                     activeMenuGroup
                                                 }
                                                 size="lg"
-                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
+                                                className={cn(
+                                                    'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
+                                                    item.label ===
+                                                        activeMenuGroup
+                                                        ? '!text-igrp'
+                                                        : ''
+                                                )}
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
                                                     <item.icon size={20} />
                                                 </div>
-                                                <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
+                                                <span className="w-16 text-xs text-center text-ellipsis truncate">
                                                     {item.label}
                                                 </span>
                                             </SidebarMenuButton>

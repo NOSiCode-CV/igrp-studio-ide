@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
-import { dockerService } from "../helpers/docker/docker";
 import Docker from 'dockerode';
 import { ServiceInfo } from "../types";
+import { dockerService } from "../services/docker-service";
 
 
 // IPC Handlers

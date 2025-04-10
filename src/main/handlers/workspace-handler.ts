@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { IWorkspace, ProjectData } from '../types';
-import { WorkspaceRepository } from '../repo/workspace-repository';
+import { WorkspaceRepository } from '../services/workspace-service';
 import { ERROR_CODES, EVENTS } from '../constants/events';
 import { handleWithCustomErrors } from '../helpers';
 

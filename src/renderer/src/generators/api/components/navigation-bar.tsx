@@ -57,7 +57,10 @@ const NavigationBar = ({
                 />
 
                 <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical"/>
+                <Separator
+                    orientation="vertical"
+                    className="mx-2 data-[orientation=vertical]:h-4"
+                />
 
                 <Breadcrumb>
                     <BreadcrumbList>

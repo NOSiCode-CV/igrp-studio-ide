@@ -14,7 +14,7 @@ import {
 import { Container, FolderKanban, Network, Settings } from 'lucide-react';
 import { WorkspaceSettings } from './components/workspace-settings';
 import { WorkspaceDocker } from './components/workspace-docker';
-import Resources from './components/Resources';
+import Resources from './components/resources';
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);

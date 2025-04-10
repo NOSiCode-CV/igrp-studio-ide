@@ -3,11 +3,10 @@ import fs from 'fs';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { IWorkspace, ProjectData } from '../types';
+import { FrameworkType, IWorkspace, ProjectData } from '../types';
 import { addProjectToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
-import { ProjectWorkspace, WorkspaceProjectsConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { getJsonContent } from '../helpers';
+import { ProjectWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
@@ -149,12 +148,16 @@ export class WorkspaceRepository {
             id: workspaceId,
         }
 
+        console.log(workspacePath)
+        console.log(workspaceConfig, )
+
         await addProjectToWorkspace(workspaceConfig, workspacePath);
     }
 
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
         const data = await this.loadData();
         let foundProject: ProjectData | undefined;
+        const { workspaceId } = updates
 
         for (const workspace of data.workspaces) {
             const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
@@ -172,10 +175,40 @@ export class WorkspaceRepository {
         }
 
         if (!foundProject) {
-            throw new Error(`Project ${projectId} not found`);
+            const workspace = data.workspaces.find(w => w.id === workspaceId);
+
+            if (!workspace) {
+                throw new Error(`Workspace ${workspaceId} not found`);
+            }
+
+            if (!(updates.framework as FrameworkType)) {
+                throw new Error(`Invalid project configuration`);
+            }
+
+            const updatedProject: ProjectData = {
+                ...updates,
+                name: updates.name || 'Unnamed Project',
+                path: updates.path as string,
+                workspaceId: updates.workspaceId as string,
+                framework: updates.framework as FrameworkType,
+                updatedAt: new Date().toISOString(),
+                id: uuidv4(),
+                config: updates.config || {},
+            };
+
+            console.log(updatedProject)
+
+            workspace.projects?.push(updatedProject as ProjectData);
+            workspace.updatedAt = new Date().toISOString();
+
+            await this.addProjectToStudioWorkspace(workspace, updatedProject);
+
+            foundProject = updatedProject;
+
         }
 
         await this.saveData(data);
+
         return foundProject;
     }
 

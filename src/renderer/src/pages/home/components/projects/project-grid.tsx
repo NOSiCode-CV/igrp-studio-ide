@@ -8,13 +8,11 @@ import {
 } from '@renderer/components/ui/card';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectData } from 'src/main/types';
-import { Clock, ExternalLink } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
-import { Button } from '@renderer/components/ui/button';
 import { ProjectIcon } from '@renderer/components/shared-ui';
-import { ProjectDropdown } from './project-dropdown';
-import { ProjectConfigurationDialog } from './project-configuration-dialog';
+import { ProjectActions } from './project-actions';
 
 interface ProjectProps {
     projects: ProjectData[];
@@ -69,12 +67,17 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                                                 {project.name}
                                             </span>
                                         </div>
-                                        <ProjectDropdown
+                                        <ProjectActions
                                             project={project}
                                             basePath={workspace.path}
                                             onDelete={(success) =>
                                                 onDelete(success)
                                             }
+                                            /* onEdit={
+                                                onEdit
+                                                    ? () => onEdit(project)
+                                                    : undefined
+                                            } */
                                         />
                                     </div>
                                 </CardTitle>
@@ -102,7 +105,7 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                                         </>
                                     )}
                                 </div>
-                                <div className="flex">
+                                {/*  <div className="flex">
                                     <ProjectConfigurationDialog
                                         project={project}
                                         projects={projects}
@@ -117,7 +120,7 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                                     >
                                         <ExternalLink className="h-4 w-4" />
                                     </Button>
-                                </div>
+                                </div> */}
                             </CardFooter>
                         </Card>
                     );

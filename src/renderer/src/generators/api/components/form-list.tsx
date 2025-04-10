@@ -118,7 +118,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     // Renderização de erros
     const renderErrors = () => {
         return (
-            <div className="p-1">
+            <>
                 {Array.isArray(errors) &&
                     errors.map((erro, index) => {
                         if (typeof erro === 'string') {
@@ -140,7 +140,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         }
                         return null;
                     })}
-            </div>
+            </>
         );
     };
 

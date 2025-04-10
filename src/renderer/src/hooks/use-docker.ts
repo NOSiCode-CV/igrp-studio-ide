@@ -70,6 +70,7 @@ export function useDocker() {
         if (!isDockerRunning && operation !== 'status') {
             const isRunning = await checkDocker();
             if (!isRunning) {
+                setError(new Error('Docker daemon is not running'));
                 throw new Error('Docker daemon is not running');
             }
         }

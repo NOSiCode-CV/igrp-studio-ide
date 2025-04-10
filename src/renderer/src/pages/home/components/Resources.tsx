@@ -42,6 +42,7 @@ import { useDocker } from '@renderer/hooks/use-docker';
 import { ServiceList } from './services/service-list';
 import { ProjectList } from './projects/project-list';
 import ProjectGrid from './projects/project-grid';
+import { getId } from '@renderer/utils/helpers';
 
 type ResourceType = 'project' | 'service';
 type ViewMode = 'grid' | 'list';
@@ -222,7 +223,11 @@ const Resources = () => {
             return;
         }
 
-        saveOrOpenProject(config);
+        saveOrOpenProject({
+            ...config,
+            id: config.id ?? getId(),
+            workspaceId: workspace.id,
+        });
     };
 
     const handleCloneProject = async (url: string): Promise<void> => {

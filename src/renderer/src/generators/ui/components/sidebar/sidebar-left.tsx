@@ -164,7 +164,12 @@ export function AppSidebar({
                                                 activeMenuGroup === item.id
                                             }
                                             size="lg"
-                                            className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
+                                            className={cn(
+                                                'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
+                                                item.id === activeMenuGroup
+                                                    ? '!text-igrp'
+                                                    : ''
+                                            )}
                                         >
                                             <div className="w-8 h-8 flex items-center justify-center">
                                                 <item.icon size={20} />

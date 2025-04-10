@@ -42,6 +42,7 @@ export interface SpringConfigData {
     springBootVersion: string;
     dependencies: Array<any>
     enableGraalVm: boolean
+    package?: string;
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;
@@ -59,6 +60,7 @@ export interface ProjectData {
     createdAt?: string;
     updatedAt?: string;
     workspaceId: string;
+    dependsOn?: string[] | Record<string, DependencyConfig>[];
 }
 
 export interface IWorkspace {
