@@ -154,7 +154,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
     };
 
     const createRelationReference = async (values: ModelConfig) => {
-        const { attributes } = values;
+        const { attributes, name: entityFrom } = values;
 
         await Promise.all(
             attributes.map(async (attribute) => {
@@ -166,7 +166,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
 
                 const relationReference: RelationReference = {
                     type: relationType,
-                    entity,
+                    entity: entityFrom,
                     fetchType,
                     fieldName: mappedBy,
                     mappedBy: name,
