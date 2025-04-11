@@ -921,10 +921,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.152":
-  version "0.0.0-alpha.152"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.152.tgz#faae075b54ce6e90e7786f90a0b8fb28a14e7c85"
-  integrity sha512-/bqwxVmXpgXEdQS3v2PT8wfTBSkoG3r+H3e3tjwFmsdgn5rPLWBf1KeSXaMs2CPIZBUf41cEM+JruMc2Q5AVzw==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.155":
+  version "0.0.0-alpha.155"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.155.tgz#fa8e5a04c88f3110235ea3fd60064f3257c09722"
+  integrity sha512-CvuDWzyDnjNxA7rLHLRT3CCzD/Z2EEFJKcy0NxNUl/teQc21dYjuiEuvpQ/l1RTYYez5WGOwyIM7AC7IJq68wQ==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.3"
@@ -997,10 +997,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.70":
-  version "0.0.1-alpha.70"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.70.tgz#8b0db9494072250739ad28a894d6dfd3693fb925"
-  integrity sha512-Y3HwMNUI28acQa80AhmSSsTJl4x/9WHFIp7mtL1DCex6f/PgBGr6J0hZBmMkpoFX6lnYOLhVIKcPXuTsRB6S8A==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.73":
+  version "0.0.1-alpha.73"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.73.tgz#59d8f0e1a5ae3fe459adae72e918b37994f68f48"
+  integrity sha512-a0nnUpAUBm8OU2P4EDa1CTUKdqQqt12t1PQ/QpaHMVkbhbL3qmC53/A21LExJOwi5aUFXwrJyCFYUv0Lq2Zzjg==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -3334,10 +3334,10 @@
   dependencies:
     csstype "^3.0.2"
 
-"@types/react@^19.1.0":
-  version "19.1.0"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-19.1.0.tgz#73c43ad9bc43496ca8184332b111e2aef63fc9da"
-  integrity sha512-UaicktuQI+9UKyA4njtDOGBD/67t8YEBt2xdfqu8+gP9hqPUPsiXlNPcpS2gVdjmis5GKPG3fCxbQLVgxsQZ8w==
+"@types/react@^19.1.1":
+  version "19.1.1"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-19.1.1.tgz#f7f2bb4a0a8d22b9ee4b8f6e27f0c78d76eb7f9b"
+  integrity sha512-ePapxDL7qrgqSF67s0h9m412d9DbXyC1n59O2st+9rjuuamWsZuD2w55rqY12CbzsZ7uVXb5Nw0gEp9Z8MMutQ==
   dependencies:
     csstype "^3.0.2"
 
@@ -8551,10 +8551,10 @@ raw-body@^3.0.0:
     iconv-lite "0.6.3"
     unpipe "1.0.0"
 
-react-day-picker@9.6.5:
-  version "9.6.5"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.6.5.tgz#94e8679bec5f26911f525b01bc208dfc5628706b"
-  integrity sha512-/LsK+2tv+ByIbO9NcRFfbt2MX0ngcLP7sQBxL/dwgaPj6XzHIh364d78ZFwMZyQzOJ93GPEdM1ZCv5FlUttNGw==
+react-day-picker@9.6.6:
+  version "9.6.6"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.6.6.tgz#5c25b415b8d97e92851c0f5bf5f0983431c40356"
+  integrity sha512-BIbhJu9yqQt8/13mTJIorEC4xpwGTa3JDW0C3UoVwNHhJsb2uWNveXmGYy7n8oV/uBsoEOGTitJOl+XpPzKsOQ==
   dependencies:
     "@date-fns/tz" "^1.2.0"
     date-fns "^4.1.0"

@@ -21,7 +21,7 @@ import {
 } from '@renderer/components/ui/sidebar';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { cn } from '@renderer/lib/utils';
-import { SearchInput } from './shared-ui';
+import { SearchInput } from '../../components/shared-ui';
 
 export interface SidebarItem {
     name: string; // Title of the navigation item

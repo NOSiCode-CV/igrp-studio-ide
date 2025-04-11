@@ -6,6 +6,8 @@ import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
 import { useTranslation } from 'react-i18next';
 import { useDto } from './useDto';
+import { Checkbox } from '@renderer/components/ui/checkbox';
+import { Label } from '@renderer/components/ui/label';
 
 interface DtoProps {
     selectors: Array<any>;
@@ -63,7 +65,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
             <div className="space-y-4 p-4">
                 <Card className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
-                        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <TextInput
                                 label={t('name')}
                                 id="name"
@@ -90,6 +92,23 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 isTouched={formik.touched.template}
                                 isRequired
                             />
+                            <div className="flex flex-col space-y-2">
+                                <Label htmlFor="enableCustonValidation">
+                                    {t('enableCustonValidation')}
+                                </Label>
+                                <Checkbox
+                                    id="enableCustonValidation"
+                                    onCheckedChange={(checked) =>
+                                        formik.setFieldValue(
+                                            'enableCustonValidation',
+                                            checked
+                                        )
+                                    }
+                                    checked={
+                                        formik.values.enableCustonValidation
+                                    }
+                                />
+                            </div>
                         </div>
                         {TabList.map(({ value }) => (
                             <Card className="rounded-sm gap-0" key={value}>

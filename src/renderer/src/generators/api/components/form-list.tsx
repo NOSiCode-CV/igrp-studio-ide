@@ -273,6 +273,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         type={row?.[key] || ''}
                         onTypeChange={(dataType: any) => changeValue(key, index, dataType)}
                         schemaTypes={options}
+                        variant={'outline'}
                     />
                 );
             default:

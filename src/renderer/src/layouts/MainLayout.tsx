@@ -6,7 +6,7 @@ import {
     IGRPSidebar,
     IGRPSidebarContent,
     IGRPSidebarFooter,
-} from '@renderer/components/app-sidebar-default';
+} from '@renderer/layouts/components/app-sidebar-default';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { Database, Folder } from 'lucide-react';
 import FooterSidebar from './components/footer-sidebar';

@@ -83,7 +83,9 @@ export const SelectInput = ({
         <IGRPCombobox
             options={options}
             value={value}
-            onChange={onChange}
+            onChange={(e) => {
+                onChange(e as string);
+            }}
             placeholder={`Select ${label}`}
             className={cn('w-full h-9', isTouched && error && 'border-red-500')}
         />

@@ -13,6 +13,7 @@ export class SpringEngine implements BaseEngine {
   }
 
   async createController(config: ControllerConfig, basePath: string): Promise<void> {
+    console.log(config)
     await addController(config, basePath)
   }
 

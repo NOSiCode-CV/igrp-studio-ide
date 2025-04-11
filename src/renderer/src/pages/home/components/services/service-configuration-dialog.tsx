@@ -74,7 +74,7 @@ export function ServiceConfigurationDialog({
     const [name, setName] = useState('');
     const [image, setImage] = useState('');
     const [description, setDescription] = useState('');
-    const [type, setType] = useState('database');
+    const [type, setType] = useState<string>('database');
     const [ports, setPorts] = useState<string[]>([]);
     const [newPort, setNewPort] = useState('');
     const [environment, setEnvironment] = useState<
@@ -84,7 +84,7 @@ export function ServiceConfigurationDialog({
     const [newEnvValue, setNewEnvValue] = useState('');
     const [volumes, setVolumes] = useState<string[]>([]);
     const [newVolume, setNewVolume] = useState('');
-    const [template, setTemplate] = useState('');
+    const [template, setTemplate] = useState<string>('');
     const [dependsOn, setDependsOn] = useState<string[]>([]);
     const [networkType, setNetworkType] = useState('bridge');
     const [customNetwork, setCustomNetwork] = useState('');
@@ -101,6 +101,8 @@ export function ServiceConfigurationDialog({
         const fetchTemplates = async () => {
             const { result } = await getTemplatesService();
 
+            console.log(result.services)
+
             const convertedTemplates =
                 result.services?.map((service) => {
                     const {
@@ -110,6 +112,7 @@ export function ServiceConfigurationDialog({
                         image,
                         command,
                         env_file,
+                        label
                     } = service;
 
                     // Convert ports array to the string format "internal:external"
@@ -144,6 +147,7 @@ export function ServiceConfigurationDialog({
                     // Build the template object
                     return {
                         id: name,
+                        label: label || name,
                         name: properties.container_name?.default || name,
                         image: properties.image?.default || image?.required,
                         type:
@@ -161,8 +165,8 @@ export function ServiceConfigurationDialog({
                         env_file: env_file?.default,
                     };
                 }) || [];
-            console.log(convertedTemplates);
-            setServiceTemplates(convertedTemplates);
+
+                setServiceTemplates(convertedTemplates);
         };
 
         fetchTemplates();
@@ -363,7 +367,7 @@ export function ServiceConfigurationDialog({
                                             options={serviceTemplates.map(
                                                 (template) => {
                                                     return {
-                                                        label: template.name,
+                                                        label: template.label,
                                                         value: template.id,
                                                     };
                                                 }

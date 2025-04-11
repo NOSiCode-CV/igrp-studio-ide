@@ -1,18 +1,18 @@
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
 } from '@renderer/components/ui/card';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectData } from 'src/main/types';
-import { Clock } from 'lucide-react';
+import { Clock, Folder } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import { ProjectActions } from './project-actions';
+import { Button } from '@renderer/components/ui/button';
 
 interface ProjectProps {
     projects: ProjectData[];
@@ -46,20 +46,16 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
     };
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {sortProjects(
                 projects.map((project, index) => {
                     return (
                         <Card
                             key={index}
-                            className="cursor-pointer group gap-1 border rounded-lg shadow-sm"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleOpenProject(project);
-                            }}
+                            className="cursor-pointer group gap-2 border rounded-lg shadow-sm"
                         >
                             <CardHeader>
-                                <CardTitle>
+                                <CardTitle className='truncate'>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon project={project} />
@@ -73,24 +69,19 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                                             onDelete={(success) =>
                                                 onDelete(success)
                                             }
-                                            /* onEdit={
-                                                onEdit
-                                                    ? () => onEdit(project)
-                                                    : undefined
-                                            } */
                                         />
                                     </div>
                                 </CardTitle>
-                                <CardDescription>
-                                    {project.config?.description && (
-                                        <p className="text-sm text-muted-foreground mb-2">
-                                            {project.config.description}
-                                        </p>
-                                    )}
-                                </CardDescription>
                             </CardHeader>
-                            <CardContent></CardContent>
-                            <CardFooter className="flex items-center text-muted-foreground justify-between">
+                            <CardContent>
+                                {' '}
+                                {project.config?.description && (
+                                    <p className="text-sm text-muted-foreground">
+                                        {project.config.description}
+                                    </p>
+                                )}
+                            </CardContent>
+                            <CardFooter className="flex flex-wrap text-muted-foreground justify-between gap-2">
                                 <div className="text-xs flex items-center">
                                     {project.updatedAt && (
                                         <>
@@ -105,6 +96,17 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                                         </>
                                     )}
                                 </div>
+                                <Button
+                                    variant={'outline'}
+                                    size={'sm'}
+                                    className="w-full"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleOpenProject(project);
+                                    }}
+                                >
+                                    <Folder></Folder>Open
+                                </Button>
                                 {/*  <div className="flex">
                                     <ProjectConfigurationDialog
                                         project={project}
