@@ -10,7 +10,7 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/use-core';
 import { useTranslation } from 'react-i18next';

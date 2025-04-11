@@ -1,4 +1,4 @@
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Button } from '@renderer/components/ui/button';
 import { Switch } from '@renderer/components/ui/switch';
 import { Input } from '@renderer/components/ui/input';

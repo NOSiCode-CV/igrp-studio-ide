@@ -34,7 +34,7 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { getServiceIcon } from '.';
 
 // Network types
@@ -368,7 +368,8 @@ export function ServiceConfigurationDialog({
                                                     };
                                                 }
                                             )}
-                                            className='w-1/2'
+                                            placeholder="Sleect a template"
+                                            className="w-1/2"
                                         />
                                         <p className="text-xs text-muted-foreground">
                                             Select a template to pre-fill

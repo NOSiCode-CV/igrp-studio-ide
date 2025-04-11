@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import yaml from 'js-yaml';
-import { O } from '@faker-js/faker/dist/airline-CBNP41sR';
 
 interface RootState {
     PageBuilder: {

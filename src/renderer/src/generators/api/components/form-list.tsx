@@ -12,7 +12,7 @@ import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { GripVertical, Plus, Trash } from 'lucide-react';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import MultipleSelector from '@renderer/components/multiples-selector';
 import { cn } from '@renderer/lib/utils';
 import {

@@ -6,6 +6,7 @@ import {
     ArrowLeft,
     Bell,
     Code,
+    Loader2,
     Maximize2,
     Minus,
     Play,
@@ -63,7 +64,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
     const { workspace } = useWorkspace();
-    const { startContainers } = useDocker();
+    const { loading, startContainers } = useDocker();
 
     const navigate = useNavigate();
 
@@ -200,8 +201,15 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                         className="h-6 text-xs gap-1"
                                         onClick={handleRun}
                                     >
-                                        <Play className="h-3 w-3 text-green-500" />
-                                        Run
+                                        {!loading ? (
+                                            <>
+                                                <Play className="h-3 w-3 text-igrp" />
+                                                Run
+                                            </>
+                                        ) : (
+                                            <Loader2 className="animate-spin h-3 w-3 text-igrp" />
+                                            
+                                        )}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>

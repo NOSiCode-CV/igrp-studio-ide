@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/components/useToast';
 import { Label } from '@renderer/components/ui/label';

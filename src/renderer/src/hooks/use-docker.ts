@@ -15,7 +15,7 @@ export function useDocker() {
 
     const [fileContent, setFileContent] = useState<any>(null);
     const [services, setServices] = useState<ServiceInfo[]>([]);
-
+    const [loading, setLoading] = useState<boolean>(false);
     const [composeConfig, setComposeConfig] = useState<DockerComposeConfig | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
@@ -67,9 +67,11 @@ export function useDocker() {
         services?: string[],
         timeout?: number
     ): Promise<DockerComposeService[] | boolean | void> => {
+        setLoading(true);
         if (!isDockerRunning && operation !== 'status') {
             const isRunning = await checkDocker();
             if (!isRunning) {
+                setLoading(false);
                 setError(new Error('Docker daemon is not running'));
                 throw new Error('Docker daemon is not running');
             }
@@ -85,6 +87,8 @@ export function useDocker() {
                 throw new Error('Docker daemon is not running');
             }
             throw err;
+        } finally {
+            setLoading(false);
         }
     }, [isDockerRunning, dockerOperations]);
 
@@ -135,6 +139,7 @@ export function useDocker() {
         composeConfig,
         services,
         error,
+        loading,
         getServiceUrl,
         loadComposeFile,
         startContainers: () => handleDockerOperation('up'),

@@ -9,7 +9,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import * as Yup from 'yup';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Connection } from 'src/main/types';
 import useToast from '@renderer/components/useToast';
 
@@ -48,7 +48,7 @@ export function ConnectionForm({
 
     const handleTestConnection = async (e, values) => {
         e.preventDefault();
-        const { success, message } = await window.api.connectToDatabase(
+        const { success, message } = await window.igrpStudio.connection.connectToDatabase(
             values
         );
         if (success) {

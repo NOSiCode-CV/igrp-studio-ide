@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { LabelRequired } from '@renderer/components/label-required';
 import { Separator } from '@renderer/components/ui/separator';
 import { SelectInput } from '@renderer/generators/api/components/inputs-form';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import DependencySelector from '@renderer/components/dependency-selector';
 
 interface SpringConfigProps {

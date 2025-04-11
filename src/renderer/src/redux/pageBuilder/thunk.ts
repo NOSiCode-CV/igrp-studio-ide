@@ -68,7 +68,7 @@ export const setWorkspace = (workspace: IWorkspace | null) => async (dispatch: a
 export const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
   try {
     if (appConfig.framework === ENV_TYPES.NEXTJS) {
-      await window.engine.registryComponent(ENV_TYPES.NEXTJS, appConfig.path)
+      await window.engine.registry(ENV_TYPES.NEXTJS, appConfig.path)
       navigate(ROUTES.PATH_PAGE_BUILDER_UI);
     } else if (appConfig.framework === ENV_TYPES.SPRING) {
       navigate(ROUTES.PATH_PAGE_BUILDER_API);
