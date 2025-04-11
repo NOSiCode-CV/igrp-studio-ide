@@ -14,9 +14,7 @@ export class NextjsEngine implements BaseEngine {
 
   async getServices(): Promise<DockerServiceRegistrationConfig> {
     await initServices()
-
     const result = loadServiceRegistry()
-    console.log(result)
     return result;
   }
 

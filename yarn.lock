@@ -921,10 +921,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.151":
-  version "0.0.0-alpha.151"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.151.tgz#b9591a94b6bfc327547d0df452e8ceb3cd8e97d9"
-  integrity sha512-3jBEsfM9uvxG9V4GNhEevNxmsYfj7jYCEKYsDg5ViGj5mFgGEIa3Ivc/YN3zOmXzXzC0a/OmC0mtBTAQJmK5tA==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.152":
+  version "0.0.0-alpha.152"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.152.tgz#faae075b54ce6e90e7786f90a0b8fb28a14e7c85"
+  integrity sha512-/bqwxVmXpgXEdQS3v2PT8wfTBSkoG3r+H3e3tjwFmsdgn5rPLWBf1KeSXaMs2CPIZBUf41cEM+JruMc2Q5AVzw==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.3"
@@ -4900,10 +4900,15 @@ dotenv-expand@^11.0.6:
   dependencies:
     dotenv "^16.4.5"
 
-dotenv@^16.4.5, dotenv@^16.4.7:
+dotenv@^16.4.5:
   version "16.4.7"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.7.tgz#0e20c5b82950140aa99be360a8a5f52335f53c26"
   integrity sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==
+
+dotenv@^16.5.0:
+  version "16.5.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.5.0.tgz#092b49f25f808f020050051d1ff258e404c78692"
+  integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
 
 dunder-proto@^1.0.0, dunder-proto@^1.0.1:
   version "1.0.1"

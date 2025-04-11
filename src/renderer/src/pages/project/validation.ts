@@ -26,33 +26,8 @@ export function useProjectValidation({ t, step }) {
             // Only validate the config object when the step is 3
             if (step === 3) {
                 return Yup.object().shape({
-                    name: Yup.string().when(
-                        '$framework',
-                        (framework, schema) => {
-                            return framework &&
-                                framework[0] === ENV_TYPES.NEXTJS
-                                ? schema
-                                    .required(
-                                        t('thisFieldRequired', {
-                                            name: t('name'),
-                                        })
-                                    )
-                                    .matches(
-                                        PATTERNS.NAME_APP_VALIDATION,
-                                        t('msgInfoAccpet')
-                                    )
-                                    .max(
-                                        50,
-                                        t('maxLengthExceeded', { max: 50 })
-                                    )
-                                : schema.notRequired();
-                        }
-                    ),
                     name: Yup.string().when('$framework', (framework, schema) => {
-                        return framework &&
-                            [ENV_TYPES.SPRING, ENV_TYPES.DOTNET].includes(
-                                framework[0]
-                            )
+                        return framework
                             ? schema
                                 .required(
                                     t('thisFieldRequired', { name: t('name') })

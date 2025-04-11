@@ -103,6 +103,11 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, async (_, limit = 5) => 
     }
 });
 
+
+ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, async (_, yaml: object, basePath: string) => {
+    return await repo.saveCustomCompose(yaml, basePath);
+});
+
 // Project Handlers
 handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.CREATE, async (_event, workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt'>) => {
     return await repo.addProject(workspaceId, project);

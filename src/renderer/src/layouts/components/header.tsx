@@ -140,12 +140,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     );
 
     const handleRun = async () => {
-        try {
-            await startContainers();
-        } catch (error) {
-            console.error(error);
-            showErrorToast(t('runProjectError'));
-        }
+        await startContainers();
     };
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null;

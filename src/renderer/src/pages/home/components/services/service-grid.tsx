@@ -20,7 +20,7 @@ interface ServiceGridProps {
 export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
     return (
         <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4  xl:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                 {services.map((service, index) => (
                     <Card
                         key={index}
@@ -43,6 +43,12 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                         </Badge>
                                     </div>
                                     <div className="flex items-center gap-1">
+                                        <Badge
+                                            variant="outline"
+                                            className={`capitalize ${getStatusColor(service.status)}`}
+                                        >
+                                            {service.status}
+                                        </Badge>
                                         <ServiceActions
                                             service={service}
                                             services={services}
@@ -51,16 +57,18 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                     </div>
                                 </div>
                             </CardTitle>
-                            <CardDescription className='truncate'>{service.name}</CardDescription>
+                            <CardDescription className="truncate">
+                                {service.name}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 gap-3">
+                            <div className="grid grid-cols-1">
                                 {service.ports && service.ports.length > 0 && (
-                                    <div className="rounded-sm bg-muted p-1">
+                                    <div className="p-1">
                                         <div className="text-xs text-muted-foreground">
                                             Ports
                                         </div>
-                                        <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
+                                        <div className="text-xs font-mono flex flex-1 gap-1 mt-0.5">
                                             {service.ports.map(
                                                 (port: string, i: number) => (
                                                     <Badge
@@ -76,13 +84,6 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                 )}
 
                                 <Dependency dependsOn={service.dependsOn} />
-
-                                <Badge
-                                    variant="outline"
-                                    className={`capitalize ${getStatusColor(service.status)}`}
-                                >
-                                    {service.status}
-                                </Badge>
                             </div>
                         </CardContent>
                     </Card>

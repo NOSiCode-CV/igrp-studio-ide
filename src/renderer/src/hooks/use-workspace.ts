@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
+import yaml from 'js-yaml';
+import { O } from '@faker-js/faker/dist/airline-CBNP41sR';
 
 interface RootState {
     PageBuilder: {
@@ -41,11 +43,6 @@ export const useWorkspace = () => {
     useEffect(() => {
         const initialize = async () => {
             await window.igrpStudio.workspace.initialize();
-
-            /*  window.igrpStudio.workspace.onError(({ code, message }) => {
-                 console.error(`[${code}] ${message}`);
-                 setError(message);
-             }); */
         };
 
         initialize();
@@ -59,6 +56,16 @@ export const useWorkspace = () => {
 
     const getRecentWorkspaces = async () => {
         return await window.igrpStudio.workspace.findRecentWorkspaces(3);
+    }
+
+    const saveCustomWorkspaceComposeFile = async (content: string) => {
+        try {
+            const composeYmal = yaml.load(content);
+            await window.igrpStudio.workspace.saveCustomWorkspaceComposeFile(composeYmal as Object, workspace.path);
+            showSuccessToast('Update successful');
+        } catch (err) {
+            showErrorToast('Failed to load workspaces');
+        }
     }
 
     const refreshWorkspaces = async () => {
@@ -220,7 +227,8 @@ export const useWorkspace = () => {
             saveOrOpenProject,
             findAllProjects,
             getRecentWorkspaces,
-            getTemplatesService
+            getTemplatesService,
+            saveCustomWorkspaceComposeFile
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

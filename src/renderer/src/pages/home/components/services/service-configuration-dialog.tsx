@@ -29,11 +29,13 @@ import {
 } from '@renderer/components/ui/tabs';
 import { Badge } from '@renderer/components/ui/badge';
 import { Switch } from '@renderer/components/ui/switch';
-import { Trash2, Database, Server, Globe, X, PlusCircle } from 'lucide-react';
+import { Trash2, X, PlusCircle } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { IGRPCombobox } from '@renderer/components/combobox';
+import { getServiceIcon } from '.';
 
 // Network types
 const networkTypes = [
@@ -41,6 +43,17 @@ const networkTypes = [
     { id: 'host', name: 'Host' },
     { id: 'none', name: 'None' },
     { id: 'overlay', name: 'Overlay' },
+];
+
+const serviceTypes = [
+    { value: 'database', label: 'Database' },
+    { value: 'cache', label: 'Cache' },
+    { value: 'web', label: 'Web Server' },
+    { value: 'api', label: 'API' },
+    { value: 'queue', label: 'Queue' },
+    { value: 'file', label: 'File' },
+    { value: 'auth', label: 'Auth' },
+    { value: 'other', label: 'Other' },
 ];
 
 interface ServiceConfigurationDialogProps {
@@ -90,12 +103,9 @@ export function ServiceConfigurationDialog({
 
             const convertedTemplates =
                 result.services?.map((service) => {
-                    console.log(service);
-
                     const {
                         properties,
                         name,
-                        label,
                         restart,
                         image,
                         command,
@@ -103,10 +113,7 @@ export function ServiceConfigurationDialog({
                     } = service;
 
                     // Convert ports array to the string format "internal:external"
-                    const ports =
-                        service.properties.ports?.default?.map(
-                            (port) => `${port.external}:${port.internal}`
-                        ) || [];
+                    const ports = [];
 
                     // Convert environments array to {name, value} format
                     const environment =
@@ -137,7 +144,7 @@ export function ServiceConfigurationDialog({
                     // Build the template object
                     return {
                         id: name,
-                        name: label || name,
+                        name: properties.container_name?.default || name,
                         image: properties.image?.default || image?.required,
                         type:
                             labels?.default?.find((l) => l.key === 'type')
@@ -154,7 +161,7 @@ export function ServiceConfigurationDialog({
                         env_file: env_file?.default,
                     };
                 }) || [];
-
+            console.log(convertedTemplates);
             setServiceTemplates(convertedTemplates);
         };
 
@@ -199,6 +206,7 @@ export function ServiceConfigurationDialog({
             (t) => t.id === templateId
         );
         if (selectedTemplate) {
+            setName(selectedTemplate.name);
             setImage(selectedTemplate.image);
             setType(selectedTemplate.type);
             setPorts([...selectedTemplate.ports]);
@@ -289,19 +297,9 @@ export function ServiceConfigurationDialog({
         }, 500);
     };
 
-    // Get service icon
-    const getServiceIcon = (serviceType: string) => {
-        switch (serviceType) {
-            case 'database':
-                return <Database className="h-4 w-4" />;
-            case 'web':
-                return <Globe className="h-4 w-4" />;
-            default:
-                return <Server className="h-4 w-4" />;
-        }
+    const onSave = (data: any) => {
+        console.log(data);
     };
-
-    const onSave = (data: any) => {};
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -335,7 +333,7 @@ export function ServiceConfigurationDialog({
                     onValueChange={setActiveTab}
                     className="flex-1 overflow-hidden flex flex-col"
                 >
-                    <TabsList className="grid grid-cols-4 mb-4">
+                    <TabsList className="grid grid-cols-4 mb-4 w-full">
                         <TabsTrigger value="basic" className="text-xs">
                             Basic
                         </TabsTrigger>
@@ -359,29 +357,19 @@ export function ServiceConfigurationDialog({
                                 {isNew && (
                                     <div className="space-y-2">
                                         <Label>Template (Optional)</Label>
-                                        <Select
+                                        <IGRPCombobox
                                             value={template}
-                                            onValueChange={applyTemplate}
-                                        >
-                                            <SelectTrigger className="h-8">
-                                                <SelectValue placeholder="Select a template or configure manually" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="custom">
-                                                    Custom Configuration
-                                                </SelectItem>
-                                                {serviceTemplates.map(
-                                                    (template) => (
-                                                        <SelectItem
-                                                            key={template.id}
-                                                            value={template.id}
-                                                        >
-                                                            {template.name}
-                                                        </SelectItem>
-                                                    )
-                                                )}
-                                            </SelectContent>
-                                        </Select>
+                                            onChange={applyTemplate}
+                                            options={serviceTemplates.map(
+                                                (template) => {
+                                                    return {
+                                                        label: template.name,
+                                                        value: template.id,
+                                                    };
+                                                }
+                                            )}
+                                            className='w-1/2'
+                                        />
                                         <p className="text-xs text-muted-foreground">
                                             Select a template to pre-fill
                                             configuration or configure manually.
@@ -437,34 +425,11 @@ export function ServiceConfigurationDialog({
                                         <Label htmlFor="type">
                                             Service Type
                                         </Label>
-                                        <Select
+                                        <IGRPCombobox
                                             value={type}
-                                            onValueChange={setType}
-                                        >
-                                            <SelectTrigger className="h-8">
-                                                <SelectValue placeholder="Select service type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="database">
-                                                    Database
-                                                </SelectItem>
-                                                <SelectItem value="cache">
-                                                    Cache
-                                                </SelectItem>
-                                                <SelectItem value="web">
-                                                    Web Server
-                                                </SelectItem>
-                                                <SelectItem value="api">
-                                                    API
-                                                </SelectItem>
-                                                <SelectItem value="queue">
-                                                    Queue
-                                                </SelectItem>
-                                                <SelectItem value="other">
-                                                    Other
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                            onChange={setType}
+                                            options={serviceTypes}
+                                        />
                                     </div>
                                 </div>
                             </TabsContent>

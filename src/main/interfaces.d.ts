@@ -10,6 +10,7 @@ export interface IWorkspaceRepository {
     getWorkspace(id: string): Promise<IWorkspace | undefined>;
     findAllWorkspaces(): Promise<IWorkspace[]>;
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
+    saveCustomWorkspaceComposeFile(yaml: object, basePath: string): Promise<void>;
 
     // Project Operations
     saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;

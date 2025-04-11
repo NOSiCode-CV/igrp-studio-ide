@@ -39,7 +39,7 @@ const MainLayout = (props: LayoutProps) => {
             ],
             href:"#"
         }));
-    }, [workspaces, switchWorkspace]);
+    }, [workspaces]);
 
     const navData = useMemo(
         () => [

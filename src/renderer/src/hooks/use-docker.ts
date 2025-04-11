@@ -86,7 +86,7 @@ export function useDocker() {
             }
             throw err;
         }
-    }, [isDockerRunning, checkDocker, dockerOperations]);
+    }, [isDockerRunning, dockerOperations]);
 
     const getServiceUrl = (service: ServiceInfo) => {
         if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.type?.includes(type))) return null;

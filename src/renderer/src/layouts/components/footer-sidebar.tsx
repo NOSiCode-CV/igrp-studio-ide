@@ -1,12 +1,7 @@
 import SupportContent from '@renderer/components/support-content';
 
 const FooterSidebar = () => {
-
-    return (
-        <>
-            <SupportContent />
-        </>
-    );
+    return <SupportContent />;
 };
 
 export default FooterSidebar;

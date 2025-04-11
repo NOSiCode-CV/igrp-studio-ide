@@ -4,7 +4,7 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { FrameworkType, IWorkspace, ProjectData } from '../types';
-import { addProjectToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import { addProjectToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, saveCustomWorkspaceComposeFile } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
 import { ProjectWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
@@ -235,6 +235,10 @@ export class WorkspaceRepository {
         }
 
         await this.saveData(data);
+    }
+
+    async saveCustomCompose(yaml: object, basePath: string) {
+        await saveCustomWorkspaceComposeFile(yaml, basePath)
     }
 
     // Query Methods
