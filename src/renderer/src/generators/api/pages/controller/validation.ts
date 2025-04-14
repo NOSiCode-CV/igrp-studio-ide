@@ -32,14 +32,8 @@ export function useActionValidation({ t }) {
     return Yup.object().shape({
         actionName: Yup.string().required('Action Name is required')
             .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-            .max(20, t("maxLengthExceeded", { max: 20 })),
-        method: Yup.string().required('Method is required'),
-        /* accepts: Yup.string().when('method', (method, schema) =>
-            methodConditions(method, schema, ['POST', 'PUT', 'PATCH'], 'Accepts is required for POST, PUT, PATCH')
-        ),
-        response: Yup.string().required('Response Type is required'), */
-        //requestParams: Yup.array().of(conditionalValidation),
-        //pathVariables: Yup.array().of(conditionalValidation),
+            .max(50, t("maxLengthExceeded", { max: 50 })),
+        method: Yup.string().required('Method is required')
     })
 
 }

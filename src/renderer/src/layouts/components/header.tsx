@@ -59,18 +59,20 @@ const Header = ({ config, basePath }: HeaderProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const { isGitEnabled } = useSelector((state: RootState) => state.git);
-    const { showErrorToast, showSuccessToast } = useToast();
     const isMac =
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
     const { workspace } = useWorkspace();
-    const { loading, startContainers } = useDocker();
 
-    const navigate = useNavigate();
+    const { loading, startContainers } = useDocker();
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
-    const [isMaximized, setIsMaximized] = useState(false); 
+    const [isMaximized, setIsMaximized] = useState(false);
+
+    const { showErrorToast, showSuccessToast } = useToast();
+
+    const navigate = useNavigate();
 
     const handleMinimize = () => {
         window.menu.minimizeWindow();
@@ -78,7 +80,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const handleMaximize = () => {
         window.menu.maximizeWindow();
-        setIsMaximized(!isMaximized); 
+        setIsMaximized(!isMaximized);
     };
 
     const handleClose = () => {
@@ -146,8 +148,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
 
-    console.log('isGitEnabled', isGitEnabled);
-
     return (
         <>
             <TooltipProvider>
@@ -156,9 +156,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                         <div className="flex items-center space-x-4 home cursor-pointer">
                             <div
                                 onClick={openPage}
-                                className={cn(
-                                    'flex items-center gap-2',
-                                )}
+                                className={cn('flex items-center gap-2')}
                             >
                                 <img
                                     src={logo}
@@ -171,21 +169,21 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             </div>
 
                             {isProjectAtive && (
-                                <Breadcrumb className='hidden lg:flex'>
+                                <Breadcrumb className="hidden lg:flex">
                                     <BreadcrumbList>
                                         <BreadcrumbItem>
                                             <BreadcrumbLink href="/#">
                                                 <ArrowLeft className="h-4 w-4" />
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
-                                        <BreadcrumbItem className='md:hidden lg:flex'>
+                                        <BreadcrumbItem className="md:hidden lg:flex">
                                             <BreadcrumbPage>
                                                 {workspace?.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator />
                                         <BreadcrumbItem>
-                                            <BreadcrumbPage className='truncate'>
+                                            <BreadcrumbPage className="truncate">
                                                 {config?.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
