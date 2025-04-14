@@ -38,6 +38,7 @@ import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { getServiceIcon, networkTypes, serviceTypes } from '.';
 import { extractDefaults } from '@renderer/utils/helpers';
 import {
+    Environment,
     Port,
     Volume,
     WorkspaceService,
@@ -280,6 +281,12 @@ export function ServiceConfigurationDialog({
             return { name: vols[0], path: vols[1], driver: 'none' };
         });
 
+        const _environments: Environment[] = environments.map(
+            ({ name, value }) => {
+                return { key: name, value };
+            }
+        );
+
         // Create service object
         const serviceData: WorkspaceService = {
             id: service?.id || '',
@@ -289,7 +296,7 @@ export function ServiceConfigurationDialog({
                 container_name: name,
                 image,
                 ports: _ports,
-                environments,
+                environments: _environments,
                 volumes: _volumes,
                 dependsOn,
                 networks: [

@@ -7,7 +7,7 @@ export type RootState = {
   git: GitState;
 }
 
-const rootReducer: Reducer<RootState> =  combineReducers({
+const rootReducer: Reducer<RootState> = combineReducers({
   PageBuilder: PageBuilderReducer,
   git: gitSlice
 })

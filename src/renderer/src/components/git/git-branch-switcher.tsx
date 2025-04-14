@@ -68,7 +68,7 @@ export function BranchSwitcher({
     );
 
     useEffect(() => {
-        checkGitStatus();
+        if (projectPath) checkGitStatus();
     }, [projectPath]);
 
     const checkGitStatus = async () => {

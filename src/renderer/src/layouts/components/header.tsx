@@ -215,17 +215,22 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 </TooltipContent>
                             </Tooltip>
 
-                            <BranchSwitcher
-                                projectPath={basePath || ''}
-                                onError={showErrorToast}
-                                onSuccess={showSuccessToast}
-                                onBranchChange={() => {
-                                    dispatch(onGetPages(basePath || ''));
-                                }}
-                            />
-
-                            {isGitEnabled && (
-                                <SyncButton basePath={basePath || ''} />
+                            {basePath && (
+                                <>
+                                    <BranchSwitcher
+                                        projectPath={basePath || ''}
+                                        onError={showErrorToast}
+                                        onSuccess={showSuccessToast}
+                                        onBranchChange={() => {
+                                            dispatch(
+                                                onGetPages(basePath || '')
+                                            );
+                                        }}
+                                    />
+                                    {isGitEnabled && (
+                                        <SyncButton basePath={basePath || ''} />
+                                    )}
+                                </>
                             )}
 
                             <DropdownMenu>
