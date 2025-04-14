@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Repository } from 'src/main/types';
-import useToast from '../useToast';
+import useToast from '../../hooks/useToast';
 import { ProjectNameDialog } from './dialog-project-name';
 import { CardGitProject } from './card-git-project';
 import { EmptyState } from '../empty-state';

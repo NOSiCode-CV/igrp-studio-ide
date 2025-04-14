@@ -5,7 +5,7 @@ import { cn } from '@renderer/lib/utils';
 import AlertDialogSync from './alert-dialog';
 import { RemoteUrlDialog } from './remote-url-dialog';
 import { useState } from 'react';
-import useToast from '../useToast';
+import useToast from '../../hooks/useToast';
 import { useGit } from '@renderer/hooks/use-git';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';

@@ -4,9 +4,9 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { FrameworkType, IWorkspace, ProjectData } from '../types';
-import { addProjectToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, saveCustomWorkspaceComposeFile } from '@igrp/igrp-studio-nextjs-engine';
+import { addProjectToWorkspace, addServiceToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, removeServiceFromWorkspace, saveCustomWorkspaceComposeFile, updateServiceToWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
-import { ProjectWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ProjectWorkspace, ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
@@ -239,6 +239,24 @@ export class WorkspaceRepository {
 
     async saveCustomCompose(yaml: object, basePath: string) {
         await saveCustomWorkspaceComposeFile(yaml, basePath)
+    }
+
+    async addService(serviceWorkspace: ServiceWorkspace, basePath: string) {
+        await addServiceToWorkspace({ ...serviceWorkspace, service: { ...serviceWorkspace.service, id: uuidv4() } }, basePath)
+    }
+
+    async deleteService(serviceId: string, basePath: string) {
+        await removeServiceFromWorkspace(serviceId, basePath)
+    }
+
+    async updateService(config: ServiceWorkspace, basePath: string) {
+        await updateServiceToWorkspace(config, basePath)
+    }
+
+    async listServices(workspaceId: string): Promise<WorkspaceService[]> {
+        const data = await this.loadData();
+        const workspace = data.workspaces.find(w => w.id === workspaceId);
+        return workspace?.services || [];
     }
 
     // Query Methods

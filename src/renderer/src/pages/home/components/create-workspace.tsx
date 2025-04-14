@@ -10,7 +10,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { useEffect, useRef, useState } from 'react';
 import { Label } from '@renderer/components/ui/label';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { FolderOpen } from 'lucide-react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IWorkspace } from 'src/main/types';

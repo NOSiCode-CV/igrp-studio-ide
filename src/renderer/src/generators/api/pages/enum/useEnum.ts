@@ -11,7 +11,7 @@ import { EnumValue } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/t
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { defaultValue, getTablesColumns, initialValues } from './config';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 export const useEnum = ({ currentItem }: { currentItem: any }) => {
     const dispatch: any = useDispatch();

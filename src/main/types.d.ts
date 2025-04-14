@@ -1,3 +1,5 @@
+import { WorkspaceService } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any;
 
 type HandlerResponse<T = any> = {
@@ -72,6 +74,7 @@ export interface IWorkspace {
     updatedAt?: string;
     lastOpenedAt?: string;
     projects?: ProjectData[];
+    services?: WorkspaceService[];
 }
 
 export interface IOpenProject {

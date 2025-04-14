@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Header from './components/header';
 import withRouter from '@renderer/common/withRouter';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
@@ -37,7 +37,7 @@ const MainLayout = (props: LayoutProps) => {
                 { label: 'Rename', action: () => console.log(workspace.id) },
                 { label: 'Delete', action: () => console.log(workspace.id) },
             ],
-            href:"#"
+            href: '#',
         }));
     }, [workspaces]);
 
@@ -45,10 +45,10 @@ const MainLayout = (props: LayoutProps) => {
         () => [
             {
                 name: 'Database',
-                type: "item" as const,
+                type: 'item' as const,
                 items: workspaceItems,
                 icon: Database,
-                href:"#"
+                href: '#',
             },
         ],
         [workspaceItems]
@@ -71,7 +71,6 @@ const MainLayout = (props: LayoutProps) => {
                             <IGRPSidebarContent items={navData}>
                                 {workspace && (
                                     <WorkspaceSwitcher
-                                        workspaces={workspaces}
                                         defaultWorkspace={workspace}
                                         onWorkspaceChange={switchWorkspace}
                                     />

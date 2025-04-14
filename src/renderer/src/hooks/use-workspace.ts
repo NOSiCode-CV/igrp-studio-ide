@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
-import { navigateToNextPage, setBasePath, setConfig, setWorkspace } from '@renderer/redux/thunks';
+import { navigateToNextPage, setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import yaml from 'js-yaml';
+import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface RootState {
     PageBuilder: {
@@ -197,10 +198,57 @@ export const useWorkspace = () => {
         return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
     }
 
+    const findAllServices = async () => {
+        return await window.igrpStudio.workspace.findAllServices(workspace?.id);
+    }
+
     const getTemplatesService = async () => {
         return await window.engine.getService(ENV_TYPES.NEXTJS).then(data => {
             return data
         });
+    }
+
+    const createOrUpdateService = async (service: WorkspaceService) => {
+        let result: any = {};
+        try {
+
+            const data: ServiceWorkspace = {
+                id: workspace.id,
+                service
+            }
+
+            if (service.id)
+                result = await window.igrpStudio.workspace.updateService(data, workspace.path)
+            else
+                result = await window.igrpStudio.workspace.createService(data, workspace.path)
+            if (result?.error) {
+                console.log(result.error)
+                showErrorToast(result.error);
+            } else
+                showSuccessToast('Service saved successfully');
+
+        } catch (err) {
+            showErrorToast(err);
+        }
+    }
+
+    const removeService = async (serviceId: string) => {
+        try {
+
+            const result
+                : any = await window.igrpStudio.workspace.deleteService(serviceId, workspace.path)
+
+            if (result?.error) {
+                console.log(result.error)
+                showErrorToast(result.error);
+            } else {
+                showSuccessToast('Service deleted successfully');
+                dispatch(setChangeStatus(true));
+            }
+
+        } catch (err) {
+            showErrorToast(err);
+        }
     }
 
     useEffect(() => {
@@ -227,7 +275,10 @@ export const useWorkspace = () => {
             findAllProjects,
             getRecentWorkspaces,
             getTemplatesService,
-            saveCustomWorkspaceComposeFile
+            saveCustomWorkspaceComposeFile,
+            createOrUpdateService,
+            removeService,
+            findAllServices
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

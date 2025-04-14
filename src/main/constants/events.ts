@@ -43,6 +43,12 @@ export const EVENTS = {
             FIND_ALL: 'repository:project:find-all',
             FIND_RECENT: 'repository:project:find-recent'
         },
+        SERVICE: {
+            CREATE: 'repository:service:create',
+            UPDATE: 'repository:service:update',
+            DELETE: 'repository:service:delete',
+            FIND_ALL: 'repository:service:find-all',
+        },
         BACKUP: {
             CREATE: 'repository:backup:create',
             RESTORE: 'repository:backup:restore'

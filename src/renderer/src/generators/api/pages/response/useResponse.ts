@@ -10,7 +10,7 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { getStatusLabel } from '@renderer/utils/helpers';
 
 const contentType = 'application/json';

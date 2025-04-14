@@ -123,13 +123,14 @@ export function BranchSwitcher({
         return (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <button
+                    <Button
+                        variant={'outline'}
                         onClick={handleInitGit}
-                        className="flex items-center border rounded px-1.5 py-0.5 text-xs gap-1 ml-2"
+                        className="h-6 text-xs"
                     >
-                        <GitFork className="mr-2 h-3 w-3" />
+                        <GitFork className="h-3 w-3" />
                         {t('initGit')}
-                    </button>
+                    </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{t('initializeGit')}</p>
@@ -192,15 +193,16 @@ export function BranchSwitcher({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <button
+                <Button
+                    variant={'outline'}
                     role="combobox"
                     aria-expanded={open}
-                    className="flex items-center border rounded px-1.5 py-0.5 text-xs gap-1 ml-2"
+                    className="h-6 text-xs space-x-1"
                 >
-                    <GitBranch className="mr-2 h-4 w-4" />
-                    {activeBranch || t('selectBranch')}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </button>
+                    <GitBranch className="h-3 w-3 " />
+                    <span>{activeBranch || t('selectBranch')}</span>
+                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">
                 <Command>

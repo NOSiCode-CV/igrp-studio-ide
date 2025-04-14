@@ -11,7 +11,7 @@ import {
 import * as Yup from 'yup';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Connection } from 'src/main/types';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 const databaseTypes = [
     { label: 'PostgreSQL', value: 'postgres' },

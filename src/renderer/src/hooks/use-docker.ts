@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { DockerComposeConfig, DockerComposeService, ServiceInfo } from 'src/main/types';
 import { useWorkspace } from './use-workspace';
 import { IDocker } from 'src/main/interfaces';

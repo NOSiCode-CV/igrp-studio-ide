@@ -31,7 +31,7 @@ import { Textarea } from '@renderer/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { setWorkspace } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 

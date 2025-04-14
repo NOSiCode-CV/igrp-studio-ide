@@ -10,7 +10,7 @@ import {
 } from '@renderer/components/ui/table';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
 import { Checkbox } from '@renderer/components/ui/checkbox';
@@ -204,7 +204,7 @@ export function TableManager({
                     <IGRPCombobox
                         value={selectedConnection}
                         onChange={(selected) => {
-                            handleConnectionSelect(selected);
+                            handleConnectionSelect(selected as string);
                         }}
                         placeholder={t('selectConnection')}
                         options={connections}
@@ -217,7 +217,7 @@ export function TableManager({
                     </Label>
                     <IGRPCombobox
                         value={action}
-                        onChange={(value) => setAction(value)}
+                        onChange={(value) => setAction(value as string)}
                         placeholder={t('selectAction')}
                         options={actions}
                         className="w-full"

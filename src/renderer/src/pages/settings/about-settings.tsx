@@ -7,7 +7,7 @@ import { CircleArrowUp, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from '@renderer/assets/images/igrp-green.svg';
 import { useTranslation } from 'react-i18next';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 export function AboutSettings() {
     const { t } = useTranslation();

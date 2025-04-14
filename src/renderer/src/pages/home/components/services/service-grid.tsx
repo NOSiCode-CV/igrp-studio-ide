@@ -13,14 +13,13 @@ import { ServiceActions } from './service-actions';
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
 interface ServiceGridProps {
     services: any[];
-    onEdit?: (service: any) => void;
     workspaceId?: string;
 }
 
-export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
+export function ServiceGrid({ services }: ServiceGridProps) {
     return (
         <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {services.map((service, index) => (
                     <Card
                         key={index}
@@ -52,7 +51,6 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                         <ServiceActions
                                             service={service}
                                             services={services}
-                                            onEdit={onEdit}
                                         />
                                     </div>
                                 </div>
@@ -68,7 +66,7 @@ export function ServiceGrid({ services, onEdit }: ServiceGridProps) {
                                         <div className="text-xs text-muted-foreground">
                                             Ports
                                         </div>
-                                        <div className="text-xs font-mono flex flex-1 gap-1 mt-0.5">
+                                        <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
                                             {service.ports.map(
                                                 (port: string, i: number) => (
                                                     <Badge

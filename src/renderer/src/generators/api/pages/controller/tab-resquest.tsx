@@ -10,6 +10,8 @@ import {
 import { BodyRequest } from './body-request';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@renderer/components/ui/card';
+import { init } from 'i18next';
+import { initialValues } from './config';
 
 interface TabRequestProps {
     formik: any;
@@ -111,7 +113,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                         addNewRow(
                                             formik,
                                             tabQueryParams,
-                                            tabQueryParams
+                                            initialValues.requestParams[0]
                                         )
                                     }
                                     removeRow={(position) =>

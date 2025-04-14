@@ -173,7 +173,7 @@ export function SpringConfig({
                         options={versions || []}
                         value={data.igrpCoreVersion}
                         onChange={(value) =>
-                            onChange({ ...data, igrpCoreVersion: value })
+                            onChange({ ...data, igrpCoreVersion: value  as string })
                         }
                         className="w-full"
                     />

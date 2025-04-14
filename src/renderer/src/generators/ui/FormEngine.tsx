@@ -5,7 +5,7 @@ import {
     ComponentConfig,
     PageConfig,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import CodeContent from './components/CodeContent';
 
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';

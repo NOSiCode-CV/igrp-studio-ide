@@ -17,11 +17,10 @@ import { Button } from '@renderer/components/ui/button';
 interface ProjectProps {
     projects: ProjectData[];
     onEdit?: () => void;
-    onDelete: (prompt: boolean) => void;
     workspaceId: string;
     projectOrder: string;
 }
-const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
+const ProjectGrid = ({ projects, projectOrder }: ProjectProps) => {
     const {
         workspace,
         actions: { saveOrOpenProject },
@@ -46,7 +45,7 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
     };
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {sortProjects(
                 projects.map((project, index) => {
                     return (
@@ -55,7 +54,7 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                             className="cursor-pointer group gap-2 border rounded-lg shadow-sm"
                         >
                             <CardHeader>
-                                <CardTitle className='truncate'>
+                                <CardTitle className=''>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon project={project} />
@@ -66,9 +65,6 @@ const ProjectGrid = ({ projects, projectOrder, onDelete }: ProjectProps) => {
                                         <ProjectActions
                                             project={project}
                                             basePath={workspace.path}
-                                            onDelete={(success) =>
-                                                onDelete(success)
-                                            }
                                         />
                                     </div>
                                 </CardTitle>

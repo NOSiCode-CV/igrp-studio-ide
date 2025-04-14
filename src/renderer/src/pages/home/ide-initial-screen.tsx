@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import WelcomeHeader from './components/welcome-header';
 import CreateWorkspace from './components/create-workspace';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import Loader from '@renderer/components/loader';
 import { IWorkspace } from 'src/main/types';
 import {

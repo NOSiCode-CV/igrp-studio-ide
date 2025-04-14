@@ -19,7 +19,7 @@ import { ModeToggle } from '@renderer/components/mode-toogle';
 import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import SyncButton from '@renderer/components/git/git-sync';
@@ -91,9 +91,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
     };
 
     const openIDE = async (ideType: string) => {
-        if (!basePath) return;
+        const path = basePath || workspace.path;
+        if (!path) return;
         try {
-            await window.api.openIDE({ basePath, ideType });
+            await window.api.openIDE({ basePath: path, ideType });
         } catch (error) {
             console.error(error);
         }
@@ -170,21 +171,21 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             </div>
 
                             {isProjectAtive && (
-                                <Breadcrumb>
+                                <Breadcrumb className='hidden lg:flex'>
                                     <BreadcrumbList>
                                         <BreadcrumbItem>
                                             <BreadcrumbLink href="/#">
                                                 <ArrowLeft className="h-4 w-4" />
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
-                                        <BreadcrumbItem>
+                                        <BreadcrumbItem className='md:hidden lg:flex'>
                                             <BreadcrumbPage>
                                                 {workspace?.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator />
                                         <BreadcrumbItem>
-                                            <BreadcrumbPage>
+                                            <BreadcrumbPage className='truncate'>
                                                 {config?.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
@@ -208,7 +209,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                             </>
                                         ) : (
                                             <Loader2 className="animate-spin h-3 w-3 text-igrp" />
-                                            
                                         )}
                                     </Button>
                                 </TooltipTrigger>

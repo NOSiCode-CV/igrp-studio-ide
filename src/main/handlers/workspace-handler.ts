@@ -3,6 +3,7 @@ import { IWorkspace, ProjectData } from '../types';
 import { WorkspaceRepository } from '../services/workspace-service';
 import { ERROR_CODES, EVENTS } from '../constants/events';
 import { handleWithCustomErrors } from '../helpers';
+import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const repo = new WorkspaceRepository();
 
@@ -137,6 +138,24 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_ALL, async (_, workspaceId?: strin
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, async (_, limit = 5) => {
     return await repo.getRecentProjects(limit);
 });
+
+
+// Service Handlers
+handleWithCustomErrors(EVENTS.REPOSITORY.SERVICE.CREATE, async (_event, service: ServiceWorkspace, basePath: string) => {
+    return await repo.addService(service, basePath);
+});
+
+handleWithCustomErrors(EVENTS.REPOSITORY.SERVICE.UPDATE, async (_, update: ServiceWorkspace, basePath: string) => {
+    return await repo.updateService(update, basePath);
+});
+
+ipcMain.handle(EVENTS.REPOSITORY.SERVICE.DELETE, async (_, serviceId: string, basePath: string) => {
+    await repo.deleteService(serviceId, basePath);
+});
+
+ipcMain.handle(EVENTS.REPOSITORY.SERVICE.FIND_ALL, async (_, workspaceId: string) => {
+    await repo.listServices(workspaceId)
+})
 
 // Backup Handlers
 ipcMain.handle(EVENTS.REPOSITORY.BACKUP.CREATE, async (event, backupPath?: string) => {

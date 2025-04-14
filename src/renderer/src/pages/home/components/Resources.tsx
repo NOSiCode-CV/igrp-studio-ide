@@ -27,7 +27,7 @@ import {
 } from '@renderer/components/ui/toggle-group';
 import { ProjectWizard } from '@renderer/pages/project';
 import { CloneProjectModal } from '@renderer/components/git/clone-project-modal';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -152,7 +152,6 @@ const ResourceSection = ({
 };
 
 const Resources = () => {
-    const [isDelete, setIsDelete] = useState(false);
     const [projectViewMode, setProjectViewMode] = useState<ViewMode>('grid');
     const [serviceViewMode, setServiceViewMode] = useState<ViewMode>('grid');
     const [projectSearchQuery, setProjectSearchQuery] = useState('');
@@ -169,25 +168,22 @@ const Resources = () => {
     } = useWorkspace();
 
     const { services, refreshContainers } = useDocker();
-    const [allProjects, setProjects] = useState<ProjectData[]>([]);
+    const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
     useEffect(() => {
         fetchProjects();
     }, [workspace]);
 
     useEffect(() => {
-        if (isDelete) fetchProjects();
-    }, [isDelete]);
-
-    useEffect(() => {
         if (changeStatus) {
             refreshContainers();
+            fetchProjects();
         }
     }, [changeStatus]);
 
     const fetchProjects = async () => {
         await findAllProjects().then((data) => {
-            setProjects(data);
+            setAllProjects(data);
         });
     };
 
@@ -330,7 +326,6 @@ const Resources = () => {
                         projects={filteredProjects}
                         workspaceId={workspace.id}
                         projectOrder={sortOrder}
-                        onDelete={setIsDelete}
                     />
                 ) : (
                     <ProjectList

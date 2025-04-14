@@ -51,3 +51,23 @@ export const getStatusColor = (status: string) => {
             return 'bg-yellow-500 text-white';
     }
 };
+
+// Network types
+export const networkTypes = [
+    { id: 'bridge', name: 'Bridge' },
+    { id: 'host', name: 'Host' },
+    { id: 'none', name: 'None' },
+    { id: 'overlay', name: 'Overlay' },
+];
+
+export const serviceTypes = [
+    { value: 'database', label: 'Database' },
+    { value: 'cache', label: 'Cache' },
+    { value: 'web', label: 'Web Server' },
+    { value: 'api', label: 'API' },
+    { value: 'queue', label: 'Queue' },
+    { value: 'file', label: 'File' },
+    { value: 'auth', label: 'Auth' },
+    { value: 'observability', label: 'Observability' },
+    { value: 'other', label: 'Other' },
+];

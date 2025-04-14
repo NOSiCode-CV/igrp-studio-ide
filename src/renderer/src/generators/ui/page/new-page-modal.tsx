@@ -1,7 +1,7 @@
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';

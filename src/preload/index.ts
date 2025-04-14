@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
+import { ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -173,7 +174,6 @@ const repo = {
 		findAllProjects: (workspaceId?: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_ALL, workspaceId),
 
-
 		// Workspace methods
 		findAllWorkspaces: () =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_ALL),
@@ -188,6 +188,16 @@ const repo = {
 		getWorkspace: (workspaceId: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET, workspaceId),
 		getLastAccessedWorkspace: () => ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT),
+
+		// Service methods
+		createService: (service: ServiceWorkspace, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.CREATE, service, basePath),
+		updateService: (service: ServiceWorkspace, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.UPDATE, service, basePath),
+		deleteService: (serviceId: string, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.DELETE, serviceId, basePath),
+		findAllServices: (workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.FIND_ALL, workspaceId),
 
 		// Backup methods
 		createBackup: (backupPath?: string) =>

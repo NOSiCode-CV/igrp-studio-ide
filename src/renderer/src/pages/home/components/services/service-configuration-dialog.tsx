@@ -35,26 +35,14 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
-import { getServiceIcon } from '.';
-
-// Network types
-const networkTypes = [
-    { id: 'bridge', name: 'Bridge' },
-    { id: 'host', name: 'Host' },
-    { id: 'none', name: 'None' },
-    { id: 'overlay', name: 'Overlay' },
-];
-
-const serviceTypes = [
-    { value: 'database', label: 'Database' },
-    { value: 'cache', label: 'Cache' },
-    { value: 'web', label: 'Web Server' },
-    { value: 'api', label: 'API' },
-    { value: 'queue', label: 'Queue' },
-    { value: 'file', label: 'File' },
-    { value: 'auth', label: 'Auth' },
-    { value: 'other', label: 'Other' },
-];
+import { getServiceIcon, networkTypes, serviceTypes } from '.';
+import { extractDefaults } from '@renderer/utils/helpers';
+import {
+    Port,
+    ServiceWorkspace,
+    Volume,
+    WorkspaceService,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface ServiceConfigurationDialogProps {
     service?: any;
@@ -74,17 +62,17 @@ export function ServiceConfigurationDialog({
     const [name, setName] = useState('');
     const [image, setImage] = useState('');
     const [description, setDescription] = useState('');
-    const [type, setType] = useState<string>('database');
+    const [type, setType] = useState<string>('');
     const [ports, setPorts] = useState<string[]>([]);
     const [newPort, setNewPort] = useState('');
-    const [environment, setEnvironment] = useState<
+    const [environments, setEnvironments] = useState<
         { name: string; value: string }[]
     >([]);
     const [newEnvName, setNewEnvName] = useState('');
     const [newEnvValue, setNewEnvValue] = useState('');
     const [volumes, setVolumes] = useState<string[]>([]);
     const [newVolume, setNewVolume] = useState('');
-    const [template, setTemplate] = useState<string>('');
+    const [template, setTemplate] = useState<any>('');
     const [dependsOn, setDependsOn] = useState<string[]>([]);
     const [networkType, setNetworkType] = useState('bridge');
     const [customNetwork, setCustomNetwork] = useState('');
@@ -94,79 +82,64 @@ export function ServiceConfigurationDialog({
     const [serviceTemplates, setServiceTemplates] = useState<any[]>([]);
 
     const {
-        actions: { getTemplatesService },
+        workspace,
+        actions: { getTemplatesService, createOrUpdateService },
     } = useWorkspace();
 
     useEffect(() => {
         const fetchTemplates = async () => {
             const { result } = await getTemplatesService();
 
-            console.log(result.services)
-
             const convertedTemplates =
                 result.services?.map((service) => {
-                    const {
-                        properties,
-                        name,
-                        restart,
-                        image,
-                        command,
-                        env_file,
-                        label
-                    } = service;
+                    const { properties, name, label } = service;
 
+                    const serviveData: any = extractDefaults(properties);
                     // Convert ports array to the string format "internal:external"
-                    const ports = [];
+                    const ports =
+                        serviveData.ports.map(
+                            (port) => `${port.external}:${port.internal}`
+                        ) || [];
 
                     // Convert environments array to {name, value} format
-                    const environment =
-                        properties.environments?.default?.map((env) => ({
+                    const environments =
+                        serviveData?.environments?.map((env) => ({
                             name: env.key,
                             value: env.value,
                         })) || [];
 
                     // Convert volumes array to "source:target" format
                     const volumes =
-                        properties?.volumes?.default?.map(
+                        serviveData.volumes?.map(
                             (vol) => `${vol.name}:${vol.path}`
                         ) || [];
 
                     // Convert dependsOn to depends_on array
-                    const depends_on =
-                        properties.dependsOn?.default?.map(
-                            (dep) => dep.service
-                        ) || [];
+                    const dependsOn =
+                        serviveData.dependsOn?.map((dep) => dep.service) || [];
 
                     // Convert labels array
-                    const labels =
-                        properties.labels?.default?.map((label) => ({
-                            key: label.key,
-                            value: label.value,
-                        })) || [];
+                    const type =
+                        serviveData.labels?.find((l) => l.key === 'type')
+                            ?.value || '';
 
                     // Build the template object
                     return {
+                        ...serviveData,
                         id: name,
                         label: label || name,
-                        name: properties.container_name?.default || name,
-                        image: properties.image?.default || image?.required,
-                        type:
-                            labels?.default?.find((l) => l.key === 'type')
-                                ?.value || 'service',
+                        name: serviveData.container_name || name,
+                        image: serviveData.image,
+                        type,
                         ports,
-                        environment,
+                        environments,
                         volumes,
-                        depends_on,
-                        labels,
-                        restart: restart?.default,
-                        command: command?.default?.map(
-                            (cmd) => cmd.instruction
-                        ),
-                        env_file: env_file?.default,
+                        dependsOn,
+                        customNetwork: `${workspace.slug}-workspace`,
                     };
                 }) || [];
 
-                setServiceTemplates(convertedTemplates);
+            setServiceTemplates(convertedTemplates);
         };
 
         fetchTemplates();
@@ -174,29 +147,35 @@ export function ServiceConfigurationDialog({
 
     useEffect(() => {
         if (open && service) {
+            const network = service.networks && service.networks[0];
+
+            const selectedTemplate = serviceTemplates.find(
+                (t) => t.name === service.name
+            );
+
+            setTemplate(selectedTemplate);
+
             // Edit mode
             setName(service.name || '');
             setDescription(service.description || '');
             setImage(service.image || '');
-            setType(service.type || 'database');
+            setType(service.type || '');
             setPorts(service.ports || []);
-            setEnvironment(service.environment || []);
+            setEnvironments(service.environment || []);
             setVolumes(service.volumes || []);
-            setTemplate(service.template || '');
             setDependsOn(service.dependsOn || []);
             setNetworkType(service.networkType || 'bridge');
-            setCustomNetwork(service.customNetwork || '');
-            setUseCustomNetwork(!!service.customNetwork);
+            setCustomNetwork(network);
+            setUseCustomNetwork(!!network);
         } else if (open) {
             // New mode
             setName('');
             setDescription('');
             setImage('');
-            setType('database');
+            setType('');
             setPorts([]);
-            setEnvironment([]);
+            setEnvironments([]);
             setVolumes([]);
-            setTemplate('');
             setDependsOn([]);
             setNetworkType('bridge');
             setCustomNetwork('');
@@ -214,9 +193,13 @@ export function ServiceConfigurationDialog({
             setImage(selectedTemplate.image);
             setType(selectedTemplate.type);
             setPorts([...selectedTemplate.ports]);
-            setEnvironment([...selectedTemplate.environment]);
+            setEnvironments([...selectedTemplate.environments]);
             setVolumes([...selectedTemplate.volumes]);
-            setTemplate(templateId);
+            setDependsOn([...selectedTemplate.dependsOn]);
+            setNetworkType(selectedTemplate.networkType);
+            setCustomNetwork(selectedTemplate.customNetwork);
+            setUseCustomNetwork(!!selectedTemplate.customNetwork);
+            setTemplate(selectedTemplate);
         }
     };
 
@@ -236,8 +219,8 @@ export function ServiceConfigurationDialog({
     // Add environment variable
     const addEnvironment = () => {
         if (newEnvName) {
-            setEnvironment([
-                ...environment,
+            setEnvironments([
+                ...environments,
                 { name: newEnvName, value: newEnvValue },
             ]);
             setNewEnvName('');
@@ -247,7 +230,7 @@ export function ServiceConfigurationDialog({
 
     // Remove environment variable
     const removeEnvironment = (index: number) => {
-        setEnvironment(environment.filter((_, i) => i !== index));
+        setEnvironments(environments.filter((_, i) => i !== index));
     };
 
     // Add volume
@@ -276,21 +259,51 @@ export function ServiceConfigurationDialog({
     const handleSave = () => {
         setIsSubmitting(true);
 
-        // Create service object
-        const serviceData = {
-            id: service?.id || `svc-${Date.now()}`,
-            name,
-            description,
-            image,
+        const {
+            depends_on,
+            id,
+            label,
             type,
-            ports,
-            environment,
-            volumes,
-            template,
-            dependsOn,
+            status,
+            name,
             networkType,
-            customNetwork: useCustomNetwork ? customNetwork : undefined,
-            status: service?.status || 'stopped',
+            customNetwork,
+            ...rest
+        } = template;
+
+        const _ports: Port[] = ports.map((portStr) => {
+            const [external, internal] = portStr.split(':').map(Number);
+            return { external, internal };
+        });
+
+        const _volumes: Volume[] = volumes.map((volumesStr) => {
+            const vols = volumesStr.split(':');
+            return { name: vols[0], path: vols[1], driver: 'none' };
+        });
+
+        // Create service object
+        const serviceData: WorkspaceService = {
+            id: service?.id || '',
+            name: template.id,
+            properties: {
+                ...rest,
+                container_name: name,
+                image,
+                ports: _ports,
+                environments,
+                volumes: _volumes,
+                dependsOn,
+                networks: [
+                    { network: useCustomNetwork ? customNetwork : '' },
+                ].filter((item) => item.network),
+                labels: Object.entries({ type, description }).reduce(
+                    (acc, [key, value]) => [
+                        ...acc.filter((label) => label.key !== key),
+                        ...(value ? [{ key, value }] : []),
+                    ],
+                    [...template.labels]
+                ),
+            },
         };
 
         // Simulate API call
@@ -302,7 +315,7 @@ export function ServiceConfigurationDialog({
     };
 
     const onSave = (data: any) => {
-        console.log(data);
+        createOrUpdateService(data);
     };
 
     return (
@@ -363,7 +376,9 @@ export function ServiceConfigurationDialog({
                                         <Label>Template (Optional)</Label>
                                         <IGRPCombobox
                                             value={template}
-                                            onChange={applyTemplate}
+                                            onChange={(tmpl) =>
+                                                applyTemplate(tmpl as any)
+                                            }
                                             options={serviceTemplates.map(
                                                 (template) => {
                                                     return {
@@ -372,7 +387,7 @@ export function ServiceConfigurationDialog({
                                                     };
                                                 }
                                             )}
-                                            placeholder="Sleect a template"
+                                            placeholder="Select a template"
                                             className="w-1/2"
                                         />
                                         <p className="text-xs text-muted-foreground">
@@ -432,8 +447,11 @@ export function ServiceConfigurationDialog({
                                         </Label>
                                         <IGRPCombobox
                                             value={type}
-                                            onChange={setType}
+                                            onChange={(type) =>
+                                                setType(type as string)
+                                            }
                                             options={serviceTypes}
+                                            placeholder="Select a type"
                                         />
                                     </div>
                                 </div>
@@ -520,17 +538,17 @@ export function ServiceConfigurationDialog({
                                             variant="outline"
                                             className="text-xs"
                                         >
-                                            {environment.length}{' '}
-                                            {environment.length === 1
+                                            {environments.length}{' '}
+                                            {environments.length === 1
                                                 ? 'variable'
                                                 : 'variables'}
                                         </Badge>
                                     </div>
 
                                     <div className="border rounded-md p-3 space-y-2">
-                                        {environment.length > 0 ? (
+                                        {environments.length > 0 ? (
                                             <div className="space-y-2">
-                                                {environment.map(
+                                                {environments.map(
                                                     (env, index) => (
                                                         <div
                                                             key={index}

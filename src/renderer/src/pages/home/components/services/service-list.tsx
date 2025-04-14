@@ -15,12 +15,10 @@ import { ServiceActions } from './service-actions';
 
 interface ServiceListProps {
     services: any[];
-    onEdit?: (service: any) => void;
     workspaceId?: string;
 }
 
-export function ServiceList({ services, onEdit }: ServiceListProps) {
-    const handleServiceClick = (_: any) => {};
+export function ServiceList({ services }: ServiceListProps) {
 
     return (
         <div className="rounded-md border relative overflow-x-auto">
@@ -40,7 +38,6 @@ export function ServiceList({ services, onEdit }: ServiceListProps) {
                         <TableRow
                             key={index}
                             className="hover:bg-muted/50 group cursor-pointer"
-                            onClick={() => handleServiceClick(service)}
                         >
                             <TableCell className="font-medium">
                                 <div className="flex items-center gap-1.5">
@@ -104,7 +101,6 @@ export function ServiceList({ services, onEdit }: ServiceListProps) {
                                 <ServiceActions
                                     service={service}
                                     services={services}
-                                    onEdit={onEdit}
                                 />
                             </TableCell>
                         </TableRow>

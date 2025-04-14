@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, FolderKanban, ListFilter, Plus } from 'lucide-react';
+import { FolderKanban, ListFilter, Plus } from 'lucide-react';
 
 import {
     DropdownMenu,
@@ -19,16 +19,17 @@ import {
 import { IWorkspace } from 'src/main/types';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
 import CreateWorkspace from '@renderer/pages/home/components/create-workspace';
+import { cn } from '@renderer/lib/utils';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 export function WorkspaceSwitcher({
-    workspaces,
     defaultWorkspace,
     onWorkspaceChange,
 }: {
-    workspaces: IWorkspace[];
     defaultWorkspace: IWorkspace;
     onWorkspaceChange: (workspace: IWorkspace) => void;
 }) {
+    const [workspaces, setWorkspaces] = React.useState<IWorkspace[]>([]);
     const [showWorkspaceDialog, setShowWorkspaceDialog] = React.useState(false);
 
     const [selectedWorkspace, setSelectedWorkspace] =
@@ -38,6 +39,10 @@ export function WorkspaceSwitcher({
         IWorkspace[]
     >([]);
 
+    const {
+        actions: { getWorkspaces },
+    } = useWorkspace();
+
     React.useEffect(() => {
         const result = workspaces.filter((workspace) =>
             workspace.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -45,7 +50,16 @@ export function WorkspaceSwitcher({
         setFilteredWorkspaces(result);
 
         setSelectedWorkspace(defaultWorkspace);
-    }, [searchTerm, defaultWorkspace]);
+    }, [searchTerm, defaultWorkspace, workspaces]);
+
+    React.useEffect(() => {
+        const loadWorkspaces = async () => {
+            await getWorkspaces().then((data) => {
+                setWorkspaces(data);
+            });
+        };
+        loadWorkspaces();
+    }, []);
 
     const handleCreationSuccess = () => {};
 
@@ -84,17 +98,18 @@ export function WorkspaceSwitcher({
                                     onSelect={() =>
                                         onWorkspaceChange(workspace)
                                     }
+                                    className={cn(
+                                        workspace.name ===
+                                            selectedWorkspace.name
+                                            ? 'text-igrp bg-igrp/5'
+                                            : ''
+                                    )}
                                 >
                                     {workspace.name}
 
-                                    {workspace.name ===
-                                    selectedWorkspace.name ? (
-                                        <Check className="ml-auto" />
-                                    ) : (
-                                        <DropdownMenuShortcut>
-                                            ⌘{index + 1}
-                                        </DropdownMenuShortcut>
-                                    )}
+                                    <DropdownMenuShortcut>
+                                        ⌘{index + 1}
+                                    </DropdownMenuShortcut>
                                 </DropdownMenuItem>
                             ))}
                             <DropdownMenuSeparator />

@@ -14,7 +14,7 @@ import { getTablesColumns, initialValues } from './config';
 import { useActionValidation } from './validation';
 import { formatMethods } from '../../helpers';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 export const useController = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { t } = useTranslation();

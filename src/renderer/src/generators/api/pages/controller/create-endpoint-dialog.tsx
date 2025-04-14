@@ -13,7 +13,7 @@ import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/inter
 import { useTranslation } from 'react-i18next';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useFormik } from 'formik';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';

@@ -9,17 +9,18 @@ import {
 } from '@renderer/components/ui/dropdown-menu';
 import { Button } from '@renderer/components/ui/button';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { Trash, Repeat, MoreVertical, Edit, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProjectData } from 'src/main/types';
+import { useDispatch } from 'react-redux';
+import { setChangeStatus } from '@renderer/redux/thunks';
 
 interface ProjectDropdownProps {
     project: ProjectData;
     basePath: string;
-    onDelete: (success: boolean) => void;
     onEdit?: () => void;
     onConvertToSpringBoot?: () => void;
     onConvertToDotNet?: () => void;
@@ -28,7 +29,6 @@ interface ProjectDropdownProps {
 export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     project,
     basePath,
-    onDelete,
     onEdit,
     onConvertToSpringBoot,
     onConvertToDotNet,
@@ -36,6 +36,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
+    const dispatch: any = useDispatch();
 
     const handleDelete = async () => {
         setIsDialogOpen(false);
@@ -45,10 +46,9 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                 basePath
             );
             showSuccessToast(t('deletedSuccess', { name: project.name }));
-            onDelete(true);
+            dispatch(setChangeStatus(true));
         } catch (error: unknown) {
             showErrorToast(error);
-            onDelete(false);
         }
     };
 
@@ -109,7 +109,10 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
                     <DropdownMenuItem
                         className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                        onClick={(e) =>{e.stopPropagation(); setIsDialogOpen(true)}}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDialogOpen(true);
+                        }}
                     >
                         <Trash className="mr-2 h-4 w-4 text-red-600" />
                         Delete Project

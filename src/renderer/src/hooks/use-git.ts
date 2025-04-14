@@ -1,4 +1,4 @@
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { useCallback } from 'react';
 import { Repository } from 'src/main/types';
 import { useTranslation } from 'react-i18next';

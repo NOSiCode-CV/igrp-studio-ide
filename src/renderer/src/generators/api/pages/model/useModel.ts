@@ -11,7 +11,7 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { defaultValues, getTablesColumns, initialValues, getValuesToSubmit } from './config';
 import { useModelValidation } from './validation';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { createGitCommit } = useGit();
