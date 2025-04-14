@@ -39,7 +39,6 @@ import { getServiceIcon, networkTypes, serviceTypes } from '.';
 import { extractDefaults } from '@renderer/utils/helpers';
 import {
     Port,
-    ServiceWorkspace,
     Volume,
     WorkspaceService,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
@@ -135,7 +134,7 @@ export function ServiceConfigurationDialog({
                         environments,
                         volumes,
                         dependsOn,
-                        customNetwork: `${workspace.slug}-workspace`,
+                        customNetwork: `${workspace.slug}-network`,
                     };
                 }) || [];
 

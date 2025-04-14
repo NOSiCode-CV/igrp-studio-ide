@@ -215,5 +215,7 @@ export interface ServiceInfo {
     hostConfig?: Record<string, any>;
     status: string,
     type?: string,
-    isProject?: boolean
+    isProject?: boolean,
+    name: string,
+    id?: string,
 }

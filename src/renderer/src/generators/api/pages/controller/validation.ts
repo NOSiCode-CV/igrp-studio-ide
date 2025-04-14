@@ -54,7 +54,7 @@ export function useControllerValidation({ t }) {
             Yup.object().shape({
                 actionName: Yup.string().required('Action Name is required')
                     .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-                    .max(20, t("maxLengthExceeded", { max: 20 })),
+                    .max(50, t("maxLengthExceeded", { max: 50 })),
                 method: Yup.string().required('Method is required'),
                 accepts: Yup.string().when('method', (method, schema) =>
                     methodConditions(method, schema, ['POST', 'PUT', 'PATCH'], 'Accepts is required for POST, PUT, PATCH')

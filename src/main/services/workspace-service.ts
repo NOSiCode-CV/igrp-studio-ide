@@ -242,15 +242,79 @@ export class WorkspaceRepository {
     }
 
     async addService(serviceWorkspace: ServiceWorkspace, basePath: string) {
-        await addServiceToWorkspace({ ...serviceWorkspace, service: { ...serviceWorkspace.service, id: uuidv4() } }, basePath)
+        const data = await this.loadData();
+        const workspace = data.workspaces.find(w => w.id === serviceWorkspace.id);
+
+        if (!workspace) {
+            throw new Error(`Workspace ${serviceWorkspace.id} not found`);
+        }
+
+        const newService = {
+            ...serviceWorkspace.service,
+            id: uuidv4()
+        };
+
+        workspace.services = workspace?.services || [];
+        workspace.services.push(newService);
+
+        await addServiceToWorkspace({ ...serviceWorkspace, service: newService }, basePath)
+
+        await this.saveData(data);
+
     }
 
     async deleteService(serviceId: string, basePath: string) {
+
+        const data = await this.loadData();
+        let deleted = false;
+
+        for (const workspace of data.workspaces) {
+            if (workspace.services) {
+                const initialLength = workspace.services.length;
+                workspace.services = workspace.services.filter(p => p.id !== serviceId);
+                if (workspace.services.length !== initialLength) {
+                    workspace.updatedAt = new Date().toISOString();
+                    deleted = true;
+                    break;
+                }
+            }
+        }
+
         await removeServiceFromWorkspace(serviceId, basePath)
+
+        if (!deleted) {
+            throw new Error(`Project ${serviceId} not found`);
+        }
+
+        await this.saveData(data);
     }
 
     async updateService(config: ServiceWorkspace, basePath: string) {
+
+        const data = await this.loadData();
+        let foundService: WorkspaceService | undefined;
+        const { service } = config
+
+        for (const workspace of data.workspaces) {
+            const serviceIndex = workspace.services?.findIndex(p => p.id === service.id) ?? -1;
+            if (serviceIndex !== -1 && workspace.services) {
+                const updatedService = {
+                    ...workspace.services[serviceIndex],
+                    ...service,
+                    updatedAt: new Date().toISOString()
+                };
+                workspace.services[serviceIndex] = updatedService;
+                workspace.updatedAt = new Date().toISOString();
+                foundService = updatedService;
+                break;
+            }
+        }
+
         await updateServiceToWorkspace(config, basePath)
+
+        await this.saveData(data);
+
+        return foundService;
     }
 
     async listServices(workspaceId: string): Promise<WorkspaceService[]> {

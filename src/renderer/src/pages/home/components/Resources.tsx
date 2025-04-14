@@ -157,6 +157,7 @@ const Resources = () => {
     const [projectSearchQuery, setProjectSearchQuery] = useState('');
     const [serviceSearchQuery, setServiceSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState<string>('lastModified');
+    const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
@@ -168,18 +169,13 @@ const Resources = () => {
     } = useWorkspace();
 
     const { services, refreshContainers } = useDocker();
-    const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
-
-    useEffect(() => {
-        fetchProjects();
-    }, [workspace]);
 
     useEffect(() => {
         if (changeStatus) {
             refreshContainers();
-            fetchProjects();
         }
-    }, [changeStatus]);
+        fetchProjects();
+    }, [changeStatus, workspace]);
 
     const fetchProjects = async () => {
         await findAllProjects().then((data) => {

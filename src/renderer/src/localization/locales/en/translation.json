@@ -453,5 +453,6 @@
   "projects": "Projects",
   "newService": "New Service",
   "services": "Services",
-  "enableCustonValidation": "Enable Custon Validation"
+  "enableCustonValidation": "Enable Custon Validation",
+  "run": "Run"
 }

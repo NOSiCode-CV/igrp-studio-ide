@@ -154,7 +154,7 @@ ipcMain.handle(EVENTS.REPOSITORY.SERVICE.DELETE, async (_, serviceId: string, ba
 });
 
 ipcMain.handle(EVENTS.REPOSITORY.SERVICE.FIND_ALL, async (_, workspaceId: string) => {
-    await repo.listServices(workspaceId)
+    return await repo.listServices(workspaceId)
 })
 
 // Backup Handlers

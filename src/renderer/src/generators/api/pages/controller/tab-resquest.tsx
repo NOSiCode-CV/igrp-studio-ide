@@ -10,7 +10,6 @@ import {
 import { BodyRequest } from './body-request';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@renderer/components/ui/card';
-import { init } from 'i18next';
 import { initialValues } from './config';
 
 interface TabRequestProps {

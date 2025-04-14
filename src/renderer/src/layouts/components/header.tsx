@@ -70,16 +70,15 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
-    const [isMaximized, setIsMaximized] = useState(false); // New state to track maximize status
+    const [isMaximized, setIsMaximized] = useState(false); 
 
-    // Window control buttons
     const handleMinimize = () => {
         window.menu.minimizeWindow();
     };
 
     const handleMaximize = () => {
         window.menu.maximizeWindow();
-        setIsMaximized(!isMaximized); // Toggle the state
+        setIsMaximized(!isMaximized); 
     };
 
     const handleClose = () => {
@@ -147,6 +146,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
 
+    console.log('isGitEnabled', isGitEnabled);
+
     return (
         <>
             <TooltipProvider>
@@ -157,7 +158,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 onClick={openPage}
                                 className={cn(
                                     'flex items-center gap-2',
-                                    isMac ? 'pl-12' : ''
                                 )}
                             >
                                 <img
@@ -205,7 +205,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                         {!loading ? (
                                             <>
                                                 <Play className="h-3 w-3 text-igrp" />
-                                                Run
+                                                {t('run')}
                                             </>
                                         ) : (
                                             <Loader2 className="animate-spin h-3 w-3 text-igrp" />
@@ -213,7 +213,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>{t('Run')}</p>
+                                    <p>{t('run')}</p>
                                 </TooltipContent>
                             </Tooltip>
 

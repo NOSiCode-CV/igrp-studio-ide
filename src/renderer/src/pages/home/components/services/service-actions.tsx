@@ -109,6 +109,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                             Open in Browser
                         </DropdownMenuItem>
                     )}
+                    
                     <DropdownMenuItem
                         className="text-red-600 focus:text-red-600 focus:bg-red-50"
                         onClick={(e) => {
