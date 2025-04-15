@@ -75,6 +75,7 @@ export interface IWorkspace {
     lastOpenedAt?: string;
     projects?: ProjectData[];
     services?: WorkspaceService[];
+    pinned?: boolean
 }
 
 export interface IOpenProject {

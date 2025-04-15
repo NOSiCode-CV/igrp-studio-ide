@@ -18,7 +18,7 @@ import { Textarea } from '@renderer/components/ui/textarea';
 
 interface CreateWorkspaceProps {
     open: boolean;
-    onSuccess: (workspaceName: IWorkspace) => void;
+    onSuccess?: (workspaceName: IWorkspace) => void;
     onOpenChange?: (open: boolean) => void;
 }
 
@@ -70,7 +70,7 @@ const CreateWorkspace = ({
                 description: workspaceDescription,
             });
             if (workspace) {
-                onSuccess(workspace);
+                onSuccess?.(workspace);
                 onOpenChange?.(false);
             }
         } catch (error) {

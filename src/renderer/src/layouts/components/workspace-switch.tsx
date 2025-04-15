@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { FolderKanban, ListFilter, Plus } from 'lucide-react';
+import { FolderKanban, ListFilter, Pin, Plus } from 'lucide-react';
 
 import {
     DropdownMenu,
@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 import {
+    SidebarGroup,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -21,6 +22,7 @@ import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
 import CreateWorkspace from '@renderer/pages/home/components/create-workspace';
 import { cn } from '@renderer/lib/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { Button } from '@renderer/components/ui/button';
 
 export function WorkspaceSwitcher({
     defaultWorkspace,
@@ -30,6 +32,9 @@ export function WorkspaceSwitcher({
     onWorkspaceChange: (workspace: IWorkspace) => void;
 }) {
     const [workspaces, setWorkspaces] = React.useState<IWorkspace[]>([]);
+    const [pinnedWorkspaces, setPinnedWorkspaces] = React.useState<
+        IWorkspace[]
+    >([]);
     const [showWorkspaceDialog, setShowWorkspaceDialog] = React.useState(false);
 
     const [selectedWorkspace, setSelectedWorkspace] =
@@ -40,8 +45,19 @@ export function WorkspaceSwitcher({
     >([]);
 
     const {
-        actions: { getWorkspaces },
+        state: { changeStatus },
+        actions: { getWorkspaces, updateWorkspace },
     } = useWorkspace();
+
+    const loadPinnedWorkspace = () => {
+      
+        const pinned: IWorkspace[] = workspaces.filter(
+            (workspace) =>
+                workspace.pinned || workspace.name === selectedWorkspace.name
+        );
+
+        setPinnedWorkspaces(pinned);
+    };
 
     React.useEffect(() => {
         const result = workspaces.filter((workspace) =>
@@ -50,6 +66,8 @@ export function WorkspaceSwitcher({
         setFilteredWorkspaces(result);
 
         setSelectedWorkspace(defaultWorkspace);
+
+        loadPinnedWorkspace();
     }, [searchTerm, defaultWorkspace, workspaces]);
 
     React.useEffect(() => {
@@ -59,79 +77,142 @@ export function WorkspaceSwitcher({
             });
         };
         loadWorkspaces();
-    }, []);
+    }, [changeStatus]);
 
-    const handleCreationSuccess = () => {};
+    const togglePinWorkspace = (
+        workspace: IWorkspace,
+        e?: React.MouseEvent
+    ) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        updateWorkspace(workspace.id, {
+            ...workspace,
+            pinned: !workspace.pinned,
+        });
+
+        loadPinnedWorkspace();
+    };
 
     return (
         <>
             <SidebarMenu className="mt-3">
-                <SidebarMenuItem>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5">
-                                <FolderKanban className="h-4 w-4 flex-shrink-0" />
-                                <span className="">
-                                    {selectedWorkspace.name}
-                                </span>
-                                <ListFilter className="ml-auto h-3 w-3" />
-                            </SidebarMenuButton>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            className="w-[--radix-dropdown-menu-trigger-width] min-w-72 rounded-lg"
-                            align="start"
-                            side={'right'}
-                            sideOffset={4}
-                        >
-                            <IGRPInputSearch
-                                name="inputseach"
-                                value={searchTerm}
-                                showSubmitButton={false}
-                                placeholder="Search workspaces"
-                                onChange={(value) =>
-                                    setSearchTerm(value.target.value)
-                                }
-                            />
-                            {filteredWorkspaces.map((workspace, index) => (
-                                <DropdownMenuItem
-                                    key={index}
-                                    onSelect={() =>
-                                        onWorkspaceChange(workspace)
-                                    }
-                                    className={cn(
-                                        workspace.name ===
-                                            selectedWorkspace.name
-                                            ? 'text-igrp bg-igrp/5'
-                                            : ''
-                                    )}
-                                >
-                                    {workspace.name}
-
-                                    <DropdownMenuShortcut>
-                                        ⌘{index + 1}
-                                    </DropdownMenuShortcut>
-                                </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                className="gap-2 p-2"
-                                onClick={() => setShowWorkspaceDialog(true)}
+                <SidebarGroup className="p-0">
+                    <SidebarMenu className="gap-1">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5">
+                                        <FolderKanban className="h-4 w-4 flex-shrink-0" />
+                                        <span className="">
+                                            {/* {selectedWorkspace.name} */}
+                                            Workspaces
+                                        </span>
+                                        <ListFilter className="ml-auto h-3 w-3" />
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                className="w-[--radix-dropdown-menu-trigger-width] min-w-72 rounded-lg"
+                                align="start"
+                                side={'right'}
+                                sideOffset={4}
                             >
-                                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                                    <Plus className="size-4" />
-                                </div>
-                                <div className="font-medium text-muted-foreground">
-                                    Add Workspace
-                                </div>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </SidebarMenuItem>
+                                <IGRPInputSearch
+                                    name="inputseach"
+                                    value={searchTerm}
+                                    showSubmitButton={false}
+                                    placeholder="Search workspaces"
+                                    onChange={(value) =>
+                                        setSearchTerm(value.target.value)
+                                    }
+                                />
+                                {filteredWorkspaces.map((workspace, index) => (
+                                    <DropdownMenuItem
+                                        key={index}
+                                        onSelect={() =>
+                                            onWorkspaceChange(workspace)
+                                        }
+                                        className={cn(
+                                            workspace.name ===
+                                                selectedWorkspace.name
+                                                ? 'text-igrp bg-igrp/5'
+                                                : ''
+                                        )}
+                                    >
+                                        {workspace.name}
+
+                                        <DropdownMenuShortcut>
+                                            ⌘{index + 1}
+                                        </DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                ))}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    className="gap-2 p-2"
+                                    onClick={() => setShowWorkspaceDialog(true)}
+                                >
+                                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                                        <Plus className="size-4" />
+                                    </div>
+                                    <div className="font-medium text-muted-foreground">
+                                        Add Workspace
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        {/* Pinned Workspaces */}
+                        {pinnedWorkspaces.map((workspace) => (
+                            <SidebarMenuItem
+                                key={workspace.id}
+                                className="ml-3 border-l-0"
+                            >
+                                <SidebarMenuButton
+                                    asChild
+                                    className={
+                                        workspace.name ===
+                                        selectedWorkspace.name
+                                            ? 'bg-muted'
+                                            : ''
+                                    }
+                                    onClick={() => onWorkspaceChange(workspace)}
+                                >
+                                    <div className="flex items-center justify-between pl-9 cursor-pointer">
+                                        <div className="flex items-center gap-2">
+                                            <span>{workspace.name}</span>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={() =>
+                                                togglePinWorkspace(workspace)
+                                            }
+                                            title={
+                                                workspace.pinned
+                                                    ? 'Unpin workspace'
+                                                    : 'Pin workspace'
+                                            }
+                                        >
+                                            <Pin
+                                                className={cn(
+                                                    'h-3 w-3',
+                                                    workspace.pinned &&
+                                                        'text-igrp'
+                                                )}
+                                            />
+                                        </Button>
+                                    </div>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </SidebarGroup>
             </SidebarMenu>
             {showWorkspaceDialog && (
                 <CreateWorkspace
                     open={showWorkspaceDialog}
-                    onSuccess={handleCreationSuccess}
                     onOpenChange={setShowWorkspaceDialog}
                 />
             )}

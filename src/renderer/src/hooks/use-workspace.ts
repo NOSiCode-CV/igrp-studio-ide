@@ -116,25 +116,22 @@ export const useWorkspace = () => {
     }
 
     const updateWorkspace = async (id: string, updates: Partial<IWorkspace>) => {
-        setLoading(true);
         try {
 
+            dispatch(setChangeStatus(false))
             await window.igrpStudio.workspace.updateWorkspace(id, updates).then((data) => {
                 if (!data) return;
                 setWorkspaces(prev =>
                     prev.map(w => w.id === id ? data : w)
                 );
-
+                dispatch(setChangeStatus(true))
                 return data;
             });
-
 
         } catch (err) {
             setError('Failed to update workspace');
             showErrorToast('Update failed');
             throw err;
-        } finally {
-            setLoading(false);
         }
     };
 
