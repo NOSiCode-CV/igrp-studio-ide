@@ -184,7 +184,7 @@ const Resources = () => {
     };
 
     const filteredProjects =
-        allProjects &&
+        allProjects && allProjects.length > 0
         allProjects.filter(
             (project) =>
                 project.name
