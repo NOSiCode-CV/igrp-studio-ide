@@ -8,12 +8,12 @@ import { ensureDirectoryExists } from '../helpers';
 
 export class NextjsEngine implements BaseEngine {
 
-  async registry(_basePath: string): Promise<void> {
+  async registry(): Promise<void> {
     await initComponents()
+    await initServices()
   }
 
   async getServices(): Promise<DockerServiceRegistrationConfig> {
-    await initServices()
     const result = loadServiceRegistry()
     return result;
   }

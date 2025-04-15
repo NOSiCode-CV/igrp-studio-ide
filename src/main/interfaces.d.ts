@@ -71,7 +71,7 @@ export interface BaseEngine {
 
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>;
 
-    registry?(basePath: string): Promise<void>;
+    registry?(): Promise<void>;
     getComponents?(): ComponentRegistrationConfig;
     getServices?(): Promise<DockerServiceRegistrationConfig>;
 
@@ -94,7 +94,7 @@ export interface IBaseEngine {
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 
     createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    registry: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    registry: (engineType: string) => Promise<HandlerResponse>;
     getComponent: (engineType: string) => Promise<HandlerResponse>;
     getService: (engineType: string) => Promise<Record<string, Component>>;
 

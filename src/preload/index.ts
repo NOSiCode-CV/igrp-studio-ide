@@ -117,9 +117,9 @@ const engine = {
 		}
 	},
 
-	registry: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+	registry: async (engineType: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType)
 		} catch (error) {
 			return handleError(error)
 		}

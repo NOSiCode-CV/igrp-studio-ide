@@ -27,7 +27,7 @@ export function useProjectValidation({ t, step }) {
             if (step === 3) {
                 return Yup.object().shape({
                     name: Yup.string().when('$framework', (framework, schema) => {
-                        return framework
+                        return framework && framework[0].includes(ENV_TYPES.SPRING, ENV_TYPES.DOTNET)
                             ? schema
                                 .required(
                                     t('thisFieldRequired', { name: t('name') })
@@ -37,7 +37,17 @@ export function useProjectValidation({ t, step }) {
                                     t('msgInfoAccpet')
                                 )
                                 .max(50, t('maxLengthExceeded', { max: 50 }))
-                            : schema.notRequired();
+                            : framework && framework[0].includes(ENV_TYPES.NEXTJS)
+                                ? schema
+                                    .required(
+                                        t('thisFieldRequired', { name: t('name') })
+                                    )
+                                    .matches(
+                                        PATTERNS.NAME_APP_VALIDATION,
+                                        t('msgInfoAccpet')
+                                    )
+                                    .max(50, t('maxLengthExceeded', { max: 50 }))
+                                : schema.notRequired();
                     }),
                     // Validation for Spring-specific fields
                     group: Yup.string().when('$framework', (framework, schema) => {

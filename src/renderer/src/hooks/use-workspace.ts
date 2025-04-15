@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import useToast from '@renderer/hooks/useToast';
 import { IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
-import { navigateToNextPage, setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
+import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import yaml from 'js-yaml';
 import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ROUTES } from '@renderer/routes/routeConstants';
 
 interface RootState {
     PageBuilder: {
@@ -179,6 +180,7 @@ export const useWorkspace = () => {
                 throw new Error(result.error);
             }
 
+            showSuccessToast('Project saved successfully');
             dispatch(setBasePath(project.path));
 
             dispatch(setConfig(project));
@@ -186,10 +188,20 @@ export const useWorkspace = () => {
             navigateToNextPage(navigate, project);
         } catch (err) {
             showErrorToast(err);
-        } finally {
-            setLoading(false);
         }
     }
+
+    const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
+
+        const navigationMap = {
+            [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
+            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
+        };
+        const path = navigationMap[appConfig.framework];
+        if (path)
+            navigate(path);
+    };
+
 
     const findAllProjects = async () => {
         return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
