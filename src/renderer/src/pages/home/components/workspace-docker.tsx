@@ -70,6 +70,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                                 size="sm"
                                 variant="ghost"
                                 className="h-6 w-6 p-0"
+                                onClick={() => loadComposeFile(workspace.path)}
                             >
                                 <RefreshCw className="h-3.5 w-3.5" />
                             </Button>

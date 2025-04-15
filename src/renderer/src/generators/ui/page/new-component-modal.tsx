@@ -126,10 +126,10 @@ export function NewComponentModal({
                             />
                         </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className='flex justify-between'>
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="ghost"
                             onClick={onClose}
                         >
                             {t('cancel')}

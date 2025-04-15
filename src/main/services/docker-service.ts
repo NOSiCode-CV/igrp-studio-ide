@@ -35,9 +35,6 @@ export class DockerService {
             throw new Error(`Environment file not found: ${envFilePath}`);
         }
 
-        console.log(escapedEnvFilePath)
-        console.log(escapedComposeFile)
-
         try {
             const { stdout } = await execAsync(
                 `docker compose -f ${escapedComposeFile} --env-file ${escapedEnvFilePath} ${command} ${serviceParam}`
@@ -97,17 +94,13 @@ export class DockerService {
                         return {
                             ...serviceDef,
                             name: serviceName,
-                            id: containerInfo.ID,
                             status: containerInfo.State,
-                            containerName: containerInfo.Name,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
                             volumes: serviceDef.volumes || [],
                             environment: this.parseEnvironmentToArray(serviceDef.environment),
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            type: serviceDef?.labels?.['type'] as string,
-                            isProject: serviceDef?.labels?.['is_project'] as boolean
                         };
                     } else {
                         // Service is not running
@@ -116,13 +109,8 @@ export class DockerService {
                             name: serviceName,
                             id: '',
                             status: 'stopped',
-                            containerName: serviceDef.container_name,
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            ports: serviceDef.ports || [],
-                            volumes: serviceDef.volumes || [],
                             environment: this.parseEnvironmentToArray(serviceDef.environment),
-                            type: serviceDef?.labels?.['type'] as string,
-                            isProject: serviceDef?.labels?.['is_project'] as boolean
                         };
                     }
                 });
@@ -138,13 +126,8 @@ export class DockerService {
                             name: serviceName,
                             id: '',
                             status: 'error',
-                            containerName: serviceDef.container_name,
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            ports: serviceDef.ports || [],
-                            volumes: serviceDef.volumes || [],
                             environment: this.parseEnvironmentToArray(serviceDef.environment),
-                            type: serviceDef?.labels?.['type'] as string,
-                            isProject: allServices?.labels?.['is_project'] as boolean
                         }
                     )
                 });

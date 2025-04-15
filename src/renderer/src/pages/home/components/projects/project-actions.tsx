@@ -14,13 +14,16 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { Trash, Repeat, MoreVertical, Edit, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ProjectData } from 'src/main/types';
+import { ProjectData, ServiceInfo } from 'src/main/types';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus } from '@renderer/redux/thunks';
+import { ConfigurationDialog } from '../configuration-dialog';
 
 interface ProjectDropdownProps {
     project: ProjectData;
     basePath: string;
+    services?: ServiceInfo[];
+    projects?: ProjectData[];
     onEdit?: () => void;
     onConvertToSpringBoot?: () => void;
     onConvertToDotNet?: () => void;
@@ -29,6 +32,8 @@ interface ProjectDropdownProps {
 export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     project,
     basePath,
+    services = [],
+    projects=[],
     onEdit,
     onConvertToSpringBoot,
     onConvertToDotNet,
@@ -39,7 +44,6 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     const dispatch: any = useDispatch();
 
     const handleDelete = async () => {
-        setIsDialogOpen(false);
         try {
             await window.igrpStudio.workspace.deleteProject(
                 project.id,
@@ -47,6 +51,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
             );
             showSuccessToast(t('deletedSuccess', { name: project.name }));
             dispatch(setChangeStatus(true));
+            setIsDialogOpen(false);
         } catch (error: unknown) {
             showErrorToast(error);
         }
@@ -54,8 +59,16 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
     const handleExternalLink = () => {
         // Implement your external link logic here
-        console.log('Open external link for', project.name);
+        console.log('Open external link for', project.name, service);
     };
+
+    const findServiceByProjectName = (
+        uuid: string
+    ): ServiceInfo | undefined => {
+        return services.find((service) => service.labels.uuid === uuid);
+    };
+
+    const service = findServiceByProjectName(project.id);
 
     return (
         <>
@@ -69,7 +82,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                         <MoreVertical className="h-4 w-4" />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-48">
+                <DropdownMenuContent className="min-w-48">
                     {onEdit && (
                         <DropdownMenuItem onClick={onEdit}>
                             <Edit className="mr-2 h-4 w-4" />
@@ -77,10 +90,12 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                         </DropdownMenuItem>
                     )}
 
-                    <DropdownMenuItem onClick={handleExternalLink}>
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Open Project
-                    </DropdownMenuItem>
+                    {service?.status === 'running' && (
+                        <DropdownMenuItem onClick={handleExternalLink}>
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Open in Browser
+                        </DropdownMenuItem>
+                    )}
 
                     {project.framework === ENV_TYPES.DOTNET && (
                         <DropdownMenuItem
@@ -105,12 +120,27 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                         </DropdownMenuItem>
                     )}
 
+                    {service && (
+                        <ConfigurationDialog
+                            service={service}
+                            services={services}
+                            projects={projects}
+                            isNew={false}
+                        >
+                            <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                                className="focus:bg-accent"
+                            >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Configure Service
+                            </DropdownMenuItem>
+                        </ConfigurationDialog>
+                    )}
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
                         className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                        onClick={(e) => {
-                            e.stopPropagation();
+                        onClick={() => {
                             setIsDialogOpen(true);
                         }}
                     >

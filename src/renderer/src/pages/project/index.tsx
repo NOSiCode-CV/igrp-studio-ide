@@ -266,7 +266,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     className="hidden"
                 />
                 <label htmlFor="icon-upload" className="block">
-                    <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2 cursor-pointer hover:border-primary/50">
+                    <div className="border border-dashed rounded-lg p-8 text-center space-y-2 cursor-pointer hover:border-primary/50">
                         {previewUrl ? (
                             <div className="flex flex-col items-center gap-2">
                                 <img
@@ -491,6 +491,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 placeholder={t('enterProjectDirectory')}
+                                readOnly
                             />
                             <Button
                                 variant="outline"
@@ -500,6 +501,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     e.preventDefault();
                                     handleOpenDirectory();
                                 }}
+                                disabled
                             >
                                 <FolderOpen className="h-4 w-4" />
                             </Button>

@@ -183,7 +183,7 @@ export interface DockerComposeService {
     host_config?: Record<string, any>;
     status: string,
     type?: string,
-    labels?: Record<string, string | boolean>
+    labels: Record<string, string>
 }
 
 export interface DockerComposeNetwork {
@@ -205,7 +205,7 @@ interface DependencyConfig {
 
 export interface ServiceInfo {
     image: string;
-    containerName?: string;
+    container_name?: string;
     ports?: string[];
     volumes?: string[];
     environment?: { name: string; value: string }[]
@@ -215,8 +215,7 @@ export interface ServiceInfo {
     restart?: string;
     hostConfig?: Record<string, any>;
     status: string,
-    type?: string,
-    isProject?: boolean,
     name: string,
     id?: string,
+    labels: Record<string, string>
 }

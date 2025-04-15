@@ -6,7 +6,7 @@ import {
     CardTitle,
 } from '@renderer/components/ui/card';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { ProjectData } from 'src/main/types';
+import { ProjectData, ServiceInfo } from 'src/main/types';
 import { Clock, Folder } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
@@ -19,8 +19,9 @@ interface ProjectProps {
     onEdit?: () => void;
     workspaceId: string;
     projectOrder: string;
+    services: ServiceInfo[];
 }
-const ProjectGrid = ({ projects, projectOrder }: ProjectProps) => {
+const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
     const {
         workspace,
         actions: { saveOrOpenProject },
@@ -54,7 +55,7 @@ const ProjectGrid = ({ projects, projectOrder }: ProjectProps) => {
                             className="cursor-pointer group gap-2 border rounded-lg shadow-sm"
                         >
                             <CardHeader>
-                                <CardTitle className=''>
+                                <CardTitle>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon project={project} />
@@ -64,13 +65,14 @@ const ProjectGrid = ({ projects, projectOrder }: ProjectProps) => {
                                         </div>
                                         <ProjectActions
                                             project={project}
+                                            projects={projects}
                                             basePath={workspace.path}
+                                            services={services}
                                         />
                                     </div>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {' '}
                                 {project.config?.description && (
                                     <p className="text-sm text-muted-foreground">
                                         {project.config.description}
@@ -101,24 +103,9 @@ const ProjectGrid = ({ projects, projectOrder }: ProjectProps) => {
                                         handleOpenProject(project);
                                     }}
                                 >
-                                    <Folder></Folder>Open
+                                    <Folder />
+                                    Open
                                 </Button>
-                                {/*  <div className="flex">
-                                    <ProjectConfigurationDialog
-                                        project={project}
-                                        projects={projects}
-                                        onSave={() => void 0}
-                                        isNew={false}
-                                    />
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <ExternalLink className="h-4 w-4" />
-                                    </Button>
-                                </div> */}
                             </CardFooter>
                         </Card>
                     );

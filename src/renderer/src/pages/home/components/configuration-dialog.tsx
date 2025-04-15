@@ -35,30 +35,37 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
-import { getServiceIcon, networkTypes, serviceTypes } from '.';
+import {
+    getServiceColor,
+    getServiceIcon,
+    networkTypes,
+    serviceTypes,
+} from './services';
 import { extractDefaults } from '@renderer/utils/helpers';
 import {
-    Environment,
     Port,
     Volume,
     WorkspaceService,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ProjectData } from 'src/main/types';
+import { ProjectIcon } from '@renderer/components/shared-ui';
 
-interface ServiceConfigurationDialogProps {
+interface ConfigurationDialogProps {
     service?: any;
     services?: any[];
+    projects?: ProjectData[];
     isNew?: boolean;
     children?: React.ReactNode;
 }
 
-export function ServiceConfigurationDialog({
+export function ConfigurationDialog({
     service,
     services = [],
+    projects = [],
     isNew = true,
     children,
-}: ServiceConfigurationDialogProps) {
+}: ConfigurationDialogProps) {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState('basic');
     const [name, setName] = useState('');
     const [image, setImage] = useState('');
     const [description, setDescription] = useState('');
@@ -66,7 +73,7 @@ export function ServiceConfigurationDialog({
     const [ports, setPorts] = useState<string[]>([]);
     const [newPort, setNewPort] = useState('');
     const [environments, setEnvironments] = useState<
-        { name: string; value: string }[]
+        { key: string; value: string }[]
     >([]);
     const [newEnvName, setNewEnvName] = useState('');
     const [newEnvValue, setNewEnvValue] = useState('');
@@ -104,7 +111,7 @@ export function ServiceConfigurationDialog({
                     // Convert environments array to {name, value} format
                     const environments =
                         serviveData?.environments?.map((env) => ({
-                            name: env.key,
+                            key: env.key,
                             value: env.value,
                         })) || [];
 
@@ -123,18 +130,23 @@ export function ServiceConfigurationDialog({
                         serviveData.labels?.find((l) => l.key === 'type')
                             ?.value || '';
 
+                    const labels =
+                        serviveData?.labels?.map((env) => ({
+                            key: env.key,
+                            value: env.value,
+                        })) || [];
+
                     // Build the template object
                     return {
                         ...serviveData,
-                        id: name,
-                        label: label || name,
-                        name: serviveData.container_name || name,
-                        image: serviveData.image,
                         type,
                         ports,
                         environments,
                         volumes,
                         dependsOn,
+                        labels,
+                        label: label || name,
+                        name: name || serviveData.container_name,
                         customNetwork: `${workspace.slug}-network`,
                     };
                 }) || [];
@@ -157,9 +169,9 @@ export function ServiceConfigurationDialog({
 
             // Edit mode
             setName(service.name || '');
-            setDescription(service.description || '');
             setImage(service.image || '');
-            setType(service.type || '');
+            setDescription(service.labels.description || '');
+            setType(service.labels.type || '');
             setPorts(service.ports || []);
             setEnvironments(service.environment || []);
             setVolumes(service.volumes || []);
@@ -186,7 +198,7 @@ export function ServiceConfigurationDialog({
     // Apply template
     const applyTemplate = (templateId: string) => {
         const selectedTemplate = serviceTemplates.find(
-            (t) => t.id === templateId
+            (t) => t.name === templateId
         );
         if (selectedTemplate) {
             setName(selectedTemplate.name);
@@ -221,7 +233,7 @@ export function ServiceConfigurationDialog({
         if (newEnvName) {
             setEnvironments([
                 ...environments,
-                { name: newEnvName, value: newEnvValue },
+                { key: newEnvName, value: newEnvValue },
             ]);
             setNewEnvName('');
             setNewEnvValue('');
@@ -255,6 +267,14 @@ export function ServiceConfigurationDialog({
         }
     };
 
+    const toggleProjectDependency = (projectId: string) => {
+        if (dependsOn.includes(projectId)) {
+            setDependsOn(dependsOn.filter((id) => id !== projectId));
+        } else {
+            setDependsOn([...dependsOn, projectId]);
+        }
+    };
+
     // Handle save
     const handleSave = () => {
         setIsSubmitting(true);
@@ -269,7 +289,9 @@ export function ServiceConfigurationDialog({
             networkType,
             customNetwork,
             ...rest
-        } = template;
+        } = template || {};
+
+        const { id: serviceId,environment, ...restService } = service;
 
         const _ports: Port[] = ports.map((portStr) => {
             const [external, internal] = portStr.split(':').map(Number);
@@ -281,34 +303,31 @@ export function ServiceConfigurationDialog({
             return { name: vols[0], path: vols[1], driver: 'none' };
         });
 
-        const _environments: Environment[] = environments.map(
-            ({ name, value }) => {
-                return { key: name, value };
-            }
+        const _labels = Object.entries({ type, description }).reduce(
+            (acc, [key, value]) => [
+                ...acc.filter((label) => label.key !== key),
+                ...(value ? [{ key, value }] : []),
+            ],
+            [...(template?.labels || [])]
         );
-
+        
         // Create service object
         const serviceData: WorkspaceService = {
-            id: service?.id || '',
-            name: template.id,
+            id: service?.labels.uuid || '',
+            name: name,
             properties: {
                 ...rest,
+                ...restService,
                 container_name: name,
                 image,
                 ports: _ports,
-                environments: _environments,
+                environments,
                 volumes: _volumes,
                 dependsOn,
                 networks: [
                     { network: useCustomNetwork ? customNetwork : '' },
                 ].filter((item) => item.network),
-                labels: Object.entries({ type, description }).reduce(
-                    (acc, [key, value]) => [
-                        ...acc.filter((label) => label.key !== key),
-                        ...(value ? [{ key, value }] : []),
-                    ],
-                    [...template.labels]
-                ),
+                labels: [..._labels],
             },
         };
 
@@ -352,23 +371,16 @@ export function ServiceConfigurationDialog({
                 </DialogHeader>
 
                 <Tabs
-                    value={activeTab}
-                    onValueChange={setActiveTab}
+                    defaultValue="basic"
                     className="flex-1 overflow-hidden flex flex-col"
                 >
                     <TabsList className="grid grid-cols-4 mb-4 w-full">
-                        <TabsTrigger value="basic" className="text-xs">
-                            Basic
-                        </TabsTrigger>
-                        <TabsTrigger value="config" className="text-xs">
-                            Configuration
-                        </TabsTrigger>
-                        <TabsTrigger value="dependencies" className="text-xs">
+                        <TabsTrigger value="basic">Basic</TabsTrigger>
+                        <TabsTrigger value="config">Configuration</TabsTrigger>
+                        <TabsTrigger value="dependencies">
                             Dependencies
                         </TabsTrigger>
-                        <TabsTrigger value="network" className="text-xs">
-                            Network
-                        </TabsTrigger>
+                        <TabsTrigger value="network">Network</TabsTrigger>
                     </TabsList>
 
                     <ScrollArea className="flex-1 pr-4">
@@ -389,7 +401,7 @@ export function ServiceConfigurationDialog({
                                                 (template) => {
                                                     return {
                                                         label: template.label,
-                                                        value: template.id,
+                                                        value: template.name,
                                                     };
                                                 }
                                             )}
@@ -562,7 +574,7 @@ export function ServiceConfigurationDialog({
                                                         >
                                                             <div className="flex-1 grid grid-cols-2 gap-2 text-xs">
                                                                 <div className="font-mono bg-muted/50 p-1 rounded truncate">
-                                                                    {env.name}
+                                                                    {env.key}
                                                                 </div>
                                                                 <div className="font-mono bg-muted/50 p-1 rounded truncate">
                                                                     {env.value}
@@ -708,7 +720,7 @@ export function ServiceConfigurationDialog({
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <Label>Depends On</Label>
+                                    <Label>Connected Services</Label>
                                     <p className="text-xs text-muted-foreground">
                                         Select services that must be started
                                         before this service.
@@ -720,45 +732,37 @@ export function ServiceConfigurationDialog({
                                                 {services
                                                     .filter(
                                                         (s) =>
-                                                            s.id !== service?.id
+                                                            s.name !==
+                                                                service?.name &&
+                                                            !s.labels.is_project
                                                     )
-                                                    .map((s) => (
+                                                    .map((s, index) => (
                                                         <div
-                                                            key={s.id}
+                                                            key={index}
                                                             className="flex items-center space-x-2"
                                                         >
                                                             <Checkbox
-                                                                id={`depends-${s.id}`}
+                                                                id={`depends-${index}`}
                                                                 checked={dependsOn.includes(
-                                                                    s.id
+                                                                    s.name
                                                                 )}
                                                                 onCheckedChange={() =>
                                                                     toggleDependency(
-                                                                        s.id
+                                                                        s.name
                                                                     )
                                                                 }
                                                             />
                                                             <div className="flex items-center gap-2">
                                                                 <div
-                                                                    className={`rounded-sm p-1 text-white ${
-                                                                        s.type ===
-                                                                        'database'
-                                                                            ? 'bg-amber-500'
-                                                                            : s.type ===
-                                                                                'web'
-                                                                              ? 'bg-blue-500'
-                                                                              : s.type ===
-                                                                                  'cache'
-                                                                                ? 'bg-purple-500'
-                                                                                : 'bg-green-500'
-                                                                    }`}
+                                                                    className={`rounded-sm p-1 text-white ${getServiceColor(s.labels.type)}`}
                                                                 >
                                                                     {getServiceIcon(
-                                                                        s.type
+                                                                        s.labels
+                                                                            .type
                                                                     )}
                                                                 </div>
                                                                 <Label
-                                                                    htmlFor={`depends-${s.id}`}
+                                                                    htmlFor={`depends-${s.name}`}
                                                                     className="text-sm font-normal cursor-pointer"
                                                                 >
                                                                     {s.name}
@@ -770,6 +774,58 @@ export function ServiceConfigurationDialog({
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
                                                 No other services available
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Project Dependencies</Label>
+                                    <p className="text-xs text-muted-foreground">
+                                        Select projects that this project
+                                        depends on.
+                                    </p>
+
+                                    <div className="border rounded-md p-3 space-y-2">
+                                        {projects.length > 0 ? (
+                                            <div className="space-y-2">
+                                                {projects
+                                                    .filter(
+                                                        (p) =>
+                                                            p.id !== service?.id
+                                                    )
+                                                    .map((p) => (
+                                                        <div
+                                                            key={p.id}
+                                                            className="flex items-center space-x-2"
+                                                        >
+                                                            <Checkbox
+                                                                id={`depends-${p.id}`}
+                                                                checked={dependsOn.includes(
+                                                                    p.id
+                                                                )}
+                                                                onCheckedChange={() =>
+                                                                    toggleProjectDependency(
+                                                                        p.id
+                                                                    )
+                                                                }
+                                                            />
+                                                            <div className="flex items-center gap-2">
+                                                                <ProjectIcon
+                                                                    project={p}
+                                                                />
+                                                                <Label
+                                                                    htmlFor={`depends-${p.id}`}
+                                                                    className="text-sm font-normal cursor-pointer"
+                                                                >
+                                                                    {p.name}
+                                                                </Label>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-xs text-muted-foreground text-center py-2">
+                                                No other projects available
                                             </p>
                                         )}
                                     </div>
@@ -854,7 +910,7 @@ export function ServiceConfigurationDialog({
                     </Button>
                     <Button
                         onClick={handleSave}
-                        disabled={isSubmitting || !name || !image}
+                        disabled={isSubmitting || !name}
                     >
                         {isSubmitting ? 'Saving...' : 'Save Service'}
                     </Button>

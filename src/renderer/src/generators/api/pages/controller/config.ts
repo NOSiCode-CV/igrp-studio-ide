@@ -12,7 +12,13 @@ export const initialValues = {
             name: "OK",
             content: {
                 "application/json": {
-                    schema: null
+                    schema: {
+                        type: "string",
+                        objectType: "",
+                        name: "data",
+                        collectionType: "none",
+                        module: ""
+                    }
                 }
             }
         },

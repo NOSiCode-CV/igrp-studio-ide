@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@renderer/components/ui/button';
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,7 +16,7 @@ import {
     MoreVertical,
     Trash,
 } from 'lucide-react';
-import { ServiceConfigurationDialog } from './service-configuration-dialog';
+import { ConfigurationDialog } from '../configuration-dialog';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { useState } from 'react';
 import useToast from '@renderer/hooks/useToast';
@@ -45,7 +46,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
     const handleDelete = async () => {
         setIsDialogOpen(false);
         try {
-            await removeService(service.id);
+            await removeService(service.labels.uuid);
         } catch (error: unknown) {
             showErrorToast(error);
         }
@@ -84,7 +85,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         </DropdownMenuItem>
                     )}
 
-                    <ServiceConfigurationDialog
+                    <ConfigurationDialog
                         service={service}
                         services={services}
                         isNew={false}
@@ -96,7 +97,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Service
                         </DropdownMenuItem>
-                    </ServiceConfigurationDialog>
+                    </ConfigurationDialog>
 
                     {getServiceUrl(service) && (
                         <DropdownMenuItem
@@ -109,17 +110,19 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                             Open in Browser
                         </DropdownMenuItem>
                     )}
-                    
-                    <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsDialogOpen(true);
-                        }}
-                    >
-                        <Trash className="mr-2 h-4 w-4 text-red-600" />
-                        Remove Service
-                    </DropdownMenuItem>
+
+                    {service.labels.uuid && (
+                        <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsDialogOpen(true);
+                            }}
+                        >
+                            <Trash className="mr-2 h-4 w-4 text-red-600" />
+                            Remove Service
+                        </DropdownMenuItem>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 

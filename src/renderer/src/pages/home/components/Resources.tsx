@@ -37,12 +37,15 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Toggle } from '@renderer/components/ui/toggle';
 import { ServiceGrid } from './services/service-grid';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
-import { ServiceConfigurationDialog } from './services/service-configuration-dialog';
+import { ConfigurationDialog } from './configuration-dialog';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { ServiceList } from './services/service-list';
 import { ProjectList } from './projects/project-list';
 import ProjectGrid from './projects/project-grid';
 import { getId } from '@renderer/utils/helpers';
+import { setChangeStatus } from '@renderer/redux/thunks';
+import { useDispatch } from 'react-redux';
+import GitProject from '@renderer/components/git/git-project';
 
 type ResourceType = 'project' | 'service';
 type ViewMode = 'grid' | 'list';
@@ -161,6 +164,7 @@ const Resources = () => {
 
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
+    const dispatch: any = useDispatch();
 
     const {
         workspace,
@@ -173,6 +177,7 @@ const Resources = () => {
     useEffect(() => {
         if (changeStatus) {
             refreshContainers();
+            dispatch(setChangeStatus(false));
         }
         fetchProjects();
     }, [changeStatus, workspace]);
@@ -197,14 +202,15 @@ const Resources = () => {
 
     const filteredServices = services.filter(
         (service) =>
-            service.containerName &&
-            service.containerName
+            !service.labels.is_project &&
+            service.container_name &&
+            service.container_name
                 .toLowerCase()
                 .includes(serviceSearchQuery.toLowerCase())
     );
 
     const onHandleOpenProjectClick = async (): Promise<void> => {
-        const result: IOpenProject = await window.api.openDirectory('');
+        const result: IOpenProject = await window.api.openDirectory();
 
         const { canceled, basePath, config, folderExists } = result;
 
@@ -259,7 +265,7 @@ const Resources = () => {
     );
 
     const ServiceActions = () => (
-        <ServiceConfigurationDialog services={filteredServices} isNew={true} />
+        <ConfigurationDialog services={filteredServices} isNew={true} />
     );
 
     const ProjectEmptyState = () => (
@@ -289,15 +295,12 @@ const Resources = () => {
                     ? `No services matching "${serviceSearchQuery}"`
                     : "This workspace doesn't have any services yet."}
             </p>
-            <ServiceConfigurationDialog
-                services={filteredServices}
-                isNew={true}
-            >
+            <ConfigurationDialog services={filteredServices} isNew={true}>
                 <Button size="sm">
                     <PlusCircle className="h-3.5 w-3.5 mr-1" />
                     Add New Service
                 </Button>
-            </ServiceConfigurationDialog>
+            </ConfigurationDialog>
         </div>
     );
 
@@ -320,15 +323,20 @@ const Resources = () => {
                 actionButtons={<ProjectActions />}
             >
                 {projectViewMode === 'grid' ? (
-                    <ProjectGrid
-                        projects={filteredProjects}
-                        workspaceId={workspace.id}
-                        projectOrder={sortOrder}
-                    />
+                    <>
+                        <ProjectGrid
+                            projects={filteredProjects}
+                            workspaceId={workspace.id}
+                            projectOrder={sortOrder}
+                            services={services}
+                        />
+                       {/*  <GitProject /> */}
+                    </>
                 ) : (
                     <ProjectList
                         projects={filteredProjects}
                         workspaceId={workspace.id}
+                        services={services}
                     />
                 )}
             </ResourceSection>

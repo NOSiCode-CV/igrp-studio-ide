@@ -6,13 +6,11 @@ import { useWorkspace } from './use-workspace';
 import { IDocker } from 'src/main/interfaces';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus } from '@renderer/redux/thunks';
-import { WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 export function useDocker() {
     const [isDockerRunning, setIsDockerRunning] = useState<boolean>(false);
     const {
         workspace,
-        actions: { findAllServices },
     } = useWorkspace();
 
     const [fileContent, setFileContent] = useState<any>(null);
@@ -32,21 +30,9 @@ export function useDocker() {
             window.igrpStudio.docker.down(projectPath);
         },
         status: async (projectPath: string) => {
-
-            const servicesSaved: WorkspaceService[] = await findAllServices();
-
             return window.igrpStudio.docker.status(projectPath).then((services: ServiceInfo[]) => {
-
-                const servicesWithIds = services.map(service => {
-                    const savedService = servicesSaved.find(s => s.name === service.name);
-                    return {
-                        ...service,
-                        id: savedService?.id || service.id, // Use saved ID if exists, else keep original
-                    };
-                });
-
-                setServices(servicesWithIds);
-                return servicesWithIds;
+                setServices(services);
+                return services;
             });
         },
         check: async () => {
@@ -107,7 +93,7 @@ export function useDocker() {
     }, [isDockerRunning, dockerOperations]);
 
     const getServiceUrl = (service: ServiceInfo) => {
-        if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.type?.includes(type))) return null;
+        if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.labels.type?.includes(type))) return null;
 
         const normalizedPorts = service.ports.map(port => {
             if (typeof port === 'string') {

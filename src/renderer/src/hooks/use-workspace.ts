@@ -37,7 +37,7 @@ export const useWorkspace = () => {
     );
 
     const { workspace, changeStatus } = useSelector(selectProperties);
-
+    
     const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(workspace)
 
     // Setup workspace and error handling
@@ -226,6 +226,8 @@ export const useWorkspace = () => {
                 service
             }
 
+            console.log(service)
+
             if (service.id)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)
             else
@@ -235,6 +237,8 @@ export const useWorkspace = () => {
                 showErrorToast(result.error);
             } else
                 showSuccessToast('Service saved successfully');
+
+            dispatch(setChangeStatus(true));
 
         } catch (err) {
             showErrorToast(err);

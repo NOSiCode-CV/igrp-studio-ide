@@ -9,7 +9,7 @@ import {
     TableRow,
 } from '@renderer/components/ui/table';
 import { formatDistanceToNow } from 'date-fns';
-import { ProjectData } from 'src/main/types';
+import { ProjectData, ServiceInfo } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import Dependency from '../dependency';
 import { ProjectActions } from './project-actions';
@@ -19,10 +19,10 @@ interface ProjectListProps {
     projects: ProjectData[];
     workspaceId?: string;
     onEdit?: (project: ProjectData) => void;
-    onDelete?: (prompt: boolean) => void;
+    services: ServiceInfo[];
 }
 
-export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
+export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
     const handleProjectClick = (project: ProjectData) => {
         saveOrOpenProject(project);
     };
@@ -83,13 +83,14 @@ export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
                             <TableCell>
                                 <ProjectActions
                                     project={project}
+                                    projects={projects}
                                     basePath={workspace.path}
-                                    onDelete={(success) => onDelete?.(success)}
                                     onEdit={
                                         onEdit
                                             ? () => onEdit(project)
                                             : undefined
                                     }
+                                    services={services}
                                 />
                             </TableCell>
                         </TableRow>

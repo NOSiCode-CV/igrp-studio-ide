@@ -249,11 +249,19 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${serviceWorkspace.id} not found`);
         }
 
+        const serviceId = uuidv4();
         const newService = {
             ...serviceWorkspace.service,
-            id: uuidv4()
+            id: serviceId,
+            properties: {
+                ...serviceWorkspace.service.properties,
+                labels: serviceWorkspace.service.properties?.labels?.map(label =>
+                    label.key === "uuid"
+                        ? { ...label, value: serviceId }
+                        : label
+                ) || []
+            }
         };
-
         workspace.services = workspace?.services || [];
         workspace.services.push(newService);
 

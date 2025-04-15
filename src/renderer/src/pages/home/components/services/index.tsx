@@ -69,5 +69,6 @@ export const serviceTypes = [
     { value: 'file', label: 'File' },
     { value: 'auth', label: 'Auth' },
     { value: 'observability', label: 'Observability' },
+    { value: 'messaging', label: 'Messaging' },
     { value: 'other', label: 'Other' },
 ];

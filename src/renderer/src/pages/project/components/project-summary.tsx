@@ -11,49 +11,49 @@ export const ProjectConfigSummary = ({ values }: { values: any }) => {
                     <span className="text-muted-foreground">Framework:</span>
                     {values.framework}
                 </p>
-                {values.framework === 'spring' && values.Config && (
+                {values.framework === 'springboot' && values.config && (
                     <>
                         <p>
                             <span className="text-muted-foreground">
                                 Database:
                             </span>
-                            {values.Config.database}
+                            {values.config.database}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
                                 Structure:
                             </span>
-                            {values.Config.structureStyle}
+                            {values.config.structureStyle}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
                                 Group:
                             </span>
-                            {values.Config.group}
+                            {values.config.group}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
                                 Artifact:
                             </span>
-                            {values.Config.artifact}
+                            {values.config.artifact}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
                                 Core Version:
                             </span>
-                            {values.Config.coreVersion}
+                            {values.config.coreVersion}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
                                 Observability:
                             </span>
-                            {values.Config.enableObservability
+                            {values.config.enableObservability
                                 ? 'Enabled'
                                 : 'Disabled'}
                         </p>
                     </>
                 )}
-                {values.framework === 'nextjs' && values.Config && (
+                {values.framework === 'nextjs' && values.config && (
                     <>
                         <p>
                             <span className="text-muted-foreground">

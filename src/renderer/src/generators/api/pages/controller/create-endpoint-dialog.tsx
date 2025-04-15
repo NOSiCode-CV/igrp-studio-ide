@@ -160,12 +160,9 @@ export function CreateEndpointDialog({
                                     value={formik.values.module}
                                     error={formik.errors.module}
                                     isTouched={formik.touched.module}
-                                    onChange={(value) =>
-                                    {
-                                        console.log("value", value);
-                                        formik.setFieldValue('module', value)
-                                    }
-                                    }
+                                    onChange={(value) => {
+                                        formik.setFieldValue('module', value);
+                                    }}
                                     onBlur={(value) =>
                                         formik.setFieldValue('module', value)
                                     }

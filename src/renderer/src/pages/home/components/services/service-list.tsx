@@ -19,10 +19,9 @@ interface ServiceListProps {
 }
 
 export function ServiceList({ services }: ServiceListProps) {
-
     return (
-        <div className="rounded-md border relative overflow-x-auto">
-            <Table className="compact-table table-fixed">
+        <div className="grid w-full [&>div]:border [&>div]:rounded">
+            <Table className="">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Name</TableHead>
@@ -42,9 +41,9 @@ export function ServiceList({ services }: ServiceListProps) {
                             <TableCell className="font-medium">
                                 <div className="flex items-center gap-1.5">
                                     <div
-                                        className={`${getServiceColor(service.type)} rounded-sm p-1 text-white`}
+                                        className={`${getServiceColor(service.labels.type)} rounded-sm p-1 text-white`}
                                     >
-                                        {getServiceIcon(service.type)}
+                                        {getServiceIcon(service.labels.type)}
                                     </div>
                                     <div className="text-xs">
                                         {service.name}
@@ -54,9 +53,9 @@ export function ServiceList({ services }: ServiceListProps) {
                             <TableCell>
                                 <Badge
                                     variant="outline"
-                                    className={`${getServiceColor(service.type)} bg-opacity-10  capitalize`}
+                                    className={`${getServiceColor(service.labels.type)} bg-opacity-10  capitalize`}
                                 >
-                                    {service.type}
+                                    {service.labels.type}
                                 </Badge>
                             </TableCell>
                             <TableCell>
