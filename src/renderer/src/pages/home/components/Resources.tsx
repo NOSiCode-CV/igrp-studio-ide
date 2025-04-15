@@ -183,15 +183,17 @@ const Resources = () => {
         });
     };
 
-    const filteredProjects = allProjects.filter(
-        (project) =>
-            project.name
-                .toLowerCase()
-                .includes(projectSearchQuery.toLowerCase()) ||
-            project.framework
-                .toLowerCase()
-                .includes(projectSearchQuery.toLowerCase())
-    );
+    const filteredProjects =
+        allProjects &&
+        allProjects.filter(
+            (project) =>
+                project.name
+                    .toLowerCase()
+                    .includes(projectSearchQuery.toLowerCase()) ||
+                project.framework
+                    .toLowerCase()
+                    .includes(projectSearchQuery.toLowerCase())
+        );
 
     const filteredServices = services.filter(
         (service) =>

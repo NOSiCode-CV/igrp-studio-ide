@@ -23,6 +23,12 @@ import CreateWorkspace from '@renderer/pages/home/components/create-workspace';
 import { cn } from '@renderer/lib/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { Button } from '@renderer/components/ui/button';
+import { Tool } from 'gojs';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
 
 export function WorkspaceSwitcher({
     defaultWorkspace,
@@ -50,7 +56,6 @@ export function WorkspaceSwitcher({
     } = useWorkspace();
 
     const loadPinnedWorkspace = () => {
-      
         const pinned: IWorkspace[] = workspaces.filter(
             (workspace) =>
                 workspace.pinned || workspace.name === selectedWorkspace.name
@@ -105,8 +110,7 @@ export function WorkspaceSwitcher({
                                 <SidebarMenuItem>
                                     <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5">
                                         <FolderKanban className="h-4 w-4 flex-shrink-0" />
-                                        <span className="">
-                                            {/* {selectedWorkspace.name} */}
+                                        <span>
                                             Workspaces
                                         </span>
                                         <ListFilter className="ml-auto h-3 w-3" />
@@ -182,27 +186,33 @@ export function WorkspaceSwitcher({
                                         <div className="flex items-center gap-2">
                                             <span>{workspace.name}</span>
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() =>
-                                                togglePinWorkspace(workspace)
-                                            }
-                                            title={
-                                                workspace.pinned
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() =>
+                                                        togglePinWorkspace(
+                                                            workspace
+                                                        )
+                                                    }
+                                                >
+                                                    <Pin
+                                                        className={cn(
+                                                            'h-3 w-3',
+                                                            workspace.pinned &&
+                                                                'text-igrp'
+                                                        )}
+                                                    />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {workspace.pinned
                                                     ? 'Unpin workspace'
-                                                    : 'Pin workspace'
-                                            }
-                                        >
-                                            <Pin
-                                                className={cn(
-                                                    'h-3 w-3',
-                                                    workspace.pinned &&
-                                                        'text-igrp'
-                                                )}
-                                            />
-                                        </Button>
+                                                    : 'Pin workspace'}
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
