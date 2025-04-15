@@ -185,15 +185,16 @@ const Resources = () => {
 
     const filteredProjects =
         allProjects && allProjects.length > 0
-        allProjects.filter(
-            (project) =>
-                project.name
-                    .toLowerCase()
-                    .includes(projectSearchQuery.toLowerCase()) ||
-                project.framework
-                    .toLowerCase()
-                    .includes(projectSearchQuery.toLowerCase())
-        );
+            ? allProjects.filter(
+                  (project) =>
+                      project.name
+                          .toLowerCase()
+                          .includes(projectSearchQuery.toLowerCase()) ||
+                      project.framework
+                          .toLowerCase()
+                          .includes(projectSearchQuery.toLowerCase())
+              )
+            : [];
 
     const filteredServices = services.filter(
         (service) =>
