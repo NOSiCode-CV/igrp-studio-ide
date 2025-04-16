@@ -56,6 +56,8 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {sortProjects(
                 projects.map((project, index) => {
+                    const ports =
+                        findServiceByProjectName(project.id)?.ports || [];
                     return (
                         <Card
                             key={index}
@@ -85,7 +87,9 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                         {project.config.description}
                                     </p>
                                 )}
-                                <PortsBadgeList ports={findServiceByProjectName(project.id)?.ports} />
+                                {ports.length > 0 && (
+                                    <PortsBadgeList ports={ports} />
+                                )}
                             </CardContent>
                             <CardFooter className="flex flex-wrap text-muted-foreground justify-between gap-2">
                                 <div className="text-xs flex items-center">
