@@ -11,6 +11,7 @@ import {
 import Dependency from '../dependency';
 import { ServiceActions } from './service-actions';
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
+import { PortsBadgeList } from '../ports-badge-list';
 interface ServiceGridProps {
     services: any[];
     workspaceId?: string;
@@ -61,25 +62,7 @@ export function ServiceGrid({ services }: ServiceGridProps) {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1">
-                                {service.ports && service.ports.length > 0 && (
-                                    <div className="p-1">
-                                        <div className="text-xs text-muted-foreground">
-                                            Ports
-                                        </div>
-                                        <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
-                                            {service.ports.map(
-                                                (port: string, i: number) => (
-                                                    <Badge
-                                                        key={i}
-                                                        variant="outline"
-                                                    >
-                                                        {port}
-                                                    </Badge>
-                                                )
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+                                <PortsBadgeList ports={service.ports} />
 
                                 <Dependency dependsOn={service.dependsOn} />
                             </div>

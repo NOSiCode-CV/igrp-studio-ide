@@ -54,6 +54,14 @@ export const GitStore = {
     }
   },
 
+  removeClonedRepo(repoId: number): void {
+    const clonedRepos = this.getClonedRepos();
+    const updatedRepos = clonedRepos.filter(id => id !== repoId);
+    if (updatedRepos.length !== clonedRepos.length) {
+      store.set('cloned_repos', updatedRepos);
+    }
+  },
+
   getClonedRepos(): number[] {
     const repos = store.get('cloned_repos', []);
     return repos || []; 

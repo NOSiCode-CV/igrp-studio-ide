@@ -60,6 +60,11 @@ export function ListGitProject({
                 );
 
             if (!folderExists || !config) {
+                await window.electron.ipcRenderer.invoke(
+                    'remove-cloned-repo',
+                    repo.id
+                );
+
                 throw new Error(t('invalidProjectStructure'));
             }
 

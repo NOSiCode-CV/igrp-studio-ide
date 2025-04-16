@@ -13,6 +13,7 @@ import { getLocale } from '@renderer/utils/helpers';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import { ProjectActions } from './project-actions';
 import { Button } from '@renderer/components/ui/button';
+import { PortsBadgeList } from '../ports-badge-list';
 
 interface ProjectProps {
     projects: ProjectData[];
@@ -43,6 +44,12 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
             }
             return 0;
         });
+    };
+
+    const findServiceByProjectName = (
+        uuid: string
+    ): ServiceInfo | undefined => {
+        return services.find((service) => service.labels?.uuid === uuid);
     };
 
     return (
@@ -78,6 +85,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                         {project.config.description}
                                     </p>
                                 )}
+                                <PortsBadgeList ports={findServiceByProjectName(project.id)?.ports} />
                             </CardContent>
                             <CardFooter className="flex flex-wrap text-muted-foreground justify-between gap-2">
                                 <div className="text-xs flex items-center">

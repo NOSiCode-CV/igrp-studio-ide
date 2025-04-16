@@ -124,10 +124,10 @@ export class WorkspaceRepository {
             updatedAt: new Date().toISOString()
         };
 
+        await this.addProjectToStudioWorkspace(workspace, newProject, false);
+
         const engine = EngineFactory.getEngine(project.framework);
         await engine.createProject(newProject, project.path);
-
-        await this.addProjectToStudioWorkspace(workspace, newProject);
 
         workspace.projects = workspace.projects || [];
         workspace.projects.push(newProject);
@@ -137,7 +137,7 @@ export class WorkspaceRepository {
         return newProject;
     }
 
-    async addProjectToStudioWorkspace(workspace: IWorkspace, newProject: ProjectData) {
+    async addProjectToStudioWorkspace(workspace: IWorkspace, newProject: ProjectData, move: boolean) {
 
         const { config, id: projectId, framework } = newProject
 
@@ -151,7 +151,8 @@ export class WorkspaceRepository {
         //call engine
         await addProjectToWorkspace(workspaceConfig, workspacePath);
 
-        await this.validateAndMoveProject(newProject, workspacePath)
+        if (move)
+            await this.validateAndMoveProject(newProject, workspacePath)
 
     }
 
@@ -201,7 +202,7 @@ export class WorkspaceRepository {
 
             workspace.updatedAt = new Date().toISOString();
 
-            await this.addProjectToStudioWorkspace(workspace, updatedProject);
+            await this.addProjectToStudioWorkspace(workspace, updatedProject, true);
 
             foundProject = updatedProject;
 

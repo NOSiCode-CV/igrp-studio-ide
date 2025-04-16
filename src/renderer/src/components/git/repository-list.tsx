@@ -107,7 +107,7 @@ export function RepositoryList() {
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',
                 repo.clone_url,
-                `${workspace.path}/projects`
+                `${workspace.path}${projectPath}`,
             );
         } catch (error) {
             console.error('Failed to clone repository:', error);

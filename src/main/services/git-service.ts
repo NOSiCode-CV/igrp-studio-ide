@@ -113,7 +113,7 @@ export const GitService = {
                 basePath = filePaths[0];
             }
 
-            const projectName = await new Promise<string>((resolve, reject) => {
+           /*  const projectName = await new Promise<string>((resolve, reject) => {
                 window.webContents.send('request-project-name', {
                     defaultName: repoUrl.split('/').pop()?.replace('.git', ''),
                 });
@@ -125,15 +125,15 @@ export const GitService = {
                 });
             });
 
-            const targetDir = path.join(basePath, projectName);
+            const targetDir = path.join(basePath, projectName); */
 
             window.webContents.send('clone-progress', {
                 status: 'starting',
-                message: `Starting to clone into ${targetDir}...`,
+                message: `Starting to clone into ${basePath}...`,
             });
 
             return new Promise((resolve, reject) => {
-                exec(`git clone ${repoUrl} "${targetDir}"`, async (error) => {
+                exec(`git clone ${repoUrl} "${basePath}"`, async (error) => {
                     if (error) {
                         window.webContents.send('clone-progress', {
                             status: 'error',
@@ -145,7 +145,7 @@ export const GitService = {
 
                     try {
                         // Usa a nova função checkAndReadBaseApi
-                        const { folderExists, config } = await checkAndReadBaseApi(targetDir);
+                        const { folderExists, config } = await checkAndReadBaseApi(basePath);
 
                         if (!folderExists || !config) {
                             throw new Error('Invalid IGRP Studio project structure');
@@ -153,11 +153,11 @@ export const GitService = {
 
                         window.webContents.send('clone-progress', {
                             status: 'success',
-                            message: `Successfully cloned to ${targetDir}`,
-                            path: targetDir,
+                            message: `Successfully cloned to ${basePath}`,
+                            path: basePath,
                             project: config
                         });
-                        resolve({ path: targetDir, project: config });
+                        resolve({ path: basePath, project: config });
                     } catch (configError) {
                         window.webContents.send('clone-progress', {
                             status: 'error',

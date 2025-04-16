@@ -36,6 +36,9 @@ ipcMain.handle('gitlab-initialize', async (_event, token) => {
 ipcMain.handle('add-cloned-repo', (_event, repoId: number) => {
     GitStore.addClonedRepo(repoId);
 });
+ipcMain.handle('remove-cloned-repo', (_event, repoId: number) => {
+    GitStore.removeClonedRepo(repoId);
+});
 ipcMain.handle('get-cloned-repos', () => {
     const repos = GitStore.getClonedRepos();
     return repos;
