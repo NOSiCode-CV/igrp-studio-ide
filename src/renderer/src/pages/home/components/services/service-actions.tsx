@@ -111,7 +111,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         </DropdownMenuItem>
                     )}
 
-                    {service.labels.uuid && (
+                    {service.labels?.uuid && (
                         <DropdownMenuItem
                             className="text-red-600 focus:text-red-600 focus:bg-red-50"
                             onClick={(e) => {

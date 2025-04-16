@@ -171,7 +171,7 @@ export function ConfigurationDialog({
             setName(service.name || '');
             setImage(service.image || '');
             setDescription(service.labels.description || '');
-            setType(service.labels.type || '');
+            setType(service.labels?.type || '');
             setPorts(service.ports || []);
             setEnvironments(service.environment || []);
             setVolumes(service.volumes || []);
@@ -734,7 +734,7 @@ export function ConfigurationDialog({
                                                         (s) =>
                                                             s.name !==
                                                                 service?.name &&
-                                                            !s.labels.is_project
+                                                            !s.labels?.is_project
                                                     )
                                                     .map((s, index) => (
                                                         <div
@@ -754,11 +754,11 @@ export function ConfigurationDialog({
                                                             />
                                                             <div className="flex items-center gap-2">
                                                                 <div
-                                                                    className={`rounded-sm p-1 text-white ${getServiceColor(s.labels.type)}`}
+                                                                    className={`rounded-sm p-1 text-white ${getServiceColor(s.labels?.type)}`}
                                                                 >
                                                                     {getServiceIcon(
                                                                         s.labels
-                                                                            .type
+                                                                            ?.type
                                                                     )}
                                                                 </div>
                                                                 <Label

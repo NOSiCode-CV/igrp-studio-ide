@@ -30,15 +30,15 @@ export function ServiceGrid({ services }: ServiceGridProps) {
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1">
                                         <div
-                                            className={`${getServiceColor(service.labels.type)} rounded-sm p-1 text-white`}
+                                            className={`${getServiceColor(service.labels?.type)} rounded-sm p-1 text-white`}
                                         >
-                                            {getServiceIcon(service.labels.type)}
+                                            {getServiceIcon(service.labels?.type)}
                                         </div>
                                         <Badge
                                             variant="outline"
                                             className="capitalize"
                                         >
-                                            {service.labels.type}
+                                            {service.labels?.type}
                                         </Badge>
                                     </div>
                                     <div className="flex items-center gap-1">

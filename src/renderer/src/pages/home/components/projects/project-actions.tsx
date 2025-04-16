@@ -33,7 +33,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     project,
     basePath,
     services = [],
-    projects=[],
+    projects = [],
     onEdit,
     onConvertToSpringBoot,
     onConvertToDotNet,
@@ -65,7 +65,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     const findServiceByProjectName = (
         uuid: string
     ): ServiceInfo | undefined => {
-        return services.find((service) => service.labels.uuid === uuid);
+        return services.find((service) => service.labels?.uuid === uuid);
     };
 
     const service = findServiceByProjectName(project.id);

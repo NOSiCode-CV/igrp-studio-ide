@@ -202,7 +202,7 @@ const Resources = () => {
 
     const filteredServices = services.filter(
         (service) =>
-            !service.labels.is_project &&
+            !service.labels?.is_project &&
             service.container_name &&
             service.container_name
                 .toLowerCase()
