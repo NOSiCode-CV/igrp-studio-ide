@@ -125,7 +125,10 @@ export interface Repository {
     html_url: string;
     clone_url: string;
     updated_at: string | null;
+    platform: string
 }
+
+export type RepositoryPlatform = "github" | "gitlab" | "other"
 
 interface Commit {
     hash: string;

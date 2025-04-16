@@ -29,6 +29,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
+import { Dialog, DialogTrigger } from '@renderer/components/ui/dialog';
 
 export function WorkspaceSwitcher({
     defaultWorkspace,
@@ -105,14 +106,12 @@ export function WorkspaceSwitcher({
             <SidebarMenu className="mt-3">
                 <SidebarGroup className="p-0">
                     <SidebarMenu className="gap-1">
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5">
                                         <FolderKanban className="h-4 w-4 flex-shrink-0" />
-                                        <span>
-                                            Workspaces
-                                        </span>
+                                        <span>Workspaces</span>
                                         <ListFilter className="ml-auto h-3 w-3" />
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -155,7 +154,10 @@ export function WorkspaceSwitcher({
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     className="gap-2 p-2"
-                                    onClick={() => setShowWorkspaceDialog(true)}
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        setShowWorkspaceDialog(true);
+                                    }}
                                 >
                                     <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                                         <Plus className="size-4" />
@@ -220,12 +222,10 @@ export function WorkspaceSwitcher({
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarMenu>
-            {showWorkspaceDialog && (
-                <CreateWorkspace
-                    open={showWorkspaceDialog}
-                    onOpenChange={setShowWorkspaceDialog}
-                />
-            )}
+            <CreateWorkspace
+                open={showWorkspaceDialog}
+                onOpenChange={setShowWorkspaceDialog}
+            />
         </>
     );
 }

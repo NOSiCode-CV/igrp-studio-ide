@@ -69,7 +69,8 @@ export const GitHubService = {
               html_url: repo.html_url,
               clone_url: repo.clone_url,
               updated_at: repo.updated_at,
-              owner: repo.owner.login
+              owner: repo.owner.login,
+              platform: 'github',
             };
           } catch (error) {
             if ((error as any).status !== 404) {

@@ -98,7 +98,7 @@ const IDEInitialScreen = () => {
                         </TabsContent>
 
                         <TabsContent value="diagram" className="mt-0">
-                            {/*  <ProjectDiagram workspace={workspaceWithServices} /> */}
+                             {/*  <ProjectDiagram workspace={workspaceWithServices} />  */}
                         </TabsContent>
 
                         <TabsContent value="config" className="mt-0">

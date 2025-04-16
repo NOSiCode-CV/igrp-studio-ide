@@ -13,7 +13,7 @@ export interface IWorkspaceRepository {
     saveCustomWorkspaceComposeFile(yaml: object, basePath: string): Promise<void>;
 
     // Project Operations
-    saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
+    createProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
     updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
     deleteProject(projectId: string, basePath: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;

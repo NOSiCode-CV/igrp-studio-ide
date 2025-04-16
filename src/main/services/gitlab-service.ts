@@ -1,6 +1,7 @@
 import { Gitlab } from '@gitbeaker/node';
 import { GitStore } from './git-store';
 import { BrowserWindow } from 'electron';
+import { platform } from 'os';
 
 let gitlab: any = null;
 
@@ -104,7 +105,8 @@ export const GitLabService = {
                 clone_url: repo.http_url_to_repo,
                 updated_at: repo.last_activity_at,
                 owner: repo.namespace.path,
-                default_branch: defaultBranch
+                default_branch: defaultBranch,
+                platform: 'gitlab',
               };
             }
             

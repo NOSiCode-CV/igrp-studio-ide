@@ -124,10 +124,10 @@ export class WorkspaceRepository {
             updatedAt: new Date().toISOString()
         };
 
-        await this.addProjectToStudioWorkspace(workspace, newProject);
-
         const engine = EngineFactory.getEngine(project.framework);
         await engine.createProject(newProject, project.path);
+
+        await this.addProjectToStudioWorkspace(workspace, newProject);
 
         workspace.projects = workspace.projects || [];
         workspace.projects.push(newProject);
@@ -182,7 +182,7 @@ export class WorkspaceRepository {
                 throw new Error(`Workspace ${workspaceId} not found`);
             }
 
-            if (!(updates.framework as FrameworkType || !updates.config.name)) {
+            if ((!updates.framework || !updates.config.name)) {
                 throw new Error(`Invalid project configuration`);
             }
 

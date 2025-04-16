@@ -239,30 +239,38 @@ const Resources = () => {
         }
     };
 
-    const ProjectActions = () => (
-        <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Toggle size={'sm'} variant={'outline'}>
-                        <EllipsisVertical />
-                    </Toggle>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    <DropdownMenuItem onClick={onHandleOpenProjectClick}>
-                        <FolderOpen className="w-4 h-4 mr-2" />
-                        <span>{t('openProject')}</span>
-                    </DropdownMenuItem>
-                    <CloneProjectModal handleCloneProject={handleCloneProject}>
-                        <DropdownMenuItem>
+    const ProjectActions = () => {
+        const [openCloneProject, setOpenCloneProject] = useState(false);
+        return (
+            <>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Toggle size={'sm'} variant={'outline'}>
+                            <EllipsisVertical />
+                        </Toggle>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={onHandleOpenProjectClick}>
+                            <FolderOpen className="w-4 h-4 mr-2" />
+                            <span>{t('openProject')}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => setOpenCloneProject(true)}
+                        >
                             <GitFork className="w-4 h-4 mr-2" />
                             {t('cloneProject')}
                         </DropdownMenuItem>
-                    </CloneProjectModal>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            <ProjectWizard />
-        </>
-    );
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <ProjectWizard />
+                <CloneProjectModal
+                    handleCloneProject={handleCloneProject}
+                    open={openCloneProject}
+                    setOpen={setOpenCloneProject}
+                />
+            </>
+        );
+    };
 
     const ServiceActions = () => (
         <ConfigurationDialog services={filteredServices} isNew={true} />
@@ -330,7 +338,7 @@ const Resources = () => {
                             projectOrder={sortOrder}
                             services={services}
                         />
-                       {/*  <GitProject /> */}
+                        {/*  <GitProject /> */}
                     </>
                 ) : (
                     <ProjectList

@@ -158,7 +158,7 @@ const repo = {
 		// Project methods
 		findAllRecentProjects: (limit?: number) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, limit),
-		saveProject: async (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) => {
+		createProject: async (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) => {
 			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project) } catch (error) {
 				return handleError(error)
 			}

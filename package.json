@@ -30,7 +30,7 @@
 		"@hello-pangea/dnd": "^18.0.1",
 		"@hookform/resolvers": "^5.0.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
-		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.158",
+		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.159",
 		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.153",
 		"@igrp/igrp-studio-springboot-engine": "0.0.1-alpha.75",
 		"@monaco-editor/react": "^4.7.0",
@@ -136,7 +136,10 @@
 		"tailwindcss": "^4.1.4",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.3",
-		"vite": "^6.2.6"
+		"vite": "^6.3.0"
+	},
+	"resolutions": {
+		"@radix-ui/react-dismissable-layer": "^1.1.5"
 	},
 	"optionalDependencies": {
 		"dmg-license": "^1.0.11"

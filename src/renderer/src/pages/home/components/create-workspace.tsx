@@ -92,7 +92,7 @@ const CreateWorkspace = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} modal>
+        <Dialog open={open} onOpenChange={() => onOpenChange?.(!open)} modal>
             <DialogContent className="max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>{t('workspace.createTitle')}</DialogTitle>

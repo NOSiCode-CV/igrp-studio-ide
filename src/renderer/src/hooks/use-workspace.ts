@@ -37,7 +37,7 @@ export const useWorkspace = () => {
     );
 
     const { workspace, changeStatus } = useSelector(selectProperties);
-    
+
     const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(workspace)
 
     // Setup workspace and error handling
@@ -166,27 +166,34 @@ export const useWorkspace = () => {
         return null;
     };
 
-    const saveOrOpenProject = async (project: ProjectData) => {
+    const saveOrOpenProject = async (project: ProjectData, onSuccess?: () => Promise<void>) => {
         try {
             const { id } = project
             let result: any = {};
-
+console.log(project)
             if (id)
                 result = await window.igrpStudio.workspace.updateProject(id, project);
             else
-                result = await window.igrpStudio.workspace.saveProject(workspace?.id, project);
+                result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
             if (result?.error) {
+                console.log(result?.error)
                 throw new Error(result.error);
             }
 
             showSuccessToast('Project saved successfully');
+
             dispatch(setBasePath(project.path));
 
             dispatch(setConfig(project));
 
+            onSuccess?.()
+
             navigateToNextPage(navigate, project);
+
+
         } catch (err) {
+            console.log(err)
             showErrorToast(err);
         }
     }
