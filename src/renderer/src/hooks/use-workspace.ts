@@ -10,6 +10,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import yaml from 'js-yaml';
 import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
+import { useTranslation } from 'react-i18next';
 
 interface RootState {
     PageBuilder: {
@@ -21,6 +22,7 @@ interface RootState {
 const selectState = (state: RootState) => state.PageBuilder;
 
 export const useWorkspace = () => {
+    const { t } = useTranslation();
     const { showSuccessToast, showErrorToast } = useToast();
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
     const [loading, setLoading] = useState(true);
@@ -170,18 +172,18 @@ export const useWorkspace = () => {
         try {
             const { id } = project
             let result: any = {};
-console.log(project)
+
             if (id)
                 result = await window.igrpStudio.workspace.updateProject(id, project);
             else
                 result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
             if (result?.error) {
-                console.log(result?.error)
                 throw new Error(result.error);
             }
 
-            showSuccessToast('Project saved successfully');
+            if (!id)
+                showSuccessToast(t('savedSuccessfully', { name: project.name }));
 
             dispatch(setBasePath(project.path));
 
@@ -190,7 +192,6 @@ console.log(project)
             onSuccess?.()
 
             navigateToNextPage(navigate, project);
-
 
         } catch (err) {
             console.log(err)
@@ -232,9 +233,7 @@ console.log(project)
                 id: workspace.id,
                 service
             }
-
-            console.log(service)
-
+            console.log(data)
             if (service.id)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)
             else

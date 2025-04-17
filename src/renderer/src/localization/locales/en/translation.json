@@ -454,5 +454,6 @@
   "newService": "New Service",
   "services": "Services",
   "enableCustonValidation": "Enable Custon Validation",
-  "run": "Run"
+  "run": "Run",
+  "savedSuccessfully":"'{{name}}' saved successfully"
 }

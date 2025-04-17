@@ -29,14 +29,14 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                 }
 
                 // Handle object dependencies
-                return Object.entries(dependency).map(([depId, config]) => (
+                return Object.entries(dependency).map(([depId, _config]) => (
                     <Badge
                         key={`${depId}-${i}`}
                         variant="outline"
                         className="text-xs truncate"
                     >
                       {depId}
-                      {config?.condition ? ` (${config.condition})` : ''}
+                     {/*  {config?.condition ? ` (${config.condition})` : ''} */}
                     </Badge>
                 ));
             })}

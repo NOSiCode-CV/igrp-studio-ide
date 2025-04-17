@@ -62,8 +62,7 @@ export function ServiceGrid({ services }: ServiceGridProps) {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1">
-                                <PortsBadgeList ports={service.ports} />
-
+                                <PortsBadgeList ports={service.ports} />    
                                 <Dependency dependsOn={service.dependsOn} />
                             </div>
                         </CardContent>

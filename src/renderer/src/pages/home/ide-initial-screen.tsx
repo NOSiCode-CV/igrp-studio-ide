@@ -14,7 +14,8 @@ import {
 import { Container, FolderKanban, Network, Settings } from 'lucide-react';
 import { WorkspaceSettings } from './components/workspace-settings';
 import { WorkspaceDocker } from './components/workspace-docker';
-import Resources from './components/resources';
+import { WorkspaceDiagram } from './components/workspace-diagram';
+import Resources from './components/Resources';
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
@@ -98,13 +99,11 @@ const IDEInitialScreen = () => {
                         </TabsContent>
 
                         <TabsContent value="diagram" className="mt-0">
-                             {/*  <ProjectDiagram workspace={workspaceWithServices} />  */}
+                            {/* <WorkspaceDiagram workspace={workspace} /> */}
                         </TabsContent>
 
                         <TabsContent value="config" className="mt-0">
-                            <WorkspaceDocker
-                                workspace={workspace}
-                            />
+                            <WorkspaceDocker workspace={workspace} />
                         </TabsContent>
 
                         <TabsContent value="settings" className="mt-0">
