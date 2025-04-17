@@ -89,7 +89,7 @@ export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [val
                     { key: 'advanced', name: '', type: 'popoverController' }
                 ]
             },
-            { key: 'description', name: t('Description'), type: 'text', },
+            { key: 'description', name: t('description'), type: 'text', },
 
         ],
         pathVariables: [
@@ -107,7 +107,7 @@ export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [val
                     { key: 'advanced', name: '', type: 'popoverController' }
                 ]
             },
-            { key: 'description', name: t('Description'), type: 'text' },
+            { key: 'description', name: t('description'), type: 'text' },
 
         ],
         headers: [

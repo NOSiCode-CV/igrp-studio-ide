@@ -10,7 +10,7 @@ import {
     TableRow,
 } from '@renderer/components/ui/table';
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
-import Dependency from '../dependency';
+import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
 
 interface ServiceListProps {

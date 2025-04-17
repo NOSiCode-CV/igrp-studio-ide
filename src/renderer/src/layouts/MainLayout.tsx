@@ -13,7 +13,7 @@ import FooterSidebar from './components/footer-sidebar';
 import { Footer } from './components/footer';
 import { Toaster } from '@renderer/components/ui/sonner';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { WorkspaceSwitcher } from './components/workspace-switch';
+import { WorkspaceSwitcher } from '../pages/workspaces/components/workspace-switch';
 
 interface LayoutProps {
     children: React.ReactNode;

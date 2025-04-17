@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import WelcomeHeader from './components/welcome-header';
-import CreateWorkspace from './components/create-workspace';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import useToast from '@renderer/hooks/useToast';
 import Loader from '@renderer/components/loader';
@@ -12,10 +10,11 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Container, FolderKanban, Network, Settings } from 'lucide-react';
-import { WorkspaceSettings } from './components/workspace-settings';
-import { WorkspaceDocker } from './components/workspace-docker';
-import { WorkspaceDiagram } from './components/workspace-diagram';
-import Resources from './components/Resources';
+import WelcomeHeader from './workspaces/welcome-header';
+import Resources from './workspaces/resources';
+import { WorkspaceDocker } from './workspaces/workspace-docker';
+import { WorkspaceSettings } from './workspaces/workspace-settings';
+import CreateWorkspace from './workspaces/components/create-workspace';
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
@@ -114,7 +113,7 @@ const IDEInitialScreen = () => {
             )}
 
             {showWorkspaceDialog && (
-                <CreateWorkspace
+                <CreateWorkspace 
                     open={showWorkspaceDialog}
                     onSuccess={handleCreationSuccess}
                 />

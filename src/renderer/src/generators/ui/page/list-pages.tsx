@@ -28,7 +28,7 @@ import {
     IGRPTabsList,
     IGRPTabsTrigger,
 } from '@renderer/components/tabs';
-import ProjectSettings from '@renderer/pages/project-settings';
+import ProjectSettings from '@renderer/pages/project/project-settings';
 import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 import {
     ToggleGroup,

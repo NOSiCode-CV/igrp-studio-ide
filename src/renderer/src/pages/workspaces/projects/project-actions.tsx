@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus } from '@renderer/redux/thunks';
-import { ConfigurationDialog } from '../configuration-dialog';
+import { ConfigurationDialog } from '../components/configuration-dialog';
 
 interface ProjectDropdownProps {
     project: ProjectData;

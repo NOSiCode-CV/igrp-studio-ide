@@ -13,6 +13,8 @@ import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
+import { Label } from '@renderer/components/ui/label';
+import { Input } from '@renderer/components/ui/input';
 
 type TbodyType = 'none' | 'multipart/form-data' | 'application/json';
 
@@ -21,6 +23,7 @@ interface BodyRequestProps {
     columnsBody: any;
     contentTypes: { label: string; value: string }[];
     schemaTypes?: { label: string; value: string }[];
+    collectionTypes: any;
 }
 
 const routeFormData = 'requestBody';
@@ -37,12 +40,15 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     contentTypes,
     schemaTypes,
     columnsBody,
+    collectionTypes,
 }) => {
     const { t } = useTranslation();
 
     const [bodyType, setBodyType] = useState<TbodyType>('none');
 
     const [contentType, setContentType] = useState('application/json');
+    const [collectionType, setCollectionType] = useState<string>('none');
+    const [name, setName] = useState<string>('');
 
     const [data, setData] = useState<any[]>([]);
 
@@ -62,13 +68,12 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     const updateFormik = (content) => {
-
         const contentType = Object.keys(content)[0];
 
         const schema = content?.[contentType]?.['schema'];
 
         if (JSON.stringify(requestBodyContent) !== JSON.stringify(content)) {
-            formik.setFieldValue(routeFormData, { content });
+            formik.setFieldValue(routeFormData, { ...formik.values.requestBody,  content });
 
             setLocalSchema(schema);
         }
@@ -88,7 +93,6 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
     useEffect(() => {
         const data = jsonSchemaToArray(localSchema);
-
         if (bodyType === 'multipart/form-data') setData(data);
     }, [bodyType]);
 
@@ -127,6 +131,25 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     useEffect(() => {
+        const schema = requestBodyContent?.[contentType]?.['schema'];
+
+        const content = {
+            [contentType]: {
+                schema: {
+                    ...schema,
+                    collectionType,
+                },
+            },
+        };
+
+        updateFormik(content);
+    }, [collectionType]);
+
+    useEffect(() => {
+        formik.setFieldValue(routeFormData, { ...formik.values.requestBody, name });
+    }, [name]);
+
+    useEffect(() => {
         if (data.length === 0) return;
         const transformedData = {
             type: 'object',
@@ -160,39 +183,35 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     return (
-        <div>
-            <div className="mb-4">
-                <div className="flex space-x-4 text-sm">
-                    <Badge
-                        onClick={() => setBodyType('none')}
-                        variant={bodyType === 'none' ? 'default' : 'outline'}
-                        className="cursor-pointer"
-                    >
-                        {t('none')}
-                    </Badge>
-                    <Badge
-                        onClick={() => setBodyType('multipart/form-data')}
-                        variant={
-                            bodyType === 'multipart/form-data'
-                                ? 'default'
-                                : 'outline'
-                        }
-                        className="cursor-pointer"
-                    >
-                        {t('formData')}
-                    </Badge>
-                    <Badge
-                        onClick={() => setBodyType('application/json')}
-                        variant={
-                            bodyType === 'application/json'
-                                ? 'default'
-                                : 'outline'
-                        }
-                        className="cursor-pointer"
-                    >
-                        {t('json')}
-                    </Badge>
-                </div>
+        <div className="flex flex-col gap-4 mt-4">
+            <div className="flex space-x-4 text-sm">
+                <Badge
+                    onClick={() => setBodyType('none')}
+                    variant={bodyType === 'none' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                >
+                    {t('none')}
+                </Badge>
+                <Badge
+                    onClick={() => setBodyType('multipart/form-data')}
+                    variant={
+                        bodyType === 'multipart/form-data'
+                            ? 'default'
+                            : 'outline'
+                    }
+                    className="cursor-pointer"
+                >
+                    {t('formData')}
+                </Badge>
+                <Badge
+                    onClick={() => setBodyType('application/json')}
+                    variant={
+                        bodyType === 'application/json' ? 'default' : 'outline'
+                    }
+                    className="cursor-pointer"
+                >
+                    {t('json')}
+                </Badge>
             </div>
             {bodyType === 'none' && (
                 <div className="text-center rounded p-8 border">
@@ -202,31 +221,55 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 </div>
             )}
             {bodyType === 'multipart/form-data' && data && columnsBody && (
-                <FormList
-                    columns={columnsBody}
-                    data={data}
-                    formik={formik}
-                    changeValue={(element, position, value) => {
-                        onChangeBody(element, position, value);
-                    }}
-                    addRow={() => {
-                        setData((prev) => [...prev, defaultValue]);
-                    }}
-                    removeRow={(position) => {
-                        setData((prev) =>
-                            prev.filter((_row, index) => index !== position)
-                        );
-                    }}
-                    name={routeFormData}
-                    btnLabels={t('field')}
-                />
+                <>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-2 w-full">
+                            <Label>{t('collectionType')}</Label>
+                            <IGRPCombobox
+                                options={collectionTypes}
+                                value={collectionType}
+                                onChange={(collectionType) =>
+                                    setCollectionType(collectionType as string)
+                                }
+                                className="w-full focus:ring-igrp focus:border-igrp h-9"
+                                placeholder={t('selectCollectionType')}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label>{t('name')}</Label>
+                            <Input
+                                name={t('name')}
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <FormList
+                        columns={columnsBody}
+                        data={data}
+                        formik={formik}
+                        changeValue={(element, position, value) => {
+                            onChangeBody(element, position, value);
+                        }}
+                        addRow={() => {
+                            setData((prev) => [...prev, defaultValue]);
+                        }}
+                        removeRow={(position) => {
+                            setData((prev) =>
+                                prev.filter((_row, index) => index !== position)
+                            );
+                        }}
+                        name={routeFormData}
+                        btnLabels={t('field')}
+                    />
+                </>
             )}
             {bodyType === 'application/json' && (
                 <div className="space-y-3">
                     <IGRPCombobox
                         value={contentType}
                         placeholder={t('selectContentType')}
-                        onChange={(value) => setContentType(value)}
+                        onChange={(value) => setContentType(value as string)}
                         options={contentTypes}
                         className="w-1/3 focus:ring-igrp focus:border-igrp h-8"
                     />

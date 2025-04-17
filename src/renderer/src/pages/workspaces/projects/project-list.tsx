@@ -11,7 +11,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
-import Dependency from '../dependency';
+import Dependency from '../components/dependency';
 import { ProjectActions } from './project-actions';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 

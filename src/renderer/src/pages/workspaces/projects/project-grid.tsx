@@ -13,7 +13,7 @@ import { getLocale } from '@renderer/utils/helpers';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import { ProjectActions } from './project-actions';
 import { Button } from '@renderer/components/ui/button';
-import { PortsBadgeList } from '../ports-badge-list';
+import { PortsBadgeList } from '../components/ports-badge-list';
 
 interface ProjectProps {
     projects: ProjectData[];

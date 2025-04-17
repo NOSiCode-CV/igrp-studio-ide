@@ -40,7 +40,7 @@ import {
     getServiceIcon,
     networkTypes,
     serviceTypes,
-} from './services';
+} from '../services';
 import { extractDefaults } from '@renderer/utils/helpers';
 import {
     Port,

@@ -19,7 +19,7 @@ import {
 } from '@renderer/components/ui/sidebar';
 import { IWorkspace } from 'src/main/types';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
-import CreateWorkspace from '@renderer/pages/home/components/create-workspace';
+import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace';
 import { cn } from '@renderer/lib/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { Button } from '@renderer/components/ui/button';

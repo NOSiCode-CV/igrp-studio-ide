@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import ControllerOverview from './controller/overview';
 import { ResponseLayout } from './response';
 import ERDLayout from './diagram';
-import { EnumLayout } from './enum/EnumLayout';
+import { EnumLayout } from './enum';
 import { EditorLayout } from './EditorLayout';
 import { FileTree, ProjectData } from 'src/main/types';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';

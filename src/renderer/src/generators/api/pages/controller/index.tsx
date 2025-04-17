@@ -159,6 +159,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                             tablesColumns={tablesColumns}
                             contentTypes={typesData}
                             schemaTypes={schemaTypes}
+                            collectionTypes={collectionType}
                         />
                     </TabsContent>
                     <TabsContent value={'response'}>

@@ -37,7 +37,7 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Toggle } from '@renderer/components/ui/toggle';
 import { ServiceGrid } from './services/service-grid';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
-import { ConfigurationDialog } from './configuration-dialog';
+import { ConfigurationDialog } from './components/configuration-dialog';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { ServiceList } from './services/service-list';
 import { ProjectList } from './projects/project-list';

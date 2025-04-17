@@ -175,9 +175,9 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                         </TabsList>
                         {TabList.map(({ value }, key) => (
                             <TabsContent key={key} value={value}>
-                                <Card className="rounded-sm">
+                                <div className="border pt-3 rounded-sm">
                                     {renderFormList(value)}
-                                </Card>
+                                </div>
                             </TabsContent>
                         ))}
                     </Tabs>

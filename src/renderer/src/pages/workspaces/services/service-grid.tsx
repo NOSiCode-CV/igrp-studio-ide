@@ -8,10 +8,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@renderer/components/ui/card';
-import Dependency from '../dependency';
+import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
-import { PortsBadgeList } from '../ports-badge-list';
+import { PortsBadgeList } from '../components/ports-badge-list';
 interface ServiceGridProps {
     services: any[];
     workspaceId?: string;

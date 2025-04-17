@@ -111,9 +111,9 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                             </div>
                         </div>
                         {TabList.map(({ value }) => (
-                            <Card className="rounded-sm gap-0" key={value}>
+                            <div className="border pt-3 rounded-sm gap-0 p-0" key={value}>
                                 {renderFormList(value)}
-                            </Card>
+                            </div>
                         ))}
                     </div>
                 </Card>

@@ -16,7 +16,7 @@ import {
     MoreVertical,
     Trash,
 } from 'lucide-react';
-import { ConfigurationDialog } from '../configuration-dialog';
+import { ConfigurationDialog } from '../components/configuration-dialog';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { useState } from 'react';
 import useToast from '@renderer/hooks/useToast';

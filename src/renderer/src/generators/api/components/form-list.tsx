@@ -118,7 +118,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     // Renderização de erros
     const renderErrors = () => {
         return (
-            <>
+            <div className='px-3'>
                 {Array.isArray(errors) &&
                     errors.map((erro, index) => {
                         if (typeof erro === 'string') {
@@ -132,7 +132,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             return Object.entries(erro).map(([key, mensagem], subIndex) =>
                                 mensagem !== undefined && (
                                     <p className="text-xs text-red-500 italic" key={`${index}-${subIndex}`}>
-                                        <strong>{key.toUpperCase()}:</strong>
+                                        <strong>{key.toUpperCase()}: </strong>
                                         {mensagem as string}
                                     </p>
                                 )
@@ -140,7 +140,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         }
                         return null;
                     })}
-            </>
+            </div>
         );
     };
 

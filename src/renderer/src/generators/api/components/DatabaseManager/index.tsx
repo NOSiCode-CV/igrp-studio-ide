@@ -191,7 +191,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent
-                className="max-w-[900px]"
+                className="sm:max-w-[600px] md:max-w-[900px] max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <DialogHeader>

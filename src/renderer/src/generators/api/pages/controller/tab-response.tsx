@@ -239,7 +239,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             )}
                         >
                             <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <LabelRequired>
                                         {t('httpStatusCode')}
                                     </LabelRequired>
@@ -248,7 +248,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         value={statusCode}
                                         onChange={(value) =>
                                             handleAddResponse({
-                                                statusCode: value,
+                                                statusCode: value as string,
                                                 oldStatusCode: statusCode,
                                                 description,
                                                 name,
@@ -263,7 +263,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         )}
                                     />
                                 </div>
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <Label>{t('name')}</Label>
                                     <Input
                                         name={t('name')}
@@ -280,7 +280,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         }
                                     />
                                 </div>
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <LabelRequired>
                                         {t('contentType')}
                                     </LabelRequired>
@@ -292,7 +292,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 statusCode,
                                                 description,
                                                 name,
-                                                contentType: value,
+                                                contentType: value as string,
                                                 type,
                                                 collectionType,
                                             })
@@ -302,7 +302,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
 
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <LabelRequired>{t('type')}</LabelRequired>
                                     <TypeSelectorDropdown
                                         type={type}
@@ -324,7 +324,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     </TypeSelectorDropdown>
                                 </div>
 
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <Label>{t('collectionType')}</Label>
                                     <IGRPCombobox
                                         options={collectionTypes}
@@ -362,7 +362,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             </div>
 
                             {/* Descritpion */}
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
                                 <Label>{t('description')}</Label>
                                 <Input
                                     type="text"
