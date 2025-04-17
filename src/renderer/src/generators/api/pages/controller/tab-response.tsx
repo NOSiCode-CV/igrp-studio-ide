@@ -53,6 +53,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         description?: string;
         type?: any;
         collectionType?: any;
+        oldStatusCode?: string;
     }) => {
         const {
             name,
@@ -61,6 +62,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
             contentType,
             type: newType,
             collectionType = 'none',
+            oldStatusCode,
         } = response;
 
         const isValueObject = typeof newType === 'object' && newType !== null;
@@ -75,20 +77,29 @@ export const TabResponse: React.FC<TabResponseProps> = ({
               ? 'dto'
               : '';
 
-        const updatedResponses = {
-            ...formik.values.responses,
-            [statusCode]: {
-                name,
-                description,
-                content: {
-                    [contentType]: {
-                        schema: {
-                            type,
-                            objectType,
-                            name: 'data',
-                            collectionType,
-                            module,
-                        },
+        // Create a copy of the current responses
+        const updatedResponses = { ...formik.values.responses };
+
+        // If we're changing the status code (oldStatusCode exists and is different)
+        if (oldStatusCode && oldStatusCode !== statusCode) {
+            // Remove the old entry if it exists
+            if (updatedResponses[oldStatusCode]) {
+                delete updatedResponses[oldStatusCode];
+            }
+        }
+
+        // Update or create the response
+        updatedResponses[statusCode] = {
+            name,
+            description,
+            content: {
+                [contentType]: {
+                    schema: {
+                        type,
+                        objectType,
+                        name: 'data',
+                        collectionType,
+                        module,
                     },
                 },
             },
@@ -166,6 +177,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                 <div className="flex space-x-4">
                     {Object.keys(responses).map((statusCode) => (
                         <button
+                            type="button"
                             key={statusCode}
                             onClick={() => setActiveResponseTab(statusCode)}
                             className={cn(
@@ -237,6 +249,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         onChange={(value) =>
                                             handleAddResponse({
                                                 statusCode: value,
+                                                oldStatusCode: statusCode,
                                                 description,
                                                 name,
                                                 contentType,
