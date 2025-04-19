@@ -85,7 +85,7 @@ export default function MultipleSelector({
                             <CommandInput placeholder={placeholder} />
                             <CommandEmpty>No item found.</CommandEmpty>
                             <CommandGroup>
-                                {options.map((option) => (
+                                {options && options.map((option) => (
                                     <CommandItem
                                         key={option.value}
                                         onSelect={() => {

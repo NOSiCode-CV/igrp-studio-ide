@@ -17,7 +17,7 @@ import {
     AccordionTrigger,
 } from '@renderer/components/ui/accordion';
 import {
-    Tabs,
+    Tabs,  
     TabsContent,
     TabsList,
     TabsTrigger,
@@ -71,6 +71,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                     componentName
                 );
                 setPropsComponent(data);
+                console.log('data', data);
 
                 // Initialize form values
                 const initialValues = Object.entries(data).reduce(

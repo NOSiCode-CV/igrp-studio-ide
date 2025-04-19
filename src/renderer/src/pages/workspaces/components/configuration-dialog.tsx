@@ -56,6 +56,7 @@ interface ConfigurationDialogProps {
     projects?: ProjectData[];
     isNew?: boolean;
     children?: React.ReactNode;
+    isProject?: boolean;
 }
 
 export function ConfigurationDialog({
@@ -64,6 +65,7 @@ export function ConfigurationDialog({
     projects = [],
     isNew = true,
     children,
+    isProject = false,
 }: ConfigurationDialogProps) {
     const { t } = useTranslation();
     const [name, setName] = useState('');
@@ -291,7 +293,7 @@ export function ConfigurationDialog({
             ...rest
         } = template || {};
 
-        const { id: serviceId,environment, ...restService } = service;
+        const { id: serviceId, environment, ...restService } = service;
 
         const _ports: Port[] = ports.map((portStr) => {
             const [external, internal] = portStr.split(':').map(Number);
@@ -310,7 +312,7 @@ export function ConfigurationDialog({
             ],
             [...(template?.labels || [])]
         );
-        
+
         // Create service object
         const serviceData: WorkspaceService = {
             id: service?.labels.uuid || '',
@@ -340,7 +342,7 @@ export function ConfigurationDialog({
     };
 
     const onSave = (data: any) => {
-        createOrUpdateService(data);
+        createOrUpdateService(data, isProject);
     };
 
     return (
@@ -351,7 +353,7 @@ export function ConfigurationDialog({
                 ) : (
                     <Button
                         variant="outline"
-                        className="bg-igrp text-primary-foreground"
+                        className="bg-igrp text-primary-foreground dark:bg-primary"
                     >
                         <PlusCircle className="w-4 h-4" />
                         {t('newService')}
@@ -734,7 +736,8 @@ export function ConfigurationDialog({
                                                         (s) =>
                                                             s.name !==
                                                                 service?.name &&
-                                                            !s.labels?.is_project
+                                                            !s.labels
+                                                                ?.is_project
                                                     )
                                                     .map((s, index) => (
                                                         <div

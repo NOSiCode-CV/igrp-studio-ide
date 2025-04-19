@@ -3,10 +3,9 @@ import { IWorkspace, ProjectData } from '../types';
 import { WorkspaceRepository } from '../services/workspace-service';
 import { ERROR_CODES, EVENTS } from '../constants/events';
 import { handleWithCustomErrors } from '../helpers';
-import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ServiceWorkspace, } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const repo = new WorkspaceRepository();
-
 
 // Initialize repository
 ipcMain.handle(EVENTS.REPOSITORY.INITIALIZE, async () => {

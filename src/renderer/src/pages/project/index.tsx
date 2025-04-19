@@ -568,7 +568,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 ) : (
                     <Button
                         variant="outline"
-                        className="bg-igrp text-primary-foreground"
+                        className="bg-igrp text-primary-foreground dark:bg-primary"
                     >
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}

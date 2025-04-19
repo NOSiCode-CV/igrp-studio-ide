@@ -45,7 +45,7 @@ const PreviewMenu = ({ basePath }: LogTerminalProps) => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" size="icon">
+                        <Button variant="secondary" size="sm">
                             <MoreVertical className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>

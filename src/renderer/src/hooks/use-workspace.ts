@@ -42,17 +42,6 @@ export const useWorkspace = () => {
 
     const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(workspace)
 
-    // Setup workspace and error handling
-    useEffect(() => {
-        const initialize = async () => {
-            await window.igrpStudio.workspace.initialize();
-        };
-
-        initialize();
-
-        refreshWorkspaces()
-    }, []);
-
     const getWorkspaces = async () => {
         return await window.igrpStudio.workspace.findAllWorkspaces();
     }
@@ -179,7 +168,9 @@ export const useWorkspace = () => {
                 result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
             if (result?.error) {
-                throw new Error(result.error);
+                console.log(result?.error)
+                showErrorToast(result?.error);
+                return
             }
 
             if (!id)
@@ -194,7 +185,6 @@ export const useWorkspace = () => {
             navigateToNextPage(navigate, project);
 
         } catch (err) {
-            console.log(err)
             showErrorToast(err);
         }
     }
@@ -225,16 +215,21 @@ export const useWorkspace = () => {
         });
     }
 
-    const createOrUpdateService = async (service: WorkspaceService) => {
+    const createOrUpdateService = async (service: WorkspaceService, isProject: boolean) => {
         let result: any = {};
         try {
+            const { id: serviceId } = service
+
 
             const data: ServiceWorkspace = {
                 id: workspace.id,
                 service
             }
             console.log(data)
-            if (service.id)
+
+            if (isProject)
+                result = await window.igrpStudio.workspace.updateProject(serviceId, data)
+            else if (serviceId)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)
             else
                 result = await window.igrpStudio.workspace.createService(data, workspace.path)

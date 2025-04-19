@@ -206,7 +206,7 @@ export class WorkspaceRepository {
 
             foundProject = updatedProject;
 
-        }
+        } 
 
         await this.saveData(data);
 

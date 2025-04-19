@@ -11,7 +11,7 @@ import { Button } from '@renderer/components/ui/button';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import useToast from '@renderer/hooks/useToast';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
-import { Trash, Repeat, MoreVertical, Edit, ExternalLink } from 'lucide-react';
+import { Trash, Repeat, MoreVertical, Edit, ExternalLink, ConstructionIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProjectData, ServiceInfo } from 'src/main/types';
@@ -126,6 +126,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                             services={services}
                             projects={projects}
                             isNew={false}
+                            isProject
                         >
                             <DropdownMenuItem
                                 onSelect={(e) => e.preventDefault()}

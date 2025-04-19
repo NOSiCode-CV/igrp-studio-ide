@@ -73,7 +73,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         const schema = content?.[contentType]?.['schema'];
 
         if (JSON.stringify(requestBodyContent) !== JSON.stringify(content)) {
-            formik.setFieldValue(routeFormData, { ...formik.values.requestBody,  content });
+            formik.setFieldValue(routeFormData, {
+                ...formik.values.requestBody,
+                content,
+            });
 
             setLocalSchema(schema);
         }
@@ -146,7 +149,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     }, [collectionType]);
 
     useEffect(() => {
-        formik.setFieldValue(routeFormData, { ...formik.values.requestBody, name });
+        formik.setFieldValue(routeFormData, {
+            ...formik.values.requestBody,
+            name,
+        });
     }, [name]);
 
     useEffect(() => {
@@ -181,6 +187,31 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
               }
             : null;
     };
+
+    const RenderFields = () => (
+        <>
+            <div className="flex flex-col gap-2 w-full">
+                <Label>{t('collectionType')}</Label>
+                <IGRPCombobox
+                    options={collectionTypes}
+                    value={collectionType}
+                    onChange={(collectionType) =>
+                        setCollectionType(collectionType as string)
+                    }
+                    className="w-full focus:ring-igrp focus:border-igrp h-9"
+                    placeholder={t('selectCollectionType')}
+                />
+            </div>
+            <div className="flex flex-col gap-2">
+                <Label>{t('name')}</Label>
+                <Input
+                    name={t('name')}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+            </div>
+        </>
+    );
 
     return (
         <div className="flex flex-col gap-4 mt-4">
@@ -223,26 +254,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             {bodyType === 'multipart/form-data' && data && columnsBody && (
                 <>
                     <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col gap-2 w-full">
-                            <Label>{t('collectionType')}</Label>
-                            <IGRPCombobox
-                                options={collectionTypes}
-                                value={collectionType}
-                                onChange={(collectionType) =>
-                                    setCollectionType(collectionType as string)
-                                }
-                                className="w-full focus:ring-igrp focus:border-igrp h-9"
-                                placeholder={t('selectCollectionType')}
-                            />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Label>{t('name')}</Label>
-                            <Input
-                                name={t('name')}
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                        </div>
+                        {RenderFields()}
                     </div>
                     <FormList
                         columns={columnsBody}
@@ -266,47 +278,49 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             )}
             {bodyType === 'application/json' && (
                 <div className="space-y-3">
-                    <IGRPCombobox
-                        value={contentType}
-                        placeholder={t('selectContentType')}
-                        onChange={(value) => setContentType(value as string)}
-                        options={contentTypes}
-                        className="w-1/3 focus:ring-igrp focus:border-igrp h-8"
-                    />
-                    <Card className="rounded">
-                        <CardContent className="p-3">
-                            <Tabs defaultValue="schema">
-                                <TabsList>
-                                    <TabsTrigger value="value">
-                                        {t('value')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="schema">
-                                        {t('dataSchema')}
-                                    </TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="value">
-                                    <MonacoEditor
-                                        content={JSON.stringify(
-                                            localSchema,
-                                            null,
-                                            2
-                                        )}
-                                        filePath=""
-                                        onChange={handleChangeEditor}
-                                        height="20vh"
-                                        language="json"
-                                    />
-                                </TabsContent>
-                                <TabsContent value="schema">
-                                    <JSONSchemaBuilder
-                                        schemaTypes={schemaTypes}
-                                        initialSchema={getContentToSchemaProps()}
-                                        onSchemaChange={handleSchemaChange}
-                                    />
-                                </TabsContent>
-                            </Tabs>
-                        </CardContent>
-                    </Card>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-2">
+                            <Label>{t('contentType')}</Label>
+                            <IGRPCombobox
+                                value={contentType}
+                                placeholder={t('selectContentType')}
+                                onChange={(value) =>
+                                    setContentType(value as string)
+                                }
+                                options={contentTypes}
+                                className="focus:ring-igrp focus:border-igrp h-8"
+                            />
+                        </div>
+                        {RenderFields()}
+                    </div>
+                    <Tabs defaultValue="schema">
+                        <TabsList>
+                            <TabsTrigger value="value">
+                                {t('value')}
+                            </TabsTrigger>
+                            <TabsTrigger value="schema">
+                                {t('dataSchema')}
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="value">
+                            <MonacoEditor
+                                content={JSON.stringify(localSchema, null, 2)}
+                                filePath=""
+                                onChange={handleChangeEditor}
+                                height="20vh"
+                                language="json"
+                            />
+                        </TabsContent>
+                        <TabsContent value="schema">
+                            <div className='border'>
+                                <JSONSchemaBuilder
+                                    schemaTypes={schemaTypes}
+                                    initialSchema={getContentToSchemaProps()}
+                                    onSchemaChange={handleSchemaChange}
+                                />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             )}
         </div>

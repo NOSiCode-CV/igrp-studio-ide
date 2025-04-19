@@ -1,4 +1,4 @@
-import { IGRPButton, IGRPChat, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPRadioButton, IGRPTextarea } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPChat, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -37,7 +37,6 @@ import {
     Activity,
     AlignLeft,
     GitMerge,
-    MessageSquare,
     MessageCircle,
     Bell as BellIcon,
     FormInput as Form,
@@ -56,6 +55,12 @@ import {
     LayoutList,
     Code,
     Heart,
+    PieChart,
+    AreaChart,
+    LineChart,
+    ChartBarBig,
+    ChartColumnBig,
+    CaseSensitive,
 } from 'lucide-react';
 
 // Constants
@@ -100,7 +105,7 @@ export const COMPONENT: Record<string, string> = {
     Password: "inputPassword",
     Textarea: 'inputTextarea',
     ColorPicker: "inputColor",
-    Select: "select",
+    Select: "combobox",
     AddOn: "inputAddOn",
     Checkbox: "checkbox",
     Radio: "radio",
@@ -109,6 +114,7 @@ export const COMPONENT: Record<string, string> = {
     Phone: "inputPhone",
     RangeSlider: "slider",
     FileUpload: "inputFile",
+    Hidden: "inputHidden",
 
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
@@ -117,7 +123,6 @@ export const COMPONENT: Record<string, string> = {
     TableAmountCell: 'tableAmountCell',
     Headline: 'headline',
     Label: 'label',
-    Chat: 'chat',
     Icon: 'icon',
 
     Box: 'box',
@@ -125,17 +130,28 @@ export const COMPONENT: Record<string, string> = {
     Card: 'card',
     Tabs: 'tabs',
 
+    Badge: 'badge',
+
     iFrame: 'iFrame',
     InfoPanel: 'infoPanel',
     Alerts: 'alerts',
-    Badges: 'badges',
     Ratings: 'ratings',
 
     EmbedVideo: 'embedVideo',
 
     CardContent: "cardContent",
     CardFooter: "cardFooter",
-    CardHeader: "cardHeader"
+    CardHeader: "cardHeader",
+
+    Piechart : 'piechart',
+    Chat: 'chat',
+    Areachart: 'areachart',
+    Linechart: 'linechart',
+    Barchart: 'barchart',
+    HorizontalBarchart: 'horizontalBarchart',
+    VerticalBarchart:"verticalBarchart",
+    RadialBarchart: "radialBarchart",
+    Radarchart: "radarchart",
 };
 
 // Icon Mapping
@@ -144,7 +160,8 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.InputText]: FormInput,
     [COMPONENT.AddOn]: FormInput,
     [COMPONENT.Number]: FormInput,
-    [COMPONENT.Label]: FormInput,
+    [COMPONENT.Label]: CaseSensitive,
+    [COMPONENT.Hidden]: FormInput,
     [COMPONENT.Date]: Calendar,
     [COMPONENT.DatePicker]: Calendar,
     [COMPONENT.InputDatePicker]: Calendar,
@@ -179,7 +196,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.InfoPanel]: Info,
     [COMPONENT.Calendar]: CalendarIcon,
     [COMPONENT.Alerts]: Bell,
-    [COMPONENT.Badges]: Badge,
+    [COMPONENT.Badge]: Badge,
     [COMPONENT.Ratings]: Star,
     [COMPONENT.EmbedVideo]: Video,
     [COMPONENT.Progress]: Activity,
@@ -191,13 +208,20 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Columns]: Columns2,
     [COMPONENT.Column]: Columns2,
     [COMPONENT.Headline]: Heading1,
-    [COMPONENT.Chat]: MessageSquare,
     [COMPONENT.Dropdown]: Ellipsis,
     [COMPONENT.Icon]: Heart,
 
+    [COMPONENT.Piechart]: PieChart,
+    [COMPONENT.Areachart]: AreaChart,
+    [COMPONENT.Linechart]: LineChart,
+    [COMPONENT.HorizontalBarchart]: ChartBarBig,
+    [COMPONENT.VerticalBarchart]: ChartColumnBig,
+
+    [COMPONENT.Chat]: MessageCircle,
+
     accordion: AlignLeft,
     treeView: GitMerge,
-    modal: MessageCircle,
+    
     notifications: BellIcon,
 
     stack: Table2,
@@ -243,5 +267,15 @@ export const COMPONENT_MAP = {
     [COMPONENT.Radio]: IGRPRadioButton,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
-    [COMPONENT.Chat]: IGRPChat
+    [COMPONENT.Chat]: IGRPChat,
+
+    [COMPONENT.Piechart]: IGRPPieChart,
+    [COMPONENT.Areachart]: IGRPAreaChart,
+    [COMPONENT.Linechart]: IGRPLineChart,
+    [COMPONENT.HorizontalBarchart]: IGRPHorizontalBarChart,
+    [COMPONENT.VerticalBarchart]: IGRPVerticalBarChart,
+    [COMPONENT.Radarchart]: IGRPRadarChart,
+    [COMPONENT.RadialBarchart]: IGRPRadialBarChart,
+
+    [COMPONENT.Badge]: IGRPBadge,
 };

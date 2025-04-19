@@ -50,6 +50,7 @@ import AppUpdater from './helpers/electron-updater';
 import { autoUpdater } from 'electron-updater';
 import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection';
 import { NextjsEngine } from './engines/NextjsEngine';
+import { WorkspaceRepository } from './services/workspace-service';
 
 const backend = require('i18next-electron-fs-backend');
 
@@ -242,6 +243,8 @@ app.whenReady().then(async () => {
     });
 
     new NextjsEngine().registry();
+
+    new WorkspaceRepository().initialize();
 
     new AppUpdater(mainWindow);
 });
