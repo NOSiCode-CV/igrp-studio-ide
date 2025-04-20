@@ -101,7 +101,9 @@ export const getStatusLabel = (statusCode: string): string => {
 export const toInitCap = (text: string) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
 
 export const getIcon = (folderName: string): LucideIcon => {
-	if (!folderName) return Circle
+
+	if (!folderName || typeof folderName !== 'string') return Circle;
+  
 	switch (folderName.toLowerCase()) {
 		case 'controllers':
 			return FileCode;

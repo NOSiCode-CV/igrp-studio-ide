@@ -320,6 +320,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                 />
                             </div>
                         </TabsContent>
+                        
                     </Tabs>
                 </div>
             )}

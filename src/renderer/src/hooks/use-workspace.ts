@@ -173,8 +173,7 @@ export const useWorkspace = () => {
                 return
             }
 
-            if (!id)
-                showSuccessToast(t('savedSuccessfully', { name: project.name }));
+            showSuccessToast(t('savedSuccessfully', { name: project.name }));
 
             dispatch(setBasePath(project.path));
 

@@ -12,14 +12,7 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@renderer/components/ui/sidebar';
-import {
-    Badge,
-    ChevronRight,
-    FileText,
-    GitBranch,
-    Home,
-    Server,
-} from 'lucide-react';
+import { ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -37,7 +30,6 @@ import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
-import { useNavSettings } from './nav-data';
 
 interface AppSidebarProps {
     className?: string;
@@ -59,10 +51,8 @@ export function AppSidebar({
     const { state: sidebarState } = useSidebar();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
+
     const menuApp = filterSubItems(menuItems, searchQuery);
-
-    const { menuItems: othersMenus } = useNavSettings();
-
     const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
     const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
@@ -85,30 +75,13 @@ export function AppSidebar({
     const handleClickMenu = (item: MenuItem) => {
         setActiveMenuGroup(item.label);
         if (item.id === 'apis') setActiveMenu(menuApp);
-        else if (item.id === 'settings') {
-            const menuApp = filterSubItems(othersMenus, searchQuery);
-            setActiveMenu(menuApp);
-        } else setActiveMenu([]);
+        else setActiveMenu([]);
     };
 
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-        /*   {
-            icon: FileText,
-            label: t('documents'),
-            id: 'documents',
-        }, */
-        {
-            icon: Badge,
-            label: t('settings'),
-            id: 'settings',
-        },
-        {
-            icon: GitBranch,
-            label: t('git'),
-            id: 'git',
-        },
+        { icon: GitBranch, label: t('git'), id: 'git' },
     ];
 
     return (
