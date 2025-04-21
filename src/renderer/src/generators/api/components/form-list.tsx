@@ -12,7 +12,7 @@ import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { GripVertical, Plus, Trash } from 'lucide-react';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import MultipleSelector from '@renderer/components/multiples-selector';
 import { cn } from '@renderer/lib/utils';
 import {
@@ -118,7 +118,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     // Renderização de erros
     const renderErrors = () => {
         return (
-            <div className="p-1">
+            <div className='px-3'>
                 {Array.isArray(errors) &&
                     errors.map((erro, index) => {
                         if (typeof erro === 'string') {
@@ -132,7 +132,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             return Object.entries(erro).map(([key, mensagem], subIndex) =>
                                 mensagem !== undefined && (
                                     <p className="text-xs text-red-500 italic" key={`${index}-${subIndex}`}>
-                                        <strong>{key.toUpperCase()}:</strong>
+                                        <strong>{key.toUpperCase()}: </strong>
                                         {mensagem as string}
                                     </p>
                                 )
@@ -218,7 +218,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         placeholder={`Select ${name}`}
                         options={dynamicOptions[`${index}-${key}`] || options}
                         value={selectMultiValues}
-                        onChange={(selectedOption) => changeValue(key, index, selectedOption)}
+                        onChange={(selectedOption) => {console.log(key, index, selectedOption);changeValue(key, index, selectedOption)}}
                     />
                 );
             case 'checkbox':
@@ -273,6 +273,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         type={row?.[key] || ''}
                         onTypeChange={(dataType: any) => changeValue(key, index, dataType)}
                         schemaTypes={options}
+                        variant={'outline'}
                     />
                 );
             default:

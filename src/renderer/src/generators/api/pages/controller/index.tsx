@@ -100,14 +100,14 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+                        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <div className="flex flex-col gap-3 md:col-span-2 space-y-2">
                                 <IGRPInputAddOn
                                     selectValue={formik.values.method}
                                     value={formik.values.path}
                                     labelText={t('methodType')}
                                     options={httpMethods}
-                                    placeholder={'posts'}
+                                    placeholder={'posts/{id}'}
                                     onBlur={formik.handleBlur}
                                     onChange={(e) =>
                                         formik.setFieldValue(
@@ -159,6 +159,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                             tablesColumns={tablesColumns}
                             contentTypes={typesData}
                             schemaTypes={schemaTypes}
+                            collectionTypes={collectionType}
                         />
                     </TabsContent>
                     <TabsContent value={'response'}>

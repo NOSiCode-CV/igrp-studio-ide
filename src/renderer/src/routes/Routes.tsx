@@ -8,10 +8,10 @@ import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayout';
 import { Loader } from 'lucide-react';
 
 const IDEInitialScreen = lazy(
-    () => import('@renderer/pages/home/ide-initial-screen')
+    () => import('@renderer/pages/ide-initial-screen')
 );
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'));
-const ProjectSettings = lazy(() => import('@renderer/pages/project-settings'));
+const ProjectSettings = lazy(() => import('@renderer/pages/project/project-settings'));
 const Connections = lazy(() => import('@renderer/pages/connections'));
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'));
 

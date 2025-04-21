@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
-    ArrowLeftCircle,
+    ArrowLeft,
     Bell,
     Code,
+    Loader2,
     Maximize2,
     Minus,
     Play,
@@ -18,7 +19,7 @@ import { ModeToggle } from '@renderer/components/mode-toogle';
 import { Button } from '@renderer/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import SyncButton from '@renderer/components/git/git-sync';
@@ -58,27 +59,28 @@ const Header = ({ config, basePath }: HeaderProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const { isGitEnabled } = useSelector((state: RootState) => state.git);
-    const { showErrorToast, showSuccessToast } = useToast();
     const isMac =
         window.api.i18nextElectronBackend.clientOptions.platform === 'darwin';
 
     const { workspace } = useWorkspace();
-    const { startContainers } = useDocker();
 
-    const navigate = useNavigate();
+    const { loading, startContainers } = useDocker();
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
-    const [isMaximized, setIsMaximized] = useState(false); // New state to track maximize status
+    const [isMaximized, setIsMaximized] = useState(false);
 
-    // Window control buttons
+    const { showErrorToast, showSuccessToast } = useToast();
+
+    const navigate = useNavigate();
+
     const handleMinimize = () => {
         window.menu.minimizeWindow();
     };
 
     const handleMaximize = () => {
         window.menu.maximizeWindow();
-        setIsMaximized(!isMaximized); // Toggle the state
+        setIsMaximized(!isMaximized);
     };
 
     const handleClose = () => {
@@ -90,9 +92,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
     };
 
     const openIDE = async (ideType: string) => {
-        if (!basePath) return;
+        const path = basePath || workspace.path;
+        if (!path) return;
         try {
-            await window.api.openIDE({ basePath, ideType });
+            await window.api.openIDE({ basePath: path, ideType });
         } catch (error) {
             console.error(error);
         }
@@ -140,13 +143,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     );
 
     const handleRun = async () => {
-        if (!workspace?.path) return;
-        try {
-            await startContainers(workspace.path);
-        } catch (error) {
-            console.error(error);
-            showErrorToast(t('runProjectError'));
-        }
+        await startContainers();
     };
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
@@ -155,14 +152,11 @@ const Header = ({ config, basePath }: HeaderProps) => {
         <>
             <TooltipProvider>
                 <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
-                    <div className="flex h-(--header-height) w-full items-center gap-2 px-4 justify-between">
-                        <div className="flex items-center space-x-2 home cursor-pointer">
+                    <div className="flex h-(--header-height) w-full items-center  px-4 justify-between">
+                        <div className="flex items-center space-x-4 home cursor-pointer">
                             <div
                                 onClick={openPage}
-                                className={cn(
-                                    'flex items-center gap-2',
-                                    isMac ? 'pl-12' : ''
-                                )}
+                                className={cn('flex items-center gap-2')}
                             >
                                 <img
                                     src={logo}
@@ -175,21 +169,21 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             </div>
 
                             {isProjectAtive && (
-                                <Breadcrumb>
+                                <Breadcrumb className="hidden lg:flex">
                                     <BreadcrumbList>
                                         <BreadcrumbItem>
                                             <BreadcrumbLink href="/#">
-                                                <ArrowLeftCircle className="h-4 w-4" />
+                                                <ArrowLeft className="h-4 w-4" />
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
-                                        <BreadcrumbItem>
+                                        <BreadcrumbItem className="md:hidden lg:flex">
                                             <BreadcrumbPage>
                                                 {workspace?.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator />
                                         <BreadcrumbItem>
-                                            <BreadcrumbPage>
+                                            <BreadcrumbPage className="truncate">
                                                 {config?.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
@@ -206,26 +200,37 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                         className="h-6 text-xs gap-1"
                                         onClick={handleRun}
                                     >
-                                        <Play className="h-3 w-3 text-green-500" />
-                                        Run
+                                        {!loading ? (
+                                            <>
+                                                <Play className="h-3 w-3 text-igrp" />
+                                                {t('run')}
+                                            </>
+                                        ) : (
+                                            <Loader2 className="animate-spin h-3 w-3 text-igrp" />
+                                        )}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>{t('Run')}</p>
+                                    <p>{t('run')}</p>
                                 </TooltipContent>
                             </Tooltip>
 
-                            <BranchSwitcher
-                                projectPath={basePath || ''}
-                                onError={showErrorToast}
-                                onSuccess={showSuccessToast}
-                                onBranchChange={() => {
-                                    dispatch(onGetPages(basePath || ''));
-                                }}
-                            />
-
-                            {isGitEnabled && (
-                                <SyncButton basePath={basePath || ''} />
+                            {basePath && (
+                                <>
+                                    <BranchSwitcher
+                                        projectPath={basePath || ''}
+                                        onError={showErrorToast}
+                                        onSuccess={showSuccessToast}
+                                        onBranchChange={() => {
+                                            dispatch(
+                                                onGetPages(basePath || '')
+                                            );
+                                        }}
+                                    />
+                                    {isGitEnabled && (
+                                        <SyncButton basePath={basePath || ''} />
+                                    )}
+                                </>
                             )}
 
                             <DropdownMenu>

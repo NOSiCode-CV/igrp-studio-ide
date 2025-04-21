@@ -13,6 +13,7 @@ export class SpringEngine implements BaseEngine {
   }
 
   async createController(config: ControllerConfig, basePath: string): Promise<void> {
+    console.log(config)
     await addController(config, basePath)
   }
 
@@ -28,7 +29,7 @@ export class SpringEngine implements BaseEngine {
     await addDTO(config, basePath)
   }
 
-  createPermission(_data: any, _basePath: string): Promise<void> {
+  async createPermission(_data: any, _basePath: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
   async delete(config: DeleteConfig, basePath: string): Promise<void> {

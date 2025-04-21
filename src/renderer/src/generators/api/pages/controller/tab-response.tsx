@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
 import { Label } from '@renderer/components/ui/label';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@renderer/components/ui/input';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
@@ -53,6 +53,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
         description?: string;
         type?: any;
         collectionType?: any;
+        oldStatusCode?: string;
     }) => {
         const {
             name,
@@ -61,6 +62,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
             contentType,
             type: newType,
             collectionType = 'none',
+            oldStatusCode,
         } = response;
 
         const isValueObject = typeof newType === 'object' && newType !== null;
@@ -75,20 +77,29 @@ export const TabResponse: React.FC<TabResponseProps> = ({
               ? 'dto'
               : '';
 
-        const updatedResponses = {
-            ...formik.values.responses,
-            [statusCode]: {
-                name,
-                description,
-                content: {
-                    [contentType]: {
-                        schema: {
-                            type,
-                            objectType,
-                            name: 'data',
-                            collectionType,
-                            module,
-                        },
+        // Create a copy of the current responses
+        const updatedResponses = { ...formik.values.responses };
+
+        // If we're changing the status code (oldStatusCode exists and is different)
+        if (oldStatusCode && oldStatusCode !== statusCode) {
+            // Remove the old entry if it exists
+            if (updatedResponses[oldStatusCode]) {
+                delete updatedResponses[oldStatusCode];
+            }
+        }
+
+        // Update or create the response
+        updatedResponses[statusCode] = {
+            name,
+            description,
+            content: {
+                [contentType]: {
+                    schema: {
+                        type,
+                        objectType,
+                        name: 'data',
+                        collectionType,
+                        module,
                     },
                 },
             },
@@ -166,6 +177,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                 <div className="flex space-x-4">
                     {Object.keys(responses).map((statusCode) => (
                         <button
+                            type="button"
                             key={statusCode}
                             onClick={() => setActiveResponseTab(statusCode)}
                             className={cn(
@@ -227,7 +239,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             )}
                         >
                             <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <LabelRequired>
                                         {t('httpStatusCode')}
                                     </LabelRequired>
@@ -236,7 +248,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         value={statusCode}
                                         onChange={(value) =>
                                             handleAddResponse({
-                                                statusCode: value,
+                                                statusCode: value as string,
+                                                oldStatusCode: statusCode,
                                                 description,
                                                 name,
                                                 contentType,
@@ -250,7 +263,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         )}
                                     />
                                 </div>
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <Label>{t('name')}</Label>
                                     <Input
                                         name={t('name')}
@@ -267,7 +280,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                         }
                                     />
                                 </div>
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <LabelRequired>
                                         {t('contentType')}
                                     </LabelRequired>
@@ -279,7 +292,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 statusCode,
                                                 description,
                                                 name,
-                                                contentType: value,
+                                                contentType: value as string,
                                                 type,
                                                 collectionType,
                                             })
@@ -289,7 +302,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
 
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <LabelRequired>{t('type')}</LabelRequired>
                                     <TypeSelectorDropdown
                                         type={type}
@@ -311,7 +324,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     </TypeSelectorDropdown>
                                 </div>
 
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2">
                                     <Label>{t('collectionType')}</Label>
                                     <IGRPCombobox
                                         options={collectionTypes}
@@ -349,7 +362,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             </div>
 
                             {/* Descritpion */}
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
                                 <Label>{t('description')}</Label>
                                 <Input
                                     type="text"

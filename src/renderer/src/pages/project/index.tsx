@@ -31,7 +31,6 @@ import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { projectIcons } from '@renderer/constants/appConstants';
-import useToast from '@renderer/components/useToast';
 import {
     backendFrameworks,
     frontendFrameworks,
@@ -76,7 +75,6 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     const [step, setStep] = React.useState(1);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
 
-    const { showErrorToast } = useToast();
     const { t } = useTranslation();
 
     const {
@@ -89,7 +87,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         name: '',
         type: undefined,
         framework: 'springboot',
-        config: undefined,
+        config: {},
         path: '',
         themeColor: '#000000',
         icon: '',
@@ -176,12 +174,6 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     };
 
-    const handleClose = () => {
-        setOpen(false);
-        setStep(1);
-        formik.resetForm();
-    };
-
     const handleOpenDirectory = () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
 
@@ -236,9 +228,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     React.useEffect(() => {
         formik.setFieldValue(
             'path',
-            `${workspace.path}/projects/${formik.values.name}`
+            `${workspace.path}/projects/${formik.values?.config?.name ?? formik.values.name}`
         );
-    }, [workspace, formik.values.name]);
+    }, [workspace, formik.values.name, formik.values?.config]);
 
     const renderStep1 = () => (
         <div className="space-y-4">
@@ -274,7 +266,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     className="hidden"
                 />
                 <label htmlFor="icon-upload" className="block">
-                    <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2 cursor-pointer hover:border-primary/50">
+                    <div className="border border-dashed rounded-lg p-8 text-center space-y-2 cursor-pointer hover:border-primary/50">
                         {previewUrl ? (
                             <div className="flex flex-col items-center gap-2">
                                 <img
@@ -473,7 +465,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-6">
             <div className="rounded-lg border p-4 space-y-6">
                 <div className="space-y-4">
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="name">{t('projectName')}</Label>
                         <Input
                             id="name"
@@ -489,7 +481,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         )}
                     </div>
 
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="path">{t('projectDirectory')}</Label>
                         <div className="flex gap-2">
                             <Input
@@ -499,6 +491,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 placeholder={t('enterProjectDirectory')}
+                                readOnly
                             />
                             <Button
                                 variant="outline"
@@ -508,6 +501,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     e.preventDefault();
                                     handleOpenDirectory();
                                 }}
+                                disabled
                             >
                                 <FolderOpen className="h-4 w-4" />
                             </Button>
@@ -520,7 +514,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     </div>
 
                     {isFrontend && (
-                        <div>
+                        <div className="space-y-2">
                             <Label>{t('themeColor')}</Label>
                             <div className="grid grid-cols-12 gap-2 mt-2">
                                 {THEME_COLORS.map((color) => (
@@ -574,7 +568,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 ) : (
                     <Button
                         variant="outline"
-                        className="bg-igrp text-primary-foreground"
+                        className="bg-igrp text-primary-foreground dark:bg-primary"
                     >
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}

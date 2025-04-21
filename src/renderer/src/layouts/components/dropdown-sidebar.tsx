@@ -11,7 +11,7 @@ import {
 import { MenuItem } from 'src/main/types';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';

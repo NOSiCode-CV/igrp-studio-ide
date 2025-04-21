@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Image, Palette, BadgeCent as Gradient, Layers } from 'lucide-react';
 import { BackgroundList } from './backgrounds/BackgroundList';
 import type { BackgroundValue } from './effects/types';

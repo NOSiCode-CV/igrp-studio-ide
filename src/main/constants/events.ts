@@ -19,7 +19,9 @@ export const EVENTS = {
         CREATE_PAGE: 'next-engine:create-page',
         DELETE_PAGE: 'next-engine:delete-page',
         REGISTRY_COMPONENT: 'engine:registry-component',
-        GET_COMPONENT: 'engine:get-component'
+        GET_COMPONENT: 'engine:get-component',
+        GET_SERVICE: 'engine:get-service',
+
     },
     REPOSITORY: {
         INITIALIZE: 'repository:initialize',
@@ -30,7 +32,8 @@ export const EVENTS = {
             DELETE: 'repository:workspace:delete',
             GET: 'repository:workspace:get',
             FIND_ALL: 'repository:workspace:find-all',
-            FIND_RECENT: 'repository:workspace:find-recent'
+            FIND_RECENT: 'repository:workspace:find-recent',
+            SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
         },
         PROJECT: {
             CREATE: 'repository:project:create',
@@ -39,6 +42,12 @@ export const EVENTS = {
             GET: 'repository:project:get',
             FIND_ALL: 'repository:project:find-all',
             FIND_RECENT: 'repository:project:find-recent'
+        },
+        SERVICE: {
+            CREATE: 'repository:service:create',
+            UPDATE: 'repository:service:update',
+            DELETE: 'repository:service:delete',
+            FIND_ALL: 'repository:service:find-all',
         },
         BACKUP: {
             CREATE: 'repository:backup:create',

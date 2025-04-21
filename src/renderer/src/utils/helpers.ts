@@ -1,6 +1,4 @@
-import { MenuItem } from 'src/main/types'
 import { faker } from '@faker-js/faker'
-import { ROUTES } from '@renderer/routes/routeConstants'
 import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,31 +7,6 @@ import { enUS, pt } from 'date-fns/locale';
 
 export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-export function createMenuHeader(label: string, folderName: string): MenuItem {
-	const icon = getIcon(folderName);
-
-	return {
-		label,
-		id: folderName ? capitalize(folderName) : undefined,
-		icon,
-		link: ROUTES.PATH_PAGE_BUILDER_API,
-		type: folderName || undefined,
-		isHeader: false,
-		subItems: []
-	}
-}
-
-export function createSubMenuItems(files: any, folderName: string): MenuItem[] {
-	return files.map((file) => ({
-		id: file.name,
-		label: file.name,
-		link: ROUTES.PATH_PAGE_BUILDER_API,
-		path: file.path,
-		type: folderName,
-		icon: ''
-	}))
 }
 
 export function filterItems(navData: any, searchQuery: string) {
@@ -128,7 +101,9 @@ export const getStatusLabel = (statusCode: string): string => {
 export const toInitCap = (text: string) => text.replace(/(?:^|\s|-)\S/g, (match) => match.toUpperCase())
 
 export const getIcon = (folderName: string): LucideIcon => {
-	if (!folderName) return Circle
+
+	if (!folderName || typeof folderName !== 'string') return Circle;
+  
 	switch (folderName.toLowerCase()) {
 		case 'controllers':
 			return FileCode;
@@ -183,3 +158,24 @@ export const getLocale = () => {
 			return enUS;
 	}
 };
+
+export function extractDefaults(schema) {
+	const result = {};
+	for (const key in schema) {
+	  const field = schema[key];
+  
+	  if ("default" in field) {
+		result[key] = field.default;
+	  } else if (field.type === "object" && field.properties) {
+		result[key] = extractDefaults(field.properties);
+	  } else if (field.type === "array") {
+		if (field.default) {
+		  result[key] = field.default;
+		} else if (field.items && field.items.properties) {
+		  // create a dummy item with default values
+		  result[key] = [extractDefaults(field.items.properties)];
+		}
+	  }
+	}
+	return result;
+  }

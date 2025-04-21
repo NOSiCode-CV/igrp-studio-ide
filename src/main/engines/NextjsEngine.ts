@@ -1,15 +1,21 @@
 // engines/NextjsEngine.ts
-import { deleteElement, initComponents, loadRegistry, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
+import { deleteElement, initComponents, initServices, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
-import { AppConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { AppConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
 import { ensureDirectoryExists } from '../helpers';
 
 
 export class NextjsEngine implements BaseEngine {
 
-  async registryComponent(_basePath: string): Promise<void> {
+  async registry(): Promise<void> {
     await initComponents()
+    await initServices()
+  }
+
+  async getServices(): Promise<DockerServiceRegistrationConfig> {
+    const result = loadServiceRegistry()
+    return result;
   }
 
   getComponents(): ComponentRegistrationConfig {
@@ -30,15 +36,13 @@ export class NextjsEngine implements BaseEngine {
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    console.log('Creating Next.js project with config:', project);
-
     const { id, config, workspaceId } = project
 
     const appConfig: AppConfig = {
       ...config as NextConfigData,
       type: 'nextjs',
       workspaceId,
-      id: Math.random().toString(36).slice(2, 12)
+      id
     }
 
     // Ensure the basePath exists

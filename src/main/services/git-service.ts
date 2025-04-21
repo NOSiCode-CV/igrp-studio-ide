@@ -16,14 +16,14 @@ export const GitService = {
             return false;
         }
     },
-    
+
     async initializeGit(projectPath: string) {
         try {
             await execAsync('git init', { cwd: projectPath });
             await execAsync('git add .', { cwd: projectPath });
             await execAsync('git commit -m "Initial commit"', { cwd: projectPath });
             await execAsync('git branch -M main', { cwd: projectPath });
-            
+
             return true;
         } catch (error: any) {
             throw new Error(error.stderr || 'Failed to initialize git');
@@ -97,39 +97,43 @@ export const GitService = {
         }
     },
 
-    async cloneRepository(repoUrl: string, window: BrowserWindow) {
+    async cloneRepository(repoUrl: string, basePath: string, window: BrowserWindow) {
         try {
-            const { canceled, filePaths } = await dialog.showOpenDialog(window, {
-                title: 'Choose Clone Location',
-                properties: ['openDirectory', 'createDirectory'],
-                buttonLabel: 'Choose Folder',
-            });
-    
-            if (canceled) {
-                throw new Error('Operation cancelled');
+            if (!basePath) {
+                const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+                    title: 'Choose Clone Location',
+                    properties: ['openDirectory', 'createDirectory'],
+                    buttonLabel: 'Choose Folder',
+                });
+
+                if (canceled) {
+                    throw new Error('Operation cancelled');
+                }
+
+                basePath = filePaths[0];
             }
-    
-            const projectName = await new Promise<string>((resolve, reject) => {
+
+           /*  const projectName = await new Promise<string>((resolve, reject) => {
                 window.webContents.send('request-project-name', {
                     defaultName: repoUrl.split('/').pop()?.replace('.git', ''),
                 });
-    
+
                 const { ipcMain } = require('electron');
                 ipcMain.once('project-name-response', (_event, name) => {
                     if (!name) reject(new Error('No project name provided'));
                     resolve(name);
                 });
             });
-    
-            const targetDir = path.join(filePaths[0], projectName);
-    
+
+            const targetDir = path.join(basePath, projectName); */
+
             window.webContents.send('clone-progress', {
                 status: 'starting',
-                message: `Starting to clone into ${targetDir}...`,
+                message: `Starting to clone into ${basePath}...`,
             });
-    
+
             return new Promise((resolve, reject) => {
-                exec(`git clone ${repoUrl} "${targetDir}"`, async (error) => {
+                exec(`git clone ${repoUrl} "${basePath}"`, async (error) => {
                     if (error) {
                         window.webContents.send('clone-progress', {
                             status: 'error',
@@ -138,27 +142,22 @@ export const GitService = {
                         reject(error);
                         return;
                     }
-    
+
                     try {
                         // Usa a nova função checkAndReadBaseApi
-                        const { folderExists, config } = await checkAndReadBaseApi(targetDir);
-    
+                        const { folderExists, config } = await checkAndReadBaseApi(basePath);
+
                         if (!folderExists || !config) {
                             throw new Error('Invalid IGRP Studio project structure');
                         }
 
                         window.webContents.send('clone-progress', {
                             status: 'success',
-                            message: `Successfully cloned to ${targetDir}`,
-                            path: targetDir,
-                            config: {
-                                type: config.type,
-                                name: config.name,
-                                framework: config.framework,
-                                config: config.config
-                            },
+                            message: `Successfully cloned to ${basePath}`,
+                            path: basePath,
+                            project: config
                         });
-                        resolve({ path: targetDir, config });
+                        resolve({ path: basePath, project: config });
                     } catch (configError) {
                         window.webContents.send('clone-progress', {
                             status: 'error',
@@ -199,7 +198,7 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to create commit');
         }
     },
-    
+
     async pull(projectPath: string, branch: string) {
         try {
             const { stdout } = await execAsync(`git pull origin ${branch}`, {
@@ -211,7 +210,7 @@ export const GitService = {
             return "Branch pushed successfully after pull failure";
         }
     },
-    
+
     async push(projectPath: string, branch: string) {
         try {
             const { stdout } = await execAsync(`git push origin ${branch}`, {
@@ -222,7 +221,7 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to push changes');
         }
     },
-    
+
     async isRemoteBranchExists(projectPath: string, branch: string) {
         try {
             await execAsync(`git ls-remote --heads origin ${branch}`, {
@@ -233,7 +232,7 @@ export const GitService = {
             return false;
         }
     },
-    
+
     async publishBranch(projectPath: string, branch: string) {
         try {
             const { stdout } = await execAsync(
@@ -242,7 +241,7 @@ export const GitService = {
             );
             return stdout;
         } catch (error: any) {
-            
+
             if (error.stderr.includes("couldn't find remote ref")) {
                 try {
                     await execAsync(`git push -u origin ${branch}`, { cwd: projectPath });
@@ -254,13 +253,13 @@ export const GitService = {
             throw new Error(error.stderr || 'Failed to publish branch');
         }
     },
-    
+
     isValidRemoteUrl(url: string): boolean {
         const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
         const sshRegex = /^git@[\w.-]+:[\w.-]+\/[\w.-]+\.git$/;
         return urlRegex.test(url) || sshRegex.test(url);
     },
-    
+
     async getChangesCount(projectPath: string) {
         try {
             const { stdout: status } = await execAsync(
@@ -296,11 +295,11 @@ export const GitService = {
             if (!hasRemote) {
                 throw new Error('NO_REMOTE_CONFIGURED');
             }
-    
+
             try {
-                await execAsync('git push --dry-run origin HEAD', { 
+                await execAsync('git push --dry-run origin HEAD', {
                     cwd: projectPath,
-                    timeout: 5000 
+                    timeout: 5000
                 });
             } catch (error: any) {
                 if (error.stderr?.includes('Permission denied') || error.stderr?.includes('403')) {
@@ -311,7 +310,7 @@ export const GitService = {
                 }
                 throw error;
             }
-    
+
             const remoteBranchExists = await this.isRemoteBranchExists(projectPath, branch);
             if (!remoteBranchExists) {
                 await this.publishBranch(projectPath, branch);
@@ -319,7 +318,7 @@ export const GitService = {
                 await this.pull(projectPath, branch);
                 await this.push(projectPath, branch);
             }
-            
+
             return true;
         } catch (error: any) {
             throw error;
@@ -330,29 +329,29 @@ export const GitService = {
         if (!this.isValidRemoteUrl(remoteUrl)) {
             throw new Error('INVALID_REMOTE_URL');
         }
-    
+
         try {
             const existingRemotes = await execAsync(`git remote`, { cwd: projectPath });
             if (existingRemotes.stdout.trim().split('\n').includes('origin')) {
                 return false;
             }
-    
+
             try {
-                await execAsync(`git ls-remote --get-url ${remoteUrl}`, { 
+                await execAsync(`git ls-remote --get-url ${remoteUrl}`, {
                     cwd: projectPath,
                     timeout: 5000
                 });
             } catch (accessError: any) {
-                if (accessError.stderr?.includes('Permission denied') || 
+                if (accessError.stderr?.includes('Permission denied') ||
                     accessError.stderr?.includes('403')) {
                     throw new Error('PERMISSION_DENIED');
                 }
                 throw accessError;
             }
-    
+
             await execAsync(`git remote add origin ${remoteUrl}`, { cwd: projectPath });
             return true;
-    
+
         } catch (error: any) {
             if (error.message === 'PERMISSION_DENIED') {
                 throw error;
@@ -394,19 +393,19 @@ export const GitService = {
             const command = process.platform === 'win32'
                 ? `git log ${branch} -n ${limit} --pretty=format:"%h - %an, %ar : %s"`
                 : `git log ${branch} -n ${limit} --pretty=format:'%h - %an, %ar : %s'`;
-            
-            const { stdout } = await execAsync(command, { 
+
+            const { stdout } = await execAsync(command, {
                 cwd: projectPath,
                 env: { ...process.env, LANG: 'en_US.UTF-8' }
             });
-    
+
             return stdout
                 .split('\n')
                 .filter(Boolean)
                 .map(line => {
                     const match = line.match(/^(.*?) - (.*?), (.*?) : (.*)$/);
                     if (!match) return null;
-                    
+
                     const [_, hash, author, date, message] = match;
                     return {
                         hash,
@@ -416,7 +415,7 @@ export const GitService = {
                     };
                 })
                 .filter(Boolean) as Commit[];
-    
+
         } catch (error: any) {
             console.error('Error listing commits:', error);
             throw new Error(error.stderr || 'Failed to list commits');
@@ -430,8 +429,8 @@ export const GitService = {
             for (const project of projects?.data) {
                 const remoteUrl = await this.getRemoteUrl(project.path);
                 if (remoteUrl) {
-                    const matchingRepo = githubRepos.find(repo => 
-                        repo.clone_url === remoteUrl || 
+                    const matchingRepo = githubRepos.find(repo =>
+                        repo.clone_url === remoteUrl ||
                         repo.html_url === remoteUrl
                     );
 

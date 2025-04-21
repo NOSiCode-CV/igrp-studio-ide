@@ -1,4 +1,3 @@
-import React from 'react';
 import { MousePointer2 } from 'lucide-react';
 
 interface InteractionControlsProps {

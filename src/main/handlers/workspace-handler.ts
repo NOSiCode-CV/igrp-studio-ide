@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron';
 import { IWorkspace, ProjectData } from '../types';
-import { WorkspaceRepository } from '../repo/workspace-repository';
+import { WorkspaceRepository } from '../services/workspace-service';
 import { ERROR_CODES, EVENTS } from '../constants/events';
 import { handleWithCustomErrors } from '../helpers';
+import { ServiceWorkspace, } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const repo = new WorkspaceRepository();
-
 
 // Initialize repository
 ipcMain.handle(EVENTS.REPOSITORY.INITIALIZE, async () => {
@@ -38,10 +38,10 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (_event, workspace: Omi
         return await repo.createWorkspace(workspace);
     } catch (error) {
         console.error('Workspace creation failed:', error);
-       /*  event.sender.send(EVENTS.ERROR, {
-            code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
-            message: error instanceof Error ? error.message : 'Failed to create workspace'
-        }); */
+        /*  event.sender.send(EVENTS.ERROR, {
+             code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
+             message: error instanceof Error ? error.message : 'Failed to create workspace'
+         }); */
         throw error;
     }
 });
@@ -103,58 +103,26 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, async (_, limit = 5) => 
     }
 });
 
+
+ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, async (_, yaml: object, basePath: string) => {
+    return await repo.saveCustomCompose(yaml, basePath);
+});
+
 // Project Handlers
 handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.CREATE, async (_event, workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt'>) => {
     return await repo.addProject(workspaceId, project);
-   /*  try {
-        return await repo.addProject(workspaceId, project);
-    } catch (error: any) {
-         console.error('Project creation failed:', error);
-        event.sender.send(EVENTS.ERROR, {
-            code: ERROR_CODES.PROJECT.CREATE_FAILED,
-            message: error
-        }); 
-        throw error;
-    } */
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.PROJECT.UPDATE, async (event, projectId: string, updates: Partial<ProjectData>) => {
-    try {
-        return await repo.updateProject(projectId, updates);
-    } catch (error: any) {
-        console.error('Project update failed:', error);
-        event.sender.send(EVENTS.ERROR, {
-            code: ERROR_CODES.PROJECT.UPDATE_FAILED,
-            message: error
-        });
-        throw error;
-    }
+ipcMain.handle(EVENTS.REPOSITORY.PROJECT.UPDATE, async (_, projectId: string, updates: Partial<ProjectData>) => {
+    return await repo.updateProject(projectId, updates);
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.PROJECT.DELETE, async (event, projectId: string) => {
-    try {
-        await repo.deleteProject(projectId);
-    } catch (error: any) {
-        console.error('Project deletion failed:', error);
-        event.sender.send(EVENTS.ERROR, {
-            code: ERROR_CODES.PROJECT.DELETE_FAILED,
-            message: error
-        });
-        throw error;
-    }
+ipcMain.handle(EVENTS.REPOSITORY.PROJECT.DELETE, async (_, projectId: string, basePath: string) => {
+    await repo.deleteProject(projectId, basePath);
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.PROJECT.GET, async (event, projectId: string) => {
-    try {
-        return await repo.getProject(projectId);
-    } catch (error: any) {
-        console.error('Project fetch failed:', error);
-        event.sender.send(EVENTS.ERROR, {
-            code: ERROR_CODES.PROJECT.NOT_FOUND,
-            message: error
-        });
-        return null;
-    }
+ipcMain.handle(EVENTS.REPOSITORY.PROJECT.GET, async (_, projectId: string) => {
+    return await repo.getProject(projectId);
 });
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_ALL, async (_, workspaceId?: string) => {
@@ -167,13 +135,26 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_ALL, async (_, workspaceId?: strin
 });
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, async (_, limit = 5) => {
-    try {
-        return await repo.getRecentProjects(limit);
-    } catch (error) {
-        console.error('Failed to fetch recent projects:', error);
-        return [];
-    }
+    return await repo.getRecentProjects(limit);
 });
+
+
+// Service Handlers
+handleWithCustomErrors(EVENTS.REPOSITORY.SERVICE.CREATE, async (_event, service: ServiceWorkspace, basePath: string) => {
+    return await repo.addService(service, basePath);
+});
+
+handleWithCustomErrors(EVENTS.REPOSITORY.SERVICE.UPDATE, async (_, update: ServiceWorkspace, basePath: string) => {
+    return await repo.updateService(update, basePath);
+});
+
+ipcMain.handle(EVENTS.REPOSITORY.SERVICE.DELETE, async (_, serviceId: string, basePath: string) => {
+    await repo.deleteService(serviceId, basePath);
+});
+
+ipcMain.handle(EVENTS.REPOSITORY.SERVICE.FIND_ALL, async (_, workspaceId: string) => {
+    return await repo.listServices(workspaceId)
+})
 
 // Backup Handlers
 ipcMain.handle(EVENTS.REPOSITORY.BACKUP.CREATE, async (event, backupPath?: string) => {

@@ -1,5 +1,6 @@
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
 import { Connection, DockerComposeService, Handler, HandlerResponse, PageableProjects, ProjectData } from "./types";
+import { ComponentRegistrationConfig, DockerServiceRegistrationConfig, ServiceWorkspace } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -9,24 +10,31 @@ export interface IWorkspaceRepository {
     getWorkspace(id: string): Promise<IWorkspace | undefined>;
     findAllWorkspaces(): Promise<IWorkspace[]>;
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
+    saveCustomWorkspaceComposeFile(yaml: object, basePath: string): Promise<void>;
 
     // Project Operations
-    saveProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
+    createProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
     updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
-    deleteProject(projectId: string): Promise<void>;
+    deleteProject(projectId: string, basePath: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
     getRecentProjects(workspaceId: string, limit?: number): Promise<ProjectData[]>;
+
+    //Service Operations
+    createService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
+    updateService(service: ServiceWorkspace, basePath: string): Promise<ServiceWorkspace>;
+    deleteService(serviceId: string, basePath: string): Promise<void>;
+    findAllServices(workspaceId: string): Promise<WorkspaceService[]>;
 
     // Utility Methods
     initialize(): Promise<void>;
     backupData(backupPath: string): Promise<void>;
     restoreData(backupPath: string): Promise<void>;
 
-    onError (callback: (error: {
+    onError(callback: (error: {
         code: string;
         message: string
-    }) => void) ;
+    }) => void);
 }
 
 export interface IProjectRepository {
@@ -63,8 +71,9 @@ export interface BaseEngine {
 
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>;
 
-    registryComponent?(basePath: string): Promise<void>;
-    getComponents?(): Record<string, Component>;
+    registry?(): Promise<void>;
+    getComponents?(): ComponentRegistrationConfig;
+    getServices?(): Promise<DockerServiceRegistrationConfig>;
 
     getDependencies?(): Promise<Dependency[]>
 }
@@ -85,16 +94,18 @@ export interface IBaseEngine {
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 
     createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    registryComponent: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    registry: (engineType: string) => Promise<HandlerResponse>;
     getComponent: (engineType: string) => Promise<HandlerResponse>;
-    getComponent: (engineType: string) => Promise<Record<string, Component>>;
+    getService: (engineType: string) => Promise<Record<string, Component>>;
 
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
 }
 
 export interface IDocker {
-    up: (projectPath: string) => Promise<DockerComposeService[]>;
-    down: (projectPath: string) => Promise<DockerComposeService[]>;
-    status: (projectPath: string) => Promise<DockerComposeService[]>;
+    up: (projectPath: string) => Promise<ServiceInfo[]>;
+    down: (projectPath: string) => Promise<void>;
+    status: (projectPath: string) => Promise<ServiceInfo[]>;
+    stop: (projectPath: string, services: string[]) => Promise<void>;
+    restart: (projectPath: string, services: string[], timeout?: number) => Promise<void>;
     check: () => Promise<boolean>
 }

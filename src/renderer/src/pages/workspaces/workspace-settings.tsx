@@ -27,9 +27,13 @@ import {
     AlertDialogTrigger,
 } from '@renderer/components/ui/alert-dialog';
 import { IWorkspace } from 'src/main/types';
-import { Textarea } from '@renderer/components/ui/Textarea';
+import { Textarea } from '@renderer/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils/helpers';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import useToast from '@renderer/hooks/useToast';
+import { setWorkspace } from '@renderer/redux/thunks';
+import { useDispatch } from 'react-redux';
 
 interface WorkspaceSettingsProps {
     workspace: IWorkspace;
@@ -44,16 +48,30 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [copied, setCopied] = useState(false);
 
+    const dispatch: any = useDispatch();
+    const { showSuccessToast } = useToast();
+
+    const {
+        actions: { updateWorkspace, deleteWorkspace },
+    } = useWorkspace();
+
     const handleSaveWorkspace = () => {
         setIsSaving(true);
 
         // Simulate API call
         setTimeout(() => {
-            console.log('Saving workspace:', {
-                id: workspace.id,
+            const uodatedWorkspace = {
+                ...workspace,
                 name: workspaceName,
                 description: workspaceDescription,
-            });
+            };
+
+            updateWorkspace(workspace.id, uodatedWorkspace);
+
+            dispatch(setWorkspace(uodatedWorkspace));
+
+            showSuccessToast(`Workspace "${workspaceName}" updated`);
+
             setIsSaving(false);
         }, 800);
     };
@@ -63,7 +81,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
         // Simulate API call
         setTimeout(() => {
-            console.log('Deleting workspace:', workspace.id);
+            deleteWorkspace(workspace.id);
             setIsDeleting(false);
         }, 800);
     };
@@ -86,9 +104,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="compact-card-content space-y-3">
-                    <div className="compact-form-field">
+                    <div className="space-y-2">
                         <Label htmlFor="workspace-id">Workspace ID</Label>
-                        <div className="flex">
+                        <div className="flex space-x-2">
                             <Input
                                 id="workspace-id"
                                 value={workspace.id}
@@ -113,7 +131,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         </p>
                     </div>
 
-                    <div className="compact-form-field">
+                    <div className="space-y-2">
                         <Label htmlFor="workspace-name">Name</Label>
                         <Input
                             id="workspace-name"
@@ -123,7 +141,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         />
                     </div>
 
-                    <div className="compact-form-field">
+                    <div className="space-y-2">
                         <Label htmlFor="workspace-description">
                             Description
                         </Label>

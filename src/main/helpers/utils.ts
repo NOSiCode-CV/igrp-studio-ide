@@ -26,7 +26,7 @@ export function closeApp(mainWindow: BrowserWindow) {
 }
 
 export function installExtensions(mainWindow: BrowserWindow): void {
-    if (is.dev) {
+    if (is.dev && process.platform === 'darwin' ) {
         // Open the DevTools.
         mainWindow.webContents.openDevTools();
         // Install extensions

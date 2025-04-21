@@ -8,6 +8,7 @@ export const initialValues: DTOConfig = {
     module: '',
     name: '',
     template: "classic",
+    enableCustonValidation: false,
     attributes: [
         {
             name: '',

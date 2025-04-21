@@ -14,6 +14,7 @@ import { Save, Copy, RefreshCw } from 'lucide-react';
 import { IWorkspace } from 'src/main/types';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useDocker } from '@renderer/hooks/use-docker';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 interface WorkspaceConfigProps {
     workspace: IWorkspace;
@@ -22,11 +23,12 @@ interface WorkspaceConfigProps {
 export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
     const [copied, setCopied] = useState(false);
 
+    const { fileContent, services, loadComposeFile } = useDocker();
+    const [content, setContent] = useState(fileContent);
+
     const {
-        fileContent: content,
-        services,
-        loadComposeFile,
-    } = useDocker();
+        actions: { saveCustomWorkspaceComposeFile },
+    } = useWorkspace();
 
     const handleCopyYaml = () => {
         if (!content) return;
@@ -35,8 +37,13 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleSaveService = (_service: any) => {
+    const handleSaveService = () => {
+        saveCustomWorkspaceComposeFile(content);
     };
+
+    useEffect(() => {
+        setContent(fileContent);
+    }, [fileContent]);
 
     useEffect(() => {
         loadComposeFile(workspace.path);
@@ -63,6 +70,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                                 size="sm"
                                 variant="ghost"
                                 className="h-6 w-6 p-0"
+                                onClick={() => loadComposeFile(workspace.path)}
                             >
                                 <RefreshCw className="h-3.5 w-3.5" />
                             </Button>
@@ -72,16 +80,14 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                                 filePath={`${workspace.path}/igrp-compose.yaml`}
                                 content={content}
                                 height="35vh"
+                                onChange={setContent}
                             />
                         )}
                     </div>
                 </CardContent>
                 <CardFooter className="compact-card-footer flex justify-between">
                     <div className="text-xs text-muted-foreground">
-                        {
-                            services.filter((s) => s.status === 'running')
-                                .length
-                        }{' '}
+                        {services.filter((s) => s.status === 'running').length}{' '}
                         services enabled
                     </div>
                     <div className="flex gap-2">
@@ -107,7 +113,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             size="sm"
                             className="h-7"
                             variant="outline"
-                            onClick={() => handleSaveService(services[0])}
+                            onClick={() => handleSaveService()}
                         >
                             <Save className="h-3.5 w-3.5 mr-1" />
                             Save

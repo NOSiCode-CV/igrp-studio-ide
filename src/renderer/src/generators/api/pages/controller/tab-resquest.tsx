@@ -10,12 +10,14 @@ import {
 import { BodyRequest } from './body-request';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@renderer/components/ui/card';
+import { initialValues } from './config';
 
 interface TabRequestProps {
     formik: any;
     tablesColumns: any;
     contentTypes: any;
     schemaTypes?: { label: string; value: string }[];
+    collectionTypes: any;
 }
 
 const extractPathParameters = (path: string) => {
@@ -35,6 +37,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     tablesColumns,
     contentTypes,
     schemaTypes,
+    collectionTypes
 }) => {
     const { t } = useTranslation();
 
@@ -111,7 +114,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                         addNewRow(
                                             formik,
                                             tabQueryParams,
-                                            tabQueryParams
+                                            initialValues.requestParams[0]
                                         )
                                     }
                                     removeRow={(position) =>
@@ -166,6 +169,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                         contentTypes={contentTypes}
                         schemaTypes={schemaTypes}
                         columnsBody={tablesColumns['requestBody']}
+                        collectionTypes={collectionTypes}
                     />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">

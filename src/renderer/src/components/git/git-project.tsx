@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Repository } from 'src/main/types';
-import useToast from '../useToast';
+import useToast from '../../hooks/useToast';
 import { ProjectNameDialog } from './dialog-project-name';
 import { CardGitProject } from './card-git-project';
 import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-    navigateToNextPage,
     setBasePath,
     setConfig,
 } from '@renderer/redux/thunks';
@@ -29,6 +28,7 @@ export default function GitProject() {
     );
     const [activeTab, setActiveTab] = useState('github');
     const {
+        workspace,
         actions: { saveOrOpenProject },
     } = useWorkspace();
 
@@ -57,6 +57,7 @@ export default function GitProject() {
                     );
                     try {
                         await saveOrOpenProject({
+                            workspaceId: workspace.id,
                             name: data.config.name,
                             framework: data.config.type,
                             config: data.config.config,
@@ -88,7 +89,7 @@ export default function GitProject() {
 
                         dispatch(setBasePath(data.path));
                         dispatch(setConfig(data.config));
-                        navigateToNextPage(navigate, data.config);
+                       // navigateToNextPage(navigate, data.config);
                     } catch (error) {
                         showErrorToast(t('failedOpenProjectAfterCloning'));
                         console.error(t('errorOpeningProject'), error);

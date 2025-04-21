@@ -12,7 +12,7 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { getTablesColumns, initialValues } from './config';
 import { useDtoValidation } from './validation';
 import { IColumnsTabelProps } from '../../types/Interfaces';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { initializeTabFromCurrentItem } = useTabs();

@@ -11,7 +11,7 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { defaultValues, getTablesColumns, initialValues, getValuesToSubmit } from './config';
 import { useModelValidation } from './validation';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 
 export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { createGitCommit } = useGit();
@@ -137,7 +137,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 { ...currentData, ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
-console.log(values)
+            console.log(values)
             const { error } = await window.engine.createModel(values, ENV_TYPES.SPRING, basePath);
 
             if (error) {
@@ -154,7 +154,7 @@ console.log(values)
     };
 
     const createRelationReference = async (values: ModelConfig) => {
-        const { attributes } = values;
+        const { attributes, name: entityFrom } = values;
 
         await Promise.all(
             attributes.map(async (attribute) => {
@@ -166,7 +166,7 @@ console.log(values)
 
                 const relationReference: RelationReference = {
                     type: relationType,
-                    entity,
+                    entity: entityFrom,
                     fetchType,
                     fieldName: mappedBy,
                     mappedBy: name,

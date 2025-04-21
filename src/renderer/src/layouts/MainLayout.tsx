@@ -6,15 +6,14 @@ import {
     IGRPSidebar,
     IGRPSidebarContent,
     IGRPSidebarFooter,
-} from '@renderer/components/app-sidebar-default';
+} from '@renderer/layouts/components/app-sidebar-default';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
-import { Database, Folder } from 'lucide-react';
+import { Database } from 'lucide-react';
 import FooterSidebar from './components/footer-sidebar';
 import { Footer } from './components/footer';
 import { Toaster } from '@renderer/components/ui/sonner';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { IWorkspace } from 'src/main/types';
-import { WorkspaceSwitcher } from './components/workspace-switch';
+import { WorkspaceSwitcher } from '../pages/workspaces/components/workspace-switch';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -23,35 +22,20 @@ interface LayoutProps {
 const MainLayout = (props: LayoutProps) => {
     const {
         workspace,
-        workspaces,
         actions: { switchWorkspace },
     } = useWorkspace();
-
-    const workspaceItems = useMemo(() => {
-        return workspaces.map((workspace: IWorkspace) => ({
-            name: workspace.name,
-            icon: Folder,
-            badge: workspace.projects?.length || 0,
-            onClick: () => switchWorkspace(workspace),
-            contextMenu: [
-                { label: 'Rename', action: () => console.log(workspace.id) },
-                { label: 'Delete', action: () => console.log(workspace.id) },
-            ],
-            href:"#"
-        }));
-    }, [workspaces, switchWorkspace]);
 
     const navData = useMemo(
         () => [
             {
                 name: 'Database',
-                type: 'item',
-                items: workspaceItems,
+                type: 'item' as const,
                 icon: Database,
-                href:"#"
+                href: '#',
             },
+           
         ],
-        [workspaceItems]
+        []
     );
 
     return (
@@ -68,10 +52,9 @@ const MainLayout = (props: LayoutProps) => {
 
                     <div className="flex flex-1 overflow-hidden">
                         <IGRPSidebar className="!top-(--header-height)  h-[calc(100svh-var(--header-height-two))]">
-                            <IGRPSidebarContent items={navData}>
+                            <IGRPSidebarContent items={[...navData]}>
                                 {workspace && (
                                     <WorkspaceSwitcher
-                                        workspaces={workspaces}
                                         defaultWorkspace={workspace}
                                         onWorkspaceChange={switchWorkspace}
                                     />

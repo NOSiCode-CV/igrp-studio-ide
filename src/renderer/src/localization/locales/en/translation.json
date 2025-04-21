@@ -57,8 +57,8 @@
   "endpointDescription": "Enter the name for your new endpoint. Click save when you're done.",
   "comonDialogtDescription": "Enter the name for your new {{name}}. Click save when you're done.",
   "newObject": "New {{name}}",
-  "deletedSuccess": "{{name}} deleted successfully!",
-  "createdSuccess": "{{name}} {{value}} have been successfully added.",
+  "deletedSuccess": "\"{{name}}\" deleted successfully!",
+  "createdSuccess": "{{name}} \"{{value}}\" have been successfully added.",
   "newDto": "New DTOs",
   "newModels": "New Schema Object",
   "newControllers": "New Endpoint",
@@ -452,5 +452,8 @@
   "orphanRemoval": "Orphan Removal",
   "projects": "Projects",
   "newService": "New Service",
-  "services": "Services"
+  "services": "Services",
+  "enableCustonValidation": "Enable Custon Validation",
+  "run": "Run",
+  "savedSuccessfully":"'{{name}}' saved successfully"
 }

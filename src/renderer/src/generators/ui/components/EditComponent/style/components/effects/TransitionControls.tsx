@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Timer, Plus, Trash2, Edit2 } from 'lucide-react';
 import { TransitionValue, transitionProperties, timingFunctions } from './types';
 

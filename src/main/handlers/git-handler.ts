@@ -36,6 +36,9 @@ ipcMain.handle('gitlab-initialize', async (_event, token) => {
 ipcMain.handle('add-cloned-repo', (_event, repoId: number) => {
     GitStore.addClonedRepo(repoId);
 });
+ipcMain.handle('remove-cloned-repo', (_event, repoId: number) => {
+    GitStore.removeClonedRepo(repoId);
+});
 ipcMain.handle('get-cloned-repos', () => {
     const repos = GitStore.getClonedRepos();
     return repos;
@@ -66,9 +69,9 @@ ipcMain.handle('gitlab-repositories', async (event) => {
 ipcMain.handle('check-git-remotes', async (_event, { projects, githubRepos }) => {
     return GitService.checkGitRemotes(projects, githubRepos);
 });
-ipcMain.handle('clone-repository', async (event, repoUrl) => {
+ipcMain.handle('clone-repository', async (event, repoUrl, basePath) => {
     const mainWindow = BrowserWindow.fromWebContents(event.sender);
-    return GitService.cloneRepository(repoUrl, mainWindow as BrowserWindow);
+    return GitService.cloneRepository(repoUrl, basePath, mainWindow as BrowserWindow);
 });
 ipcMain.handle('list-branches', async (_event, projectPath) => {
     return GitService.listBranches(projectPath);

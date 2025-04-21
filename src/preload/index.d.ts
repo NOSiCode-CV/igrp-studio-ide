@@ -6,14 +6,11 @@ import { Connection, FileTree, ProjectData } from 'src/main/types';
 import { IConnenctionRepository, IWorkspaceRepository, IBaseEngine, IDocker } from 'src/main/interfaces';
 import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
 
-export 
-
-
 interface CustomAPI {
 
     fetchSelectors: (module: string, basePath: string) => Promise<[]>
 
-    openDirectory: (buttonLabel: string) => Promise<IOpenProject>;
+    openDirectory: (buttonLabel?: string) => Promise<IOpenProject>;
     fetchFiles: (basePath: string) => Promise<FileTree[]>;
     getJsonContent: (filePath: string) => Promise<any>;
     getFileContent: (filePath: string) => Promise<any>;

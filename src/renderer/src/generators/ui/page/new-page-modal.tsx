@@ -1,7 +1,6 @@
-import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
@@ -16,6 +15,7 @@ import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils/helpers';
+import { Button } from '@renderer/components/ui/button';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -109,10 +109,10 @@ export function NewPageModal({
                             />
                         </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className='flex justify-between'>
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="ghost"
                             onClick={onClose}
                         >
                             {t('cancel')}

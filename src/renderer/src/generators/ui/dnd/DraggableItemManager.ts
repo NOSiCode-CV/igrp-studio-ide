@@ -81,6 +81,9 @@ const setDefaultProperties = (schema: any) => {
         if (schema[key].default !== undefined) {
             properties[key] = schema[key].default;
         }
+        else if (schema[key].type === 'array' && schema[key].items?.enum === undefined) {
+            properties[key] = [];
+        }
     }
     return properties;
 };

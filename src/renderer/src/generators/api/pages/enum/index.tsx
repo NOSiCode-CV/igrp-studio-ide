@@ -51,7 +51,7 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                             isTouched={formik.touched.name}
                             isRequired
                         />
-                        <Card className="rounded-sm">
+                        <div className="border pt-3 rounded-sm">
                             <FormList
                                 columns={tablesColumns.values || []}
                                 formik={formik}
@@ -74,7 +74,7 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                                 btnLabels={t('enum')}
                                 name={tableName}
                             />
-                        </Card>
+                        </div>
                     </div>
                 </Card>
             </div>

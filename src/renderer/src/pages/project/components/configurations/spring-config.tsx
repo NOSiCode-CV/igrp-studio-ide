@@ -3,32 +3,31 @@
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Textarea } from '@renderer/components/ui/Textarea';
+import { Textarea } from '@renderer/components/ui/textarea';
 import { useEffect, useState } from 'react';
-import { ProjectData, SpringConfigData } from 'src/main/types';
+import { SpringConfigData } from 'src/main/types';
 import {
     DatabaseOptions,
     projectStructureStyle,
 } from '@renderer/constants/appConstants';
 import useCore from '@renderer/hooks/use-core';
 import { useTranslation } from 'react-i18next';
-import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/label-required';
 import { Separator } from '@renderer/components/ui/separator';
 import { SelectInput } from '@renderer/generators/api/components/inputs-form';
-import { IGRPCombobox } from '@renderer/components/combobox';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import DependencySelector from '@renderer/components/dependency-selector';
 
 interface SpringConfigProps {
     data: SpringConfigData;
-    errors?: FormikErrors<ProjectData>;
+    errors?: any;
     onChange: (data: SpringConfigData) => void;
 }
 
 const DEFAULT_SPRING_CONFIG: SpringConfigData = {
-    apiName: '',
+    name: '',
     description: '',
-    group: '',
+    group: 'cv.igrp',
     artifact: '',
     database: 'Postgresql',
     projectStructureStyle: 'technical',
@@ -85,17 +84,17 @@ export function SpringConfig({
             <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
                 <Input
-                    id="apiName"
-                    value={data.apiName}
+                    id="name"
+                    value={data.name}
                     onChange={(e) =>
-                        onChange({ ...data, apiName: e.target.value })
+                        onChange({ ...data, name: e.target.value })
                     }
                     placeholder={t('enterProjectName')}
                     maxLength={50}
                 />
-                {errors?.config && errors.config.apiName && (
+                {errors?.config && errors.config.name && (
                     <p className="text-xs text-destructive">
-                        {errors.config.apiName}
+                        {errors.config.name}
                     </p>
                 )}
             </div>
@@ -156,7 +155,7 @@ export function SpringConfig({
                     <LabelRequired>{t('chooseDbEngine')}</LabelRequired>
                     <IGRPCombobox
                         value={data.database}
-                        onChange={(value) =>
+                        onChange={(value: any) =>
                             onChange({ ...data, database: value })
                         }
                         options={DatabaseOptions}
@@ -174,7 +173,7 @@ export function SpringConfig({
                         options={versions || []}
                         value={data.igrpCoreVersion}
                         onChange={(value) =>
-                            onChange({ ...data, igrpCoreVersion: value })
+                            onChange({ ...data, igrpCoreVersion: value  as string })
                         }
                         className="w-full"
                     />

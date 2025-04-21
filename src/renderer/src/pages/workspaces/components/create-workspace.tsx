@@ -10,7 +10,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { useEffect, useRef, useState } from 'react';
 import { Label } from '@renderer/components/ui/label';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { FolderOpen } from 'lucide-react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IWorkspace } from 'src/main/types';
@@ -18,7 +18,7 @@ import { Textarea } from '@renderer/components/ui/textarea';
 
 interface CreateWorkspaceProps {
     open: boolean;
-    onSuccess: (workspaceName: IWorkspace) => void;
+    onSuccess?: (workspaceName: IWorkspace) => void;
     onOpenChange?: (open: boolean) => void;
 }
 
@@ -70,7 +70,7 @@ const CreateWorkspace = ({
                 description: workspaceDescription,
             });
             if (workspace) {
-                onSuccess(workspace);
+                onSuccess?.(workspace);
                 onOpenChange?.(false);
             }
         } catch (error) {
@@ -92,7 +92,7 @@ const CreateWorkspace = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} modal>
+        <Dialog open={open} onOpenChange={() => onOpenChange?.(!open)} modal>
             <DialogContent className="max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>{t('workspace.createTitle')}</DialogTitle>

@@ -4,7 +4,7 @@ import { changeValue } from '../../helpers';
 import { useEffect, useState } from 'react';
 import NavigationBar from '../../components/navigation-bar';
 import { useDispatch } from 'react-redux';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useTabs } from '@renderer/components/navigation/TabContext';

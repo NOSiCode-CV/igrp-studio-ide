@@ -5,7 +5,7 @@ import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { columnsVariants, columnVariants } from '../../utils/layout-mapping';
-import BoxContainer from '../tools/BoxWrappertsx';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface ColProps {
     isDisabled?: boolean;
@@ -63,14 +63,14 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     dropZone={false}
                     className={cn(columnVariants({ variant, className }))}
                 >
-                    <BoxContainer
+                    <BoxWrapper
                         comp={comp}
                         onEdit={() => handleEditClick(comp)}
                         group="group/comp"
                         className="opacity-0 group-hover/comp:opacity-100"
                     >
                         <Component comp={comp} onDragEnd={onDragEnd} />
-                    </BoxContainer>
+                    </BoxWrapper>
                 </Draggable>
             ) : (
                 <div key={comp.id}>Loading...</div>

@@ -1,7 +1,7 @@
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
@@ -119,17 +119,17 @@ export function NewComponentModal({
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <IconBrowser
-                                title="Icon Display [IGRP Studio]?"
-                                onIconSelect={(icon) => {
+                                onSelectedIcon={(icon) => {
                                     formik.setFieldValue('icon', icon);
                                 }}
+                                selectedIcon={''}
                             />
                         </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className='flex justify-between'>
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="ghost"
                             onClick={onClose}
                         >
                             {t('cancel')}

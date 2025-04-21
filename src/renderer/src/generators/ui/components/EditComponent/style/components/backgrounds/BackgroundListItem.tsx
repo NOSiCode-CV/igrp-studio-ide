@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { Edit2, Trash2 } from 'lucide-react';
 import { BackgroundEditor } from './BackgroundEditor';
 import { getBackgroundStyles } from './utils';

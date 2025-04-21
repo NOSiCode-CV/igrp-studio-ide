@@ -1,4 +1,3 @@
-import React from 'react';
 import { Trash2 } from 'lucide-react';
 import type { BackgroundValue, GradientValue } from '../../effects/types';
 

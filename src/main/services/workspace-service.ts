@@ -3,9 +3,10 @@ import fs from 'fs';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { IWorkspace, ProjectData } from '../types';
-import { newWorkspace as engineNewWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import { FrameworkType, IWorkspace, ProjectData } from '../types';
+import { addProjectToWorkspace, addServiceToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, removeServiceFromWorkspace, saveCustomWorkspaceComposeFile, updateServiceToWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
+import { ProjectWorkspace, ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
@@ -50,7 +51,7 @@ export class WorkspaceRepository {
         data.workspaces.push(newWorkspace);
 
         try {
-            await engineNewWorkspace({ ...baseConfigWorkspace, id: Math.random().toString(36).slice(2, 12) }, workspace.path)
+            await engineNewWorkspace({ ...baseConfigWorkspace }, workspace.path)
         } catch (error) {
             throw error
         }
@@ -107,13 +108,14 @@ export class WorkspaceRepository {
 
     // Project CRUD Operations
     async addProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData> {
+
         const data = await this.loadData();
         const workspace = data.workspaces.find(w => w.id === workspaceId);
 
         if (!workspace) {
             throw new Error(`Workspace ${workspaceId} not found`);
         }
-        
+
         const newProject: ProjectData = {
             ...project,
             id: uuidv4(),
@@ -122,8 +124,9 @@ export class WorkspaceRepository {
             updatedAt: new Date().toISOString()
         };
 
+        await this.addProjectToStudioWorkspace(workspace, newProject, false);
+
         const engine = EngineFactory.getEngine(project.framework);
-        
         await engine.createProject(newProject, project.path);
 
         workspace.projects = workspace.projects || [];
@@ -134,9 +137,29 @@ export class WorkspaceRepository {
         return newProject;
     }
 
+    async addProjectToStudioWorkspace(workspace: IWorkspace, newProject: ProjectData, move: boolean) {
+
+        const { config, id: projectId, framework } = newProject
+
+        const { path: workspacePath, id: workspaceId } = workspace
+
+        const workspaceConfig: ProjectWorkspace = {
+            config: { ...config, id: projectId, type: framework },
+            id: workspaceId,
+        }
+
+        //call engine
+        await addProjectToWorkspace(workspaceConfig, workspacePath);
+
+        if (move)
+            await this.validateAndMoveProject(newProject, workspacePath)
+
+    }
+
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
         const data = await this.loadData();
         let foundProject: ProjectData | undefined;
+        const { workspaceId } = updates
 
         for (const workspace of data.workspaces) {
             const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
@@ -154,14 +177,43 @@ export class WorkspaceRepository {
         }
 
         if (!foundProject) {
-            throw new Error(`Project ${projectId} not found`);
-        }
+            const workspace = data.workspaces.find(w => w.id === workspaceId);
+
+            if (!workspace) {
+                throw new Error(`Workspace ${workspaceId} not found`);
+            }
+
+            if ((!updates.framework || !updates.config.name)) {
+                throw new Error(`Invalid project configuration`);
+            }
+
+            const updatedProject: ProjectData = {
+                ...updates,
+                name: updates.config.name || 'Unnamed Project',
+                path: updates.path as string,
+                workspaceId: updates.workspaceId as string,
+                framework: updates.framework as FrameworkType,
+                updatedAt: new Date().toISOString(),
+                id: uuidv4(),
+                config: updates.config || {},
+            };
+
+            workspace.projects?.push(updatedProject as ProjectData);
+
+            workspace.updatedAt = new Date().toISOString();
+
+            await this.addProjectToStudioWorkspace(workspace, updatedProject, true);
+
+            foundProject = updatedProject;
+
+        } 
 
         await this.saveData(data);
+
         return foundProject;
     }
 
-    async deleteProject(projectId: string): Promise<void> {
+    async deleteProject(projectId: string, basePath: string): Promise<void> {
         const data = await this.loadData();
         let deleted = false;
 
@@ -177,11 +229,107 @@ export class WorkspaceRepository {
             }
         }
 
+        await removeProjectFromWorkspace(projectId, basePath);
+
         if (!deleted) {
             throw new Error(`Project ${projectId} not found`);
         }
 
         await this.saveData(data);
+    }
+
+    async saveCustomCompose(yaml: object, basePath: string) {
+        await saveCustomWorkspaceComposeFile(yaml, basePath)
+    }
+
+    async addService(serviceWorkspace: ServiceWorkspace, basePath: string) {
+        const data = await this.loadData();
+        const workspace = data.workspaces.find(w => w.id === serviceWorkspace.id);
+
+        if (!workspace) {
+            throw new Error(`Workspace ${serviceWorkspace.id} not found`);
+        }
+
+        const serviceId = uuidv4();
+        const newService = {
+            ...serviceWorkspace.service,
+            id: serviceId,
+            properties: {
+                ...serviceWorkspace.service.properties,
+                labels: serviceWorkspace.service.properties?.labels?.map(label =>
+                    label.key === "uuid"
+                        ? { ...label, value: serviceId }
+                        : label
+                ) || []
+            }
+        };
+        workspace.services = workspace?.services || [];
+        workspace.services.push(newService);
+
+        await addServiceToWorkspace({ ...serviceWorkspace, service: newService }, basePath)
+
+        await this.saveData(data);
+
+    }
+
+    async deleteService(serviceId: string, basePath: string) {
+
+        const data = await this.loadData();
+        let deleted = false;
+
+        for (const workspace of data.workspaces) {
+            if (workspace.services) {
+                const initialLength = workspace.services.length;
+                workspace.services = workspace.services.filter(p => p.id !== serviceId);
+                if (workspace.services.length !== initialLength) {
+                    workspace.updatedAt = new Date().toISOString();
+                    deleted = true;
+                    break;
+                }
+            }
+        }
+
+        await removeServiceFromWorkspace(serviceId, basePath)
+
+        if (!deleted) {
+            throw new Error(`Project ${serviceId} not found`);
+        }
+
+        await this.saveData(data);
+    }
+
+    async updateService(config: ServiceWorkspace, basePath: string) {
+
+        const data = await this.loadData();
+        let foundService: WorkspaceService | undefined;
+        const { service } = config
+
+        for (const workspace of data.workspaces) {
+            const serviceIndex = workspace.services?.findIndex(p => p.id === service.id) ?? -1;
+            if (serviceIndex !== -1 && workspace.services) {
+                const updatedService = {
+                    ...workspace.services[serviceIndex],
+                    ...service,
+                    updatedAt: new Date().toISOString()
+                };
+                workspace.services[serviceIndex] = updatedService;
+                workspace.updatedAt = new Date().toISOString();
+                foundService = updatedService;
+                break;
+            }
+        }
+
+        await updateServiceToWorkspace(config, basePath)
+
+        await this.saveData(data);
+
+        return foundService;
+    }
+
+    async listServices(workspaceId: string): Promise<WorkspaceService[]> {
+        const data = await this.loadData();
+        const workspace = data.workspaces.find(w => w.id === workspaceId);
+        return workspace?.services || [];
     }
 
     // Query Methods
@@ -207,7 +355,11 @@ export class WorkspaceRepository {
     async listProjects(workspaceId: string): Promise<ProjectData[]> {
         const data = await this.loadData();
         const workspace = data.workspaces.find(w => w.id === workspaceId);
-        return workspace?.projects || [];
+        return workspace?.projects?.sort((a, b) => {
+            const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z');
+            const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z');
+            return dateB.getTime() - dateA.getTime();
+        }) || [];
     }
 
     async getRecentWorkspaces(limit = 5): Promise<IWorkspace[]> {
@@ -230,6 +382,37 @@ export class WorkspaceRepository {
                 return dateB.getTime() - dateA.getTime();
             })
             .slice(0, limit);
+    }
+
+    async validateAndMoveProject(project: ProjectData, workspacePath: string): Promise<void> {
+        // Expected project path pattern: <workspacePath>/projects/<projectName>
+        const expectedPath = path.join(workspacePath, 'projects', project.config.name);
+
+        // If project is already in correct location, do nothing
+        if (project.path === expectedPath) {
+            return;
+        }
+
+        // Create projects directory if it doesn't exist
+        const projectsDir = path.join(workspacePath, 'projects');
+        if (!fs.existsSync(projectsDir)) {
+            await fs.promises.mkdir(projectsDir, { recursive: true });
+        }
+
+        // Check if target directory already exists
+        if (fs.existsSync(expectedPath)) {
+            throw new Error(`Target directory ${expectedPath} already exists`);
+        }
+
+        // Move the project
+        try {
+            await fs.promises.cp(project.path, expectedPath, { recursive: true });
+            await fs.promises.rm(project.path, { recursive: true, force: true });
+            project.path = expectedPath;
+            project.updatedAt = new Date().toISOString();
+        } catch (error: any) {
+            throw new Error(`Failed to move project: ${error.message}`);
+        }
     }
 
     // Backup Methods

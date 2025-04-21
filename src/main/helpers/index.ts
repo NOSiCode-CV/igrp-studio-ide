@@ -43,7 +43,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
             const data = await readFile(baseApiPath, 'utf8');
             const parsedConfig = JSON.parse(data);
 
-            const { id, type } = parsedConfig
+            const { id, type, workspaceId } = parsedConfig
 
             if (baseApiPath.endsWith('baseApi.json')) {
                 config = {
@@ -52,7 +52,8 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
                     type: 'backend',
                     framework: type,
                     config: { ...parsedConfig },
-                    path: folderPath
+                    path: folderPath,
+                    workspaceId: workspaceId
                 }
             } else if (baseApiPath.endsWith('baseApp.json')) {
                 config = {
@@ -61,7 +62,8 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
                     type: 'frontend',
                     framework: type,
                     config: { ...parsedConfig },
-                    path: folderPath
+                    path: folderPath,
+                    workspaceId: workspaceId
                 }
             }
 

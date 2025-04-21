@@ -18,7 +18,7 @@ import { TableManager } from './TableManager';
 import { ConnectionManager } from './ConnectionManager';
 import { Button } from '@renderer/components/ui/button';
 import { getValuesToSubmit, initialValues } from '../../pages/model/config';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { getId, toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
@@ -191,7 +191,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent
-                className="max-w-[900px]"
+                className="sm:max-w-[600px] md:max-w-[900px] max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <DialogHeader>

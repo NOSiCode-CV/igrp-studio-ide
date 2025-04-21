@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Square, RefreshCw } from 'lucide-react';
 
 interface BorderValue {

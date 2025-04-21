@@ -62,7 +62,7 @@ export default function SupportContent({}: SupportContentProps) {
                     <span className="h-6 w-6">
                         <Headset />
                     </span>
-                    <h2 className="text-lg font-semibold">{t('supportTitle')}</h2>
+                    <h2 className="text-base font-semibold">{t('supportTitle')}</h2>
                 </div>
                 <div className="px-1">
                     <p className="text-muted-foreground">

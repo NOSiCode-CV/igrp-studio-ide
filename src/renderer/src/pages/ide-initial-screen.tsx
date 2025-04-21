@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import WelcomeHeader from './components/welcome-header';
-import CreateWorkspace from './components/create-workspace';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import Loader from '@renderer/components/loader';
 import { IWorkspace } from 'src/main/types';
 import {
@@ -12,9 +10,11 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { Container, FolderKanban, Network, Settings } from 'lucide-react';
-import Resources from './components/Resources';
-import { WorkspaceSettings } from './components/workspace-settings';
-import { WorkspaceDocker } from './components/workspace-docker';
+import WelcomeHeader from './workspaces/welcome-header';
+import Resources from './workspaces/resources';
+import { WorkspaceDocker } from './workspaces/workspace-docker';
+import { WorkspaceSettings } from './workspaces/workspace-settings';
+import CreateWorkspace from './workspaces/components/create-workspace';
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
@@ -98,13 +98,11 @@ const IDEInitialScreen = () => {
                         </TabsContent>
 
                         <TabsContent value="diagram" className="mt-0">
-                            {/*  <ProjectDiagram workspace={workspaceWithServices} /> */}
+                            {/* <WorkspaceDiagram workspace={workspace} /> */}
                         </TabsContent>
 
                         <TabsContent value="config" className="mt-0">
-                            <WorkspaceDocker
-                                workspace={workspace}
-                            />
+                            <WorkspaceDocker workspace={workspace} />
                         </TabsContent>
 
                         <TabsContent value="settings" className="mt-0">
@@ -115,7 +113,7 @@ const IDEInitialScreen = () => {
             )}
 
             {showWorkspaceDialog && (
-                <CreateWorkspace
+                <CreateWorkspace 
                     open={showWorkspaceDialog}
                     onSuccess={handleCreationSuccess}
                 />

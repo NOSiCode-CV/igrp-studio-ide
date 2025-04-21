@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, HelpCircle, Terminal, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, HelpCircle, AlertCircle } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -107,7 +107,7 @@ export function Footer() {
                 <div className="flex items-center space-x-3">
                     <Separator orientation="vertical" className="h-4" />
 
-                    <DebugTerminal/>
+                    <DebugTerminal />
 
                     <Tooltip>
                         <TooltipTrigger asChild>

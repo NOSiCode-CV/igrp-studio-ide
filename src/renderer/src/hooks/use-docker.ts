@@ -1,16 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
-import useToast from '@renderer/components/useToast';
-import { DockerComposeConfig, DockerComposeService } from 'src/main/types';
+import useToast from '@renderer/hooks/useToast';
+import { DockerComposeConfig, DockerComposeService, ServiceInfo } from 'src/main/types';
 import { useWorkspace } from './use-workspace';
-
-
-export interface DockerOperations {
-    up: (projectPath: string) => Promise<DockerComposeService[]>;
-    down: (projectPath: string) => Promise<DockerComposeService[]>;
-    status: (projectPath: string) => Promise<DockerComposeService[]>;
-    check: () => Promise<boolean>;
-}
+import { IDocker } from 'src/main/interfaces';
+import { useDispatch } from 'react-redux';
+import { setChangeStatus } from '@renderer/redux/thunks';
 
 export function useDocker() {
     const [isDockerRunning, setIsDockerRunning] = useState<boolean>(false);
@@ -18,35 +13,40 @@ export function useDocker() {
         workspace,
     } = useWorkspace();
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [fileContent, setFileContent] = useState<any>(null);
-    const [services, setServices] = useState<DockerComposeService[]>([]);
-
+    const [services, setServices] = useState<ServiceInfo[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
     const [composeConfig, setComposeConfig] = useState<DockerComposeConfig | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
     const { showErrorToast } = useToast();
+    const dispatch: any = useDispatch();
 
-    const dockerOperations: DockerOperations = {
+    const dockerOperations: IDocker = {
         up: async (projectPath: string) => {
-            if (!window.igrpStudio?.docker) throw new Error('Electron API not available');
             return window.igrpStudio.docker.up(projectPath);
         },
         down: async (projectPath: string) => {
-            if (!window.igrpStudio?.docker) throw new Error('Electron API not available');
-            return window.igrpStudio.docker.down(projectPath);
+            window.igrpStudio.docker.down(projectPath);
         },
         status: async (projectPath: string) => {
-            if (!window.igrpStudio?.docker) throw new Error('Electron API not available');
-            return window.igrpStudio.docker.status(projectPath).then((services: DockerComposeService[]) => {
+            return window.igrpStudio.docker.status(projectPath).then((services: ServiceInfo[]) => {
                 setServices(services);
-                console.log("services", services)
                 return services;
-            })
+            });
         },
         check: async () => {
-            if (!window.igrpStudio?.docker) return false;
             return window.igrpStudio.docker.check();
+        },
+        stop: async (projectPath: string, services: string[]) => {
+            await window.igrpStudio.docker.stop(projectPath, services).then(() => {
+                dispatch(setChangeStatus(true))
+            })
+        },
+        restart: async (projectPath: string, services: string[], timeout?: number) => {
+            await window.igrpStudio.docker.restart(projectPath, services, timeout).then(() => {
+                dispatch(setChangeStatus(true))
+            })
         }
     };
 
@@ -63,18 +63,22 @@ export function useDocker() {
 
 
     const handleDockerOperation = useCallback(async (
-        operation: keyof DockerOperations,
-        projectPath: string
-    ): Promise<DockerComposeService[] | boolean> => {
+        operation: keyof IDocker,
+        services?: string[],
+        timeout?: number
+    ): Promise<DockerComposeService[] | boolean | void> => {
+        setLoading(true);
         if (!isDockerRunning && operation !== 'status') {
             const isRunning = await checkDocker();
             if (!isRunning) {
+                setLoading(false);
+                setError(new Error('Docker daemon is not running'));
                 throw new Error('Docker daemon is not running');
             }
         }
 
         try {
-            return await dockerOperations[operation](projectPath);
+            return await dockerOperations[operation](workspace.path, services ?? [], timeout);
         } catch (err) {
             setError(err as Error);
             if (err instanceof Error &&
@@ -83,11 +87,13 @@ export function useDocker() {
                 throw new Error('Docker daemon is not running');
             }
             throw err;
+        } finally {
+            setLoading(false);
         }
-    }, [isDockerRunning, checkDocker, dockerOperations]);
+    }, [isDockerRunning, dockerOperations]);
 
-    const getServiceUrl = (service: DockerComposeService) => {
-        if (service.status !== 'running' || !service.ports || service.ports.length === 0) return null;
+    const getServiceUrl = (service: ServiceInfo) => {
+        if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.labels.type?.includes(type))) return null;
 
         const normalizedPorts = service.ports.map(port => {
             if (typeof port === 'string') {
@@ -99,20 +105,6 @@ export function useDocker() {
             }
             return port;
         });
-
-        // Try to find the most likely web port
-        const commonWebPorts = [80, 443, 3000, 8080, 8000, 9000, 9001];
-        const webPort = normalizedPorts.find(p => commonWebPorts.includes(p.target));
-
-        if (webPort) {
-            const protocol = [443, 8443].includes(webPort.target) ? 'https' : 'http';
-            return `${protocol}://localhost:${webPort.published}`;
-        }
-
-        // Try to guess protocol based on service image
-        if (service.image?.includes('postgres') || service.image?.includes('redis') || webPort) {
-            return null
-        }
 
         // Fallback to first port with HTTP
         return `http://localhost:${normalizedPorts[0].published}`;
@@ -136,7 +128,7 @@ export function useDocker() {
 
     useEffect(() => {
         const refreshContainers = async () => {
-            if (workspace?.path) handleDockerOperation('status', workspace.path)
+            if (workspace?.path) handleDockerOperation('status')
         };
 
         refreshContainers();
@@ -146,13 +138,14 @@ export function useDocker() {
         fileContent,
         composeConfig,
         services,
-        isLoading,
         error,
+        loading,
         getServiceUrl,
         loadComposeFile,
-        startContainers: (projectPath: string) => handleDockerOperation('up', projectPath),
-        stopContainers: (projectPath: string) => handleDockerOperation('down', projectPath),
-        refreshContainers: (projectPath: string) => handleDockerOperation('status', projectPath),
-
+        startContainers: () => handleDockerOperation('up'),
+        stopContainers: () => handleDockerOperation('down'),
+        refreshContainers: () => handleDockerOperation('status'),
+        stopService: (services?: string[]) => handleDockerOperation('stop', services),
+        restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', services, timeout),
     };
 }

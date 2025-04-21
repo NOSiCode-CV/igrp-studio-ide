@@ -1,21 +1,28 @@
 import { useState, useEffect } from 'react';
-import useToast from '@renderer/components/useToast';
+import useToast from '@renderer/hooks/useToast';
 import { IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
-import { navigateToNextPage, setBasePath, setConfig, setWorkspace } from '@renderer/redux/thunks';
+import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+import yaml from 'js-yaml';
+import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ROUTES } from '@renderer/routes/routeConstants';
+import { useTranslation } from 'react-i18next';
 
 interface RootState {
     PageBuilder: {
-        workspace: IWorkspace
+        workspace: IWorkspace,
+        changeStatus: boolean
     };
 }
 
 const selectState = (state: RootState) => state.PageBuilder;
 
 export const useWorkspace = () => {
+    const { t } = useTranslation();
     const { showSuccessToast, showErrorToast } = useToast();
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,29 +33,14 @@ export const useWorkspace = () => {
     const selectProperties = createSelector(
         selectState,
         (studio) => ({
-            workspace: studio.workspace
+            workspace: studio.workspace,
+            changeStatus: studio.changeStatus
         })
     );
 
-    const { workspace } = useSelector(selectProperties);
+    const { workspace, changeStatus } = useSelector(selectProperties);
 
     const [currentWorkspace, setCurrentWorkspace] = useState<IWorkspace | null>(workspace)
-
-    // Setup workspace and error handling
-    useEffect(() => {
-        const initialize = async () => {
-            await window.igrpStudio.workspace.initialize();
-
-            /*  window.igrpStudio.workspace.onError(({ code, message }) => {
-                 console.error(`[${code}] ${message}`);
-                 setError(message);
-             }); */
-        };
-
-        initialize();
-
-        refreshWorkspaces()
-    }, []);
 
     const getWorkspaces = async () => {
         return await window.igrpStudio.workspace.findAllWorkspaces();
@@ -56,6 +48,16 @@ export const useWorkspace = () => {
 
     const getRecentWorkspaces = async () => {
         return await window.igrpStudio.workspace.findRecentWorkspaces(3);
+    }
+
+    const saveCustomWorkspaceComposeFile = async (content: string) => {
+        try {
+            const composeYmal = yaml.load(content);
+            await window.igrpStudio.workspace.saveCustomWorkspaceComposeFile(composeYmal as Object, workspace.path);
+            showSuccessToast('Update successful');
+        } catch (err) {
+            showErrorToast('Failed to load workspaces');
+        }
     }
 
     const refreshWorkspaces = async () => {
@@ -106,22 +108,22 @@ export const useWorkspace = () => {
     }
 
     const updateWorkspace = async (id: string, updates: Partial<IWorkspace>) => {
-        setLoading(true);
         try {
 
-            const updated = await window.igrpStudio.workspace.updateWorkspace(id, updates);
+            dispatch(setChangeStatus(false))
+            await window.igrpStudio.workspace.updateWorkspace(id, updates).then((data) => {
+                if (!data) return;
+                setWorkspaces(prev =>
+                    prev.map(w => w.id === id ? data : w)
+                );
+                dispatch(setChangeStatus(true))
+                return data;
+            });
 
-            setWorkspaces(prev =>
-                prev.map(w => w.id === id ? updated : w)
-            );
-
-            return updated;
         } catch (err) {
             setError('Failed to update workspace');
             showErrorToast('Update failed');
             throw err;
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -130,6 +132,7 @@ export const useWorkspace = () => {
         try {
             await window.igrpStudio.workspace.deleteWorkspace(id);
             setWorkspaces(prev => prev.filter(w => w.id !== id));
+            dispatch(setWorkspace(null))
             showSuccessToast('Workspace removed');
         } catch (err) {
             setError('Failed to delete workspace');
@@ -154,36 +157,111 @@ export const useWorkspace = () => {
         return null;
     };
 
-    const saveOrOpenProject = async (project: ProjectData) => {
+    const saveOrOpenProject = async (project: ProjectData, onSuccess?: () => Promise<void>) => {
         try {
             const { id } = project
             let result: any = {};
 
             if (id)
-                await window.igrpStudio.workspace.updateProject(id, project);
+                result = await window.igrpStudio.workspace.updateProject(id, project);
             else
-                result = await window.igrpStudio.workspace.saveProject(workspace?.id, project);
+                result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
             if (result?.error) {
-                showErrorToast(result.error);
+                console.log(result?.error)
+                showErrorToast(result?.error);
                 return
             }
+
+            showSuccessToast(t('savedSuccessfully', { name: project.name }));
 
             dispatch(setBasePath(project.path));
 
             dispatch(setConfig(project));
 
+            onSuccess?.()
+
             navigateToNextPage(navigate, project);
+
         } catch (err) {
             showErrorToast(err);
-            throw err;
-        } finally {
-            setLoading(false);
         }
     }
 
+    const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
+
+        const navigationMap = {
+            [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
+            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
+        };
+        const path = navigationMap[appConfig.framework];
+        if (path)
+            navigate(path);
+    };
+
+
     const findAllProjects = async () => {
         return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
+    }
+
+    const findAllServices = async () => {
+        return await window.igrpStudio.workspace.findAllServices(workspace?.id);
+    }
+
+    const getTemplatesService = async () => {
+        return await window.engine.getService(ENV_TYPES.NEXTJS).then(data => {
+            return data
+        });
+    }
+
+    const createOrUpdateService = async (service: WorkspaceService, isProject: boolean) => {
+        let result: any = {};
+        try {
+            const { id: serviceId } = service
+
+
+            const data: ServiceWorkspace = {
+                id: workspace.id,
+                service
+            }
+            console.log(data)
+
+            if (isProject)
+                result = await window.igrpStudio.workspace.updateProject(serviceId, data)
+            else if (serviceId)
+                result = await window.igrpStudio.workspace.updateService(data, workspace.path)
+            else
+                result = await window.igrpStudio.workspace.createService(data, workspace.path)
+            if (result?.error) {
+                console.log(result.error)
+                showErrorToast(result.error);
+            } else
+                showSuccessToast('Service saved successfully');
+
+            dispatch(setChangeStatus(true));
+
+        } catch (err) {
+            showErrorToast(err);
+        }
+    }
+
+    const removeService = async (serviceId: string) => {
+        try {
+
+            const result
+                : any = await window.igrpStudio.workspace.deleteService(serviceId, workspace.path)
+
+            if (result?.error) {
+                console.log(result.error)
+                showErrorToast(result.error);
+            } else {
+                showSuccessToast('Service deleted successfully');
+                dispatch(setChangeStatus(true));
+            }
+
+        } catch (err) {
+            showErrorToast(err);
+        }
     }
 
     useEffect(() => {
@@ -208,10 +286,16 @@ export const useWorkspace = () => {
             getWorkspaces,
             saveOrOpenProject,
             findAllProjects,
-            getRecentWorkspaces
+            getRecentWorkspaces,
+            getTemplatesService,
+            saveCustomWorkspaceComposeFile,
+            createOrUpdateService,
+            removeService,
+            findAllServices
         },
         state: {
-            hasWorkspaces: workspaces.length > 0
+            hasWorkspaces: workspaces.length > 0,
+            changeStatus
         }
     };
 };

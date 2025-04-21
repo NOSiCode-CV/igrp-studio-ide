@@ -1,4 +1,3 @@
-import React from 'react';
 import type { BackgroundValue } from '../../effects/types';
 
 interface ImageEditorProps {

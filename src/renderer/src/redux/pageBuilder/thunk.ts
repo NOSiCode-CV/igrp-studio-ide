@@ -1,4 +1,3 @@
-import { ROUTES } from '@renderer/routes/routeConstants';
 
 import {
   setConfigAction,
@@ -9,7 +8,6 @@ import {
   setWorkspaceAction
 } from './reducer';
 import { FileTree, IWorkspace, ProjectData } from 'src/main/types';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
 /**
  * set BasePath
  * @param {*} param0
@@ -54,29 +52,12 @@ export const setCurrentItem = (item: any) => async (dispatch: any) => {
  * set status
  * @param {*} param0
  */
-export const setWorkspace = (workspace: IWorkspace) => async (dispatch: any) => {
+export const setWorkspace = (workspace: IWorkspace | null) => async (dispatch: any) => {
   try {
     dispatch(setWorkspaceAction(workspace));
   } catch (error) { }
 };
 
-
-/**
- * set BasePath
- * @param {*} param0
- */
-export const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
-  try {
-    if (appConfig.framework === ENV_TYPES.NEXTJS) {
-      await window.engine.registryComponent(ENV_TYPES.NEXTJS, appConfig.path)
-      navigate(ROUTES.PATH_PAGE_BUILDER_UI);
-    } else if (appConfig.framework === ENV_TYPES.SPRING) {
-      navigate(ROUTES.PATH_PAGE_BUILDER_API);
-    }
-  } catch (error) {
-    console.error('Navigation error:', error);
-  }
-};
 
 /* /**
 *  fetch  pages

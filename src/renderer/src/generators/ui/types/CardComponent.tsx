@@ -1,5 +1,5 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import { COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
+import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
@@ -14,12 +14,14 @@ const CardComponent = ({ comp }: CardComponentProps) => {
     const Icon = ICON_MAP[componentName];
 
     const Component = COMPONENT_MAP[componentName];
-
+    const componentLabel = commonProperties?.label || componentName;
     return (
         <>
             {Component ? (
                 //@ts-ignore
-                <Component {...args} onSelectValueChange={() => void 0} />
+                <Component {...args} onSelectValueChange={() => void 0}>
+                   {/*  {componentName === COMPONENT.Button && componentLabel} */}
+                </Component>
             ) : (
                 <div className="rounded-lg shadow-xs border p-4 bg-card">
                     <div className="flex items-center gap-3">

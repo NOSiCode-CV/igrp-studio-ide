@@ -13,10 +13,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import React, { useState } from 'react';
 
 const toMap = (items: any) => {
-    return items.map((value: string) => ({
-        value,
-        label: value,
-    }));
+    return (
+        items &&
+        items.map((value: string) => ({
+            value,
+            label: value,
+        }))
+    );
 };
 
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {

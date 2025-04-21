@@ -12,14 +12,7 @@ import {
     SidebarTrigger,
     useSidebar,
 } from '@renderer/components/ui/sidebar';
-import {
-    Badge,
-    ChevronRight,
-    FileText,
-    GitBranch,
-    Home,
-    Server,
-} from 'lucide-react';
+import { ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -37,7 +30,6 @@ import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
-import { useNavSettings } from './nav-data';
 
 interface AppSidebarProps {
     className?: string;
@@ -59,10 +51,8 @@ export function AppSidebar({
     const { state: sidebarState } = useSidebar();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
+
     const menuApp = filterSubItems(menuItems, searchQuery);
-
-    const { menuItems: othersMenus } = useNavSettings();
-
     const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
     const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
@@ -85,30 +75,13 @@ export function AppSidebar({
     const handleClickMenu = (item: MenuItem) => {
         setActiveMenuGroup(item.label);
         if (item.id === 'apis') setActiveMenu(menuApp);
-        else if (item.id === 'settings') {
-            const menuApp = filterSubItems(othersMenus, searchQuery);
-            setActiveMenu(menuApp);
-        } else setActiveMenu([]);
+        else setActiveMenu([]);
     };
 
     const menuIcons: MenuItem[] = [
         { icon: Server, label: t('apis'), id: 'apis' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-        /*   {
-            icon: FileText,
-            label: t('documents'),
-            id: 'documents',
-        }, */
-        {
-            icon: Badge,
-            label: t('settings'),
-            id: 'settings',
-        },
-        {
-            icon: GitBranch,
-            label: t('git'),
-            id: 'git',
-        },
+        { icon: GitBranch, label: t('git'), id: 'git' },
     ];
 
     return (
@@ -165,12 +138,18 @@ export function AppSidebar({
                                                     activeMenuGroup
                                                 }
                                                 size="lg"
-                                                className="px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate"
+                                                className={cn(
+                                                    'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
+                                                    item.label ===
+                                                        activeMenuGroup
+                                                        ? '!text-igrp'
+                                                        : ''
+                                                )}
                                             >
                                                 <div className="w-8 h-8 flex items-center justify-center">
                                                     <item.icon size={20} />
                                                 </div>
-                                                <span className="w-16 text-xs text-center block text-ellipsis overflow-hidden whitespace-nowrap truncate">
+                                                <span className="w-16 text-xs text-center text-ellipsis truncate">
                                                     {item.label}
                                                 </span>
                                             </SidebarMenuButton>

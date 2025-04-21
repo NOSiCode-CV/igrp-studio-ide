@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
+import { ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -116,9 +117,9 @@ const engine = {
 		}
 	},
 
-	registryComponent: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+	registry: async (engineType: string): Promise<HandlerResponse> => {
 		try {
-			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType, basePath)
+			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -127,6 +128,14 @@ const engine = {
 	getComponent: async (engineType: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.NEXT.GET_COMPONENT, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getService: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_SERVICE, engineType)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -149,15 +158,17 @@ const repo = {
 		// Project methods
 		findAllRecentProjects: (limit?: number) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, limit),
-		saveProject: async (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) => {
+		createProject: async (workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>) => {
 			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CREATE, workspaceId, project) } catch (error) {
 				return handleError(error)
 			}
 		},
+		saveCustomWorkspaceComposeFile: (yaml: object, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, yaml, basePath),
 		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
-		deleteProject: (projectId: string) =>
-			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId),
+		deleteProject: (projectId: string, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId, basePath),
 		getProject: (projectId: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.GET, projectId),
 		findAllProjects: (workspaceId?: string) =>
@@ -177,6 +188,16 @@ const repo = {
 		getWorkspace: (workspaceId: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET, workspaceId),
 		getLastAccessedWorkspace: () => ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT),
+
+		// Service methods
+		createService: (service: ServiceWorkspace, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.CREATE, service, basePath),
+		updateService: (service: ServiceWorkspace, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.UPDATE, service, basePath),
+		deleteService: (serviceId: string, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.DELETE, serviceId, basePath),
+		findAllServices: (workspaceId: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.FIND_ALL, workspaceId),
 
 		// Backup methods
 		createBackup: (backupPath?: string) =>
@@ -218,6 +239,8 @@ const repo = {
 		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
 		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
 		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
+		stop: (projectPath: string, services: string[]) => ipcRenderer.invoke('docker-stop', projectPath, services),
+		restart: (projectPath: string, services: string[], timeout?: number) => ipcRenderer.invoke('docker-restart', projectPath, services, timeout),
 		check: () => ipcRenderer.invoke('docker-check')
 	}
 }

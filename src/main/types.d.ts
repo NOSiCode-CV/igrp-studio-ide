@@ -1,3 +1,5 @@
+import { WorkspaceService } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any;
 
 type HandlerResponse<T = any> = {
@@ -10,14 +12,13 @@ export type ProjectType = "frontend" | "backend"
 export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet';
 
 export interface NextConfigData {
-    appName: string
+    name: string
     description?: string
     workspaceId: string;
     id: string;
 }
 
 export interface DotNetConfigData {
-    apiName: string;
     artifact: string;
     database: DatabaseTypes;
     description?: string;
@@ -29,7 +30,7 @@ export interface DotNetConfigData {
 }
 
 export interface SpringConfigData {
-    apiName: string;
+    name: string;
     description: string;
     group: string;
     artifact: string;
@@ -42,6 +43,7 @@ export interface SpringConfigData {
     springBootVersion: string;
     dependencies: Array<any>
     enableGraalVm: boolean
+    package?: string;
 }
 
 export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData;
@@ -52,13 +54,14 @@ export interface ProjectData {
     icon?: string;
     type?: ProjectType
     framework: FrameworkType
-    config?: ConfigData;
+    config: ConfigData | any;
     path: string;
     themeColor?: string;
     location?: location,
     createdAt?: string;
     updatedAt?: string;
     workspaceId: string;
+    dependsOn?: string[] | Record<string, DependencyConfig>[];
 }
 
 export interface IWorkspace {
@@ -71,6 +74,8 @@ export interface IWorkspace {
     updatedAt?: string;
     lastOpenedAt?: string;
     projects?: ProjectData[];
+    services?: WorkspaceService[];
+    pinned?: boolean
 }
 
 export interface IOpenProject {
@@ -120,7 +125,10 @@ export interface Repository {
     html_url: string;
     clone_url: string;
     updated_at: string | null;
+    platform: string
 }
+
+export type RepositoryPlatform = "github" | "gitlab" | "other"
 
 interface Commit {
     hash: string;
@@ -167,16 +175,18 @@ export interface DockerComposeConfig {
 
 export interface DockerComposeService {
     image: string;
-    containerName?: string;
+    container_name?: string;
     ports?: string[];
     volumes?: string[];
     environment?: { name: string; value: string }[]
-    dependsOn?: string[];
+    depends_on?: string[];
     networks?: string[];
     hostname?: string;
     restart?: string;
     host_config?: Record<string, any>;
-    status: string
+    status: string,
+    type?: string,
+    labels: Record<string, string>
 }
 
 export interface DockerComposeNetwork {
@@ -190,4 +200,25 @@ export interface DockerComposeVolume {
     name?: string;
     driver?: string;
     external?: boolean;
+}
+
+interface DependencyConfig {
+    condition?: string;
+}
+
+export interface ServiceInfo {
+    image: string;
+    container_name?: string;
+    ports?: string[];
+    volumes?: string[];
+    environment?: { name: string; value: string }[]
+    dependsOn?: string[] | Record<string, DependencyConfig>[];
+    networks?: string[];
+    hostname?: string;
+    restart?: string;
+    hostConfig?: Record<string, any>;
+    status: string,
+    name: string,
+    id?: string,
+    labels: Record<string, string>
 }

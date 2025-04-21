@@ -2,10 +2,9 @@ import { Repository } from 'src/main/types';
 import { Button } from '../ui/button';
 import { GitFork } from 'lucide-react';
 import { Card } from '../ui/card';
-import useToast from '../useToast';
+import useToast from '../../hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { useEffect } from 'react';
 
 type CardGitProjectProps = {
     repo: Repository;

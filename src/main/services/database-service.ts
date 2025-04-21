@@ -1,7 +1,6 @@
 import { app } from 'electron'
 import fs from 'fs'
 import { readFile, writeFile } from 'fs/promises';
-import { IConnenctionRepository } from '../interfaces';
 import { Connection } from '../types';
 
 const filename = app.getPath('userData') + "/rp-connections.json";
@@ -17,7 +16,7 @@ async function saveCfg(cfg: any) {
     await writeFile(filename, JSON.stringify(cfg));
 }
 
-export class ConnectionRepository implements IConnenctionRepository {
+export class ConnectionRepository {
 
     async save(connection: Connection): Promise<Connection> {
 
