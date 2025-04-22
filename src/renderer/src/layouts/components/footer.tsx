@@ -69,6 +69,7 @@ export function Footer() {
                 await window.electron
                     .checkForUpdates()
                     .then((version: string) => {
+                        if(!version) return;
                         setNewVersion(version);
                         if (version !== appVersion) {
                             setLog(t('versionAvailable', { version }));

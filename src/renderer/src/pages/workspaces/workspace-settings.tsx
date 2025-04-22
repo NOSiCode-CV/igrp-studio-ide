@@ -126,7 +126,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 )}
                             </Button>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                             This is the unique identifier for your workspace.
                         </p>
                     </div>
@@ -192,7 +192,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-xs font-medium">Auto-save</div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-sm text-muted-foreground">
                                 Automatically save changes
                             </div>
                         </div>
@@ -206,7 +206,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             <div className="text-xs font-medium">
                                 Enable Versioning
                             </div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-sm text-muted-foreground">
                                 Track changes to workspace configuration
                             </div>
                         </div>
@@ -220,7 +220,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             <div className="text-xs font-medium">
                                 Experimental Features
                             </div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-sm text-muted-foreground">
                                 Enable experimental workspace features
                             </div>
                         </div>
@@ -244,7 +244,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 <h4 className="text-xs font-medium">
                                     Delete this workspace
                                 </h4>
-                                <p className="text-[10px] text-muted-foreground">
+                                <p className="text-sm text-muted-foreground">
                                     Once deleted, it will be gone forever. This
                                     action cannot be undone.
                                 </p>
@@ -282,10 +282,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                             <div className="text-xs font-medium mb-1">
                                                 {workspace.name}
                                             </div>
-                                            <div className="text-[10px] text-muted-foreground">
+                                            <div className="text-sm text-muted-foreground">
                                                 {workspace.description}
                                             </div>
-                                            <div className="text-[10px] mt-1">
+                                            <div className="text-sm mt-1">
                                                 <span className="text-muted-foreground">
                                                     ID:{' '}
                                                 </span>

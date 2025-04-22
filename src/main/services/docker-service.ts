@@ -97,7 +97,7 @@ export class DockerService {
                             status: containerInfo.State,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
                             volumes: serviceDef.volumes || [],
-                            environment: this.parseEnvironmentToArray(serviceDef.environment),
+                            environments: this.parseEnvironmentToArray(serviceDef.environment),
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
@@ -110,7 +110,7 @@ export class DockerService {
                             id: '',
                             status: 'stopped',
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            environment: this.parseEnvironmentToArray(serviceDef.environment),
+                            environments: this.parseEnvironmentToArray(serviceDef.environment),
                         };
                     }
                 });
@@ -127,7 +127,7 @@ export class DockerService {
                             id: '',
                             status: 'error',
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            environment: this.parseEnvironmentToArray(serviceDef.environment),
+                            environments: this.parseEnvironmentToArray(serviceDef.environment),
                         }
                     )
                 });

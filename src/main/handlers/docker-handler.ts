@@ -5,8 +5,8 @@ import { dockerService } from "../services/docker-service";
 
 
 // IPC Handlers
-ipcMain.handle('docker-up', async (_event, projectPath: string): Promise<ServiceInfo[]> => {
-    return await dockerService.up(projectPath);
+ipcMain.handle('docker-up', async (_event, projectPath: string): Promise<void> => {
+    await dockerService.up(projectPath);
 });
 
 ipcMain.handle('docker-down', async (_event, projectPath: string): Promise<void> => {

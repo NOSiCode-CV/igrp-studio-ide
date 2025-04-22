@@ -66,17 +66,17 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                                             >
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <div>
+                                                        <>
                                                             <IGRPIcon
                                                                 iconName={
-                                                                    iconName
+                                                                    iconName as any
                                                                 }
                                                                 size="24"
                                                             />
                                                             <span className="sr-only">
                                                                 {iconName}
                                                             </span>
-                                                        </div>
+                                                        </>
                                                     </TooltipTrigger>
                                                     {!selectedIcon && (
                                                         <TooltipContent>

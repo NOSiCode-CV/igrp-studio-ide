@@ -92,7 +92,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             <IGRPCombobox
                                 options={contentTypes}
                                 value={contentType}
-                                onChange={(value) => setContentType(value)}
+                                onChange={(value) => setContentType(value as string)}
                                 className="w-full"
                             />
                         </div>

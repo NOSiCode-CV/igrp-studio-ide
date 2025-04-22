@@ -50,7 +50,7 @@ export function BoxShadowControls({
                 return;
 
             const buttonRect = buttonRef.current.getBoundingClientRect();
-            const containerRect = containerRef.current.getBoundingClientRect();
+            //const containerRect = containerRef.current.getBoundingClientRect();
             const spaceBelow = window.innerHeight - buttonRect.bottom;
             const spaceAbove = buttonRect.top;
 

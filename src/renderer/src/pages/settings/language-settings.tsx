@@ -48,7 +48,9 @@ export function LanguageSettings() {
                     <IGRPCombobox
                         value={currentLanguage}
                         options={languages}
-                        onChange={handleLanguageChange}
+                        onChange={(value) =>
+                            handleLanguageChange(value as string)
+                        }
                     />
                 </div>
             </div>

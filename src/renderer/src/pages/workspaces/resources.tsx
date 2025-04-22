@@ -45,7 +45,6 @@ import ProjectGrid from './projects/project-grid';
 import { getId } from '@renderer/utils/helpers';
 import { setChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
-import GitProject from '@renderer/components/git/git-project';
 
 type ResourceType = 'project' | 'service';
 type ViewMode = 'grid' | 'list';
@@ -160,6 +159,7 @@ const Resources = () => {
     const [projectSearchQuery, setProjectSearchQuery] = useState('');
     const [serviceSearchQuery, setServiceSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState<string>('lastModified');
+    const [sortOrderService, setSortOrderService] = useState<string>('lastModified');
     const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
     const { showErrorToast } = useToast();
@@ -359,8 +359,8 @@ const Resources = () => {
                 viewMode={serviceViewMode}
                 onViewModeChange={setServiceViewMode}
                 onSearchChange={setServiceSearchQuery}
-                sortValue={sortOrder}
-                onSortChange={setSortOrder}
+                sortValue={sortOrderService}
+                onSortChange={setSortOrderService}
                 isEmpty={filteredServices.length === 0}
                 emptyState={<ServiceEmptyState />}
                 actionButtons={<ServiceActions />}

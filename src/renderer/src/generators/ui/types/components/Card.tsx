@@ -29,7 +29,7 @@ export const COMPONENT_MAP: Record<string, React.ElementType> = {
     [COMPONENT.CardHeader]: IGRPCardHeader,
 };
 
-const Card: React.FC<CardProps> = ({ comp, isDisabled, onDragEnd }) => {
+const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     const {
         children: components,
         id: componentId,

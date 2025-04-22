@@ -86,7 +86,7 @@ export function JSONSchemaBuilder({
         onSchemaChange?.({ ...schema, properties: orderedProperties });
     }, [schema, fieldOrder, onSchemaChange]);
 
-    const generateUniqueName = (
+    /* const generateUniqueName = (
         baseName: string,
         existingNames: Set<string>
     ): string => {
@@ -97,31 +97,22 @@ export function JSONSchemaBuilder({
             counter++;
         }
         return uniqueName;
-    };
+    }; */
 
-    const checkAndUpdateDuplicateNames = (
-        field: SchemaField,
-        parentField: SchemaField | null,
-        existingNames: Set<string>
-    ): SchemaField => {
+    const checkAndUpdateDuplicateNames = (field: SchemaField): SchemaField => {
         const updatedField = { ...field };
 
-        /*  if (parentField) {
-            updatedField.name = generateUniqueName(field.name, existingNames);
-            existingNames.add(updatedField.name);
-        }
- */
         if (
             (updatedField.type === 'object' || updatedField.type === 'array') &&
             updatedField.properties
         ) {
-            const propertyNames = new Set<string>();
+            // const propertyNames = new Set<string>();
             updatedField.properties = Object.fromEntries(
                 Object.entries(updatedField.properties).map(([_key, value]) => {
                     const updatedValue = checkAndUpdateDuplicateNames(
-                        value,
-                        updatedField,
-                        propertyNames
+                        value
+                        /*  updatedField,
+                        propertyNames */
                     );
                     return [updatedValue.name, updatedValue];
                 })
@@ -132,7 +123,7 @@ export function JSONSchemaBuilder({
     };
 
     const handleAddNewField = (parentId?: string) => {
-        const newFieldName = `field${parentId}${Object.keys(schema.properties?.[parentId]?.properties ?? {}).length + 1}`;
+        const newFieldName = `field${parentId}${parentId ? Object.keys(schema.properties?.[parentId]?.properties ?? {}).length + 1 : ''}`;
         const newFieldId = `new_field_${Date.now()}`;
 
         const newField: SchemaField = {
@@ -161,9 +152,9 @@ export function JSONSchemaBuilder({
                                         ...field.properties,
                                         [newFieldId]: newField,
                                     };
-                                    const existingNames = new Set(
+                                    /*  const existingNames = new Set(
                                         Object.keys(updatedProperties)
-                                    );
+                                    ); */
                                     const updatedField = {
                                         ...field,
                                         properties: Object.fromEntries(
@@ -172,9 +163,9 @@ export function JSONSchemaBuilder({
                                             ).map(([_key, value]) => {
                                                 const updatedValue =
                                                     checkAndUpdateDuplicateNames(
-                                                        value,
-                                                        field,
-                                                        existingNames
+                                                        value
+                                                        /*  field,
+                                                        existingNames */
                                                     );
                                                 return [
                                                     updatedValue.name,

@@ -3,7 +3,7 @@ import { IWorkspace, ProjectData } from '../types';
 import { WorkspaceRepository } from '../services/workspace-service';
 import { ERROR_CODES, EVENTS } from '../constants/events';
 import { handleWithCustomErrors } from '../helpers';
-import { ServiceWorkspace, } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ProjectWorkspace, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 const repo = new WorkspaceRepository();
 
@@ -115,6 +115,10 @@ handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.CREATE, async (_event, workspac
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.UPDATE, async (_, projectId: string, updates: Partial<ProjectData>) => {
     return await repo.updateProject(projectId, updates);
+});
+
+ipcMain.handle(EVENTS.REPOSITORY.PROJECT.CONFIGURE_SERVICE, async (_, config: ProjectWorkspace, basePath: string) => {
+    await repo.configureService(config, basePath);
 });
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.DELETE, async (_, projectId: string, basePath: string) => {

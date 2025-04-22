@@ -167,6 +167,8 @@ const repo = {
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, yaml, basePath),
 		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
+		configureService: (config: ServiceWorkspace, basePath: string) =>
+			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CONFIGURE_SERVICE, config, basePath),
 		deleteProject: (projectId: string, basePath: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId, basePath),
 		getProject: (projectId: string) =>

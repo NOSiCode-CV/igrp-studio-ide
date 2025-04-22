@@ -61,7 +61,7 @@ const EmptyPage = ({ onClick }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [onClick]);
     return (
-        <IGRPContainer>
+        <IGRPContainer className='mb-0'>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {actions.map((action, key) => (
                     <Card
@@ -69,7 +69,7 @@ const EmptyPage = ({ onClick }) => {
                         className="group hover:border-primary/50 transition-colors cursor-pointer"
                         onClick={action.onClick}
                     >
-                        <CardContent className="p-6 flex flex-col items-center justify-center space-y-4">
+                        <CardContent className="flex flex-col items-center justify-center space-y-4">
                             <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                                 {action.icon}
                             </div>

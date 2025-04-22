@@ -4,7 +4,7 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { FrameworkType, IWorkspace, ProjectData } from '../types';
-import { addProjectToWorkspace, addServiceToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, removeServiceFromWorkspace, saveCustomWorkspaceComposeFile, updateServiceToWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import { addProjectToWorkspace, addServiceToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, removeServiceFromWorkspace, saveCustomWorkspaceComposeFile, updateProjectToWorkspace, updateServiceToWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
 import { ProjectWorkspace, ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
@@ -159,7 +159,7 @@ export class WorkspaceRepository {
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
         const data = await this.loadData();
         let foundProject: ProjectData | undefined;
-        const { workspaceId } = updates
+        const { config: project, id: workspaceId } = updates;
 
         for (const workspace of data.workspaces) {
             const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
@@ -183,16 +183,16 @@ export class WorkspaceRepository {
                 throw new Error(`Workspace ${workspaceId} not found`);
             }
 
-            if ((!updates.framework || !updates.config.name)) {
+            if ((!project.framework || !project.config.name)) {
                 throw new Error(`Invalid project configuration`);
             }
 
             const updatedProject: ProjectData = {
                 ...updates,
                 name: updates.config.name || 'Unnamed Project',
-                path: updates.path as string,
-                workspaceId: updates.workspaceId as string,
-                framework: updates.framework as FrameworkType,
+                path: project.path as string,
+                workspaceId: project.workspaceId as string,
+                framework: project.framework as FrameworkType,
                 updatedAt: new Date().toISOString(),
                 id: uuidv4(),
                 config: updates.config || {},
@@ -206,11 +206,48 @@ export class WorkspaceRepository {
 
             foundProject = updatedProject;
 
-        } 
+        }
 
         await this.saveData(data);
 
         return foundProject;
+    }
+
+    async configureService(config: ProjectWorkspace, basePath: string): Promise<void> {
+
+        const { id: workspaceId, service, config: projectData } = config
+
+        const { config: projectDataConfig, id: projectId, framework } = projectData
+
+        const data = await this.loadData();
+
+        const workspace = data.workspaces.find(w => w.id === workspaceId);
+
+        if (!workspace) {
+            throw new Error(`Workspace ${workspaceId} not found`);
+        }
+
+        const projectConfig: ProjectWorkspace = {
+            config: { ...projectDataConfig, id: projectId, type: framework },
+            service,
+            id: workspaceId,
+        }
+
+        console.log('projectConfig', projectConfig)
+
+        await updateProjectToWorkspace(projectConfig, basePath);
+
+        const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
+        workspace.projects = workspace.projects ?? [];
+        workspace.projects[projectIndex] = {
+            ...workspace.projects[projectIndex],
+            id: projectId,
+            config: projectDataConfig,
+            service,
+            updatedAt: new Date().toISOString()
+        };
+
+        this.updateWorkspace(workspaceId, workspace)
     }
 
     async deleteProject(projectId: string, basePath: string): Promise<void> {

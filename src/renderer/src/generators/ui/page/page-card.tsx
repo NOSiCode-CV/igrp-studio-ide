@@ -22,7 +22,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
     const { t } = useTranslation();
     return (
         <Card>
-            <CardContent className="pt-6">
+            <CardContent>
                 <h3 className="font-semibold mb-2">{pageName}</h3>
                 <p className="text-sm text-muted-foreground">
                     {t('Type')}: {isPage ? 'Page' : 'Component'}

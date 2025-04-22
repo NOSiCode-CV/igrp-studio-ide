@@ -1,5 +1,4 @@
 import { exec } from 'child_process';
-import * as path from 'path';
 import { BrowserWindow, dialog } from 'electron';
 import { promisify } from 'util';
 import { checkAndReadBaseApi } from '../helpers';
@@ -37,6 +36,7 @@ export const GitService = {
             return false;
         }
     },
+
     async listBranches(projectPath: string) {
         try {
             // Lista todos os branches (locais e remotos)
@@ -113,19 +113,19 @@ export const GitService = {
                 basePath = filePaths[0];
             }
 
-           /*  const projectName = await new Promise<string>((resolve, reject) => {
-                window.webContents.send('request-project-name', {
-                    defaultName: repoUrl.split('/').pop()?.replace('.git', ''),
-                });
-
-                const { ipcMain } = require('electron');
-                ipcMain.once('project-name-response', (_event, name) => {
-                    if (!name) reject(new Error('No project name provided'));
-                    resolve(name);
-                });
-            });
-
-            const targetDir = path.join(basePath, projectName); */
+            /*  const projectName = await new Promise<string>((resolve, reject) => {
+                 window.webContents.send('request-project-name', {
+                     defaultName: repoUrl.split('/').pop()?.replace('.git', ''),
+                 });
+ 
+                 const { ipcMain } = require('electron');
+                 ipcMain.once('project-name-response', (_event, name) => {
+                     if (!name) reject(new Error('No project name provided'));
+                     resolve(name);
+                 });
+             });
+ 
+             const targetDir = path.join(basePath, projectName); */
 
             window.webContents.send('clone-progress', {
                 status: 'starting',

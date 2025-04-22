@@ -55,6 +55,7 @@ export interface ProjectData {
     type?: ProjectType
     framework: FrameworkType
     config: ConfigData | any;
+    service?: any;
     path: string;
     themeColor?: string;
     location?: location,
@@ -211,7 +212,7 @@ export interface ServiceInfo {
     container_name?: string;
     ports?: string[];
     volumes?: string[];
-    environment?: { name: string; value: string }[]
+    environments?: { name: string; value: string }[]
     dependsOn?: string[] | Record<string, DependencyConfig>[];
     networks?: string[];
     hostname?: string;

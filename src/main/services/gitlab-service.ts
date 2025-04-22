@@ -1,7 +1,6 @@
 import { Gitlab } from '@gitbeaker/node';
 import { GitStore } from './git-store';
 import { BrowserWindow } from 'electron';
-import { platform } from 'os';
 
 let gitlab: any = null;
 

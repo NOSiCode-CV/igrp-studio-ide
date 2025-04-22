@@ -56,7 +56,7 @@ interface ConfigurationDialogProps {
     projects?: ProjectData[];
     isNew?: boolean;
     children?: React.ReactNode;
-    isProject?: boolean;
+    project?: ProjectData;
 }
 
 export function ConfigurationDialog({
@@ -65,7 +65,7 @@ export function ConfigurationDialog({
     projects = [],
     isNew = true,
     children,
-    isProject = false,
+    project,
 }: ConfigurationDialogProps) {
     const { t } = useTranslation();
     const [name, setName] = useState('');
@@ -92,7 +92,11 @@ export function ConfigurationDialog({
 
     const {
         workspace,
-        actions: { getTemplatesService, createOrUpdateService },
+        actions: {
+            getTemplatesService,
+            createOrUpdateService,
+            configureService,
+        },
     } = useWorkspace();
 
     useEffect(() => {
@@ -175,7 +179,7 @@ export function ConfigurationDialog({
             setDescription(service.labels.description || '');
             setType(service.labels?.type || '');
             setPorts(service.ports || []);
-            setEnvironments(service.environment || []);
+            setEnvironments(service.environments || []);
             setVolumes(service.volumes || []);
             setDependsOn(service.dependsOn || []);
             setNetworkType(service.networkType || 'bridge');
@@ -281,55 +285,71 @@ export function ConfigurationDialog({
     const handleSave = () => {
         setIsSubmitting(true);
 
+        // Destructure template with fallback to empty object
         const {
-            depends_on,
-            id,
-            label,
-            type,
-            status,
-            name,
-            networkType,
-            customNetwork,
-            ...rest
+            depends_on: templateDependsOn,
+            id: templateId,
+            labels: templateLabels = [],
+            ...templateRest
         } = template || {};
 
-        const { id: serviceId, environment, ...restService } = service;
+        // Destructure service with fallback to empty object
+        const {
+            id: serviceId,
+            labels: serviceLabels = {},
+            properties: serviceProperties = {},
+            ...serviceRest
+        } = service || {};
 
+        // Process ports
         const _ports: Port[] = ports.map((portStr) => {
             const [external, internal] = portStr.split(':').map(Number);
             return { external, internal };
         });
 
-        const _volumes: Volume[] = volumes.map((volumesStr) => {
-            const vols = volumesStr.split(':');
-            return { name: vols[0], path: vols[1], driver: 'none' };
+        // Process volumes
+        const _volumes: Volume[] = volumes.map((volumeStr) => {
+            const [name, path] = volumeStr.split(':');
+            return { name, path, driver: 'none' };
         });
 
+        // Process labels - merge template labels with new ones
         const _labels = Object.entries({ type, description }).reduce(
             (acc, [key, value]) => [
                 ...acc.filter((label) => label.key !== key),
                 ...(value ? [{ key, value }] : []),
             ],
-            [...(template?.labels || [])]
+            [...templateLabels]
         );
 
-        // Create service object
         const serviceData: WorkspaceService = {
-            id: service?.labels.uuid || '',
+            // ID priority: service.labels.uuid > service.id > template.id
+            id: serviceLabels.uuid || serviceId || templateId || '',
             name: name,
             properties: {
-                ...rest,
-                ...restService,
+                // Template properties (lowest priority)
+                ...templateRest,
+                // Service properties (medium priority)
+                ...serviceProperties,
+                // Form values (highest priority)
+                ...serviceRest,
                 container_name: name,
                 image,
                 ports: _ports,
                 environments,
                 volumes: _volumes,
-                dependsOn,
+                depends_on: dependsOn,
                 networks: [
                     { network: useCustomNetwork ? customNetwork : '' },
                 ].filter((item) => item.network),
-                labels: [..._labels],
+                // Merged labels with service labels taking priority
+                labels: [
+                    ..._labels,
+                    ...Object.entries(serviceLabels).map(([key, value]) => ({
+                        key,
+                        value,
+                    })),
+                ],
             },
         };
 
@@ -341,8 +361,9 @@ export function ConfigurationDialog({
         }, 500);
     };
 
-    const onSave = (data: any) => {
-        createOrUpdateService(data, isProject);
+    const onSave = (data: WorkspaceService) => {
+        if (project) configureService({ config: project, service: data });
+        else createOrUpdateService(data);
     };
 
     return (
