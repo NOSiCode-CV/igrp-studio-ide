@@ -13,6 +13,8 @@ build_packagedev:
     - tags
   variables:
     ELECTRON_BUILDER_CACHE: "${CI_PROJECT_DIR}/.cache/electron-builder"
+    # Make sure the variable is available in the script environment
+    CERTIFICATE_PASSWORD: "${CERTIFICATE_PASSWORD}"
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
@@ -29,6 +31,7 @@ build_packagedev:
       "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
 
   script:
+    - echo "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" > .env
     - yarn install --frozen-lockfile
     - yarn release:win
     - yarn release:linux
