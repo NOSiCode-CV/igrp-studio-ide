@@ -31,7 +31,8 @@ build_packagedev:
       "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
 
   script:
-    - echo "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" > .env
+    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
+    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
     - yarn install --frozen-lockfile
     - yarn release:win
     - yarn release:linux
