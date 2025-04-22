@@ -153,7 +153,7 @@
 			"target": "nsis",
 			"signtoolOptions": {
 				"certificateFile": "certificate.pfx",
-				"certificatePassword": "Pa$$w0rd",
+				"certificatePassword": "ewSh5xAKvMCJ8M9GfG6uHrY",
 				"signingHashAlgorithms": [
 					"sha256"
 				],
