@@ -25,10 +25,12 @@ build_packagedev:
     - dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
 
     # Download the certificate file from GitLab repository
-    - >
-      curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" 
-      -o certificate.pfx 
-      "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
+    #- >
+      #curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" 
+      #-o certificate.pfx 
+      #"https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
+    
+    - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}

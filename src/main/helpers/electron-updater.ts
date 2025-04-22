@@ -21,15 +21,15 @@ export default class AppUpdater {
         this.win.webContents.send('message-update', text);
     }
 
-     configurePlatformSpecifics() {
+    configurePlatformSpecifics() {
         autoUpdater.setFeedURL({
             provider: "s3",
             bucket: "igrp-studio",
-            endpoint: "https://storage-api.nosi.cv",
+            endpoint: import.meta.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
             path: `${process.platform}/${process.arch}`,
             channel: "latest"
-          });
-      }
+        });
+    }
 
     initAutoUpdater() {
         autoUpdater.logger = log
