@@ -56,24 +56,16 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
 
     const loadAction = (content: ControllerAction) => {
         const { actionName, path, method, pathVariables, requestParams, headers, responses, requestBody } = content;
-        setOldActionName(actionName);
-
         formik.setFieldValue('actionName', actionName || initialValues.actionName);
         formik.setFieldValue('method', method || initialValues.method);
         formik.setFieldValue('path', path || initialValues.path);
-        formik.setFieldValue('requestBody', requestBody || '');
+        formik.setFieldValue('requestBody', requestBody || initialValues.requestBody);
         formik.setFieldValue('pathVariables', pathVariables || initialValues.pathVariables);
         formik.setFieldValue('requestParams', requestParams || initialValues.requestParams);
         formik.setFieldValue('responses', responses || initialValues.responses);
         formik.setFieldValue('headers', headers || initialValues.headers);
+        setOldActionName(actionName);
     };
-
-    useEffect(() => {
-        const load = async () => {
-            await getJsonData(currentItem.path).then(setData);
-        };
-        load();
-    }, [currentItem]);
 
     useEffect(() => {
         const res = getTablesColumns(selectors, enumTypes, t);
@@ -90,8 +82,15 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
 
     useEffect(() => {
         const { content, id } = currentItem;
-        if (content) loadAction(content);
+
         setId(id);
+        loadAction(content || {});
+
+        const load = async () => {
+            await getJsonData(currentItem.path).then(setData);
+        };
+        load();
+
     }, [currentItem]);
 
     const getValuesToSubmit = async () => {

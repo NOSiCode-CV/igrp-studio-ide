@@ -169,11 +169,7 @@ export function ConfigurationDialog({
         if (open && service) {
             const network = service.networks && service.networks[0];
 
-            const selectedTemplate = serviceTemplates.find(
-                (t) => t.name === service.name
-            );
-
-            setTemplate(selectedTemplate);
+            console.log('service', service);
 
             // Edit mode
             setName(service.name || '');
@@ -286,10 +282,13 @@ export function ConfigurationDialog({
     const mergeLabels = (
         templateLabels: Environment[] = [],
         serviceLabels: Record<string, string> = {},
-        formLabels: Record<string, string> = {}
+        formLabels: Record<string, string> = {},
+        uuid: string
     ): Environment[] => {
         // Create a map to store labels and prevent duplicates
         const labelsMap = new Map<string, string>();
+
+        labelsMap.set('uuid', uuid || '');
 
         // Add template labels first (lowest priority)
         templateLabels.forEach((label) => {
@@ -334,8 +333,6 @@ export function ConfigurationDialog({
             ...templateRest
         } = template || {};
 
-        console.log(template);
-
         // Destructure service with fallback to empty object
         const {
             id: serviceId,
@@ -343,10 +340,9 @@ export function ConfigurationDialog({
             properties: serviceProperties = {},
             depends_on: serviceDependsOn,
             name: ServiceName,
+            status,
             ...serviceRest
         } = service || {};
-
-        console.log(service);
 
         // Process ports
         const _ports: Port[] = ports.map((portStr) => {
@@ -365,7 +361,8 @@ export function ConfigurationDialog({
         const _labels = mergeLabels(
             templateLabels,
             serviceLabels,
-            { type, description } // form labels
+            { type, description },
+            serviceLabels.uuid
         );
 
         //depondencies
@@ -374,8 +371,7 @@ export function ConfigurationDialog({
         });
 
         const serviceData: WorkspaceService = {
-            // ID priority: service.labels.uuid > service.id > template.id
-            id: serviceLabels.uuid || serviceId || templateId || '',
+            id: serviceLabels.uuid || '',
             name: name,
             properties: {
                 // Template properties (lowest priority)
@@ -394,7 +390,7 @@ export function ConfigurationDialog({
                     { network: useCustomNetwork ? customNetwork : '' },
                 ].filter((item) => item.network),
                 // Merged labels with service labels taking priority
-                labels: _labels
+                labels: _labels,
             },
         };
 

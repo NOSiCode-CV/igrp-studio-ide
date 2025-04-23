@@ -162,8 +162,6 @@ export const useWorkspace = () => {
             const { id } = project
             let result: any = {};
 
-            console.log(project)
-
             if (id)
                 result = await window.igrpStudio.workspace.updateProject(id, project);
             else
@@ -225,8 +223,6 @@ export const useWorkspace = () => {
                 id: workspace.id,
                 service
             }
-            console.log('configureService', data)
-
 
             if (serviceId)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)

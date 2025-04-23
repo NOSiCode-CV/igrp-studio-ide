@@ -179,7 +179,7 @@ export interface DockerComposeService {
     container_name?: string;
     ports?: string[];
     volumes?: string[];
-    environment?: { name: string; value: string }[]
+    environment?: string[]
     depends_on?: string[];
     networks?: string[];
     hostname?: string;
@@ -213,7 +213,7 @@ export interface ServiceInfo {
     container_name?: string;
     ports?: string[];
     volumes?: string[];
-    environments?: { name: string; value: string }[]
+    environments?: { key: string; value: string }[]
     dependsOn?: string[] | Record<string, DependencyConfig>[];
     networks?: string[];
     hostname?: string;

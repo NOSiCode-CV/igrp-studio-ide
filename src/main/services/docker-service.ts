@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import yaml from 'js-yaml';
 import path from 'path';
-import { DockerComposeConfig, DockerComposeService, ServiceInfo } from '../types';
+import { DockerComposeConfig, ServiceInfo } from '../types';
 
 const execAsync = promisify(exec);
 
@@ -99,11 +99,11 @@ export class DockerService {
                             status: containerInfo.State,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
                             volumes: serviceDef.volumes || [],
-                            environments: this.parseEnvironmentToArray(serviceDef.environment),
+                            environments: this.parseEnvironmentToArray(environment),
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
-                            dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            env_file: env_file.map((file: string) => {
+                            dependsOn: depends_on && !Array.isArray(depends_on) ? [depends_on] : depends_on || [],
+                            env_file: env_file && env_file.map((file: string) => {
                                 return { file }
                             }),
                         };
@@ -113,9 +113,9 @@ export class DockerService {
                             ...rest,
                             name: serviceName,
                             status: 'stopped',
-                            dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            environments: this.parseEnvironmentToArray(serviceDef.environment),
-                            env_file: env_file.map((file: string) => {
+                            dependsOn: depends_on && !Array.isArray(depends_on) ? [depends_on] : depends_on || [],
+                            environments: this.parseEnvironmentToArray(environment),
+                            env_file: env_file && env_file.map((file: string) => {
                                 return { file }
                             }),
                         };
@@ -135,8 +135,8 @@ export class DockerService {
                             status: 'error',
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
                             environments: this.parseEnvironmentToArray(serviceDef.environment),
-                            env_file: env_file.map((file: string) => {
-                                return {file}
+                            env_file: env_file && env_file.map((file: string) => {
+                                return { file }
                             }),
                         }
                     )
@@ -187,15 +187,30 @@ export class DockerService {
     }
 
     private parseEnvironmentToArray(
-        env?: Record<string, string> | string[] | Array<{ name: string; value: string }>
-    ): Array<{ name: string; value: string }> {
+        env?: string[] | Array<{ key: string; value: string }>
+    ): Array<{ key: string; value: string }> {
         if (!env) return [];
-
-        // Handle array of {name, value} objects (already in correct format)
-        if (Array.isArray(env) && env.length > 0 && typeof env[0] === 'object' && 'name' in env[0]) {
-            return env as Array<{ name: string; value: string }>;
+    
+        // Case 1: Already in correct format (array of {name, value} objects)
+        if (env.length > 0 && typeof env[0] === 'object' && 'name' in env[0]) {
+            return env as Array<{ key: string; value: string }>;
         }
-        return []
+    
+        // Case 2: Array of strings in "KEY=VALUE" format (including ${VARIABLE} syntax)
+        if (env.length > 0 && typeof env[0] === 'string') {
+            return (env as string[]).map(item => {
+                const [name, ...valueParts] = item.split('=');
+                const value = valueParts.join('='); // Handle values containing '='
+                
+                // Preserve the ${VARIABLE} syntax in the value
+                return { 
+                    key: name.trim(), 
+                    value: value.trim() 
+                };
+            });
+        }
+    
+        return [];
     }
 
     async logs(projectPath: string, service?: string): Promise<string> {
