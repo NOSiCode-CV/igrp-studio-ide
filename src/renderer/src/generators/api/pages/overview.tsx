@@ -141,7 +141,7 @@ const Overview = ({}: NewProps) => {
                                             <div className="text-muted-foreground">
                                                 Type
                                             </div>
-                                            <div className="font-medium capitalize">
+                                            <div className="text-sm font-medium capitalize">
                                                 {project.type}
                                             </div>
                                         </div>
@@ -150,7 +150,7 @@ const Overview = ({}: NewProps) => {
                                             <div className="text-muted-foreground">
                                                 Framework
                                             </div>
-                                            <div className="font-medium capitalize">
+                                            <div className="text-sm font-medium capitalize">
                                                 {project.framework}
                                             </div>
                                         </div>
