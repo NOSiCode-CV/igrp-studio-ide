@@ -30,6 +30,7 @@ const useStudio = () => {
     // Dynamically import a component by name
     const dynamicImport = useCallback(async (componentName: string) => {
         try {
+            /* @vite-ignore */
             const module = await import(`../generators/ui/types/components/${componentName}`);
             return module.default;
         } catch (error) {
