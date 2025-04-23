@@ -188,6 +188,7 @@ export interface DockerComposeService {
     status: string,
     type?: string,
     labels: Record<string, string>
+    env_file: string[];
 }
 
 export interface DockerComposeNetwork {
@@ -222,4 +223,5 @@ export interface ServiceInfo {
     name: string,
     id?: string,
     labels: Record<string, string>
+    env_file: { file: string }[]
 }

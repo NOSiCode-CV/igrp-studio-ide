@@ -43,6 +43,8 @@ import {
 } from '../services';
 import { extractDefaults } from '@renderer/utils/helpers';
 import {
+    Dependency,
+    Environment,
     Port,
     Volume,
     WorkspaceService,
@@ -281,6 +283,41 @@ export function ConfigurationDialog({
         }
     };
 
+    const mergeLabels = (
+        templateLabels: Environment[] = [],
+        serviceLabels: Record<string, string> = {},
+        formLabels: Record<string, string> = {}
+    ): Environment[] => {
+        // Create a map to store labels and prevent duplicates
+        const labelsMap = new Map<string, string>();
+
+        // Add template labels first (lowest priority)
+        templateLabels.forEach((label) => {
+            if (!labelsMap.has(label.key)) {
+                labelsMap.set(label.key, label.value);
+            }
+        });
+
+        // Add form labels (medium priority)
+        Object.entries(formLabels).forEach(([key, value]) => {
+            if (value) {
+                // Only add if value exists
+                labelsMap.set(key, value);
+            }
+        });
+
+        // Add service labels (highest priority)
+        Object.entries(serviceLabels).forEach(([key, value]) => {
+            labelsMap.set(key, value);
+        });
+
+        // Convert the map back to an array of Label objects
+        return Array.from(labelsMap.entries()).map(([key, value]) => ({
+            key,
+            value,
+        }));
+    };
+
     // Handle save
     const handleSave = () => {
         setIsSubmitting(true);
@@ -290,16 +327,26 @@ export function ConfigurationDialog({
             depends_on: templateDependsOn,
             id: templateId,
             labels: templateLabels = [],
+            customNetwork,
+            label,
+            type,
+            name,
             ...templateRest
         } = template || {};
+
+        console.log(template);
 
         // Destructure service with fallback to empty object
         const {
             id: serviceId,
             labels: serviceLabels = {},
             properties: serviceProperties = {},
+            depends_on: serviceDependsOn,
+            name: ServiceName,
             ...serviceRest
         } = service || {};
+
+        console.log(service);
 
         // Process ports
         const _ports: Port[] = ports.map((portStr) => {
@@ -314,13 +361,17 @@ export function ConfigurationDialog({
         });
 
         // Process labels - merge template labels with new ones
-        const _labels = Object.entries({ type, description }).reduce(
-            (acc, [key, value]) => [
-                ...acc.filter((label) => label.key !== key),
-                ...(value ? [{ key, value }] : []),
-            ],
-            [...templateLabels]
+        // Use the mergeLabels function
+        const _labels = mergeLabels(
+            templateLabels,
+            serviceLabels,
+            { type, description } // form labels
         );
+
+        //depondencies
+        const _dependsOn: Dependency[] = dependsOn.map((depend) => {
+            return { service: depend };
+        });
 
         const serviceData: WorkspaceService = {
             // ID priority: service.labels.uuid > service.id > template.id
@@ -338,18 +389,12 @@ export function ConfigurationDialog({
                 ports: _ports,
                 environments,
                 volumes: _volumes,
-                depends_on: dependsOn,
+                dependsOn: _dependsOn,
                 networks: [
                     { network: useCustomNetwork ? customNetwork : '' },
                 ].filter((item) => item.network),
                 // Merged labels with service labels taking priority
-                labels: [
-                    ..._labels,
-                    ...Object.entries(serviceLabels).map(([key, value]) => ({
-                        key,
-                        value,
-                    })),
-                ],
+                labels: _labels
             },
         };
 

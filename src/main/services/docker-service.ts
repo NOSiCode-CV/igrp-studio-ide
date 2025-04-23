@@ -47,10 +47,10 @@ export class DockerService {
         }
     }
 
-    async up(projectPath: string): Promise<DockerComposeService[]> {
+    async up(projectPath: string): Promise<void> {
         try {
             await this.executeComposeCommand(projectPath, `up -d --quiet-pull`);
-            return this.status(projectPath);
+            this.status(projectPath);
         } catch (error: any) {
             throw new Error(`Failed to start containers: ${error.message}`);
         }
@@ -89,10 +89,12 @@ export class DockerService {
                     const serviceDef = allServices[serviceName];
                     const containerInfo = runningServicesMap.get(serviceName);
 
+                    const { environment, depends_on, env_file, ...rest } = serviceDef
+
                     if (containerInfo) {
                         // Service is running
                         return {
-                            ...serviceDef,
+                            ...rest,
                             name: serviceName,
                             status: containerInfo.State,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
@@ -101,16 +103,21 @@ export class DockerService {
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
+                            env_file: env_file.map((file: string) => {
+                                return { file }
+                            }),
                         };
                     } else {
                         // Service is not running
                         return {
-                            ...serviceDef,
+                            ...rest,
                             name: serviceName,
-                            id: '',
                             status: 'stopped',
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
                             environments: this.parseEnvironmentToArray(serviceDef.environment),
+                            env_file: env_file.map((file: string) => {
+                                return { file }
+                            }),
                         };
                     }
                 });
@@ -120,14 +127,17 @@ export class DockerService {
                 // Fallback to all services from compose file marked as not running
                 return serviceNames.map(serviceName => {
                     const serviceDef = allServices[serviceName]
+                    const { environment, depends_on, env_file, ...rest } = serviceDef
                     return (
                         {
-                            ...serviceDef,
+                            ...rest,
                             name: serviceName,
-                            id: '',
                             status: 'error',
                             dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
                             environments: this.parseEnvironmentToArray(serviceDef.environment),
+                            env_file: env_file.map((file: string) => {
+                                return {file}
+                            }),
                         }
                     )
                 });
