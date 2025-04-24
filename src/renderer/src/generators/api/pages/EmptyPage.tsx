@@ -12,6 +12,9 @@ import { FileCode, Database, FileText } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/*******  4646bf93-3169-4616-a9fd-32d225c29f36  *******/
+
 const EmptyPage = ({ onClick }) => {
     const { t } = useTranslation();
 

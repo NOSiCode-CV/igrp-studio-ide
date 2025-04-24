@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useToast from '@renderer/hooks/useToast';
-import { IWorkspace, ProjectData } from 'src/main/types';
+import { HandlerResponse, IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
 import { useNavigate } from 'react-router-dom';
@@ -214,8 +214,8 @@ export const useWorkspace = () => {
         });
     }
 
-    const createOrUpdateService = async (service: WorkspaceService) => {
-        let result: any = {};
+    const createOrUpdateService = async (service: WorkspaceService): Promise<HandlerResponse> => {
+        let result: HandlerResponse = {};
         try {
             const { id: serviceId } = service
 
@@ -223,6 +223,8 @@ export const useWorkspace = () => {
                 id: workspace.id,
                 service
             }
+
+            console.log('createOrUpdateService', data)
 
             if (serviceId)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)
@@ -237,19 +239,22 @@ export const useWorkspace = () => {
 
             dispatch(setChangeStatus(true));
 
+            return result
+
         } catch (err) {
             showErrorToast(err);
+            return { error: err as string }
         }
     }
 
-    const configureService = async ({ config, service }: { config: any, service: WorkspaceService }) => {
+    const configureService = async ({ config, service }: { config: any, service: WorkspaceService }): Promise<HandlerResponse> => {
         let result: any = {};
         try {
 
             const data: ProjectWorkspace = {
                 id: workspace.id,
                 service,
-                config:{
+                config: {
                     ...config,
                     id: service.id,
                 }
@@ -267,8 +272,11 @@ export const useWorkspace = () => {
 
             dispatch(setChangeStatus(true));
 
+            return result;
+
         } catch (err) {
             showErrorToast(err);
+            return { error: err as string }
         }
     }
 

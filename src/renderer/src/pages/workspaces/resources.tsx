@@ -159,7 +159,8 @@ const Resources = () => {
     const [projectSearchQuery, setProjectSearchQuery] = useState('');
     const [serviceSearchQuery, setServiceSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState<string>('lastModified');
-    const [sortOrderService, setSortOrderService] = useState<string>('lastModified');
+    const [sortOrderService, setSortOrderService] =
+        useState<string>('lastModified');
     const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
     const { showErrorToast } = useToast();

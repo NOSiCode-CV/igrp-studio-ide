@@ -1,6 +1,6 @@
 {
 	"name": "igrp-studio",
-	"version": "0.0.1-alpha.3",
+	"version": "0.0.1-alpha.1",
 	"description": "IGRP Studio for development",
 	"main": "out/main/index.js",
 	"author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
@@ -30,7 +30,7 @@
 		"@hookform/resolvers": "^5.0.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.159",
-		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.165",
+		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.170",
 		"@igrp/igrp-studio-springboot-engine": "0.0.1-alpha.79",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^21.1.1",
@@ -93,7 +93,7 @@
 		"next-themes": "^0.4.6",
 		"oracledb": "^6.8.0",
 		"path-browserify": "^1.0.1",
-		"pg": "^8.15.1",
+		"pg": "^8.15.5",
 		"process": "^0.11.10",
 		"react-day-picker": "9.6.7",
 		"react-hook-form": "^7.56.1",
@@ -120,7 +120,7 @@
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",
 		"@vitejs/plugin-react": "^4.4.1",
-		"electron": "35.2.0",
+		"electron": "35.2.1",
 		"electron-builder": "^26.0.12",
 		"electron-builder-squirrel-windows": "26.0.12",
 		"electron-devtools-installer": "^4.0.0",
@@ -135,7 +135,7 @@
 		"tailwindcss": "^4.1.4",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.3",
-		"vite": "^6.3.2"
+		"vite": "^6.3.3"
 	},
 	"resolutions": {
 		"@radix-ui/react-dismissable-layer": "^1.1.5"

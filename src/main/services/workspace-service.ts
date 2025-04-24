@@ -159,7 +159,7 @@ export class WorkspaceRepository {
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
         const data = await this.loadData();
         let foundProject: ProjectData | undefined;
-        const { config: project, id: workspaceId } = updates;
+        const { config: project, workspaceId, framework, path, type } = updates;
 
         for (const workspace of data.workspaces) {
             const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
@@ -183,24 +183,26 @@ export class WorkspaceRepository {
                 throw new Error(`Workspace ${workspaceId} not found`);
             }
 
-            if ((!project.framework || !project.config.name)) {
+            if ((!framework || !project.name)) {
                 throw new Error(`Invalid project configuration`);
             }
 
             const updatedProject: ProjectData = {
-                ...updates,
-                name: updates.config.name || 'Unnamed Project',
-                path: project.path as string,
-                workspaceId: project.workspaceId as string,
-                framework: project.framework as FrameworkType,
+                name: project.name || 'Unnamed Project',
+                path: path as string,
+                type,
+                workspaceId: workspaceId as string,
+                framework: framework as FrameworkType,
                 updatedAt: new Date().toISOString(),
                 id: uuidv4(),
-                config: updates.config || {},
+                config: project || {},
             };
 
             workspace.projects?.push(updatedProject as ProjectData);
 
             workspace.updatedAt = new Date().toISOString();
+
+            console.log(updatedProject)
 
             await this.addProjectToStudioWorkspace(workspace, updatedProject, true);
 
@@ -232,8 +234,6 @@ export class WorkspaceRepository {
             service,
             id: workspaceId,
         }
-
-        console.log('projectConfig', projectConfig)
 
         await updateProjectToWorkspace(projectConfig, basePath);
 

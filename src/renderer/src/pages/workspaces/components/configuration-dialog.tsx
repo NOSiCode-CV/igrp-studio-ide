@@ -49,7 +49,7 @@ import {
     Volume,
     WorkspaceService,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { ProjectData } from 'src/main/types';
+import { HandlerResponse, ProjectData } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 
 interface ConfigurationDialogProps {
@@ -318,7 +318,7 @@ export function ConfigurationDialog({
     };
 
     // Handle save
-    const handleSave = () => {
+    const handleSave = async () => {
         setIsSubmitting(true);
 
         // Destructure template with fallback to empty object
@@ -367,7 +367,7 @@ export function ConfigurationDialog({
 
         //depondencies
         const _dependsOn: Dependency[] = dependsOn.map((depend) => {
-            return { service: depend };
+            return { service: depend.replace('{{slug}}', workspace.slug) };
         });
 
         const serviceData: WorkspaceService = {
@@ -394,17 +394,20 @@ export function ConfigurationDialog({
             },
         };
 
-        // Simulate API call
-        setTimeout(() => {
-            onSave(serviceData);
+        try {
+            const { error } = await onSave(serviceData);
             setIsSubmitting(false);
-            setOpen(false);
-        }, 500);
+            if (!error) setOpen(false);
+        } catch (err) {
+            console.error(err);
+            setIsSubmitting(false);
+        }
     };
 
-    const onSave = (data: WorkspaceService) => {
-        if (project) configureService({ config: project, service: data });
-        else createOrUpdateService(data);
+    const onSave = async (data: WorkspaceService): Promise<HandlerResponse> => {
+        if (project)
+            return await configureService({ config: project, service: data });
+        else return await createOrUpdateService(data);
     };
 
     return (

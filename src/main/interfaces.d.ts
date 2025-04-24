@@ -23,7 +23,7 @@ export interface IWorkspaceRepository {
 
     //Service Operations
     createService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
-    updateService(service: ServiceWorkspace, basePath: string): Promise<ServiceWorkspace>;
+    updateService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
     deleteService(serviceId: string, basePath: string): Promise<void>;
     findAllServices(workspaceId: string): Promise<WorkspaceService[]>;
 
