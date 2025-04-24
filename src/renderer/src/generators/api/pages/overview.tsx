@@ -33,6 +33,8 @@ import { SpringConfigData } from 'src/main/types';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useGit } from '@renderer/hooks/use-git';
 import Dependency from '@renderer/pages/workspaces/components/dependency';
+import { useSelector } from 'react-redux';
+import { RootState } from '@renderer/redux';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
@@ -44,6 +46,10 @@ const Overview = ({}: NewProps) => {
     const [projectId, setProjectId] = useState<string>('');
     const [repositoryUrl, setRepositoruUrl] = useState<string | null>(null);
     const { getRemoteUrl } = useGit();
+
+    const { isGitEnabled, branches, activeBranch } = useSelector(
+        (state: RootState) => state.git
+    );
 
     const {
         actions: { saveOrOpenProject },
@@ -205,6 +211,12 @@ const Overview = ({}: NewProps) => {
                                                 {project.framework}
                                             </p>
                                         </div>
+                                        <div>
+                                            <p className="text-muted-foreground   text-xs mb-1">
+                                                Version
+                                            </p>
+                                            <p className="">{project.config.springBootVersion}</p>
+                                        </div>
                                         <Dependency
                                             dependsOn={project.dependsOn}
                                         />
@@ -218,12 +230,16 @@ const Overview = ({}: NewProps) => {
                                         <GitBranchIcon className="text-green-400 w-5 h-5" />
                                     </div>
                                     <div className="space-y-4">
-                                        <div>
-                                            <p className="text-muted-foreground text-xs mb-1">
-                                                Repository
-                                            </p>
-                                            <p className="">main</p>
-                                        </div>
+                                        {isGitEnabled && (
+                                            <div>
+                                                <p className="text-muted-foreground text-xs mb-1">
+                                                    Repository
+                                                </p>
+                                                <p className="">
+                                                    {activeBranch}
+                                                </p>
+                                            </div>
+                                        )}
                                         {repositoryUrl && (
                                             <div>
                                                 <div className="text-muted-foreground text-xs">
@@ -249,7 +265,7 @@ const Overview = ({}: NewProps) => {
                                             <p className="text-muted-foreground text-xs mb-1">
                                                 Last Updated
                                             </p>
-                                            <p className="">2 hours ago</p>
+                                            <p className="">...</p>
                                         </div>
                                         {/*  <div>
                                             <p className="text-muted-foreground text-xs mb-1">

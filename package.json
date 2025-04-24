@@ -165,14 +165,30 @@
 					"sha256"
 				],
 				"rfc3161TimeStampServer": "http://timestamp.digicert.com",
-				"publisherName": "NOSi E.P.E <contact@nosi.cv>"
+				"publisherName": "NOSi E.P.E <contact@nosi.cv>",
+			},
+			"publish": {
+				"provider": "s3",
+				"bucket": "igrp-studio",
+				"region": "praia",
+				"endpoint": "https://storage-api.nosi.cv",
+				"channel": "latest",
+				"path": "win32/${arch}/"
 			}
 		},
 		"mac": {
 			"icon": "resources/icons/icon.icns",
 			"category": "public.app-category.developer-tools",
 			"entitlementsInherit": "build/entitlements.mac.plist",
-			"notarize": false
+			"notarize": false,
+			"publish": {
+				"provider": "s3",
+				"bucket": "igrp-studio",
+				"region": "praia",
+				"endpoint": "https://storage-api.nosi.cv",
+				"channel": "latest",
+				"path": "darwin/${arch}/"
+			}
 		},
 		"linux": {
 			"icon": "resources/icons/icon.png",

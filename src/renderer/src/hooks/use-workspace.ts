@@ -168,16 +168,15 @@ export const useWorkspace = () => {
                 result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
             if (result?.error) {
-                console.log(result?.error)
                 showErrorToast(result?.error);
                 return
             }
 
-            showSuccessToast(t('savedSuccessfully', { name: project.name }));
+            showSuccessToast(t('savedSuccessfully', { name: result.name }));
 
-            dispatch(setBasePath(project.path));
+            dispatch(setBasePath(result.path));
 
-            dispatch(setConfig(project));
+            dispatch(setConfig(result));
 
             onSuccess?.()
 
@@ -223,8 +222,6 @@ export const useWorkspace = () => {
                 id: workspace.id,
                 service
             }
-
-            console.log('createOrUpdateService', data)
 
             if (serviceId)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)
