@@ -6,10 +6,8 @@ import {
     ArrowLeft,
     Bell,
     Code,
-    Loader2,
     Maximize2,
     Minus,
-    Play,
     Square,
     X,
 } from 'lucide-react';
@@ -49,6 +47,7 @@ import {
 import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
+import DockerControls from '@renderer/components/docker-controls';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -64,7 +63,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const { workspace } = useWorkspace();
 
-    const { loading, startContainers } = useDocker();
+    const { loading, startContainers, stopContainers, stopService } =
+        useDocker();
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
@@ -146,6 +146,14 @@ const Header = ({ config, basePath }: HeaderProps) => {
         await startContainers();
     };
 
+    const handleDowm = async () => {
+        await stopContainers();
+    };
+
+    const handleStop = async () => {
+        await stopService();
+    };
+
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
 
     return (
@@ -192,28 +200,13 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             )}
                         </div>
                         <div className="flex items-center space-x-2 ">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-6 text-xs gap-1"
-                                        onClick={handleRun}
-                                    >
-                                        {!loading ? (
-                                            <>
-                                                <Play className="h-3 w-3 text-igrp" />
-                                                {t('run')}
-                                            </>
-                                        ) : (
-                                            <Loader2 className="animate-spin h-3 w-3 text-igrp" />
-                                        )}
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{t('run')}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <DockerControls
+                                loading={loading}
+                                onRun={handleRun}
+                                onDropAll={handleDowm}
+                                onStopAll={handleStop}
+                                t={t}
+                            />
 
                             {basePath && (
                                 <>

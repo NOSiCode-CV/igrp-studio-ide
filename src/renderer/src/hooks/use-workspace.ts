@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useToast from '@renderer/hooks/useToast';
-import { HandlerResponse, IWorkspace, ProjectData } from 'src/main/types';
+import { HandlerResponse, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types';
 import { useDispatch } from 'react-redux';
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
 import { useNavigate } from 'react-router-dom';
@@ -172,6 +172,11 @@ export const useWorkspace = () => {
                 return
             }
 
+            await findAllServices().then(data => {
+                result.service = data.find(s => s.labels.uuid === result.id)
+                return data
+            })
+
             showSuccessToast(t('savedSuccessfully', { name: result.name }));
 
             dispatch(setBasePath(result.path));
@@ -204,7 +209,7 @@ export const useWorkspace = () => {
     }
 
     const findAllServices = async () => {
-        return await window.igrpStudio.workspace.findAllServices(workspace?.id);
+        return await window.igrpStudio.docker.status(workspace.path)
     }
 
     const getTemplatesService = async () => {

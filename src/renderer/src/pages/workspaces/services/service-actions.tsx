@@ -31,6 +31,7 @@ interface ServiceActionsProps {
 export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
     const { getServiceUrl, stopService, restartService } = useDocker();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditService, setEditService] = useState(false);
     const { showErrorToast } = useToast();
     const {
         actions: { removeService },
@@ -63,8 +64,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                 <DropdownMenuContent align="end" className="w-48">
                     {service.status === 'running' ? (
                         <DropdownMenuItem
-                            onClick={(e) => {
-                                e.stopPropagation();
+                            onClick={() => {
                                 stopService([service.name]);
                             }}
                             className="text-red-600 focus:text-red-600 focus:bg-red-50"
@@ -74,8 +74,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         </DropdownMenuItem>
                     ) : (
                         <DropdownMenuItem
-                            onClick={(e) => {
-                                e.stopPropagation();
+                            onClick={() => {
                                 restartService([service.name], 300);
                             }}
                             className="text-green-600 focus:text-green-600 focus:bg-green-50"
@@ -85,27 +84,18 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         </DropdownMenuItem>
                     )}
 
-                    <ConfigurationDialog
-                        service={service}
-                        services={services}
-                        isNew={false}
+                    <DropdownMenuItem
+                        className="focus:bg-accent"
+                        onClick={() => {
+                            setEditService(true);
+                        }}
                     >
-                        <DropdownMenuItem
-                            onSelect={(e) => e.preventDefault()}
-                            className="focus:bg-accent"
-                        >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Service
-                        </DropdownMenuItem>
-                    </ConfigurationDialog>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit Service
+                    </DropdownMenuItem>
 
                     {getServiceUrl(service) && (
-                        <DropdownMenuItem
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleServiceUrl();
-                            }}
-                        >
+                        <DropdownMenuItem onClick={handleServiceUrl}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Open in Browser
                         </DropdownMenuItem>
@@ -114,8 +104,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                     {service.labels?.uuid && (
                         <DropdownMenuItem
                             className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                            onClick={(e) => {
-                                e.stopPropagation();
+                            onClick={() => {
                                 setIsDialogOpen(true);
                             }}
                         >
@@ -132,6 +121,16 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                 recordId={service.name}
                 isOpen={isDialogOpen}
             />
+
+            <ConfigurationDialog
+                service={service}
+                services={services}
+                isNew={false}
+                open={isEditService}
+                setOpen={setEditService}
+            >
+                <span className='sr-only'>Edit</span>
+            </ConfigurationDialog>
         </>
     );
 };

@@ -59,6 +59,8 @@ interface ConfigurationDialogProps {
     isNew?: boolean;
     children?: React.ReactNode;
     project?: ProjectData;
+    open?: boolean;
+    setOpen?: (open: boolean) => void;
 }
 
 export function ConfigurationDialog({
@@ -68,6 +70,8 @@ export function ConfigurationDialog({
     isNew = true,
     children,
     project,
+    open,
+    setOpen,
 }: ConfigurationDialogProps) {
     const { t } = useTranslation();
     const [name, setName] = useState('');
@@ -89,7 +93,6 @@ export function ConfigurationDialog({
     const [customNetwork, setCustomNetwork] = useState('');
     const [useCustomNetwork, setUseCustomNetwork] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [open, setOpen] = useState(false);
     const [serviceTemplates, setServiceTemplates] = useState<any[]>([]);
 
     const {
@@ -126,7 +129,7 @@ export function ConfigurationDialog({
                     // Convert volumes array to "source:target" format
                     const volumes =
                         serviveData.volumes?.map(
-                            (vol) => `${vol.name}:${vol.path}`
+                            (vol) => `${vol.name}:${vol.path}:${vol.driver}`
                         ) || [];
 
                     // Convert dependsOn to depends_on array
@@ -352,8 +355,8 @@ export function ConfigurationDialog({
 
         // Process volumes
         const _volumes: Volume[] = volumes.map((volumeStr) => {
-            const [name, path] = volumeStr.split(':');
-            return { name, path, driver: 'none' };
+            const [name, path, driver] = volumeStr.split(':');
+            return { name, path, driver };
         });
 
         // Process labels - merge template labels with new ones
@@ -370,6 +373,15 @@ export function ConfigurationDialog({
             return { service: depend.replace('{{slug}}', workspace.slug) };
         });
 
+        const _environments: Environment[] = environments.map(
+            ({ key, value }) => {
+                return {
+                    key,
+                    value: value.replace('{{slug}}', workspace.slug),
+                };
+            }
+        );
+
         const serviceData: WorkspaceService = {
             id: serviceLabels.uuid || '',
             name: name,
@@ -383,7 +395,7 @@ export function ConfigurationDialog({
                 container_name: name,
                 image,
                 ports: _ports,
-                environments,
+                environments: _environments,
                 volumes: _volumes,
                 dependsOn: _dependsOn,
                 networks: [
@@ -397,7 +409,7 @@ export function ConfigurationDialog({
         try {
             const { error } = await onSave(serviceData);
             setIsSubmitting(false);
-            if (!error) setOpen(false);
+            if (!error) setOpen?.(false);
         } catch (err) {
             console.error(err);
             setIsSubmitting(false);
@@ -973,7 +985,7 @@ export function ConfigurationDialog({
                 </Tabs>
 
                 <DialogFooter className="pt-2">
-                    <Button variant="outline" onClick={() => setOpen(false)}>
+                    <Button variant="outline" onClick={() => setOpen?.(false)}>
                         Cancel
                     </Button>
                     <Button

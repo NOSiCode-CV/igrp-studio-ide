@@ -455,5 +455,6 @@
   "services": "Services",
   "enableCustonValidation": "Enable Custon Validation",
   "run": "Run",
-  "savedSuccessfully":"'{{name}}' saved successfully"
+  "savedSuccessfully": "'{{name}}' saved successfully",
+  "stop": "Stop"
 }

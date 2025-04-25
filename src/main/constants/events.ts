@@ -55,7 +55,8 @@ export const EVENTS = {
             RESTORE: 'repository:backup:restore'
         }
     },
-    ERROR: 'error'
+    ERROR: 'error',
+    LOG: 'log'
 };
 
 
@@ -75,5 +76,6 @@ export const ERROR_CODES = {
     BACKUP: {
         FAILED: 'backup:failed',
         RESTORE_FAILED: 'backup:restore-failed'
-    }
+    },
+    ERROR: 'error',
 };

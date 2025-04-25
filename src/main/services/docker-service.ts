@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import yaml from 'js-yaml';
@@ -22,6 +22,32 @@ export class DockerService {
         return this.composeCache[projectPath];
     }
 
+    private prepareInitScript(projectPath: string): void {
+        const scriptPath = path.join(projectPath, '.igrpstudio', 'db-init.sh');
+
+        try {
+            // Read and normalize line endings
+            let content = fs.readFileSync(scriptPath, 'utf8');
+            content = content.replace(/\r\n/g, '\n');
+
+            // Change shebang to #!/bin/sh for Alpine compatibility
+            content = content.replace(/^#!\/bin\/bash/, '#!/bin/sh');
+
+            fs.writeFileSync(scriptPath, content);
+
+            // Set executable permissions
+            if (process.platform !== 'win32') {
+                execSync(`chmod +x "${scriptPath}"`);
+            } else {
+                // Windows alternative if using WSL
+                execSync(`wsl chmod +x "${scriptPath.replace(/\\/g, '/')}"`);
+            }
+        } catch (error) {
+            console.error('Error preparing init script:', error);
+            throw error;
+        }
+    }
+
     async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
         const composeFile = path.join(projectPath, 'igrp-compose.yaml');
         const escapedComposeFile = this.escapePath(composeFile);
@@ -30,6 +56,9 @@ export class DockerService {
         const envFilePath = path.join(projectPath, '.igrp.env');
         const escapedEnvFilePath = this.escapePath(envFilePath);
 
+
+        // Prepare the init script first
+        this.prepareInitScript(projectPath);
 
         if (!fs.existsSync(envFilePath)) {
             throw new Error(`Environment file not found: ${envFilePath}`);
@@ -190,26 +219,26 @@ export class DockerService {
         env?: string[] | Array<{ key: string; value: string }>
     ): Array<{ key: string; value: string }> {
         if (!env) return [];
-    
+
         // Case 1: Already in correct format (array of {name, value} objects)
         if (env.length > 0 && typeof env[0] === 'object' && 'name' in env[0]) {
             return env as Array<{ key: string; value: string }>;
         }
-    
+
         // Case 2: Array of strings in "KEY=VALUE" format (including ${VARIABLE} syntax)
         if (env.length > 0 && typeof env[0] === 'string') {
             return (env as string[]).map(item => {
                 const [name, ...valueParts] = item.split('=');
                 const value = valueParts.join('='); // Handle values containing '='
-                
+
                 // Preserve the ${VARIABLE} syntax in the value
-                return { 
-                    key: name.trim(), 
-                    value: value.trim() 
+                return {
+                    key: name.trim(),
+                    value: value.trim()
                 };
             });
         }
-    
+
         return [];
     }
 

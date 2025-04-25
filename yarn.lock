@@ -994,10 +994,10 @@
     vaul "1.1.2"
     zod "3.24.2"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.170":
-  version "0.0.1-alpha.170"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.170.tgz#3735094fb6cf5a3236e324356d4d52f5b3c6bbd9"
-  integrity sha512-6lwESZsadndTqsoxi86fqpsjx7YHtrTU0zgSEm4xNhZYo9UYPdqpPKICvDbWhOFOLx88Y39SfPIk0Qay9yVs6A==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.175":
+  version "0.0.1-alpha.175"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.175.tgz#f0bc735fb382229184d13507351187672d2761bc"
+  integrity sha512-KiVTsgimJ+n//bqvuG90o9YwAVtXk1gt/HvltylX8rRGXtImy4fjawgFYUbfPZUQRAjccicSn9UjqxrPUeqK4w==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -3366,10 +3366,10 @@
   dependencies:
     undici-types "~6.20.0"
 
-"@types/node@^22.14.1":
-  version "22.14.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.14.1.tgz#53b54585cec81c21eee3697521e31312d6ca1e6f"
-  integrity sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==
+"@types/node@^22.15.2":
+  version "22.15.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.2.tgz#1db55aa64618ee93a58c8912f74beefe44aca905"
+  integrity sha512-uKXqKN9beGoMdBfcaTY1ecwz6ctxuJAcUlwE55938g0ZJ8lRxwAZqRz2AJ4pzpt5dHdTPMB863UZ0ESiFUcP7A==
   dependencies:
     undici-types "~6.21.0"
 
@@ -3941,10 +3941,10 @@ axios@^1.8.3:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-axios@^1.8.4:
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.8.4.tgz#78990bb4bc63d2cae072952d374835950a82f447"
-  integrity sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==
+axios@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.9.0.tgz#25534e3b72b54540077d33046f77e3b8d7081901"
+  integrity sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.0"
@@ -8830,17 +8830,17 @@ react-resizable-panels@^2.1.8:
   resolved "https://registry.yarnpkg.com/react-resizable-panels/-/react-resizable-panels-2.1.8.tgz#4f31057854d93c30a6e221ff8c0ecb7addec55a3"
   integrity sha512-oDvD0sw34Ecx00cQFLiRJpAE2fCgNLBr8DMrBzkrsaUiLpAycIQoY3eAWfMblDql3pTIMZ60wJ/P89RO1htM2w==
 
-react-router-dom@^7.5.1:
-  version "7.5.1"
-  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-7.5.1.tgz#16ffa63006dfdbab53cf243be84c29535e7dc4e0"
-  integrity sha512-5DPSPc7ENrt2tlKPq0FtpG80ZbqA9aIKEyqX6hSNJDlol/tr6iqCK4crqdsusmOSSotq6zDsn0y3urX9TuTNmA==
+react-router-dom@^7.5.2:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-7.5.2.tgz#fb00e4ac7e1fcc6cb9861458d3ddb2d1b074ca79"
+  integrity sha512-yk1XW8Fj7gK7flpYBXF3yzd2NbX6P7Kxjvs2b5nu1M04rb5pg/Zc4fGdBNTeT4eDYL2bvzWNyKaIMJX/RKHTTg==
   dependencies:
-    react-router "7.5.1"
+    react-router "7.5.2"
 
-react-router@7.5.1:
-  version "7.5.1"
-  resolved "https://registry.yarnpkg.com/react-router/-/react-router-7.5.1.tgz#e0bae54e913d139e727e7a88d165174a2cdbeb27"
-  integrity sha512-/jjU3fcYNd2bwz9Q0xt5TwyiyoO8XjSEFXJY4O/lMAlkGTHWuHRAbR9Etik+lSDqMC7A7mz3UlXzgYT6Vl58sA==
+react-router@7.5.2:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-7.5.2.tgz#889137b9ce91dadc06eb40997f57f08199845973"
+  integrity sha512-9Rw8r199klMnlGZ8VAsV/I8WrIF6IyJ90JQUdboupx1cdkgYqwnrYjH+I/nY/7cA1X5zia4mDJqH36npP7sxGQ==
   dependencies:
     cookie "^1.0.1"
     set-cookie-parser "^2.6.0"
