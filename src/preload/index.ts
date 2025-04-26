@@ -252,7 +252,7 @@ const window = {
 	maximizeWindow: () => ipcRenderer.send('maximize-window'),
 	closeWindow: () => ipcRenderer.send('close-window'),
 	restoreWindow: () => ipcRenderer.send('restore-window'),
-	isMaximized: () => ipcRenderer.send('is-window-maximized')
+    isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

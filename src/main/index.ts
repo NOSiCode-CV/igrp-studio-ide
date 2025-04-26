@@ -413,7 +413,7 @@ ipcMain.on('close-window', () => {
     mainWindow.close();
 });
 
-ipcMain.on('is-window-maximized', () => {
+ipcMain.handle('is-window-maximized', () => {
     return mainWindow.isMaximized();
 });
 

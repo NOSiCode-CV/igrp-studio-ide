@@ -48,6 +48,7 @@ import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
+import { withFormik } from 'formik';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -70,12 +71,15 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const [isMaximized, setIsMaximized] = useState(false);
 
+    const [isFullscreen, setIsFullscreen] = useState(false); // Add this state
+
     const { showErrorToast, showSuccessToast } = useToast();
 
     const navigate = useNavigate();
 
     const handleMinimize = () => {
         window.menu.minimizeWindow();
+        window.menu.isMaximized;
     };
 
     const handleMaximize = () => {
@@ -112,10 +116,23 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     useEffect(() => {
         const checkMaximized = async () => {
-            const maximized = window.menu.isMaximized();
-            setIsMaximized(maximized);
+            try {
+                const maximized = await window.menu.isMaximized();
+                setIsMaximized(maximized);
+            } catch (error) {
+                setIsMaximized(false);
+            }
         };
+
         checkMaximized();
+
+        // Optional: Add listeners for window state changes
+        const updateState = () => checkMaximized();
+        window.addEventListener('resize', updateState);
+
+        return () => {
+            window.removeEventListener('resize', updateState);
+        };
     }, []);
 
     const WindowButton = ({
@@ -164,7 +181,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
                         <div className="flex items-center space-x-4 home cursor-pointer">
                             <div
                                 onClick={openPage}
-                                className={cn('flex items-center gap-2')}
+                                className={cn(
+                                    'flex items-center gap-2',
+                                    isMac && isMaximized && 'pl-12'
+                                )}
                             >
                                 <img
                                     src={logo}
