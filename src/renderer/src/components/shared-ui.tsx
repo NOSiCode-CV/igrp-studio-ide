@@ -72,7 +72,7 @@ function Headline({
 }: HeadlineProps) {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            {Icon && <Icon className="h-5 w-5 text-igrp" />}
+            {Icon && <Icon className="h-5 w-5 text-primary" />}
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
                 {description && (
@@ -93,7 +93,7 @@ function SubHeadline({
 }: HeadlineProps) {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            {Icon && <Icon className="h-5 w-5 text-igrp" />}
+            {Icon && <Icon className="h-5 w-5 text-primary" />}
             <div>
                 <h1 className="text-base font-medium leading-tight">{title}</h1>
                 {description && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Globe, Home, Keyboard, Link, Settings } from 'lucide-react';
+import { Bell, Globe, Home, Keyboard, Link, Settings, Shirt } from 'lucide-react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -40,6 +40,7 @@ import {
 } from '@renderer/components/ui/tooltip';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import KeyboardShortcuts from './keyboard-shortcuts';
+import { AppearanceSettings } from './appearance';
 
 const data = {
     nav: [
@@ -51,6 +52,7 @@ const data = {
             component: ConnectedAccountsSettings,
         },
         { name: 'notifications', icon: Bell },
+        { name: 'appearance', icon: Shirt, component: AppearanceSettings },
         { name: 'shortcuts', icon: Keyboard, component: KeyboardShortcuts },
     ],
 };

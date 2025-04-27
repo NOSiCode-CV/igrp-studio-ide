@@ -167,7 +167,7 @@ const Overview = () => {
                                                     Name
                                                 </p>
                                                 <p className="truncate">
-                                                    {project.config.name}
+                                                    {project.config?.name}
                                                 </p>
                                             </div>
                                             <div>

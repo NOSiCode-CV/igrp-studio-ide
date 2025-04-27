@@ -2,11 +2,11 @@ const GenNoInfoField = () => {
     return (
         <div className="text-xs space-x-1 min-h-12 flex items-center justify-center">
             <span>DROP</span>
-            <span className="text-igrp">
+            <span className="text-primary">
                 <b>FIELDS</b>
             </span>
             <span>OR</span>
-            <span className="text-igrp">
+            <span className="text-primary">
                 <b>COPY</b>
             </span>
         </div>

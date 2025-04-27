@@ -1,6 +1,10 @@
 import { Button } from '@renderer/components/ui/button';
 import { Copy, Move, Plus, Trash, Settings } from 'lucide-react';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@renderer/components/ui/tooltip'; // Adjust the import based on your UI library
+import {
+    Tooltip,
+    TooltipTrigger,
+    TooltipContent,
+} from '@renderer/components/ui/tooltip'; // Adjust the import based on your UI library
 
 interface RowOptionsProps {
     onClickAddControl: (type: string) => void;
@@ -11,7 +15,7 @@ interface RowOptionsProps {
 const SectionTool = ({
     onClickAddControl,
     onClickDeleteSection,
-    onEdit
+    onEdit,
 }: RowOptionsProps) => {
     return (
         <div id="row-tools">
@@ -19,7 +23,7 @@ const SectionTool = ({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
-                        className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
+                        className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full z-50"
                         onClick={() => onClickAddControl('top')}
                     >
                         <Plus className="h-7 w-7" />
@@ -34,7 +38,7 @@ const SectionTool = ({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
-                        className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full bg-igrp text-white z-50 cursor-pointer"
+                        className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full z-50"
                         onClick={() => onClickAddControl('bottom')}
                     >
                         <Plus className="h-7 w-7" />

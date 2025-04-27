@@ -107,7 +107,7 @@ export function WorkspaceSwitcher({
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuItem>
-                                    <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-igrp bg-igrp/5">
+                                    <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-primary bg-primary/5">
                                         <FolderKanban className="h-4 w-4 flex-shrink-0" />
                                         <span>Workspaces</span>
                                         <ListFilter className="ml-auto h-3 w-3" />
@@ -138,7 +138,7 @@ export function WorkspaceSwitcher({
                                         className={cn(
                                             workspace.name ===
                                                 selectedWorkspace.name
-                                                ? 'text-igrp bg-igrp/5'
+                                                ? 'text-primary bg-primary/5'
                                                 : ''
                                         )}
                                     >
