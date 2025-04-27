@@ -456,5 +456,6 @@
   "enableCustonValidation": "Enable Custon Validation",
   "run": "Run",
   "savedSuccessfully": "'{{name}}' saved successfully",
-  "stop": "Stop"
+  "stop": "Stop",
+  "appearance": "Appearance"
 }

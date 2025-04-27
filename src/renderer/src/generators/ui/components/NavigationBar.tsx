@@ -67,7 +67,6 @@ const NavigationBar = ({
                         <Button
                             size="sm"
                             onClick={onSwitch}
-                            className="hover:bg-igrp"
                             variant={'secondary'}
                         >
                             {isDesign ? <FileJsonIcon /> : <Eye />}
@@ -81,7 +80,6 @@ const NavigationBar = ({
                     <TooltipTrigger asChild>
                         <Button
                             size="sm"
-                            className="hover:text-igrp"
                             onClick={handleSaveClick}
                         >
                             {t('save')}

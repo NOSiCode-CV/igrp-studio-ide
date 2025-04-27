@@ -110,7 +110,7 @@ export function AppSidebar({
                                     className="md:h-8 md:p-0 items-center justify-center"
                                 >
                                     <a href="#/">
-                                        <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-igrp text-sidebar-primary-foreground">
+                                        <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                             <Home className="size-4" />
                                         </div>
                                     </a>
@@ -142,7 +142,7 @@ export function AppSidebar({
                                                     'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
                                                     item.label ===
                                                         activeMenuGroup
-                                                        ? '!text-igrp'
+                                                        ? '!text-primary'
                                                         : ''
                                                 )}
                                             >
