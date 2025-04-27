@@ -34,6 +34,7 @@ import { useGit } from '@renderer/hooks/use-git';
 import Dependency from '@renderer/pages/workspaces/components/dependency';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
+import { GitContributors } from '@renderer/components/git/git-contributors';
 
 const Overview = () => {
     const [copied, setCopied] = useState(false);
@@ -138,18 +139,6 @@ const Overview = () => {
                                         </h1>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex space-x-2">
-                                        {project.type && (
-                                            <span className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium">
-                                                {project.type}
-                                            </span>
-                                        )}
-                                        <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">
-                                            Active
-                                        </span>
-                                    </div>
-                                </div>
                             </div>
 
                             <div className="grid grid-cols-3 gap-6">
@@ -216,7 +205,9 @@ const Overview = () => {
                                             </p>
                                         </div>
                                         <Dependency
-                                            dependsOn={project?.service.dependsOn}
+                                            dependsOn={
+                                                project?.service.dependsOn
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -265,21 +256,9 @@ const Overview = () => {
                                             </p>
                                             <p className="">...</p>
                                         </div>
-                                        {/*  <div>
-                                            <p className="text-muted-foreground text-xs mb-1">
-                                                Contributors
-                                            </p>
-                                            <div className="flex -space-x-2 mt-1">
-                                                {[1, 2, 3].map((i) => (
-                                                    <div
-                                                        key={i}
-                                                        className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center  text-sm font-medium border-2 border-[#2d2d2d]"
-                                                    >
-                                                        {i}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div> */}
+                                        <GitContributors
+                                            projectPath={basePath}
+                                        />
                                     </div>
                                 </div>
                             </div>

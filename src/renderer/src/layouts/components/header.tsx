@@ -48,7 +48,6 @@ import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
-import { withFormik } from 'formik';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -70,8 +69,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
     const [isMaximized, setIsMaximized] = useState(false);
-
-    const [isFullscreen, setIsFullscreen] = useState(false); // Add this state
 
     const { showErrorToast, showSuccessToast } = useToast();
 
@@ -200,7 +197,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 <Breadcrumb className="hidden lg:flex">
                                     <BreadcrumbList>
                                         <BreadcrumbItem>
-                                            <BreadcrumbLink href="/#">
+                                            <BreadcrumbLink href="#/">
                                                 <ArrowLeft className="h-4 w-4" />
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
