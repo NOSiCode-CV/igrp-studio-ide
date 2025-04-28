@@ -181,8 +181,11 @@ const repo = {
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_ALL),
 		findRecentWorkspaces: (limit?: number) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, limit),
-		createWorkspace: (workspace: Omit<IWorkspace, 'id' | 'createdAt'>) =>
-			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace),
+		createWorkspace: async (workspace: Omit<IWorkspace, 'id' | 'createdAt'>): Promise<HandlerResponse> => {
+			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace) } catch (error) {
+				return handleError(error)
+			}
+		},
 		updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.UPDATE, workspaceId, updates),
 		deleteWorkspace: (workspaceId: string) =>
@@ -252,7 +255,7 @@ const window = {
 	maximizeWindow: () => ipcRenderer.send('maximize-window'),
 	closeWindow: () => ipcRenderer.send('close-window'),
 	restoreWindow: () => ipcRenderer.send('restore-window'),
-    isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
+	isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

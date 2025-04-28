@@ -33,7 +33,7 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT, async (event) => {
     }
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
+handleWithCustomErrors(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
     try {
         return await repo.createWorkspace(workspace);
     } catch (error) {

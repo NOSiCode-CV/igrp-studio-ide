@@ -4,7 +4,7 @@ import { ComponentRegistrationConfig, DockerServiceRegistrationConfig, ProjectWo
 
 export interface IWorkspaceRepository {
     // Workspace Operations
-    createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<IWorkspace>;
+    createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<HandlerResponse>;
     updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>;
     deleteWorkspace(id: string): Promise<void>;
     getWorkspace(id: string): Promise<IWorkspace | undefined>;

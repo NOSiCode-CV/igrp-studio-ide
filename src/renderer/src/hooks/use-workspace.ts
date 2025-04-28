@@ -87,24 +87,29 @@ export const useWorkspace = () => {
         }
     };
 
-    const createWorkspace = async (workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>): Promise<IWorkspace> => {
-        setLoading(true);
+    const createWorkspace = async (workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>): Promise<IWorkspace | null> => {
+
         try {
-            const newWorkspace = await window.igrpStudio.workspace.createWorkspace({
+            const { result, error } = await window.igrpStudio.workspace.createWorkspace({
                 ...workspaceData,
                 createdAt: new Date().toISOString()
             });
 
-            showSuccessToast(`Workspace "${newWorkspace.name}" created`);
+            if (error) {
+                showErrorToast(error);
+                return null;
+            }
 
-            dispatch(setWorkspace(newWorkspace))
+            showSuccessToast(`Workspace "${result.name}" created`);
 
-            return newWorkspace;
+            dispatch(setWorkspace(result))
+
+            dispatch(setChangeStatus(true))
+
+            return result;
         } catch (err) {
             showErrorToast(err);
             throw err;
-        } finally {
-            setLoading(false);
         }
 
     };

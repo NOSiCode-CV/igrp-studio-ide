@@ -63,7 +63,7 @@ const CreateWorkspace = ({
 
         setIsCreating(true);
         try {
-            const workspace: IWorkspace = await createWorkspace({
+            const workspace = await createWorkspace({
                 name: workspaceName,
                 path: directoryPath,
                 slug,
