@@ -25,7 +25,7 @@ export const PortsBadgeList = ({
     }
 
     return (
-        <div className={cn('p-1', className)}>
+        <div className={cn('py-1', className)}>
             <div className="text-xs text-muted-foreground">{title}</div>
             <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
                 {ports.map((port, index) => (

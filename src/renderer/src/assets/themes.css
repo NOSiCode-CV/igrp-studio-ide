@@ -26,17 +26,6 @@ body {
   }
 }
 
-.theme-default,
-.theme-default-scaled {
-  --primary: var(--color-neutral-600);
-  --primary-foreground: var(--color-neutral-50);
-
-  @variant dark {
-    --primary: var(--color-neutral-500);
-    --primary-foreground: var(--color-neutral-50);
-  }
-}
-
 .theme-blue,
 .theme-blue-scaled {
   --primary: oklch(0.623 0.214 259.815);
@@ -45,7 +34,6 @@ body {
   @variant dark {
     --primary: oklch(0.546 0.245 262.881);
     --primary-foreground: oklch(0.379 0.146 265.522);
-    ;
   }
 }
 
@@ -55,8 +43,8 @@ body {
   --primary-foreground: oklch(0.982 0.018 155.826);
 
   @variant dark {
-    --primary: oklch(0.696 0.17 162.48);
-    --primary-foreground: oklch(0.393 0.095 152.535);
+    --primary: oklch(0.546 0.245 262.881);
+    --primary-foreground: oklch(0.379 0.146 265.522);
   }
 }
 

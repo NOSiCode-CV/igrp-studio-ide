@@ -23,20 +23,25 @@ interface SearchInputProps {
 // Get project type icon
 function ProjectIcon({ project }: { project: ProjectData }) {
     return project.icon ? (
-        <img
-            src={project.icon}
-            alt="Project icon"
-            width={20}
-            height={20}
-            className="rounded-full"
-        />
+        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            <img
+                src={project.icon}
+                alt="Project icon"
+                width={20}
+                height={20}
+                className="rounded-full"
+            />
+        </div>
     ) : projectIcons[project.framework] ? (
-        <img
-            src={projectIcons[project.framework]}
-            alt={`${project.framework} logo`}
-            width={20}
-            height={20}
-        />
+        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            {' '}
+            <img
+                src={projectIcons[project.framework]}
+                alt={`${project.framework} logo`}
+                width={20}
+                height={20}
+            />
+        </div>
     ) : null;
 }
 

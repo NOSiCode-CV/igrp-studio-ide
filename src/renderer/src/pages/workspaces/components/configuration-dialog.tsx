@@ -113,6 +113,7 @@ export function ConfigurationDialog({
                     const { properties, name, label } = service;
 
                     const serviveData: any = extractDefaults(properties);
+
                     // Convert ports array to the string format "internal:external"
                     const ports =
                         serviveData.ports.map(
@@ -156,8 +157,9 @@ export function ConfigurationDialog({
                         volumes,
                         dependsOn,
                         labels,
-                        label: label || name,
-                        name: name || serviveData.container_name,
+                        label,
+                        name,
+                        container_name: serviveData.container_name,
                         customNetwork: `${workspace.slug}-network`,
                     };
                 }) || [];
@@ -171,9 +173,6 @@ export function ConfigurationDialog({
     useEffect(() => {
         if (open && service) {
             const network = service.networks && service.networks[0];
-
-            console.log('service', service);
-
             // Edit mode
             setName(service.name || '');
             setImage(service.image || '');
@@ -300,17 +299,17 @@ export function ConfigurationDialog({
             }
         });
 
+        // Add service labels (highest priority)
+        Object.entries(serviceLabels).forEach(([key, value]) => {
+            labelsMap.set(key, value);
+        });
+
         // Add form labels (medium priority)
         Object.entries(formLabels).forEach(([key, value]) => {
             if (value) {
                 // Only add if value exists
                 labelsMap.set(key, value);
             }
-        });
-
-        // Add service labels (highest priority)
-        Object.entries(serviceLabels).forEach(([key, value]) => {
-            labelsMap.set(key, value);
         });
 
         // Convert the map back to an array of Label objects
@@ -342,8 +341,10 @@ export function ConfigurationDialog({
             labels: serviceLabels = {},
             properties: serviceProperties = {},
             depends_on: serviceDependsOn,
-            name: ServiceName,
+            name: serviceName,
             status,
+            createdAt,
+            statusMessage,
             ...serviceRest
         } = service || {};
 
@@ -356,7 +357,7 @@ export function ConfigurationDialog({
         // Process volumes
         const _volumes: Volume[] = volumes.map((volumeStr) => {
             const [name, path, driver] = volumeStr.split(':');
-            return { name, path, driver };
+            return { name, path, driver: driver || 'none' };
         });
 
         // Process labels - merge template labels with new ones
@@ -364,7 +365,7 @@ export function ConfigurationDialog({
         const _labels = mergeLabels(
             templateLabels,
             serviceLabels,
-            { type, description },
+            { type, description, name },
             serviceLabels.uuid
         );
 
@@ -384,7 +385,7 @@ export function ConfigurationDialog({
 
         const serviceData: WorkspaceService = {
             id: serviceLabels.uuid || '',
-            name: name,
+            name: serviceLabels.name || name,
             properties: {
                 // Template properties (lowest priority)
                 ...templateRest,
@@ -392,7 +393,6 @@ export function ConfigurationDialog({
                 ...serviceProperties,
                 // Form values (highest priority)
                 ...serviceRest,
-                container_name: name,
                 image,
                 ports: _ports,
                 environments: _environments,

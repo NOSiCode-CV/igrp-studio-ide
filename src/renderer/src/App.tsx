@@ -15,7 +15,6 @@ const App = () => {
     useEffect(() => {
         async function loadTheme() {
             const savedTheme = await ThemeService.getActiveTheme();
-            console.log(savedTheme);
             if (savedTheme) {
                 setActiveThemeValue(savedTheme);
             }

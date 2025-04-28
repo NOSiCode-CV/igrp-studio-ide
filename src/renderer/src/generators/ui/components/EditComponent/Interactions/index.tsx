@@ -14,47 +14,37 @@ const Interactions = ({
     path: string;
 }) => {
     const { getInteractionsComponent } = useStudio();
-    const [interactions, setInteractions] = useState({});
+    const [interactionsType, setInteractionsType] = useState({});
 
     const [linkedShadow, setLinkedShadow] = useState(true);
-    const [boxShadows, setBoxShadows] = useState<ShadowValue[]>([
-        {
-            x: '0',
-            y: '4',
-            blur: '8',
-            spread: '0',
-            color: '#00000040',
-            inset: false,
-        },
-    ]);
+    const [interactions, setInteractions] = useState<ShadowValue[]>([]);
 
     const { componentName } = comp;
 
     useEffect(() => {
         if (componentName)
             getInteractionsComponent(path, componentName).then((data) =>
-                setInteractions(data)
+                setInteractionsType(data)
             );
     }, [getInteractionsComponent, comp, componentName]);
-
-    console.log(interactions);
 
     return (
         <div className="p-3 space-y-2">
             <TriggerControls
-                shadows={boxShadows}
+                shadows={interactions}
                 linkedShadow={linkedShadow}
-                onShadowsChange={setBoxShadows}
+                onShadowsChange={setInteractions}
                 onLinkedShadowChange={setLinkedShadow}
-                interactions={interactions}
+                interactions={interactionsType}
             />
-
-            <EmptyList
-                title="Element Trigger"
-                description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
-                className="py-12"
-                icon={<MousePointer />}
-            />
+            {interactions.length === 0 && (
+                <EmptyList
+                    title="Element Trigger"
+                    description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
+                    className="py-12"
+                    icon={<MousePointer />}
+                />
+            )}
         </div>
     );
 };

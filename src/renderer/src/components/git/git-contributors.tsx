@@ -31,13 +31,13 @@ export function GitContributors({ projectPath }) {
                     {contributors.slice(0, 3).map((contributor, i) => (
                         <Tooltip key={i}>
                             <TooltipTrigger asChild>
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-medium border-1 border-[#2d2d2d]">
+                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-medium border-1">
                                     {contributor.name.charAt(0).toUpperCase()}
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
                                 <p>{contributor.name}</p>
-                                <p className="text-muted-foreground text-xs">
+                                <p className="text-foreground text-xs">
                                     {contributor.email}
                                 </p>
                             </TooltipContent>

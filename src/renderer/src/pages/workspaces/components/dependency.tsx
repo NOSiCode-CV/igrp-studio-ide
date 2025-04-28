@@ -48,7 +48,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
             {isTable ? (
                 <div className="flex flex-wrap gap-1"> {content}</div>
             ) : (
-                <div className=" p-1">
+                <div className="py-1">
                     <div className="text-xs text-muted-foreground">
                         Depends on
                     </div>

@@ -39,7 +39,7 @@ export function AppearanceSettings() {
                 <div className="grid w-full flex-1 grid-cols-2 flex-wrap items-start gap-2 sm:flex sm:items-center md:gap-6">
                     <div className="flex flex-col gap-2">
                         <Label className="text-xs">Accent Color</Label>
-                        <div className="flex flex-wrap gap-1 md:gap-2">
+                        <div className="flex flex-wrap gap-2 md:gap-2">
                             {baseColors.map((theme) => {
                                 const isActive = activeTheme === theme.name;
 
@@ -89,7 +89,7 @@ export function AppearanceSettings() {
                                                 <Check className="!size-2.5 text-white" />
                                             )}
                                         </span>
-                                        <span className="hidden xl:block">
+                                        <span className="hidden md:block">
                                             {theme.label === 'Zinc'
                                                 ? 'Default'
                                                 : theme.label}

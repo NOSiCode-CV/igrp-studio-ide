@@ -23,29 +23,52 @@ export class DockerService {
     }
 
     private prepareInitScript(projectPath: string): void {
-        const scriptPath = path.join(projectPath, '.igrpstudio', 'db-init.sh');
+        const igrpStudioPath = path.join(projectPath, '.igrpstudio');
 
         try {
-            // Read and normalize line endings
-            let content = fs.readFileSync(scriptPath, 'utf8');
-            content = content.replace(/\r\n/g, '\n');
+            // Find all .sh files recursively
+            const shFiles = this.findShFilesRecursively(igrpStudioPath);
 
-            // Change shebang to #!/bin/sh for Alpine compatibility
-            content = content.replace(/^#!\/bin\/bash/, '#!/bin/sh');
+            for (const scriptPath of shFiles) {
+                // Read and normalize line endings
+                let content = fs.readFileSync(scriptPath, 'utf8');
+                content = content.replace(/\r\n/g, '\n');
 
-            fs.writeFileSync(scriptPath, content);
+                // Change shebang to #!/bin/sh for Alpine compatibility
+                content = content.replace(/^#!\/bin\/bash/, '#!/bin/sh');
 
-            // Set executable permissions
-            if (process.platform !== 'win32') {
-                execSync(`chmod +x "${scriptPath}"`);
-            } else {
-                // Windows alternative if using WSL
-                execSync(`wsl chmod +x "${scriptPath.replace(/\\/g, '/')}"`);
+                fs.writeFileSync(scriptPath, content);
+
+                // Set executable permissions
+                if (process.platform !== 'win32') {
+                    execSync(`chmod +x "${scriptPath}"`);
+                } else {
+                    // Windows alternative if using WSL
+                    execSync(`wsl chmod +x "${scriptPath.replace(/\\/g, '/')}"`);
+                }
             }
         } catch (error) {
-            console.error('Error preparing init script:', error);
+            console.error('Error preparing init scripts:', error);
             throw error;
         }
+    }
+
+    private findShFilesRecursively(directory: string): string[] {
+        const shFiles: string[] = [];
+
+        const files = fs.readdirSync(directory);
+        for (const file of files) {
+            const fullPath = path.join(directory, file);
+            const stat = fs.statSync(fullPath);
+
+            if (stat.isDirectory()) {
+                shFiles.push(...this.findShFilesRecursively(fullPath));
+            } else if (file.endsWith('.sh')) {
+                shFiles.push(fullPath);
+            }
+        }
+
+        return shFiles;
     }
 
     async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
@@ -98,6 +121,7 @@ export class DockerService {
             // Load compose file first to get all services
             const compose = await this.loadComposeFile(projectPath);
             const allServices = compose.services;
+            const volumes = compose.volumes;
             const serviceNames = Object.keys(allServices);
 
             try {
@@ -119,6 +143,21 @@ export class DockerService {
                     const containerInfo = runningServicesMap.get(serviceName);
 
                     const { environment, depends_on, env_file, ...rest } = serviceDef
+                    // Process volumes with driver information
+                    const processedVolumes = (serviceDef.volumes || []).map(volume => {
+                        if (typeof volume === 'string') {
+                            // For named volumes (format "volume_name:container_path")
+                            const [volumeName] = volume.split(':');
+
+                            // Check if we have driver info for this volume
+                            const volumeConfig = volumes?.[volumeName];
+                            if (volumeConfig?.driver) {
+                                return `${volume}:${volumeConfig.driver}`;
+                            }
+                        }
+                        return volume;
+                    });
+
 
                     if (containerInfo) {
                         // Service is running
@@ -127,7 +166,7 @@ export class DockerService {
                             name: serviceName,
                             status: containerInfo.State,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
-                            volumes: serviceDef.volumes || [],
+                            volumes: processedVolumes,
                             environments: this.parseEnvironmentToArray(environment),
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
@@ -147,6 +186,7 @@ export class DockerService {
                             env_file: env_file && env_file.map((file: string) => {
                                 return { file }
                             }),
+                            volumes: processedVolumes,
                         };
                     }
                 });
