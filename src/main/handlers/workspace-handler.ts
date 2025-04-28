@@ -25,7 +25,7 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT, async (event) => {
     } catch (error) {
         console.error('Workspace get last access failed:', error);
 
-        event.sender.send(EVENTS.ERROR, {
+        event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
             message: error instanceof Error ? error.message : 'Failed to get last access failed:'
         });
@@ -33,15 +33,14 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT, async (event) => {
     }
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (_event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
+ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
     try {
         return await repo.createWorkspace(workspace);
     } catch (error) {
-        console.error('Workspace creation failed:', error);
-        /*  event.sender.send(EVENTS.ERROR, {
-             code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
-             message: error instanceof Error ? error.message : 'Failed to create workspace'
-         }); */
+        event.sender.send(EVENTS.LOG, {
+            code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
+            message: error instanceof Error ? error.message : 'Failed to create workspace'
+        });
         throw error;
     }
 });
@@ -50,8 +49,7 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.UPDATE, async (event, id: string, upd
     try {
         return await repo.updateWorkspace(id, updates);
     } catch (error) {
-        console.error('Workspace update failed:', error);
-        event.sender.send(EVENTS.ERROR, {
+        event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.WORKSPACE.UPDATE_FAILED,
             message: error instanceof Error ? error.message : 'Failed to update workspace'
         });
@@ -63,8 +61,7 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.DELETE, async (event, id: string) => 
     try {
         await repo.deleteWorkspace(id);
     } catch (error) {
-        console.error('Workspace deletion failed:', error);
-        event.sender.send(EVENTS.ERROR, {
+        event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.WORKSPACE.DELETE_FAILED,
             message: error instanceof Error ? error.message : 'Failed to delete workspace'
         });
@@ -76,8 +73,7 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.GET, async (event, id: string) => {
     try {
         return await repo.getWorkspace(id);
     } catch (error) {
-        console.error('Workspace fetch failed:', error);
-        event.sender.send(EVENTS.ERROR, {
+        event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.WORKSPACE.NOT_FOUND,
             message: error instanceof Error ? error.message : 'Workspace not found'
         });
@@ -165,8 +161,7 @@ ipcMain.handle(EVENTS.REPOSITORY.BACKUP.CREATE, async (event, backupPath?: strin
     try {
         await repo.backupData(backupPath);
     } catch (error: any) {
-        console.error('Backup failed:', error);
-        event.sender.send(EVENTS.ERROR, {
+        event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.BACKUP.FAILED,
             message: error
         });
@@ -178,8 +173,7 @@ ipcMain.handle(EVENTS.REPOSITORY.BACKUP.RESTORE, async (event, backupPath: strin
     try {
         await repo.restoreData(backupPath);
     } catch (error: any) {
-        console.error('Restore failed:', error);
-        event.sender.send(EVENTS.ERROR, {
+        event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.BACKUP.RESTORE_FAILED,
             message: error
         });
