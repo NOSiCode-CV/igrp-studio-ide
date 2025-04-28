@@ -51,6 +51,7 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { HandlerResponse, ProjectData } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
+import { constructFrom } from 'date-fns';
 
 interface ConfigurationDialogProps {
     service?: any;
@@ -68,7 +69,6 @@ export function ConfigurationDialog({
     services = [],
     projects = [],
     isNew = true,
-    children,
     project,
     open,
     setOpen,
@@ -104,74 +104,74 @@ export function ConfigurationDialog({
         },
     } = useWorkspace();
 
+    const fetchTemplates = async () => {
+        const { result } = await getTemplatesService();
+
+        const convertedTemplates =
+            result.services?.map((service) => {
+                const { properties, name, label } = service;
+
+                const serviveData: any = extractDefaults(properties);
+
+                // Convert ports array to the string format "internal:external"
+                const ports =
+                    serviveData.ports.map(
+                        (port) => `${port.external}:${port.internal}`
+                    ) || [];
+
+                // Convert environments array to {name, value} format
+                const environments =
+                    serviveData?.environments?.map((env) => ({
+                        key: env.key,
+                        value: env.value,
+                    })) || [];
+
+                // Convert volumes array to "source:target" format
+                const volumes =
+                    serviveData.volumes?.map(
+                        (vol) => `${vol.name}:${vol.path}:${vol.driver}`
+                    ) || [];
+
+                // Convert dependsOn to depends_on array
+                const dependsOn =
+                    serviveData.dependsOn?.map((dep) => dep.service) || [];
+
+                // Convert labels array
+                const type =
+                    serviveData.labels?.find((l) => l.key === 'type')?.value ||
+                    '';
+
+                const labels =
+                    serviveData?.labels?.map((env) => ({
+                        key: env.key,
+                        value: env.value,
+                    })) || [];
+
+                // Build the template object
+                return {
+                    ...serviveData,
+                    type,
+                    ports,
+                    environments,
+                    volumes,
+                    dependsOn,
+                    labels,
+                    label,
+                    name,
+                    container_name: serviveData.container_name,
+                    customNetwork: `${workspace.slug}-network`,
+                };
+            }) || [];
+
+        setServiceTemplates(convertedTemplates);
+    };
+
     useEffect(() => {
-        const fetchTemplates = async () => {
-            const { result } = await getTemplatesService();
-
-            const convertedTemplates =
-                result.services?.map((service) => {
-                    const { properties, name, label } = service;
-
-                    const serviveData: any = extractDefaults(properties);
-
-                    // Convert ports array to the string format "internal:external"
-                    const ports =
-                        serviveData.ports.map(
-                            (port) => `${port.external}:${port.internal}`
-                        ) || [];
-
-                    // Convert environments array to {name, value} format
-                    const environments =
-                        serviveData?.environments?.map((env) => ({
-                            key: env.key,
-                            value: env.value,
-                        })) || [];
-
-                    // Convert volumes array to "source:target" format
-                    const volumes =
-                        serviveData.volumes?.map(
-                            (vol) => `${vol.name}:${vol.path}:${vol.driver}`
-                        ) || [];
-
-                    // Convert dependsOn to depends_on array
-                    const dependsOn =
-                        serviveData.dependsOn?.map((dep) => dep.service) || [];
-
-                    // Convert labels array
-                    const type =
-                        serviveData.labels?.find((l) => l.key === 'type')
-                            ?.value || '';
-
-                    const labels =
-                        serviveData?.labels?.map((env) => ({
-                            key: env.key,
-                            value: env.value,
-                        })) || [];
-
-                    // Build the template object
-                    return {
-                        ...serviveData,
-                        type,
-                        ports,
-                        environments,
-                        volumes,
-                        dependsOn,
-                        labels,
-                        label,
-                        name,
-                        container_name: serviveData.container_name,
-                        customNetwork: `${workspace.slug}-network`,
-                    };
-                }) || [];
-
-            setServiceTemplates(convertedTemplates);
-        };
+        if (!open) return;
 
         fetchTemplates();
-    }, []);
 
-    useEffect(() => {
-        if (open && service) {
+        if (service) {
             const network = service.networks && service.networks[0];
             // Edit mode
             setName(service.name || '');
@@ -185,7 +185,7 @@ export function ConfigurationDialog({
             setNetworkType(service.networkType || 'bridge');
             setCustomNetwork(network);
             setUseCustomNetwork(!!network);
-        } else if (open) {
+        } else {
             // New mode
             setName('');
             setDescription('');
@@ -206,6 +206,7 @@ export function ConfigurationDialog({
         const selectedTemplate = serviceTemplates.find(
             (t) => t.name === templateId
         );
+
         if (selectedTemplate) {
             setName(selectedTemplate.name);
             setImage(selectedTemplate.image);
@@ -424,16 +425,6 @@ export function ConfigurationDialog({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {children ? (
-                    children
-                ) : (
-                    <Button>
-                        <PlusCircle className="w-4 h-4" />
-                        {t('newService')}
-                    </Button>
-                )}
-            </DialogTrigger>
             <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                     <DialogTitle>
@@ -616,7 +607,7 @@ export function ConfigurationDialog({
                                                 onClick={addPort}
                                                 disabled={!newPort}
                                             >
-                                                Add
+                                                {t('add')}
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
@@ -708,7 +699,7 @@ export function ConfigurationDialog({
                                                     onClick={addEnvironment}
                                                     disabled={!newEnvName}
                                                 >
-                                                    Add
+                                                    {t('add')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -780,7 +771,7 @@ export function ConfigurationDialog({
                                                 onClick={addVolume}
                                                 disabled={!newVolume}
                                             >
-                                                Add
+                                                {t('add')}
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
@@ -983,7 +974,7 @@ export function ConfigurationDialog({
 
                 <DialogFooter className="pt-2">
                     <Button variant="outline" onClick={() => setOpen?.(false)}>
-                        Cancel
+                        {t('cancel')}
                     </Button>
                     <Button
                         onClick={handleSave}

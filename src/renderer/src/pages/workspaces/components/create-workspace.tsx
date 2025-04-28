@@ -75,7 +75,7 @@ const CreateWorkspace = ({
             }
         } catch (error) {
             console.error('Workspace creation failed:', error);
-            showErrorToast(t('workspace.createError'));
+            showErrorToast(error);
         } finally {
             setIsCreating(false);
         }

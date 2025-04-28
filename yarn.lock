@@ -994,10 +994,10 @@
     vaul "1.1.2"
     zod "3.24.2"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.179":
-  version "0.0.1-alpha.179"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.179.tgz#bc5183e59ad576ee0624866278abf67d3bb90634"
-  integrity sha512-bL/h/yBf0NpZN2sMbnwrkNtlxgrdEq1df0vXFt4vtdesAog0n0khSg0KHOvqORkiSmFeg7GcbJNozIaxDD8EFA==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.180":
+  version "0.0.1-alpha.180"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.180.tgz#7f217df835ed0c0d9152e5e91fa74d54440f058a"
+  integrity sha512-5IQ06f+oRKMiQrXCJPBGGSSdOXVtQq0L+L4DGV9n3cacHo6VAdeoujFXWw5VonIAUbt8uzGI+22UtBk7k6QG6A==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -6354,10 +6354,10 @@ i18next-electron-fs-backend@^3.0.3:
     lodash.clonedeep "^4.5.0"
     lodash.merge "^4.6.2"
 
-i18next@^25.0.1:
-  version "25.0.1"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-25.0.1.tgz#8870939202299a29fe2c99ea913f8e72db535e31"
-  integrity sha512-8S8PyZbrymJZn3DaN70/34JYWNhsqrU6yA4MuzcygJBv+41dgNMocEA8h+kV1P7MCc1ll03lOTOIXE7mpNCicw==
+i18next@^25.0.2:
+  version "25.0.2"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-25.0.2.tgz#3bfd51d11603e130cc4a88ff37038393dc560951"
+  integrity sha512-xWxgK8GAaPYkV9ia2tdgbtdM+qiC+ysVTBPvXhpCORU/+QkeQe3BSI7Crr+c4ZXULN1PfnXG/HY2n7HGx4KKBg==
   dependencies:
     "@babel/runtime" "^7.26.10"
 

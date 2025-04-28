@@ -264,18 +264,38 @@ const Resources = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <ProjectWizard />
-                <CloneProjectModal
-                    handleCloneProject={handleCloneProject}
-                    open={openCloneProject}
-                    setOpen={setOpenCloneProject}
-                />
+                {openCloneProject && (
+                    <CloneProjectModal
+                        handleCloneProject={handleCloneProject}
+                        open={openCloneProject}
+                        setOpen={setOpenCloneProject}
+                    />
+                )}
             </>
         );
     };
 
-    const ServiceActions = () => (
-        <ConfigurationDialog services={filteredServices} isNew={true} />
-    );
+    const ServiceActions = () => {
+        const [open, setOpen] = useState(false);
+
+        return (
+            <>
+                <Button onClick={() => setOpen(true)}>
+                    <PlusCircle className="w-4 h-4" />
+                    {t('newService')}
+                </Button>
+
+                {open && (
+                    <ConfigurationDialog
+                        services={filteredServices}
+                        isNew={true}
+                        open={open}
+                        setOpen={setOpen}
+                    />
+                )}
+            </>
+        );
+    };
 
     const ProjectEmptyState = () => (
         <div className="shrink-0 border border-dashed rounded-md p-6 text-center">
@@ -339,7 +359,6 @@ const Resources = () => {
                             projectOrder={sortOrder}
                             services={services}
                         />
-                        {/*  <GitProject /> */}
                     </>
                 ) : (
                     <ProjectList
