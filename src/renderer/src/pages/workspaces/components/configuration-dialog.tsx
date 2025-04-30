@@ -43,11 +43,13 @@ import {
 } from '../services';
 import { extractDefaults } from '@renderer/utils/helpers';
 import {
+    Dependency,
+    Environment,
     Port,
     Volume,
     WorkspaceService,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { ProjectData } from 'src/main/types';
+import { HandlerResponse, ProjectData } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 
 interface ConfigurationDialogProps {
@@ -56,7 +58,7 @@ interface ConfigurationDialogProps {
     projects?: ProjectData[];
     isNew?: boolean;
     children?: React.ReactNode;
-    isProject?: boolean;
+    project?: ProjectData;
 }
 
 export function ConfigurationDialog({
@@ -65,7 +67,7 @@ export function ConfigurationDialog({
     projects = [],
     isNew = true,
     children,
-    isProject = false,
+    project,
 }: ConfigurationDialogProps) {
     const { t } = useTranslation();
     const [name, setName] = useState('');
@@ -92,7 +94,11 @@ export function ConfigurationDialog({
 
     const {
         workspace,
-        actions: { getTemplatesService, createOrUpdateService },
+        actions: {
+            getTemplatesService,
+            createOrUpdateService,
+            configureService,
+        },
     } = useWorkspace();
 
     useEffect(() => {
@@ -163,11 +169,7 @@ export function ConfigurationDialog({
         if (open && service) {
             const network = service.networks && service.networks[0];
 
-            const selectedTemplate = serviceTemplates.find(
-                (t) => t.name === service.name
-            );
-
-            setTemplate(selectedTemplate);
+            console.log('service', service);
 
             // Edit mode
             setName(service.name || '');
@@ -175,7 +177,7 @@ export function ConfigurationDialog({
             setDescription(service.labels.description || '');
             setType(service.labels?.type || '');
             setPorts(service.ports || []);
-            setEnvironments(service.environment || []);
+            setEnvironments(service.environments || []);
             setVolumes(service.volumes || []);
             setDependsOn(service.dependsOn || []);
             setNetworkType(service.networkType || 'bridge');
@@ -277,72 +279,135 @@ export function ConfigurationDialog({
         }
     };
 
+    const mergeLabels = (
+        templateLabels: Environment[] = [],
+        serviceLabels: Record<string, string> = {},
+        formLabels: Record<string, string> = {},
+        uuid: string
+    ): Environment[] => {
+        // Create a map to store labels and prevent duplicates
+        const labelsMap = new Map<string, string>();
+
+        labelsMap.set('uuid', uuid || '');
+
+        // Add template labels first (lowest priority)
+        templateLabels.forEach((label) => {
+            if (!labelsMap.has(label.key)) {
+                labelsMap.set(label.key, label.value);
+            }
+        });
+
+        // Add form labels (medium priority)
+        Object.entries(formLabels).forEach(([key, value]) => {
+            if (value) {
+                // Only add if value exists
+                labelsMap.set(key, value);
+            }
+        });
+
+        // Add service labels (highest priority)
+        Object.entries(serviceLabels).forEach(([key, value]) => {
+            labelsMap.set(key, value);
+        });
+
+        // Convert the map back to an array of Label objects
+        return Array.from(labelsMap.entries()).map(([key, value]) => ({
+            key,
+            value,
+        }));
+    };
+
     // Handle save
-    const handleSave = () => {
+    const handleSave = async () => {
         setIsSubmitting(true);
 
+        // Destructure template with fallback to empty object
         const {
-            depends_on,
-            id,
+            depends_on: templateDependsOn,
+            id: templateId,
+            labels: templateLabels = [],
+            customNetwork,
             label,
             type,
-            status,
             name,
-            networkType,
-            customNetwork,
-            ...rest
+            ...templateRest
         } = template || {};
 
-        const { id: serviceId, environment, ...restService } = service;
+        // Destructure service with fallback to empty object
+        const {
+            id: serviceId,
+            labels: serviceLabels = {},
+            properties: serviceProperties = {},
+            depends_on: serviceDependsOn,
+            name: ServiceName,
+            status,
+            ...serviceRest
+        } = service || {};
 
+        // Process ports
         const _ports: Port[] = ports.map((portStr) => {
             const [external, internal] = portStr.split(':').map(Number);
             return { external, internal };
         });
 
-        const _volumes: Volume[] = volumes.map((volumesStr) => {
-            const vols = volumesStr.split(':');
-            return { name: vols[0], path: vols[1], driver: 'none' };
+        // Process volumes
+        const _volumes: Volume[] = volumes.map((volumeStr) => {
+            const [name, path] = volumeStr.split(':');
+            return { name, path, driver: 'none' };
         });
 
-        const _labels = Object.entries({ type, description }).reduce(
-            (acc, [key, value]) => [
-                ...acc.filter((label) => label.key !== key),
-                ...(value ? [{ key, value }] : []),
-            ],
-            [...(template?.labels || [])]
+        // Process labels - merge template labels with new ones
+        // Use the mergeLabels function
+        const _labels = mergeLabels(
+            templateLabels,
+            serviceLabels,
+            { type, description },
+            serviceLabels.uuid
         );
 
-        // Create service object
+        //depondencies
+        const _dependsOn: Dependency[] = dependsOn.map((depend) => {
+            return { service: depend.replace('{{slug}}', workspace.slug) };
+        });
+
         const serviceData: WorkspaceService = {
-            id: service?.labels.uuid || '',
+            id: serviceLabels.uuid || '',
             name: name,
             properties: {
-                ...rest,
-                ...restService,
+                // Template properties (lowest priority)
+                ...templateRest,
+                // Service properties (medium priority)
+                ...serviceProperties,
+                // Form values (highest priority)
+                ...serviceRest,
                 container_name: name,
                 image,
                 ports: _ports,
                 environments,
                 volumes: _volumes,
-                dependsOn,
+                dependsOn: _dependsOn,
                 networks: [
                     { network: useCustomNetwork ? customNetwork : '' },
                 ].filter((item) => item.network),
-                labels: [..._labels],
+                // Merged labels with service labels taking priority
+                labels: _labels,
             },
         };
 
-        // Simulate API call
-        setTimeout(() => {
-            onSave(serviceData);
+        try {
+            const { error } = await onSave(serviceData);
             setIsSubmitting(false);
-            setOpen(false);
-        }, 500);
+            if (!error) setOpen(false);
+        } catch (err) {
+            console.error(err);
+            setIsSubmitting(false);
+        }
     };
 
-    const onSave = (data: any) => {
-        createOrUpdateService(data, isProject);
+    const onSave = async (data: WorkspaceService): Promise<HandlerResponse> => {
+        if (project)
+            return await configureService({ config: project, service: data });
+        else return await createOrUpdateService(data);
     };
 
     return (

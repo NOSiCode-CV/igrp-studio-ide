@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useToast from '@renderer/hooks/useToast';
-import { IWorkspace, ProjectData } from 'src/main/types';
+import { HandlerResponse, IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import yaml from 'js-yaml';
-import { ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ProjectWorkspace, ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { useTranslation } from 'react-i18next';
 
@@ -168,16 +168,15 @@ export const useWorkspace = () => {
                 result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
             if (result?.error) {
-                console.log(result?.error)
                 showErrorToast(result?.error);
                 return
             }
 
-            showSuccessToast(t('savedSuccessfully', { name: project.name }));
+            showSuccessToast(t('savedSuccessfully', { name: result.name }));
 
-            dispatch(setBasePath(project.path));
+            dispatch(setBasePath(result.path));
 
-            dispatch(setConfig(project));
+            dispatch(setConfig(result));
 
             onSuccess?.()
 
@@ -214,24 +213,21 @@ export const useWorkspace = () => {
         });
     }
 
-    const createOrUpdateService = async (service: WorkspaceService, isProject: boolean) => {
-        let result: any = {};
+    const createOrUpdateService = async (service: WorkspaceService): Promise<HandlerResponse> => {
+        let result: HandlerResponse = {};
         try {
             const { id: serviceId } = service
-
 
             const data: ServiceWorkspace = {
                 id: workspace.id,
                 service
             }
-            console.log(data)
 
-            if (isProject)
-                result = await window.igrpStudio.workspace.updateProject(serviceId, data)
-            else if (serviceId)
+            if (serviceId)
                 result = await window.igrpStudio.workspace.updateService(data, workspace.path)
             else
                 result = await window.igrpStudio.workspace.createService(data, workspace.path)
+
             if (result?.error) {
                 console.log(result.error)
                 showErrorToast(result.error);
@@ -240,8 +236,44 @@ export const useWorkspace = () => {
 
             dispatch(setChangeStatus(true));
 
+            return result
+
         } catch (err) {
             showErrorToast(err);
+            return { error: err as string }
+        }
+    }
+
+    const configureService = async ({ config, service }: { config: any, service: WorkspaceService }): Promise<HandlerResponse> => {
+        let result: any = {};
+        try {
+
+            const data: ProjectWorkspace = {
+                id: workspace.id,
+                service,
+                config: {
+                    ...config,
+                    id: service.id,
+                }
+            }
+
+            console.log('configureService', data)
+
+            result = await window.igrpStudio.workspace.configureService(data, workspace.path)
+
+            if (result?.error) {
+                console.log(result.error)
+                showErrorToast(result.error);
+            } else
+                showSuccessToast('Service saved successfully');
+
+            dispatch(setChangeStatus(true));
+
+            return result;
+
+        } catch (err) {
+            showErrorToast(err);
+            return { error: err as string }
         }
     }
 
@@ -291,7 +323,8 @@ export const useWorkspace = () => {
             saveCustomWorkspaceComposeFile,
             createOrUpdateService,
             removeService,
-            findAllServices
+            findAllServices,
+            configureService
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

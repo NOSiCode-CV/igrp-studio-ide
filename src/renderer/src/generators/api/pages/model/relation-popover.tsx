@@ -232,7 +232,7 @@ export function RelationPopover({
                                         onChange={(value) =>
                                             setLocalRelation({
                                                 ...localRelation,
-                                                referencedColumnName: value,
+                                                referencedColumnName: value as string,
                                             })
                                         }
                                     />

@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPChat, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -61,6 +61,8 @@ import {
     ChartBarBig,
     ChartColumnBig,
     CaseSensitive,
+    Gauge,
+    RadarIcon,
 } from 'lucide-react';
 
 // Constants
@@ -143,16 +145,17 @@ export const COMPONENT: Record<string, string> = {
     CardFooter: "cardFooter",
     CardHeader: "cardHeader",
 
-    Piechart : 'piechart',
+    Piechart: 'piechart',
     Chat: 'chat',
     Areachart: 'areachart',
     Linechart: 'linechart',
     Barchart: 'barchart',
     HorizontalBarchart: 'horizontalBarchart',
-    VerticalBarchart:"verticalBarchart",
+    VerticalBarchart: "verticalBarchart",
     RadialBarchart: "radialBarchart",
     Radarchart: "radarchart",
-};
+}
+
 
 // Icon Mapping
 export const ICON_MAP: Record<string, React.ElementType> = {
@@ -216,12 +219,14 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Linechart]: LineChart,
     [COMPONENT.HorizontalBarchart]: ChartBarBig,
     [COMPONENT.VerticalBarchart]: ChartColumnBig,
+    [COMPONENT.RadialBarchart]: Gauge,
+    [COMPONENT.Radarchart]: RadarIcon,
 
     [COMPONENT.Chat]: MessageCircle,
 
     accordion: AlignLeft,
     treeView: GitMerge,
-    
+
     notifications: BellIcon,
 
     stack: Table2,
@@ -267,7 +272,6 @@ export const COMPONENT_MAP = {
     [COMPONENT.Radio]: IGRPRadioButton,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
-    [COMPONENT.Chat]: IGRPChat,
 
     [COMPONENT.Piechart]: IGRPPieChart,
     [COMPONENT.Areachart]: IGRPAreaChart,

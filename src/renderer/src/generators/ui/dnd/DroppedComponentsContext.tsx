@@ -64,6 +64,7 @@ const newStructuredComponent = (
             variant: 'default',
         },
         children: children || [],
+        interactions: [],
     };
 
     return newRow;

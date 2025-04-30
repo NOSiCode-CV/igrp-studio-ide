@@ -103,6 +103,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <div className="flex flex-col gap-3 md:col-span-2 space-y-2">
                                 <IGRPInputAddOn
+                                    id="method"
                                     selectValue={formik.values.method}
                                     value={formik.values.path}
                                     labelText={t('methodType')}
@@ -115,9 +116,9 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                             e.target.value
                                         )
                                     }
-                                    onSelectValueChange={(value) =>
-                                        formik.setFieldValue('method', value)
-                                    }
+                                    onSelectValueChange={(value) => {
+                                        formik.setFieldValue('method', value || currentItem.content?.method);
+                                    }}
                                     classNameGlobal={cn(
                                         'w-full h-8 mb-6',
                                         formik.touched.path &&

@@ -215,7 +215,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                     const schema = content?.[contentType]?.['schema'];
 
-                    const type = (schema && schema.type) || 'string';
+                    const module = (schema && schema.module) || '';
+                    const objectType = (schema && schema.objectType) || '';
+
+                    const typeValue = (schema && schema.type) || 'string';
+
+                    const type = { type: objectType, module, value: typeValue };
+
                     const collectionType =
                         (schema && schema.collectionType) || 'none';
 
@@ -227,6 +233,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                               },
                           }
                         : null;
+
 
                     return (
                         <div
@@ -305,7 +312,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 <div className="flex flex-col gap-2">
                                     <LabelRequired>{t('type')}</LabelRequired>
                                     <TypeSelectorDropdown
-                                        type={type}
+                                        type={typeValue}
                                         onTypeChange={(type) =>
                                             handleAddResponse({
                                                 statusCode,
@@ -375,12 +382,13 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                             name,
                                             contentType,
                                             type,
+                                            collectionType,
                                         })
                                     }
                                     className="w-full"
                                 />
                             </div>
-                            {type === 'object' && (
+                            {typeValue === 'object' && (
                                 <Card className="rounded">
                                     <CardHeader>
                                         <CardTitle>{t('dataSchema')}</CardTitle>

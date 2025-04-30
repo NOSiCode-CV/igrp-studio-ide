@@ -103,6 +103,9 @@ ipcMain.handle('is-git-initialized', async (_event, projectPath: string) => {
 ipcMain.handle('initialize-git', async (_event, projectPath: string) => {
     return GitService.initializeGit(projectPath);
 });
+ipcMain.handle('get-remote-git', async (_event, projectPath: string) => {
+    return GitService.getRemoteUrl(projectPath);
+});
 ipcMain.handle('add-git-remote', async (_event, { projectPath, remoteUrl }) => {
     return GitService.addRemote(projectPath, remoteUrl);
 });

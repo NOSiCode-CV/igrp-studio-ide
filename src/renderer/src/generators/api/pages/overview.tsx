@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
-import EmptyPage from './EmptyPage';
-import { OptionType } from '@renderer/constants/appConstants';
-import { useTranslation } from 'react-i18next';
-import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
+import { OptionType, projectIcons } from '@renderer/constants/appConstants';
 import DashboardOverview from '../components/dashboard-overview';
 
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
@@ -24,9 +21,20 @@ import { Button } from '@renderer/components/ui/button';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import { Check, Copy } from 'lucide-react';
+import {
+    Check,
+    Copy,
+    GitBranch,
+    GitBranchIcon,
+    Package,
+    Server,
+} from 'lucide-react';
 import { SpringConfigData } from 'src/main/types';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { useGit } from '@renderer/hooks/use-git';
+import Dependency from '@renderer/pages/workspaces/components/dependency';
+import { useSelector } from 'react-redux';
+import { RootState } from '@renderer/redux';
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
@@ -35,17 +43,21 @@ interface NewProps {
 
 const Overview = ({}: NewProps) => {
     const [copied, setCopied] = useState(false);
+    const [projectId, setProjectId] = useState<string>('');
+    const [repositoryUrl, setRepositoruUrl] = useState<string | null>(null);
+    const { getRemoteUrl } = useGit();
 
-    const { t } = useTranslation();
+    const { isGitEnabled, branches, activeBranch } = useSelector(
+        (state: RootState) => state.git
+    );
 
-    const { newTab } = useTabs();
     const {
         actions: { saveOrOpenProject },
     } = useWorkspace();
 
-    const { config: project, filesThree } = useStudioAPI();
+    const { config: project, filesThree, basePath } = useStudioAPI();
 
-    const { config, id: projectId } = project;
+    const { config } = project || {};
 
     const [data, setData] = useState<SpringConfigData>(config);
 
@@ -57,9 +69,16 @@ const Overview = ({}: NewProps) => {
         dto: 0,
     });
 
-    const handleOptionClick = (opt: OptionType) => {
-        newTab({ type: opt });
-    };
+    useEffect(() => {
+        const fetchRemoteUrl = async () => {
+            await getRemoteUrl(basePath).then(setRepositoruUrl);
+        };
+        fetchRemoteUrl();
+    }, [basePath]);
+
+    useEffect(() => {
+        setProjectId(project?.id);
+    }, [project]);
 
     useEffect(() => {
         const newStats = { modules: 0, controllers: 0, models: 0, dto: 0 };
@@ -107,12 +126,168 @@ const Overview = ({}: NewProps) => {
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="mt-0 space-y-4">
-                    <IGRPPageHeader
-                        title={t('apiOverview')}
-                        description={t('manageApiEndpoints')}
-                    />
-                    <DashboardOverview stats={stats} />
-                    <EmptyPage onClick={handleOptionClick} />
+                    {project && (
+                        <>
+                            <div className="space-x-3 flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shadow-lg">
+                                        <img
+                                            src={
+                                                projectIcons[project.framework]
+                                            }
+                                            alt={`${project.framework} logo`}
+                                            width={16}
+                                            height={16}
+                                            className="h-68 w-8"
+                                        />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-2xl font-semibold">
+                                            Project Details
+                                        </h1>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex space-x-2">
+                                        <span className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium">
+                                            {project.type}
+                                        </span>
+                                        <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">
+                                            Active
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-6">
+                                <div className="p-5 rounded-lg border">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-base font-medium">
+                                            Project Info
+                                        </h3>
+                                        <Package className="text-blue-400 w-5 h-5" />
+                                    </div>
+                                    {project && (
+                                        <div className="space-y-4">
+                                            <div>
+                                                <p className="text-muted-foreground text-xs mb-1">
+                                                    Name
+                                                </p>
+                                                <p className="">
+                                                    {project.config.name}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <div className="text-muted-foreground">
+                                                    Type
+                                                </div>
+                                                <div className="text-sm font-medium capitalize">
+                                                    {project.type}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-muted-foreground text-xs mb-1">
+                                                    Version
+                                                </p>
+                                                <p className="">1.0.0</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="p-6 rounded-lg border space-y-4">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-base font-medium">
+                                            Technical Stack
+                                        </h3>
+                                        <Server className="text-purple-400 w-5 h-5" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <p className="text-muted-foreground text-xs mb-1">
+                                                Framework
+                                            </p>
+                                            <p className="">
+                                                {project.framework}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-muted-foreground   text-xs mb-1">
+                                                Version
+                                            </p>
+                                            <p className="">{project.config.springBootVersion}</p>
+                                        </div>
+                                        <Dependency
+                                            dependsOn={project.dependsOn}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="p-6 rounded-lg border space-y-4">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-base font-medium">
+                                            Development
+                                        </h3>
+                                        <GitBranchIcon className="text-green-400 w-5 h-5" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        {isGitEnabled && (
+                                            <div>
+                                                <p className="text-muted-foreground text-xs mb-1">
+                                                    Repository
+                                                </p>
+                                                <p className="">
+                                                    {activeBranch}
+                                                </p>
+                                            </div>
+                                        )}
+                                        {repositoryUrl && (
+                                            <div>
+                                                <div className="text-muted-foreground text-xs">
+                                                    Repository
+                                                </div>
+                                                <div className="text-sm font-medium truncate">
+                                                    <a
+                                                        href={repositoryUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-primary hover:underline flex items-center"
+                                                    >
+                                                        <GitBranch className="h-3.5 w-3.5" />
+                                                        {repositoryUrl.replace(
+                                                            /^https?:\/\//,
+                                                            ''
+                                                        )}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div>
+                                            <p className="text-muted-foreground text-xs mb-1">
+                                                Last Updated
+                                            </p>
+                                            <p className="">...</p>
+                                        </div>
+                                        {/*  <div>
+                                            <p className="text-muted-foreground text-xs mb-1">
+                                                Contributors
+                                            </p>
+                                            <div className="flex -space-x-2 mt-1">
+                                                {[1, 2, 3].map((i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center  text-sm font-medium border-2 border-[#2d2d2d]"
+                                                    >
+                                                        {i}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div> */}
+                                    </div>
+                                </div>
+                            </div>
+                            <DashboardOverview stats={stats} />
+                        </>
+                    )}
                 </TabsContent>
                 <TabsContent value="settings" className="mt-0 space-y-4">
                     <Card>
@@ -135,7 +310,7 @@ const Overview = ({}: NewProps) => {
                                             id="project-id"
                                             value={projectId}
                                             readOnly
-                                            className="h-8 text-xs font-mono bg-muted/50 flex-1 rounded-r-none"
+                                            className="h-8 font-mono bg-muted/50 flex-1 rounded-r-none"
                                         />
                                         <Button
                                             variant="outline"

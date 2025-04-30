@@ -18,7 +18,6 @@ import {
 import { GitFork, Key, Link, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RepositoryList } from './repository-list';
-import { Repository } from 'src/main/types';
 
 interface CloneProjectModalProps {
     handleCloneProject: (

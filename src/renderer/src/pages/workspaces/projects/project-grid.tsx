@@ -14,6 +14,7 @@ import { ProjectIcon } from '@renderer/components/shared-ui';
 import { ProjectActions } from './project-actions';
 import { Button } from '@renderer/components/ui/button';
 import { PortsBadgeList } from '../components/ports-badge-list';
+import Dependency from '../components/dependency';
 
 interface ProjectProps {
     projects: ProjectData[];
@@ -35,7 +36,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
     const sortProjects = (projects: any[]) => {
         return [...projects].sort((a, b) => {
             if (projectOrder === 'name') {
-                return a.name.localeCompare(b.name);
+                return a.name?.localeCompare(b.name);
             } else if (projectOrder === 'lastModified') {
                 return (
                     new Date(b.config?.lastModified).getTime() -
@@ -56,8 +57,9 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {sortProjects(
                 projects.map((project, index) => {
-                    const ports =
-                        findServiceByProjectName(project.id)?.ports || [];
+                    const service = findServiceByProjectName(project.id);
+                    const dependsOn = service?.dependsOn || [];
+                    const ports = service?.ports || [];
                     return (
                         <Card
                             key={index}
@@ -89,6 +91,9 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                 )}
                                 {ports.length > 0 && (
                                     <PortsBadgeList ports={ports} />
+                                )}
+                                {ports.length > 0 && (
+                                    <Dependency dependsOn={dependsOn} />
                                 )}
                             </CardContent>
                             <CardFooter className="flex flex-wrap text-muted-foreground justify-between gap-2">

@@ -159,6 +159,17 @@ export const useGit = () => {
         }
     }, []);
 
+    const getRemoteUrl = useCallback(async (projectPath: string) => {
+        try {
+            return await window.electron.ipcRenderer.invoke(
+                'get-remote-git',
+                projectPath
+            );
+        } catch (error) {
+            return null
+        }
+    }, []);
+
     const checkLocalProjects = useCallback(
         async (githubRepos: Repository[]) => {
             const localProjects = await findAllProjects();
@@ -202,7 +213,6 @@ export const useGit = () => {
         return true
     }, []);
 
-
     return {
         createGitCommit,
         pullChanges,
@@ -212,6 +222,7 @@ export const useGit = () => {
         listCommits,
         checkLocalProjects,
         setAutoCommit,
-        checkIsAutoCommit
+        checkIsAutoCommit,
+        getRemoteUrl
     };
 };

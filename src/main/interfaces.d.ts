@@ -1,6 +1,6 @@
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
 import { Connection, DockerComposeService, Handler, HandlerResponse, PageableProjects, ProjectData } from "./types";
-import { ComponentRegistrationConfig, DockerServiceRegistrationConfig, ServiceWorkspace } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { ComponentRegistrationConfig, DockerServiceRegistrationConfig, ProjectWorkspace, ServiceWorkspace } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -14,7 +14,8 @@ export interface IWorkspaceRepository {
 
     // Project Operations
     createProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
-    updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData>;
+    updateProject(projectId: string, updates: Partial<ProjectWorkspace>): Promise<ProjectWorkspace>;
+    configureService(config: ProjectWorkspace, basePath: string): Promise<void>;
     deleteProject(projectId: string, basePath: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
@@ -22,7 +23,7 @@ export interface IWorkspaceRepository {
 
     //Service Operations
     createService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
-    updateService(service: ServiceWorkspace, basePath: string): Promise<ServiceWorkspace>;
+    updateService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
     deleteService(serviceId: string, basePath: string): Promise<void>;
     findAllServices(workspaceId: string): Promise<WorkspaceService[]>;
 

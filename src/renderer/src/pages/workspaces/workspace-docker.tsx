@@ -79,7 +79,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             <MonacoEditor
                                 filePath={`${workspace.path}/igrp-compose.yaml`}
                                 content={content}
-                                height="35vh"
+                                height="50vh"
                                 onChange={setContent}
                             />
                         )}

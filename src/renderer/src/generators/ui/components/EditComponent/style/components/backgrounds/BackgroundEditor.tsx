@@ -19,7 +19,6 @@ export function BackgroundEditor({
     background,
     index,
     onClose,
-    onRemove,
     onChange,
 }: BackgroundEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);

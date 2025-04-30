@@ -28,7 +28,7 @@ const Interactions = ({
         },
     ]);
 
-    const { componentName, id: componentId, properties } = comp;
+    const { componentName } = comp;
 
     useEffect(() => {
         if (componentName)

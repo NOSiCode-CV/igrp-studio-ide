@@ -23,13 +23,11 @@ import CreateWorkspace from '@renderer/pages/workspaces/components/create-worksp
 import { cn } from '@renderer/lib/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { Button } from '@renderer/components/ui/button';
-import { Tool } from 'gojs';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import { Dialog, DialogTrigger } from '@renderer/components/ui/dialog';
 
 export function WorkspaceSwitcher({
     defaultWorkspace,

@@ -8,13 +8,13 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
-import { Card, CardContent } from '@renderer/components/ui/card';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
+import { constructNow } from 'date-fns';
 
 type TbodyType = 'none' | 'multipart/form-data' | 'application/json';
 
@@ -109,14 +109,16 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
     const handleSchemaChange = (newSchema: JSONSchema) => {
         const properties = newSchema.properties || {};
-
         const firstKey = Object.keys(properties)[0];
 
         const extractedSchema = firstKey ? properties[firstKey] : newSchema;
 
         const content = {
             [contentType]: {
-                schema: extractedSchema,
+                schema: {
+                    ...extractedSchema,
+                    collectionType
+                },
             },
         };
 
@@ -134,26 +136,21 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     useEffect(() => {
-        const schema = requestBodyContent?.[contentType]?.['schema'];
-
-        const content = {
-            [contentType]: {
-                schema: {
-                    ...schema,
-                    collectionType,
+        const requestBody = {
+            ...formik.values.requestBody,
+            name,
+            content: {
+                [contentType]: {
+                    schema: {
+                        ...formik.values.requestBody?.content[contentType]
+                            ?.schema,
+                        collectionType,
+                    },
                 },
             },
         };
-
-        updateFormik(content);
-    }, [collectionType]);
-
-    useEffect(() => {
-        formik.setFieldValue(routeFormData, {
-            ...formik.values.requestBody,
-            name,
-        });
-    }, [name]);
+        formik.setFieldValue('requestBody', requestBody);
+    }, [name, collectionType]);
 
     useEffect(() => {
         if (data.length === 0) return;
@@ -312,7 +309,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                             />
                         </TabsContent>
                         <TabsContent value="schema">
-                            <div className='border'>
+                            <div className="border">
                                 <JSONSchemaBuilder
                                     schemaTypes={schemaTypes}
                                     initialSchema={getContentToSchemaProps()}
@@ -320,7 +317,6 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                 />
                             </div>
                         </TabsContent>
-                        
                     </Tabs>
                 </div>
             )}

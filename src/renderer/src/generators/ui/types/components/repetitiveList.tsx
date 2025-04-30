@@ -30,7 +30,6 @@ export const COMPONENT_MAP: Record<string, React.ElementType> = {
 
 const RepetitiveProps: React.FC<RepetitiveProps> = ({
     comp,
-    isDisabled,
     onDragEnd,
 }) => {
     const {
