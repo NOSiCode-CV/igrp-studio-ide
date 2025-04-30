@@ -26,8 +26,8 @@ export function useDocker() {
         up: async (projectPath: string) => {
             return window.igrpStudio.docker.up(projectPath);
         },
-        down: async (projectPath: string) => {
-            window.igrpStudio.docker.down(projectPath);
+        down: async (projectPath: string, { dropVolume }) => {
+            return window.igrpStudio.docker.down(projectPath, { dropVolume });
         },
         status: async (projectPath: string) => {
             return window.igrpStudio.docker.status(projectPath).then((services: ServiceInfo[]) => {
@@ -38,15 +38,15 @@ export function useDocker() {
         check: async () => {
             return window.igrpStudio.docker.check();
         },
-        stop: async (projectPath: string, services: string[]) => {
-            await window.igrpStudio.docker.stop(projectPath, services).then(() => {
-                dispatch(setChangeStatus(true))
-            })
+        stop: async (projectPath: string, { services }) => {
+            await window.igrpStudio.docker.stop(projectPath, { services }).then(() => {
+                dispatch(setChangeStatus(true));
+            });
         },
-        restart: async (projectPath: string, services: string[], timeout?: number) => {
-            await window.igrpStudio.docker.restart(projectPath, services, timeout).then(() => {
-                dispatch(setChangeStatus(true))
-            })
+        restart: async (projectPath: string, { services, timeout }) => {
+            await window.igrpStudio.docker.restart(projectPath, { services, timeout }).then(() => {
+                dispatch(setChangeStatus(true));
+            });
         }
     };
 
@@ -64,9 +64,15 @@ export function useDocker() {
 
     const handleDockerOperation = useCallback(async (
         operation: keyof IDocker,
-        services?: string[],
-        timeout?: number
+        options?: {
+            services?: string[],
+            timeout?: number,
+            dropVolume?: boolean
+        }
     ): Promise<DockerComposeService[] | boolean | void> => {
+
+        const { services, timeout, dropVolume } = options || {}
+
         setLoading(true);
         if (!isDockerRunning && operation !== 'status') {
             const isRunning = await checkDocker();
@@ -78,7 +84,7 @@ export function useDocker() {
         }
 
         try {
-            return await dockerOperations[operation](workspace.path, services ?? [], timeout);
+            return await dockerOperations[operation](workspace.path, { services: services ?? [], timeout, dropVolume });
         } catch (err) {
             setError(err as Error);
             if (err instanceof Error &&
@@ -143,9 +149,9 @@ export function useDocker() {
         getServiceUrl,
         loadComposeFile,
         startContainers: () => handleDockerOperation('up'),
-        stopContainers: () => handleDockerOperation('down'),
+        stopContainers: (dropVolume: boolean) => handleDockerOperation('down', { dropVolume }),
         refreshContainers: () => handleDockerOperation('status'),
-        stopService: (services?: string[]) => handleDockerOperation('stop', services),
-        restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', services, timeout),
+        stopService: (services?: string[]) => handleDockerOperation('stop', { services }),
+        restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', { services, timeout }),
     };
 }

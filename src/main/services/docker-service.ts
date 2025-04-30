@@ -105,9 +105,9 @@ export class DockerService {
         }
     }
 
-    async down(projectPath: string): Promise<void> {
+    async down(projectPath: string, dropVolume: boolean): Promise<void> {
         try {
-            await this.executeComposeCommand(projectPath, 'down --remove-orphans');
+            await this.executeComposeCommand(projectPath, `down --remove-orphans ${dropVolume && '-v'}`);
         } catch (error: any) {
             throw new Error(`Failed to stop containers: ${error.message}`);
         }

@@ -17,9 +17,10 @@ ipcMain.handle('docker-up', async (event, projectPath: string): Promise<void> =>
     }
 });
 
-ipcMain.handle('docker-down', async (event, projectPath: string): Promise<void> => {
+ipcMain.handle('docker-down', async (event, projectPath: string, options: { dropVolume: boolean }): Promise<void> => {
     try {
-        await dockerService.down(projectPath);
+        const { dropVolume } = options || {}
+        await dockerService.down(projectPath, dropVolume);
     } catch (error: any) {
         event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.ERROR,
@@ -32,7 +33,6 @@ ipcMain.handle('docker-down', async (event, projectPath: string): Promise<void> 
 ipcMain.handle('docker-status', async (event, projectPath: string): Promise<ServiceInfo[]> => {
     try {
         return await dockerService.status(projectPath);
-
     } catch (error: any) {
         event.sender.send(EVENTS.LOG, {
             code: ERROR_CODES.ERROR,
@@ -42,8 +42,9 @@ ipcMain.handle('docker-status', async (event, projectPath: string): Promise<Serv
     }
 });
 
-ipcMain.handle('docker-stop', async (event, projectPath: string, services: string[]): Promise<void> => {
+ipcMain.handle('docker-stop', async (event, projectPath: string, options: { services: string[]; timeout?: number }): Promise<void> => {
     try {
+        const { services } = options || {}
         await dockerService.stop(projectPath, services);
 
     } catch (error: any) {
@@ -55,9 +56,9 @@ ipcMain.handle('docker-stop', async (event, projectPath: string, services: strin
     }
 });
 
-ipcMain.handle('docker-restart', async (event, projectPath: string, services: string[],
-    timeout?: number): Promise<void> => {
+ipcMain.handle('docker-restart', async (event, projectPath: string, options: { services: string[]; timeout?: number }): Promise<void> => {
     try {
+        const { services, timeout } = options || {}
         await dockerService.restart(projectPath, services, timeout);
 
     } catch (error: any) {

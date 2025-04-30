@@ -160,8 +160,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
         await startContainers();
     };
 
-    const handleDowm = async () => {
-        await stopContainers();
+    const handleDowm = async (dropVolume: boolean) => {
+        await stopContainers(dropVolume);
     };
 
     const handleStop = async () => {

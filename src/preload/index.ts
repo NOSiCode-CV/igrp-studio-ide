@@ -242,10 +242,10 @@ const repo = {
 	},
 	docker: {
 		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
-		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
+		down: (projectPath: string, options: { dropVolume?: boolean }) => ipcRenderer.invoke('docker-down', projectPath, options),
 		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
-		stop: (projectPath: string, services: string[]) => ipcRenderer.invoke('docker-stop', projectPath, services),
-		restart: (projectPath: string, services: string[], timeout?: number) => ipcRenderer.invoke('docker-restart', projectPath, services, timeout),
+		stop: (projectPath: string, options: { services: string[] }) => ipcRenderer.invoke('docker-stop', projectPath, options),
+		restart: (projectPath: string, options: { services: string[]; timeout?: number }) => ipcRenderer.invoke('docker-restart', projectPath, options),
 		check: () => ipcRenderer.invoke('docker-check')
 	}
 }
