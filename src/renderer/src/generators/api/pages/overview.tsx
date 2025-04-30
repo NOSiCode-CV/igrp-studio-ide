@@ -250,12 +250,6 @@ const Overview = () => {
                                                 </div>
                                             </div>
                                         )}
-                                        <div>
-                                            <p className="text-muted-foreground text-xs mb-1">
-                                                Last Updated
-                                            </p>
-                                            <p className="">...</p>
-                                        </div>
                                         <GitContributors
                                             projectPath={basePath}
                                         />

@@ -31,8 +31,8 @@ export function GitContributors({ projectPath }) {
                     {contributors.slice(0, 3).map((contributor, i) => (
                         <Tooltip key={i}>
                             <TooltipTrigger asChild>
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-medium border-1">
-                                    {contributor.name.charAt(0).toUpperCase()}
+                                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium border-1">
+                                    {contributor.name.charAt(0).toUpperCase()} 
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">

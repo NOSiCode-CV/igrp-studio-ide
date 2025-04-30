@@ -16,7 +16,7 @@ const Interactions = ({
     const { getInteractionsComponent } = useStudio();
     const [interactionsType, setInteractionsType] = useState({});
 
-    const [linkedShadow, setLinkedShadow] = useState(true);
+    const [linkedInteraction, setLinkedInteraction] = useState(true);
     const [interactions, setInteractions] = useState<ShadowValue[]>([]);
 
     const { componentName } = comp;
@@ -31,11 +31,11 @@ const Interactions = ({
     return (
         <div className="p-3 space-y-2">
             <TriggerControls
-                shadows={interactions}
-                linkedShadow={linkedShadow}
-                onShadowsChange={setInteractions}
-                onLinkedShadowChange={setLinkedShadow}
-                interactions={interactionsType}
+                interactions={interactions}
+                linkedInteraction={linkedInteraction}
+                onInteractionsChange={setInteractions}
+                onLinkedInteranctionChange={setLinkedInteraction}
+                interactionsType={interactionsType}
             />
             {interactions.length === 0 && (
                 <EmptyList

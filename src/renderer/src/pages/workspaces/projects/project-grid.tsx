@@ -70,7 +70,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon project={project} />
-                                            <span className="text-xs truncate text-ellipsis">
+                                            <span className="text-xs truncate text-ellipsis md:max-w-40">
                                                 {project.name}
                                             </span>
                                         </div>

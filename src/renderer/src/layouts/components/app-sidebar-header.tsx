@@ -16,7 +16,6 @@ interface AppSidebarHeaderProps {
 
 export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
     basePath,
-    name,
     description,
     sidebarState,
     handleSearch,
@@ -25,11 +24,8 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
     const { t } = useTranslation();
     return (
         <SidebarHeader className={cn('flex flex-col', className)}>
-            <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 flex flex-1 justify-between">
-                <div className="grid flex-1 text-left text-sm leading-tight items-center">
-                    <span className="truncate font-semibold">{name}</span>
-                    <span className="truncate text-xs">{description}</span>
-                </div>
+            <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 flex flex-1 justify-between items-center">
+                <span className="font-semibold">{description}</span>
                 {basePath && <CreateModuleDialog basePath={basePath} />}
             </div>
             <FormSearch
