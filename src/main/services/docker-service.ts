@@ -42,9 +42,6 @@ export class DockerService {
                 // Set executable permissions
                 if (process.platform !== 'win32') {
                     execSync(`chmod +x "${scriptPath}"`);
-                } else {
-                    // Windows alternative if using WSL
-                    execSync(`wsl chmod +x "${scriptPath.replace(/\\/g, '/')}"`);
                 }
             }
         } catch (error) {
