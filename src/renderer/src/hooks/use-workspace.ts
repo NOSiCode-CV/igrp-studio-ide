@@ -126,7 +126,6 @@ export const useWorkspace = () => {
     const updateWorkspace = async (id: string, updates: Partial<IWorkspace>) => {
         try {
 
-            dispatch(setChangeStatus(false))
             await window.igrpStudio.workspace.updateWorkspace(id, updates).then((data) => {
                 if (!data) return;
                 dispatch(setChangeStatus(true))

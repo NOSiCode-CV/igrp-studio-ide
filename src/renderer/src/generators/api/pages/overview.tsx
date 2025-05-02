@@ -200,7 +200,7 @@ const Overview = () => {
                                             <p className="">
                                                 {
                                                     project.config
-                                                        .springBootVersion
+                                                        ?.springBootVersion
                                                 }
                                             </p>
                                         </div>

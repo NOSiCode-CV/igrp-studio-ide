@@ -43,8 +43,6 @@ import { ServiceList } from './services/service-list';
 import { ProjectList } from './projects/project-list';
 import ProjectGrid from './projects/project-grid';
 import { getId } from '@renderer/utils/helpers';
-import { setChangeStatus } from '@renderer/redux/thunks';
-import { useDispatch } from 'react-redux';
 
 type ResourceType = 'project' | 'service';
 type ViewMode = 'grid' | 'list';
@@ -165,22 +163,18 @@ const Resources = () => {
 
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
-    const dispatch: any = useDispatch();
 
     const {
         workspace,
-        actions: { findAllProjects, saveOrOpenProject },
+        actions: { findAllProjects, saveOrOpenProject, refreshWorkspaces },
         state: { changeStatus },
     } = useWorkspace();
 
-    const { services, refreshContainers } = useDocker();
+    const { services } = useDocker({ workspace, changeStatus });
 
     useEffect(() => {
-        if (changeStatus) {
-            refreshContainers();
-            dispatch(setChangeStatus(false));
-        }
         fetchProjects();
+        refreshWorkspaces();
     }, [changeStatus, workspace]);
 
     const fetchProjects = async () => {

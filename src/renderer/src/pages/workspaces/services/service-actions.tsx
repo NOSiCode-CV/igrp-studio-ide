@@ -29,13 +29,15 @@ interface ServiceActionsProps {
 }
 
 export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
-    const { getServiceUrl, stopService, restartService } = useDocker();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isEditService, setEditService] = useState(false);
     const { showErrorToast } = useToast();
     const {
+        workspace,
         actions: { removeService },
     } = useWorkspace();
+
+    const { getServiceUrl, stopService, restartService } = useDocker({workspace});
 
     const handleServiceUrl = () => {
         const url = getServiceUrl(service);

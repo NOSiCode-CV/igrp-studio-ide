@@ -64,7 +64,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     const { workspace } = useWorkspace();
 
     const { loading, startContainers, stopContainers, stopService } =
-        useDocker();
+        useDocker({workspace});
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 

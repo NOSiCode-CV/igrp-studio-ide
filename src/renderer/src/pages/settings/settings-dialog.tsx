@@ -1,6 +1,14 @@
 'use client';
 
-import { Bell, Globe, Home, Keyboard, Link, Settings, Shirt } from 'lucide-react';
+import {
+    Bell,
+    Globe,
+    Home,
+    Keyboard,
+    Link,
+    Settings,
+    Shirt,
+} from 'lucide-react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -117,26 +125,27 @@ export function SettingsDialog() {
                     </Sidebar>
 
                     <main className="flex h-[480px] flex-1 flex-col">
-                        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-                            <div className="flex items-center gap-2 px-4">
-                                <Breadcrumb>
-                                    <BreadcrumbList>
-                                        <BreadcrumbItem className="hidden md:block">
-                                            <BreadcrumbLink href="#/">
-                                                {t('settings')}
-                                            </BreadcrumbLink>
-                                        </BreadcrumbItem>
-                                        <BreadcrumbSeparator className="hidden md:block" />
-                                        <BreadcrumbItem>
-                                            <BreadcrumbPage>
-                                                {t(activeItem)}
-                                            </BreadcrumbPage>
-                                        </BreadcrumbItem>
-                                    </BreadcrumbList>
-                                </Breadcrumb>
-                            </div>
-                        </header>
-                        <ScrollArea>
+                        <ScrollArea className='h-full'>
+                            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                                <div className="flex items-center gap-2 px-4">
+                                    <Breadcrumb>
+                                        <BreadcrumbList>
+                                            <BreadcrumbItem className="hidden md:block">
+                                                <BreadcrumbLink href="#/">
+                                                    {t('settings')}
+                                                </BreadcrumbLink>
+                                            </BreadcrumbItem>
+                                            <BreadcrumbSeparator className="hidden md:block" />
+                                            <BreadcrumbItem>
+                                                <BreadcrumbPage>
+                                                    {t(activeItem)}
+                                                </BreadcrumbPage>
+                                            </BreadcrumbItem>
+                                        </BreadcrumbList>
+                                    </Breadcrumb>
+                                </div>
+                            </header>
+
                             <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
                                 {data.nav.find(
                                     (item) => item.name === activeItem
