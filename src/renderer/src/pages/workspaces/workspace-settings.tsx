@@ -254,7 +254,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                     <Button
                                         variant="destructive"
                                         size="sm"
-                                        className="h-7 text-primary-foreground"
+                                        className="h-7"
                                     >
                                         <Trash2 className="h-3.5 w-3.5 mr-1" />
                                         <span>Delete</span>
@@ -300,7 +300,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                             Cancel
                                         </AlertDialogCancel>
                                         <AlertDialogAction
-                                            className="h-7 text-xs bg-destructive text-primary-foreground hover:bg-destructive/90"
+                                            className="h-7 text-xs bg-destructive hover:bg-destructive/90"
                                             onClick={handleDeleteWorkspace}
                                         >
                                             {isDeleting

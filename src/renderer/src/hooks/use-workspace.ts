@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useToast from '@renderer/hooks/useToast';
 import { HandlerResponse, IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
@@ -26,7 +26,6 @@ export const useWorkspace = () => {
     const { showSuccessToast, showErrorToast } = useToast();
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const dispatch: any = useDispatch()
     const navigate = useNavigate()
 
@@ -48,6 +47,20 @@ export const useWorkspace = () => {
 
     const getRecentWorkspaces = async () => {
         return await window.igrpStudio.workspace.findRecentWorkspaces(3);
+    }
+
+    const findAllProjects = async () => {
+        return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
+    }
+
+    const findAllServices = async () => {
+        return await window.igrpStudio.docker.status(workspace.path)
+    }
+
+    const getTemplatesService = async () => {
+        return await window.engine.getService(ENV_TYPES.NEXTJS).then(data => {
+            return data
+        });
     }
 
     const saveCustomWorkspaceComposeFile = async (content: string) => {
@@ -74,28 +87,31 @@ export const useWorkspace = () => {
         }
     };
 
-    const createWorkspace = async (workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>) => {
-        setLoading(true);
+    const createWorkspace = async (workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>): Promise<IWorkspace | null> => {
+
         try {
-            const newWorkspace = await window.igrpStudio.workspace.createWorkspace({
+            const { result, error } = await window.igrpStudio.workspace.createWorkspace({
                 ...workspaceData,
                 createdAt: new Date().toISOString()
             });
 
-            setWorkspaces(prev => [...prev, newWorkspace]);
+            if (error) {
+                showErrorToast(error);
+                return null;
+            }
 
-            dispatch(setWorkspace(newWorkspace))
+            showSuccessToast(`Workspace "${result.name}" created`);
 
-            showSuccessToast(`Workspace "${newWorkspace.name}" created`);
+            dispatch(setWorkspace(result))
 
-            return newWorkspace;
+            dispatch(setChangeStatus(true))
+
+            return result;
         } catch (err) {
-            setError('Failed to create workspace');
-            showErrorToast('Workspace creation failed');
+            showErrorToast(err);
             throw err;
-        } finally {
-            setLoading(false);
         }
+
     };
 
     const markWorkspaceAccessed = async (workspaces: IWorkspace[]) => {
@@ -110,19 +126,14 @@ export const useWorkspace = () => {
     const updateWorkspace = async (id: string, updates: Partial<IWorkspace>) => {
         try {
 
-            dispatch(setChangeStatus(false))
             await window.igrpStudio.workspace.updateWorkspace(id, updates).then((data) => {
                 if (!data) return;
-                setWorkspaces(prev =>
-                    prev.map(w => w.id === id ? data : w)
-                );
                 dispatch(setChangeStatus(true))
                 return data;
             });
 
         } catch (err) {
-            setError('Failed to update workspace');
-            showErrorToast('Update failed');
+            showErrorToast('Failed to update workspace');
             throw err;
         }
     };
@@ -135,8 +146,7 @@ export const useWorkspace = () => {
             dispatch(setWorkspace(null))
             showSuccessToast('Workspace removed');
         } catch (err) {
-            setError('Failed to delete workspace');
-            showErrorToast('Deletion failed');
+            showErrorToast('Failed to delete workspace');
             throw err;
         } finally {
             setLoading(false);
@@ -172,6 +182,11 @@ export const useWorkspace = () => {
                 return
             }
 
+            await findAllServices().then(data => {
+                result.service = data.find(s => s.labels.uuid === result.id)
+                return data
+            })
+
             showSuccessToast(t('savedSuccessfully', { name: result.name }));
 
             dispatch(setBasePath(result.path));
@@ -199,22 +214,9 @@ export const useWorkspace = () => {
     };
 
 
-    const findAllProjects = async () => {
-        return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
-    }
-
-    const findAllServices = async () => {
-        return await window.igrpStudio.workspace.findAllServices(workspace?.id);
-    }
-
-    const getTemplatesService = async () => {
-        return await window.engine.getService(ENV_TYPES.NEXTJS).then(data => {
-            return data
-        });
-    }
-
     const createOrUpdateService = async (service: WorkspaceService): Promise<HandlerResponse> => {
         let result: HandlerResponse = {};
+        dispatch(setChangeStatus(false));
         try {
             const { id: serviceId } = service
 
@@ -232,7 +234,7 @@ export const useWorkspace = () => {
                 console.log(result.error)
                 showErrorToast(result.error);
             } else
-                showSuccessToast('Service saved successfully');
+                showSuccessToast(t('savedSuccessfully', { name: "Service" }));
 
             dispatch(setChangeStatus(true));
 
@@ -257,15 +259,13 @@ export const useWorkspace = () => {
                 }
             }
 
-            console.log('configureService', data)
-
             result = await window.igrpStudio.workspace.configureService(data, workspace.path)
 
             if (result?.error) {
                 console.log(result.error)
                 showErrorToast(result.error);
             } else
-                showSuccessToast('Service saved successfully');
+                showSuccessToast(t('savedSuccessfully', { name: "Service" }));
 
             dispatch(setChangeStatus(true));
 
@@ -280,6 +280,8 @@ export const useWorkspace = () => {
     const removeService = async (serviceId: string) => {
         try {
 
+            dispatch(setChangeStatus(false));
+
             const result
                 : any = await window.igrpStudio.workspace.deleteService(serviceId, workspace.path)
 
@@ -287,7 +289,7 @@ export const useWorkspace = () => {
                 console.log(result.error)
                 showErrorToast(result.error);
             } else {
-                showSuccessToast('Service deleted successfully');
+                showSuccessToast(t('deletedSuccess', { name: 'Service' }));
                 dispatch(setChangeStatus(true));
             }
 
@@ -296,18 +298,28 @@ export const useWorkspace = () => {
         }
     }
 
-    useEffect(() => {
-        if (error) {
+    const removeProject = async (project: ProjectData) => {
+        dispatch(setChangeStatus(false));
+        try {
+            await window.igrpStudio.workspace.deleteProject(
+                project.id,
+                workspace.path
+            );
+            dispatch(setChangeStatus(true));
+            showSuccessToast(t('deletedSuccess', { name: project.name }));
+        } catch (error: unknown) {
             showErrorToast(error);
-            setError(null);
         }
-    }, [error]);
+    };
+
+    useEffect(() => {
+        refreshWorkspaces();
+    }, []);
 
     return {
         workspaces,
         workspace,
         loading,
-        error,
         actions: {
             createWorkspace,
             updateWorkspace,
@@ -323,8 +335,9 @@ export const useWorkspace = () => {
             saveCustomWorkspaceComposeFile,
             createOrUpdateService,
             removeService,
-            findAllServices,
-            configureService
+            //findAllServices,
+            configureService,
+            removeProject
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

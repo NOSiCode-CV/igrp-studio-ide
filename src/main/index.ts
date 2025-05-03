@@ -36,6 +36,7 @@ import './handlers/db-handler';
 import './handlers/workspace-handler';
 import './handlers/git-handler';
 import './handlers/docker-handler';
+import './handlers/global-handler';
 
 import { buildTaskbar } from './helpers/taskbar';
 import {
@@ -51,6 +52,7 @@ import { autoUpdater } from 'electron-updater';
 import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection';
 import { NextjsEngine } from './engines/NextjsEngine';
 import { WorkspaceRepository } from './services/workspace-service';
+import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 
 const backend = require('i18next-electron-fs-backend');
 
@@ -247,6 +249,8 @@ app.whenReady().then(async () => {
     new WorkspaceRepository().initialize();
 
     new AppUpdater(mainWindow);
+
+    await IGRPStudioSettings.initialize();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -413,7 +417,7 @@ ipcMain.on('close-window', () => {
     mainWindow.close();
 });
 
-ipcMain.on('is-window-maximized', () => {
+ipcMain.handle('is-window-maximized', () => {
     return mainWindow.isMaximized();
 });
 

@@ -23,20 +23,25 @@ interface SearchInputProps {
 // Get project type icon
 function ProjectIcon({ project }: { project: ProjectData }) {
     return project.icon ? (
-        <img
-            src={project.icon}
-            alt="Project icon"
-            width={20}
-            height={20}
-            className="rounded-full"
-        />
+        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            <img
+                src={project.icon}
+                alt="Project icon"
+                width={20}
+                height={20}
+                className="rounded-full"
+            />
+        </div>
     ) : projectIcons[project.framework] ? (
-        <img
-            src={projectIcons[project.framework]}
-            alt={`${project.framework} logo`}
-            width={20}
-            height={20}
-        />
+        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            {' '}
+            <img
+                src={projectIcons[project.framework]}
+                alt={`${project.framework} logo`}
+                width={20}
+                height={20}
+            />
+        </div>
     ) : null;
 }
 
@@ -72,7 +77,7 @@ function Headline({
 }: HeadlineProps) {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            {Icon && <Icon className="h-5 w-5 text-igrp" />}
+            {Icon && <Icon className="h-5 w-5 text-primary" />}
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
                 {description && (
@@ -93,7 +98,7 @@ function SubHeadline({
 }: HeadlineProps) {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            {Icon && <Icon className="h-5 w-5 text-igrp" />}
+            {Icon && <Icon className="h-5 w-5 text-primary" />}
             <div>
                 <h1 className="text-base font-medium leading-tight">{title}</h1>
                 {description && (

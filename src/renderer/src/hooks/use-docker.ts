@@ -1,17 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
 import useToast from '@renderer/hooks/useToast';
-import { DockerComposeConfig, DockerComposeService, ServiceInfo } from 'src/main/types';
-import { useWorkspace } from './use-workspace';
+import { DockerComposeConfig, DockerComposeService, IWorkspace, ServiceInfo } from 'src/main/types';
 import { IDocker } from 'src/main/interfaces';
-import { useDispatch } from 'react-redux';
-import { setChangeStatus } from '@renderer/redux/thunks';
 
-export function useDocker() {
+export function useDocker({ workspace, changeStatus = false }: { workspace: IWorkspace, changeStatus?: boolean }) {
     const [isDockerRunning, setIsDockerRunning] = useState<boolean>(false);
-    const {
-        workspace,
-    } = useWorkspace();
 
     const [fileContent, setFileContent] = useState<any>(null);
     const [services, setServices] = useState<ServiceInfo[]>([]);
@@ -20,14 +14,13 @@ export function useDocker() {
     const [error, setError] = useState<Error | null>(null);
 
     const { showErrorToast } = useToast();
-    const dispatch: any = useDispatch();
 
     const dockerOperations: IDocker = {
         up: async (projectPath: string) => {
             return window.igrpStudio.docker.up(projectPath);
         },
-        down: async (projectPath: string) => {
-            window.igrpStudio.docker.down(projectPath);
+        down: async (projectPath: string, { dropVolume }) => {
+            return window.igrpStudio.docker.down(projectPath, { dropVolume });
         },
         status: async (projectPath: string) => {
             return window.igrpStudio.docker.status(projectPath).then((services: ServiceInfo[]) => {
@@ -38,15 +31,11 @@ export function useDocker() {
         check: async () => {
             return window.igrpStudio.docker.check();
         },
-        stop: async (projectPath: string, services: string[]) => {
-            await window.igrpStudio.docker.stop(projectPath, services).then(() => {
-                dispatch(setChangeStatus(true))
-            })
+        stop: async (projectPath: string, { services }) => {
+            await window.igrpStudio.docker.stop(projectPath, { services })
         },
-        restart: async (projectPath: string, services: string[], timeout?: number) => {
-            await window.igrpStudio.docker.restart(projectPath, services, timeout).then(() => {
-                dispatch(setChangeStatus(true))
-            })
+        restart: async (projectPath: string, { services, timeout }) => {
+            await window.igrpStudio.docker.restart(projectPath, { services, timeout })
         }
     };
 
@@ -64,10 +53,17 @@ export function useDocker() {
 
     const handleDockerOperation = useCallback(async (
         operation: keyof IDocker,
-        services?: string[],
-        timeout?: number
+        options?: {
+            services?: string[],
+            timeout?: number,
+            dropVolume?: boolean
+        }
     ): Promise<DockerComposeService[] | boolean | void> => {
+
+        const { services, timeout, dropVolume } = options || {}
+
         setLoading(true);
+
         if (!isDockerRunning && operation !== 'status') {
             const isRunning = await checkDocker();
             if (!isRunning) {
@@ -78,7 +74,7 @@ export function useDocker() {
         }
 
         try {
-            return await dockerOperations[operation](workspace.path, services ?? [], timeout);
+            return await dockerOperations[operation](workspace.path, { services: services ?? [], timeout, dropVolume });
         } catch (err) {
             setError(err as Error);
             if (err instanceof Error &&
@@ -128,11 +124,11 @@ export function useDocker() {
 
     useEffect(() => {
         const refreshContainers = async () => {
-            if (workspace?.path) handleDockerOperation('status')
+            handleDockerOperation('status')
         };
 
-        refreshContainers();
-    }, [workspace]);
+        if (workspace && changeStatus) refreshContainers();
+    }, [workspace, changeStatus]);
 
     return {
         fileContent,
@@ -143,9 +139,9 @@ export function useDocker() {
         getServiceUrl,
         loadComposeFile,
         startContainers: () => handleDockerOperation('up'),
-        stopContainers: () => handleDockerOperation('down'),
+        stopContainers: (dropVolume: boolean) => handleDockerOperation('down', { dropVolume }),
         refreshContainers: () => handleDockerOperation('status'),
-        stopService: (services?: string[]) => handleDockerOperation('stop', services),
-        restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', services, timeout),
+        stopService: (services?: string[]) => handleDockerOperation('stop', { services }),
+        restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', { services, timeout }),
     };
 }

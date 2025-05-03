@@ -78,7 +78,7 @@ const TabsNavigation = ({
     };
 
     return (
-        <nav className="flex justify-between me-5">
+        <nav className="flex justify-between pr-5 bg-background">
             <div className="flex flex-1 w-[100px]">
                 <ScrollArea ref={scrollAreaRef}>
                     <div className="flex items-center whitespace-nowrap">
@@ -92,7 +92,7 @@ const TabsNavigation = ({
                                                 className={cn(
                                                     'px-4 h-10 text-sm font-medium focus:outline-hidden cursor-pointer align-middle flex',
                                                     {
-                                                        'text-igrp border-t-2 border-igrp':
+                                                        'text-primary border-t-2 border-primary':
                                                             activeTab ===
                                                             tab.id,
                                                     }

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { BoxSelect, Lock, Unlock, Plus, Trash2, Edit2 } from 'lucide-react';
-import { ShadowValue } from '../../style/components/effects/types';
+import { InteractionValue } from '../../style/components/effects/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,19 +10,19 @@ import {
 import { Button } from '@renderer/components/ui/button';
 
 interface TriggerControlsProps {
-    shadows: ShadowValue[];
-    linkedShadow: boolean;
-    interactions: any;
-    onShadowsChange: (shadows: ShadowValue[]) => void;
-    onLinkedShadowChange: (linked: boolean) => void;
+    interactions: InteractionValue[];
+    linkedInteraction: boolean;
+    interactionsType: any;
+    onInteractionsChange: (shadows: InteractionValue[]) => void;
+    onLinkedInteranctionChange: (linked: boolean) => void;
 }
 
 export function TriggerControls({
-    shadows,
-    linkedShadow,
     interactions,
-    onShadowsChange,
-    onLinkedShadowChange,
+    linkedInteraction,
+    interactionsType,
+    onInteractionsChange,
+    onLinkedInteranctionChange,
 }: TriggerControlsProps) {
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [popoverPosition, setPopoverPosition] = useState<'top' | 'bottom'>(
@@ -74,20 +74,21 @@ export function TriggerControls({
         }
     }, [editingIndex]);
 
-    const addShadow = () => {
-        const newShadow = {
+    const addInteraction = (int) => {
+        const newInteraction = {
             x: '0',
             y: '4',
             blur: '8',
             spread: '0',
             color: '#00000040',
             inset: false,
+            name: int,
         };
-        onShadowsChange([...shadows, newShadow]);
+        onInteractionsChange([...interactions, newInteraction]);
     };
 
     const removeShadow = (index: number) => {
-        onShadowsChange(shadows.filter((_, i) => i !== index));
+        onInteractionsChange(interactions.filter((_, i) => i !== index));
         if (editingIndex === index) {
             setEditingIndex(null);
         }
@@ -95,13 +96,13 @@ export function TriggerControls({
 
     const updateShadow = (
         index: number,
-        field: keyof ShadowValue,
+        field: keyof InteractionValue,
         value: any
     ) => {
-        const newShadows = [...shadows];
+        const newShadows = [...interactions];
         newShadows[index] = { ...newShadows[index], [field]: value };
 
-        if (linkedShadow && (field === 'x' || field === 'y')) {
+        if (linkedInteraction && (field === 'x' || field === 'y')) {
             newShadows[index] = {
                 ...newShadows[index],
                 x: field === 'x' ? value : newShadows[index].x,
@@ -109,10 +110,10 @@ export function TriggerControls({
             };
         }
 
-        onShadowsChange(newShadows);
+        onInteractionsChange(newShadows);
     };
 
-    const getShadowPreview = (shadow: ShadowValue) => {
+    const getShadowPreview = (shadow: InteractionValue) => {
         return `${shadow.inset ? 'inset ' : ''}${shadow.x}px ${shadow.y}px ${shadow.blur}px ${shadow.spread}px ${shadow.color}`;
     };
 
@@ -121,13 +122,16 @@ export function TriggerControls({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant={'secondary'} size={'sm'}>
-                    <Plus size={10} />
+                        <Plus size={10} />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="min-w-60">
-                    {Object.keys(interactions).map((int, index) => {
+                    {Object.keys(interactionsType).map((int, index) => {
                         return (
-                            <DropdownMenuItem key={index} onClick={addShadow}>
+                            <DropdownMenuItem
+                                key={index}
+                                onClick={() => addInteraction(int)}
+                            >
                                 {int}
                             </DropdownMenuItem>
                         );
@@ -141,7 +145,7 @@ export function TriggerControls({
         shadow,
         index,
     }: {
-        shadow: ShadowValue;
+        shadow: InteractionValue;
         index: number;
     }) => (
         <div
@@ -155,7 +159,7 @@ export function TriggerControls({
             <div className="space-y-2">
                 <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-                        Edit Shadow {index + 1}
+                        Edit Interaction {index + 1}
                     </span>
                     <button
                         onClick={() => removeShadow(index)}
@@ -268,52 +272,39 @@ export function TriggerControls({
                 </h3>
                 <div className="flex items-center gap-1">
                     <button
-                        onClick={() => onLinkedShadowChange(!linkedShadow)}
+                        onClick={() =>
+                            onLinkedInteranctionChange(!linkedInteraction)
+                        }
                         className={`p-0.5 rounded ${
-                            linkedShadow
+                            linkedInteraction
                                 ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                                 : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                         }`}
                         title={
-                            linkedShadow
+                            linkedInteraction
                                 ? 'Unlink shadow values'
                                 : 'Link shadow values'
                         }
                     >
-                        {linkedShadow ? (
+                        {linkedInteraction ? (
                             <Lock size={10} />
                         ) : (
                             <Unlock size={10} />
                         )}
                     </button>
-                    {/*  <button
-                        onClick={addShadow}
-                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                        title="Add shadow"
-                    >
-                        <Plus size={10} />
-                    </button> */}
                     <AddDropdown />
                 </div>
             </div>
 
             <div className="space-y-1">
-                {shadows.map((shadow, index) => (
+                {interactions.map((shadow, index) => (
                     <div
                         key={index}
                         className="group flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
                     >
-                        <div
-                            className="w-6 h-6 rounded border border-gray-200 dark:border-gray-700"
-                            style={{ boxShadow: getShadowPreview(shadow) }}
-                        />
                         <div className="flex-1 min-w-0">
-                            <div className="text-[9px] font-medium text-gray-700 dark:text-gray-300">
-                                {shadow.inset ? 'Inside' : 'Outside'} Shadow{' '}
-                                {index + 1}
-                            </div>
-                            <div className="text-[8px] text-gray-500 dark:text-gray-400 truncate">
-                                {getShadowPreview(shadow)}
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                {`${shadow.name} ${index + 1}`}
                             </div>
                         </div>
                         <div className="flex items-center gap-1">

@@ -95,7 +95,7 @@ export default function ProjectSettings({
                         <SettingsRow
                             label="icon"
                             value={
-                                <div className="h-12 w-12 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-500">
+                                <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
                                     <img
                                         src={projectIcons[framework]}
                                         alt={`${project.framework} logo`}

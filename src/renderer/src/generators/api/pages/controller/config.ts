@@ -32,15 +32,7 @@ export const initialValues = {
             isRequired: true
         }
     ],
-    pathVariables: [
-        {
-            type: 'string',
-            name: '',
-            value: "",
-            description: '',
-            isRequired: true
-        }
-    ],
+    pathVariables: [],
     headers: [
         {
             type: '',

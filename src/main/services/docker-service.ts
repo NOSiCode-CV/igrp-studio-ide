@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import yaml from 'js-yaml';
@@ -22,6 +22,52 @@ export class DockerService {
         return this.composeCache[projectPath];
     }
 
+    private prepareInitScript(projectPath: string): void {
+        const igrpStudioPath = path.join(projectPath, '.igrpstudio');
+
+        try {
+            // Find all .sh files recursively
+            const shFiles = this.findShFilesRecursively(igrpStudioPath);
+
+            for (const scriptPath of shFiles) {
+                // Read and normalize line endings
+                let content = fs.readFileSync(scriptPath, 'utf8');
+                content = content.replace(/\r\n/g, '\n');
+
+                // Change shebang to #!/bin/sh for Alpine compatibility
+                content = content.replace(/^#!\/bin\/bash/, '#!/bin/sh');
+
+                fs.writeFileSync(scriptPath, content);
+
+                // Set executable permissions
+                if (process.platform !== 'win32') {
+                    execSync(`chmod +x "${scriptPath}"`);
+                }
+            }
+        } catch (error) {
+            console.error('Error preparing init scripts:', error);
+            throw error;
+        }
+    }
+
+    private findShFilesRecursively(directory: string): string[] {
+        const shFiles: string[] = [];
+
+        const files = fs.readdirSync(directory);
+        for (const file of files) {
+            const fullPath = path.join(directory, file);
+            const stat = fs.statSync(fullPath);
+
+            if (stat.isDirectory()) {
+                shFiles.push(...this.findShFilesRecursively(fullPath));
+            } else if (file.endsWith('.sh')) {
+                shFiles.push(fullPath);
+            }
+        }
+
+        return shFiles;
+    }
+
     async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
         const composeFile = path.join(projectPath, 'igrp-compose.yaml');
         const escapedComposeFile = this.escapePath(composeFile);
@@ -30,6 +76,9 @@ export class DockerService {
         const envFilePath = path.join(projectPath, '.igrp.env');
         const escapedEnvFilePath = this.escapePath(envFilePath);
 
+
+        // Prepare the init script first
+        this.prepareInitScript(projectPath);
 
         if (!fs.existsSync(envFilePath)) {
             throw new Error(`Environment file not found: ${envFilePath}`);
@@ -56,9 +105,9 @@ export class DockerService {
         }
     }
 
-    async down(projectPath: string): Promise<void> {
+    async down(projectPath: string, dropVolume: boolean): Promise<void> {
         try {
-            await this.executeComposeCommand(projectPath, 'down --remove-orphans');
+            await this.executeComposeCommand(projectPath, `down --remove-orphans ${dropVolume && '-v'}`);
         } catch (error: any) {
             throw new Error(`Failed to stop containers: ${error.message}`);
         }
@@ -69,6 +118,7 @@ export class DockerService {
             // Load compose file first to get all services
             const compose = await this.loadComposeFile(projectPath);
             const allServices = compose.services;
+            const volumes = compose.volumes;
             const serviceNames = Object.keys(allServices);
 
             try {
@@ -90,6 +140,21 @@ export class DockerService {
                     const containerInfo = runningServicesMap.get(serviceName);
 
                     const { environment, depends_on, env_file, ...rest } = serviceDef
+                    // Process volumes with driver information
+                    const processedVolumes = (serviceDef.volumes || []).map(volume => {
+                        if (typeof volume === 'string') {
+                            // For named volumes (format "volume_name:container_path")
+                            const [volumeName] = volume.split(':');
+
+                            // Check if we have driver info for this volume
+                            const volumeConfig = volumes?.[volumeName];
+                            if (volumeConfig?.driver) {
+                                return `${volume}:${volumeConfig.driver}`;
+                            }
+                        }
+                        return volume;
+                    });
+
 
                     if (containerInfo) {
                         // Service is running
@@ -98,7 +163,7 @@ export class DockerService {
                             name: serviceName,
                             status: containerInfo.State,
                             ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
-                            volumes: serviceDef.volumes || [],
+                            volumes: processedVolumes,
                             environments: this.parseEnvironmentToArray(environment),
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
@@ -118,6 +183,7 @@ export class DockerService {
                             env_file: env_file && env_file.map((file: string) => {
                                 return { file }
                             }),
+                            volumes: processedVolumes,
                         };
                     }
                 });
@@ -190,26 +256,26 @@ export class DockerService {
         env?: string[] | Array<{ key: string; value: string }>
     ): Array<{ key: string; value: string }> {
         if (!env) return [];
-    
+
         // Case 1: Already in correct format (array of {name, value} objects)
         if (env.length > 0 && typeof env[0] === 'object' && 'name' in env[0]) {
             return env as Array<{ key: string; value: string }>;
         }
-    
+
         // Case 2: Array of strings in "KEY=VALUE" format (including ${VARIABLE} syntax)
         if (env.length > 0 && typeof env[0] === 'string') {
             return (env as string[]).map(item => {
                 const [name, ...valueParts] = item.split('=');
                 const value = valueParts.join('='); // Handle values containing '='
-                
+
                 // Preserve the ${VARIABLE} syntax in the value
-                return { 
-                    key: name.trim(), 
-                    value: value.trim() 
+                return {
+                    key: name.trim(),
+                    value: value.trim()
                 };
             });
         }
-    
+
         return [];
     }
 

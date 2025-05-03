@@ -31,7 +31,7 @@ interface CustomMenu {
     maximizeWindow: () => void,
     closeWindow: () => void,
     restoreWindow: () => void,
-    isMaximized: () => boolean,
+    isMaximized: () => Promise<boolean>,
 }
 
 declare global {

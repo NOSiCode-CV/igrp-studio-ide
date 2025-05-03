@@ -137,7 +137,7 @@ export function AppSidebar({
                                 className="md:h-8 md:p-0 items-center justify-center"
                             >
                                 <a href="#/">
-                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-igrp text-sidebar-primary-foreground">
+                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                         <Home className="size-4" />
                                     </div>
                                 </a>
@@ -145,7 +145,7 @@ export function AppSidebar({
                         </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarHeader>
-                <SidebarContent>
+                <SidebarContent className="overflow-hidden ">
                     <SidebarGroup>
                         <SidebarGroupContent className="md:px-0">
                             <SidebarMenu>
@@ -166,9 +166,8 @@ export function AppSidebar({
                                             size="lg"
                                             className={cn(
                                                 'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
-                                                item.id === activeMenuGroup
-                                                    ? '!text-igrp'
-                                                    : ''
+                                                item.id === activeMenuGroup &&
+                                                    '!text-primary'
                                             )}
                                         >
                                             <div className="w-8 h-8 flex items-center justify-center">
@@ -204,8 +203,8 @@ export function AppSidebar({
                         ref={searchInputRef}
                     />
                 </SidebarHeader>
-                <SidebarContent>
-                    <ScrollArea>
+                <SidebarContent className="overflow-hidden">
+                    <ScrollArea className="h-[calc(100vh-230px)]">
                         {activeMenuGroup === 'explorer' ? (
                             <FileExplorerSidebar
                                 basePath={basePath}

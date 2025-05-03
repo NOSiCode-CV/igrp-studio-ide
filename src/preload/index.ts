@@ -181,8 +181,11 @@ const repo = {
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_ALL),
 		findRecentWorkspaces: (limit?: number) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, limit),
-		createWorkspace: (workspace: Omit<IWorkspace, 'id' | 'createdAt'>) =>
-			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace),
+		createWorkspace: async (workspace: Omit<IWorkspace, 'id' | 'createdAt'>): Promise<HandlerResponse> => {
+			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace) } catch (error) {
+				return handleError(error)
+			}
+		},
 		updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.UPDATE, workspaceId, updates),
 		deleteWorkspace: (workspaceId: string) =>
@@ -239,10 +242,10 @@ const repo = {
 	},
 	docker: {
 		up: (projectPath: string) => ipcRenderer.invoke('docker-up', projectPath),
-		down: (projectPath: string) => ipcRenderer.invoke('docker-down', projectPath),
+		down: (projectPath: string, options: { dropVolume?: boolean }) => ipcRenderer.invoke('docker-down', projectPath, options),
 		status: (projectPath: string) => ipcRenderer.invoke('docker-status', projectPath),
-		stop: (projectPath: string, services: string[]) => ipcRenderer.invoke('docker-stop', projectPath, services),
-		restart: (projectPath: string, services: string[], timeout?: number) => ipcRenderer.invoke('docker-restart', projectPath, services, timeout),
+		stop: (projectPath: string, options: { services: string[] }) => ipcRenderer.invoke('docker-stop', projectPath, options),
+		restart: (projectPath: string, options: { services: string[]; timeout?: number }) => ipcRenderer.invoke('docker-restart', projectPath, options),
 		check: () => ipcRenderer.invoke('docker-check')
 	}
 }
@@ -252,7 +255,7 @@ const window = {
 	maximizeWindow: () => ipcRenderer.send('maximize-window'),
 	closeWindow: () => ipcRenderer.send('close-window'),
 	restoreWindow: () => ipcRenderer.send('restore-window'),
-	isMaximized: () => ipcRenderer.send('is-window-maximized')
+	isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { lazy } from 'react';
 import {
-    Boxes,
+    Box,
     Cable,
     DatabaseZap,
     FileJson2,
@@ -220,7 +220,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                       ];
 
                 const folderMenuItem: MenuItem = {
-                    icon: isShared ? Layers : Boxes,
+                    icon: isShared ? Layers : Box,
                     label: isShared ? t(folder.name) : folder.name,
                     module: folder.name,
                     subItems: [],

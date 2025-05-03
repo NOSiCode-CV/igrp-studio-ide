@@ -63,7 +63,7 @@ const CreateWorkspace = ({
 
         setIsCreating(true);
         try {
-            const workspace: IWorkspace = await createWorkspace({
+            const workspace = await createWorkspace({
                 name: workspaceName,
                 path: directoryPath,
                 slug,
@@ -75,7 +75,7 @@ const CreateWorkspace = ({
             }
         } catch (error) {
             console.error('Workspace creation failed:', error);
-            showErrorToast(t('workspace.createError'));
+            showErrorToast(error);
         } finally {
             setIsCreating(false);
         }

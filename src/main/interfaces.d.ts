@@ -4,7 +4,7 @@ import { ComponentRegistrationConfig, DockerServiceRegistrationConfig, ProjectWo
 
 export interface IWorkspaceRepository {
     // Workspace Operations
-    createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<IWorkspace>;
+    createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<HandlerResponse>;
     updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>;
     deleteWorkspace(id: string): Promise<void>;
     getWorkspace(id: string): Promise<IWorkspace | undefined>;
@@ -98,15 +98,14 @@ export interface IBaseEngine {
     registry: (engineType: string) => Promise<HandlerResponse>;
     getComponent: (engineType: string) => Promise<HandlerResponse>;
     getService: (engineType: string) => Promise<Record<string, Component>>;
-
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
 }
 
 export interface IDocker {
     up: (projectPath: string) => Promise<ServiceInfo[]>;
-    down: (projectPath: string) => Promise<void>;
+    down: (projectPath: string, options: { dropVolume?: boolean }) => Promise<void>;
     status: (projectPath: string) => Promise<ServiceInfo[]>;
-    stop: (projectPath: string, services: string[]) => Promise<void>;
-    restart: (projectPath: string, services: string[], timeout?: number) => Promise<void>;
+    stop: (projectPath: string, options: { services: string[] }) => Promise<void>;
+    restart: (projectPath: string, options: { services: string[]; timeout?: number }) => Promise<void>;
     check: () => Promise<boolean>
 }
