@@ -112,7 +112,9 @@ ipcMain.handle('add-git-remote', async (_event, { projectPath, remoteUrl }) => {
 ipcMain.handle('list-commits', async (_event, { projectPath, branch, limit }) => {
     return GitService.listCommits(projectPath, branch, limit);
 });
-
+ipcMain.handle('get-contributors-git', async (_event, { projectPath }) => {
+    return GitService.getContributors(projectPath);
+});
 ipcMain.handle('set-auto-commit', async (_, prompt: boolean) => {
     return GitStore.setAutoCommit(prompt);
 });

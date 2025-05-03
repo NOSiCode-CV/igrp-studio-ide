@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { Database, FileCode, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
+import { Database, Activity, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 import { v4 as uuidv4 } from 'uuid';
 import i18next from 'i18next';
@@ -106,7 +106,7 @@ export const getIcon = (folderName: string): LucideIcon => {
   
 	switch (folderName.toLowerCase()) {
 		case 'controllers':
-			return FileCode;
+			return Activity;
 		case 'models':
 			return Database;
 		case 'dto':

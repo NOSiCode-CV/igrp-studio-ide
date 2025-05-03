@@ -6,10 +6,8 @@ import {
     ArrowLeft,
     Bell,
     Code,
-    Loader2,
     Maximize2,
     Minus,
-    Play,
     Square,
     X,
 } from 'lucide-react';
@@ -49,6 +47,7 @@ import {
 import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
+import DockerControls from '@renderer/components/docker-controls';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -64,7 +63,8 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const { workspace } = useWorkspace();
 
-    const { loading, startContainers } = useDocker();
+    const { loading, startContainers, stopContainers, stopService } =
+        useDocker({workspace});
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
@@ -76,6 +76,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const handleMinimize = () => {
         window.menu.minimizeWindow();
+        window.menu.isMaximized;
     };
 
     const handleMaximize = () => {
@@ -112,10 +113,23 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     useEffect(() => {
         const checkMaximized = async () => {
-            const maximized = window.menu.isMaximized();
-            setIsMaximized(maximized);
+            try {
+                const maximized = await window.menu.isMaximized();
+                setIsMaximized(maximized);
+            } catch (error) {
+                setIsMaximized(false);
+            }
         };
+
         checkMaximized();
+
+        // Optional: Add listeners for window state changes
+        const updateState = () => checkMaximized();
+        window.addEventListener('resize', updateState);
+
+        return () => {
+            window.removeEventListener('resize', updateState);
+        };
     }, []);
 
     const WindowButton = ({
@@ -146,6 +160,14 @@ const Header = ({ config, basePath }: HeaderProps) => {
         await startContainers();
     };
 
+    const handleDowm = async (dropVolume: boolean) => {
+        await stopContainers(dropVolume);
+    };
+
+    const handleStop = async () => {
+        await stopService();
+    };
+
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
 
     return (
@@ -156,7 +178,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
                         <div className="flex items-center space-x-4 home cursor-pointer">
                             <div
                                 onClick={openPage}
-                                className={cn('flex items-center gap-2')}
+                                className={cn(
+                                    'flex items-center gap-2',
+                                    isMac && isMaximized && 'pl-12'
+                                )}
                             >
                                 <img
                                     src={logo}
@@ -172,7 +197,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 <Breadcrumb className="hidden lg:flex">
                                     <BreadcrumbList>
                                         <BreadcrumbItem>
-                                            <BreadcrumbLink href="/#">
+                                            <BreadcrumbLink href="#/">
                                                 <ArrowLeft className="h-4 w-4" />
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
@@ -192,28 +217,13 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             )}
                         </div>
                         <div className="flex items-center space-x-2 ">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-6 text-xs gap-1"
-                                        onClick={handleRun}
-                                    >
-                                        {!loading ? (
-                                            <>
-                                                <Play className="h-3 w-3 text-igrp" />
-                                                {t('run')}
-                                            </>
-                                        ) : (
-                                            <Loader2 className="animate-spin h-3 w-3 text-igrp" />
-                                        )}
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{t('run')}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <DockerControls
+                                loading={loading}
+                                onRun={handleRun}
+                                onDropAll={handleDowm}
+                                onStopAll={handleStop}
+                                t={t}
+                            />
 
                             {basePath && (
                                 <>

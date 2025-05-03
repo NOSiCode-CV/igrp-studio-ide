@@ -69,7 +69,7 @@ export function Footer() {
                 await window.electron
                     .checkForUpdates()
                     .then((version: string) => {
-                        if(!version) return;
+                        if (!version) return;
                         setNewVersion(version);
                         if (version !== appVersion) {
                             setLog(t('versionAvailable', { version }));
@@ -99,7 +99,7 @@ export function Footer() {
                         ) : (
                             <span className="flex items-center space-x-1 text-amber-600">
                                 <AlertCircle className="h-4 w-4" />
-                                <span>{log}</span>
+                                <span className="truncate">{log}</span>
                             </span>
                         )}
                     </span>

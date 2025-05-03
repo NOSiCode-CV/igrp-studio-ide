@@ -76,7 +76,7 @@ const Section = ({
     };
 
     return (
-        <div className="group/row relative hover:border-2 hover:border-igrp rounded-lg px-1">
+        <div className="group/row relative hover:border-2 hover:border-primary rounded-lg px-1">
             {!isDisabled && (
                 <SectionTool
                     onClickAddControl={(type) =>

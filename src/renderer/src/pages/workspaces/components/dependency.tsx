@@ -1,4 +1,6 @@
 import { Badge } from '@renderer/components/ui/badge';
+import { cn } from '@renderer/lib/utils';
+import { getServiceColor } from '../services';
 
 interface DependencyConfig {
     condition?: string;
@@ -21,7 +23,9 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                         <Badge
                             key={`${dependency}-${i}`}
                             variant="outline"
-                            className="text-xs truncate"
+                            className={cn("w-full md:max-w-50 truncate whitespace-nowrap inline-block rounded-lg text-xs font-medium",
+                                getServiceColor(dependency)
+                            )}
                         >
                             {dependency}
                         </Badge>
@@ -33,7 +37,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                     <Badge
                         key={`${depId}-${i}`}
                         variant="outline"
-                        className="text-xs truncate"
+                        className="text-xs truncate overflow-hidden text-ellipsis  wrap-break-word"
                     >
                       {depId}
                      {/*  {config?.condition ? ` (${config.condition})` : ''} */}
@@ -48,7 +52,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
             {isTable ? (
                 <div className="flex flex-wrap gap-1"> {content}</div>
             ) : (
-                <div className=" p-1">
+                <div className="py-1">
                     <div className="text-xs text-muted-foreground">
                         Depends on
                     </div>

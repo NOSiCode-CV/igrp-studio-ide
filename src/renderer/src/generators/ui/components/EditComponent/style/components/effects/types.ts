@@ -7,6 +7,9 @@ export interface ShadowValue {
   color: string;
   inset: boolean;
 }
+export interface InteractionValue {
+  name:string
+}
 
 // Filter Types
 export interface FilterValue {

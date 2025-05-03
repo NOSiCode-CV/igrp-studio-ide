@@ -82,7 +82,7 @@ export function ListGitProject({
 
     return (
         <TooltipProvider>
-            <div className="flex items-center justify-between py-3 px-4 border-b hover:bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between py-3 px-4 hover:bg-muted transition-colors">
                 <div className="flex-1 min-w-0 mr-4">
                     <div className="flex items-center gap-2">
                         <PlatformIcon

@@ -120,7 +120,10 @@ class NextJsManager {
 
   private sendLog(message: string): void {
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-      this.mainWindow.webContents.send('log', message);
+      this.mainWindow.webContents.send('log', {
+        code: 'INFO',
+        message
+      });
     }
   }
 }

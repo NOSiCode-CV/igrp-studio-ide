@@ -23,7 +23,7 @@ interface WorkspaceConfigProps {
 export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
     const [copied, setCopied] = useState(false);
 
-    const { fileContent, services, loadComposeFile } = useDocker();
+    const { fileContent, services, loadComposeFile } = useDocker({workspace});
     const [content, setContent] = useState(fileContent);
 
     const {

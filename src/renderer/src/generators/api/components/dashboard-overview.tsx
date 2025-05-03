@@ -4,7 +4,7 @@ import { useTabs } from '@renderer/components/navigation/TabContext';
 import { Card, CardContent, CardHeader } from '@renderer/components/ui/card';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
-import { Boxes, Database, FileCode, FileText, Plus } from 'lucide-react';
+import { Activity, Box, Database, FileText, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface StatsCardProps {
@@ -14,6 +14,7 @@ interface StatsCardProps {
     description?: string;
     iconColor?: string;
     buttonGradient?: string;
+    gradient?: string;
     onClick?: () => void;
 }
 
@@ -24,25 +25,34 @@ function StatsCard({
     iconColor,
     description,
     buttonGradient,
-    onClick
+    gradient,
+    onClick,
 }: StatsCardProps) {
     return (
         <Card className="group relative">
+            <div
+                className={cn(
+                    `absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg`,
+                    gradient
+                )}
+            ></div>
             <CardHeader>
                 <div className="flex items-center justify-between ">
                     <div className="flex items-center">
                         <Icon className={cn(`w-5 h-5 mr-2`, iconColor)} />
                         <h3 className="font-medium">{title}</h3>
                     </div>
-                    {onClick && <button
-                        className={cn(
-                            `text-primary-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-r p-2.5 rounded-full hover:shadow-lg hover:scale-110 transform`,
-                            buttonGradient
-                        )}
-                        onClick={onClick}
-                    >
-                        <Plus size={14} />
-                    </button>}
+                    {onClick && (
+                        <button
+                            className={cn(
+                                `text-primary-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-r p-2.5 rounded-full hover:shadow-lg hover:scale-110 transform`,
+                                buttonGradient
+                            )}
+                            onClick={onClick}
+                        >
+                            <Plus size={14} />
+                        </button>
+                    )}
                 </div>
             </CardHeader>
             <CardContent>
@@ -67,7 +77,7 @@ interface DashboardOverviewProps {
 }
 
 export default function DashboardOverview({ stats }: DashboardOverviewProps) {
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
 
     const { newTab } = useTabs();
 
@@ -79,7 +89,7 @@ export default function DashboardOverview({ stats }: DashboardOverviewProps) {
         {
             title: t('modules'),
             value: stats.modules,
-            Icon: Boxes,
+            Icon: Box,
             description: t('modulesDescription'),
             gradient: 'from-blue-500/20 to-indigo-500/20',
             iconColor: 'text-blue-400',
@@ -88,7 +98,7 @@ export default function DashboardOverview({ stats }: DashboardOverviewProps) {
         {
             title: t('endpoints'),
             value: stats.controllers,
-            Icon: FileCode,
+            Icon: Activity,
             description: t('endpointsDescription'),
             gradient: 'from-emerald-500/20 to-teal-500/20',
             iconColor: 'text-emerald-400',

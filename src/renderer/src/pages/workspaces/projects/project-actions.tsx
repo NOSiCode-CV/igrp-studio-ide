@@ -15,9 +15,8 @@ import { Trash, Repeat, MoreVertical, Edit, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProjectData, ServiceInfo } from 'src/main/types';
-import { useDispatch } from 'react-redux';
-import { setChangeStatus } from '@renderer/redux/thunks';
 import { ConfigurationDialog } from '../components/configuration-dialog';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
 
 interface ProjectDropdownProps {
     project: ProjectData;
@@ -31,7 +30,6 @@ interface ProjectDropdownProps {
 
 export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     project,
-    basePath,
     services = [],
     projects = [],
     onEdit,
@@ -39,18 +37,16 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     onConvertToDotNet,
 }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const { showErrorToast, showSuccessToast } = useToast();
+    const { showErrorToast } = useToast();
     const { t } = useTranslation();
-    const dispatch: any = useDispatch();
+
+    const {
+        actions: { removeProject },
+    } = useWorkspace();
 
     const handleDelete = async () => {
         try {
-            await window.igrpStudio.workspace.deleteProject(
-                project.id,
-                basePath
-            );
-            showSuccessToast(t('deletedSuccess', { name: project.name }));
-            dispatch(setChangeStatus(true));
+            await removeProject(project);
             setIsDialogOpen(false);
         } catch (error: unknown) {
             showErrorToast(error);

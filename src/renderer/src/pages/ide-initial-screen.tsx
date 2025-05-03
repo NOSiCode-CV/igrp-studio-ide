@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import useToast from '@renderer/hooks/useToast';
 import Loader from '@renderer/components/loader';
-import { IWorkspace } from 'src/main/types';
 import {
     Tabs,
     TabsContent,
@@ -19,12 +17,10 @@ import CreateWorkspace from './workspaces/components/create-workspace';
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
     const [hasWorkspace, setHasWorkspace] = useState(false);
-    const { showSuccessToast } = useToast();
 
     const {
         workspace,
         loading: workspacesLoading,
-        actions: { refreshWorkspaces },
     } = useWorkspace();
 
     useEffect(() => {
@@ -39,15 +35,9 @@ const IDEInitialScreen = () => {
         checkWorkspaces();
     }, [workspace, workspacesLoading]);
 
-    useEffect(() => {
-        refreshWorkspaces();
-    }, []);
-
-    const handleCreationSuccess = (newWorkspace: IWorkspace) => {
+    const handleCreationSuccess = () => {
         setShowWorkspaceDialog(false);
         setHasWorkspace(true);
-        refreshWorkspaces();
-        showSuccessToast(`Workspace "${newWorkspace.name}" created`);
     };
 
     if (workspacesLoading) {

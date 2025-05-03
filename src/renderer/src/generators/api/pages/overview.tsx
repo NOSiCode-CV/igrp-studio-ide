@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { OptionType, projectIcons } from '@renderer/constants/appConstants';
+import { projectIcons } from '@renderer/constants/appConstants';
 import DashboardOverview from '../components/dashboard-overview';
 
-import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import {
     Tabs,
     TabsContent,
@@ -35,19 +34,15 @@ import { useGit } from '@renderer/hooks/use-git';
 import Dependency from '@renderer/pages/workspaces/components/dependency';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
+import { GitContributors } from '@renderer/components/git/git-contributors';
 
-interface NewProps {
-    onOpenNew: (tab: TabItem) => void;
-    open: OptionType;
-}
-
-const Overview = ({}: NewProps) => {
+const Overview = () => {
     const [copied, setCopied] = useState(false);
     const [projectId, setProjectId] = useState<string>('');
     const [repositoryUrl, setRepositoruUrl] = useState<string | null>(null);
     const { getRemoteUrl } = useGit();
 
-    const { isGitEnabled, branches, activeBranch } = useSelector(
+    const { isGitEnabled, activeBranch } = useSelector(
         (state: RootState) => state.git
     );
 
@@ -78,6 +73,7 @@ const Overview = ({}: NewProps) => {
 
     useEffect(() => {
         setProjectId(project?.id);
+        setData(config);
     }, [project]);
 
     useEffect(() => {
@@ -99,10 +95,6 @@ const Overview = ({}: NewProps) => {
 
         setStats(newStats);
     }, [filesThree]);
-
-    useEffect(() => {
-        setData(config);
-    }, [project]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -147,16 +139,6 @@ const Overview = ({}: NewProps) => {
                                         </h1>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex space-x-2">
-                                        <span className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium">
-                                            {project.type}
-                                        </span>
-                                        <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">
-                                            Active
-                                        </span>
-                                    </div>
-                                </div>
                             </div>
 
                             <div className="grid grid-cols-3 gap-6">
@@ -173,8 +155,8 @@ const Overview = ({}: NewProps) => {
                                                 <p className="text-muted-foreground text-xs mb-1">
                                                     Name
                                                 </p>
-                                                <p className="">
-                                                    {project.config.name}
+                                                <p className="truncate">
+                                                    {project.config?.name}
                                                 </p>
                                             </div>
                                             <div>
@@ -215,10 +197,17 @@ const Overview = ({}: NewProps) => {
                                             <p className="text-muted-foreground   text-xs mb-1">
                                                 Version
                                             </p>
-                                            <p className="">{project.config.springBootVersion}</p>
+                                            <p className="">
+                                                {
+                                                    project.config
+                                                        ?.springBootVersion
+                                                }
+                                            </p>
                                         </div>
                                         <Dependency
-                                            dependsOn={project.dependsOn}
+                                            dependsOn={
+                                                project?.service.dependsOn
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -261,27 +250,9 @@ const Overview = ({}: NewProps) => {
                                                 </div>
                                             </div>
                                         )}
-                                        <div>
-                                            <p className="text-muted-foreground text-xs mb-1">
-                                                Last Updated
-                                            </p>
-                                            <p className="">...</p>
-                                        </div>
-                                        {/*  <div>
-                                            <p className="text-muted-foreground text-xs mb-1">
-                                                Contributors
-                                            </p>
-                                            <div className="flex -space-x-2 mt-1">
-                                                {[1, 2, 3].map((i) => (
-                                                    <div
-                                                        key={i}
-                                                        className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center  text-sm font-medium border-2 border-[#2d2d2d]"
-                                                    >
-                                                        {i}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div> */}
+                                        <GitContributors
+                                            projectPath={basePath}
+                                        />
                                     </div>
                                 </div>
                             </div>

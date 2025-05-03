@@ -33,7 +33,7 @@ export const supportChannels = [
     },
     {
         name: 'Email',
-        icon: 'https://www.svgrepo.com/show/521128/email-1.svg',
+        icon: 'https://www.svgrepo.com/show/421616/email-mail-web.svg',
         iconClassName: 'hover:opacity-80',
     },
     {

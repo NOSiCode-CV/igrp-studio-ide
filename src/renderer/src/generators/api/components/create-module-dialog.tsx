@@ -108,9 +108,8 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                     <TooltipTrigger asChild>
                         <DialogTrigger asChild>
                             <Button
-                                variant="outline"
                                 size="icon"
-                                className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200 bg-igrp text-primary-foreground"
+                                className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
                             >
                                 <Plus className="h-4 w-4" />
                             </Button>

@@ -35,7 +35,7 @@ export const getServiceColor = (type: string) => {
         case 'file':
             return 'bg-red-500';
         default:
-            return 'bg-green-500';
+            return 'bg-muted';
     }
 };
 

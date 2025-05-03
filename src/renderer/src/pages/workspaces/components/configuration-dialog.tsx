@@ -9,7 +9,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@renderer/components/ui/dialog';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -29,7 +28,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import { Badge } from '@renderer/components/ui/badge';
 import { Switch } from '@renderer/components/ui/switch';
-import { Trash2, X, PlusCircle } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +58,8 @@ interface ConfigurationDialogProps {
     isNew?: boolean;
     children?: React.ReactNode;
     project?: ProjectData;
+    open?: boolean;
+    setOpen?: (open: boolean) => void;
 }
 
 export function ConfigurationDialog({
@@ -66,8 +67,9 @@ export function ConfigurationDialog({
     services = [],
     projects = [],
     isNew = true,
-    children,
     project,
+    open,
+    setOpen,
 }: ConfigurationDialogProps) {
     const { t } = useTranslation();
     const [name, setName] = useState('');
@@ -89,7 +91,6 @@ export function ConfigurationDialog({
     const [customNetwork, setCustomNetwork] = useState('');
     const [useCustomNetwork, setUseCustomNetwork] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [open, setOpen] = useState(false);
     const [serviceTemplates, setServiceTemplates] = useState<any[]>([]);
 
     const {
@@ -101,76 +102,75 @@ export function ConfigurationDialog({
         },
     } = useWorkspace();
 
+    const fetchTemplates = async () => {
+        const { result } = await getTemplatesService();
+
+        const convertedTemplates =
+            result.services?.map((service) => {
+                const { properties, name, label } = service;
+
+                const serviveData: any = extractDefaults(properties);
+
+                // Convert ports array to the string format "internal:external"
+                const ports =
+                    serviveData.ports.map(
+                        (port) => `${port.external}:${port.internal}`
+                    ) || [];
+
+                // Convert environments array to {name, value} format
+                const environments =
+                    serviveData?.environments?.map((env) => ({
+                        key: env.key,
+                        value: env.value,
+                    })) || [];
+
+                // Convert volumes array to "source:target" format
+                const volumes =
+                    serviveData.volumes?.map(
+                        (vol) => `${vol.name}:${vol.path}:${vol.driver}`
+                    ) || [];
+
+                // Convert dependsOn to depends_on array
+                const dependsOn =
+                    serviveData.dependsOn?.map((dep) => dep.service) || [];
+
+                // Convert labels array
+                const type =
+                    serviveData.labels?.find((l) => l.key === 'type')?.value ||
+                    '';
+
+                const labels =
+                    serviveData?.labels?.map((env) => ({
+                        key: env.key,
+                        value: env.value,
+                    })) || [];
+
+                // Build the template object
+                return {
+                    ...serviveData,
+                    type,
+                    ports,
+                    environments,
+                    volumes,
+                    dependsOn,
+                    labels,
+                    label,
+                    name,
+                    container_name: serviveData.container_name,
+                    customNetwork: `${workspace.slug}-network`,
+                };
+            }) || [];
+
+        setServiceTemplates(convertedTemplates);
+    };
+
     useEffect(() => {
-        const fetchTemplates = async () => {
-            const { result } = await getTemplatesService();
-
-            const convertedTemplates =
-                result.services?.map((service) => {
-                    const { properties, name, label } = service;
-
-                    const serviveData: any = extractDefaults(properties);
-                    // Convert ports array to the string format "internal:external"
-                    const ports =
-                        serviveData.ports.map(
-                            (port) => `${port.external}:${port.internal}`
-                        ) || [];
-
-                    // Convert environments array to {name, value} format
-                    const environments =
-                        serviveData?.environments?.map((env) => ({
-                            key: env.key,
-                            value: env.value,
-                        })) || [];
-
-                    // Convert volumes array to "source:target" format
-                    const volumes =
-                        serviveData.volumes?.map(
-                            (vol) => `${vol.name}:${vol.path}`
-                        ) || [];
-
-                    // Convert dependsOn to depends_on array
-                    const dependsOn =
-                        serviveData.dependsOn?.map((dep) => dep.service) || [];
-
-                    // Convert labels array
-                    const type =
-                        serviveData.labels?.find((l) => l.key === 'type')
-                            ?.value || '';
-
-                    const labels =
-                        serviveData?.labels?.map((env) => ({
-                            key: env.key,
-                            value: env.value,
-                        })) || [];
-
-                    // Build the template object
-                    return {
-                        ...serviveData,
-                        type,
-                        ports,
-                        environments,
-                        volumes,
-                        dependsOn,
-                        labels,
-                        label: label || name,
-                        name: name || serviveData.container_name,
-                        customNetwork: `${workspace.slug}-network`,
-                    };
-                }) || [];
-
-            setServiceTemplates(convertedTemplates);
-        };
+        if (!open) return;
 
         fetchTemplates();
-    }, []);
 
-    useEffect(() => {
-        if (open && service) {
+        if (service) {
             const network = service.networks && service.networks[0];
-
-            console.log('service', service);
-
             // Edit mode
             setName(service.name || '');
             setImage(service.image || '');
@@ -183,7 +183,7 @@ export function ConfigurationDialog({
             setNetworkType(service.networkType || 'bridge');
             setCustomNetwork(network);
             setUseCustomNetwork(!!network);
-        } else if (open) {
+        } else {
             // New mode
             setName('');
             setDescription('');
@@ -204,6 +204,7 @@ export function ConfigurationDialog({
         const selectedTemplate = serviceTemplates.find(
             (t) => t.name === templateId
         );
+
         if (selectedTemplate) {
             setName(selectedTemplate.name);
             setImage(selectedTemplate.image);
@@ -297,17 +298,17 @@ export function ConfigurationDialog({
             }
         });
 
+        // Add service labels (highest priority)
+        Object.entries(serviceLabels).forEach(([key, value]) => {
+            labelsMap.set(key, value);
+        });
+
         // Add form labels (medium priority)
         Object.entries(formLabels).forEach(([key, value]) => {
             if (value) {
                 // Only add if value exists
                 labelsMap.set(key, value);
             }
-        });
-
-        // Add service labels (highest priority)
-        Object.entries(serviceLabels).forEach(([key, value]) => {
-            labelsMap.set(key, value);
         });
 
         // Convert the map back to an array of Label objects
@@ -339,8 +340,10 @@ export function ConfigurationDialog({
             labels: serviceLabels = {},
             properties: serviceProperties = {},
             depends_on: serviceDependsOn,
-            name: ServiceName,
+            name: serviceName,
             status,
+            createdAt,
+            statusMessage,
             ...serviceRest
         } = service || {};
 
@@ -352,8 +355,8 @@ export function ConfigurationDialog({
 
         // Process volumes
         const _volumes: Volume[] = volumes.map((volumeStr) => {
-            const [name, path] = volumeStr.split(':');
-            return { name, path, driver: 'none' };
+            const [name, path, driver] = volumeStr.split(':');
+            return { name, path, driver: driver || 'none' };
         });
 
         // Process labels - merge template labels with new ones
@@ -361,7 +364,7 @@ export function ConfigurationDialog({
         const _labels = mergeLabels(
             templateLabels,
             serviceLabels,
-            { type, description },
+            { type, description, name },
             serviceLabels.uuid
         );
 
@@ -370,9 +373,18 @@ export function ConfigurationDialog({
             return { service: depend.replace('{{slug}}', workspace.slug) };
         });
 
+        const _environments: Environment[] = environments.map(
+            ({ key, value }) => {
+                return {
+                    key,
+                    value: value.replace('{{slug}}', workspace.slug),
+                };
+            }
+        );
+
         const serviceData: WorkspaceService = {
             id: serviceLabels.uuid || '',
-            name: name,
+            name: serviceLabels.name || name,
             properties: {
                 // Template properties (lowest priority)
                 ...templateRest,
@@ -380,10 +392,9 @@ export function ConfigurationDialog({
                 ...serviceProperties,
                 // Form values (highest priority)
                 ...serviceRest,
-                container_name: name,
                 image,
                 ports: _ports,
-                environments,
+                environments: _environments,
                 volumes: _volumes,
                 dependsOn: _dependsOn,
                 networks: [
@@ -397,7 +408,7 @@ export function ConfigurationDialog({
         try {
             const { error } = await onSave(serviceData);
             setIsSubmitting(false);
-            if (!error) setOpen(false);
+            if (!error) setOpen?.(false);
         } catch (err) {
             console.error(err);
             setIsSubmitting(false);
@@ -412,19 +423,6 @@ export function ConfigurationDialog({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {children ? (
-                    children
-                ) : (
-                    <Button
-                        variant="outline"
-                        className="bg-igrp text-primary-foreground dark:bg-primary"
-                    >
-                        <PlusCircle className="w-4 h-4" />
-                        {t('newService')}
-                    </Button>
-                )}
-            </DialogTrigger>
             <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                     <DialogTitle>
@@ -607,7 +605,7 @@ export function ConfigurationDialog({
                                                 onClick={addPort}
                                                 disabled={!newPort}
                                             >
-                                                Add
+                                                {t('add')}
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
@@ -699,7 +697,7 @@ export function ConfigurationDialog({
                                                     onClick={addEnvironment}
                                                     disabled={!newEnvName}
                                                 >
-                                                    Add
+                                                    {t('add')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -771,7 +769,7 @@ export function ConfigurationDialog({
                                                 onClick={addVolume}
                                                 disabled={!newVolume}
                                             >
-                                                Add
+                                                {t('add')}
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
@@ -973,8 +971,8 @@ export function ConfigurationDialog({
                 </Tabs>
 
                 <DialogFooter className="pt-2">
-                    <Button variant="outline" onClick={() => setOpen(false)}>
-                        Cancel
+                    <Button variant="outline" onClick={() => setOpen?.(false)}>
+                        {t('cancel')}
                     </Button>
                     <Button
                         onClick={handleSave}

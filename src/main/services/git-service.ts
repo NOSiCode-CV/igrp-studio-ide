@@ -445,5 +445,35 @@ export const GitService = {
             console.error('Error checking git remotes:', error);
             return {};
         }
+    },
+
+    async getContributors(projectPath: string): Promise<{name: string, email: string}[]> {
+        try {
+            const { stdout } = await execAsync('git shortlog -sne --all', { cwd: projectPath });
+            
+            const contributors = stdout
+                .split('\n')
+                .filter(line => line.trim().length > 0)
+                .map(line => {
+                    const match = line.trim().match(/^\d+\s+(.+)\s+<(.+)>$/);
+                    return match ? { name: match[1], email: match[2] } : null;
+                })
+                .filter(Boolean) as {name: string, email: string}[];
+
+             // Filter distinct emails (case-insensitive)
+             const uniqueContributors = contributors.reduce<{name: string, email: string}[]>(
+                (acc, contributor) => {
+                    if (!acc.some(c => c.email.toLowerCase() === contributor.email.toLowerCase())) {
+                        acc.push(contributor);
+                    }
+                    return acc;
+                },
+                []
+            );
+
+            return uniqueContributors;
+        } catch (error: any) {
+            throw new Error(error.stderr || 'Failed to get contributors');
+        }
     }
 };
