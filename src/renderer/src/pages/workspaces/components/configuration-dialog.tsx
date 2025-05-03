@@ -9,7 +9,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@renderer/components/ui/dialog';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -29,7 +28,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import { Badge } from '@renderer/components/ui/badge';
 import { Switch } from '@renderer/components/ui/switch';
-import { Trash2, X, PlusCircle } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +50,6 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { HandlerResponse, ProjectData } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
-import { constructFrom } from 'date-fns';
 
 interface ConfigurationDialogProps {
     service?: any;

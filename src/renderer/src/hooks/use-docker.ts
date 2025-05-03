@@ -3,8 +3,6 @@ import yaml from 'js-yaml';
 import useToast from '@renderer/hooks/useToast';
 import { DockerComposeConfig, DockerComposeService, IWorkspace, ServiceInfo } from 'src/main/types';
 import { IDocker } from 'src/main/interfaces';
-import { useDispatch } from 'react-redux';
-import { setChangeStatus } from '@renderer/redux/thunks';
 
 export function useDocker({ workspace, changeStatus = false }: { workspace: IWorkspace, changeStatus?: boolean }) {
     const [isDockerRunning, setIsDockerRunning] = useState<boolean>(false);
@@ -16,7 +14,6 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
     const [error, setError] = useState<Error | null>(null);
 
     const { showErrorToast } = useToast();
-    const dispatch: any = useDispatch();
 
     const dockerOperations: IDocker = {
         up: async (projectPath: string) => {
@@ -126,7 +123,6 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
     }, [])
 
     useEffect(() => {
-        console.log(changeStatus)
         const refreshContainers = async () => {
             handleDockerOperation('status')
         };
@@ -144,7 +140,7 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
         loadComposeFile,
         startContainers: () => handleDockerOperation('up'),
         stopContainers: (dropVolume: boolean) => handleDockerOperation('down', { dropVolume }),
-        //refreshContainers: () => handleDockerOperation('status'),
+        refreshContainers: () => handleDockerOperation('status'),
         stopService: (services?: string[]) => handleDockerOperation('stop', { services }),
         restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', { services, timeout }),
     };

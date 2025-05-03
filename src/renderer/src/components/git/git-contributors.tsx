@@ -20,7 +20,7 @@ export function GitContributors({ projectPath }) {
             );
             setContributors(data);
         }
-        loadData();
+        if (projectPath) loadData();
     }, [projectPath]);
 
     return (

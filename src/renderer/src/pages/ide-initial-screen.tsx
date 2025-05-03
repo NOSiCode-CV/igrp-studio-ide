@@ -21,7 +21,6 @@ const IDEInitialScreen = () => {
     const {
         workspace,
         loading: workspacesLoading,
-        actions: { refreshWorkspaces },
     } = useWorkspace();
 
     useEffect(() => {
@@ -36,14 +35,9 @@ const IDEInitialScreen = () => {
         checkWorkspaces();
     }, [workspace, workspacesLoading]);
 
-    useEffect(() => {
-        refreshWorkspaces();
-    }, []);
-
     const handleCreationSuccess = () => {
         setShowWorkspaceDialog(false);
         setHasWorkspace(true);
-        refreshWorkspaces();
     };
 
     if (workspacesLoading) {

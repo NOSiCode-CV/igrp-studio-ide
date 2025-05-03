@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useToast from '@renderer/hooks/useToast';
 import { HandlerResponse, IWorkspace, ProjectData } from 'src/main/types';
 import { useDispatch } from 'react-redux';
@@ -216,6 +216,7 @@ export const useWorkspace = () => {
 
     const createOrUpdateService = async (service: WorkspaceService): Promise<HandlerResponse> => {
         let result: HandlerResponse = {};
+        dispatch(setChangeStatus(false));
         try {
             const { id: serviceId } = service
 
@@ -233,7 +234,7 @@ export const useWorkspace = () => {
                 console.log(result.error)
                 showErrorToast(result.error);
             } else
-                showSuccessToast('Service saved successfully');
+                showSuccessToast(t('savedSuccessfully', { name: "Service" }));
 
             dispatch(setChangeStatus(true));
 
@@ -264,7 +265,7 @@ export const useWorkspace = () => {
                 console.log(result.error)
                 showErrorToast(result.error);
             } else
-                showSuccessToast('Service saved successfully');
+                showSuccessToast(t('savedSuccessfully', { name: "Service" }));
 
             dispatch(setChangeStatus(true));
 
@@ -279,6 +280,8 @@ export const useWorkspace = () => {
     const removeService = async (serviceId: string) => {
         try {
 
+            dispatch(setChangeStatus(false));
+
             const result
                 : any = await window.igrpStudio.workspace.deleteService(serviceId, workspace.path)
 
@@ -286,7 +289,7 @@ export const useWorkspace = () => {
                 console.log(result.error)
                 showErrorToast(result.error);
             } else {
-                showSuccessToast('Service deleted successfully');
+                showSuccessToast(t('deletedSuccess', { name: 'Service' }));
                 dispatch(setChangeStatus(true));
             }
 
@@ -294,6 +297,24 @@ export const useWorkspace = () => {
             showErrorToast(err);
         }
     }
+
+    const removeProject = async (project: ProjectData) => {
+        dispatch(setChangeStatus(false));
+        try {
+            await window.igrpStudio.workspace.deleteProject(
+                project.id,
+                workspace.path
+            );
+            dispatch(setChangeStatus(true));
+            showSuccessToast(t('deletedSuccess', { name: project.name }));
+        } catch (error: unknown) {
+            showErrorToast(error);
+        }
+    };
+
+    useEffect(() => {
+        refreshWorkspaces();
+    }, []);
 
     return {
         workspaces,
@@ -314,8 +335,9 @@ export const useWorkspace = () => {
             saveCustomWorkspaceComposeFile,
             createOrUpdateService,
             removeService,
-            findAllServices,
-            configureService
+            //findAllServices,
+            configureService,
+            removeProject
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

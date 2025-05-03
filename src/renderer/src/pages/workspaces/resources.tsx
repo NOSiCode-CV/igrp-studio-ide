@@ -162,6 +162,7 @@ const Resources = () => {
     const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
     const { showErrorToast } = useToast();
+
     const { t } = useTranslation();
 
     const {
@@ -170,11 +171,15 @@ const Resources = () => {
         state: { changeStatus },
     } = useWorkspace();
 
-    const { services } = useDocker({ workspace, changeStatus });
+    const { services, refreshContainers } = useDocker({
+        workspace,
+        changeStatus,
+    });
 
     useEffect(() => {
         fetchProjects();
         refreshWorkspaces();
+        refreshContainers();
     }, [changeStatus, workspace]);
 
     const fetchProjects = async () => {
