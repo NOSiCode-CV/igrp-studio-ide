@@ -150,7 +150,6 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             },
         };
         formik.setFieldValue('requestBody', requestBody);
-        console.log(bodyType, name, requestBody);
     }, [name, bodyType]);
 
     useEffect(() => {
@@ -178,7 +177,6 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
         updateFormik(content);
 
-        console.log(content);
     }, [data]);
 
     const getContentToSchemaProps = () => {

@@ -29,7 +29,7 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
-    const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module);
 
     const [title, setTitle] = useState('');
@@ -110,6 +110,7 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
 
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('createdSuccess', { name: t('response'), value: values.name }));
+            handleRenameTab(currentItem.id, values.name as string);
         } catch (error) {
             showErrorToast(error);
         }
