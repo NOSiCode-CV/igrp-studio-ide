@@ -170,15 +170,17 @@ export const useWorkspace = () => {
     const saveOrOpenProject = async (project: ProjectData, onSuccess?: () => Promise<void>) => {
         try {
             const { id } = project
-            let result: any = {};
+            let response: any = {};
 
             if (id)
-                result = await window.igrpStudio.workspace.updateProject(id, project);
+                response = await window.igrpStudio.workspace.updateProject(id, project);
             else
-                result = await window.igrpStudio.workspace.createProject(workspace?.id, project);
+                response = await window.igrpStudio.workspace.createProject(workspace?.id, project);
 
-            if (result?.error) {
-                showErrorToast(result?.error);
+            const { result, error } = response
+
+            if (error) {
+                showErrorToast(error);
                 return
             }
 

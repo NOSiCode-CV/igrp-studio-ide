@@ -14,7 +14,7 @@ import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import { constructNow } from 'date-fns';
+import { Bot } from 'lucide-react';
 
 type TbodyType = 'none' | 'multipart/form-data' | 'application/json';
 
@@ -46,8 +46,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
     const [bodyType, setBodyType] = useState<TbodyType>('none');
 
-    const [contentType, setContentType] = useState('application/json');
     const [collectionType, setCollectionType] = useState<string>('none');
+
     const [name, setName] = useState<string>('');
 
     const [data, setData] = useState<any[]>([]);
@@ -114,10 +114,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         const extractedSchema = firstKey ? properties[firstKey] : newSchema;
 
         const content = {
-            [contentType]: {
+            [bodyType]: {
                 schema: {
                     ...extractedSchema,
-                    collectionType
+                    collectionType,
                 },
             },
         };
@@ -127,7 +127,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
     const handleChangeEditor = (value: string) => {
         const content = {
-            [contentType]: {
+            [bodyType]: {
                 schema: JSON.parse(value),
             },
         };
@@ -136,24 +136,26 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     };
 
     useEffect(() => {
+        if (bodyType === 'none') return;
         const requestBody = {
             ...formik.values.requestBody,
             name,
             content: {
-                [contentType]: {
+                [bodyType]: {
                     schema: {
-                        ...formik.values.requestBody?.content[contentType]
-                            ?.schema,
+                        ...formik.values.requestBody?.content[bodyType]?.schema,
                         collectionType,
                     },
                 },
             },
         };
         formik.setFieldValue('requestBody', requestBody);
-    }, [name, collectionType]);
+        console.log(bodyType, name, requestBody);
+    }, [name, bodyType]);
 
     useEffect(() => {
         if (data.length === 0) return;
+
         const transformedData = {
             type: 'object',
             properties: data.reduce((acc, row) => {
@@ -167,19 +169,24 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
         const content = {
             ['multipart/form-data']: {
-                schema: transformedData,
+                schema: {
+                    ...formik.values.requestBody?.content[bodyType]?.schema,
+                    ...transformedData,
+                },
             },
         };
 
         updateFormik(content);
+
+        console.log(content);
     }, [data]);
 
     const getContentToSchemaProps = () => {
         return localSchema
             ? {
-                  type: '',
+                  type: 'object',
                   properties: {
-                      [localSchema?.name]: localSchema,
+                      [localSchema?.name || 'data']: localSchema,
                   },
               }
             : null;
@@ -195,7 +202,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     onChange={(collectionType) =>
                         setCollectionType(collectionType as string)
                     }
-                    className="w-full focus:ring-igrp focus:border-igrp h-9"
+                    className="w-full h-9"
                     placeholder={t('selectCollectionType')}
                 />
             </div>
@@ -234,58 +241,62 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 <Badge
                     onClick={() => setBodyType('application/json')}
                     variant={
-                        bodyType === 'application/json' ? 'default' : 'outline'
+                        bodyType === 'multipart/form-data' ||
+                        bodyType === 'none'
+                            ? 'outline'
+                            : 'default'
                     }
                     className="cursor-pointer"
                 >
                     {t('json')}
                 </Badge>
             </div>
-            {bodyType === 'none' && (
+            {bodyType === 'none' ? (
                 <div className="text-center rounded p-8 border">
                     <p className="text-muted-foreground text-xs">
                         {t('noBodyParameters')}
                     </p>
                 </div>
-            )}
-            {bodyType === 'multipart/form-data' && data && columnsBody && (
+            ) : bodyType === 'multipart/form-data' && data && columnsBody ? (
                 <>
                     <div className="grid grid-cols-3 gap-3">
                         {RenderFields()}
                     </div>
-                    <FormList
-                        columns={columnsBody}
-                        data={data}
-                        formik={formik}
-                        changeValue={(element, position, value) => {
-                            onChangeBody(element, position, value);
-                        }}
-                        addRow={() => {
-                            setData((prev) => [...prev, defaultValue]);
-                        }}
-                        removeRow={(position) => {
-                            setData((prev) =>
-                                prev.filter((_row, index) => index !== position)
-                            );
-                        }}
-                        name={routeFormData}
-                        btnLabels={t('field')}
-                    />
+                    <div className="border rounded">
+                        <FormList
+                            columns={columnsBody}
+                            data={data}
+                            formik={formik}
+                            changeValue={(element, position, value) => {
+                                onChangeBody(element, position, value);
+                            }}
+                            addRow={() => {
+                                setData((prev) => [...prev, defaultValue]);
+                            }}
+                            removeRow={(position) => {
+                                setData((prev) =>
+                                    prev.filter(
+                                        (_row, index) => index !== position
+                                    )
+                                );
+                            }}
+                            name={routeFormData}
+                            btnLabels={t('field')}
+                        />
+                    </div>
                 </>
-            )}
-            {bodyType === 'application/json' && (
+            ) : (
                 <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-3">
                         <div className="flex flex-col gap-2">
                             <Label>{t('contentType')}</Label>
                             <IGRPCombobox
-                                value={contentType}
+                                value={bodyType}
                                 placeholder={t('selectContentType')}
                                 onChange={(value) =>
-                                    setContentType(value as string)
+                                    setBodyType(value as TbodyType)
                                 }
                                 options={contentTypes}
-                                className="focus:ring-igrp focus:border-igrp h-8"
                             />
                         </div>
                         {RenderFields()}
@@ -309,7 +320,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                             />
                         </TabsContent>
                         <TabsContent value="schema">
-                            <div className="border">
+                            <div className="border rounded">
                                 <JSONSchemaBuilder
                                     schemaTypes={schemaTypes}
                                     initialSchema={getContentToSchemaProps()}

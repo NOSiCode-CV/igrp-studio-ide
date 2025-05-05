@@ -45,7 +45,7 @@ handleWithCustomErrors(EVENTS.REPOSITORY.WORKSPACE.CREATE, async (event, workspa
     }
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.UPDATE, async (event, id: string, updates: Partial<IWorkspace>) => {
+handleWithCustomErrors(EVENTS.REPOSITORY.WORKSPACE.UPDATE, async (event, id: string, updates: Partial<IWorkspace>) => {
     try {
         return await repo.updateWorkspace(id, updates);
     } catch (error) {
@@ -109,7 +109,7 @@ handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.CREATE, async (_event, workspac
     return await repo.addProject(workspaceId, project);
 });
 
-ipcMain.handle(EVENTS.REPOSITORY.PROJECT.UPDATE, async (_, projectId: string, updates: Partial<ProjectData>) => {
+handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.UPDATE, async (_, projectId: string, updates: Partial<ProjectData>) => {
     return await repo.updateProject(projectId, updates);
 });
 
