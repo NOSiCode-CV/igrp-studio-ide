@@ -19,7 +19,7 @@ import useToast from '@renderer/hooks/useToast';
 export const useController = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
-    const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { modules, dto, basePath, enums, responses, getJsonData } = useStudioAPI(currentItem?.module);
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
@@ -164,6 +164,9 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
             createGitCommit(basePath, `Add action ${formik.values.actionName}`);
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('createdSuccess', { name: t('controller'), value: values.name }));
+
+            handleRenameTab(id, formik.values.actionName);
+
         } catch (error) {
             showErrorToast(error);
         }

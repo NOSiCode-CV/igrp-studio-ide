@@ -50,10 +50,7 @@ const TabManager = ({ currentItem }: ContentProps) => {
                         className={activeTab === tab.id ? 'block' : 'hidden'}
                     >
                         {tab.id === TAB_DEFAULT ? (
-                            <Overview
-                                onOpenNew={handleOpenNew}
-                                open={tab.open}
-                            />
+                            <Overview />
                         ) : (
                             <PageController
                                 onOpenNew={handleOpenNew}

@@ -9,7 +9,6 @@ import {
 } from '@renderer/components/tabs';
 import { BodyRequest } from './body-request';
 import { useTranslation } from 'react-i18next';
-import { Card } from '@renderer/components/ui/card';
 import { initialValues } from './config';
 
 interface TabRequestProps {
@@ -37,7 +36,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     tablesColumns,
     contentTypes,
     schemaTypes,
-    collectionTypes
+    collectionTypes,
 }) => {
     const { t } = useTranslation();
 
@@ -62,7 +61,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                 newPathVariables.push({
                     name: param,
                     type: 'string',
-                    value:'',
+                    value: '',
                     isRequired: true,
                     description: '',
                 });
@@ -96,7 +95,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                     {columnsQuery && (
                         <div className="space-y-3">
                             <p className="text-sm">{t('queryParameters')}</p>
-                            <Card className="rounded-sm">
+                            <div className="border rounded-sm py-0">
                                 <FormList
                                     formik={formik}
                                     columns={columnsQuery}
@@ -128,11 +127,11 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                     btnLabels={t('queryParameter')}
                                     name={tabQueryParams}
                                 />
-                            </Card>
+                            </div>
                             {hasVariables && (
                                 <>
                                     <p className="text-sm">{t('variables')}</p>
-                                    <Card className="rounded-sm">
+                                    <div className="border rounded-sm py-0">
                                         <FormList
                                             formik={formik}
                                             columns={columnsVariables}
@@ -157,7 +156,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                                             }
                                             name={tabPathVariables}
                                         />
-                                    </Card>
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -173,31 +172,33 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                     />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">
-                    {columnsHeaders && (
-                        <FormList
-                            formik={formik}
-                            columns={columnsHeaders}
-                            data={formik.values[tabHeaders]}
-                            changeValue={(element, position, value) =>
-                                changeValue(
-                                    formik,
-                                    element,
-                                    position,
-                                    value,
-                                    tabHeaders
-                                )
-                            }
-                            addRow={() =>
-                                addNewRow(formik, tabHeaders, tabHeaders)
-                            }
-                            removeRow={(position) =>
-                                removeRow(formik, tabQueryParams, position)
-                            }
-                            errors={formik.errors[tabHeaders]}
-                            btnLabels={t('headers')}
-                            name={tabHeaders}
-                        />
-                    )}
+                    <div className="border rounded-sm py-0">
+                        {columnsHeaders && (
+                            <FormList
+                                formik={formik}
+                                columns={columnsHeaders}
+                                data={formik.values[tabHeaders]}
+                                changeValue={(element, position, value) =>
+                                    changeValue(
+                                        formik,
+                                        element,
+                                        position,
+                                        value,
+                                        tabHeaders
+                                    )
+                                }
+                                addRow={() =>
+                                    addNewRow(formik, tabHeaders, tabHeaders)
+                                }
+                                removeRow={(position) =>
+                                    removeRow(formik, tabQueryParams, position)
+                                }
+                                errors={formik.errors[tabHeaders]}
+                                btnLabels={t('headers')}
+                                name={tabHeaders}
+                            />
+                        )}
+                    </div>
                 </IGRPTabsContent>
             </IGRPTabs>
         </>

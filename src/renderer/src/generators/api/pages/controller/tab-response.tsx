@@ -183,7 +183,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             className={cn(
                                 `px-4 py-2`,
                                 activeResponseTab === statusCode &&
-                                    'border-b-2 border-igrp text-igrp'
+                                    'border-b-2 border-primary text-primary'
                             )}
                         >
                             {responses[statusCode]?.name
@@ -264,7 +264,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 collectionType,
                                             })
                                         }
-                                        className="w-full focus:ring-igrp focus:border-igrp h-9"
+                                        className="w-ful"
                                         placeholder={t(
                                             'httpStatusCodePlaceholder'
                                         )}
@@ -305,7 +305,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                             })
                                         }
                                         options={contentTypes}
-                                        className="w-full focus:ring-igrp focus:border-igrp h-9"
+                                        className="w-full"
                                     />
                                 </div>
 
@@ -346,7 +346,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 collectionType,
                                             })
                                         }
-                                        className="w-full focus:ring-igrp focus:border-igrp h-9"
+                                        className="w-full"
                                         placeholder={t('selectCollectionType')}
                                     />
                                 </div>

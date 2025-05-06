@@ -15,7 +15,7 @@ import { IColumnsTabelProps } from '../../types/Interfaces';
 import useToast from '@renderer/hooks/useToast';
 
 export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
-    const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { createGitCommit } = useGit();
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
@@ -120,6 +120,7 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
             createGitCommit(basePath, `Add dto ${newValues.name}`);
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('createdSuccess', { name: t('dto'), value: newValues.name }));
+            handleRenameTab(currentItem.id, newValues.name);
         } catch (error) {
             showErrorToast(error);
         }

@@ -15,7 +15,7 @@ import useToast from '@renderer/hooks/useToast';
 
 export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { createGitCommit } = useGit();
-    const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem,handleRenameTab } = useTabs();
     const { showErrorToast, showSuccessToast } = useToast();
     const { models, basePath, config, enums, findModelsByName, getJsonData } = useStudioAPI(currentItem?.module);
     const { t } = useTranslation();
@@ -148,6 +148,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
             await createRelationReference(values);
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('createdSuccess', { name: t('model'), value: values.name }));
+            handleRenameTab(currentItem.id, values.name);
         } catch (error) {
             showErrorToast(error);
         }
