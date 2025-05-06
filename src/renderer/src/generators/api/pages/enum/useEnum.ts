@@ -18,7 +18,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
-    const { initializeTabFromCurrentItem } = useTabs();
+    const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { basePath } = useStudioAPI(currentItem?.module);
 
     const [title, setTitle] = useState('');
@@ -120,6 +120,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
             createGitCommit(basePath, `Add enum ${formik.values.name}`);
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('createdSuccess', { name: t('enum'), value: values.name }));
+            handleRenameTab(currentItem.id, values.name);
         } catch (error) {
             showErrorToast(error);
         }

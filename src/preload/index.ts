@@ -163,10 +163,13 @@ const repo = {
 				return handleError(error)
 			}
 		},
+		updateProject: async (projectId: string, updates: Partial<ProjectData>) => {
+			try { return await ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates) } catch (error) {
+				return handleError(error)
+			}
+		},
 		saveCustomWorkspaceComposeFile: (yaml: object, basePath: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, yaml, basePath),
-		updateProject: (projectId: string, updates: Partial<ProjectData>) =>
-			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.UPDATE, projectId, updates),
 		configureService: (config: ServiceWorkspace, basePath: string) =>
 			ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CONFIGURE_SERVICE, config, basePath),
 		deleteProject: (projectId: string, basePath: string) =>
