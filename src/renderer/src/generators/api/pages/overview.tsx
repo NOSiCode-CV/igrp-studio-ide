@@ -141,7 +141,7 @@ const Overview = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-6">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="p-5 rounded-lg border">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-base font-medium">

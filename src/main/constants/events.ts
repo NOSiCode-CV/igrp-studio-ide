@@ -21,6 +21,7 @@ export const EVENTS = {
         REGISTRY_COMPONENT: 'engine:registry-component',
         GET_COMPONENT: 'engine:get-component',
         GET_SERVICE: 'engine:get-service',
+        LOAD_METADATA: 'engine:load-metadata'
 
     },
     REPOSITORY: {

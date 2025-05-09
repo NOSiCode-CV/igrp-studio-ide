@@ -3,12 +3,13 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
-import { FileTree } from 'src/main/types';
+import { FileTree, ProjectData } from 'src/main/types';
 
 interface RootState {
     PageBuilder: {
         filesThree: FileTree[];
         basePath: string;
+        config: ProjectData
     };
 }
 
@@ -16,10 +17,11 @@ const selectState = (state: RootState) => state.PageBuilder;
 const selectProperties = createSelector(selectState, (studio) => ({
     files: studio.filesThree ?? [],
     basePath: studio.basePath,
+    config: studio.config,
 }));
 
 const useStudio = () => {
-    const { files, basePath } = useSelector(selectProperties);
+    const { files, basePath, config } = useSelector(selectProperties);
 
     // Fetch components from the files tree
     const fetchComponents = useCallback(() => {
@@ -140,7 +142,9 @@ const useStudio = () => {
     }, [findComponent]);
 
     return {
+        files,
         basePath,
+        config,
         getAcceptedChildren,
         getPropertiesComponent,
         getRegistryComponent,

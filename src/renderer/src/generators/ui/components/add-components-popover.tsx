@@ -17,7 +17,7 @@ import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 
-export const AddField = ({
+export const AddComponentPopover = ({
     comp,
     parentComp,
 }: {
@@ -62,7 +62,6 @@ export const AddField = ({
 
     return (
         <>
-            {' '}
             {components.length > 0 ? (
                 <Popover>
                     <Tooltip>

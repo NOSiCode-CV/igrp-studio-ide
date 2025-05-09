@@ -17,13 +17,14 @@ import { useGit } from '@renderer/hooks/use-git';
 import { ComponentConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils/helpers';
 import IconBrowser from '@renderer/components/icon/icon-browser';
+import { useEffect } from 'react';
 
 const initialValues: ComponentConfig = {
     type: 'component',
     name: '',
     path: 'teste',
     icon: '',
-    id: getId(),
+    id: '',
 };
 
 interface NewComponentModalProps {
@@ -45,12 +46,16 @@ export function NewComponentModal({
 
     const { showErrorToast, showSuccessToast } = useToast();
 
+    useEffect(() => {
+        formik.resetForm();
+    }, [isOpen]);
+
     const handleConfirm = async (
         pageConfig: ComponentConfig
     ): Promise<void> => {
         try {
             const { error } = await window.engine.createPage(
-                pageConfig,
+                { ...pageConfig, id: getId() },
                 ENV_TYPES.NEXTJS,
                 basePath
             );
@@ -126,12 +131,8 @@ export function NewComponentModal({
                             />
                         </div>
                     </div>
-                    <DialogFooter className='flex justify-between'>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={onClose}
-                        >
+                    <DialogFooter className="flex justify-between">
+                        <Button type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
                         </Button>
                         <Button

@@ -14,6 +14,7 @@ import { useDtoValidation } from './validation';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import useToast from '@renderer/hooks/useToast';
 
+
 export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { createGitCommit } = useGit();
@@ -50,10 +51,10 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
             formik.resetForm();
             return;
         }
-        const { name, template, attributes, type } = data;
+        const { attributes, type } = data;
 
-        formik.setFieldValue('name', name || '');
-        formik.setFieldValue('template', template || '');
+        formik.setValues(data);
+        formik.setFieldValue('attributes', attributes || initialValues.attributes);
         formik.setFieldValue('attributes', attributes || initialValues.attributes);
 
         if (type === OPTION_TYPE.MODEL) {
@@ -86,7 +87,7 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
             enums,
             current: data,
             t,
-        });
+        })
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
@@ -163,6 +164,7 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
         tablesColumns,
         data,
         id,
+        dto,
         handleSave,
         handleDelete,
         onClickSourceCode,

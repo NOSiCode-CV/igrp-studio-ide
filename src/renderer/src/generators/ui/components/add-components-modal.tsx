@@ -15,14 +15,14 @@ import {
 import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import React, { useEffect, useState, useCallback } from 'react';
-import { ICON_MAP } from '../../ComponentTypes';
-import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { handleDragEnd } from '../../dnd/DraggableItemManager';
+import { ICON_MAP } from '../ComponentTypes';
+import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
+import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { Button } from '@renderer/components/ui/button';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { SidebarRight } from '../sidebar/sidebar-right';
+import { SidebarRight } from './sidebar/sidebar-right';
 import {
     Table,
     TableBody,
@@ -38,7 +38,7 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 
-export const EditComponent = ({
+export const AddComponentModal = ({
     path,
     comp,
 }: {
@@ -99,7 +99,7 @@ export const EditComponent = ({
                         <DialogTrigger asChild>
                             <Badge
                                 variant={'secondary'}
-                                className="rounded-sm cursor-pointer"
+                                className="rounded-sm cursor-pointer mt-0.5"
                             >
                                 <span className="text-xs">Add Comp</span>
                             </Badge>
@@ -109,7 +109,7 @@ export const EditComponent = ({
                         <p>Add Comp</p>
                     </TooltipContent>
                 </Tooltip>
-                <DialogContent className="max-w-6xl h-[70vh] p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))]">
+                <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
                     <div className="flex flex-1 flex-col overflow-auto order-first">
                         <DialogHeader className="p-4">
                             <div className="flex justify-between">

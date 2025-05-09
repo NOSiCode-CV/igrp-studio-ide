@@ -45,6 +45,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             clearEditingComponent,
             currentComponent,
             setInitComponents,
+            types,
+            setAllTypes,
         } = useDroppedComponents();
 
         const components: StructuredLayout = getAllComponents();
@@ -79,6 +81,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     path,
                     pageName: label,
                     components: jsonStructure,
+                    types,
                 };
 
                 const compConfig: ComponentConfig = {
@@ -117,6 +120,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     const data = await window.api.getJsonContent(pagePath);
                     if (data.components) {
                         setInitComponents(data.components);
+                        setAllTypes(data.types);
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
@@ -143,11 +147,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
-                        {isDesign ? (
-                            <Page page={components} onDragEnd={onDragEnd} />
-                        ) : (
-                            <CodeContent pagePath={pagePath} />
-                        )}</ContainerScrollArea>
+                            {isDesign ? (
+                                <Page page={components} onDragEnd={onDragEnd} />
+                            ) : (
+                                <CodeContent pagePath={pagePath} />
+                            )}
+                        </ContainerScrollArea>
                     </div>
                 </SidebarInset>
                 {currentComponent && <SidebarRight />}

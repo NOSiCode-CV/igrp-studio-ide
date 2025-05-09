@@ -65,7 +65,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                         e.preventDefault();
                         handleSave();
                     }}
-                >
+                >1
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3">
                             <Label className="">{t('httpStatusCode')}</Label>

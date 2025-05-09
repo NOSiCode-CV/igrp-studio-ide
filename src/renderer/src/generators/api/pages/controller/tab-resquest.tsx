@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import {
     IGRPTabs,
     IGRPTabsContent,

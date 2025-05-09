@@ -43,17 +43,24 @@ export interface ComponentConfig {
 export interface StructuredComponent {
   id: string
   componentName: string
+  tag: string
   label?: string
   type?: string
+  allowTypes?: boolean,
+  dataType?: string
   properties: {
     className?: string;
     content?: string;
     [key: string]: any;
   };
-  children: StructuredComponent[]
   interactions: {
     [key: string]: any;
-  }
+  },
+  dataProperties?:{
+    [key: string]: any;
+  },
+  children: StructuredComponent[]
+
 }
 
 export type StructuredLayout = StructuredComponent
@@ -73,6 +80,7 @@ export interface Source {
   interactions: {
     [key: string]: any;
   }
+  allowTypes: boolean
 }
 
 export interface EditingComponentParams {

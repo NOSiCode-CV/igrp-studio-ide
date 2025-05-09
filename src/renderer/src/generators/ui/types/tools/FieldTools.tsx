@@ -7,10 +7,10 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import { EditComponent } from '../../components/EditComponent';
 import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useEffect, useState } from 'react';
+import { AddComponentModal } from '../../components/add-components-modal';
 
 interface ToolsProps {
     onEdit: () => void;
@@ -100,7 +100,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                     </TooltipContent>
                 </Tooltip>
                 {components.length > 0 && path && (
-                    <EditComponent path={path} comp={comp} />
+                    <AddComponentModal path={path} comp={comp} />
                 )}
             </div>
         </TooltipProvider>

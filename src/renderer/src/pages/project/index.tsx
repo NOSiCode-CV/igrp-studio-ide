@@ -7,6 +7,7 @@ import {
     ArrowLeft,
     ArrowRight,
     PlusCircle,
+    Loader2,
 } from 'lucide-react';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -632,6 +633,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         type="submit"
                                         disabled={formik.isSubmitting}
                                     >
+                                        {formik.isSubmitting && (
+                                            <Loader2 className="animate-spin" />
+                                        )}
                                         {t('createProject')}
                                     </Button>
                                 )}

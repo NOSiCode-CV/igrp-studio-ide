@@ -234,7 +234,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                           }
                         : null;
 
-
                     return (
                         <div
                             key={statusCode}
@@ -389,11 +388,11 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 />
                             </div>
                             {typeValue === 'object' && (
-                                <Card className="rounded">
-                                    <CardHeader>
-                                        <CardTitle>{t('dataSchema')}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
+                                <>
+                                    <p className="">
+                                        {t('dataSchema')}
+                                    </p>
+                                    <div className="border rounded">
                                         <JSONSchemaBuilder
                                             schemaTypes={schemaTypes}
                                             enumTypes={enumTypes}
@@ -406,8 +405,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 );
                                             }}
                                         />
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </>
                             )}
                         </div>
                     );

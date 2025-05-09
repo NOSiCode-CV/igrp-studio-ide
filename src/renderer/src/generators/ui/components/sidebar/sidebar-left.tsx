@@ -42,6 +42,8 @@ import useStudio from '@renderer/hooks/use-studio';
 import NavigatorSidebar from './sidebar-navigator';
 import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 import SidebarAppComponents from './sidebar-app-components';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/KeyboardKey';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -73,18 +75,10 @@ export function AppSidebar({
         setFilteredData(filterSubItems(initialData, searchQuery));
     }, [searchQuery, initialData]);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
-                e.preventDefault();
-                searchInputRef.current?.focus();
-                searchInputRef.current?.select();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    useKeyPress(() => {
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+    }, [KeyboardKey.find]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);

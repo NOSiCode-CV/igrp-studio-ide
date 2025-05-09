@@ -121,3 +121,12 @@ ipcMain.handle('set-auto-commit', async (_, prompt: boolean) => {
 ipcMain.handle('is-auto-commit', async () => {
     return GitStore.isAutoCommit();
 });
+
+
+///GitLabService store config
+ipcMain.handle('get-gitlab-config', async () => {
+    return GitLabService.getConfig();
+});
+ipcMain.handle('set-gitlab-config', async (config: any) => {
+    return GitLabService.setConfig(config);
+});

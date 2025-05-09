@@ -252,3 +252,15 @@ export const formVariants = cva(
         },
     }
 )
+
+export const flexVariants = cva(
+    "flex flex-1 gap-4",
+    {
+        variants: {
+            variant: layoutMapping['flex']
+        },
+        defaultVariants: {
+            variant: "row",
+        },
+    }
+)

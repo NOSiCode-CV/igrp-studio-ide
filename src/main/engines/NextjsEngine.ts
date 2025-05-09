@@ -1,7 +1,7 @@
 // engines/NextjsEngine.ts
-import { deleteElement, initComponents, initServices, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
+import { deleteElement, initComponents, initServices, loadAppExports, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
-import { AppConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { AppConfig, AppExportsConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
 import { ensureDirectoryExists } from '../helpers';
 
@@ -16,6 +16,10 @@ export class NextjsEngine implements BaseEngine {
   async getServices(): Promise<DockerServiceRegistrationConfig> {
     const result = loadServiceRegistry()
     return result;
+  }
+
+  async getAppMetadata(basePath: string): Promise<AppExportsConfig> {
+    return await loadAppExports(basePath)
   }
 
   getComponents(): ComponentRegistrationConfig {

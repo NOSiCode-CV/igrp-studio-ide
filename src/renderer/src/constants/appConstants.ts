@@ -14,7 +14,18 @@ export const PATTERNS = {
     PATH_VALIDATION: /^[a-zA-Z_/]+$/,
     SPECIAL_CHARACTERS: /^[a-zA-Z0-9\s]*$/,
     NO_SPACE_BUT_ALLOW_HYPHEN: /^[^\s]+$/,
-    NAME_APP_VALIDATION: /^[a-zA-Z_-]+$/
+    NAME_APP_VALIDATION: /^[a-zA-Z_-]+$/,
+    // Next.js route segment validation (improved readability)
+    VALID_SEGMENT_PATTERN: (() => {
+        const segmentPatterns = [
+            String.raw`\([^)]+\)`,                          // Route groups (auth)
+            String.raw`\[(?:\.\.\.)?[\w-]+(?:\|\^[^\]]+\$)?\]`,      // Dynamic [id] or [...slug]
+            String.raw`\[\[(?:\.\.\.)?[\w-]+(?:\|\^[^\]]+\$)?\]\]`,  // Optional [[...slug]]
+            String.raw`[\w-]+`                               // Static segments
+        ].join('|');
+
+        return new RegExp(`^(?:${segmentPatterns})(?:\\/(?:${segmentPatterns}))*?$`);
+    })()
 };
 
 

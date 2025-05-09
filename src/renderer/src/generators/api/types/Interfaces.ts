@@ -4,6 +4,7 @@ export interface IColumnsTabelProps {
   type: string
   options?: any
   width?: string
+  readonly?: boolean
   items?: IColumnsTabelProps[]
   dependsOn?: string,
   getOptions?: (value: number) => Array<any>

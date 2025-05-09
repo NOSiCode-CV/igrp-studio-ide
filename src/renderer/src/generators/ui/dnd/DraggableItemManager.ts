@@ -39,31 +39,38 @@ const handleDropComponent = (
     type: string,
     { handleAddChildToComponent }: any
 ) => {
-    const { label, properties, childrenTypes, interactions } = source
+    const { label, properties, childrenTypes, interactions, allowTypes } = source
 
     const componentId = generateId(draggableId);
+
+    const tag = getTagName(draggableId);
 
     // Create the component object
     const component: StructuredComponent = {
         id: componentId,
+        tag,
         componentName: draggableId,
         label,
         type,
         properties: setDefaultProperties(properties),
         children: [],
-        interactions: setDefaultInteractions(interactions)
+        interactions: setDefaultInteractions(interactions, tag),
+        allowTypes
     };
 
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
-        const { name, label, properties, interactions } = child
+        const { name, label, properties, interactions, allowTypes } = child
         const childId = generateId(name);
+        const tag = getTagName(name)
         const childComponent: StructuredComponent = {
             id: childId,
+            tag,
             componentName: name,
             label: label,
             properties: setDefaultProperties(properties),
             children: [],
-            interactions: setDefaultInteractions(interactions)
+            interactions: setDefaultInteractions(interactions, tag),
+            allowTypes
         };
         component.children?.push(childComponent);
     });
@@ -74,29 +81,48 @@ const handleDropComponent = (
 };
 
 
-// Utility function to set default values based on the schema
-const setDefaultProperties = (schema: any) => {
+// Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
+const setDefaultProperties = (schema: any): any => {
     const properties: any = {};
+
     for (const key in schema) {
-        if (schema[key].default !== undefined) {
-            properties[key] = schema[key].default;
-        }
-        else if (schema[key].type === 'array' && schema[key].items?.enum === undefined) {
+
+        const prop = schema[key];
+
+        if (prop.type === 'array' && !prop.items?.enum) {
             properties[key] = [];
-        }
+        } else if (prop.type === 'object' && prop.properties) {
+            properties[key] = setDefaultProperties(prop.properties); // Recursive call
+        } else
+            properties[key] = prop.default
     }
+
     return properties;
 };
 
+
 // Utility function to set default values based on the schema
-const setDefaultInteractions = (schema: any) => {
+const setDefaultInteractions = (schema: any, tag: string) => {
     const interactions: any = {};
     for (const key in schema) {
-        if (schema[key].properties.fnCustomSet.default !== undefined) {
+        if (schema[key].properties?.fnCustomSet.default !== undefined) {
             interactions[key] = {
-                ['fnCustomSet']: schema[key].properties.fnCustomSet.default
+                ['fnCustomSet']: schema[key].properties.fnCustomSet.default.replace('{{id}}', tag)
             };
         }
     }
     return interactions;
+};
+
+const componentCounters: Record<string, number> = {};
+
+const getTagName = (componentName: string) => {
+    const baseName = componentName
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join('');
+
+    // Incrementa o contador para este tipo de componente
+    componentCounters[baseName] = (componentCounters[baseName] || 0) + 1;
+    return `${baseName}${componentCounters[baseName]}`;
 };

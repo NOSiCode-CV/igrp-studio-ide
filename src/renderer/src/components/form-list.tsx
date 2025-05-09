@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from 'react';
-import { ITabelContainer } from '../types/Interfaces';
+import { ITabelContainer } from '../generators/api/types/Interfaces';
 import {
     Table,
     TableBody,
@@ -22,10 +22,10 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { PopoverController } from '../pages/controller/popover';
-import { PopoverModel } from '../pages/model/popover';
-import { PopoverDto } from '../pages/dto/popover-dto';
-import { RelationPopover } from '../pages/model/relation-popover';
+import { PopoverController } from '../generators/api/pages/controller/popover';
+import { PopoverModel } from '../generators/api/pages/model/popover';
+import { PopoverDto } from '../generators/api/pages/dto/popover-dto';
+import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
@@ -134,7 +134,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             if (typeof erro === 'string') {
                                 return (
                                     <p
-                                        className="text-xs text-red-500 italic"
+                                        className="text-xs text-destructive italic"
                                         key={`${index}`}
                                     >
                                         {erro}
@@ -146,7 +146,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     ([key, mensagem], subIndex) =>
                                         mensagem !== undefined && (
                                             <p
-                                                className="text-xs text-red-500 italic"
+                                                className="text-xs text-destructive italic"
                                                 key={`${index}-${subIndex}`}
                                             >
                                                 <strong>
@@ -220,7 +220,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         type,
         options,
         selectValue,
-        selectMultiValues
+        selectMultiValues,
+        readonly
     ) => {
         switch (type) {
             case 'text':
@@ -230,7 +231,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         className={cn(
                             'h-8 text-sm',
                             errors?.[index]?.[key] && touched?.[index]?.[key]
-                                ? 'border-red-500'
+                                ? 'border-destructive'
                                 : ''
                         )}
                         type={type}
@@ -238,6 +239,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         onChange={(ev) =>
                             changeValue(key, index, ev.target.value)
                         }
+                        readOnly={readonly}
                     />
                 );
             case 'select':
@@ -354,7 +356,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             {...provided.draggableProps}
                         >
                             {columns.map(
-                                ({ key, type, options, items }, index2) => {
+                                (
+                                    { key, type, options, items, readonly },
+                                    index2
+                                ) => {
                                     const selectValue = ['select'].includes(
                                         type
                                     )
@@ -599,7 +604,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                         type,
                                                         options,
                                                         selectValue,
-                                                        selectMultiValues
+                                                        selectMultiValues,
+                                                        readonly
                                                     )
                                                 )}
                                             </div>
@@ -612,7 +618,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className={`text-red-500 opacity-0 group-hover/item:opacity-100`}
+                                        className={`text-destructive opacity-0 group-hover/item:opacity-100`}
                                         onClick={(e) => {
                                             e.preventDefault();
                                             removeRow(index);

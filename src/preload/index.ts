@@ -148,6 +148,14 @@ const engine = {
 			return handleError(error)
 		}
 	},
+
+	getAppMetadata: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.LOAD_METADATA, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {

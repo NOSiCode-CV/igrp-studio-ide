@@ -14,6 +14,7 @@ import {
 } from '@renderer/lib/dnd/types';
 import { generateId } from '@renderer/utils/helpers';
 import { COMPONENT } from '../ComponentTypes';
+import { TypeDef } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface DroppedComponentsContextType {
     newStructure: (name: string) => StructuredComponent;
@@ -39,12 +40,20 @@ interface DroppedComponentsContextType {
     ) => void;
 
     removeRow: (rowId: string) => void;
-    setEditingComponent: ({
-        path,
-        component,
-    }: EditingComponentParams) => void;
+    setEditingComponent: ({ path, component }: EditingComponentParams) => void;
     clearEditingComponent: () => void;
     currentComponent: EditingComponentParams | null;
+
+    components: StructuredLayout;
+
+    //types
+    types: TypeDef[];
+    addType: (type: TypeDef) => void;
+    updateType: (id: string, updates: Partial<TypeDef>) => void;
+    removeType: (id: string) => void;
+    createOrUpdateType: (newType: TypeDef) => void;
+    getTypeByComponentId: (componentId: string) => TypeDef | undefined;
+    setAllTypes: (newTypes: TypeDef[]) => void;
 }
 
 const DroppedComponentsContext = createContext<
@@ -65,6 +74,7 @@ const newStructuredComponent = (
         },
         children: children || [],
         interactions: [],
+        tag: '',
     };
 
     return newRow;
@@ -80,6 +90,9 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
             newStructuredComponent(COMPONENT.Section),
         ])
     );
+
+    const [types, setTypes] = useState<TypeDef[]>([]);
+
     const [currentComponent, setCurrentComponent] =
         useState<EditingComponentParams | null>(null);
 
@@ -288,6 +301,8 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
                 return updatedComponents;
             });
+
+            setCurrentComponent(null);
         },
         []
     );
@@ -368,6 +383,49 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         setCurrentComponent(null);
     };
 
+    //types
+    const addType = (type: TypeDef) => {
+        setTypes((prev) => [...prev, type]);
+    };
+
+    const updateType = (id: string, updates: Partial<TypeDef>) => {
+        setTypes((prev) =>
+            prev.map((type) =>
+                type.componentId === id ? { ...type, ...updates } : type
+            )
+        );
+    };
+
+    const removeType = (id: string) => {
+        setTypes((prev) => prev.filter((type) => type.componentId !== id));
+    };
+
+    const createOrUpdateType = (newType: TypeDef) => {
+        setTypes((prevTypes) => {
+            const existingIndex = prevTypes.findIndex(
+                (t) => t.componentId === newType.componentId
+            );
+
+            if (existingIndex !== -1) {
+                // Update
+                const updated = [...prevTypes];
+                updated[existingIndex] = newType;
+                return updated;
+            } else {
+                // Create
+                return [...prevTypes, newType];
+            }
+        });
+    };
+
+    const getTypeByComponentId = (componentId: string): TypeDef | undefined => {
+        return types.find((t) => t.componentId === componentId);
+    };
+
+    const setAllTypes = (newTypes: TypeDef[]) => {
+        setTypes(newTypes);
+    };
+
     return (
         <DroppedComponentsContext.Provider
             value={{
@@ -381,7 +439,17 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 getAllComponents,
                 setEditingComponent,
                 clearEditingComponent,
+
+                addType,
+                updateType,
+                removeType,
+                createOrUpdateType,
+                getTypeByComponentId,
+                setAllTypes,
+
+                components,
                 currentComponent,
+                types,
             }}
         >
             {children}

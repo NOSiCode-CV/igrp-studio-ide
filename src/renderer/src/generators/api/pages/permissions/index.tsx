@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { usePermisisonValidation } from './validation';
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import { getTablesColumns, defaultInitialValues } from './config';
 import { PermissionConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import useStudioAPI from '@renderer/hooks/use-studio-api';

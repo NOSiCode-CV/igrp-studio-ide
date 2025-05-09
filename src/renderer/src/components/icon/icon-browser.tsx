@@ -17,6 +17,7 @@ import {
     CommandList,
 } from '../ui/command';
 import { getLabel } from '@renderer/utils/helpers';
+import { IGRPIconProps } from '@igrp/igrp-framework-react-design-system/dist/components/igrp/icon';
 
 interface IconBrowserProps {
     selectedIcon: string;
@@ -50,42 +51,50 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                         />
                         {open && (
                             <CommandList className="max-h-[200px] overflow-auto">
-                                <CommandEmpty>
-                                    No icons found.
-                                </CommandEmpty>
+                                <CommandEmpty>No icons found.</CommandEmpty>
                                 <CommandGroup>
                                     <div className="grid grid-cols-[repeat(auto-fill,_minmax(30px,_1fr))] gap-4 w-full">
-                                        {iconsList.map((iconName, index) => (
-                                            <CommandItem
-                                                key={index}
-                                                onSelect={() =>
-                                                    handleIconClick(iconName)
-                                                }
-                                                className="flex items-center justify-between p-2 cursor-pointer"
-                                                aria-label={`View details for ${iconName}`}
-                                            >
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <>
-                                                            <IGRPIcon
-                                                                iconName={
-                                                                    iconName as any
-                                                                }
-                                                                size="24"
-                                                            />
-                                                            <span className="sr-only">
-                                                                {iconName}
-                                                            </span>
-                                                        </>
-                                                    </TooltipTrigger>
-                                                    {!selectedIcon && (
-                                                        <TooltipContent>
-                                                            {getLabel(iconName)}
-                                                        </TooltipContent>
-                                                    )}
-                                                </Tooltip>
-                                            </CommandItem>
-                                        ))}
+                                        {iconsList.map((iconName, index) => {
+                                            const IconComponent =
+                                                icons[iconName];
+                                            return (
+                                                <CommandItem
+                                                    key={index}
+                                                    onSelect={() =>
+                                                        handleIconClick(
+                                                            iconName
+                                                        )
+                                                    }
+                                                    className="flex items-center justify-between p-2 cursor-pointer"
+                                                    aria-label={`View details for ${iconName}`}
+                                                    aria-describedby={`View details for-${iconName}`}
+                                                >
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <>
+                                                                <IconComponent
+                                                                    name={
+                                                                        iconName
+                                                                    }
+                                                                    className="h-6 w-6"
+                                                                    aria-describedby={`tooltip-${iconName}`}
+                                                                />
+                                                                <span className="sr-only">
+                                                                    {iconName}
+                                                                </span>
+                                                            </>
+                                                        </TooltipTrigger>
+                                                        {!selectedIcon && (
+                                                            <TooltipContent>
+                                                                {getLabel(
+                                                                    iconName
+                                                                )}
+                                                            </TooltipContent>
+                                                        )}
+                                                    </Tooltip>
+                                                </CommandItem>
+                                            );
+                                        })}
                                     </div>
                                 </CommandGroup>
                             </CommandList>

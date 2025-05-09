@@ -8,6 +8,7 @@ import {
 import StructureDropdown from '../../components/StructureDropdown';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT } from '../../ComponentTypes';
+import { BindingConfigurationModal } from '../../components/binding-configuration-modal';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -22,7 +23,7 @@ const CompTools = ({
     handleClickStructComp,
     comp,
 }: ToolsProps) => {
-    const { componentName, label } = comp;
+    const { componentName, label, allowTypes } = comp;
 
     const isGrids = [COMPONENT.Columns].includes(componentName);
 
@@ -87,6 +88,10 @@ const CompTools = ({
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
+
+                {allowTypes && (
+                    <BindingConfigurationModal comp={comp} path={''} />
+                )}
             </div>
         </TooltipProvider>
     );

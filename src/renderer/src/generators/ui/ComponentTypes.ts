@@ -63,6 +63,8 @@ import {
     CaseSensitive,
     Gauge,
     RadarIcon,
+    ArrowRight,
+    MoveRight,
 } from 'lucide-react';
 
 // Constants
@@ -85,6 +87,7 @@ export const COMPONENT: Record<string, string> = {
     Columns: "columns",
     Column: "column",
     Grid: "grid",
+    Flex: "flex",
     Section: "section",
     Container: 'container',
     Form: 'form',
@@ -208,6 +211,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Form]: Form,
     [COMPONENT.Container]: Square,
     [COMPONENT.Grid]: Grid,
+    [COMPONENT.Flex]: MoveRight,
     [COMPONENT.Columns]: Columns2,
     [COMPONENT.Column]: Columns2,
     [COMPONENT.Headline]: Heading1,

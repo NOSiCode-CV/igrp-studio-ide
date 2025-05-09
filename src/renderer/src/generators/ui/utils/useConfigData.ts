@@ -38,7 +38,8 @@ const useConfigdata = () => {
                 icon: ICON_MAP[component.name],
                 properties: component.properties,
                 interactions: component.interactions,
-                childrenTypes: component.childrenTypes
+                childrenTypes: component.childrenTypes,
+                allowTypes: component.allowTypes
             }))
         }));
     }, [components]);

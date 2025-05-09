@@ -8,7 +8,7 @@ export interface ShadowValue {
   inset: boolean;
 }
 export interface InteractionValue {
-  name:string
+  [key: string]: any;
 }
 
 // Filter Types

@@ -12,7 +12,7 @@ import {
 import { getLabel } from '@renderer/utils/helpers';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
-import TableTool from '../tools/tableTool';
+import TableTool from '../tools/TableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 

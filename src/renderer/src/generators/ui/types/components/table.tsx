@@ -20,7 +20,7 @@ import { Button } from '@renderer/components/ui/button';
 import { Ellipsis } from 'lucide-react';
 import BoxField from '../tools/BoxFields';
 import { DropdownItem } from './dropdownitem';
-import TableTool from '../tools/tableTool';
+import TableTool from '../tools/TableTool';
 
 export interface TableProps {
     isDisabled?: boolean;
