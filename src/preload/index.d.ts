@@ -36,7 +36,7 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage
+        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage | onFolderChange | watchFolder
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
         menu: CustomMenu,

@@ -9,3 +9,4 @@ ipcMain.handle('theme:set', async (_event, theme: string) => {
     IGRPStudioSettings.setActiveTheme(theme);
     return true;
 });
+

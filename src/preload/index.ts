@@ -3,6 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 import { ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
+import { WatchEvent } from '../main/helpers/watch-folder'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -281,7 +282,12 @@ if (process.contextIsolated) {
 			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
 			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 			downloadUpdate: () => ipcRenderer.invoke('download-update'),
-			installUpdate: () => ipcRenderer.invoke('install-update')
+			installUpdate: () => ipcRenderer.invoke('install-update'),
+			watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
+			onFolderChange: (callback: (event: WatchEvent) => void) => {
+				ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data));
+			},
+
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)

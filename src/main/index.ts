@@ -53,6 +53,7 @@ import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection';
 import { NextjsEngine } from './engines/NextjsEngine';
 import { WorkspaceRepository } from './services/workspace-service';
 import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
+import { folderWatcher } from './helpers/watch-folder';
 
 const backend = require('i18next-electron-fs-backend');
 
@@ -569,4 +570,12 @@ ipcMain.handle('download-update', async () => {
 // 📌 IPC para instalar a atualização quando o usuário clicar
 ipcMain.handle('install-update', async () => {
     autoUpdater.quitAndInstall();
+});
+
+
+// Handle folder watching
+ipcMain.handle('watch-folder', (_, folderPath: string) => {
+    return folderWatcher.watchFolder(folderPath, (event) => {
+        mainWindow?.webContents.send('folder-change', event);
+    });
 });

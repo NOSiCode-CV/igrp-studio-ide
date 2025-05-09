@@ -142,7 +142,6 @@ export const BindingConfigurationModal = ({ comp }: BindingProps) => {
             createOrUpdateType(values);
 
             if (componentId) {
-
                 handleUpdateChildComponent(componentId, {
                     ...comp,
                     dataType: values.name,
@@ -157,7 +156,6 @@ export const BindingConfigurationModal = ({ comp }: BindingProps) => {
                         });
                     }
                 });
-                
             }
         },
     });
@@ -190,6 +188,17 @@ export const BindingConfigurationModal = ({ comp }: BindingProps) => {
 
         setTypeMaps(fieldsTypes);
     }, [selectedType]);
+
+    useEffect(() => {
+        window.electron.ipcRenderer.on('folder-change', loadMetadata);
+
+        return () => {
+            window.electron.ipcRenderer.removeListener(
+                'message-update',
+                loadMetadata
+            );
+        };
+    }, []);
 
     useEffect(() => {
         loadMetadata();
