@@ -46,7 +46,9 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             currentComponent,
             setInitComponents,
             types,
+            functions,
             setAllTypes,
+            setAllFunctions,
         } = useDroppedComponents();
 
         const components: StructuredLayout = getAllComponents();
@@ -81,6 +83,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     path,
                     pageName: label,
                     components: jsonStructure,
+                    functions,
                     types,
                 };
 
@@ -91,6 +94,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     name: label,
                     components: jsonStructure,
                 };
+
+                console.log(type === 'page' ? pageConfig : compConfig)
 
                 const { error } = await window.engine.createPage(
                     type === 'page' ? pageConfig : compConfig,
@@ -121,6 +126,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     if (data.components) {
                         setInitComponents(data.components);
                         setAllTypes(data.types);
+                        setAllFunctions(data.functions);
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);

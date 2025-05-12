@@ -24,6 +24,7 @@ import {
     GripHorizontal,
     Home,
     ListTodo,
+    SquareFunction,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -44,6 +45,7 @@ import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 import SidebarAppComponents from './sidebar-app-components';
 import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import { KeyboardKey } from '@renderer/constants/KeyboardKey';
+import { CustomCodeMenu, SidebarAppCustomCode } from './siderbar-app-custom-code';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -58,8 +60,11 @@ export function AppSidebar({
     const { getRegistryComponent } = useStudio();
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
-    const [activeMenuGroup, setActiveMenuGroup] =
-        useState<string>('widgetPalette');
+    const [activeMenuGroup, setActiveMenuGroup] = useState({
+        icon: ListTodo,
+        label: t('widgetPalette'),
+        id: 'widgetPalette',
+    });
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -85,12 +90,13 @@ export function AppSidebar({
     };
 
     const handleNavegationClick = (item: any) => {
-        setActiveMenuGroup(item.id);
+        setActiveMenuGroup(item);
     };
 
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
+        { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         {
@@ -155,12 +161,13 @@ export function AppSidebar({
                                                 handleNavegationClick(item);
                                             }}
                                             isActive={
-                                                activeMenuGroup === item.id
+                                                activeMenuGroup.id === item.id
                                             }
                                             size="lg"
                                             className={cn(
                                                 'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
-                                                item.id === activeMenuGroup &&
+                                                item.id ===
+                                                    activeMenuGroup.id &&
                                                     '!text-primary'
                                             )}
                                         >
@@ -184,11 +191,17 @@ export function AppSidebar({
 
             {/* Second Sidebar */}
             <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-                <SidebarHeader className="gap-3.5 border-b p-4">
+                <SidebarHeader className="gap-3.5 border-b">
                     <div className="flex w-full items-center justify-between">
-                        <div className="text-base font-medium text-foreground">
-                            {t(activeMenuGroup)}
+                        <div className="flex flex-1 space-x-2  items-center">
+                            <activeMenuGroup.icon size={20}/>
+                            <div className="text-base font-medium text-foreground">
+                                {t(activeMenuGroup.label)}
+                            </div>
                         </div>
+                        {activeMenuGroup.id === 'customCode' && (
+                            <CustomCodeMenu />
+                        )}
                     </div>
                     <SidebarInput
                         placeholder={`Search (${SHORTCUTS.FIND})`}
@@ -199,17 +212,17 @@ export function AppSidebar({
                 </SidebarHeader>
                 <SidebarContent className="overflow-hidden">
                     <ScrollArea className="h-[calc(100vh-230px)]">
-                        {activeMenuGroup === 'explorer' ? (
+                        {activeMenuGroup.id === 'explorer' ? (
                             <FileExplorerSidebar
                                 basePath={basePath}
                                 searchTerm={searchQuery}
                             />
-                        ) : activeMenuGroup === 'navigator' ? (
+                        ) : activeMenuGroup.id === 'navigator' ? (
                             <NavigatorSidebar
                                 basePath={basePath}
                                 searchTerm={searchQuery}
                             />
-                        ) : activeMenuGroup === 'git' ? (
+                        ) : activeMenuGroup.id === 'git' ? (
                             <GitCommitsSidebar
                                 basePath={basePath}
                                 onSelectCommit={(commit) => {
@@ -217,8 +230,10 @@ export function AppSidebar({
                                     // Optional: Handle commit selection
                                 }}
                             />
-                        ) : activeMenuGroup === 'components' ? (
+                        ) : activeMenuGroup.id === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
+                        ) : activeMenuGroup.id === 'customCode' ? (
+                            <SidebarAppCustomCode searchTerm={searchQuery} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible

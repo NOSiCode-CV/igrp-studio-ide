@@ -384,7 +384,7 @@ export const BindingConfigurationModal = ({ comp }: BindingProps) => {
                         </div>
 
                         <DialogFooter className="space-x-2">
-                            <DialogClose>Cancel</DialogClose>
+                            <DialogClose>close</DialogClose>
                             <Button
                                 type="submit"
                                 disabled={formik.isSubmitting}

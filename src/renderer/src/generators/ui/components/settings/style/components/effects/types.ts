@@ -8,7 +8,8 @@ export interface ShadowValue {
   inset: boolean;
 }
 export interface InteractionValue {
-  [key: string]: any;
+  fnCustomSet?: string;
+  fnName?: string;
 }
 
 // Filter Types

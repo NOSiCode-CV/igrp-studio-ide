@@ -37,6 +37,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
+import { SidebarInset } from '@renderer/components/ui/sidebar';
 
 export const AddComponentModal = ({
     path,
@@ -110,7 +111,7 @@ export const AddComponentModal = ({
                     </TooltipContent>
                 </Tooltip>
                 <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
-                    <div className="flex flex-1 flex-col overflow-auto order-first">
+                    <SidebarInset>
                         <DialogHeader className="p-4">
                             <div className="flex justify-between">
                                 <div>
@@ -149,13 +150,8 @@ export const AddComponentModal = ({
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="order-last border-l">
-                        <SidebarRight
-                            comp={currentComponent}
-                            path={currentPath}
-                        />
-                    </div>
+                    </SidebarInset>
+                    <SidebarRight comp={currentComponent} path={currentPath}/>
                 </DialogContent>
             </Dialog>
         </>

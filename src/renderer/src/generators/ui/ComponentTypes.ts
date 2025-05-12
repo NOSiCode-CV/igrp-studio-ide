@@ -63,8 +63,8 @@ import {
     CaseSensitive,
     Gauge,
     RadarIcon,
-    ArrowRight,
     MoveRight,
+    Hash,
 } from 'lucide-react';
 
 // Constants
@@ -165,7 +165,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Input]: FormInput,
     [COMPONENT.InputText]: FormInput,
     [COMPONENT.AddOn]: FormInput,
-    [COMPONENT.Number]: FormInput,
+    [COMPONENT.Number]: Hash,
     [COMPONENT.Label]: CaseSensitive,
     [COMPONENT.Hidden]: FormInput,
     [COMPONENT.Date]: Calendar,

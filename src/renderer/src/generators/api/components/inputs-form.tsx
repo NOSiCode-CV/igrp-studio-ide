@@ -14,12 +14,13 @@ export interface InputProps {
     error?: string; // Mensagem de erro (opcional)
     isTouched?: boolean; // Indica se o campo foi tocado/interagido
     [key: string]: any; // Permite outras props adicionais
+    classNameLabel?: string; // Indica se o campo tem rótulo
 }
 
 export interface TextInputProps extends InputProps {
     value?: string; // Valor do input
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // Função chamada quando o valor muda
-    onBlur: (event: React.FocusEvent<HTMLInputElement>) => void; // Função chamada quando o input perde o foco
+    onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void; // Função chamada quando o input perde o foco
 }
 
 export interface SelectInputProps extends InputProps {
@@ -85,12 +86,16 @@ export const SelectInput = ({
     onChange,
     isTouched = false,
     error,
+    classNameLabel,
+    placeholder,
 }: SelectInputProps) => (
     <div className="flex flex-col gap-2">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} className={cn(classNameLabel)}>
+                {label}
+            </Label>
         )}
         <IGRPCombobox
             options={options}
@@ -98,7 +103,7 @@ export const SelectInput = ({
             onChange={(e) => {
                 onChange(e as string);
             }}
-            placeholder={`Select ${label}`}
+            placeholder={placeholder ?? `Select ${label}`}
             className={cn(
                 'w-full h-9',
                 isTouched && error && 'border-destructive'

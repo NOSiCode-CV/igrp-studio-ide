@@ -3,7 +3,7 @@ import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { TriggerControls } from './components/TriggerControls';
+import { TriggerControls } from './components/trigger-controls';
 import { InteractionValue } from '../style/components/effects/types';
 
 interface InteractionProps {

@@ -14,7 +14,10 @@ import {
 } from '@renderer/lib/dnd/types';
 import { generateId } from '@renderer/utils/helpers';
 import { COMPONENT } from '../ComponentTypes';
-import { TypeDef } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    CustomFunctionConfig,
+    TypeDef,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface DroppedComponentsContextType {
     newStructure: (name: string) => StructuredComponent;
@@ -54,6 +57,16 @@ interface DroppedComponentsContextType {
     createOrUpdateType: (newType: TypeDef) => void;
     getTypeByComponentId: (componentId: string) => TypeDef | undefined;
     setAllTypes: (newTypes: TypeDef[]) => void;
+
+    //functions
+    functions: CustomFunctionConfig[];
+    addFunction: (type: CustomFunctionConfig) => void;
+    updateFunction: (
+        id: string,
+        updates: Partial<CustomFunctionConfig>
+    ) => void;
+    removeFunction: (id: string) => void;
+    setAllFunctions: (newTypes: CustomFunctionConfig[]) => void;
 }
 
 const DroppedComponentsContext = createContext<
@@ -92,6 +105,8 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     );
 
     const [types, setTypes] = useState<TypeDef[]>([]);
+
+    const [functions, setFunctions] = useState<CustomFunctionConfig[]>([]);
 
     const [currentComponent, setCurrentComponent] =
         useState<EditingComponentParams | null>(null);
@@ -426,6 +441,28 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         setTypes(newTypes);
     };
 
+    //functions
+    const addFunction = (fnc: CustomFunctionConfig) => {
+        setFunctions((prev = []) => [...prev, fnc]); // Fallback to empty array
+    };
+
+    const updateFunction = (
+        id: string,
+        updates: Partial<CustomFunctionConfig>
+    ) => {
+        setFunctions((prev) =>
+            prev.map((fnc) => (fnc.id === id ? { ...fnc, ...updates } : fnc))
+        );
+    };
+
+    const removeFunction = (id: string) => {
+        setFunctions((prev) => prev.filter((fnc) => fnc.id !== id));
+    };
+
+    const setAllFunctions = (fncs: CustomFunctionConfig[]) => {
+        setFunctions(Array.isArray(fncs) ? fncs : []); // Ensure array
+      };
+
     return (
         <DroppedComponentsContext.Provider
             value={{
@@ -447,9 +484,15 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 getTypeByComponentId,
                 setAllTypes,
 
+                addFunction,
+                updateFunction,
+                removeFunction,
+                setAllFunctions,
+
                 components,
                 currentComponent,
                 types,
+                functions,
             }}
         >
             {children}

@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Save, Mouse } from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse } from 'lucide-react';
 import { InteractionValue } from '../../style/components/effects/types';
 import {
     DropdownMenu,
@@ -10,10 +10,17 @@ import { Button } from '@renderer/components/ui/button';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import {
     Dialog,
+    DialogClose,
     DialogContent,
-    DialogTrigger,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@renderer/components/ui/dialog';
 import { useEffect, useRef, useState } from 'react';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import { Label } from '@renderer/components/ui/label';
+import { SelectInput } from '@renderer/generators/api/components/inputs-form';
+import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext';
 
 interface TriggerControlsProps {
     interactions: Record<string, InteractionValue>;
@@ -30,10 +37,13 @@ export function TriggerControls({
     componentTag,
     onInteractionsChange,
 }: TriggerControlsProps) {
-    
     const [localInteractions, setLocalInteractions] = useState<
         Record<string, InteractionValue>
     >({});
+
+    const [selectFunction, setSelectFunction] = useState<string>('');
+
+    const { functions } = useDroppedComponents();
 
     const codeRef = useRef<string>('');
 
@@ -83,11 +93,8 @@ export function TriggerControls({
     };
 
     const saveInteraction = (key: string) => {
-        try {
-            updateInteraction(key, 'fnCustomSet', codeRef.current);
-        } catch (e: any) {
-            console.error(e);
-        }
+        updateInteraction(key, 'fnCustomSet', codeRef.current);
+        updateInteraction(key, 'fnName', selectFunction);
     };
 
     const AddDropdown = () => {
@@ -118,52 +125,71 @@ export function TriggerControls({
     const InteractionEditor = ({
         interaction,
         interactionKey,
+        open,
+        setOpen,
     }: {
         interaction: InteractionValue;
         interactionKey: string;
+        open: boolean;
+        setOpen: (open: boolean) => void;
     }) => (
-        <Dialog>
-            <DialogTrigger asChild>
-                <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                    <Edit2 size={10} />
-                </button>
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
-                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                            Edit Interaction {interactionKey + 1}
+                <DialogHeader>
+                    <DialogTitle>
+                        Edit Interaction{' '}
+                        <span className="text-muted-foreground">
+                            {interactionKey + 1}
                         </span>
-                        <div>
-                            <button
-                                onClick={() => saveInteraction(interactionKey)}
-                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                            >
-                                <Save size={16} />
-                            </button>
-                            <button
-                                onClick={() =>
-                                    removeInteraction(interactionKey)
-                                }
-                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                            >
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
-                    </div>
-                    <MonacoEditor
-                        content={interaction.fnCustomSet}
-                        filePath=""
-                        onChange={(newCode) => {
-                            codeRef.current = newCode;
+                    </DialogTitle>
+                    <DialogDescription />
+                </DialogHeader>
+                <div className="space-y-2">
+                    <SelectInput
+                        label={'Function'}
+                        placeholder="Select Function"
+                        id="select-function"
+                        value={interaction.fnName}
+                        onChange={(value) => {
+                            setSelectFunction(value as string);
                         }}
-                        height="20vh"
-                        language="typescript"
+                        options={functions.map(({ name }) => ({
+                            label: name,
+                            value: name,
+                        }))}
                     />
+                    <div className="flex-1 border rounded">
+                        <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                            Inline Function
+                        </Label>
+                        <MonacoEditor
+                            content={interaction.fnCustomSet || ''}
+                            filePath=""
+                            onChange={(newCode) => {
+                                codeRef.current = newCode;
+                            }}
+                            height="30vh"
+                            language="typescript"
+                        />
+                    </div>
                 </div>
+                <DialogFooter className="space-x-2">
+                    <DialogClose>Close</DialogClose>
+                    <Button
+                        type="submit"
+                        size={'sm'}
+                        onClick={() => saveInteraction(interactionKey)}
+                    >
+                        Save changes
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
+
+    const [open, setOpen] = useState(false);
+    const [interaction, setInteraction] = useState<InteractionValue>();
+    const [interactionKey, setInteractionKey] = useState<string>();
 
     return (
         <div className="space-y-1.5">
@@ -186,29 +212,48 @@ export function TriggerControls({
                                 className="group flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
                             >
                                 <div className="flex-1 min-w-0">
-                                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {interactionsType[key]?.label || key}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <div className="relative">
-                                        <InteractionEditor
-                                            interaction={interaction}
-                                            interactionKey={key}
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={() => removeInteraction(key)}
-                                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                                    <Button
+                                        variant={'ghost'}
+                                        size={'icon'}
+                                        onClick={() => {
+                                            setOpen(true);
+                                            setInteraction(interaction);
+                                            setInteractionKey(key);
+                                        }}
+                                        className="w-6 h-6"
                                     >
-                                        <Trash2 size={10} />
-                                    </button>
+                                        <Edit2 size={4} />
+                                    </Button>
+                                    <Button
+                                        variant={'ghost'}
+                                        size={'sm'}
+                                        onClick={() => removeInteraction(key)}
+                                    >
+                                        <Trash2
+                                            size={4}
+                                            className="text-destructive"
+                                        />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     }
                 )}
             </div>
+
+            {open && interaction && interactionKey && (
+                <InteractionEditor
+                    open={open}
+                    setOpen={setOpen}
+                    interaction={interaction}
+                    interactionKey={interactionKey}
+                />
+            )}
         </div>
     );
 }
