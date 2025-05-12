@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { FolderKanban, ListFilter, Pin, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import {
     DropdownMenu,
@@ -40,6 +41,9 @@ export function WorkspaceSwitcher({
     const [pinnedWorkspaces, setPinnedWorkspaces] = React.useState<
         IWorkspace[]
     >([]);
+
+    const { t } = useTranslation();
+
     const [showWorkspaceDialog, setShowWorkspaceDialog] = React.useState(false);
 
     const [selectedWorkspace, setSelectedWorkspace] =
@@ -109,7 +113,7 @@ export function WorkspaceSwitcher({
                                 <SidebarMenuItem>
                                     <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-primary bg-primary/5">
                                         <FolderKanban className="h-4 w-4 flex-shrink-0" />
-                                        <span>Workspaces</span>
+                                        <span>{t('workspaces')}</span>
                                         <ListFilter className="ml-auto h-3 w-3" />
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -124,7 +128,7 @@ export function WorkspaceSwitcher({
                                     name="inputseach"
                                     value={searchTerm}
                                     showSubmitButton={false}
-                                    placeholder="Search workspaces"
+                                    placeholder={t('searchWorkspaces')}
                                     onChange={(value) =>
                                         setSearchTerm(value.target.value)
                                     }
@@ -161,7 +165,7 @@ export function WorkspaceSwitcher({
                                         <Plus className="size-4" />
                                     </div>
                                     <div className="font-medium text-muted-foreground">
-                                        Add Workspace
+                                    {t('addWorkspace')}
                                     </div>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -177,7 +181,7 @@ export function WorkspaceSwitcher({
                                     className={
                                         workspace.name ===
                                         selectedWorkspace.name
-                                            ? 'bg-muted'
+                                            ? t('bgMuted')
                                             : ''
                                     }
                                     onClick={() => onWorkspaceChange(workspace)}
@@ -209,8 +213,8 @@ export function WorkspaceSwitcher({
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 {workspace.pinned
-                                                    ? 'Unpin workspace'
-                                                    : 'Pin workspace'}
+                                                    ? t('unpinWorkspace') 
+                                                    : t('pinWorkspace')}
                                             </TooltipContent>
                                         </Tooltip>
                                     </div>

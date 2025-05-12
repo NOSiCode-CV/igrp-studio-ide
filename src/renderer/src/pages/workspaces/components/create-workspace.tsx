@@ -97,7 +97,7 @@ const CreateWorkspace = ({
                 <DialogHeader>
                     <DialogTitle>{t('workspace.createTitle')}</DialogTitle>
                     <DialogDescription className="text-xs">
-                        Create a new workspace to organize your projects.
+                    {t('createWorkspaceInfo')}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -129,7 +129,7 @@ const CreateWorkspace = ({
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             id="description"
-                            placeholder="Describe your workspace..."
+                            placeholder={t('describeWorkspace')}
                             value={workspaceDescription}
                             onChange={(e) =>
                                 setWorkspaceDescription(e.target.value)

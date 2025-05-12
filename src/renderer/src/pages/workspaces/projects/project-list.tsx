@@ -14,6 +14,7 @@ import { ProjectIcon } from '@renderer/components/shared-ui';
 import Dependency from '../components/dependency';
 import { ProjectActions } from './project-actions';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { useTranslation } from 'react-i18next';
 
 interface ProjectListProps {
     projects: ProjectData[];
@@ -26,6 +27,8 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
     const handleProjectClick = (project: ProjectData) => {
         saveOrOpenProject(project);
     };
+    
+    const { t } = useTranslation();
 
     const {
         workspace,
@@ -37,10 +40,10 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
             <Table className="compact-table">
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Framework</TableHead>
-                        <TableHead>Dependencies</TableHead>
-                        <TableHead>Last Updated</TableHead>
+                        <TableHead>{t('name')}</TableHead>
+                        <TableHead>{t('framework')}</TableHead>
+                        <TableHead>{t('dependencies')}</TableHead>
+                        <TableHead>{t('lastUpdated')}</TableHead>
                         <TableHead className="w-[80px]"></TableHead>
                     </TableRow>
                 </TableHeader>

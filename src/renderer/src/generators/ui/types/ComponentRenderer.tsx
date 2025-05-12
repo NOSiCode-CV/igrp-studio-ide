@@ -1,8 +1,10 @@
 import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const ComponentRenderer = ({ comp, onDragEnd }) => {
+    const { t } = useTranslation();
     const { componentName } = comp;
 
     const [components, setComponents] = useState<StructuredComponent[]>([]);
@@ -53,12 +55,12 @@ export const ComponentRenderer = ({ comp, onDragEnd }) => {
                                 isDisabled={true}
                             />
                         ) : (
-                            <div key={component.id}>Loading...</div>
+                            <div key={component.id}>{t('loading')}</div>
                         );
                     }
                 )
             ) : (
-                <div>No components to render</div>
+                <div>{t('noComponentsToRender')}</div>
             )}
         </div>
     );

@@ -1,5 +1,6 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { Badge } from '@renderer/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogContent,
@@ -45,6 +46,8 @@ export const EditComponent = ({
     path: string;
     comp: StructuredComponent;
 }) => {
+   
+    
     const { componentName, id, children } = comp;
 
     const [currentComponent, setCurrentComponent] =
@@ -66,6 +69,7 @@ export const EditComponent = ({
     }, [getAcceptedChildren]);
 
     // Handle adding a component
+    
     const handleAddComponent = useCallback(
         (item: any, droppableId: string) => {
             const result: DragEndResult = {
@@ -90,8 +94,11 @@ export const EditComponent = ({
         setCurrentComponent(component);
         setCurrentPath(`${path}/${comp.componentName}`);
     };
+    
 
     return (
+        
+        
         <>
             <Dialog>
                 <Tooltip>
@@ -101,12 +108,12 @@ export const EditComponent = ({
                                 variant={'secondary'}
                                 className="rounded-sm cursor-pointer"
                             >
-                                <span className="text-xs">Add Comp</span>
+                                <span className="text-xs">{t('addComponent')}</span>
                             </Badge>
                         </DialogTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Add Comp</p>
+                        <p>t{('addComponent')}</p>
                     </TooltipContent>
                 </Tooltip>
                 <DialogContent className="max-w-6xl h-[70vh] p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))]">
@@ -114,9 +121,9 @@ export const EditComponent = ({
                         <DialogHeader className="p-4">
                             <div className="flex justify-between">
                                 <div>
-                                    <DialogTitle>Add Component</DialogTitle>
+                                    <DialogTitle>{t('addComponent')}</DialogTitle>
                                     <DialogDescription>
-                                        Select a component to add to your{' '}
+                                    {t('selectComponent')}{' '}
                                         {componentName}
                                     </DialogDescription>
                                 </div>
@@ -175,7 +182,7 @@ const renderAddComponents = (
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size={'sm'}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Component
+                    {t('addComponent')}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -283,7 +290,7 @@ const renderCreatedComponents = (
                                         })
                                     }
                                 >
-                                    Delete
+                                    {t('delete')}
                                 </Button>
                                 {canAcceptChildren(component) &&
                                     renderAddComponents(
@@ -304,6 +311,7 @@ const renderCreatedComponents = (
 };
 
 // Main component that renders the table with a single header
+const { t } = useTranslation();
 const ComponentTable = ({
     components,
     registryComponents,
@@ -319,8 +327,8 @@ const ComponentTable = ({
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('label')}</TableHead>
+                    <TableHead>{t('actions')}</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

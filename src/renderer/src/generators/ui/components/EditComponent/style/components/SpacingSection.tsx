@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Terminal, Code2, Keyboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type Side = 'top' | 'right' | 'bottom' | 'left';
 type SpacingType = 'margin' | 'padding';
@@ -33,6 +34,7 @@ export function SpacingSection() {
   const [activeType, setActiveType] = useState<SpacingType>('margin');
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [lastCommand, setLastCommand] = useState('');
+  const { t } = useTranslation();
 
   const handleKeyCommand = useCallback((e: KeyboardEvent) => {
     if (e.metaKey || e.ctrlKey) {
@@ -98,19 +100,19 @@ export function SpacingSection() {
         <div className="bg-gray-100 dark:bg-gray-800 rounded p-1.5 text-[9px] space-y-1">
           <div className="flex justify-between">
             <span>⌘/Ctrl + M</span>
-            <span className="text-gray-500">Switch to Margin</span>
+            <span className="text-gray-500">{t('switchToMargin')}</span>
           </div>
           <div className="flex justify-between">
             <span>⌘/Ctrl + P</span>
-            <span className="text-gray-500">Switch to Padding</span>
+            <span className="text-gray-500">{t('switchToPadding')}</span>
           </div>
           <div className="flex justify-between">
             <span>⌘/Ctrl + 1</span>
-            <span className="text-gray-500">Set all to 16px</span>
+            <span className="text-gray-500">{t('setAllTo16px')}</span>
           </div>
           <div className="flex justify-between">
             <span>⌘/Ctrl + 0</span>
-            <span className="text-gray-500">Reset values</span>
+            <span className="text-gray-500">{t('resetValues')}</span>
           </div>
         </div>
       )}

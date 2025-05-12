@@ -269,7 +269,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                                         iconName={config.icon}
                                                     />
                                                     <span>
-                                                        Open in {config.name}
+                                                        {t('openIn')} {config.name}
                                                     </span>
                                                 </DropdownMenuItem>
                                             );

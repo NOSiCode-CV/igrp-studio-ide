@@ -1,4 +1,5 @@
 import { Eye, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface VisibilityControlsProps {
     opacity: string;
@@ -34,12 +35,14 @@ export function VisibilityControls({
     onBlendModeChange,
     onReset,
 }: VisibilityControlsProps) {
+    const { t } = useTranslation();
     return (
+        
         <div className="space-y-1.5">
             <div className="flex items-center justify-between">
                 <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                     <Eye size={10} />
-                    Visibility
+                    {t('visibility')}
                 </h3>
                 <button
                     onClick={onReset}
@@ -52,7 +55,7 @@ export function VisibilityControls({
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-0.5">
                     <label className="text-[9px] text-gray-500 dark:text-gray-400">
-                        Opacity
+                    {t('opacity')}
                     </label>
                     <div className="flex items-center gap-1">
                         <input
@@ -68,7 +71,7 @@ export function VisibilityControls({
                 </div>
                 <div className="space-y-0.5">
                     <label className="text-[9px] text-gray-500 dark:text-gray-400">
-                        Blend Mode
+                    {t('blendMode')}
                     </label>
                     <select
                         value={mixBlendMode}

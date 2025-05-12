@@ -1,13 +1,16 @@
+import { useTranslation } from 'react-i18next';
+
 const GenNoInfoField = () => {
+    const { t } = useTranslation();
     return (
         <div className="text-xs space-x-1 min-h-12 flex items-center justify-center">
-            <span>DROP</span>
+            <span>{t('drop')}</span>
             <span className="text-primary">
-                <b>FIELDS</b>
+                <b>{t('fields')}</b>
             </span>
-            <span>OR</span>
+            <span>{t('or')}</span>
             <span className="text-primary">
-                <b>COPY</b>
+                <b>{t('copy')}</b>
             </span>
         </div>
     );

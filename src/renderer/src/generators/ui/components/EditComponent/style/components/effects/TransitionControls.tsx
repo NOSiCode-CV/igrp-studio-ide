@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Timer, Plus, Trash2, Edit2 } from 'lucide-react';
 import { TransitionValue, transitionProperties, timingFunctions } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface TransitionControlsProps {
   transitions: TransitionValue[];
@@ -66,7 +67,8 @@ export function TransitionControls({
       setEditingIndex(null);
     }
   };
-
+  
+  const { t } = useTranslation();
   const updateTransition = (index: number, field: keyof TransitionValue, value: string) => {
     const newTransitions = [...transitions];
     newTransitions[index] = { ...newTransitions[index], [field]: value };
@@ -87,7 +89,7 @@ export function TransitionControls({
       <div className="space-y-2">
         <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
           <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-            Edit Transition {index + 1}
+          {t('editTransition')} {index + 1}
           </span>
           <button
             onClick={() => removeTransition(index)}

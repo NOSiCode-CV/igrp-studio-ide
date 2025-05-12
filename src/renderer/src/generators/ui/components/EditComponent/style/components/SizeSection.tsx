@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, ArrowDown, Lock, Unlock, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SizeValue {
   value: string;
@@ -17,6 +18,7 @@ export function SizeSection() {
   const [aspectRatio, setAspectRatio] = useState('');
   const [overflowX, setOverflowX] = useState('visible');
   const [overflowY, setOverflowY] = useState('visible');
+  const { t } = useTranslation();
 
   const units = ['px', '%', 'rem', 'em', 'vw', 'vh', 'auto'];
   const commonAspectRatios = [
@@ -126,7 +128,7 @@ export function SizeSection() {
       {/* Aspect Ratio */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Aspect Ratio</h3>
+          <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('aspectRatio')}</h3>
           <button
             onClick={() => setAspectRatioLocked(!aspectRatioLocked)}
             className={`p-0.5 rounded ${
@@ -145,7 +147,7 @@ export function SizeSection() {
           className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           disabled={!aspectRatioLocked}
         >
-          <option value="">Custom</option>
+          <option value="">{t('custom')}</option>
           {commonAspectRatios.map(ratio => (
             <option key={ratio.value} value={ratio.value}>{ratio.label}</option>
           ))}

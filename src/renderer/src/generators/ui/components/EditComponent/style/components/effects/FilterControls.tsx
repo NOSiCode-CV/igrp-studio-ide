@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Filter, Plus, Trash2, Edit2 } from 'lucide-react';
 import { FilterValue, filterTypes } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface FilterControlsProps {
   title: string;
@@ -83,11 +84,13 @@ export function FilterControls({
   const getFilterPreview = (filter: FilterValue) => {
     return `${filter.type}(${filter.value}${filter.unit})`;
   };
-
+  
+  const { t } = useTranslation();
   const FilterEditor = ({ filter, index }: { filter: FilterValue; index: number }) => {
     const filterType = filterTypes.find(t => t.name === filter.type);
 
     return (
+      
       <div 
         ref={popoverRef}
         className={`absolute z-50 right-0 w-56 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${
@@ -97,7 +100,7 @@ export function FilterControls({
         <div className="space-y-2">
           <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
             <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-              Edit Filter {index + 1}
+            {t('editFilter')} {index + 1}
             </span>
             <button
               onClick={() => removeFilter(index)}

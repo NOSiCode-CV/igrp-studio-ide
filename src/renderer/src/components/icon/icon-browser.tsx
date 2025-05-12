@@ -5,7 +5,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '../ui/tooltip';
-
+import { useTranslation } from 'react-i18next';
 import { icons } from 'lucide-react';
 import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import {
@@ -24,6 +24,9 @@ interface IconBrowserProps {
 }
 
 const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
+
+    const { t } = useTranslation();
+    
     const [open, setOpen] = useState(false);
 
     const commandRef = useRef<HTMLDivElement>(null);
@@ -51,7 +54,7 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                         {open && (
                             <CommandList className="max-h-[200px] overflow-auto">
                                 <CommandEmpty>
-                                    No icons found.
+                                {t('noIconsFound')}
                                 </CommandEmpty>
                                 <CommandGroup>
                                     <div className="grid grid-cols-[repeat(auto-fill,_minmax(30px,_1fr))] gap-4 w-full">

@@ -124,7 +124,7 @@ export function Footer() {
                             </div>
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                            <p>Network Status</p>
+                            <p>{t('networkStatus')}</p>
                         </TooltipContent>
                     </Tooltip>
 
@@ -139,7 +139,7 @@ export function Footer() {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                            <p>Help Center</p>
+                            <p>{t('helpCenter')}</p>
                         </TooltipContent>
                     </Tooltip>
                 </div>

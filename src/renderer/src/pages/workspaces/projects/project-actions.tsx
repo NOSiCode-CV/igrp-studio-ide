@@ -55,7 +55,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
     const handleExternalLink = () => {
         // Implement your external link logic here
-        console.log('Open external link for', project.name, service);
+        console.log(t('openExternalLinkFor'), project.name, service);
     };
 
     const findServiceByProjectName = (
@@ -82,17 +82,17 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     {onEdit && (
                         <DropdownMenuItem onClick={onEdit}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit Project
+                            {t('editProject')}
                         </DropdownMenuItem>
                     )}
 
                     {service?.status === 'running' && (
                         <DropdownMenuItem onClick={handleExternalLink}>
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            Open in Browser
+                            {t('openInBrowser')}
                         </DropdownMenuItem>
                     )}
-
+                 
                     {project.framework === ENV_TYPES.DOTNET && (
                         <DropdownMenuItem
                             onClick={onConvertToSpringBoot}
@@ -129,7 +129,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                                 className="focus:bg-accent"
                             >
                                 <Edit className="mr-2 h-4 w-4" />
-                                Configure Service
+                               {t('configureService')}
                             </DropdownMenuItem>
                         </ConfigurationDialog>
                     )}
@@ -142,7 +142,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                         }}
                     >
                         <Trash className="mr-2 h-4 w-4 text-red-600" />
-                        Delete Project
+                        {t('removeProject')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

@@ -1,5 +1,6 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { Badge } from '@renderer/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 import {
     Popover,
     PopoverContent,
@@ -59,6 +60,7 @@ export const AddField = ({
 
         return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
     };
+    const { t } = useTranslation();
 
     return (
         <>
@@ -77,17 +79,17 @@ export const AddField = ({
                             </PopoverTrigger>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Add Comp</p>
+                            <p>{t('addComp')}</p>
                         </TooltipContent>
                     </Tooltip>
 
                     <PopoverContent className="w-100 p-3 space-y-3">
                         <div className="p-2 border-b">
                             <h3 className="text-lg font-semibold">
-                                Add Component
+                            {t('addComponent')}
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                                Select a component to add to your{' '}
+                            {t('selectComponent')}{' '}
                                 {componentName}
                             </p>
                         </div>

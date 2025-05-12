@@ -15,6 +15,7 @@ import { ProjectActions } from './project-actions';
 import { Button } from '@renderer/components/ui/button';
 import { PortsBadgeList } from '../components/ports-badge-list';
 import Dependency from '../components/dependency';
+import { useTranslation } from 'react-i18next';
 
 interface ProjectProps {
     projects: ProjectData[];
@@ -28,6 +29,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         workspace,
         actions: { saveOrOpenProject },
     } = useWorkspace();
+    const { t } = useTranslation();
 
     const handleOpenProject = async (p: ProjectData): Promise<void> => {
         saveOrOpenProject(p);
@@ -121,7 +123,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                     }}
                                 >
                                     <Folder />
-                                    Open
+                                    {t('open')}
                                 </Button>
                             </CardFooter>
                         </Card>

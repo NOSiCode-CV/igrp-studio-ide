@@ -6,6 +6,7 @@ import { GradientEditor } from './editors/GradientEditor';
 import { CommonControls } from './editors/CommonControls';
 import { getBackgroundStyles } from './utils';
 import type { BackgroundValue } from '../effects/types';
+import { useTranslation } from 'react-i18next';
 
 interface BackgroundEditorProps {
     background: BackgroundValue;
@@ -21,6 +22,7 @@ export function BackgroundEditor({
     onClose,
     onChange,
 }: BackgroundEditorProps) {
+    const { t } = useTranslation();
     const editorRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState<'top' | 'bottom'>('bottom');
 
@@ -62,7 +64,7 @@ export function BackgroundEditor({
             <div className="space-y-2">
                 <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-                        Edit Background {index + 1}
+                    {t('editBackground')} {index + 1}
                     </span>
                     <button
                         onClick={(e) => {

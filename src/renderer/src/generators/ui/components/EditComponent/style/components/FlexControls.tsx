@@ -1,4 +1,6 @@
 
+import { useTranslation } from 'react-i18next'; 
+
 interface FlexControlsProps {
   direction: string;
   wrap: string;
@@ -12,6 +14,7 @@ interface FlexControlsProps {
   onGapChange: (value: string) => void;
 }
 
+
 export function FlexControls({
   direction,
   wrap,
@@ -24,7 +27,11 @@ export function FlexControls({
   onJustifyContentChange,
   onGapChange,
 }: FlexControlsProps) {
+
+  const { t } = useTranslation();
   return (
+
+    
     <div className="space-y-2">
       <div className="grid grid-cols-2 gap-1">
         <div className="space-y-1">
@@ -34,10 +41,10 @@ export function FlexControls({
             onChange={(e) => onDirectionChange(e.target.value)}
             className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
-            <option value="row">Row</option>
-            <option value="row-reverse">Row Reverse</option>
-            <option value="column">Column</option>
-            <option value="column-reverse">Column Reverse</option>
+            <option value="row">{t('row')}</option>
+            <option value="row-reverse">{t('rowReverse')}</option>
+            <option value="column">{t('column')}</option>
+            <option value="column-reverse">{t('columnReverse')}</option>
           </select>
         </div>
 
@@ -48,9 +55,9 @@ export function FlexControls({
             onChange={(e) => onWrapChange(e.target.value)}
             className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
-            <option value="nowrap">No Wrap</option>
-            <option value="wrap">Wrap</option>
-            <option value="wrap-reverse">Wrap Reverse</option>
+            <option value="nowrap">{t('noWrap')}</option>
+            <option value="wrap">{t('wrap')}</option>
+            <option value="wrap-reverse">{t('wrapReverse')}</option>
           </select>
         </div>
       </div>
@@ -63,11 +70,11 @@ export function FlexControls({
             onChange={(e) => onAlignItemsChange(e.target.value)}
             className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
-            <option value="stretch">Stretch</option>
-            <option value="flex-start">Start</option>
-            <option value="flex-end">End</option>
-            <option value="center">Center</option>
-            <option value="baseline">Baseline</option>
+            <option value="stretch">{t('stretch')}</option>
+            <option value="flex-start">{t('start')}</option>
+            <option value="flex-end">{t('end')}</option>
+            <option value="center">{t('center')}</option>
+            <option value="baseline">{t('baseline')}</option>
           </select>
         </div>
 
@@ -78,12 +85,12 @@ export function FlexControls({
             onChange={(e) => onJustifyContentChange(e.target.value)}
             className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
-            <option value="flex-start">Start</option>
-            <option value="flex-end">End</option>
-            <option value="center">Center</option>
-            <option value="space-between">Space Between</option>
-            <option value="space-around">Space Around</option>
-            <option value="space-evenly">Space Evenly</option>
+            <option value="flex-start">{t('start')}</option>
+            <option value="flex-end">{t('end')}</option>
+            <option value="center">{t('center')}</option>
+            <option value="space-between">{t('spaceBetween')}</option>
+            <option value="space-around">{t('spaceAround')}</option>
+            <option value="space-evenly">{t('spaceEvenly')}</option>
           </select>
         </div>
       </div>
@@ -101,9 +108,9 @@ export function FlexControls({
           <select
             className="w-16 px-1 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
-            <option value="px">px</option>
-            <option value="rem">rem</option>
-            <option value="%">%</option>
+            <option value="px">{t('px')}</option>
+            <option value="rem">{t('rem')}</option>
+            <option value="%">{t('%')}</option>
           </select>
         </div>
       </div>

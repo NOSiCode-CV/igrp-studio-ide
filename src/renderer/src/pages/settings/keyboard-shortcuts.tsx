@@ -18,57 +18,57 @@ interface ShortcutGroup {
     title: string;
     shortcuts: Shortcut[];
 }
-
+const { t } = useTranslation();
 const shortcutData: ShortcutGroup[] = [
     {
-        title: 'Endpoints',
+        title: t('endpoints'),
         shortcuts: [
-            { name: 'New Endpoint', shortcut: SHORTCUTS.NEW_CONTROLLER },
-            { name: 'New Schema', shortcut: SHORTCUTS.NEW_MODEL },
-            { name: 'New Dto', shortcut: SHORTCUTS.NEW_DTO },
-            { name: 'New Project', shortcut: SHORTCUTS.NEW_PROJECT },
-            { name: 'Save', shortcut: SHORTCUTS.SAVE },
-            { name: 'Delete', shortcut: SHORTCUTS.DELETE },
+            { name: t('newEndpoint'), shortcut: SHORTCUTS.NEW_CONTROLLER },
+            { name: t('newSchema'), shortcut: SHORTCUTS.NEW_MODEL },
+            { name: t('newDto'), shortcut: SHORTCUTS.NEW_DTO },
+            { name: t('newProject'), shortcut: SHORTCUTS.NEW_PROJECT },
+            { name: t('save'), shortcut: SHORTCUTS.SAVE },
+            { name: t('delete'), shortcut: SHORTCUTS.DELETE },
         ],
     },
     {
-        title: 'Tabs',
+        title: t('tabs'),
         shortcuts: [
-            { name: 'Close Tab', shortcut: SHORTCUTS.CLOSE_TAB },
-            { name: 'Force Quit Tab', shortcut: SHORTCUTS.FORCE_QUIT_TAB },
+            { name: t('closeTab'), shortcut: SHORTCUTS.CLOSE_TAB },
+            { name: t('forceQuitTab'), shortcut: SHORTCUTS.FORCE_QUIT_TAB },
             {
-                name: 'Switch to Next tab',
+                name: t('switchToNextTab'),
                 shortcut: SHORTCUTS.SWITCH_TO_NEXT_TAB,
             },
             {
-                name: 'Switch to Previous tab',
+                name: t('switchToPreviousTab'),
                 shortcut: SHORTCUTS.SWITCH_TO_PREVIOUS_TAB,
             },
             {
-                name: 'Jump to Specific Tab',
+                name: t('jumpToSpecificTab'),
                 shortcut: SHORTCUTS.JUMP_TO_SPECIFIC_TAB,
             },
-            { name: 'Jump to Last Tab', shortcut: SHORTCUTS.JUMP_TO_LAST_TAB },
+            { name: t('jumpToLastTab'), shortcut: SHORTCUTS.JUMP_TO_LAST_TAB },
         ],
     },
     {
-        title: 'Code Editor',
+        title: t('codeEditor'),
         shortcuts: [
-            { name: 'Find', shortcut: SHORTCUTS.FIND },
-            { name: 'Replace', shortcut: SHORTCUTS.REPLACE },
+            { name: t('find'), shortcut: SHORTCUTS.FIND },
+            { name: t('replace'), shortcut: SHORTCUTS.REPLACE },
         ],
     },
     {
-        title: 'General',
+        title: t('general'),
         shortcuts: [
-            { name: 'Open/Close Sidebar', shortcut: SHORTCUTS.CLOSE_SIDEBAR },
-            { name: 'Settings', shortcut: SHORTCUTS.SETTINGS },
-            { name: 'Wrap', shortcut: ['↵', '⇧ ↵'] }, // Não precisa de adaptação, pois é específico do editor
-            { name: 'Hide Window', shortcut: 'Click to edit' }, // Ação não relacionada a atalhos de teclado
-            { name: 'Zoom in', shortcut: SHORTCUTS.ZOOM_IN },
-            { name: 'Zoom out', shortcut: SHORTCUTS.ZOOM_OUT },
+            { name: t('toggleSidebar'), shortcut: SHORTCUTS.CLOSE_SIDEBAR },
+            { name: t('settings'), shortcut: SHORTCUTS.SETTINGS },
+            { name: t('wrap'), shortcut: ['↵', '⇧ ↵'] }, // Não precisa de adaptação, pois é específico do editor
+            { name: t('hideWindow'), shortcut: t('clickToEdit') }, // Ação não relacionada a atalhos de teclado
+            { name: t('zoomIn'), shortcut: SHORTCUTS.ZOOM_IN },
+            { name: t('zoomOut'), shortcut: SHORTCUTS.ZOOM_OUT },
             {
-                name: 'Open Shortcut Help',
+                name: t('openShortcutHelp'),
                 shortcut: SHORTCUTS.OPEN_SHORTCUT_HELP,
             },
         ],
@@ -108,7 +108,7 @@ export default function KeyboardShortcuts() {
                         size="sm"
                         onClick={() => setEnabled(true)}
                     >
-                        Reset to default
+                       {t('resetToDefault')}
                     </Button>
                 </div>
                 <div className="relative">
@@ -143,7 +143,7 @@ export default function KeyboardShortcuts() {
                                                     {shortcut.shortcut[0]}
                                                 </kbd>
                                                 <span className="text-xs text-muted-foreground">
-                                                    or
+                                                    {t('or')}
                                                 </span>
                                                 <kbd className="rounded bg-muted px-2 py-1 text-xs">
                                                     {shortcut.shortcut[1]}

@@ -4,6 +4,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
+import { useTranslation } from 'react-i18next';
 
 import { useIsMobile } from "@renderer/hooks/use-mobile"
 import { cn } from "@renderer/lib/utils"
@@ -181,6 +182,7 @@ function Sidebar({
   }
 
   if (isMobile) {
+    const { t } = useTranslation();
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
@@ -196,8 +198,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetTitle>{t('sidebar')}</SheetTitle>
+            <SheetDescription>{t('displaysMobileSidebar')}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -259,6 +261,7 @@ function SidebarTrigger({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
+  const { t } = useTranslation();
 
   return (
     <Button
@@ -274,7 +277,7 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">{t('toggleSidebar')}</span>
     </Button>
   )
 }

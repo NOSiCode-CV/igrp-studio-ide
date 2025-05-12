@@ -101,7 +101,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
-            console.log('Form submitted with values:', values);
+            console.log(t('formSubmittedWithValues')+99, values);
             actions.setSubmitting(false);
             saveOrOpenProject({ ...formik.values });
         },
@@ -175,25 +175,24 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     };
 
     const handleOpenDirectory = () => {
-        window.electron.ipcRenderer.send('open-directory-dialog');
-
-        window.electron.ipcRenderer.on('file-content', (_e, result) => {
+        window.electron.ipcRenderer.send(t('openDirectoryDialog'));
+        window.electron.ipcRenderer.on(t('fileContent'), (_e, result) => {
             if (!result.canceled) {
-                formik.setFieldValue('path', result.filePaths[0]);
+                formik.setFieldValue(t('path'), result.filePaths[0]);
             }
         });
     };
 
     const handleChangeType = (value: string) => {
         if (formik.values.framework !== value)
-            formik.setFieldValue('framework', '');
-        formik.setFieldValue('type', value);
+            formik.setFieldValue(t('framework'), '');
+        formik.setFieldValue(t('type'), value);
     };
 
     const handleChangeFramework = (value: string) => {
         if (formik.values.framework !== value)
-            formik.setFieldValue('config', undefined);
-        formik.setFieldValue('framework', value);
+            formik.setFieldValue(t('config'), undefined);
+        formik.setFieldValue(t('framework'), value);
     };
 
     const SelectedComponent = formik.values?.framework
@@ -207,7 +206,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }, [open]);
 
     React.useEffect(() => {
-        formik.handleBlur('projectName');
+        formik.handleBlur(t('projectName'));
     }, []);
 
     React.useEffect(() => {
@@ -218,16 +217,16 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             }
         };
 
-        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener(t('keydown'), handleKeyDown);
 
         return () => {
-            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener(t('keydown'), handleKeyDown);
         };
     }, []);
 
     React.useEffect(() => {
         formik.setFieldValue(
-            'path',
+            t('path'),
             `${workspace.path}/projects/${formik.values?.config?.name ?? formik.values.name}`
         );
     }, [workspace, formik.values.name, formik.values?.config]);
@@ -446,7 +445,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             data={formik.values.config}
                             errors={formik.errors}
                             onChange={(config) =>
-                                formik.setFieldValue('config', config)
+                                formik.setFieldValue(t('config'), config)
                             }
                         />
                     </div>
@@ -523,7 +522,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         type="button"
                                         onClick={() =>
                                             formik.setFieldValue(
-                                                'themeColor',
+                                                t('themeColor'),
                                                 color.value
                                             )
                                         }

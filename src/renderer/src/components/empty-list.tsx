@@ -5,6 +5,7 @@ import { CuboidIcon as Cube, Plus } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
 import { Button } from '@renderer/components/ui/button';
 import { Separator } from './ui/separator';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyListProps extends React.HTMLAttributes<HTMLDivElement> {
     icon?: React.ReactNode;
@@ -16,6 +17,7 @@ interface EmptyListProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function EmptyList({
+    
     icon = <Cube className="h-12 w-12 text-muted-foreground/60" />,
     title = 'No items created yet',
     description = 'Items let you organize content in your sidebar. Create an item to get started.',
@@ -25,6 +27,7 @@ export function EmptyList({
     className,
     ...props
 }: EmptyListProps) {
+    const { t } = useTranslation();
     return (
         <div
             className={cn(
@@ -52,7 +55,7 @@ export function EmptyList({
                 <>
                     <Separator orientation="horizontal" />
                     <p className="mt-4 text-sm text-muted-foreground">
-                        Create shortcut:{' '}
+                    {t('createShortcut')}{' '}
                         <kbd className="font-semibold">{shortcut}</kbd>
                     </p>
                 </>

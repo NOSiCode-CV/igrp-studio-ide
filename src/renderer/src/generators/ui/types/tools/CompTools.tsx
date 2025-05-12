@@ -8,6 +8,7 @@ import {
 import StructureDropdown from '../../components/StructureDropdown';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT } from '../../ComponentTypes';
+import { useTranslation } from 'react-i18next';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -23,6 +24,7 @@ const CompTools = ({
     comp,
 }: ToolsProps) => {
     const { componentName, label } = comp;
+    const { t } = useTranslation();
 
     const isGrids = [COMPONENT.Columns].includes(componentName);
 
@@ -40,7 +42,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Move</p>
+                        <p>{t('move')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -51,7 +53,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Clone</p>
+                        <p>{t('clone')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -70,7 +72,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Edit</p>
+                        <p>{t('edit')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -84,7 +86,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Delete</p>
+                        <p>{t('delete')}</p>
                     </TooltipContent>
                 </Tooltip>
             </div>

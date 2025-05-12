@@ -1,5 +1,6 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { AddField } from '../../components/add-fields';
+import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
     TooltipContent,
@@ -14,6 +15,7 @@ interface RowOptionsProps {
 }
 
 const TableTool = ({ comp, parentComp, onEdit }: RowOptionsProps) => {
+    const { t } = useTranslation();
     return (
         <div id="table-tools relative">
             {/* Action buttons */}
@@ -29,7 +31,7 @@ const TableTool = ({ comp, parentComp, onEdit }: RowOptionsProps) => {
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Editar</p>
+                            <p>{t('edit')}</p>
                         </TooltipContent>
                     </Tooltip>
 

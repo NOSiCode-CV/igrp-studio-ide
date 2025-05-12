@@ -161,10 +161,10 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                 ) : (
                     <Tabs className="flex-1" defaultValue="props">
                         <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="props">Props</TabsTrigger>
-                            <TabsTrigger value="styles">Style</TabsTrigger>
+                            <TabsTrigger value="props">{t('props')}</TabsTrigger>
+                            <TabsTrigger value="styles">{t('style')}</TabsTrigger>
                             <TabsTrigger value="interactions">
-                                Interactions
+                            {t('interactions')}
                             </TabsTrigger>
                         </TabsList>
 

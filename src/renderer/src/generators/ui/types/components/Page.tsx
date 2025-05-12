@@ -4,6 +4,7 @@ import PageTools from '../tools/PageTools';
 import { useEffect, useRef, useState } from 'react';
 import useStudio from '@renderer/hooks/use-studio';
 import { COMPONENT } from '../../ComponentTypes';
+import { useTranslation } from 'react-i18next';
 
 interface PageProps {
     page: StructuredLayout;
@@ -11,6 +12,7 @@ interface PageProps {
 }
 
 export const Page = ({ onDragEnd, page }: PageProps) => {
+    const { t } = useTranslation();
     const { setInitComponents, newStructure, setEditingComponent } =
         useDroppedComponents();
 
@@ -94,7 +96,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
                                 key={row.id}
                                 className="animate-pulse h-20 w-full rounded-md"
                             >
-                                Loading...
+                                {t('loading')}
                             </div>
                         );
                     })}

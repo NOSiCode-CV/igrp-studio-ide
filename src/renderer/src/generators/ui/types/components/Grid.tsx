@@ -8,6 +8,7 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { gridVariants } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
+import { useTranslation } from 'react-i18next';
 
 export interface GridProps {
     comp: StructuredComponent;
@@ -15,6 +16,7 @@ export interface GridProps {
 }
 
 const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
+    const { t } = useTranslation();
     const { children, properties, id: componentId } = comp;
 
     const { variant, className } = properties || {};
@@ -75,7 +77,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                         </BoxWrapper>
                     </Draggable>
                 ) : (
-                    <div key={comp.id}>Loading...</div>
+                    <div key={comp.id}>{t('loading')}</div>
                 );
             });
 

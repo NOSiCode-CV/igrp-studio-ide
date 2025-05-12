@@ -1,4 +1,5 @@
 import { MousePointer2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface InteractionControlsProps {
   cursor: string;
@@ -27,12 +28,13 @@ export function InteractionControls({
   onCursorChange,
   onOutlineChange
 }: InteractionControlsProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <MousePointer2 size={10} />
-          Interaction
+          {t('interaction')}
         </h3>
       </div>
       <div className="space-y-2">

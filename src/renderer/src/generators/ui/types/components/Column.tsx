@@ -7,6 +7,7 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import BoxWrapper from '../tools/BoxWrapper';
+import { useTranslation } from 'react-i18next';
 
 export interface ColProps {
     comp: StructuredComponent;
@@ -15,7 +16,7 @@ export interface ColProps {
 
 const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     const { children, id: componentId } = comp;
-
+    const { t } = useTranslation();
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
     }>({});
@@ -70,7 +71,7 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     </BoxWrapper>
                 </Draggable>
             ) : (
-                <div key={comp.id}>Loading...</div>
+                <div key={comp.id}>{t('loading')}</div>
             );
         });
     };

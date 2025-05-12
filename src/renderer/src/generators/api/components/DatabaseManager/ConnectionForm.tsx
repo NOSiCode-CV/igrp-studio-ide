@@ -2,6 +2,7 @@ import { Form, Formik } from 'formik';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
+import { useTranslation } from 'react-i18next';
 import {
     Tabs,
     TabsContent,
@@ -44,6 +45,8 @@ export function ConnectionForm({
     onSubmit,
     onCancel,
 }: ConnectionFormProps) {
+    
+    const { t } = useTranslation()
     const { showErrorToast, showSuccessToast } = useToast();
 
     const handleTestConnection = async (e, values) => {
@@ -57,6 +60,7 @@ export function ConnectionForm({
     };
 
     return (
+        
         <Formik
             initialValues={{
                 name: connection.name || '',
@@ -86,17 +90,17 @@ export function ConnectionForm({
                     <Tabs defaultValue="general" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="general">
-                                General Connection
+                            {t('generalConnection')}
                             </TabsTrigger>
                             <TabsTrigger value="ssh">
-                                SSH Connection
+                            {t('sshConnection')}
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="general">
                             <div className="space-y-4 grid md:grid-cols-1">
                                 <div>
                                     <Label htmlFor="name">
-                                        Connection Name
+                                    {t('connectionName')}
                                     </Label>
                                     <Input
                                         id="name"
@@ -114,7 +118,7 @@ export function ConnectionForm({
 
                                 <div className="flex flex-col space-y-1">
                                     <Label htmlFor="databaseType">
-                                        Database Type
+                                    {t('databaseType')}
                                     </Label>
                                     <IGRPCombobox
                                         options={databaseTypes}
@@ -136,7 +140,7 @@ export function ConnectionForm({
                                 <div className="grid grid-cols-12 gap-2">
                                     <div className="col-span-9">
                                         <div>
-                                            <Label htmlFor="host">Host</Label>
+                                            <Label htmlFor="host">{t('host')}</Label>
                                             <Input
                                                 id="host"
                                                 name="host"
@@ -156,7 +160,7 @@ export function ConnectionForm({
 
                                     <div className="col-span-3">
                                         <div>
-                                            <Label htmlFor="port">Port</Label>
+                                            <Label htmlFor="port">{t('port')}</Label>
                                             <Input
                                                 id="port"
                                                 name="port"
@@ -177,7 +181,7 @@ export function ConnectionForm({
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <Label htmlFor="user">Username</Label>
+                                        <Label htmlFor="user">{t('username')}</Label>
                                         <Input
                                             id="user"
                                             name="user"
@@ -195,7 +199,7 @@ export function ConnectionForm({
 
                                     <div>
                                         <Label htmlFor="password">
-                                            Password
+                                        {t('password')}
                                         </Label>
                                         <Input
                                             id="password"
@@ -216,7 +220,7 @@ export function ConnectionForm({
                                 </div>
                                 <div>
                                     <Label htmlFor="database">
-                                        Database Name
+                                    {t('databaseName')}
                                     </Label>
                                     <Input
                                         id="database"
@@ -247,11 +251,11 @@ export function ConnectionForm({
                             type="button"
                             onClick={(e) => handleTestConnection(e, values)}
                         >
-                            Test connection
+                            {t('testConnection')}
                         </Button>
                         <div className="flex space-x-2 mt-4">
                             <Button variant="outline" onClick={onCancel}>
-                                Cancel
+                            {t('cancel')}
                             </Button>
                             <Button type="submit">
                                 {connection.name ? 'Update' : 'Add'} Connection

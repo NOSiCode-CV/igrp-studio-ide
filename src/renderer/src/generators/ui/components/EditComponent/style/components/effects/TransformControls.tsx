@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { RotateCw, Plus, Trash2, Edit2 } from 'lucide-react';
 import { TransformValue, transformTypes } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface TransformControlsProps {
     transforms: TransformValue[];
@@ -19,6 +20,7 @@ export function TransformControls({
     const buttonRef = useRef<HTMLButtonElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
@@ -112,8 +114,10 @@ export function TransformControls({
         const transformType = transformTypes.find(
             (t) => t.name === transform.type
         );
-
+        
+        const { t } = useTranslation();
         return (
+            
             <div
                 ref={popoverRef}
                 className={`absolute z-50 right-0 w-56 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${
@@ -125,7 +129,7 @@ export function TransformControls({
                 <div className="space-y-2">
                     <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
                         <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-                            Edit Transform {index + 1}
+                        {t('editTransform')} {index + 1}
                         </span>
                         <button
                             onClick={() => removeTransform(index)}
@@ -155,7 +159,7 @@ export function TransformControls({
 
                     <div className="space-y-0.5">
                         <label className="text-[9px] text-gray-500">
-                            Value
+                        {t('value')}
                         </label>
                         <div className="flex items-center gap-1">
                             <input
@@ -192,7 +196,7 @@ export function TransformControls({
 
                     <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
                         <div className="text-[9px] text-gray-500 mb-1">
-                            Preview
+                        {t('preview')}
                         </div>
                         <div className="relative w-full h-12">
                             <div

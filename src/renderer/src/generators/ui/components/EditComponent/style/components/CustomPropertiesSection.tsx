@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Variable, Plus, Trash2, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface CustomProperty {
   name: string;
@@ -26,13 +27,14 @@ export function CustomPropertiesSection() {
   const resetProperties = () => {
     setProperties([]);
   };
-
+  const { t } = useTranslation();
   return (
+    
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <Variable size={10} />
-          Custom Properties
+          {t('customProperties')}
         </h3>
         <div className="flex items-center gap-1">
           <button
@@ -47,7 +49,7 @@ export function CustomPropertiesSection() {
             className="flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-medium text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
           >
             <Plus size={10} />
-            Add
+            {t('add')}
           </button>
         </div>
       </div>

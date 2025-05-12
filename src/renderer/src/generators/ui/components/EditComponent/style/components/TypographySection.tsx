@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TypographyValue {
   value: string;
@@ -44,7 +45,7 @@ export function TypographySection() {
     { value: 'Arial', label: 'Arial' },
     { value: 'monospace', label: 'Monospace' }
   ];
-
+  const { t } = useTranslation();
   const SizeInput = ({ 
     value,
     onChange,
@@ -104,7 +105,7 @@ export function TypographySection() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">Family</label>
+            <label className="text-[9px] text-gray-500 dark:text-gray-400">{t('family')}</label>
             <select
               className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
@@ -114,7 +115,7 @@ export function TypographySection() {
             </select>
           </div>
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">Weight</label>
+            <label className="text-[9px] text-gray-500 dark:text-gray-400">{t('weight')}</label>
             <select
               value={fontWeight}
               onChange={(e) => setFontWeight(e.target.value)}
@@ -130,7 +131,7 @@ export function TypographySection() {
 
       {/* Size and Line Height */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Size & Height</h3>
+        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('sizeHeight')}</h3>
         <div className="grid grid-cols-2 gap-2">
           <SizeInput
             value={fontSize}
@@ -150,7 +151,7 @@ export function TypographySection() {
 
       {/* Spacing */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Spacing</h3>
+        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('spacing')}</h3>
         <div className="grid grid-cols-2 gap-2">
           <SizeInput
             value={letterSpacing}
@@ -169,7 +170,7 @@ export function TypographySection() {
 
       {/* Text Alignment */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Alignment</h3>
+        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('alignment')}</h3>
         <div className="grid grid-cols-4 gap-0.5">
           {[
             { value: 'left', icon: <AlignLeft size={12} /> },
@@ -194,18 +195,18 @@ export function TypographySection() {
 
       {/* Style and Decoration */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Style</h3>
+        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('style')}</h3>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">Font Style</label>
+            <label className="text-[9px] text-gray-500 dark:text-gray-400">{t('fontStyle')}</label>
             <select
               value={fontStyle}
               onChange={(e) => setFontStyle(e.target.value)}
               className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
-              <option value="normal">Normal</option>
-              <option value="italic">Italic</option>
-              <option value="oblique">Oblique</option>
+              <option value="normal">{t('normal')}</option>
+              <option value="italic">{t('italic')}</option>
+              <option value="oblique">{t('oblique')}</option>
             </select>
           </div>
           <div className="space-y-0.5">
@@ -215,10 +216,10 @@ export function TypographySection() {
               onChange={(e) => setTextDecoration(e.target.value)}
               className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
-              <option value="none">None</option>
-              <option value="underline">Underline</option>
-              <option value="line-through">Line Through</option>
-              <option value="overline">Overline</option>
+              <option value="none">{t('none')}</option>
+              <option value="underline">{t('underline')}</option>
+              <option value="line-through">{t('lineThrough')}</option>
+              <option value="overline">{t('overline')}</option>
             </select>
           </div>
         </div>
@@ -232,10 +233,10 @@ export function TypographySection() {
           onChange={(e) => setTextTransform(e.target.value)}
           className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
         >
-          <option value="none">None</option>
-          <option value="uppercase">Uppercase</option>
-          <option value="lowercase">Lowercase</option>
-          <option value="capitalize">Capitalize</option>
+          <option value="none">{t('none')}</option>
+          <option value="uppercase">{t('uppercase')}</option>
+          <option value="lowercase">{t('lowercase')}</option>
+          <option value="capitalize">{t('capitalize')}</option>
         </select>
       </div>
     </div>

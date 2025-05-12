@@ -11,6 +11,7 @@ import { EditComponent } from '../../components/EditComponent';
 import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ToolsProps {
     onEdit: () => void;
@@ -27,6 +28,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
     const { getAcceptedChildren } = useStudio();
+    const { t } = useTranslation();
 
     useEffect(() => {
         getAcceptedChildren(path || parentComponentName, componentName).then(
@@ -50,7 +52,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Move</p>
+                        <p>{t('move')}</p>
                     </TooltipContent>
                 </Tooltip>
                 <Tooltip>
@@ -63,7 +65,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Clone</p>
+                        <p>{t('clone')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -81,7 +83,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Edit</p>
+                        <p>{t('edit')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -96,7 +98,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Delete</p>
+                        <p>{t('delete')}</p>
                     </TooltipContent>
                 </Tooltip>
                 {components.length > 0 && path && (

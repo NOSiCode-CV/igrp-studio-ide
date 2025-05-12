@@ -11,15 +11,16 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
     const [baseUrl, setBaseUrl] = useState('');
     const [clientId, setClientId] = useState('');
     const [clientSecret, setClientSecret] = useState('');
-
+    const { t } = useTranslation();
     const handleSave = () => {
         onSave({ baseUrl, clientId, clientSecret });
     };
+    
 
     return (
         <div className="space-y-4">
             <div className='space-y-2'>
-                <Label>GitLab Base URL</Label>
+                <Label>{t('gitlabBaseUrl')}</Label>
                 <Input
                     type="text"
                     value={baseUrl}
@@ -29,7 +30,7 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
                 />
             </div>
             <div className='space-y-2'>
-                <Label>Client ID</Label>
+                <Label>{t('clientId')}</Label>
                 <Input
                     type="text"
                     value={clientId}
@@ -38,7 +39,7 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
                 />
             </div>
             <div className='space-y-2'>
-                <Label>Client Secret</Label>
+                <Label>{t('clientSecret')}</Label>
                 <Input
                     type="password"
                     value={clientSecret}
@@ -46,7 +47,7 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
                     className="input"
                 />
             </div>
-            <Button onClick={handleSave}>Save Configuration</Button>
+            <Button onClick={handleSave}>{t('saveConfiguration')}</Button>
         </div>
     );
 }

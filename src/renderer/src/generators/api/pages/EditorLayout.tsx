@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import MonacoEditor from '@renderer/components/monaco-editor';
+import { useTranslation } from 'react-i18next';
 
 export const EditorLayout = ({ currentItem }) => {
+    const { t } = useTranslation();
     const [data, setData] = useState<any>(null);
     const [filePath, setFilePath] = useState<string>('');
 
@@ -29,7 +31,7 @@ export const EditorLayout = ({ currentItem }) => {
                 />
             ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
-                    Select a file to edit
+                   {t('selectFileToEdit')}
                 </div>
             )}
         </div>

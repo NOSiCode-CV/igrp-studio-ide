@@ -15,6 +15,7 @@ import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
 import { Switch } from '@renderer/components/ui/switch';
 import { Copy, Check, Trash2, AlertTriangle, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -70,11 +71,12 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
             dispatch(setWorkspace(uodatedWorkspace));
 
-            showSuccessToast(`Workspace "${workspaceName}" updated`);
+            showSuccessToast(`${t('workspace')} "${workspaceName}" ${t('updated')}`);
 
             setIsSaving(false);
         }, 800);
     };
+    const { t } = useTranslation();
 
     const handleDeleteWorkspace = () => {
         setIsDeleting(true);
@@ -97,15 +99,15 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
             <Card>
                 <CardHeader className="compact-card-header">
                     <CardTitle className="text-sm">
-                        Workspace Information
+                        {t('workspaceInformation')}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                        Basic information about your workspace
+                    {t('workspaceInformation')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="compact-card-content space-y-3">
                     <div className="space-y-2">
-                        <Label htmlFor="workspace-id">Workspace ID</Label>
+                        <Label htmlFor="workspace-id">{t('workspaceId')}</Label>
                         <div className="flex space-x-2">
                             <Input
                                 id="workspace-id"
@@ -127,12 +129,12 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             </Button>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
-                            This is the unique identifier for your workspace.
+                                {t('workspaceIdDescription')}
                         </p>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="workspace-name">Name</Label>
+                        <Label htmlFor="workspace-name">{t('nameDescription')}</Label>
                         <Input
                             id="workspace-name"
                             value={workspaceName}
@@ -143,7 +145,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
                     <div className="space-y-2">
                         <Label htmlFor="workspace-description">
-                            Description
+                            {t('description')}
                         </Label>
                         <Textarea
                             id="workspace-description"
@@ -159,7 +161,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     {workspace.updatedAt && (
                         <div className="flex items-center text-xs text-muted-foreground">
                             <Clock className="h-3.5 w-3.5 mr-1" />
-                            Last updated:{' '}
+                            {t('lastUpdated')} :{' '}
                             {formatDistanceToNow(workspace.updatedAt, {
                                 addSuffix: true,
                                 locale: getLocale(),
@@ -176,24 +178,24 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 workspaceDescription === workspace.description)
                         }
                     >
-                        {isSaving ? 'Saving...' : 'Save Changes'}
+                        {isSaving ? t('saving') : t('saveChanges')}
                     </Button>
                 </CardFooter>
             </Card>
 
             <Card>
                 <CardHeader className="compact-card-header">
-                    <CardTitle className="text-sm">Advanced Settings</CardTitle>
+                    <CardTitle className="text-sm">{t('advancedSettings')}</CardTitle>
                     <CardDescription className="text-xs">
-                        Configure advanced options for your workspace
+                             {t('configureAdvancedOptions')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="compact-card-content space-y-3">
                     <div className="flex items-center justify-between">
                         <div>
-                            <div className="text-xs font-medium">Auto-save</div>
+                            <div className="text-xs font-medium">{t('autoSave')}</div>
                             <div className="text-sm text-muted-foreground">
-                                Automatically save changes
+                              {t('autoSaveChanges')}
                             </div>
                         </div>
                         <Switch defaultChecked />
@@ -204,10 +206,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-xs font-medium">
-                                Enable Versioning
+                            {t('enableVersioning')}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                                Track changes to workspace configuration
+                             {t('trackChanges')}
                             </div>
                         </div>
                         <Switch defaultChecked />
@@ -218,10 +220,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-xs font-medium">
-                                Experimental Features
+                            {t('experimentalFeatures')} 
                             </div>
                             <div className="text-sm text-muted-foreground">
-                                Enable experimental workspace features
+                            {t('enableExperimentalFeatures')}
                             </div>
                         </div>
                         <Switch />
@@ -231,10 +233,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
             <Card className="border-destructive/50">
                 <CardHeader className="compact-card-header">
                     <CardTitle className="text-sm text-destructive">
-                        Danger Zone
+                        {t('dangerZone')}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                        Irreversible actions for your workspace
+                        {t('irreversibleActions')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="compact-card-content">
@@ -242,11 +244,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         <div className="flex items-start justify-between">
                             <div>
                                 <h4 className="text-xs font-medium">
-                                    Delete this workspace
+                                {t('deleteWorkspace')}
                                 </h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Once deleted, it will be gone forever. This
-                                    action cannot be undone.
+                                {t('deleteWarning')}
                                 </p>
                             </div>
                             <AlertDialog>
@@ -257,24 +258,22 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         className="h-7"
                                     >
                                         <Trash2 className="h-3.5 w-3.5 mr-1" />
-                                        <span>Delete</span>
+                                        <span>{t('delete')}</span>
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="compact-dialog">
                                     <AlertDialogHeader className="compact-dialog-header">
                                         <AlertDialogTitle className="text-base flex items-center gap-2">
                                             <AlertTriangle className="h-4 w-4 text-destructive" />
-                                            Delete Workspace
+                                            {t('deleteWorkspace')}
                                         </AlertDialogTitle>
                                         <AlertDialogDescription className="text-xs">
-                                            This action cannot be undone. This
-                                            will permanently delete the
+                                             {t('cannotUndoAction')}
                                             <span className="font-medium">
                                                 {' '}
                                                 {workspace.name}{' '}
                                             </span>
-                                            workspace and all associated
-                                            projects and configurations.
+                                            {t('workspaceAndProjects')}
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <div className="py-3">
@@ -287,7 +286,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                             </div>
                                             <div className="text-sm mt-1">
                                                 <span className="text-muted-foreground">
-                                                    ID:{' '}
+                                                {t('id')}  {' '}
                                                 </span>
                                                 <span className="font-mono">
                                                     {workspace.id}
@@ -297,15 +296,15 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                     </div>
                                     <AlertDialogFooter className="compact-dialog-footer flex flex-1 items-center ">
                                         <AlertDialogCancel className="h-7 text-xs">
-                                            Cancel
+                                        {t('cancel')}
                                         </AlertDialogCancel>
                                         <AlertDialogAction
                                             className="h-7 text-xs bg-destructive hover:bg-destructive/90"
                                             onClick={handleDeleteWorkspace}
                                         >
                                             {isDeleting
-                                                ? 'Deleting...'
-                                                : 'Delete Workspace'}
+                                                ? t('deleting')
+                                                :  t('deleteWorkspace')}
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>

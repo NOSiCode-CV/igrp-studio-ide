@@ -131,7 +131,7 @@ const ResourceSection = ({
                     </ToggleGroup>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span>Sort by:</span>
+                    <span>{t('sortBy')}</span>
                     <Select value={sortValue} onValueChange={onSortChange}>
                         <SelectTrigger className="w-[180px] !h-7">
                             <SelectValue placeholder={t('orderBy')} />
@@ -234,7 +234,7 @@ const Resources = () => {
         try {
             await window.electron.ipcRenderer.invoke('clone-repository', url);
         } catch (error) {
-            console.error('Error cloning repository:', error);
+            console.error(t('errorCloningRepository'), error);
             showErrorToast(t('cloneProjectError'));
         }
     };
@@ -299,16 +299,16 @@ const Resources = () => {
     const ProjectEmptyState = () => (
         <div className="shrink-0 border border-dashed rounded-md p-6 text-center">
             <FolderKanban className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <h3 className="text-sm font-medium">No projects found</h3>
+            <h3 className="text-sm font-medium">{t('noProjectsFound')}</h3>
             <p className="text-xs text-muted-foreground mb-3">
                 {projectSearchQuery
-                    ? `No projects matching "${projectSearchQuery}"`
-                    : "This workspace doesn't have any projects yet."}
+                    ? `${t('noProjectsMatching')} "${projectSearchQuery}"`
+                    :t('noProjectsYet')}
             </p>
             <ProjectWizard>
                 <Button size="sm">
                     <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                    Create New Project
+                    {t('createNewProject')}
                 </Button>
             </ProjectWizard>
         </div>
@@ -317,16 +317,17 @@ const Resources = () => {
     const ServiceEmptyState = () => (
         <div className="border border-dashed rounded-md p-6 text-center">
             <Server className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <h3 className="text-sm font-medium">No services found</h3>
+            <h3 className="text-sm font-medium">{t('noServicesFound')}
+            </h3>
             <p className="text-xs text-muted-foreground mb-3">
                 {serviceSearchQuery
-                    ? `No services matching "${serviceSearchQuery}"`
-                    : "This workspace doesn't have any services yet."}
+                    ? `${t('noServicesMatching')} "${serviceSearchQuery}"`
+                    : t('noServicesYet')}
             </p>
             <ConfigurationDialog services={filteredServices} isNew={true}>
                 <Button size="sm">
                     <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                    Add New Service
+                    {t('addNewService')}
                 </Button>
             </ConfigurationDialog>
         </div>

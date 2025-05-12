@@ -128,8 +128,7 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             <p>
-                                                Delete containers and all
-                                                Volumes
+                                            {t('deleteContainersVolumes')}
                                             </p>
                                         </TooltipContent>
                                     </Tooltip>

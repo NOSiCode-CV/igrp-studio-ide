@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Move, RefreshCw, Lock, Unlock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PositionValue {
     value: string;
@@ -10,6 +11,7 @@ type PositionType = 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
 type Side = 'top' | 'right' | 'bottom' | 'left';
 
 export function PositionSection() {
+    const { t } = useTranslation();
     const [positionType, setPositionType] = useState<PositionType>('static');
     const [zIndex, setZIndex] = useState('');
     const [linked, setLinked] = useState(true);
@@ -68,6 +70,7 @@ export function PositionSection() {
         }
     };
 
+   
     const resetPositions = () => {
         setPositionType('static');
         setZIndex('');
@@ -87,7 +90,7 @@ export function PositionSection() {
                 <div className="flex items-center justify-between">
                     <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                         <Move size={10} />
-                        Position
+                        {t('position')}
                     </h3>
                     <button
                         onClick={resetPositions}
@@ -118,7 +121,7 @@ export function PositionSection() {
                     <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
                             <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-                                Offset
+                            {t('offset')}
                             </h3>
                             <button
                                 onClick={() => setLinked(!linked)}
@@ -188,7 +191,7 @@ export function PositionSection() {
                     {/* Z-Index */}
                     <div className="space-y-1.5">
                         <label className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
-                            Z-Index
+                        {t('zIndex')}
                         </label>
                         <input
                             type="number"

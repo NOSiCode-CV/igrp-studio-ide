@@ -3,6 +3,7 @@ import { icons } from 'lucide-react'; // Import icons properly
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
+import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
     TooltipContent,
@@ -13,6 +14,7 @@ import {
 const IconLibrary: React.FC = () => {
     const [_selectedIcon, setSelectedIcon] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const { t } = useTranslation();
 
     const iconNames = Object.keys(icons) as Array<keyof typeof icons>;
 
@@ -66,7 +68,7 @@ const IconLibrary: React.FC = () => {
                                 );
                             })
                         ) : (
-                            <p>No icons found.</p>
+                            <p>{t('noIconsFound')}</p>
                         )}
                     </div>
                 </ScrollArea>
