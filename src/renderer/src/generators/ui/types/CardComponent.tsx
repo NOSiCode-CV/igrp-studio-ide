@@ -10,8 +10,15 @@ export interface CardComponentProps {
 const CardComponent = ({ comp }: CardComponentProps) => {
     const { componentName, properties } = comp;
 
-    const { commonProperties, iconProperties, error, errorMessage, ...args } =
-        properties;
+    const {
+        commonProperties,
+        iconProperties,
+        dataproperties,
+        dataProperties,
+        error,
+        errorMessage,
+        ...args
+    } = properties;
 
     const componentLabel = properties?.label || componentName;
 
@@ -26,7 +33,7 @@ const CardComponent = ({ comp }: CardComponentProps) => {
             {Component ? (
                 componentName === COMPONENT.Button ? (
                     //@ts-ignore
-                    <IGRPButton {...args} onSelectValueChange={() => void 0} {...iconProperties}>
+                    <IGRPButton {...args} {...iconProperties}>
                         {componentLabel}
                     </IGRPButton>
                 ) : (
@@ -46,7 +53,7 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                             </div>
                         )}
                         <div className="text-sm font-medium text-gray-700 truncate">
-                            {componentName}
+                            {componentLabel}
                         </div>
                     </div>
                 </div>

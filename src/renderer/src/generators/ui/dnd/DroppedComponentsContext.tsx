@@ -16,13 +16,14 @@ import { generateId } from '@renderer/utils/helpers';
 import { COMPONENT } from '../ComponentTypes';
 import {
     CustomFunctionConfig,
+    Import,
+    State,
     TypeDef,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface DroppedComponentsContextType {
     newStructure: (name: string) => StructuredComponent;
-    setInitComponents: (components: StructuredLayout) => void;
-    getAllComponents: () => StructuredLayout;
+    setAllComponents: (components: StructuredLayout) => void;
 
     handleAddChildToComponent: (
         destination: Destination,
@@ -67,6 +68,25 @@ interface DroppedComponentsContextType {
     ) => void;
     removeFunction: (id: string) => void;
     setAllFunctions: (newTypes: CustomFunctionConfig[]) => void;
+
+    //states
+    states: State[];
+    addState: (type: State) => void;
+    updateState: (id: string, updates: Partial<State>) => void;
+    removeState: (id: string) => void;
+    setAllStates: (newTypes: State[]) => void;
+
+    //imoports
+    imports: Import[];
+    addImport: (type: Import) => void;
+    updateImport: (id: string, updates: Partial<Import>) => void;
+    removeImport: (id: string) => void;
+    setAllImports: (newImports: Import[]) => void;
+
+    componentCounters: Record<string, number>;
+    getComponentCounter: (baseName: string) => number;
+    getAllComponentCounters: () => Record<string, number>;
+    setAllComponentCounters: (newCounters: Record<string, number>) => void;
 }
 
 const DroppedComponentsContext = createContext<
@@ -108,10 +128,16 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
     const [functions, setFunctions] = useState<CustomFunctionConfig[]>([]);
 
+    const [states, setStates] = useState<State[]>([]);
+
+    const [imports, setImports] = useState<Import[]>([]);
+
+    let componentCounters: Record<string, number> = {};
+
     const [currentComponent, setCurrentComponent] =
         useState<EditingComponentParams | null>(null);
 
-    const setInitComponents = (components: StructuredLayout) => {
+    const setAllComponents = (components: StructuredLayout) => {
         setComponents(components);
     };
 
@@ -383,7 +409,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     }, []);
 
     // Função que obtém todos os componentes
-    const getAllComponents = (): StructuredLayout => components;
 
     const setEditingComponent = ({
         path,
@@ -461,19 +486,81 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
     const setAllFunctions = (fncs: CustomFunctionConfig[]) => {
         setFunctions(Array.isArray(fncs) ? fncs : []); // Ensure array
-      };
+    };
+
+    //states
+    const addState = (state: State) => {
+        setStates((prev = []) => [...prev, state]); // Fallback to empty array
+    };
+
+    const updateState = (id: string, updates: Partial<State>) => {
+        setStates((prev) =>
+            prev.map((state) =>
+                state.id === id ? { ...state, ...updates } : state
+            )
+        );
+    };
+
+    const removeState = (id: string) => {
+        setStates((prev) => prev.filter((state) => state.id !== id));
+    };
+
+    const setAllStates = (states: State[]) => {
+        setStates(Array.isArray(states) ? states : []);
+    };
+
+    //imports
+    const addImport = (importPath: Import) => {
+        setImports((prev = []) => [...prev, importPath]); // Fallback to empty array
+    };
+
+    const updateImport = (id: string, updates: Partial<Import>) => {
+        setImports((prev) =>
+            prev.map((importPath) =>
+                importPath.id === id
+                    ? { ...importPath, ...updates }
+                    : importPath
+            )
+        );
+    };
+    const removeImport = (id: string) => {
+        setImports((prev) => prev.filter((importPath) => importPath.id !== id));
+    };
+    const setAllImports = (imports: Import[]) => {
+        setImports(Array.isArray(imports) ? imports : []); // Ensure array
+    };
+
+    //common
+    const getComponentCounter = useCallback(
+        (baseName: string): number => {
+            componentCounters[baseName] =
+                (componentCounters[baseName] || 0) + 1;
+            return componentCounters[baseName];
+        },
+        [componentCounters]
+    );
+
+    const getAllComponentCounters = useCallback(() => {
+        return { ...componentCounters };
+    }, [componentCounters]);
+
+    const setAllComponentCounters = useCallback(
+        (newCounters: Record<string, number>) => {
+            componentCounters = newCounters;
+        },
+        []
+    );
 
     return (
         <DroppedComponentsContext.Provider
             value={{
                 newStructure,
-                setInitComponents,
+                setAllComponents,
                 handleAddChildToComponent,
                 handleRemoveChildFromComponent,
                 handleReorderChildInComponent,
                 handleUpdateChildComponent,
                 removeRow,
-                getAllComponents,
                 setEditingComponent,
                 clearEditingComponent,
 
@@ -489,10 +576,27 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 removeFunction,
                 setAllFunctions,
 
+                addState,
+                updateState,
+                removeState,
+                setAllStates,
+
+                addImport,
+                updateImport,
+                removeImport,
+                setAllImports,
+
                 components,
                 currentComponent,
                 types,
                 functions,
+                states,
+                imports,
+
+                componentCounters,
+                getComponentCounter,
+                getAllComponentCounters,
+                setAllComponentCounters,
             }}
         >
             {children}

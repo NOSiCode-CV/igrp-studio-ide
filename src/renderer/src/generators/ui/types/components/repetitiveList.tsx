@@ -12,7 +12,7 @@ import {
 import { getLabel } from '@renderer/utils/helpers';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
-import TableTool from '../tools/TableTool';
+import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 
@@ -86,7 +86,6 @@ const RepetitiveProps: React.FC<RepetitiveProps> = ({
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className="p-0"
                 >
                     <TableTool
                         comp={component}

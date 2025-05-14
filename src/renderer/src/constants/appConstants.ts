@@ -104,3 +104,9 @@ export const projectStructureStyle = [
     { value: 'technical', label: 'Technical' },
     { value: 'domain', label: 'Domain-Driven Design (DDD)' },
 ];
+
+export enum APRESENTATION {
+    DESIGN = "design",
+    CODE = "code",
+    JSON = "json"
+};

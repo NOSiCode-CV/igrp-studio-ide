@@ -90,8 +90,8 @@ const Section = ({
                 onDrop={handleDrop}
                 component={comp}
                 className={cn(
-                    'hover:border-none space-y-6',
-                    isDisabled && 'border-none hover:border-red-500'
+                    'hover:border-none space-y-1',
+                    isDisabled && 'border-none hover:border-destructive'
                 )}
             >
                 {components && components.length > 0 ? (
@@ -109,7 +109,7 @@ const Section = ({
                                     isDisabled={isDisabled}
                                     className={cn(
                                         comp.type === APP_COMPONENT &&
-                                            'hover:border-red-500'
+                                            'hover:border-destructive'
                                     )}
                                 >
                                     <BoxContainer

@@ -1,7 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import Editor, { Monaco, OnChange, Theme } from '@monaco-editor/react';
 import { useTheme } from './theme-provider';
-
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -22,7 +21,6 @@ self.MonacoEnvironment = {
             return new htmlWorker();
         }
         if (label === 'typescript' || label === 'javascript') {
-            console.log('使用ts worker........................');
             return new tsWorker();
         }
         return new editorWorker();
@@ -40,17 +38,50 @@ interface MonacoEditorProps {
     language?: string;
 }
 
-const MonacoEditor: React.FC<MonacoEditorProps> = ({
+export interface MonacoEditorHandle {
+    insertTextAtCursor: (text: string) => void;
+    getEditor: () => monaco.editor.IStandaloneCodeEditor | null;
+}
+
+const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(({
     filePath = 'file:///untitled',
     content,
     onChange,
     height = '100vh',
     options,
     language,
-}) => {
-    const editorRef = useRef<any>(null);
+}, ref) => {
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const monacoRef = useRef<Monaco | null>(null);
     const { theme } = useTheme();
     const [editorTheme, setEditorTheme] = useState<Theme>('vs-dark');
+
+    // Expose editor methods via ref
+    useImperativeHandle(ref, () => ({
+        insertTextAtCursor: (text: string) => {
+            if (editorRef.current) {
+                const editor = editorRef.current;
+                const selection = editor.getSelection();
+                const range = selection 
+                    ? new monaco.Range(
+                        selection.startLineNumber,
+                        selection.startColumn,
+                        selection.endLineNumber,
+                        selection.endColumn
+                    )
+                    : new monaco.Range(1, 1, 1, 1);
+                
+                editor.executeEdits("insert-text", [
+                    {
+                        range,
+                        text,
+                        forceMoveMarkers: true
+                    }
+                ]);
+            }
+        },
+        getEditor: () => editorRef.current
+    }));
 
     // Update editor theme based on app theme
     useEffect(() => {
@@ -59,39 +90,34 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
     }, [theme]);
 
     // Handle editor mount
-    const handleEditorDidMount = (editor: any, monaco: Monaco) => {
+    const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) => {
         editorRef.current = editor;
+        monacoRef.current = monacoInstance;
 
-        if (!monaco) {
+        if (!monacoInstance) {
             console.error('Monaco instance is undefined');
             return;
         }
 
         if (filePath) {
             try {
-                const uri = monaco.Uri.parse(filePath);
-                const existingModel = monaco.editor.getModel(uri);
+                const uri = monacoInstance.Uri.parse(filePath);
+                const existingModel = monacoInstance.editor.getModel(uri);
 
                 if (!existingModel) {
-                    console.log('Creating new model for URI:', uri.toString());
-                    const model = monaco.editor.createModel(
+                    const model = monacoInstance.editor.createModel(
                         content,
                         language,
                         uri
                     );
                     editor.setModel(model);
                 } else {
-                    console.log(
-                        'Using existing model for URI:',
-                        uri.toString()
-                    );
                     editor.setModel(existingModel);
                 }
             } catch (error) {
                 console.error('Error setting Monaco Editor model:', error);
-                console.log('Fallback: Using default untitled file path');
-                const uri = monaco.Uri.parse('file:///untitled');
-                const model = monaco.editor.createModel(content, language, uri);
+                const uri = monacoInstance.Uri.parse('file:///untitled');
+                const model = monacoInstance.editor.createModel(content, language, uri);
                 editor.setModel(model);
             }
         }
@@ -136,9 +162,12 @@ const MonacoEditor: React.FC<MonacoEditorProps> = ({
                 minimap: { enabled: false },
                 wordWrap: 'on',
                 autoIndent: 'full',
+                tabSize: 2,
             }}
         />
     );
-};
+});
+
+MonacoEditor.displayName = 'MonacoEditor';
 
 export default React.memo(MonacoEditor);

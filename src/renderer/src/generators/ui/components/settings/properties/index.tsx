@@ -1,4 +1,7 @@
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCombobox,
+    IGRPDatePicker,
+} from '@igrp/igrp-framework-react-design-system';
 import DomainForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import MultipleSelector from '@renderer/components/multiples-selector';
@@ -32,8 +35,6 @@ const getNestedValue = (obj: any, path: string) => {
         );
 };
 
-const ACCORDION_TAGS = ['commonProperties', 'iconProperties', 'dataProperties'];
-
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     const [collapsed, setCollapsed] = useState({});
 
@@ -51,8 +52,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
 
         const fieldPath = parentKey ? `${parentKey}.${key}` : key;
 
-        const value =
-            getNestedValue(formValues, fieldPath)
+        const value = getNestedValue(formValues, fieldPath);
 
         if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties;
@@ -174,6 +174,19 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                             e.target.value
                                         )
                                     }
+                                />
+                            );
+                        case 'date':
+                            return (
+                                <IGRPDatePicker
+                                    name={
+                                        parentKey ? `${parentKey}.${key}` : key
+                                    }
+                                    date={value}
+                                    onDateChange={(value) =>
+                                        handleInputChange(fieldPath, value)
+                                    }
+                                    className=""
                                 />
                             );
                         case 'array':

@@ -103,7 +103,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className="border-none"
+            className='p-1'
         >
             <div className={cn(gridVariants({ variant, className }))}>
                 {renderColumns()}

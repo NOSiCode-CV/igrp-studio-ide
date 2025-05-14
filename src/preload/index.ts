@@ -157,6 +157,14 @@ const engine = {
 			return handleError(error)
 		}
 	},
+
+	getCodeSnippets: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_CODE_SNIPPET, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {

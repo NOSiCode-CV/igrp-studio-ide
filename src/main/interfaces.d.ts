@@ -80,6 +80,8 @@ export interface BaseEngine {
 
     getAppMetadata?: (basePath: string) => Promise<PayloadConfig>;
 
+    getCodeSnippets?(): CodeSnippetsRegistrationConfig;
+
 }
 
 
@@ -103,7 +105,9 @@ export interface IBaseEngine {
     getService: (engineType: string) => Promise<Record<string, Component>>;
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
 
-    getAppMetadata: (engineType: string, basePath: string) => Promise<AppExportsConfig>
+    getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
+
+    getCodeSnippets(engineType: string): CodeSnippetsRegistrationConfig;
 }
 
 export interface IDocker {

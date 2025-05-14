@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -65,6 +65,7 @@ import {
     RadarIcon,
     MoveRight,
     Hash,
+    EyeOff,
 } from 'lucide-react';
 
 // Constants
@@ -167,7 +168,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.AddOn]: FormInput,
     [COMPONENT.Number]: Hash,
     [COMPONENT.Label]: CaseSensitive,
-    [COMPONENT.Hidden]: FormInput,
+    [COMPONENT.Hidden]: EyeOff,
     [COMPONENT.Date]: Calendar,
     [COMPONENT.DatePicker]: Calendar,
     [COMPONENT.InputDatePicker]: Calendar,
@@ -276,6 +277,7 @@ export const COMPONENT_MAP = {
     [COMPONENT.Radio]: IGRPRadioButton,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
+    [COMPONENT.Switch]: IGRPSwitch,
 
     [COMPONENT.Piechart]: IGRPPieChart,
     [COMPONENT.Areachart]: IGRPAreaChart,

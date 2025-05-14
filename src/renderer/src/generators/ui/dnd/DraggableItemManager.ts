@@ -4,7 +4,7 @@ import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/in
 
 export const handleDragEnd = (
     result: any,
-    { handleAddChildToComponent, handleReorderChildInComponent }: any
+    { handleAddChildToComponent, handleReorderChildInComponent, generateTag }: any
 ) => {
 
     // const { getAcceptedChildren } = useStudio()
@@ -28,7 +28,7 @@ export const handleDragEnd = (
     if (mode === 'MOVE') {
         handleReorderChildInComponent(draggableId, source, destination);
     } else {
-        handleDropComponent(draggableId, source, destination, type, { handleAddChildToComponent });
+        handleDropComponent(draggableId, source, destination, type, { handleAddChildToComponent, generateTag });
     }
 };
 
@@ -37,13 +37,13 @@ const handleDropComponent = (
     source: Source,
     destination: Destination,
     type: string,
-    { handleAddChildToComponent }: any
+    { handleAddChildToComponent, generateTag }: any
 ) => {
     const { label, properties, childrenTypes, interactions, allowTypes } = source
 
     const componentId = generateId(draggableId);
 
-    const tag = getTagName(draggableId);
+    const tag = generateTag(draggableId);
 
     // Create the component object
     const component: StructuredComponent = {
@@ -61,7 +61,7 @@ const handleDropComponent = (
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
         const { name, label, properties, interactions, allowTypes } = child
         const childId = generateId(name);
-        const tag = getTagName(name)
+        const tag = generateTag(name)
         const childComponent: StructuredComponent = {
             id: childId,
             tag,
@@ -114,15 +114,5 @@ const setDefaultInteractions = (schema: any, tag: string) => {
     return interactions;
 };
 
-const componentCounters: Record<string, number> = {};
 
-const getTagName = (componentName: string) => {
-    const baseName = componentName
-        .split('-')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join('');
 
-    // Incrementa o contador para este tipo de componente
-    componentCounters[baseName] = (componentCounters[baseName] || 0) + 1;
-    return `${baseName}${componentCounters[baseName]}`;
-};

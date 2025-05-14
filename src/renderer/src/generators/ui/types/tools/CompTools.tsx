@@ -9,6 +9,8 @@ import StructureDropdown from '../../components/StructureDropdown';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT } from '../../ComponentTypes';
 import { BindingConfigurationModal } from '../../components/binding-configuration-modal';
+import { Badge } from '@renderer/components/ui/badge';
+import { useEffect, useState } from 'react';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -25,7 +27,18 @@ const CompTools = ({
 }: ToolsProps) => {
     const { componentName, label, allowTypes } = comp;
 
+    const [isOpen, setIsOpen] = useState(false);
+
+    const [currentComponent, setCurrentComponent] =
+        useState<StructuredComponent | null>(null);
+
     const isGrids = [COMPONENT.Columns].includes(componentName);
+    
+    useEffect(() => {
+        if (!isOpen) {
+            setCurrentComponent(null);
+        }
+    },[isOpen, comp]);
 
     return (
         <TooltipProvider>
@@ -90,7 +103,37 @@ const CompTools = ({
                 </Tooltip>
 
                 {allowTypes && (
-                    <BindingConfigurationModal comp={comp} path={''} />
+                    <>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge
+                                    variant={'secondary'}
+                                    className="rounded-sm cursor-pointer my-0.5"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentComponent(comp);
+                                        setIsOpen(true);
+                                    }}
+                                >
+                                    <span className="text-xs">
+                                        Binding Config
+                                    </span>
+                                </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Binding Configuration</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        {currentComponent && (
+                            <BindingConfigurationModal
+                                comp={currentComponent}
+                                path={''}
+                                open={isOpen}
+                                setOpen={setIsOpen}
+                            />
+                        )}
+                    </>
                 )}
             </div>
         </TooltipProvider>

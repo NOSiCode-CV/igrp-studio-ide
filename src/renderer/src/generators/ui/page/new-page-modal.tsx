@@ -15,14 +15,21 @@ import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/type
 import { getId } from '@renderer/utils/helpers';
 import { Button } from '@renderer/components/ui/button';
 import { FocusEvent } from 'react';
-import { TextInput } from '@renderer/generators/api/components/inputs-form';
+import {
+    CheckboxInput,
+    TextInput,
+} from '@renderer/generators/api/components/inputs-form';
 
 const initialValues: PageConfig = {
     type: 'page',
     pageName: '',
     path: '',
     description: undefined,
+    forceDynamic: false,
     id: '',
+    types: [],
+    states: [],
+    functions: [],
 };
 
 interface NewPageModalProps {
@@ -140,6 +147,13 @@ export function NewPageModal({
                             isTouched={formik.touched.path}
                             error={formik.errors.path}
                             isRequired
+                        />
+
+                        <CheckboxInput
+                            id="forceDynamic"
+                            label={t('forceDynamic')}
+                            onChange={formik.handleChange}
+                            value={formik.values.forceDynamic}
                         />
                     </div>
                     <DialogFooter className="flex justify-between">

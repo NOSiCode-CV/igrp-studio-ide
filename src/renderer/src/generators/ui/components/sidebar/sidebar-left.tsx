@@ -45,7 +45,10 @@ import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 import SidebarAppComponents from './sidebar-app-components';
 import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import { KeyboardKey } from '@renderer/constants/KeyboardKey';
-import { CustomCodeMenu, SidebarAppCustomCode } from './siderbar-app-custom-code';
+import {
+    CustomCodeMenu,
+    SidebarAppCustomCode,
+} from './custom-code/sidebar-app-custom-code';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -194,7 +197,7 @@ export function AppSidebar({
                 <SidebarHeader className="gap-3.5 border-b">
                     <div className="flex w-full items-center justify-between">
                         <div className="flex flex-1 space-x-2  items-center">
-                            <activeMenuGroup.icon size={20}/>
+                            <activeMenuGroup.icon size={20} />
                             <div className="text-base font-medium text-foreground">
                                 {t(activeMenuGroup.label)}
                             </div>

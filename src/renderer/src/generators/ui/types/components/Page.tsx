@@ -11,7 +11,7 @@ interface PageProps {
 }
 
 export const Page = ({ onDragEnd, page }: PageProps) => {
-    const { setInitComponents, newStructure, setEditingComponent } =
+    const { newStructure, setEditingComponent, setAllComponents } =
         useDroppedComponents();
 
     const { children: components } = page;
@@ -53,7 +53,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
             } else if (type === 'bottom') {
                 newRows.splice(rowIndex + 1, 0, newRow);
             }
-            setInitComponents({
+            setAllComponents({
                 ...page,
                 children: newRows,
             });
@@ -63,7 +63,7 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
     useEffect(() => {
         if (components.length === 0) {
             const newRow = newStructure(COMPONENT.Section);
-            setInitComponents({
+            setAllComponents({
                 ...page,
                 children: [newRow],
             });

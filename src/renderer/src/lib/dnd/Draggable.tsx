@@ -14,7 +14,7 @@ interface DraggableProps {
     children: React.ReactNode;
     type?: string;
     mode?: string;
-    isDisabled?: boolean
+    isDisabled?: boolean;
 }
 
 const Draggable = ({
@@ -27,7 +27,7 @@ const Draggable = ({
     type = 'DEFAULT',
     mode = 'DROP',
     children,
-    isDisabled=false
+    isDisabled = false,
 }: DraggableProps) => {
     const { id: componentId } = item;
 
@@ -55,7 +55,7 @@ const Draggable = ({
         e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
         e.dataTransfer.setData('dropTargetId', JSON.stringify(dropTargetId));
 
-      /*   const preview = document.createElement('div');
+        /*   const preview = document.createElement('div');
         preview.className = 'bg-blue-500/20 border-2 border-blue-500 rounded-lg absolute pointer-events-none';
         preview.style.width = '200px';
         preview.style.height = '100px';
@@ -71,9 +71,7 @@ const Draggable = ({
             onDragStartCapture={(e) => {
                 hadleDragStart(e);
             }}
-             onDragStart={(_) => {
-               
-            }} 
+            onDragStart={(_) => {}}
             onDragEnd={onDragEnd}
             onDragLeave={(e) => {
                 handleDragLeave(e);
@@ -84,12 +82,12 @@ const Draggable = ({
             }}
             className={cn(
                 dropZone &&
-                    'relative border rounded-lg bg-card transition-all p-2',
+                    'relative border border-dashed rounded-lg bg-card transition-all p-2',
                 draggedId === componentId && dropZone
                     ? 'opacity-25 border-primary'
                     : 'border-border',
                 dropZone && 'hover:border-primary/50',
-                isDisabled && 'hover:border-red-500',
+                isDisabled && 'hover:border-destructive',
                 className
             )}
             id={`drag-${componentId}`}

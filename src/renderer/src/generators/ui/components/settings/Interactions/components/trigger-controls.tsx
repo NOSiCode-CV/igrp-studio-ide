@@ -19,8 +19,8 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { Label } from '@renderer/components/ui/label';
-import { SelectInput } from '@renderer/generators/api/components/inputs-form';
-import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import useCustomCode from '../../../../hooks/useCustomCode';
 
 interface TriggerControlsProps {
     interactions: Record<string, InteractionValue>;
@@ -41,11 +41,10 @@ export function TriggerControls({
         Record<string, InteractionValue>
     >({});
 
-    const [selectFunction, setSelectFunction] = useState<string>('');
-
-    const { functions } = useDroppedComponents();
+    const { functionOptions } = useCustomCode();
 
     const codeRef = useRef<string>('');
+    const functionRef = useRef<any>('');
 
     useEffect(() => {
         setLocalInteractions(interactions);
@@ -94,7 +93,12 @@ export function TriggerControls({
 
     const saveInteraction = (key: string) => {
         updateInteraction(key, 'fnCustomSet', codeRef.current);
-        updateInteraction(key, 'fnName', selectFunction);
+        updateInteraction(key, 'fnName', functionRef.current);
+        setOpen(false);
+        setInteraction(undefined);
+        setInteractionKey(undefined);
+        codeRef.current = '';
+        functionRef.current = '';
     };
 
     const AddDropdown = () => {
@@ -134,7 +138,7 @@ export function TriggerControls({
         setOpen: (open: boolean) => void;
     }) => (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
+            <DialogContent className="flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max:h-[70vh]">
                 <DialogHeader>
                     <DialogTitle>
                         Edit Interaction{' '}
@@ -142,21 +146,22 @@ export function TriggerControls({
                             {interactionKey + 1}
                         </span>
                     </DialogTitle>
-                    <DialogDescription />
+                    <DialogDescription>
+                        Either select a function below or write your custom
+                        implementation
+                    </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-2">
-                    <SelectInput
+                    <IGRPCombobox
+                        ref={functionRef}
                         label={'Function'}
                         placeholder="Select Function"
-                        id="select-function"
+                        name="select-function"
                         value={interaction.fnName}
                         onChange={(value) => {
-                            setSelectFunction(value as string);
+                            functionRef.current = value as string;
                         }}
-                        options={functions.map(({ name }) => ({
-                            label: name,
-                            value: name,
-                        }))}
+                        options={functionOptions}
                     />
                     <div className="flex-1 border rounded">
                         <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
@@ -176,7 +181,6 @@ export function TriggerControls({
                 <DialogFooter className="space-x-2">
                     <DialogClose>Close</DialogClose>
                     <Button
-                        type="submit"
                         size={'sm'}
                         onClick={() => saveInteraction(interactionKey)}
                     >
