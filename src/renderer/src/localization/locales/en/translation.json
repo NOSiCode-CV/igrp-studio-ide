@@ -671,7 +671,7 @@
   "lowercase": "Lowercase",
   "capitalize": "Capitalize",
   "addComp": "Add Comp",
-  "addComponent": "Add Component",
+  "addComponent": "Add component '{{name}}'",
   "selectComponent": "Select a component to add to your",
   "props": "Props",
   "interactions": "Interactions",
