@@ -129,7 +129,7 @@ export function ConnectedAccountsSettings() {
     const handleGitLabConfigSave = (config: any) => {
         // Salva as configurações do GitLab (por exemplo, em electron-store)
         setGitlabConfig(config);
-        alert('GitLab configuration saved');
+        alert(t("gitlabConfigSaved"));
     };
 
     return (

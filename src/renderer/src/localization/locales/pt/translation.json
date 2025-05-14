@@ -60,6 +60,7 @@
   "createdSuccess": "{{name}} {{value}} foi adicionado com sucesso.",
   "newDto": "Novo DTOs",
   "newModels": "Novo Schema",
+ "newSchema": "Novo Esquema",
   "newControllers": "Novo Endpoint",
   "newAction": "Nova Ação",
   "createNewAction": "Criar uma nova Ação",
@@ -224,7 +225,7 @@
   "database_type": "Tipo de Banco de Dados",
   "host": "Host",
   "port": "Porta",
-  "actions": "Ações",
+  "status": "Estado",
   "new": "Novo",
   "add_new_connection": "Adicionar Nova Conexão",
   "fill_details_to_add_connection": "Preencha os detalhes para adicionar uma nova conexão de banco de dados",
@@ -675,6 +676,7 @@
   "props": "Propriedades",
   "interactions": "Interações",
   "drop": "Soltar",
+  "actions": "Ações",
   "here": "Aqui",
   "startNext": "Iniciar Next.js",
   "stopNext": "Parar Next.js",
@@ -735,8 +737,25 @@
   "switchToNextTab": "Alternar para próxima aba",
   "forceQuitTab": "Forçar saída da aba",
   "closeTab": "Fechar aba",
-  "tabs": "Abas"
+  "tabs": "Abas",
+  "searchPlaceholder": "Pesquisar {{type}}s...",
+  "noProjectsYet": "Ainda não há projetos",
+  "workspaceCreationFailed": "Falha na criação do workspace",
+  "myWorkspace": "Meu Espaço de Trabalho",
+  "myWorkspaceSlug": "meu-espaco-de-trabalho",
+  "myWorkspaceDescription": "Meu espaço de desenvolvimento com projetos Docker",
+  "slug": "Slug",
+  "addModule": "Adicionar módulo",
+  "openExternalUrl": "Abrir URL externa",
+  "page": "Página",
+  "component": "Componente",
+    "searchForWidget": "Pesquisar por widget...",
+   "selectedCommit": "Commit Selecionado:",
+   "toggleSidebar": "Alternar barra lateral",
+   "gitlabConfigSaved": "Configuração do GitLab salva"
+
   
+
 
   
 

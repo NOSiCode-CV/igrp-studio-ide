@@ -122,7 +122,7 @@ export function NewPageModal({
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? 'Saving...' : 'Save'}
+                            {formik.isSubmitting ?  t("saving") : t("save")}
                         </Button>
                     </DialogFooter>
                 </form>

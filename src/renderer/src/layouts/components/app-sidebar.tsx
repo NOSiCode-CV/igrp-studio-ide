@@ -188,7 +188,7 @@ export function AppSidebar({
                                         basePath={basePath}
                                         onSelectCommit={(commit) => {
                                             console.log(
-                                                'Selected Commit:',
+                                                t('selectedCommit'),
                                                 commit
                                             );
                                         }}

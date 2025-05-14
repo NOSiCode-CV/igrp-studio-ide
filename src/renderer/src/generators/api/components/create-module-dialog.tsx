@@ -89,7 +89,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
             formik.resetForm();
 
-            createGitCommit(basePath, `Add module ${formik.values.name}`);
+             createGitCommit(basePath, `${t("addModule")} ${formik.values.name}`);
 
             dispatch(onSetChangeStatus(true));
 

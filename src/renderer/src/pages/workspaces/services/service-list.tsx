@@ -34,7 +34,7 @@ export function ServiceList({ services }: ServiceListProps) {
                         <TableHead>{t('ports')}</TableHead>
                         <TableHead>{t('dependencies')}</TableHead>
                         <TableHead>{t('status')}</TableHead>
-                        <TableHead className="w-[100px]">Actions</TableHead>
+                        <TableHead className="w-[100px]">{t('actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

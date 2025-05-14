@@ -46,7 +46,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
     const handleServiceUrl = () => {
         const url = getServiceUrl(service);
         if (url) {
-            window.electron.ipcRenderer.send('open-external-url', url);
+            window.electron.ipcRenderer.send(t("openExternalUrl"), url);
         }
     };
 

@@ -60,6 +60,7 @@
   "deletedSuccess": "\"{{name}}\" deleted successfully!",
   "createdSuccess": "{{name}} \"{{value}}\" have been successfully added.",
   "newDto": "New DTOs",
+  "newSchema": "New Schema",
   "newModels": "New Schema Object",
   "newControllers": "New Endpoint",
   "newAction": "New Action",
@@ -735,8 +736,22 @@
   "switchToNextTab": "Switch to Next tab",
   "forceQuitTab": "Force Quit Tab",
   "closeTab": "Close Tab",
-  "tabs": "Tabs"
-    
+  "tabs": "Tabs",
+  "searchPlaceholder": "Search {{type}}s...",
+  "noProjectsYet": "No projects yet",
+  "workspaceCreationFailed": "Workspace creation failed",
+  "myWorkspace": "My Workspace",
+  "myWorkspaceSlug": "my-workspace",
+  "myWorkspaceDescription": "My development workspace with Docker projects",
+  "slug": "Slug",
+   "addModule": "Add module",
+   "openExternalUrl": "Open external URL",
+   "page": "Page",
+   "component": "Component",
+   "searchForWidget": "Search for widget...",
+  "selectedCommit": "Selected Commit:",
+  "toggleSidebar": "Toggle Sidebar",
+  "gitlabConfigSaved": "GitLab configuration saved"
   
 
 

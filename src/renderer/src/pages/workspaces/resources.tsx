@@ -102,7 +102,7 @@ const ResourceSection = ({
             <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <div className="flex items-center gap-3">
                     <SearchInput
-                        placeholder={`Search ${type}s...`}
+                        placeholder={`${t('search')} ${type}s...`}
                         value={searchQuery}
                         onChange={onSearchChange}
                         className="lg:w-[250px]"

@@ -64,7 +64,7 @@ export function NewComponentModal({
                 `Component ${pageConfig.name} has been successfully added.`
             );
             // commit after creating the page
-            createGitCommit(basePath, `Add Component ${pageConfig.name}`);
+            createGitCommit(basePath, t("addComponent", { name: pageConfig.name }));
             onConfirm?.();
 
             formik.resetForm();
@@ -139,7 +139,7 @@ export function NewComponentModal({
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? 'Saving...' : 'Save'}
+                            {formik.isSubmitting ? t("saving") : t("save")}
                         </Button>
                     </DialogFooter>
                 </form>
