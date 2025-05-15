@@ -37,6 +37,7 @@ import './handlers/workspace-handler';
 import './handlers/git-handler';
 import './handlers/docker-handler';
 import './handlers/global-handler';
+import './helpers/fetch-request';
 
 import { buildTaskbar } from './helpers/taskbar';
 import {
@@ -445,50 +446,6 @@ ipcMain.on('start-drag', (_event) => {
         }
     });
 });
-
-// Handler para buscar versões
-ipcMain.handle(
-    'get-versions',
-    async (_event, endpoint: string): Promise<HandlerResponse> => {
-        try {
-            const response = await fetch(endpoint);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Erro na API: ${response.status} - ${response.statusText}`
-                );
-            }
-
-            const data = await response.json();
-
-            if (!data.items || !Array.isArray(data.items)) {
-                throw new Error('Formato de resposta inesperado');
-            }
-
-            // Retorna somente os números de versão
-            return {
-                result: data.items
-                    .filter((item) => item.version !== null)
-                    .map(
-                        (item: {
-                            version: string;
-                            maven2: { version: string };
-                        }) => item.version || item.maven2?.version
-                    ),
-            };
-        } catch (error) {
-            console.error('Erro ao buscar versões:', error);
-
-            // Retorna o erro no formato definido
-            return {
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : 'Erro desconhecido',
-            };
-        }
-    }
-);
 
 ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
     try {

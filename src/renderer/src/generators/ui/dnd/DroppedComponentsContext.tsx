@@ -8,121 +8,38 @@ import React, {
 import { useSidebar } from '@renderer/components/ui/sidebar';
 import {
     Destination,
+    DroppedComponentsContextType,
     EditingComponentParams,
     StructuredComponent,
     StructuredLayout,
 } from '@renderer/lib/dnd/types';
-import { generateId } from '@renderer/utils/helpers';
-import { COMPONENT } from '../ComponentTypes';
 import {
     CustomFunctionConfig,
     Import,
     State,
     TypeDef,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-
-interface DroppedComponentsContextType {
-    newStructure: (name: string) => StructuredComponent;
-    setAllComponents: (components: StructuredLayout) => void;
-
-    handleAddChildToComponent: (
-        destination: Destination,
-        childComponent: StructuredComponent
-    ) => void;
-
-    handleRemoveChildFromComponent: (destination: Destination) => void;
-
-    handleReorderChildInComponent: (
-        draggableId: string,
-        source: Destination,
-        destination: Destination
-    ) => void;
-
-    handleUpdateChildComponent: (
-        componentId: string,
-        updates: Partial<StructuredComponent>
-    ) => void;
-
-    removeRow: (rowId: string) => void;
-    setEditingComponent: ({ path, component }: EditingComponentParams) => void;
-    clearEditingComponent: () => void;
-    currentComponent: EditingComponentParams | null;
-
-    components: StructuredLayout;
-
-    //types
-    types: TypeDef[];
-    addType: (type: TypeDef) => void;
-    updateType: (id: string, updates: Partial<TypeDef>) => void;
-    removeType: (id: string) => void;
-    createOrUpdateType: (newType: TypeDef) => void;
-    getTypeByComponentId: (componentId: string) => TypeDef | undefined;
-    setAllTypes: (newTypes: TypeDef[]) => void;
-
-    //functions
-    functions: CustomFunctionConfig[];
-    addFunction: (type: CustomFunctionConfig) => void;
-    updateFunction: (
-        id: string,
-        updates: Partial<CustomFunctionConfig>
-    ) => void;
-    removeFunction: (id: string) => void;
-    setAllFunctions: (newTypes: CustomFunctionConfig[]) => void;
-
-    //states
-    states: State[];
-    addState: (type: State) => void;
-    updateState: (id: string, updates: Partial<State>) => void;
-    removeState: (id: string) => void;
-    setAllStates: (newTypes: State[]) => void;
-
-    //imoports
-    imports: Import[];
-    addImport: (type: Import) => void;
-    updateImport: (id: string, updates: Partial<Import>) => void;
-    removeImport: (id: string) => void;
-    setAllImports: (newImports: Import[]) => void;
-
-    componentCounters: Record<string, number>;
-    getComponentCounter: (baseName: string) => number;
-    getAllComponentCounters: () => Record<string, number>;
-    setAllComponentCounters: (newCounters: Record<string, number>) => void;
-}
+import { newStructuredComponent } from './helpers';
 
 const DroppedComponentsContext = createContext<
     DroppedComponentsContextType | undefined
 >(undefined);
-
-const newStructuredComponent = (
-    name: string,
-    children?: Array<StructuredComponent>
-) => {
-    const newRowId = generateId(name);
-    const newRow: StructuredComponent = {
-        id: newRowId,
-        componentName: name,
-        label: name,
-        properties: {
-            variant: 'default',
-        },
-        children: children || [],
-        interactions: [],
-        tag: '',
-    };
-
-    return newRow;
-};
 
 export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
     const { toggleSidebar, setOpen } = useSidebar();
 
-    const [components, setComponents] = useState<StructuredLayout>(
-        newStructuredComponent(COMPONENT.Container, [
-            newStructuredComponent(COMPONENT.Section),
-        ])
-    );
+    const [components, setComponents] = useState<StructuredComponent>({
+        id: '',
+        tag: '',
+        componentName: '',
+        label: '',
+        type: '',
+        properties: {},
+        interactions: {},
+        children: [],
+    });
 
     const [types, setTypes] = useState<TypeDef[]>([]);
 
@@ -131,8 +48,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     const [states, setStates] = useState<State[]>([]);
 
     const [imports, setImports] = useState<Import[]>([]);
-
-    let componentCounters: Record<string, number> = {};
 
     const [currentComponent, setCurrentComponent] =
         useState<EditingComponentParams | null>(null);
@@ -530,27 +445,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         setImports(Array.isArray(imports) ? imports : []); // Ensure array
     };
 
-    //common
-    const getComponentCounter = useCallback(
-        (baseName: string): number => {
-            componentCounters[baseName] =
-                (componentCounters[baseName] || 0) + 1;
-            return componentCounters[baseName];
-        },
-        [componentCounters]
-    );
-
-    const getAllComponentCounters = useCallback(() => {
-        return { ...componentCounters };
-    }, [componentCounters]);
-
-    const setAllComponentCounters = useCallback(
-        (newCounters: Record<string, number>) => {
-            componentCounters = newCounters;
-        },
-        []
-    );
-
     return (
         <DroppedComponentsContext.Provider
             value={{
@@ -592,11 +486,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 functions,
                 states,
                 imports,
-
-                componentCounters,
-                getComponentCounter,
-                getAllComponentCounters,
-                setAllComponentCounters,
             }}
         >
             {children}

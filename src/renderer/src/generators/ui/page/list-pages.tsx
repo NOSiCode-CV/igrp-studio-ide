@@ -122,7 +122,7 @@ const MainPageBuilder = ({
         ...filteredPages.map((page) => ({
             ...page.content,
             ...page,
-            pagePath: page.content.path,
+            pagePath: page.content?.path,
             isPage: true,
         })),
         ...filteredComponents.map((comp) => ({

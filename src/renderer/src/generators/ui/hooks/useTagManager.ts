@@ -1,7 +1,7 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useRef, useCallback } from 'react';
 
-export function useTagManager(componentTree: StructuredComponent) {
+export function useTagManager(componentTree: StructuredComponent | null) {
     const tagSetRef = useRef<Set<string>>(new Set());
 
     // Função recursiva para coletar todos os IDs
@@ -15,6 +15,7 @@ export function useTagManager(componentTree: StructuredComponent) {
 
     // Reconstrói o Set de IDs com base no componente atual
     const rebuild = useCallback(() => {
+        if (!componentTree) return
         const newSet = new Set<string>();
         collectAllIds(componentTree).forEach(tag => newSet.add(tag));
         tagSetRef.current = newSet;

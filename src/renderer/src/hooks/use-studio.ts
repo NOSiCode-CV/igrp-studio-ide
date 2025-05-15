@@ -1,6 +1,6 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { FileTree, ProjectData } from 'src/main/types';
@@ -22,6 +22,8 @@ const selectProperties = createSelector(selectState, (studio) => ({
 
 const useStudio = () => {
     const { files, basePath, config } = useSelector(selectProperties);
+
+    const [componentsRegistered, setComponentsRegistered] = useState<ComponentRegisterConfig[]>([]);
 
     // Fetch components from the files tree
     const fetchComponents = useCallback(() => {
@@ -76,8 +78,10 @@ const useStudio = () => {
 
     // Get all registered components
     const getRegistryComponent = useCallback(async () => {
-        const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
-        return result.components;
+        return await window.engine.getComponent(ENV_TYPES.NEXTJS).then((res) => {
+            setComponentsRegistered(res.result.components);
+            return res.result.components
+        })
     }, []);
 
     // Helper function to find a component by name or within a parent's acceptedChildren
@@ -141,10 +145,20 @@ const useStudio = () => {
         return component ? component.interactions : [];
     }, [findComponent]);
 
+     const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
+        return componentsRegistered.find(component => component.name === id);
+    };
+
+    useEffect(() => {
+        getRegistryComponent();
+    }, []);
+
     return {
         files,
         basePath,
         config,
+        componentsRegistered,
+        findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,
         getRegistryComponent,

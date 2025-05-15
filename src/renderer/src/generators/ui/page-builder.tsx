@@ -1,4 +1,10 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
+import {
+    forwardRef,
+    useCallback,
+    useEffect,
+    useImperativeHandle,
+    useState,
+} from 'react';
 
 import { useConfigdata } from './hooks/useConfigData';
 import {
@@ -20,6 +26,9 @@ import { useDispatch } from 'react-redux';
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
 import { Page } from './types/components/Page';
 import { useTagManager } from './hooks/useTagManager';
+import { COMPONENT } from './ComponentTypes';
+import { newStructuredComponent } from './dnd/helpers';
+import useStudio from '@renderer/hooks/use-studio';
 
 interface FormEngineProps {
     basePath: string;
@@ -58,11 +67,15 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { menuItems } = useConfigdata();
+        const { componentsRegistered, findComponentById } = useStudio();
+
+        const { menuItems } = useConfigdata(componentsRegistered);
 
         const dispatch: any = useDispatch();
 
         const { rebuild, generateTag } = useTagManager(components);
+
+        const [loading, setLoading] = useState<boolean>(false);
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
@@ -78,28 +91,29 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             clearEditingComponent();
         }, [activePresentation]);
 
-        const handleSave = async (jsonStructure: StructuredLayout) => {
+        const handleSave = async (components: StructuredLayout) => {
             try {
                 if (basePath === undefined) return;
 
-                const pageConfig: PageConfig = {
+                const config: any = {
                     id,
                     type,
                     path,
-                    pageName: label,
-                    components: jsonStructure,
+                    components,
                     functions,
                     types,
                     states,
                     imports,
                 };
 
+                const pageConfig: PageConfig = {
+                    ...config,
+                    pageName: label,
+                };
+
                 const compConfig: ComponentConfig = {
-                    id,
-                    type,
-                    path,
+                    ...config,
                     name: label,
-                    components: jsonStructure,
                 };
 
                 console.log(type === 'page' ? pageConfig : compConfig);
@@ -123,7 +137,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         };
 
-        //TODO for refactor after accert new json model
         useEffect(() => {
             const getJsonData = async () => {
                 try {
@@ -131,6 +144,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                     const data = await window.api.getJsonContent(pagePath);
                     if (data.components) {
+                        setLoading(true);
                         setAllComponents(data.components);
                         setAllTypes(data.types);
                         setAllFunctions(data.functions);
@@ -145,6 +159,31 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         }, [basePath, page]);
 
         useEffect(() => {
+            if (loading) return;
+
+            const pageCompRegister = findComponentById(COMPONENT.PageContent);
+            const sectionCompRegister = findComponentById(
+                COMPONENT.PageContent
+            );
+
+            const section = newStructuredComponent(
+                COMPONENT.Section,
+                [],
+                sectionCompRegister
+            );
+
+            const pageContent = newStructuredComponent(
+                COMPONENT.PageContent,
+                [{ ...section, tag: generateTag(COMPONENT.Section) }],
+                pageCompRegister
+            );
+            setAllComponents({
+                ...pageContent,
+                tag: generateTag(COMPONENT.PageContent),
+            });
+        }, [menuItems, loading]);
+
+        useEffect(() => {
             rebuild();
         }, [components, rebuild]);
 
@@ -153,7 +192,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             removeRow,
             handleAddChildToComponent,
             handleReorderChildInComponent,
-            generateTag
+            generateTag,
         };
 
         const onDragEnd = useCallback((result: DragEndResult) => {
@@ -170,7 +209,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                             {activePresentation === APRESENTATION.DESIGN ? (
                                 <Page page={components} onDragEnd={onDragEnd} />
                             ) : activePresentation === APRESENTATION.JSON ? (
-                                <CodeContentJson components={components} />
+                                <CodeContentJson
+                                    components={components}
+                                    pagePath={pagePath}
+                                />
                             ) : (
                                 <CodeContentTS
                                     pagePath={`${basePath}/src/app/(generated)/${page.pagePath}/page.tsx`}

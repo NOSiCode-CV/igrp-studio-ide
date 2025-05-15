@@ -70,8 +70,6 @@ const useCustomCode = (): CustomCodeHook => {
 
                 setTypes(metadata.types || [])
 
-                console.log(metadata)
-
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to load resources'));
                 console.error('Error loading data:', err);

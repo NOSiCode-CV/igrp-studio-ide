@@ -3,28 +3,25 @@ import { HandlerResponse } from "src/main/types";
 
 const useCore = () => {
     const getVersions = useCallback(async () => {
-        const data: HandlerResponse = await window.api.getVersions(import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS);
-    
-        const sortedVersions = data.result.sort((a, b) => {
-            const [_, dateA, suffixA] = a.match(/-(\d{8}\.\d{6})-(\d+)$/);
-            const [__, dateB, suffixB] = b.match(/-(\d{8}\.\d{6})-(\d+)$/);
+        const { result }: HandlerResponse = await window.api.getVersions(import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS);
 
-            if (dateA > dateB) return -1;
-            if (dateA < dateB) return 1;
-
-            return parseInt(suffixB) - parseInt(suffixA);
-        });
-
-        return sortedVersions.map((value) => {
+        return result.items.map((item) => {
             return {
-                label: value,
-                value: value,
+                label: item.version,
+                value: item.version,
             };
         });
     }, []);
 
+    const fetchData = useCallback(async (endpoint: string) => {
+        const { result }: HandlerResponse = await window.api.fetchData(endpoint);
+
+        return result
+    }, []);
+
     return {
         getVersions,
+        fetchData
     };
 };
 

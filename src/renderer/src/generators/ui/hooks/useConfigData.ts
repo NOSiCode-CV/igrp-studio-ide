@@ -1,18 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import useStudio from '@renderer/hooks/use-studio';
+import { useMemo } from 'react';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { GROUP_COMPONET, ICON_MAP } from '../ComponentTypes';
+import { COMPONENT, GROUP_COMPONET, ICON_MAP } from '../ComponentTypes';
 
-const HIDDEN_COMPONENTS = ['column']
+const HIDDEN_COMPONENTS = [COMPONENT.Column, COMPONENT.PageContent]
 
-const useConfigdata = () => {
-
-    const { getRegistryComponent } = useStudio()
-    const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
-
-    useEffect(() => {
-        getRegistryComponent().then(data => setComponents(data));
-    }, [getRegistryComponent]);
+const useConfigdata = (components: ComponentRegisterConfig[]) => {
 
     const menuItems = useMemo(() => {
         if (!components || components.length === 0) return [];
@@ -39,7 +31,8 @@ const useConfigdata = () => {
                 properties: component.properties,
                 interactions: component.interactions,
                 childrenTypes: component.childrenTypes,
-                allowTypes: component.allowTypes
+                allowTypes: component.allowTypes,
+                data: component.data,
             }))
         }));
     }, [components]);

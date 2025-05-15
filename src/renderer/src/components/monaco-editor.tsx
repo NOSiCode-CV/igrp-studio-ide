@@ -170,4 +170,4 @@ const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(({
 
 MonacoEditor.displayName = 'MonacoEditor';
 
-export default React.memo(MonacoEditor);
+export default MonacoEditor

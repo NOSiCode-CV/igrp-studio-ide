@@ -114,6 +114,12 @@ export const FAKE_COMPONENT_DATA: Record<string, any> = {
             angleAxisKey: "month",
         }
     },
+    [COMPONENT.Select]: {
+        properties: {
+            options: [
+            ]
+        }
+    },
     // Default fallback component
     Default: {
         componentName: 'UnknownComponent',

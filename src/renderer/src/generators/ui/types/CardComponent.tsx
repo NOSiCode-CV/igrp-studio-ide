@@ -8,7 +8,7 @@ export interface CardComponentProps {
 }
 
 const CardComponent = ({ comp }: CardComponentProps) => {
-    const { componentName, properties } = comp;
+    const { componentName, properties, data } = comp;
 
     const {
         commonProperties,

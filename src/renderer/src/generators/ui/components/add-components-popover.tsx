@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
+import { useTagManager } from '../hooks/useTagManager';
 
 export const AddComponentPopover = ({
     comp,
@@ -29,6 +30,7 @@ export const AddComponentPopover = ({
 
     const { getAcceptedChildren } = useStudio();
     const { handleAddChildToComponent } = useDroppedComponents();
+    const { generateTag} = useTagManager(null);
 
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
 
@@ -51,6 +53,7 @@ export const AddComponentPopover = ({
         };
         handleDragEnd(result, {
             handleAddChildToComponent,
+            generateTag
         });
     };
 

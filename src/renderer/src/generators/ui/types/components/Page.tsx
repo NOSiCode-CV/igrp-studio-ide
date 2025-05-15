@@ -11,10 +11,11 @@ interface PageProps {
 }
 
 export const Page = ({ onDragEnd, page }: PageProps) => {
+    const { children: components } = page;
+
     const { newStructure, setEditingComponent, setAllComponents } =
         useDroppedComponents();
 
-    const { children: components } = page;
     const { dynamicImport } = useStudio();
 
     const [loadedComponents, setLoadedComponents] = useState<{

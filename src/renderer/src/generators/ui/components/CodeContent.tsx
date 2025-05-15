@@ -1,15 +1,11 @@
 import MonacoEditor from '@renderer/components/monaco-editor';
 
-const CodeContentJson = (components) => {
+const CodeContentJson = ({ components, pagePath }: any) => {
     const code = JSON.stringify(components, null, 2);
-
-    return <MonacoEditor language="json" content={code} />;
+    return <MonacoEditor language="json" content={code} filePath={pagePath} />;
 };
 
-
-
-const CodeContentTS = (pagePath) => {
-    console.log('pagePath', pagePath);
+const CodeContentTS = ({ pagePath }: any) => {
     return (
         <MonacoEditor language="typescript" content={''} filePath={pagePath} />
     );

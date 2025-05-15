@@ -23,6 +23,8 @@ interface CustomAPI {
 
     getVersions: (endpoint: string) => Promise<HandlerResponse>,
 
+    fetchData: (endpoint: string) => Promise<HandlerResponse>,
+
     i18nextElectronBackend: any
 }
 

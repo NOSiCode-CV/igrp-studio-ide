@@ -18,7 +18,6 @@ import {
 import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext';
 import { FormikProps, useFormik } from 'formik';
 import { Loader2 } from 'lucide-react';
-import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import { ImportComponent } from './custom-code-imports';

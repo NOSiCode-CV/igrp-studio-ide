@@ -21,6 +21,7 @@ import { DialogDescription } from '@radix-ui/react-dialog';
 import { Label } from '@renderer/components/ui/label';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import useCustomCode from '../../../../hooks/useCustomCode';
+import { ImportComponent } from '../../../sidebar/custom-code/custom-code-imports';
 
 interface TriggerControlsProps {
     interactions: Record<string, InteractionValue>;
@@ -31,43 +32,49 @@ interface TriggerControlsProps {
     ) => void;
 }
 
+const mapPropertyOptions = (properties: Record<string, any> = {}) => {
+    return Object.entries(properties).map(([key, prop]) => ({
+        value: key, // The property key as value
+        label:
+            prop.label ||
+            key
+                .replace(/([A-Z])/g, ' $1') // Add space before capitals
+                .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+                .trim(),
+    }));
+};
+
 export function TriggerControls({
     interactions,
     interactionsType,
-    componentTag,
     onInteractionsChange,
 }: TriggerControlsProps) {
     const [localInteractions, setLocalInteractions] = useState<
         Record<string, InteractionValue>
     >({});
 
-    const { functionOptions } = useCustomCode();
-
-    const codeRef = useRef<string>('');
-    const functionRef = useRef<any>('');
-
     useEffect(() => {
         setLocalInteractions(interactions);
     }, [interactions]);
 
     const addInteraction = (int: string, interaction: Record<string, any>) => {
-        const fnCustomSet = interaction?.properties?.fnCustomSet.default
+        /*  const fnCustomSet = interaction?.properties?.fnCustomSet.default
             ? interaction?.properties.fnCustomSet.default.replace(
                   '{{id}}',
                   componentTag
               )
-            : '';
+            : ''; */
 
         const updated = {
             ...localInteractions,
             [int]: {
-                fnCustomSet,
+                //fnCustomSet,
             },
         };
 
         onInteractionsChange(updated);
         setLocalInteractions(updated);
-        codeRef.current = fnCustomSet;
+        // codeRef.current = fnCustomSet;
     };
 
     const removeInteraction = (key: string) => {
@@ -75,30 +82,6 @@ export function TriggerControls({
         delete newInteractions[key];
         setLocalInteractions(newInteractions);
         onInteractionsChange(newInteractions);
-    };
-
-    const updateInteraction = (
-        key: string,
-        field: keyof InteractionValue,
-        value: any
-    ) => {
-        const updated = {
-            ...localInteractions,
-            [key]: { ...localInteractions[key], [field]: value },
-        };
-
-        setLocalInteractions(updated);
-        onInteractionsChange(updated);
-    };
-
-    const saveInteraction = (key: string) => {
-        updateInteraction(key, 'fnCustomSet', codeRef.current);
-        updateInteraction(key, 'fnName', functionRef.current);
-        setOpen(false);
-        setInteraction(undefined);
-        setInteractionKey(undefined);
-        codeRef.current = '';
-        functionRef.current = '';
     };
 
     const AddDropdown = () => {
@@ -125,71 +108,6 @@ export function TriggerControls({
             </DropdownMenu>
         );
     };
-
-    const InteractionEditor = ({
-        interaction,
-        interactionKey,
-        open,
-        setOpen,
-    }: {
-        interaction: InteractionValue;
-        interactionKey: string;
-        open: boolean;
-        setOpen: (open: boolean) => void;
-    }) => (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max:h-[70vh]">
-                <DialogHeader>
-                    <DialogTitle>
-                        Edit Interaction{' '}
-                        <span className="text-muted-foreground">
-                            {interactionKey + 1}
-                        </span>
-                    </DialogTitle>
-                    <DialogDescription>
-                        Either select a function below or write your custom
-                        implementation
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-2">
-                    <IGRPCombobox
-                        ref={functionRef}
-                        label={'Function'}
-                        placeholder="Select Function"
-                        name="select-function"
-                        value={interaction.fnName}
-                        onChange={(value) => {
-                            functionRef.current = value as string;
-                        }}
-                        options={functionOptions}
-                    />
-                    <div className="flex-1 border rounded">
-                        <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
-                            Inline Function
-                        </Label>
-                        <MonacoEditor
-                            content={interaction.fnCustomSet || ''}
-                            filePath=""
-                            onChange={(newCode) => {
-                                codeRef.current = newCode;
-                            }}
-                            height="30vh"
-                            language="typescript"
-                        />
-                    </div>
-                </div>
-                <DialogFooter className="space-x-2">
-                    <DialogClose>Close</DialogClose>
-                    <Button
-                        size={'sm'}
-                        onClick={() => saveInteraction(interactionKey)}
-                    >
-                        Save changes
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
 
     const [open, setOpen] = useState(false);
     const [interaction, setInteraction] = useState<InteractionValue>();
@@ -256,8 +174,143 @@ export function TriggerControls({
                     setOpen={setOpen}
                     interaction={interaction}
                     interactionKey={interactionKey}
+                    onInteractionsChange={onInteractionsChange}
+                    interactionsType={interactionsType}
+                    setLocalInteractions={setLocalInteractions}
+                    localInteractions={localInteractions}
                 />
             )}
         </div>
     );
 }
+
+const InteractionEditor = ({
+    interaction,
+    interactionKey,
+    open,
+    setOpen,
+    onInteractionsChange,
+    interactionsType,
+    setLocalInteractions,
+    localInteractions,
+}: {
+    interaction: InteractionValue;
+    interactionKey: string;
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    onInteractionsChange: (
+        interactions: Record<string, InteractionValue>
+    ) => void;
+    interactionsType: any;
+    localInteractions: Record<string, InteractionValue>;
+    setLocalInteractions: (
+        localInteractions: Record<string, InteractionValue>
+    ) => void;
+}) => {
+    console.log(interaction);
+
+    const codeRef = useRef<string>('');
+    const functionRef = useRef<any>('');
+
+    const [interactionType, setInteractionType] = useState<string>('');
+
+    const { functionOptions } = useCustomCode();
+
+    const interactions = interactionsType[interactionKey];
+
+    console.log(interactions);
+
+    const options = mapPropertyOptions(interactions?.properties);
+
+    const updateInteraction = (
+        key: string,
+        field: keyof InteractionValue,
+        value: any
+    ) => {
+        const updated = {
+            ...localInteractions,
+            [key]: { ...localInteractions[key], [field]: value },
+        };
+
+        setLocalInteractions(updated);
+        onInteractionsChange(updated);
+    };
+
+    const saveInteraction = (key: string) => {
+        updateInteraction(key, 'fnCustomSet', codeRef.current);
+        updateInteraction(key, 'fnName', functionRef.current);
+        setOpen(false);
+        codeRef.current = '';
+        functionRef.current = '';
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max:h-[70vh]">
+                <DialogHeader>
+                    <DialogTitle>
+                        Edit Interaction{' '}
+                        <span className="text-muted-foreground">
+                            {interactionKey + 1}
+                        </span>
+                    </DialogTitle>
+                    <DialogDescription>
+                        Either select a function below or write your custom
+                        implementation
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2">
+                    <IGRPCombobox
+                        ref={functionRef}
+                        label={'Interaction Type'}
+                        name="select-interaction-type"
+                        value={interactionType}
+                        onChange={(value) => {
+                            setInteractionType(value as string);
+                        }}
+                        options={options}
+                    />
+                    <IGRPCombobox
+                        ref={functionRef}
+                        label={'Function'}
+                        placeholder="Select Function"
+                        name="select-function"
+                        value={interaction.fnName}
+                        onChange={(value) => {
+                            functionRef.current = value as string;
+                        }}
+                        options={functionOptions}
+                    />
+                    <div className="flex-1 border rounded">
+                        <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                            Inline Function
+                        </Label>
+                        <MonacoEditor
+                            content={interaction.fnCustomSet || ''}
+                            filePath=""
+                            onChange={(newCode) => {
+                                codeRef.current = newCode;
+                            }}
+                            height="30vh"
+                            language="typescript"
+                        />
+                    </div>
+
+                    <ImportComponent
+                        initialImports={[]}
+                        onChange={(imports) => {}}
+                    />
+                </div>
+                <DialogFooter className="space-x-2">
+                    <DialogClose>Close</DialogClose>
+                    <Button
+                        size={'sm'}
+                        onClick={() => saveInteraction(interactionKey)}
+                    >
+                        Save changes
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};

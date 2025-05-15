@@ -85,6 +85,7 @@ export const GROUP_COMPONET: Record<string, string> = {
 };
 
 export const COMPONENT: Record<string, string> = {
+    PageContent: "page",
     Columns: "columns",
     Column: "column",
     Grid: "grid",
