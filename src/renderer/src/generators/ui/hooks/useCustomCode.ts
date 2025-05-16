@@ -1,6 +1,7 @@
 import { State, CustomFunctionConfig, CodeSnippetsRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { useDroppedComponents } from "@renderer/generators/ui/dnd/DroppedComponentsContext";
 import useStudio from "@renderer/hooks/use-studio";
+import { StructuredComponent } from "@renderer/lib/dnd/types";
 import { EngineService } from "@renderer/services/EngineService";
 import { useMemo, useState, useEffect } from "react";
 
@@ -21,8 +22,10 @@ interface CustomCodeHook {
 }
 
 const useCustomCode = (): CustomCodeHook => {
-    const { states, functions: droppedFunctions } = useDroppedComponents();
+    const { states: drpoppedStates, functions: droppedFunctions, components } = useDroppedComponents();
     const [metadataFunctions, setMetadataFunctions] = useState<CustomFunctionConfig[]>([]);
+    const [metadataStates, setMetadataStates] = useState<State[]>([]);
+
     const [snippets, setSnippets] = useState<CodeSnippetsRegisterConfig[]>([]);
     const [types, setTypes] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -33,6 +36,11 @@ const useCustomCode = (): CustomCodeHook => {
     const functions = useMemo(() => {
         return [...droppedFunctions, ...metadataFunctions];
     }, [droppedFunctions, metadataFunctions]);
+
+    // Merge dropped functions with metadata functions
+    const states = useMemo(() => {
+        return [...drpoppedStates, ...metadataStates];
+    }, [drpoppedStates, metadataStates]);
 
     // Memoize function options
     const functionOptions = useMemo<Option[]>(() => {
@@ -56,20 +64,19 @@ const useCustomCode = (): CustomCodeHook => {
             setIsLoading(true);
             try {
                 // Parallel fetching
-                const [snippetsResponse, metadataResponse] = await Promise.all([
+                const [snippetsResponse, metadataResponse, metadataStates] = await Promise.all([
                     EngineService.getCodeSnippets(),
-                    EngineService.getAppMetadata(basePath)
+                    EngineService.getAppMetadata(basePath),
+                    extractAllStates(components)
                 ]);
+
+                setMetadataStates(metadataStates || []);
 
                 setSnippets(snippetsResponse.result?.codes || []);
 
-                // Extract functions from metadata
-                const metadata = metadataResponse.result;
+                setMetadataFunctions(metadataResponse.result.functions || []);
 
-                setMetadataFunctions(metadata.functions || []);
-
-                setTypes(metadata.types || [])
-
+                setTypes(metadataResponse.result.types || [])
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to load resources'));
                 console.error('Error loading data:', err);
@@ -91,7 +98,6 @@ const useCustomCode = (): CustomCodeHook => {
         );
     };
 }, []);*/
-
     return {
         functions,
         states,
@@ -103,5 +109,52 @@ const useCustomCode = (): CustomCodeHook => {
         error,
     };
 };
+
+export function extractAllStates(node: StructuredComponent): State[] {
+    const states: State[] = [];
+
+    function traverse(currentNode: StructuredComponent) {
+        if (!currentNode.data) return;
+
+        // Verifica todas as chaves do objeto `data`
+        Object.entries(currentNode.data).forEach(([key, value]) => {
+            // Caso 1: Estado direto (data.state)
+            if (key === 'state' && isState(value)) {
+                states.push(validateState(value));
+            }
+            // Caso 2: Objeto aninhado que pode conter state
+            else if (value && typeof value === 'object') {
+                if ('state' in value && isState(value.state)) {
+                    states.push(validateState(value.state));
+                }
+            }
+        });
+
+        // Recursão para filhos
+        if (currentNode.children?.length) {
+            currentNode.children.forEach(child => traverse(child));
+        }
+    }
+
+    // Valida se um objeto é um State válido
+    function isState(obj: any): obj is Partial<State> {
+        return obj && typeof obj === 'object' && 'name' in obj && 'type' in obj;
+    }
+
+    // Garante que o state tenha todas propriedades necessárias
+    function validateState(state: Partial<State>): State {
+        return {
+            id: state.id || '',
+            type: state.type || 'any',
+            name: state.name || 'unnamed',
+            defaultValue: state.defaultValue,
+            imports: state.imports || [],
+            ...state // Mantém outras propriedades
+        };
+    }
+
+    traverse(node);
+    return states;
+}
 
 export default useCustomCode;

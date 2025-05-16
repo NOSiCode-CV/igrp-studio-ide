@@ -67,9 +67,9 @@ const Flex: React.FC<FlexProps> = ({ comp, onDragEnd }: FlexProps) => {
                     >
                         <BoxWrapper
                             comp={comp}
-                            group="group/column-comp"
+                            group="group/flex"
                             onEdit={() => handleEditClick(comp)}
-                            className="opacity-0 group-hover/column-comp:opacity-100"
+                            className="opacity-0 group-hover/flex:opacity-100"
                         >
                             <Component comp={comp} onDragEnd={onDragEnd} />
                         </BoxWrapper>

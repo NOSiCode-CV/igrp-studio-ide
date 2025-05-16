@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -66,6 +66,7 @@ import {
     MoveRight,
     Hash,
     EyeOff,
+    Search,
 } from 'lucide-react';
 
 // Constants
@@ -138,6 +139,7 @@ export const COMPONENT: Record<string, string> = {
     Tabs: 'tabs',
 
     Badge: 'badge',
+    Search: 'inputSearch',
 
     iFrame: 'iFrame',
     InfoPanel: 'infoPanel',
@@ -229,6 +231,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Radarchart]: RadarIcon,
 
     [COMPONENT.Chat]: MessageCircle,
+    [COMPONENT.Search]: Search,
 
     accordion: AlignLeft,
     treeView: GitMerge,
@@ -279,6 +282,7 @@ export const COMPONENT_MAP = {
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
     [COMPONENT.Switch]: IGRPSwitch,
+    [COMPONENT.Search]: IGRPInputSearch,
 
     [COMPONENT.Piechart]: IGRPPieChart,
     [COMPONENT.Areachart]: IGRPAreaChart,

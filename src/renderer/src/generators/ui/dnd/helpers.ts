@@ -23,12 +23,25 @@ export const getDefaultProperties = (schema: any): any => {
 
 // Utility function to set default values based on the schema
 export const getDefaultInteractions = (schema: any, tag?: string) => {
-    const interactions: any = getRequiredDataSchema(schema, tag);
+    const interactions: any = {};
+    for (const key in schema) {
+        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
+            interactions[key] = getDefaultInteractions(schema[key].properties);
+        }
+        else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
+            interactions[key] = getDefaultInteractions(schema[key].properties);
+        }
+        else if (schema[key].type === 'array' && !schema[key].items?.enum) {
+            interactions[key] = [];
+        }
+        else if (schema[key].required || schema[key].visible) {
+            interactions[key] = schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
+        }
+    }
     return interactions;
 };
 
 export const getRequiredDataSchema = (schema: any, tag?: string) => {
-
     const states: any = {};
     for (const key in schema) {
         if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
@@ -43,6 +56,7 @@ export const getRequiredDataSchema = (schema: any, tag?: string) => {
     }
     return states;
 };
+
 
 export const newStructuredComponent = (
     name: string,

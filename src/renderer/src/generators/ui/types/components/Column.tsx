@@ -62,9 +62,9 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                 >
                     <BoxWrapper
                         comp={comp}
-                        group="group/column-comp"
+                        group="group/column"
                         onEdit={() => handleEditClick(comp)}
-                        className="top-0 opacity-0 group-hover/column-comp:opacity-100"
+                        className="top-0 opacity-0 group-hover/column:opacity-100"
                     >
                         <Component comp={comp} onDragEnd={onDragEnd} />
                     </BoxWrapper>
