@@ -1,9 +1,11 @@
 import {
     CustomFunctionConfig,
+    Import,
     State,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Button } from '@renderer/components/ui/button';
+import { getId } from '@renderer/utils/helpers';
 import { FunctionSquare } from 'lucide-react';
 
 interface TabStatesProps {
@@ -13,8 +15,9 @@ interface TabStatesProps {
 
 interface TabFunctionsProps {
     functions: CustomFunctionConfig[];
-    currentFunction: CustomFunctionConfig;
+    currentFunction?: CustomFunctionConfig;
     editorRef?: React.RefObject<any>;
+    onInsertImport?: (importObj: Import) => void;
 }
 
 interface TabSnippetsProps {
@@ -123,47 +126,56 @@ const TabsFunctions = ({
     functions,
     currentFunction,
     editorRef,
+    onInsertImport,
 }: TabFunctionsProps) => {
     const handleInsertFunction = (funct: CustomFunctionConfig) => {
         if (editorRef && editorRef.current) {
-            editorRef.current.insertTextAtCursor(funct.code);
+            let code = funct.code;
+            if (!code && funct.name) {
+                code = `${funct.name}();`;
+            }
+            editorRef.current.insertTextAtCursor(code);
+            if (funct.path)
+                onInsertImport?.({
+                    namespace: `import {${funct.name}} from '${funct.path}'`,
+                    id: getId(),
+                });
         }
     };
 
+    const filteredFunctions = currentFunction
+        ? functions.filter((funct) => funct.id !== currentFunction.id)
+        : functions;
     return (
         <div className="flex flex-col gap-2">
-            {functions.length > 0 ? (
-                functions
-                    .filter((funct) => funct.id !== currentFunction.id)
-                    .map((funct, index) => (
-                        <div
-                            key={index}
-                            className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
-                        >
-                            <div className="flex items-center space-x-2">
-                                <span className="font-medium">
-                                    {funct.name}
-                                </span>
-                                <span className="text-gray-400 text-sm">
-                                    {funct.returnValue?.type}
-                                </span>
-                            </div>
-                            <Button
-                                size={'sm'}
-                                variant="outline"
-                                onClick={() => {
-                                    handleInsertFunction(funct);
-                                }}
-                            >
-                                Insert Code
-                            </Button>
+            {filteredFunctions.length > 0 ? (
+                filteredFunctions.map((funct, index) => (
+                    <div
+                        key={index}
+                        className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <span className="font-medium">{funct.name}</span>
+                            <span className="text-gray-400 text-sm">
+                                {funct.returnValue?.type}
+                            </span>
                         </div>
-                    ))
+                        <Button
+                            size={'sm'}
+                            variant="outline"
+                            onClick={() => {
+                                handleInsertFunction(funct);
+                            }}
+                        >
+                            Insert Code
+                        </Button>
+                    </div>
+                ))
             ) : (
                 <EmptyList
                     icon={<FunctionSquare />}
-                    title="No States"
-                    description="Create your first custom state to add functionality to your page!"
+                    title="No Functions"
+                    description="Create your first custom functions to add functionality to your page!"
                     className="py-12"
                 />
             )}

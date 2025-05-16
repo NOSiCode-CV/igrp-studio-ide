@@ -39,16 +39,18 @@ const ImportComponent = ({
         ) {
             setImports([...imports, parsed]);
             setNewImport('');
+            onChange?.(imports);
         }
     };
 
     const removeImport = (id: string) => {
         setImports(imports.filter((imp) => imp.id !== id));
+        onChange?.(imports.filter((imp) => imp.id !== id));
     };
 
     useEffect(() => {
-        onChange?.(imports);
-    }, [imports]);
+        setImports(initialImports);
+    }, [initialImports]);
 
     return (
         <div className="space-y-2">

@@ -54,39 +54,24 @@ const Draggable = ({
         e.dataTransfer.setData('mode', JSON.stringify(mode));
         e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
         e.dataTransfer.setData('dropTargetId', JSON.stringify(dropTargetId));
-
-        /*   const preview = document.createElement('div');
-        preview.className = 'bg-blue-500/20 border-2 border-blue-500 rounded-lg absolute pointer-events-none';
-        preview.style.width = '200px';
-        preview.style.height = '100px';
-        preview.style.display = 'none';
-        document.body.appendChild(preview);
-    
-        e.dataTransfer.setDragImage(preview, 0, 0); */
     };
-
+console.log(activeDropZone?.dropTargetId, componentId);
     return (
         <div
             draggable
-            onDragStartCapture={(e) => {
-                hadleDragStart(e);
-            }}
-            onDragStart={(_) => {}}
+            onDragStartCapture={hadleDragStart}
             onDragEnd={onDragEnd}
-            onDragLeave={(e) => {
-                handleDragLeave(e);
-            }}
+            onDragLeave={handleDragLeave}
             onDragOver={(e) => {
                 handleDragOver(e, componentId, index, dropTargetId);
                 handleLayoutChange(layout);
             }}
             className={cn(
                 dropZone &&
-                    'relative border border-dashed rounded-lg bg-card transition-all p-2',
+                    'relative border border-dashed  hover:border-primary/50 rounded-lg bg-card transition-all p-2',
                 draggedId === componentId && dropZone
                     ? 'opacity-25 border-primary'
                     : 'border-border',
-                dropZone && 'hover:border-primary/50',
                 isDisabled && 'hover:border-destructive',
                 className
             )}

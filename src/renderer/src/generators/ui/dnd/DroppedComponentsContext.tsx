@@ -264,47 +264,49 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     );
     //Funcao para fazer update de um component
     const handleUpdateChildComponent = useCallback(
-        (
-            componentId: string, // ID of the component to update
-            updates: Partial<StructuredComponent> // Partial updates to apply
-        ) => {
-            // Validate inputs
+        (componentId: string, updates: Partial<StructuredComponent>) => {
             if (!componentId || !updates) {
                 console.error('Invalid component ID or updates');
                 return;
             }
 
-            // Recursive function to find and update the target component
-            const updateComponentTree = (
-                component: StructuredComponent
-            ): StructuredComponent => {
-                // If the current component matches the target ID, apply the updates
-                if (component.id === componentId) {
+            setComponents((prev) => {
+                // First check if we're updating the root component
+                if (prev.id === componentId) {
                     return {
-                        ...component,
+                        ...prev,
                         ...updates,
                     };
                 }
 
-                // If the current component has children, search recursively
-                if (component.children) {
-                    const updatedChildren =
-                        component.children.map(updateComponentTree);
-                    return {
-                        ...component,
-                        children: updatedChildren,
-                    };
-                }
+                // Recursive function to find and update child components
+                const updateComponentTree = (
+                    component: StructuredComponent
+                ): StructuredComponent => {
+                    if (component.id === componentId) {
+                        return {
+                            ...component,
+                            ...updates,
+                        };
+                    }
 
-                // If no match is found, return the component unchanged
-                return component;
-            };
+                    if (component.children) {
+                        const updatedChildren =
+                            component.children.map(updateComponentTree);
+                        return {
+                            ...component,
+                            children: updatedChildren,
+                        };
+                    }
 
-            // Update the components state
-            setComponents((prev) => ({
-                ...prev,
-                children: (prev.children || []).map(updateComponentTree),
-            }));
+                    return component;
+                };
+
+                return {
+                    ...prev,
+                    children: (prev.children || []).map(updateComponentTree),
+                };
+            });
         },
         []
     );

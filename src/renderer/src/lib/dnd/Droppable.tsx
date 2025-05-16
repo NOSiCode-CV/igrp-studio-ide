@@ -1,6 +1,6 @@
 import { useDragDrop } from './drag-drop-context';
 
-import { useEffect, type DragEvent } from 'react';
+import { useEffect, useState, type DragEvent } from 'react';
 import { LayoutMode, StructuredComponent } from './types';
 import { cn } from '../utils';
 
@@ -20,6 +20,8 @@ const Droppable = ({
     className,
 }: DroppableProps) => {
     const { id: componentId } = component || {};
+
+    const [targetHovered, setTargetHovered] = useState<string>('');
 
     const {
         activeDropZone,
@@ -41,23 +43,41 @@ const Droppable = ({
         onDrop(droppedItem);
     };
 
+    const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        handleDragLeave(e);
+        setTargetHovered('');
+    };
+
+    const onDragOverCapture = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setTargetHovered((e.target as HTMLElement)?.id);
+    };
+
+    const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        handleDragOver(e, componentId);
+    };
+
     useEffect(() => {
         if (component) {
             handleLayoutChange;
             setComponents(component.children);
         }
     }, [component]);
-
+    
     return (
         <div
-            onDragOver={(e) => handleDragOver(e, componentId)}
             onDrop={handleDropItem}
-            onDragLeave={handleDragLeave}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDragOverCapture={onDragOverCapture}
             id={componentId}
             className={cn(
-                'min-h-12 p-3 rounded-lg bg-card', //border border-dashed border-gray-400
+                'p-3 min-h-12 rounded-lg bg-card hover:border', //border border-dashed border-gray-400
                 draggingItem &&
-                    activeDropZone?.dropTargetId === componentId &&
+                    (activeDropZone?.dropTargetId === componentId ||
+                        targetHovered === componentId) &&
                     'bg-primary/35',
                 className
             )}

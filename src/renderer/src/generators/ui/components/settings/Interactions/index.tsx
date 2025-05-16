@@ -37,6 +37,10 @@ const Interactions = ({
         data: Record<string, InteractionValue>
     ) => {
         if (componentId)
+            console.log({
+                ...comp,
+                interactions: { ...data },
+            });
             onInteranctionsChange(componentId, {
                 ...comp,
                 interactions: { ...data },

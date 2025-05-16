@@ -1,6 +1,6 @@
 const GenNoInfoField = () => {
     return (
-        <div className="text-xs space-x-1 min-h-12 flex items-center justify-center">
+        <div className="text-xs space-x-1 min-h-12 flex items-center justify-center pointer-events-none">
             <span>DROP</span>
             <span className="text-primary">
                 <b>FIELDS</b>
