@@ -6,10 +6,11 @@ type HandlerResponse<T = any> = {
 };
 
 async function genericFetchHandler<T>(
-    endpoint: string
+    endpoint: string,
+    headers?: object
 ): Promise<HandlerResponse<T>> {
     try {
-        const response = await fetch(endpoint);
+        const response = await fetch(endpoint, headers);
 
         if (!response.ok) {
             throw new Error(
@@ -42,7 +43,7 @@ ipcMain.handle(
 // Exemplo de uso para outro endpoint (agora mais direto)
 ipcMain.handle(
     'fetch-data',
-    async (_event, endpoint: string): Promise<HandlerResponse> => {
-        return genericFetchHandler(endpoint);
+    async (_event, endpoint: string, headers: object): Promise<HandlerResponse> => {
+        return genericFetchHandler(endpoint, headers);
     }
 );

@@ -35,7 +35,7 @@ const api = {
 
 	getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
 
-	fetchData: (endpoint: string) => ipcRenderer.invoke('fetch-data', endpoint),
+	fetchData: (endpoint: string, headers: object) => ipcRenderer.invoke('fetch-data', endpoint, headers),
 
 	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
 }

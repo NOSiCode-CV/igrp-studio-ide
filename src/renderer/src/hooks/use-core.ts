@@ -13,8 +13,8 @@ const useCore = () => {
         });
     }, []);
 
-    const fetchData = useCallback(async (endpoint: string) => {
-        const { result }: HandlerResponse = await window.api.fetchData(endpoint);
+    const fetchData = useCallback(async (endpoint: string, headers: object) => {
+        const { result }: HandlerResponse = await window.api.fetchData(endpoint, headers);
 
         return result
     }, []);
