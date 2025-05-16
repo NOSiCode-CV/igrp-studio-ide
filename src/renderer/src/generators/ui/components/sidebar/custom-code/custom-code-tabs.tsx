@@ -22,6 +22,7 @@ interface TabFunctionsProps {
 
 interface TabSnippetsProps {
     snippets: any[];
+    componentTag: string;
     editorRef?: React.RefObject<any>;
 }
 function capitalizeFirstLetter(string: string) {
@@ -73,10 +74,16 @@ const TabStates = ({ states, editorRef }: TabStatesProps) => {
     );
 };
 
-const TabSnipptes = ({ snippets, editorRef }: TabSnippetsProps) => {
+const TabSnipptes = ({
+    snippets,
+    componentTag,
+    editorRef,
+}: TabSnippetsProps) => {
     const handleInsertSnippet = (snippet: any) => {
         if (editorRef && editorRef.current) {
-            editorRef.current.insertTextAtCursor(snippet.code);
+            editorRef.current.insertTextAtCursor(
+                snippet.code.replace('{{tag}}', componentTag)
+            );
         }
     };
 

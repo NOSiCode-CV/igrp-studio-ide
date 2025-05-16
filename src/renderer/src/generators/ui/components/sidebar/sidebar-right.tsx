@@ -37,7 +37,7 @@ interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
 
 export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     const { t } = useTranslation();
-    const { getPropertiesComponent } = useStudio();
+    const { getPropertiesComponent, getChildPropertiesComponent } = useStudio();
     const {
         currentComponent: editingComponentParams,
         handleUpdateChildComponent,
@@ -56,6 +56,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         componentName,
         id: componentId,
         properties = {},
+        childProperties = {},
     } = currentComp || {};
 
     // State management
@@ -63,6 +64,16 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     const [propsComponent, setPropsComponent] = React.useState<
         Record<string, any>
     >({});
+
+    const [childformValues, setChildformValues] = React.useState<
+        Record<string, any>
+    >({});
+
+    const [propsComponentChild, setPropsComponentChild] = React.useState<
+        Record<string, any>
+    >({});
+
+    const [currentTag, setCurrentTag] = React.useState<string>(tag || '');
 
     // Load properties component
     React.useEffect(() => {
@@ -77,9 +88,9 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                 setPropsComponent(data);
 
                 // Initialize form values
-                const initialValues = Object.entries(data).reduce(
+                const initialValues = Object.entries(data ?? {}).reduce(
                     (acc, [key, config]) => {
-                        acc[key] = properties[key] ?? config.defaultValue;
+                        acc[key] = properties[key] ?? config.default;
                         return acc;
                     },
                     {} as Record<string, any>
@@ -92,32 +103,60 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         };
 
         loadProps();
-    }, [componentId, currentPath, getPropertiesComponent, properties]);
+    }, []);
+
+    // Load properties component
+    React.useEffect(() => {
+        if (!componentName) return;
+
+        const loadProps = async () => {
+            try {
+                const data = await getChildPropertiesComponent(
+                    currentPath,
+                    componentName
+                );
+                setPropsComponentChild(
+                    data && !Array.isArray(data) ? data : {}
+                );
+
+                // Initialize form values
+                //TODO : fix this subtree values
+                const initialValues = Object.entries(data ?? {}).reduce(
+                    (acc, [key, config]) => {
+                        acc[key] = childProperties[key] ?? config.default;
+                        return acc;
+                    },
+                    {} as Record<string, any>
+                );
+
+                setChildformValues(initialValues);
+            } catch (error) {
+                console.error('Error loading properties component:', error);
+            }
+        };
+
+        loadProps();
+    }, []);
 
     // Debounced component update
     React.useEffect(() => {
-        if (!componentId || Object.keys(formValues).length === 0) return;
-
-        const timer = setTimeout(() => {
-            handleUpdateChildComponent(componentId, {
-                ...currentComp,
-                properties: { ...properties, ...formValues },
-            });
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [
-        formValues,
-        componentId,
-        currentComp,
-        handleUpdateChildComponent,
-        properties,
-    ]);
+        if (!componentId) return;
+        handleUpdateChildComponent(componentId, {
+            ...currentComp,
+            properties: { ...properties, ...formValues },
+            childProperties: { ...childProperties, ...childformValues },
+        });
+    }, [formValues, childformValues]);
 
     // Event handlers
     const handleInputChange = React.useCallback(
-        (fieldPath: string, value: any) => {
-            setFormValues((prev) => {
+        (
+            fieldPath: string,
+            value: any,
+            setState: (states: Record<string, any>) => void
+        ) => {
+            console.log(fieldPath, value);
+            setState((prev) => {
                 const setNestedValue = (
                     obj: any,
                     path: string[],
@@ -146,11 +185,15 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     }, [clearEditingComponent]);
 
     const udpateTag = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (componentId)
-            handleUpdateChildComponent(componentId, {
-                ...currentComp,
-                tag: e.target.value,
-            });
+        if (!componentId) return;
+        handleUpdateChildComponent(componentId, {
+            ...currentComp,
+            properties: { ...properties, ...formValues },
+            childProperties: { ...childProperties, ...childformValues },
+            tag: e.target.value,
+        });
+
+        setCurrentTag(e.target.value);
     };
 
     return (
@@ -192,7 +235,11 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                             <Label htmlFor={'tab'}>
                                 {`${label} - ${componentId}`}
                             </Label>
-                            <Input id="tag" value={tag} onChange={udpateTag} />
+                            <Input
+                                id="tag"
+                                value={currentTag}
+                                onChange={udpateTag}
+                            />
                         </div>
                         <Tabs className="flex-1 px-2" defaultValue="props">
                             <TabsList className="grid w-full grid-cols-3">
@@ -219,13 +266,46 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                                                 <RenderPropsConfig
                                                     propsComp={propsComponent}
                                                     formValues={formValues}
-                                                    handleInputChange={
-                                                        handleInputChange
+                                                    handleInputChange={(
+                                                        fieldPath: string,
+                                                        value: any
+                                                    ) =>
+                                                        handleInputChange(
+                                                            fieldPath,
+                                                            value,
+                                                            setFormValues
+                                                        )
                                                     }
                                                 />
                                             )}
                                         </AccordionContent>
                                     </AccordionItem>
+                                    {Object.keys(propsComponentChild).length >
+                                        0 && (
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger>
+                                                {t('Child Properties')}
+                                            </AccordionTrigger>
+                                            <AccordionContent className="space-y-2">
+                                                <RenderPropsConfig
+                                                    propsComp={
+                                                        propsComponentChild
+                                                    }
+                                                    formValues={childformValues}
+                                                    handleInputChange={(
+                                                        fieldPath: string,
+                                                        value: any
+                                                    ) =>
+                                                        handleInputChange(
+                                                            fieldPath,
+                                                            value,
+                                                            setChildformValues
+                                                        )
+                                                    }
+                                                />
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    )}
                                 </Accordion>
                             </TabsContent>
                             <TabsContent value="styles" className="space-y-6">

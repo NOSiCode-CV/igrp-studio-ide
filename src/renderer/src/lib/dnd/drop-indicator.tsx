@@ -28,8 +28,8 @@ export function DropIndicator({ position, isActive, className }: DropIndicatorPr
     >
       <div
         className={cn(
-          "bg-primary rounded-full shadow-[0_0_4px_2px_rgba(var(--primary)_/_0.25)]",
-          position === "left" || position === "right" ? "w-1 h-full" : "h-1 w-full",
+          "bg-primary/35 rounded-full shadow-[0_0_4px_2px_rgba(var(--primary)_/_0.25)]",
+          position === "left" || position === "right" ? "w-12 h-full" : "h-2 w-full",
         )}
       />
     </div>

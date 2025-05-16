@@ -53,6 +53,9 @@ export interface StructuredComponent {
     content?: string;
     [key: string]: any;
   };
+  childProperties?: {
+    [key: string]: any;
+  },
   interactions: {
     [key: string]: any;
   },

@@ -33,23 +33,10 @@ interface TriggerControlsProps {
     ) => void;
 }
 
-const mapPropertyOptions = (properties: Record<string, any> = {}) => {
-    return Object.entries(properties)
-        .filter(([_, prop]) => prop.visible)
-        .map(([key, prop]) => ({
-            value: key,
-            label:
-                prop.label ||
-                key
-                    .replace(/([A-Z])/g, ' $1') // Add space before capitals
-                    .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
-                    .trim(),
-        }));
-};
-
 export function TriggerControls({
     interactions,
     interactionsType,
+    componentTag,
     onInteractionsChange,
 }: TriggerControlsProps) {
     const [localInteractions, setLocalInteractions] = useState<
@@ -68,7 +55,6 @@ export function TriggerControls({
 
         onInteractionsChange(updated);
         setLocalInteractions(updated);
-        // codeRef.current = fnCustomSet;
     };
 
     const removeInteraction = (key: string) => {
@@ -172,6 +158,7 @@ export function TriggerControls({
                     interactionsType={interactionsType}
                     setLocalInteractions={setLocalInteractions}
                     localInteractions={localInteractions}
+                    componentTag={componentTag}
                 />
             )}
         </div>
@@ -187,7 +174,9 @@ const InteractionEditor = ({
     interactionsType,
     setLocalInteractions,
     localInteractions,
+    componentTag,
 }: {
+    componentTag: string;
     interaction: InteractionValue;
     interactionKey: string;
     open: boolean;
@@ -209,50 +198,39 @@ const InteractionEditor = ({
     const [imports, setImports] = useState<Import[]>(
         interaction.fnCustomCode?.imports || []
     );
-    const [fnName, setFnName] = useState<string>('');
+    const [fnName, setFnName] = useState<string | undefined>(undefined);
 
     const { functionOptions } = useCustomCode();
 
     const interactions = interactionsType[interactionKey];
 
-    const propertyOptions = mapPropertyOptions(interactions?.properties);
-    const hasfnNameOption = propertyOptions.find(
-        (opt) => opt.value === 'fnName'
-    );
+    const hasfnNameOption = interactions?.properties.fnName.visible;
 
-    const hasfnCustomSetOption = propertyOptions.find(
-        (opt) => opt.value === 'fnCustomSet'
-    );
+    const hasfnCustomSetOption = interactions?.properties.fnCustomSet.visible;
 
-    const hasfnCustomCodeOption = propertyOptions.find(
-        (opt) => opt.value === 'fnCustomCode'
-    );
+    const hasfnCodeOption =
+        interactions?.properties.fnCustomCode?.properties?.fnCode?.visible;
 
-    const updateInteraction = (
-        key: string,
-        field: keyof InteractionValue,
-        value: any
-    ) => {
+    const hasImportOption =
+        interactions?.properties.fnCustomCode.properties?.imports?.visible;
+
+    const saveInteraction = (key: string) => {
+        const newInteractions = {
+            fnCustomSet: fnCustomSetRef.current,
+            fnName,
+            fnCustomCode: {
+                fnCode: fnCustomCodeRef.current || undefined,
+                imports,
+            },
+        };
+
         const updated = {
             ...localInteractions,
-            [key]: { ...localInteractions[key], [field]: value },
+            [key]: { ...localInteractions[key], ...newInteractions },
         };
 
         setLocalInteractions(updated);
         onInteractionsChange(updated);
-    };
-
-    const saveInteraction = (key: string) => {
-        if (fnCustomSetRef.current)
-            updateInteraction(key, 'fnCustomSet', fnCustomSetRef.current);
-        if (fnName) updateInteraction(key, 'fnName', fnName);
-
-        if (hasfnCustomCodeOption) {
-            updateInteraction(key, 'fnCustomCode', {
-                fnCode: fnCustomCodeRef.current,
-                imports,
-            });
-        }
 
         setOpen(false);
         fnCustomCodeRef.current = '';
@@ -306,6 +284,12 @@ const InteractionEditor = ({
                                 options={functionOptions}
                             />
                         )}
+                        {hasImportOption && (
+                            <ImportComponent
+                                initialImports={imports}
+                                onChange={(value) => setImports(value)}
+                            />
+                        )}
                         {hasfnCustomSetOption && (
                             <div className="flex-1 border rounded">
                                 <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
@@ -323,43 +307,38 @@ const InteractionEditor = ({
                                 />
                             </div>
                         )}
-                        {hasfnCustomCodeOption && (
-                            <>
-                                <ImportComponent
-                                    initialImports={imports}
-                                    onChange={(value) => setImports(value)}
+
+                        {hasfnCodeOption && (
+                            <div className="flex-1 border rounded">
+                                <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                                    Custom Code
+                                </Label>
+                                <MonacoEditor
+                                    content={
+                                        interaction.fnCustomCode?.fnCode || ''
+                                    }
+                                    filePath=""
+                                    onChange={(newCode) => {
+                                        fnCustomCodeRef.current = newCode;
+                                    }}
+                                    height="40vh"
+                                    language="typescript"
+                                    ref={fnCustomCodeEditorRef}
                                 />
-                                <div className="flex-1 border rounded">
-                                    <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
-                                        Custom Code
-                                    </Label>
-                                    <MonacoEditor
-                                        content={
-                                            interaction.fnCustomCode?.fnCode ||
-                                            ''
-                                        }
-                                        filePath=""
-                                        onChange={(newCode) => {
-                                            fnCustomCodeRef.current = newCode;
-                                        }}
-                                        height="40vh"
-                                        language="typescript"
-                                        ref={fnCustomCodeEditorRef}
-                                    />
-                                </div>
-                            </>
+                            </div>
                         )}
                     </div>
                 </SidebarInset>
                 <FunctionSettingsSidebar
                     formik={null}
                     editorRef={
-                        hasfnCustomCodeOption
+                        hasfnCodeOption
                             ? fnCustomCodeEditorRef
                             : fnCustomSetEditorRef
                     }
                     side="right"
                     onInsertImport={handleInsertImport}
+                    componentTag={componentTag}
                 />
             </DialogContent>
         </Dialog>

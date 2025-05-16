@@ -139,13 +139,18 @@ const useStudio = () => {
         return component ? component.properties : [];
     }, [findComponent]);
 
+    const getChildPropertiesComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
+        return component ? component.childProperties : [];
+    }, [findComponent]);
+
     // Get properties for a component
     const getInteractionsComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.interactions : [];
     }, [findComponent]);
 
-     const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
+    const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
         return componentsRegistered.find(component => component.name === id);
     };
 
@@ -161,6 +166,7 @@ const useStudio = () => {
         findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,
+        getChildPropertiesComponent,
         getRegistryComponent,
         getInteractionsComponent,
         getComponentData,

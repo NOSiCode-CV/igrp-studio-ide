@@ -47,6 +47,7 @@ const returnTypeOptions = [
 interface FunctionSettingsSidebarProps
     extends React.ComponentProps<typeof Sidebar> {
     formik?: any;
+    componentTag: string
     editorRef?: React.RefObject<any>;
     onInsertImport?: (importObj: Import) => void;
 }
@@ -54,6 +55,7 @@ interface FunctionSettingsSidebarProps
 export const FunctionSettingsSidebar = ({
     formik,
     editorRef,
+    componentTag,
     onInsertImport,
     ...props
 }: FunctionSettingsSidebarProps) => {
@@ -338,6 +340,7 @@ export const FunctionSettingsSidebar = ({
                         <TabSnipptes
                             snippets={snippets}
                             editorRef={editorRef}
+                            componentTag={componentTag}
                         />
                     </TabsContent>
                     <TabsContent value="functions" className="space-y-4">

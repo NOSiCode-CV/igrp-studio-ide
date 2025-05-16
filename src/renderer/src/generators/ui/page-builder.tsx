@@ -162,9 +162,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             if (loading) return;
 
             const pageCompRegister = findComponentById(COMPONENT.PageContent);
-            const sectionCompRegister = findComponentById(
-                COMPONENT.PageContent
-            );
+            const sectionCompRegister = findComponentById(COMPONENT.Section);
 
             const section = newStructuredComponent(
                 COMPONENT.Section,
