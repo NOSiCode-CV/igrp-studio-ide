@@ -55,7 +55,6 @@ const Draggable = ({
         e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
         e.dataTransfer.setData('dropTargetId', JSON.stringify(dropTargetId));
     };
-console.log(activeDropZone?.dropTargetId, componentId);
     return (
         <div
             draggable
