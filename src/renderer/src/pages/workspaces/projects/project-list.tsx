@@ -25,7 +25,7 @@ interface ProjectListProps {
 
 export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
     const handleProjectClick = (project: ProjectData) => {
-        saveOrOpenProject({project});
+        saveOrOpenProject(project);
     };
     
     const { t } = useTranslation();

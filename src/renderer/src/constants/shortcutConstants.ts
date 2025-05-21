@@ -2,7 +2,7 @@
 
 const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
-const SHORTCUTS = {
+export const SHORTCUTS = {
     // Atalhos existentes
     NEW_MODEL: isMac ? '⌘ M' : 'Ctrl+M',
     NEW_CONTROLLER: isMac ? '⌘ E' : 'Ctrl+E',
@@ -27,14 +27,3 @@ const SHORTCUTS = {
     ZOOM_OUT: isMac ? '⌘ -' : 'Ctrl+-',
     OPEN_SHORTCUT_HELP: isMac ? '⌘ /' : 'Ctrl+/',
 };
-
-enum KeyboardKey {
-    escape = 'Escape',
-    enter = 'Enter',
-    find = 'f',
-    model = 'm',
-    endpoint = 'e',
-    dto = 'o'
-}
-
-export { KeyboardKey, SHORTCUTS }

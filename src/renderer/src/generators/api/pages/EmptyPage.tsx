@@ -7,9 +7,11 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
-import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
+import { KeyboardKey } from '@renderer/constants/KeyboardKey';
+import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import { FileCode, Database, FileText } from 'lucide-react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const EmptyPage = ({ onClick }) => {

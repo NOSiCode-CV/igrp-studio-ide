@@ -42,9 +42,10 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import useStudio from '@renderer/hooks/use-studio';
 import NavigatorSidebar from './sidebar-navigator';
-import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
+import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 import SidebarAppComponents from './sidebar-app-components';
 import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/KeyboardKey';
 import {
     CustomCodeMenu,
     SidebarAppCustomCode,
@@ -239,9 +240,11 @@ export function AppSidebar({
                             <SidebarAppComponents searchTerm={searchQuery} />
                         ) : activeMenuGroup.id === 'customCode' ? (
                             <SidebarAppCustomCode searchTerm={searchQuery} />
+                            
                         ) : activeMenuGroup.id === 'appLogic' ? (
                             <SidebarAppLogic searchTerm={searchQuery} />
-                        ) : (
+                        ):
+                        (
                             filteredData.map((item, index) => (
                                 <Collapsible
                                     key={index}

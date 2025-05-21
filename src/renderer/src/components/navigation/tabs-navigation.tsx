@@ -15,7 +15,7 @@ import { TAB_DEFAULT, TabItem, useTabs } from './TabContext';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Button } from '../ui/button';
 import { OptionType } from '@renderer/constants/appConstants';
-import { SHORTCUTS } from '@renderer/constants/shortcut';
+import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
 
 interface TabsNavigationProps {
     tabs: TabItem[];

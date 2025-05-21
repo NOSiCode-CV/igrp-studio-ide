@@ -11,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { getLabel } from '@renderer/utils/helpers';
+import { generateFakeDataForField, getLabel } from '@renderer/utils/helpers';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
@@ -19,10 +19,8 @@ import { COMPONENT } from '../../ComponentTypes';
 import { Button } from '@renderer/components/ui/button';
 import { Ellipsis } from 'lucide-react';
 import BoxField from '../tools/BoxFields';
+import { DropdownItem } from './dropdownitem';
 import TableTool from '../tools/tableTool';
-import Droppable from '@renderer/lib/dnd/Droppable';
-import { Badge } from '@renderer/components/ui/badge';
-import { useFakedata } from '../../hooks/useFakeData';
 
 export interface TableProps {
     isDisabled?: boolean;
@@ -39,7 +37,6 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
     }>({});
     const { setEditingComponent } = useDroppedComponents();
     const { dynamicImport } = useStudio();
-    const { getDataTableFake } = useFakedata();
 
     // Extract table columns and filters from components
     useEffect(() => {
@@ -80,6 +77,17 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
         loadComponents();
     }, [columns, filters, dynamicImport]);
 
+    // Generate fake data for the table
+    const fakeData = useMemo(() => {
+        return Array.from({ length: 4 }).map(() => {
+            const rowData: { [key: string]: any } = {};
+            columns.forEach((child) => {
+                rowData[child.id] = generateFakeDataForField(child);
+            });
+            return rowData;
+        });
+    }, [columns]);
+
     // Handle edit click
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
@@ -90,7 +98,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
 
     // Render table headers
     const renderTableHeaders = useCallback(
-        (compName: string, dropTargetId: string) => {
+        (compName: string) => {
             return columns.map((child, index) => {
                 const Component = loadedComponents[child.id];
                 const { label, properties } = child;
@@ -106,7 +114,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             index={index}
                             mode="MOVE"
                             layout="horizontal"
-                            dropTargetId={dropTargetId}
+                            dropTargetId={componentId}
                             className={cn('border-none')}
                         >
                             <BoxField
@@ -128,15 +136,14 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
 
     // Render table rows
     const renderTableRows = useMemo(() => {
-        return getDataTableFake(columns).map((row, rowIndex) => (
+        return fakeData.map((row, rowIndex) => (
             <TableRow key={rowIndex}>
                 {columns.map((child) => (
                     <TableCell key={child.id}>
-                        {child.componentName === COMPONENT.TableCheckboxCell ? (
+                        {child.componentName === COMPONENT.Checkbox ? (
                             <Checkbox id={child.id} checked={row[child.id]} />
-                        ) : child.componentName ===
-                          COMPONENT.TableableBadgeCell ? (
-                            <Badge variant="secondary">Badge</Badge>
+                        ) : child.componentName === COMPONENT.Dropdown ? (
+                            <DropdownItem comp={child} />
                         ) : child.componentName ===
                           COMPONENT.TableActionListCell ? (
                             <Button variant="secondary" size="icon">
@@ -149,16 +156,16 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                 ))}
             </TableRow>
         ));
-    }, [columns]);
+    }, [columns, fakeData]);
 
     // Render table filters
     const renderTableFilters = useCallback(
-        (compName: string, dropTargetId: string) => {
+        (compName: string) => {
             if (filters.length === 0)
                 return <GenNoInfoComp type="TABLE FILTERS" />;
 
             return (
-                <div className="flex flex-1">
+                <div className="w-full grid grid-cols-4 gap-3">
                     {filters.map((child, index) => {
                         const Component = loadedComponents[child.id];
 
@@ -172,7 +179,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 index={index}
                                 mode="MOVE"
                                 layout="horizontal"
-                                dropTargetId={dropTargetId}
+                                dropTargetId={componentId}
                                 className={cn('border-none')}
                             >
                                 <BoxField
@@ -209,41 +216,29 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
         <div className="w-full flex flex-col gap-3">
             {/* Render TableFilter first */}
             {tableFilters.map((tableComp, index) => {
-                const { componentName: compName, id } = tableComp;
+                const { componentName: compName } = tableComp;
 
                 return (
-                    <Droppable
+                    <div
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
-                        component={tableComp}
-                        onDrop={onDragEnd}
                     >
-                        <TableTool
-                            parentComp={comp}
-                            comp={tableComp}
-                            onEdit={() => handleEdit(tableComp, componentName)}
-                            tableColumns={tableColumns[0].children}
-                        />
-                        {renderTableFilters(compName, id)}
-                    </Droppable>
+                        <TableTool parentComp={comp} comp={tableComp} onEdit={() => handleEdit(tableComp, componentName)}/>
+                        {renderTableFilters(compName)}
+                    </div>
                 );
             })}
 
             {/* Render TableColumn next */}
             {tableColumns.map((tableComp, index) => {
-                const { componentName, id } = tableComp;
+                const { componentName } = tableComp;
+
                 return (
-                    <Droppable
+                    <div
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
-                        component={tableComp}
-                        onDrop={onDragEnd}
                     >
-                        <TableTool
-                            parentComp={comp}
-                            comp={tableComp}
-                            onEdit={() => handleEdit(tableComp, componentName)}
-                        />
+                        <TableTool parentComp={comp} comp={tableComp} onEdit={() => handleEdit(tableComp, componentName)}/>
                         {columns.length === 0 ? (
                             <GenNoInfoComp
                                 type={getLabel(componentName).toUpperCase()}
@@ -253,17 +248,14 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 <Table className="w-full text-sm text-left rtl:text-right table-fixed">
                                     <TableHeader>
                                         <TableRow>
-                                            {renderTableHeaders(
-                                                componentName,
-                                                id
-                                            )}
+                                            {renderTableHeaders(componentName)}
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>{renderTableRows}</TableBody>
                                 </Table>
                             </div>
                         )}
-                    </Droppable>
+                    </div>
                 );
             })}
         </div>

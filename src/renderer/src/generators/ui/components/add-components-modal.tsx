@@ -1,4 +1,5 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { Badge } from '@renderer/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -6,6 +7,11 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@renderer/components/ui/dialog';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
 import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import React, { useEffect, useState, useCallback } from 'react';
@@ -15,6 +21,7 @@ import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { Button } from '@renderer/components/ui/button';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
+import { DialogTrigger } from '@radix-ui/react-dialog';
 import { SidebarRight } from './sidebar/sidebar-right';
 import {
     Table,
@@ -31,23 +38,14 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { useTagManager } from '../hooks/useTagManager';
-import * as LucideIcons from 'lucide-react';
-import { cn } from '@renderer/lib/utils';
-
-interface AddComponentProps {
-    path: string;
-    comp: StructuredComponent;
-    open: boolean;
-    setOpen: (open: boolean) => void;
-}
 
 export const AddComponentModal = ({
     path,
     comp,
-    open,
-    setOpen,
-}: AddComponentProps) => {
+}: {
+    path: string;
+    comp: StructuredComponent;
+}) => {
     const { componentName, id, children } = comp;
 
     const [currentComponent, setCurrentComponent] =
@@ -59,10 +57,7 @@ export const AddComponentModal = ({
 
     const { getAcceptedChildren } = useStudio();
 
-    const { handleAddChildToComponent, components: allComponents } =
-        useDroppedComponents();
-
-    const { generateTag } = useTagManager(allComponents);
+    const { handleAddChildToComponent } = useDroppedComponents();
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -87,7 +82,6 @@ export const AddComponentModal = ({
 
             handleDragEnd(result, {
                 handleAddChildToComponent,
-                generateTag,
             });
         },
         [handleAddChildToComponent]
@@ -100,8 +94,23 @@ export const AddComponentModal = ({
 
     return (
         <>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] !max-w-[80vw] !h-[80vh]">
+            <Dialog>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger asChild>
+                            <Badge
+                                variant={'secondary'}
+                                className="rounded-sm cursor-pointer mt-0.5"
+                            >
+                                <span className="text-xs">Add Comp</span>
+                            </Badge>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Add Comp</p>
+                    </TooltipContent>
+                </Tooltip>
+                <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
                     <SidebarInset>
                         <DialogHeader className="p-4">
                             <div className="flex justify-between">
@@ -142,7 +151,7 @@ export const AddComponentModal = ({
                             </div>
                         </div>
                     </SidebarInset>
-                    <SidebarRight comp={currentComponent} path={currentPath} className='h-full' />
+                    <SidebarRight comp={currentComponent} path={currentPath}/>
                 </DialogContent>
             </Dialog>
         </>
@@ -194,7 +203,7 @@ const renderCreatedComponents = (
 
     // Render the icon for a component
     const renderIcon = (iconName: string) => {
-        const IconComponent = LucideIcons[iconName] ?? ICON_MAP[iconName];
+        const IconComponent = ICON_MAP[iconName];
         return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
     };
 
@@ -236,61 +245,56 @@ const renderCreatedComponents = (
 
     return (
         <>
-            {components.map((component, index) => {
-                const { properties, label, id } = component;
-                return (
-                    <React.Fragment key={index}>
-                        <TableRow>
-                            <TableCell
-                                className="font-medium"
-                                style={{ paddingLeft: `${level * 20}px` }}
-                            >
-                                <div className="flex items-center gap-2">
-                                    {renderIcon(
-                                        properties?.iconProperties?.iconName
+            {components.map((component, index) => (
+                <React.Fragment key={index}>
+                    <TableRow>
+                        <TableCell
+                            className="font-medium"
+                            style={{ paddingLeft: `${level * 20}px` }}
+                        >
+                            <div className="flex items-center gap-2">
+                                {renderIcon(component.properties?.iconClass)}
+                                <span>{component.label}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        handleEditComponent(component)
+                                    }
+                                >
+                                    Edit
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-600 hover:text-red-900"
+                                    onClick={() =>
+                                        handleRemoveChildFromComponent({
+                                            droppableId: component.id,
+                                            index,
+                                        })
+                                    }
+                                >
+                                    Delete
+                                </Button>
+                                {canAcceptChildren(component) &&
+                                    renderAddComponents(
+                                        getAcceptedChildren(component),
+                                        component.id,
+                                        handleAddComponent
                                     )}
-                                    <span>{`${label} (${properties.labelTrigger})`}</span>
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                            handleEditComponent(component)
-                                        }
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-destructive"
-                                        onClick={() =>
-                                            handleRemoveChildFromComponent({
-                                                droppableId: id,
-                                                index,
-                                            })
-                                        }
-                                    >
-                                        Delete
-                                    </Button>
-                                    {canAcceptChildren(component) &&
-                                        renderAddComponents(
-                                            getAcceptedChildren(component),
-                                            id,
-                                            handleAddComponent
-                                        )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                        {component.children &&
-                            component.children.length > 0 &&
-                            renderChildComponents(component.children, level)}
-                    </React.Fragment>
-                );
-            })}
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                    {component.children &&
+                        component.children.length > 0 &&
+                        renderChildComponents(component.children, level)}
+                </React.Fragment>
+            ))}
         </>
     );
 };

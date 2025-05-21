@@ -105,7 +105,7 @@ const Overview = () => {
     };
 
     const handleSave = () => {
-        saveOrOpenProject({ project: { ...project, config: data } });
+        saveOrOpenProject({ ...project, config: data });
     };
 
     return (

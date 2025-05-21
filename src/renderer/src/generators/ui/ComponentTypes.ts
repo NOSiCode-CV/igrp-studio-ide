@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -127,20 +127,8 @@ export const COMPONENT: Record<string, string> = {
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
     TableFilter: 'tableFilters',
-
     TableActionListCell: 'tableActionListCell',
     TableAmountCell: 'tableAmountCell',
-    TableCheckboxCell: 'tableCheckboxCell',
-    TableDateCell: 'tableDateCell',
-    TableableBadgeCell: 'tableBadgeCell',
-
-    TableInputFilter: 'tableInputFilter',
-    TableMinMaxFilter: 'tableMinMaxFilter',
-    TableFilterDate: 'tableDateFilter',
-    TableSelectFilter: 'tableSelectFilter',
-    TableFacetedFilter: 'tableFacetedFilter',
-    TableFilterDropdown: 'tableDropdownFilter',
-
     Headline: 'headline',
     Label: 'label',
     Icon: 'icon',
@@ -305,12 +293,4 @@ export const COMPONENT_MAP = {
     [COMPONENT.RadialBarchart]: IGRPRadialBarChart,
 
     [COMPONENT.Badge]: IGRPBadge,
-
-
-    [COMPONENT.TableInputFilter]: IGRPDataTableFilterInput,
-    [COMPONENT.TableMinMaxFilter]: IGRPDataTableFilterMinMax,
-    [COMPONENT.TableFilterDate]: IGRPDataTableFilterDate,
-    [COMPONENT.TableSelectFilter]: IGRPDataTableFilterSelect,
-    [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
-    [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown
 };

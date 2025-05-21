@@ -87,33 +87,13 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                 );
                 setPropsComponent(data);
 
-                // Função para fazer deep merge de objetos
-                const deepMerge = (target: any, source: any) => {
-                    for (const key in source) {
-                        if (source[key] instanceof Object && key in target) {
-                            Object.assign(
-                                source[key],
-                                deepMerge(target[key], source[key])
-                            );
-                        }
-                    }
-                    Object.assign(target || {}, source);
-                    return target;
-                };
-
-                // Initialize form values with deep merge
-                const initialValues = deepMerge(
-                    // Começa com os defaults
-                    Object.entries(data ?? {}).reduce(
-                        (acc, [key, config]) => {
-                            acc[key] = config.default;
-                            return acc;
-                        },
-                        {} as Record<string, any>
-                    ),
-
-                    // Sobrescreve com as properties atuais
-                    properties
+                // Initialize form values
+                const initialValues = Object.entries(data ?? {}).reduce(
+                    (acc, [key, config]) => {
+                        acc[key] = properties[key] ?? config.default;
+                        return acc;
+                    },
+                    {} as Record<string, any>
                 );
 
                 setFormValues(initialValues);
@@ -123,7 +103,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         };
 
         loadProps();
-    }, [componentName]);
+    }, []);
 
     // Load properties component
     React.useEffect(() => {
@@ -143,7 +123,6 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                 //TODO : fix this subtree values
                 const initialValues = Object.entries(data ?? {}).reduce(
                     (acc, [key, config]) => {
-                        console.log(config);
                         acc[key] = childProperties[key] ?? config.default;
                         return acc;
                     },
@@ -157,7 +136,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         };
 
         loadProps();
-    }, [componentName]);
+    }, []);
 
     // Debounced component update
     React.useEffect(() => {
@@ -176,6 +155,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
             value: any,
             setState: (states: Record<string, any>) => void
         ) => {
+            console.log(fieldPath, value);
             setState((prev) => {
                 const setNestedValue = (
                     obj: any,
@@ -221,11 +201,6 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
             collapsible="none"
             className="overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!"
             {...props}
-            style={
-                {
-                    '--sidebar-width': '380px',
-                } as React.CSSProperties
-            }
         >
             <SidebarHeader>
                 <div className="items-center justify-between flex flex-1">

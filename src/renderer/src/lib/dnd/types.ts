@@ -63,11 +63,7 @@ export interface StructuredComponent {
     [key: string]: any;
   },
   children: StructuredComponent[],
-  data?: {
-    [key: string]: {
-      state: State
-    };
-  };
+  data?: State[]
 }
 
 export type StructuredLayout = StructuredComponent

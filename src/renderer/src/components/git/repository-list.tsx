@@ -107,7 +107,7 @@ export function RepositoryList() {
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',
                 repo.clone_url,
-                `${workspace.path}${projectPath}`
+                `${workspace.path}${projectPath}`,
             );
         } catch (error) {
             console.error('Failed to clone repository:', error);
@@ -132,8 +132,8 @@ export function RepositoryList() {
                         const { project, path } = data;
                         const { config, type } = project;
 
-                        await saveOrOpenProject({
-                            project: {
+                        await saveOrOpenProject(
+                            {
                                 workspaceId: workspace.id,
                                 name: config.name,
                                 framework: config.type,
@@ -142,7 +142,7 @@ export function RepositoryList() {
                                 path,
                                 config,
                             },
-                            onSuccess: async () => {
+                            async () => {
                                 // This callback runs after the project is successfully saved
                                 await window.electron.ipcRenderer.invoke(
                                     'add-cloned-repo',
@@ -166,8 +166,8 @@ export function RepositoryList() {
                                     ...prevPaths,
                                     [cloningRepoId!]: data.path,
                                 }));
-                            },
-                        });
+                            }
+                        );
                     } catch (error) {
                         showErrorToast(t('failedOpenProjectAfterCloning'));
                         console.error(t('errorOpeningProject'), error);

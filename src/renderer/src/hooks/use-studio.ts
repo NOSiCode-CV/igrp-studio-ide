@@ -25,8 +25,6 @@ const useStudio = () => {
 
     const [componentsRegistered, setComponentsRegistered] = useState<ComponentRegisterConfig[]>([]);
 
-    const [pageOptions, setPageOptions] = useState<any[]>([]);
-
     // Fetch components from the files tree
     const fetchComponents = useCallback(() => {
         const componentsFolder = files.find((page) => page.name === 'components');
@@ -160,25 +158,11 @@ const useStudio = () => {
         getRegistryComponent();
     }, []);
 
-    useEffect(() => {
-        const pages = files.find((page) => page.name === 'pages')
-        const options = pages?.children?.map((page) => {
-            const { content } = page
-            return {
-                value: content.pageName,
-                label: content.pageName,
-                metadata: content
-            }
-        }) ?? [];
-        setPageOptions(options)
-    }, [files])
-
     return {
         files,
         basePath,
         config,
         componentsRegistered,
-        pageOptions,
         findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,

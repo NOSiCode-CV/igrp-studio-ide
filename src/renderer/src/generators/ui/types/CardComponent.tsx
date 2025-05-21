@@ -1,16 +1,14 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
+import { getFakeComponentData } from '../fakeComponentData';
 import { IGRPButton } from '@igrp/igrp-framework-react-design-system';
-import { useFakedata } from '../hooks/useFakeData';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
 }
 
 const CardComponent = ({ comp }: CardComponentProps) => {
-    const { getFakeComponentData } = useFakedata();
-
-    const { componentName, properties } = comp;
+    const { componentName, properties, data } = comp;
 
     const {
         commonProperties,

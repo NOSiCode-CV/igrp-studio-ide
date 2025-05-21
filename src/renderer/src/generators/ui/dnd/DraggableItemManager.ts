@@ -8,11 +8,23 @@ export const handleDragEnd = (
     { handleAddChildToComponent, handleReorderChildInComponent, generateTag, addState }: any
 ) => {
 
+    // const { getAcceptedChildren } = useStudio()
+
     const { draggableId, source, destination, mode, type }: DragEndResult = result;
+
+    // const { droppableId } = destination;
 
     if (!destination) {
         return;
     }
+
+
+    /*  useCallback(() => {
+         getAcceptedChildren(parentComponentName, componentName).then((data) => {
+             setComponents(data);
+         });
+     }, [parentComponentName, componentName, getAcceptedChildren]); */
+
 
     if (mode === 'MOVE') {
         handleReorderChildInComponent(draggableId, source, destination);
@@ -34,7 +46,7 @@ const handleDropComponent = (
 
     const tag = generateTag(draggableId);
 
-    const data = getRequiredDataSchema(dataProperties, tag);
+    const data = getRequiredDataSchema(dataProperties);
 
     const interactions = getDefaultInteractions(interactionsProperties, tag);
 
@@ -56,7 +68,7 @@ const handleDropComponent = (
         const { name, label, properties, interactions: interactionsProperties, allowTypes, data: dataProperties } = child
         const childId = generateId(name);
         const tag = generateTag(name)
-        const data = getRequiredDataSchema(dataProperties, tag);
+        const data = getRequiredDataSchema(dataProperties);
         const interactions = getDefaultInteractions(interactionsProperties, tag);
 
         const childComponent: StructuredComponent = {

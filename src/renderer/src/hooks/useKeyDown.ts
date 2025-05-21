@@ -1,11 +1,11 @@
-import { KeyboardKey } from '@renderer/constants/shortcut';
+import { KeyboardKey } from '@renderer/constants/KeyboardKey';
 import { useEffect } from 'react';
 
 export const useKeyPress = (callback: (T?: any) => void, keys: KeyboardKey[]) => {
   const onKeyDown = (event: KeyboardEvent) => {
     const wasAnyKeyPressed = keys.some((key) => event.key === key);
 
-    if ((event.ctrlKey || event.metaKey) && wasAnyKeyPressed) {
+    if (wasAnyKeyPressed) {
       event.preventDefault();
       callback();
     }

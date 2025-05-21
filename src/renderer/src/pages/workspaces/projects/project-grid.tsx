@@ -31,8 +31,8 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
     } = useWorkspace();
     const { t } = useTranslation();
 
-    const handleOpenProject = async (project: ProjectData): Promise<void> => {
-        saveOrOpenProject({  project, openProject: true });
+    const handleOpenProject = async (p: ProjectData): Promise<void> => {
+        saveOrOpenProject(p);
     };
 
     const sortProjects = (projects: any[]) => {

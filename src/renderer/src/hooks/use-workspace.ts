@@ -21,12 +21,6 @@ interface RootState {
 
 const selectState = (state: RootState) => state.PageBuilder;
 
-interface openProjectProps {
-    project: ProjectData,
-    onSuccess?: () => Promise<void>
-    openProject?: boolean
-}
-
 export const useWorkspace = () => {
     const { t } = useTranslation();
     const { showSuccessToast, showErrorToast } = useToast();
@@ -173,9 +167,7 @@ export const useWorkspace = () => {
         return null;
     };
 
-    const saveOrOpenProject = async ({ project, openProject,
-        onSuccess }: openProjectProps) => {
-        setLoading(true);
+    const saveOrOpenProject = async (project: ProjectData, onSuccess?: () => Promise<void>) => {
         try {
             const { id } = project
             let response: any = {};
@@ -197,8 +189,7 @@ export const useWorkspace = () => {
                 return data
             })
 
-            if (openProject)
-                showSuccessToast(t('savedSuccessfully', { name: result.name }));
+            showSuccessToast(t('savedSuccessfully', { name: result.name }));
 
             dispatch(setBasePath(result.path));
 
@@ -210,9 +201,6 @@ export const useWorkspace = () => {
 
         } catch (err) {
             showErrorToast(err);
-        }
-        finally {
-            setLoading(false);
         }
     }
 
@@ -349,6 +337,7 @@ export const useWorkspace = () => {
             saveCustomWorkspaceComposeFile,
             createOrUpdateService,
             removeService,
+            //findAllServices,
             configureService,
             removeProject
         },
