@@ -87,6 +87,7 @@ const Flex: React.FC<FlexProps> = ({ comp, onDragEnd }: FlexProps) => {
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
+            className='p-1'
         >
             <div className={cn(flexVariants({ variant, className }))}>
                 {renderColumns()}

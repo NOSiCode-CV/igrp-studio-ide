@@ -65,7 +65,8 @@ export function AppSidebar({
     const { getRegistryComponent } = useStudio();
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
-    const [activeMenuGroup, setActiveMenuGroup] = useState({
+
+    const [activeMenuGroup, setActiveMenuGroup] = useState<MenuItem>({
         icon: ListTodo,
         label: t('widgetPalette'),
         id: 'widgetPalette',
@@ -94,10 +95,6 @@ export function AppSidebar({
         setSearchQuery(e.target.value);
     };
 
-    const handleNavegationClick = (item: any) => {
-        setActiveMenuGroup(item);
-    };
-
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
@@ -105,16 +102,8 @@ export function AppSidebar({
         { icon: BrainCircuit, label: t('Applogic'), id: 'appLogic' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-        {
-            icon: Badge,
-            label: t('settings'),
-            id: 'settings',
-        },
-        {
-            icon: GitBranch,
-            label: t('git'),
-            id: 'git',
-        },
+        { icon: Badge, label: t('settings'), id: 'settings' },
+        { icon: GitBranch, label: t('git'), id: 'git' },
     ];
 
     return (
@@ -164,7 +153,7 @@ export function AppSidebar({
                                             }}
                                             onClick={() => {
                                                 setOpen(true);
-                                                handleNavegationClick(item);
+                                                setActiveMenuGroup(item);
                                             }}
                                             isActive={
                                                 activeMenuGroup.id === item.id

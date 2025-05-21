@@ -27,6 +27,7 @@ import { PopoverModel } from '../generators/api/pages/model/popover';
 import { PopoverDto } from '../generators/api/pages/dto/popover-dto';
 import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
+import { Label } from './ui/label';
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
     data,
@@ -241,6 +242,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         }
                         readOnly={readonly}
                     />
+                );
+            case 'label':
+                return (
+                    <Label htmlFor={`${key}_${index}`}>
+                        {row?.[key] || ''}
+                    </Label>
                 );
             case 'select':
                 return (

@@ -7,6 +7,9 @@ import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
+import { GenNoInfoComp } from '../../components/GenNoInfoComp';
+import { getLabel } from '@renderer/utils/helpers';
+import GenNoInfoField from '../../components/GenNoInfoField';
 
 export interface FormComponentProps {
     comp: StructuredComponent;
@@ -65,38 +68,44 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
         loadComponents();
     }, [buttonComponents, dynamicImport]);
 
-    const renderButtons = () =>
-        buttonComponents.map((button: StructuredComponent, index: number) => {
-            const Component = loadedComponents[button.id];
-            return (
-                <Draggable
-                    key={button.id}
-                    item={button}
-                    index={index}
-                    dropTargetId={componentId}
-                    layout="horizontal"
-                    className="p-0 border-none"
-                >
-                    {Component && (
-                        <BoxField
-                            comp={button}
-                            parentComp={comp}
-                            onEdit={() => handleEditClick(button)}
+    const renderButtons = () => {
+        return buttonComponents.length === 0 ? (
+            <GenNoInfoField />
+        ) : (
+            buttonComponents.map(
+                (button: StructuredComponent, index: number) => {
+                    const Component = loadedComponents[button.id];
+                    return (
+                        <Draggable
+                            key={button.id}
+                            item={button}
                             index={index}
+                            dropTargetId={componentId}
+                            layout="horizontal"
+                            className="p-1"
                         >
-                            <Component comp={button} onDragEnd={onDragEnd} />
-                        </BoxField>
-                    )}
-                </Draggable>
-            );
-        });
+                            {Component && (
+                                <BoxField
+                                    comp={button}
+                                    parentComp={comp}
+                                    onEdit={() => handleEditClick(button)}
+                                    index={index}
+                                >
+                                    <Component
+                                        comp={button}
+                                        onDragEnd={onDragEnd}
+                                    />
+                                </BoxField>
+                            )}
+                        </Draggable>
+                    );
+                }
+            )
+        );
+    };
 
     return (
-        <Droppable
-            component={comp}
-            onDrop={onDragEnd}
-            layout="horizontal"
-        >
+        <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
             <IGRPPageHeader
                 title={title || label || componentName}
                 description={description}
