@@ -14,7 +14,7 @@ export const EditorLayout = ({ currentItem }) => {
             setData(data);
             setFilePath(currentItem.path);
         } catch (error) {
-            console.error('Failed to load JSON content:', error);
+            console.error(t("failedLoadJsonContent"), error);
         }
     };
 

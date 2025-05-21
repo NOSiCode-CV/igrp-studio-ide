@@ -59,11 +59,11 @@ export const ResponseLayout = ({
                                 options={httpStatusCodes}
                                 value={formik.values.statusCode}
                                 onChange={(value) => {
-                                    formik.setFieldValue('statusCode', value);
+                                    formik.setFieldValue(t("statusCode"), value);
                                     handleChangeCode(value);
                                 }}
                                 onBlur={(value) => {
-                                    formik.setFieldValue('statusCode', value);
+                                    formik.setFieldValue(t("statusCode"), value);
                                     handleChangeCode(value);
                                 }}
                                 error={formik.errors.statusCode}

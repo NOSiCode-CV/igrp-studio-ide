@@ -94,7 +94,8 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
-                `Module ${formik.values.name} have been successfully added.`
+                t('moduleAdded', { name: formik.values.name })
+               // `Module ${formik.values.name} have been successfully added.`
             );
         } catch (error) {
             showErrorToast(error);

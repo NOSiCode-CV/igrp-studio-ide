@@ -62,7 +62,7 @@ export default function SerializationConfigModal({
         setConfig((prev) => ({
             ...prev,
             module,
-            type: type === 'models' ? 'model' : type
+            type: type === t('models') ? 'model' : type
         }));
     }, [item]);
 

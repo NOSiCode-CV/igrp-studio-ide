@@ -58,8 +58,8 @@ const EmptyPage = ({ onClick }) => {
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener(t("keydown"), handleKeyDown);
+        return () => window.removeEventListener(t("keydown"), handleKeyDown);
     }, [onClick]);
     return (
         <IGRPContainer className='mb-0'>

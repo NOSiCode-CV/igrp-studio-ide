@@ -48,9 +48,9 @@
   "currentButtons": "Ações",
   "msgInfoAccpetName": "O nome do atributo deve conter apenas caracteres alfabéticos e não pode conter espaços ou caracteres especiais.",
   "dto": "Objecto transferência de dados",
-  "models": "Schemas",
+  "models": "Esquemas",
   "controllers": "Endpoints",
-  "model": "Schema",
+  "model": "Esquema",
   "controller": "Endpoint",
   "shared": "Componentes",
   "dialogDescription": "Insira o nome para o seu novo módulo. Clique em salvar quando terminar.",
@@ -149,7 +149,7 @@
   "endpoints": "Endpoints",
   "endpointsDescription": "Controladores de endpoints da API",
   "schemas": "Schemas",
-  "schemasDescription": "Modelos e schemas de dados",
+  "schemasDescription": "Modelos e esquemas de dados",
   "dtos": "DTOs",
   "dtosDescription": "Objetos de transferência de dados",
   "advanced": "Avançado",
@@ -707,7 +707,6 @@
   "searchWorkspaces": "Pesquisar espaços de trabalho",
   "bgMuted": "Fundo atenuado",
   "errorCloningRepository": "Erro ao clonar o repositório:",
-  "cloneRepository": "Clonar Repositório",
   "saveChanges": "Salvar Alterações",
   "deleting": "Eliminando...",
   "updated": "atualizado",
@@ -740,7 +739,6 @@
   "tabs": "Abas",
   "searchPlaceholder": "Pesquisar {{type}}s...",
   "noProjectsYet": "Ainda não há projetos",
-  "workspaceCreationFailed": "Falha na criação do workspace",
   "myWorkspace": "Meu Espaço de Trabalho",
   "myWorkspaceSlug": "meu-espaco-de-trabalho",
   "myWorkspaceDescription": "Meu espaço de desenvolvimento com projetos Docker",
@@ -749,15 +747,31 @@
   "openExternalUrl": "Abrir URL externa",
   "page": "Página",
   "component": "Componente",
-    "searchForWidget": "Pesquisar por widget...",
+   "searchForWidget": "Pesquisar por widget...",
    "selectedCommit": "Commit Selecionado:",
    "toggleSidebar": "Alternar barra lateral",
-   "gitlabConfigSaved": "Configuração do GitLab salva"
-
-  
-
-
-  
+   "gitlabConfigSaved": "Configuração do GitLab salva",
+   "workspaceCreationFailed": "Falha na criação do espaço de trabalho: {{error}}",
+   "cloneRepository": "Clonar repositório '{{name}}'",
+   "createNewModule": "Criar novo módulo",
+   "saveModule": "Guardar módulo",
+   "moduleAdded": "O módulo '{{name}}' foi adicionado com sucesso.",
+    "ConnectionNameRequired": "O nome da conexão é obrigatório",
+    "DatabaseTypeRequired": "O tipo de banco de dados é obrigatório",
+    "HostRequired": "O host é obrigatório",
+    "PortRequired": "A porta é obrigatória",
+    "PortGreaterThanZero": "A porta deve ser maior que 0",
+    "UsernameRequired": "O nome de usuário é obrigatório",
+    "PasswordRequired": "A senha é obrigatória",
+    "FieldNameEmpty": "O nome do campo não pode estar vazio. Por favor, insira um nome válido.",
+    "FieldNameDuplicate": "O nome do campo \"${name}\" é duplicado. Por favor, escolha um nome único.",
+    "selectCascadeTypes": "Selecione os tipos de cascata...",
+    "errorLoadJsonPermission": "Falha ao carregar conteúdo JSON por permissão {permissionName}:",
+    "permission": "Permissão",
+    "failedLoadJsonContent": "Falha ao carregar conteúdo JSON:",
+    "permissions": "Permissões",
+    "statusCode": "Código de status",
+    "failedFetchSelectors": "Falha ao buscar seletores:"
 
 
   

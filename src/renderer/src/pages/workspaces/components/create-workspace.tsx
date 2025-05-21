@@ -74,7 +74,7 @@ const CreateWorkspace = ({
                 onOpenChange?.(false);
             }
         } catch (error) {
-             console.error('Workspace creation failed:', error);
+             console.error(t('workspaceCreationFailed'), error);
             showErrorToast(error);
         } finally {
             setIsCreating(false);

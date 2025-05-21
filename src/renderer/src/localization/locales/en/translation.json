@@ -706,7 +706,7 @@
   "searchWorkspaces": "Search workspaces",
   "bgMuted": "Muted background",
   "errorCloningRepository": "Error cloning repository:",
-  "cloneRepository": "Clone Repository",
+  "cloneRepository": "Clone repository '{{name}}'",
   "saveChanges": "Save Changes",
   "deleting": "Deleting...",
   "updated": "updated",
@@ -739,7 +739,6 @@
   "tabs": "Tabs",
   "searchPlaceholder": "Search {{type}}s...",
   "noProjectsYet": "No projects yet",
-  "workspaceCreationFailed": "Workspace creation failed",
   "myWorkspace": "My Workspace",
   "myWorkspaceSlug": "my-workspace",
   "myWorkspaceDescription": "My development workspace with Docker projects",
@@ -751,15 +750,28 @@
    "searchForWidget": "Search for widget...",
   "selectedCommit": "Selected Commit:",
   "toggleSidebar": "Toggle Sidebar",
-  "gitlabConfigSaved": "GitLab configuration saved"
-  
-
-
-
-  
-
-
-  
+  "gitlabConfigSaved": "GitLab configuration saved",
+   "workspaceCreationFailed": "Workspace creation failed: {{error}}",
+   "moduleAdded": "Module '{{name}}' has been successfully added.",
+    "My Database Connection": "My Database Connection",
+    "Update": "Update",
+    "Add": "Add",
+    "ConnectionNameRequired": "Connection name is required",
+    "DatabaseTypeRequired": "Database type is required",
+    "HostRequired": "Host is required",
+    "PortRequired": "Port is required",
+    "PortGreaterThanZero": "Port must be greater than 0",
+    "UsernameRequired": "Username is required",
+    "PasswordRequired": "Password is required",
+    "FieldNameEmpty": "Field name cannot be empty. Please enter a valid name.",
+    "FieldNameDuplicate": "Field name \"${name}\" is duplicate. Please choose a unique name.",
+    "selectCascadeTypes": "Select cascade types...",
+    "errorLoadJsonPermission": "Failed to load JSON content for permission {permissionName}:",
+    "permission": "Permission",
+    "failedLoadJsonContent": "Failed to load JSON content:",
+    "permissions": "Permissions",
+    "statusCode": "Status code",
+    "failedFetchSelectors": "Failed to fetch selectors:"
    
 
 

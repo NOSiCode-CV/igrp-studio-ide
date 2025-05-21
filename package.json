@@ -1,5 +1,5 @@
 {
-	"name": "igrp-studio",
+	"name": "igrp-studio-horizon",
 	"version": "0.0.1-alpha.1",
 	"description": "IGRP Studio for development",
 	"main": "out/main/index.js",

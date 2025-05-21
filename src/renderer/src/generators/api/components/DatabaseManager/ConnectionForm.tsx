@@ -29,16 +29,7 @@ interface ConnectionFormProps {
     onCancel: () => void;
 }
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Connection name is required'),
-    databaseType: Yup.string().required('Database type is required'),
-    host: Yup.string().required('Host is required'),
-    port: Yup.number()
-        .required('Port is required')
-        .min(1, 'Port must be greater than 0'),
-    user: Yup.string().required('Username is required'),
-    password: Yup.string().required('Password is required'),
-});
+
 
 export function ConnectionForm({
     connection,
@@ -58,6 +49,17 @@ export function ConnectionForm({
             showSuccessToast(message);
         } else showErrorToast(message);
     };
+
+    const validationSchema = Yup.object({
+    name: Yup.string().required(t('ConnectionNameRequired')),
+    databaseType: Yup.string().required(t('DatabaseTypeRequired')),
+    host: Yup.string().required(t('HostRequired')),
+    port: Yup.number()
+        .required(t('PortRequired'))
+        .min(1, t('PortGreaterThanZero')),
+    user: Yup.string().required(t('UsernameRequired')),
+    password: Yup.string().required(t('PasswordRequired')),
+});
 
     return (
         
@@ -108,7 +110,7 @@ export function ConnectionForm({
                                         value={values.name}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        placeholder="My Database Connection"
+                                        placeholder={t('general')}
                                         required
                                     />
                                     {errors.name && touched.name && (
@@ -125,7 +127,7 @@ export function ConnectionForm({
                                         value={values.databaseType}
                                         onChange={(value) => {
                                             setFieldValue(
-                                                'databaseType',
+                                                t('databaseType'),
                                                 value
                                             );
                                         }}
@@ -188,7 +190,7 @@ export function ConnectionForm({
                                             value={values.user}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            placeholder="Username"
+                                            placeholder={t('username')}
                                         />
                                         {errors.user && touched.user && (
                                             <div className="text-xs">
@@ -208,7 +210,7 @@ export function ConnectionForm({
                                             value={values.password}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            placeholder="Password"
+                                            placeholder={t('Password')}
                                         />
                                         {errors.password &&
                                             touched.password && (
@@ -258,7 +260,7 @@ export function ConnectionForm({
                             {t('cancel')}
                             </Button>
                             <Button type="submit">
-                                {connection.name ? 'Update' : 'Add'} Connection
+                                {connection.name ? t('Update') : t('Add')} Connection
                             </Button>
                         </div>
                     </div>

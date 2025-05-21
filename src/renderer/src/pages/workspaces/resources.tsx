@@ -232,7 +232,7 @@ const Resources = () => {
 
     const handleCloneProject = async (url: string): Promise<void> => {
         try {
-            await window.electron.ipcRenderer.invoke('clone-repository', url);
+            await window.electron.ipcRenderer.invoke(t('cloneRepository'), url);
         } catch (error) {
             console.error(t('errorCloningRepository'), error);
             showErrorToast(t('cloneProjectError'));
