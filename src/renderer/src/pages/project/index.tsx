@@ -104,7 +104,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         onSubmit: (values, actions) => {
             console.log('Form submitted with values:', values);
             actions.setSubmitting(false);
-            saveOrOpenProject({ ...formik.values });
+            saveOrOpenProject({ project: { ...formik.values } });
         },
     });
 

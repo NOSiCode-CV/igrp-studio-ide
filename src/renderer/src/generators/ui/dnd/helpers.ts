@@ -41,16 +41,17 @@ export const getDefaultInteractions = (schema: any, tag?: string) => {
     return interactions;
 };
 
-export const getRequiredDataSchema = (schema: any, tag?: string) => {
+export const getRequiredDataSchema = (schema: any, tag: string) => {
     const states: any = {};
     for (const key in schema) {
         if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
-            states[key] = getRequiredDataSchema(schema[key].properties);
+            states[key] = getRequiredDataSchema(schema[key].properties, tag);
         }
         else if (schema[key].type === 'array' && !schema[key].items?.enum) {
             states[key] = [];
         }
         else {
+
             states[key] = schema[key].default ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
         }
     }
@@ -72,7 +73,7 @@ export const newStructuredComponent = (
         data: dataProperties,
     } = componentRegister || {};
 
-    const data = getRequiredDataSchema(dataProperties);
+    const data = getRequiredDataSchema(dataProperties, '');
     const interactions = getDefaultInteractions(interactionsProperties);
     const properties = getDefaultProperties(props);
 

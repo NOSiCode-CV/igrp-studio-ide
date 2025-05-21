@@ -11,6 +11,8 @@ import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useEffect, useState } from 'react';
 import { AddComponentModal } from '../../components/add-components-modal';
+import { Badge } from '@renderer/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface ToolsProps {
     onEdit: () => void;
@@ -40,6 +42,19 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
         handleRemoveChildFromComponent({ droppableId: id, index });
     };
 
+    const [isOpen, setIsOpen] = useState(false);
+
+    const [currentComponent, setCurrentComponent] =
+        useState<StructuredComponent | null>(null);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setCurrentComponent(null);
+        }
+    }, [isOpen, comp]);
+
+    const { t } = useTranslation();
+
     return (
         <TooltipProvider>
             <div className="shadow-lg flex justify-end p-0 space-x-0">
@@ -50,7 +65,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Move</p>
+                        <p>{t('move')}</p>
                     </TooltipContent>
                 </Tooltip>
                 <Tooltip>
@@ -63,7 +78,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Clone</p>
+                        <p>{t('clone')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -81,7 +96,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Edit</p>
+                        <p>{t('edit')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -96,11 +111,37 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Delete</p>
+                        <p>{t('delete')}</p>
                     </TooltipContent>
                 </Tooltip>
                 {components.length > 0 && path && (
-                    <AddComponentModal path={path} comp={comp} />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                variant={'secondary'}
+                                className="rounded-sm cursor-pointer mt-0.5"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentComponent(comp);
+                                    setIsOpen(true);
+                                }}
+                            >
+                                <span className="text-xs">Add Comp</span>
+                            </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Add Comp</p>
+                        </TooltipContent>
+                    </Tooltip>
+                )}
+
+                {isOpen && path && currentComponent && (
+                    <AddComponentModal
+                        path={path}
+                        comp={comp}
+                        open={isOpen}
+                        setOpen={setIsOpen}
+                    />
                 )}
             </div>
         </TooltipProvider>

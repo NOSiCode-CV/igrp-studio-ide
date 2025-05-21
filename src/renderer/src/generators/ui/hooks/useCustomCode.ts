@@ -4,10 +4,12 @@ import useStudio from "@renderer/hooks/use-studio";
 import { StructuredComponent } from "@renderer/lib/dnd/types";
 import { EngineService } from "@renderer/services/EngineService";
 import { useMemo, useState, useEffect } from "react";
+import { useComponents } from "./useComponents";
 
 interface Option {
     label: string;
     value: string;
+    metadata?: any
 }
 
 interface CustomCodeHook {
@@ -23,6 +25,7 @@ interface CustomCodeHook {
 
 const useCustomCode = (): CustomCodeHook => {
     const { states: drpoppedStates, functions: droppedFunctions, components } = useDroppedComponents();
+    const { extractAllStates } = useComponents()
     const [metadataFunctions, setMetadataFunctions] = useState<CustomFunctionConfig[]>([]);
     const [metadataStates, setMetadataStates] = useState<State[]>([]);
 
@@ -58,6 +61,8 @@ const useCustomCode = (): CustomCodeHook => {
         }));
     }, [types]);
 
+
+
     // Fetch code snippets and metadata
     useEffect(() => {
         const fetchData = async () => {
@@ -67,7 +72,7 @@ const useCustomCode = (): CustomCodeHook => {
                 const [snippetsResponse, metadataResponse, metadataStates] = await Promise.all([
                     EngineService.getCodeSnippets(),
                     EngineService.getAppMetadata(basePath),
-                    extractAllStates(components)
+                    extractAllStates()
                 ]);
 
                 setMetadataStates(metadataStates || []);
@@ -84,20 +89,18 @@ const useCustomCode = (): CustomCodeHook => {
                 setIsLoading(false);
             }
         };
-
         fetchData();
+
+        /*   window.electron.ipcRenderer.on('folder-change', fetchData);
+  
+          return () => {
+              window.electron.ipcRenderer.removeListener(
+                  'folder-change',
+                  fetchData
+              );
+          }; */
     }, [basePath]);
 
-    /*  useEffect(() => {
-    window.electron.ipcRenderer.on('folder-change', loadMetadata);
-
-    return () => {
-        window.electron.ipcRenderer.removeListener(
-            'message-update',
-            loadMetadata
-        );
-    };
-}, []);*/
     return {
         functions,
         states,
@@ -109,52 +112,5 @@ const useCustomCode = (): CustomCodeHook => {
         error,
     };
 };
-
-export function extractAllStates(node: StructuredComponent): State[] {
-    const states: State[] = [];
-
-    function traverse(currentNode: StructuredComponent) {
-        if (!currentNode.data) return;
-
-        // Verifica todas as chaves do objeto `data`
-        Object.entries(currentNode.data).forEach(([key, value]) => {
-            // Caso 1: Estado direto (data.state)
-            if (key === 'state' && isState(value)) {
-                states.push(validateState(value));
-            }
-            // Caso 2: Objeto aninhado que pode conter state
-            else if (value && typeof value === 'object') {
-                if ('state' in value && isState(value.state)) {
-                    states.push(validateState(value.state));
-                }
-            }
-        });
-
-        // Recursão para filhos
-        if (currentNode.children?.length) {
-            currentNode.children.forEach(child => traverse(child));
-        }
-    }
-
-    // Valida se um objeto é um State válido
-    function isState(obj: any): obj is Partial<State> {
-        return obj && typeof obj === 'object' && 'name' in obj && 'type' in obj;
-    }
-
-    // Garante que o state tenha todas propriedades necessárias
-    function validateState(state: Partial<State>): State {
-        return {
-            id: state.id || '',
-            type: state.type || 'any',
-            name: state.name || 'unnamed',
-            defaultValue: state.defaultValue,
-            imports: state.imports || [],
-            ...state // Mantém outras propriedades
-        };
-    }
-
-    traverse(node);
-    return states;
-}
 
 export default useCustomCode;

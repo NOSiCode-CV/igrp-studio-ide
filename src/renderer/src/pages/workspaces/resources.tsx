@@ -224,9 +224,11 @@ const Resources = () => {
         }
 
         saveOrOpenProject({
-            ...config,
-            id: config.id ?? getId(),
-            workspaceId: workspace.id,
+            project: {
+                ...config,
+                id: config.id ?? getId(),
+                workspaceId: workspace.id,
+            },
         });
     };
 

@@ -1,5 +1,4 @@
 import { Plus, Trash2, Edit2, Mouse } from 'lucide-react';
-import { InteractionValue } from '../../style/components/effects/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,14 +22,61 @@ import { ImportComponent } from '../../../sidebar/custom-code/custom-code-import
 import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { FunctionSettingsSidebar } from '../../../sidebar/custom-code/functions-settings';
+import { getId } from '@renderer/utils/helpers';
+import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
+import useStudio from '@renderer/hooks/use-studio';
+
+type ActionType = 'function' | 'navigate' | 'formSubmit';
+
+const actionTypeOptions = [
+    { value: 'function', label: 'Function' },
+    { value: 'navigate', label: 'Navigation' },
+    { value: 'formSubmit', label: 'Form Submit' },
+];
+
+interface NavigationAction {
+    name: string;
+    path: string;
+    params?: Record<string, string>;
+}
+
+interface FormSubmitAction {
+    formId: string;
+    targetForm: string;
+    validation?: boolean;
+}
+
+interface Action {
+    type: ActionType;
+    function?: {
+        fnName?: string;
+        fnCustomSet?: string;
+        fnCustomCode?: {
+            fnCode?: string;
+            imports?: Import[];
+        };
+    };
+    navigate?: NavigationAction;
+    formSubmit?: FormSubmitAction;
+}
 
 interface TriggerControlsProps {
-    interactions: Record<string, InteractionValue>;
+    interactions: Action;
     interactionsType: any;
     componentTag: string;
-    onInteractionsChange: (
-        interactions: Record<string, InteractionValue>
-    ) => void;
+    onInteractionsChange: (interactions: Action) => void;
+}
+
+interface InteractionEditorProps {
+    interaction: Action;
+    interactionKey: string;
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    onInteractionsChange: (interactions: Action) => void;
+    interactionsType: any;
+    setLocalInteractions: (interactions: Action) => void;
+    localInteractions: Action;
+    componentTag: string;
 }
 
 export function TriggerControls({
@@ -39,9 +85,9 @@ export function TriggerControls({
     componentTag,
     onInteractionsChange,
 }: TriggerControlsProps) {
-    const [localInteractions, setLocalInteractions] = useState<
-        Record<string, InteractionValue>
-    >({});
+    const [localInteractions, setLocalInteractions] = useState<Action>({
+        type: 'function',
+    });
 
     useEffect(() => {
         setLocalInteractions(interactions);
@@ -90,7 +136,7 @@ export function TriggerControls({
     };
 
     const [open, setOpen] = useState(false);
-    const [interaction, setInteraction] = useState<InteractionValue>();
+    const [interaction, setInteraction] = useState<Action>();
     const [interactionKey, setInteractionKey] = useState<string>();
 
     return (
@@ -175,58 +221,66 @@ const InteractionEditor = ({
     setLocalInteractions,
     localInteractions,
     componentTag,
-}: {
-    componentTag: string;
-    interaction: InteractionValue;
-    interactionKey: string;
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    onInteractionsChange: (
-        interactions: Record<string, InteractionValue>
-    ) => void;
-    interactionsType: any;
-    localInteractions: Record<string, InteractionValue>;
-    setLocalInteractions: (
-        localInteractions: Record<string, InteractionValue>
-    ) => void;
-}) => {
+}: InteractionEditorProps) => {
+    const [actionType, setActionType] = useState<ActionType>(
+        interaction.type || 'function'
+    );
+    const [currentAction, setCurrentAction] = useState<Action>(interaction);
+
+    const { pageOptions: availablePages } = useStudio();
+    const { getFormOptions } = useComponents();
+    const availableForms = getFormOptions();
+
+    // Refs e states para diferentes editores
     const fnCustomSetEditorRef = useRef<any>(null);
     const fnCustomCodeEditorRef = useRef<any>(null);
 
+    /*     // Dados para navegação
+    const [selectedPage, setSelectedPage] = useState<{
+        id: string;
+        name: string;
+    } | null>(null);
+
+    const [navigationParams, setNavigationParams] = useState<
+        Record<string, string>
+    >({});
+
+    // Dados para submit de formulário
+    const [selectedForm, setSelectedForm] = useState<{
+        id: string;
+        name: string;
+    } | null>(null); */
+
     const fnCustomSetRef = useRef<string>('');
     const fnCustomCodeRef = useRef<string>('');
+
     const [imports, setImports] = useState<Import[]>(
-        interaction.fnCustomCode?.imports || []
+        currentAction?.function?.fnCustomCode?.imports || []
     );
-    const [fnName, setFnName] = useState<string | undefined>(undefined);
 
     const { functionOptions } = useCustomCode();
 
     const interactions = interactionsType[interactionKey];
 
-    const hasfnNameOption = interactions?.properties.fnName.visible;
+    const { properties } = interactions;
 
-    const hasfnCustomSetOption = interactions?.properties.fnCustomSet.visible;
+    const hasfnNameOption = properties?.function?.properties.fnName.visible;
+
+    const hasfnCustomSetOption =
+        properties?.function?.properties.fnCustomSet.visible;
 
     const hasfnCodeOption =
-        interactions?.properties.fnCustomCode?.properties?.fnCode?.visible;
+        properties?.function?.properties.fnCustomCode?.properties?.fnCode
+            ?.visible;
 
     const hasImportOption =
-        interactions?.properties.fnCustomCode.properties?.imports?.visible;
+        properties?.function?.properties.fnCustomCode.properties?.imports
+            ?.visible;
 
-    const saveInteraction = (key: string) => {
-        const newInteractions = {
-            fnCustomSet: fnCustomSetRef.current,
-            fnName,
-            fnCustomCode: {
-                fnCode: fnCustomCodeRef.current || undefined,
-                imports,
-            },
-        };
-
+    const saveInteraction = () => {
         const updated = {
             ...localInteractions,
-            [key]: { ...localInteractions[key], ...newInteractions },
+            [interactionKey]: currentAction,
         };
 
         setLocalInteractions(updated);
@@ -237,57 +291,70 @@ const InteractionEditor = ({
         fnCustomSetRef.current = '';
     };
 
-    const handleInsertImport = (importObj: Import) => {
+    const handleChangeFnName = (fnName: string) => {
+        if (!fnName) return;
+
+        const functionOption = functionOptions.find(
+            (option) => option.value === fnName
+        );
+
+        const namespace = `import {${fnName}} from '${functionOption?.metadata?.path}'`;
+
+        setImports?.((prev) => [
+            ...prev,
+            {
+                namespace,
+                id: getId(),
+            },
+        ]);
+
+        setCurrentAction({
+            ...currentAction,
+            function: {
+                ...currentAction.function,
+                fnName: fnName,
+            },
+        });
+    };
+
+    const handleChangeImport = (importObj: Import) => {
         setImports?.((prev) => [...prev, importObj]);
     };
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
-                <SidebarInset className="p-4 space-y-4">
-                    <DialogHeader>
-                        <div className="flex flex-1 justify-between">
-                            <div className="space-y-2">
-                                <DialogTitle>
-                                    Edit Interaction{' '}
-                                    <span className="text-muted-foreground">
-                                        {interactionKey + 1}
-                                    </span>
-                                </DialogTitle>
-                                <DialogDescription>
-                                    Either select a function below or write your
-                                    custom implementation
-                                </DialogDescription>
-                            </div>
-                            <div>
-                                <Button
-                                    size={'sm'}
-                                    onClick={() =>
-                                        saveInteraction(interactionKey)
-                                    }
-                                >
-                                    Save changes
-                                </Button>
-                            </div>
-                        </div>
-                    </DialogHeader>
-                    <div className="space-y-2">
+    useEffect(() => {
+        setCurrentAction({
+            ...currentAction,
+            function: {
+                ...currentAction.function,
+                fnCustomCode: {
+                    ...currentAction.function?.fnCustomCode,
+                    imports: imports,
+                },
+            },
+        });
+    }, [imports]);
+
+    const renderActionConfig = () => {
+        switch (actionType) {
+            case 'function':
+                return (
+                    <div className="space-y-4">
                         {hasfnNameOption && (
                             <IGRPCombobox
                                 label={'Function'}
                                 placeholder="Select Function"
                                 name="select-function"
-                                value={interaction.fnName}
-                                onChange={(value) => {
-                                    setFnName(value as string);
-                                }}
+                                value={currentAction.function?.fnName}
+                                onChange={(value) =>
+                                    handleChangeFnName(value as string)
+                                }
                                 options={functionOptions}
                             />
                         )}
                         {hasImportOption && (
                             <ImportComponent
                                 initialImports={imports}
-                                onChange={(value) => setImports(value)}
+                                onChange={(imports) => setImports(imports)}
                             />
                         )}
                         {hasfnCustomSetOption && (
@@ -296,11 +363,20 @@ const InteractionEditor = ({
                                     Inline Function
                                 </Label>
                                 <MonacoEditor
-                                    content={interaction.fnCustomSet || ''}
+                                    content={
+                                        currentAction.function?.fnCustomSet ||
+                                        ''
+                                    }
                                     filePath=""
-                                    onChange={(newCode) => {
-                                        fnCustomSetRef.current = newCode;
-                                    }}
+                                    onChange={(newCode) =>
+                                        setCurrentAction({
+                                            ...currentAction,
+                                            function: {
+                                                ...currentAction.function,
+                                                fnCustomSet: newCode,
+                                            },
+                                        })
+                                    }
                                     height="5vh"
                                     language="typescript"
                                     ref={fnCustomSetEditorRef}
@@ -315,12 +391,23 @@ const InteractionEditor = ({
                                 </Label>
                                 <MonacoEditor
                                     content={
-                                        interaction.fnCustomCode?.fnCode || ''
+                                        currentAction.function?.fnCustomCode
+                                            ?.fnCode || ''
                                     }
                                     filePath=""
-                                    onChange={(newCode) => {
-                                        fnCustomCodeRef.current = newCode;
-                                    }}
+                                    onChange={(newCode) =>
+                                        setCurrentAction({
+                                            ...currentAction,
+                                            function: {
+                                                ...currentAction.function,
+                                                fnCustomCode: {
+                                                    ...currentAction.function
+                                                        ?.fnCustomCode,
+                                                    fnCode: newCode,
+                                                },
+                                            },
+                                        })
+                                    }
                                     height="40vh"
                                     language="typescript"
                                     ref={fnCustomCodeEditorRef}
@@ -328,18 +415,157 @@ const InteractionEditor = ({
                             </div>
                         )}
                     </div>
+                );
+
+            case 'navigate':
+                return (
+                    <div className="space-y-4">
+                        <IGRPCombobox
+                            label="Target Page"
+                            placeholder="Select page"
+                            value={
+                                currentAction.navigate?.name
+                                    ? currentAction.navigate.name.replace(
+                                          'onClick',
+                                          ''
+                                      )
+                                    : ''
+                            }
+                            onChange={(id) => {
+                                const page = availablePages.find(
+                                    (p) => p.value === id
+                                );
+                                console.log(page);
+                                if (page) {
+                                    setCurrentAction({
+                                        ...currentAction,
+                                        navigate: {
+                                            path: page.metadata.path,
+                                            name: `onClick${id}`,
+                                        },
+                                    });
+                                }
+                            }}
+                            options={availablePages}
+                        />
+
+                        {/*  <div className="space-y-2">
+                            <Label>Navigation Parameters</Label>
+                            {Object.entries(navigationParams).map(
+                                ([key, value]) => (
+                                    <div key={key} className="flex gap-2">
+                                        <Input value={key} disabled />
+                                        <Input
+                                            value={value}
+                                            onChange={(e) =>
+                                                setNavigationParams({
+                                                    ...navigationParams,
+                                                    [key]: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                )
+                            )}
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                    setNavigationParams({
+                                        ...navigationParams,
+                                        [`param${Object.keys(navigationParams).length + 1}`]:
+                                            '',
+                                    })
+                                }
+                            >
+                                Add Parameter
+                            </Button>
+                        </div> */}
+                    </div>
+                );
+
+            case 'formSubmit':
+                return (
+                    <div className="space-y-4">
+                        <IGRPCombobox
+                            label="Target Form"
+                            placeholder="Select form"
+                            value={currentAction.formSubmit?.targetForm}
+                            onChange={(form) => {
+                                setCurrentAction({
+                                    ...currentAction,
+                                    formSubmit: {
+                                        formId: '',
+                                        targetForm: form as string,
+                                    },
+                                });
+                            }}
+                            options={availableForms}
+                        />
+                    </div>
+                );
+
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
+                <SidebarInset className="p-4 space-y-4">
+                    <DialogHeader>
+                        <div className="flex flex-1 justify-between">
+                            <div className="space-y-2">
+                                <DialogTitle>Edit Interaction</DialogTitle>
+                                <DialogDescription>
+                                    Configure what happens when this interaction
+                                    is triggered
+                                </DialogDescription>
+                            </div>
+                            <div>
+                                <Button
+                                    size={'sm'}
+                                    onClick={() => saveInteraction()}
+                                >
+                                    Save changes
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <IGRPCombobox
+                            label="Action Type"
+                            placeholder="Select action type"
+                            name="action-type"
+                            value={actionType}
+                            onChange={(value) => {
+                                setCurrentAction({
+                                    ...currentAction,
+                                    type: value as ActionType,
+                                });
+                                setActionType(value as ActionType);
+                            }}
+                            options={actionTypeOptions}
+                        />
+
+                        {renderActionConfig()}
+                    </div>
                 </SidebarInset>
-                <FunctionSettingsSidebar
-                    formik={null}
-                    editorRef={
-                        hasfnCodeOption
-                            ? fnCustomCodeEditorRef
-                            : fnCustomSetEditorRef
-                    }
-                    side="right"
-                    onInsertImport={handleInsertImport}
-                    componentTag={componentTag}
-                />
+                {/* Sidebar com configurações adicionais */}
+                {actionType === 'function' && (
+                    <FunctionSettingsSidebar
+                        editorRef={
+                            hasfnCodeOption
+                                ? fnCustomCodeEditorRef
+                                : fnCustomSetEditorRef
+                        }
+                        onInsertImport={(importObj) => {
+                            handleChangeImport(importObj);
+                        }}
+                        componentTag={componentTag}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
