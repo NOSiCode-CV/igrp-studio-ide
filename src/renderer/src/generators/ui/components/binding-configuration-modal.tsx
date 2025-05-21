@@ -19,10 +19,7 @@ import {
 } from '@renderer/generators/api/components/inputs-form';
 import { SchemaTypeItem } from 'src/main/types';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import {
-    ElementField,
-    TypeDef,
-} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ElementField } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
@@ -31,13 +28,32 @@ import useToast from '@renderer/hooks/useToast';
 import { capitalize } from '@renderer/utils/helpers';
 import { COMPONENT } from '../ComponentTypes';
 
-const defaultFieldType: ElementField = {
+interface LabeledElementField extends ElementField {
+    componentId: string;
+    name: string;
+    type: string;
+    validation?: string;
+    defaultValue?: string;
+    required: boolean;
+    label: string;
+}
+
+type LabeledTypeDef = {
+    componentId: string;
+    name: string;
+    path: string;
+    tags?: string[];
+    fields: LabeledElementField[];
+};
+
+const defaultFieldType: LabeledElementField = {
     componentId: '',
     name: '',
     type: 'string',
     required: false,
     validation: '',
     defaultValue: '',
+    label: '',
 };
 
 const FIELD_TYPES: SchemaTypeItem[] = [
@@ -95,6 +111,7 @@ export const BindingConfigurationModal = ({
     );
 
     const columns = [
+        { key: 'label', name: t('label'), type: 'label' },
         { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
         ...(!newBinding
             ? [
@@ -134,7 +151,7 @@ export const BindingConfigurationModal = ({
         return true;
     };
 
-    const formik: FormikProps<TypeDef> = useFormik({
+    const formik: FormikProps<LabeledTypeDef> = useFormik({
         enableReinitialize: true,
         initialValues: {
             componentId,
@@ -148,14 +165,15 @@ export const BindingConfigurationModal = ({
 
             if (!validate()) return;
 
+            const { label, ...rest } = values;
+
             createOrUpdateType({
-                ...values,
+                ...rest,
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 
             if (componentId) {
                 //TODO For revisions
-
                 let defaultValues: any = undefined;
                 if (comp.componentName === COMPONENT.Form) {
                     defaultValues = {
@@ -208,7 +226,7 @@ export const BindingConfigurationModal = ({
 
     useEffect(() => {
         const type = getFields();
-        const fieldsTypes = type.map((field: ElementField) => ({
+        const fieldsTypes = type.map((field: LabeledElementField) => ({
             label: `${field.name} (${field.type})`,
             value: field.name,
         }));
@@ -245,11 +263,11 @@ export const BindingConfigurationModal = ({
         components: StructuredComponent[],
         existingNames: string[] = []
     ): {
-        fields: ElementField[];
+        fields: LabeledElementField[];
         componentMap: Map<string, StructuredComponent>;
     } => {
         const componentMap: Map<string, StructuredComponent> = new Map();
-        const fields: ElementField[] = [];
+        const fields: LabeledElementField[] = [];
         const newExistingNames = new Set(existingNames);
 
         const processComponent = (child: StructuredComponent) => {
@@ -267,6 +285,7 @@ export const BindingConfigurationModal = ({
                         ...defaultFieldType,
                         name: child.tag,
                         componentId: child.id,
+                        label: child.properties.label ?? child.label,
                     });
                     newExistingNames.add(child.id);
                 }

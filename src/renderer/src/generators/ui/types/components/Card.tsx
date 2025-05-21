@@ -5,7 +5,6 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { COMPONENT } from '../../ComponentTypes';
 import {
-    IGRPCard,
     IGRPCardContent,
     IGRPCardFooter,
     IGRPCardHeader,

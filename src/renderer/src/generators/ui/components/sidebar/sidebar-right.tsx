@@ -75,6 +75,10 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
 
     const [currentTag, setCurrentTag] = React.useState<string>(tag || '');
 
+    React.useEffect(() => {
+        setCurrentTag(tag || '');
+    }, [tag]);
+
     // Load properties component
     React.useEffect(() => {
         if (!componentName) return;
