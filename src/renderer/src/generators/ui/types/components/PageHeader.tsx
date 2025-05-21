@@ -96,10 +96,8 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className="border-none"
         >
             <IGRPPageHeader
-                variant={'h3'}
                 title={title || label || componentName}
                 description={description}
             >

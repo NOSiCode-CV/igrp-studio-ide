@@ -1,7 +1,7 @@
 import { Card } from '@renderer/components/ui/card';
 import NavigationBar from '../../components/navigation-bar';
 import { TextInput } from '../../components/inputs-form';
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import { useEnum } from './useEnum';
 import { addNewRow, changeValue, removeRow } from '../../helpers';
 import { defaultValue } from './config';

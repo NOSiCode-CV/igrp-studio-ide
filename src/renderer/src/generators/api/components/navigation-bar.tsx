@@ -104,7 +104,7 @@ const NavigationBar = ({
                                             setDeleteModal(true);
                                         }}
                                         size={'sm'}
-                                        className="outline-1 outline-red-500 text-red-500"
+                                        className="outline-1 outline-destructive text-destructive"
                                     >
                                         <Trash />
                                         <span className="sr-only">

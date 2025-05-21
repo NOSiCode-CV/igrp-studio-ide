@@ -1,4 +1,7 @@
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCombobox,
+    IGRPDatePicker,
+} from '@igrp/igrp-framework-react-design-system';
 import DomainForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import MultipleSelector from '@renderer/components/multiples-selector';
@@ -22,6 +25,16 @@ const toMap = (items: any) => {
     );
 };
 
+const getNestedValue = (obj: any, path: string) => {
+    return path
+        .split('.')
+        .reduce(
+            (acc, key) =>
+                acc && acc[key] !== undefined ? acc[key] : undefined,
+            obj
+        );
+};
+
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
     const [collapsed, setCollapsed] = useState({});
 
@@ -36,9 +49,13 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const label = getLabel(key);
         const type = enumValues ? 'enum' : typeDefault;
-        const value = formValues[key];
 
-        if (key === 'commonProperties' || key === 'iconProperties') {
+        const fieldPath = parentKey ? `${parentKey}.${key}` : key;
+
+        const value = getNestedValue(formValues, fieldPath);
+
+        if (fieldConfig.type === 'object' && fieldConfig.properties) {
+            const props = fieldConfig.properties;
             return (
                 <>
                     <div className="flex flex-col gap-2" key={key}>
@@ -59,10 +76,10 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                         {collapsed[key] && (
                             <>
                                 <div className="space-y-3">
-                                    {Object.keys(fieldConfig).map((nestedKey) =>
+                                    {Object.keys(props).map((nestedKey) =>
                                         renderField(
                                             nestedKey,
-                                            fieldConfig[nestedKey],
+                                            props[nestedKey],
                                             parentKey
                                                 ? `${parentKey}.${key}`
                                                 : key
@@ -81,7 +98,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                 <IconBrowser
                     selectedIcon={value}
                     onSelectedIcon={(icon: string) => {
-                        handleInputChange(key, icon);
+                        handleInputChange(fieldPath, icon);
                     }}
                 />
             );
@@ -89,15 +106,17 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
             return (
                 <DomainForm
                     onAdd={(opt) => {
-                        handleInputChange(key, opt);
+                        handleInputChange(fieldPath, opt);
                     }}
                 />
             );
         }
+
         return (
             <div
                 className={cn(
-                    type === 'boolean' && 'flex flex-1 space-x-3 align-middle',
+                    type === 'boolean' &&
+                        'flex flex-1 space-x-3 align-middle justify-between',
                     type !== 'boolean' && 'flex flex-col gap-2'
                 )}
                 key={key}
@@ -110,9 +129,9 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                 <Switch
                                     id={parentKey ? `${parentKey}.${key}` : key}
                                     name={key}
-                                    checked={value || false}
+                                    checked={value}
                                     onCheckedChange={(checked) => {
-                                        handleInputChange(key, checked);
+                                        handleInputChange(fieldPath, checked);
                                     }}
                                 />
                             );
@@ -121,7 +140,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                 <IGRPCombobox
                                     value={value}
                                     onChange={(value) =>
-                                        handleInputChange(key, value)
+                                        handleInputChange(fieldPath, value)
                                     }
                                     options={toMap(enumValues)}
                                     className="w-full"
@@ -135,7 +154,10 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     name={key}
                                     value={value}
                                     onChange={(e) =>
-                                        handleInputChange(key, e.target.value)
+                                        handleInputChange(
+                                            fieldPath,
+                                            e.target.value
+                                        )
                                     }
                                 />
                             );
@@ -147,8 +169,24 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                     name={key}
                                     value={value}
                                     onChange={(e) =>
-                                        handleInputChange(key, e.target.value)
+                                        handleInputChange(
+                                            fieldPath,
+                                            e.target.value
+                                        )
                                     }
+                                />
+                            );
+                        case 'date':
+                            return (
+                                <IGRPDatePicker
+                                    name={
+                                        parentKey ? `${parentKey}.${key}` : key
+                                    }
+                                    date={value}
+                                    onDateChange={(value) =>
+                                        handleInputChange(fieldPath, value)
+                                    }
+                                    className=""
                                 />
                             );
                         case 'array':
@@ -156,7 +194,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                 <MultipleSelector
                                     value={value}
                                     onChange={(value) =>
-                                        handleInputChange(key, value)
+                                        handleInputChange(fieldPath, value)
                                     }
                                     options={toMap(items?.enum)}
                                 />

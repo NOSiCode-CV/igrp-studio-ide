@@ -136,6 +136,23 @@ handleWithCustomErrors(
     }
 );
 
+handleWithCustomErrors(
+    EVENTS.NEXT.GET_CODE_SNIPPET,
+    async (_event, engineType: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        const data = engine.getCodeSnippets?.();
+        return data;
+    }
+);
+
+handleWithCustomErrors(
+    EVENTS.NEXT.LOAD_METADATA,
+    async (_event, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        return engine.getAppMetadata?.(basePath);
+    }
+);
+
 ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
     return await engineTypes(module, basePath);
 });

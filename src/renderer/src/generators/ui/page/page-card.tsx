@@ -8,6 +8,7 @@ interface PageCardProps {
     page: {
         name: string;
         path: string;
+        pagePath: string;
         status: string;
         created: string;
         pageName: string;
@@ -18,14 +19,17 @@ interface PageCardProps {
 }
 
 export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
-    const { isPage, pageName } = page;
+    const { isPage, pageName, pagePath } = page;
     const { t } = useTranslation();
     return (
         <Card>
             <CardContent>
                 <h3 className="font-semibold mb-2">{pageName}</h3>
                 <p className="text-sm text-muted-foreground">
-                    {t('Type')}: {isPage ? t("page") : t("component")}
+                    {t('Path')}: {pagePath}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                    {t('Type')}: {isPage ? 'Page' : 'Component'}
                 </p>
             </CardContent>
             <CardFooter className="flex justify-between">

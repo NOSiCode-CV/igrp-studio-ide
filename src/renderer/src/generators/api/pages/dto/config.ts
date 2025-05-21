@@ -9,6 +9,10 @@ export const initialValues: DTOConfig = {
     name: '',
     template: "classic",
     enableCustonValidation: false,
+    extends: {
+        name: '',
+        module: ''
+    },
     attributes: [
         {
             name: '',
@@ -52,15 +56,17 @@ export const getTablesColumns = ({ selectors, dto, models, enums, current, t }):
     )
 
     const dataTypes = (
-		selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
-		| {
-			ATTRIBUTE_TYPES: string[]
-		}
-		| undefined
-	)?.ATTRIBUTE_TYPES || []
+        selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+        | {
+            ATTRIBUTE_TYPES: string[]
+        }
+        | undefined
+    )?.ATTRIBUTE_TYPES || []
+
+    const dtos = getOptionsByObject(dto, module, currentDto);
 
     const namespacesOptions: SchemaTypeItem[] = [
-        { label: t('dto'), value: 'dto', items: getOptionsByObject(dto, module, currentDto) },
+        { label: t('dto'), value: 'dto', items: dtos },
         { label: t('model'), value: 'model', items: getOptionsByObject(models, module, currentDto) },
         { label: t('dataTypes'), value: 'java', items: dataTypes },
         { label: t('enum'), value: 'enum', items: getOptionsByObject(enums, module, currentDto) }

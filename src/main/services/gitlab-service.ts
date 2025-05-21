@@ -8,7 +8,7 @@ export const GitLabService = {
   async initializeServices() {
     try {
       const token = GitStore.getToken('gitlab');
-      
+
       if (token) {
         await this.initialize(token);
         return true;
@@ -27,7 +27,7 @@ export const GitLabService = {
       });
 
       GitStore.setToken('gitlab', token);
-      
+
       return true;
     } catch (error) {
       console.error('Failed to initialize GitLab client:', error);
@@ -46,17 +46,17 @@ export const GitLabService = {
       if (!gitlab) throw new Error('GitLab client not initialized');
       const igrpRepos: any = [];
       const batchSize = 10;
-  
+
       const repos = await gitlab.Projects.all({
         membership: true,
         orderBy: 'last_activity_at',
         sort: 'desc',
         perPage: 100
       });
-  
+
       for (let i = 0; i < repos.length; i += batchSize) {
         const batch = repos.slice(i, i + batchSize);
-        
+
         const promises = batch.map(async (repo) => {
           try {
             const branches = await gitlab.Branches.all(repo.id, { perPage: 5 })
@@ -64,14 +64,14 @@ export const GitLabService = {
                 console.log(`Error fetching branches for ${repo.name}:`, err.description || err.message);
                 return [];
               });
-            
+
             if (branches.length === 0) {
               console.log(`Repository ${repo.name} has no branches or is empty.`);
               return null;
             }
-            
+
             const defaultBranch = repo.default_branch || 'main';
-            
+
             const tree = await gitlab.Repositories.tree(repo.id, {
               path: '/',
               ref: defaultBranch
@@ -87,12 +87,12 @@ export const GitLabService = {
               }
               return [];
             });
-            
+
             // Check if .igrpstudio directory exists in the tree
-            const hasIgrpStudioDir = tree.some(item => 
+            const hasIgrpStudioDir = tree.some(item =>
               item.name === '.igrpstudio' && item.type === 'tree'
             );
-            
+
             if (hasIgrpStudioDir) {
               return {
                 id: repo.id,
@@ -108,22 +108,31 @@ export const GitLabService = {
                 platform: 'gitlab',
               };
             }
-            
+
             return null;
           } catch (error: any) {
             console.log(`Error checking repo gitlab ${repo.name}:`, error.description || error.message);
             return null;
           }
         });
-  
+
         const results = await Promise.all(promises);
         igrpRepos.push(...results.filter(r => r !== null));
       }
-  
+
       return igrpRepos;
     } catch (error) {
       console.error('Error listing GitLab repositories:', error);
       throw error;
     }
+  },
+
+  async getConfig(): Promise<any> {
+    // Add logic to retrieve GitLab configuration
+    return {}; // Example: return an empty object or actual configuration
+  },
+
+  async setConfig(config: any): Promise<void> {
+    // Add logic to retrieve GitLab configuration
   }
 };

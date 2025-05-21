@@ -86,7 +86,6 @@ const RepetitiveProps: React.FC<RepetitiveProps> = ({
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className="p-0"
                 >
                     <TableTool
                         comp={component}

@@ -69,9 +69,9 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                     >
                         <BoxWrapper
                             comp={comp}
-                            group="group/column-comp"
+                            group="group/column-grid"
                             onEdit={() => handleEditClick(comp)}
-                            className="opacity-0 group-hover/column-comp:opacity-100"
+                            className="opacity-0 group-hover/column-grid:opacity-100"
                         >
                             <Component comp={comp} onDragEnd={onDragEnd} />
                         </BoxWrapper>
@@ -105,7 +105,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className="border-none"
+            className='p-1'
         >
             <div className={cn(gridVariants({ variant, className }))}>
                 {renderColumns()}

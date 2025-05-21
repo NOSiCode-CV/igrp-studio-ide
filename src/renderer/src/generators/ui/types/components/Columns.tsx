@@ -62,8 +62,11 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     key={comp.id}
                     item={comp}
                     index={index}
-                    dropZone={false}
-                    className={cn(columnVariants({ variant, className }))}
+                    dropZone={true}
+                    className={cn(
+                        'p-0',
+                        columnVariants({ variant, className })
+                    )}
                 >
                     <BoxWrapper
                         comp={comp}
@@ -81,7 +84,7 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     };
 
     return (
-        <div className={cn('p-3', columnsVariants({ variant, className }))}>
+        <div className={cn('p-2', columnsVariants({ variant, className }))}>
             {renderColumns()}
         </div>
     );

@@ -1,3 +1,5 @@
+import { Import } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+
 // Shadow Types
 export interface ShadowValue {
   x: string;
@@ -8,7 +10,12 @@ export interface ShadowValue {
   inset: boolean;
 }
 export interface InteractionValue {
-  name:string
+  fnCustomSet?: string;
+  fnName?: string;
+  fnCustomCode?: {
+    fnCode?: string;
+    imports?: Import[];
+  }
 }
 
 // Filter Types

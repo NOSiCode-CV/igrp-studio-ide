@@ -8,7 +8,9 @@ import {
 import StructureDropdown from '../../components/StructureDropdown';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT } from '../../ComponentTypes';
-import { useTranslation } from 'react-i18next';
+import { BindingConfigurationModal } from '../../components/binding-configuration-modal';
+import { Badge } from '@renderer/components/ui/badge';
+import { useEffect, useState } from 'react';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -23,10 +25,20 @@ const CompTools = ({
     handleClickStructComp,
     comp,
 }: ToolsProps) => {
-    const { componentName, label } = comp;
-    const { t } = useTranslation();
+    const { componentName, label, allowTypes } = comp;
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    const [currentComponent, setCurrentComponent] =
+        useState<StructuredComponent | null>(null);
 
     const isGrids = [COMPONENT.Columns].includes(componentName);
+    
+    useEffect(() => {
+        if (!isOpen) {
+            setCurrentComponent(null);
+        }
+    },[isOpen, comp]);
 
     return (
         <TooltipProvider>
@@ -42,7 +54,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{t('move')}</p>
+                        <p>Move</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -53,7 +65,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{t('clone')}</p>
+                        <p>Clone</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -72,7 +84,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{t('edit')}</p>
+                        <p>Edit</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -86,9 +98,43 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{t('delete')}</p>
+                        <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
+
+                {allowTypes && (
+                    <>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge
+                                    variant={'secondary'}
+                                    className="rounded-sm cursor-pointer my-0.5"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentComponent(comp);
+                                        setIsOpen(true);
+                                    }}
+                                >
+                                    <span className="text-xs">
+                                        Binding Config
+                                    </span>
+                                </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Binding Configuration</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        {currentComponent && (
+                            <BindingConfigurationModal
+                                comp={currentComponent}
+                                path={''}
+                                open={isOpen}
+                                setOpen={setIsOpen}
+                            />
+                        )}
+                    </>
+                )}
             </div>
         </TooltipProvider>
     );

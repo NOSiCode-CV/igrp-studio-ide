@@ -1,108 +1,92 @@
-// a little function to help us with reordering the result
-export const reorder = <T>(list: T[], startIndex: number, endIndex: number): T[] => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed); // inserting task in new index
+import { StructuredComponent } from "@renderer/lib/dnd/types";
+import { generateId } from "@renderer/utils/helpers";
+import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
-  return result;
+// Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
+export const getDefaultProperties = (schema: any): any => {
+    const properties: any = {};
+
+    for (const key in schema) {
+
+        const prop = schema[key];
+
+        if (prop.type === 'array' && !prop.items?.enum) {
+            properties[key] = [];
+        } else if (prop.type === 'object' && prop.properties) {
+            properties[key] = getDefaultProperties(prop.properties); // Recursive call
+        } else
+            properties[key] = prop.default
+    }
+
+    return properties;
 };
 
-export const remove = (arr, index) => [
-  // part of the array before the specified index
-  ...arr.slice(0, index),
-  // part of the array after the specified index
-  ...arr.slice(index + 1)
-];
-
-export const insert = (arr, index, newItem) => [
-  // part of the array before the specified index
-  ...arr.slice(0, index),
-  // inserted item
-  newItem,
-  // part of the array after the specified index
-  ...arr.slice(index)
-];
-
-export const reorderChildren = (children, splitDropZonePath, splitItemPath) => {
-  if (splitDropZonePath.length === 1) {
-    const dropZoneIndex = Number(splitDropZonePath[0]);
-    const itemIndex = Number(splitItemPath[0]);
-    return reorder(children, itemIndex, dropZoneIndex);
-  }
-
-  const updatedChildren = [...children];
-
-  const curIndex = Number(splitDropZonePath.slice(0, 1));
-
-  // Update the specific node's children
-  const splitDropZoneChildrenPath = splitDropZonePath.slice(1);
-  const splitItemChildrenPath = splitItemPath.slice(1);
-  const nodeChildren = updatedChildren[curIndex];
-  updatedChildren[curIndex] = {
-    ...nodeChildren,
-    children: reorderChildren(
-      nodeChildren.children,
-      splitDropZoneChildrenPath,
-      splitItemChildrenPath
-    )
-  };
-
-  return updatedChildren;
+// Utility function to set default values based on the schema
+export const getDefaultInteractions = (schema: any, tag?: string) => {
+    const interactions: any = {};
+    for (const key in schema) {
+        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
+            interactions[key] = getDefaultInteractions(schema[key].properties);
+        }
+        else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
+            interactions[key] = getDefaultInteractions(schema[key].properties);
+        }
+        else if (schema[key].type === 'array' && !schema[key].items?.enum) {
+            interactions[key] = [];
+        }
+        else if (schema[key].required || schema[key].visible) {
+            interactions[key] = schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
+        }
+    }
+    return interactions;
 };
 
-export const removeChildFromChildren = (children, splitItemPath) => {
-  if (splitItemPath.length === 1) {
-    const itemIndex = Number(splitItemPath[0]);
-    return remove(children, itemIndex);
-  }
+export const getRequiredDataSchema = (schema: any, tag: string) => {
+    const states: any = {};
+    for (const key in schema) {
+        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
+            states[key] = getRequiredDataSchema(schema[key].properties, tag);
+        }
+        else if (schema[key].type === 'array' && !schema[key].items?.enum) {
+            states[key] = [];
+        }
+        else {
 
-  const updatedChildren = [...children];
-
-  const curIndex = Number(splitItemPath.slice(0, 1));
-
-  // Update the specific node's children
-  const splitItemChildrenPath = splitItemPath.slice(1);
-  const nodeChildren = updatedChildren[curIndex];
-  updatedChildren[curIndex] = {
-    ...nodeChildren,
-    children: removeChildFromChildren(
-      nodeChildren.children,
-      splitItemChildrenPath
-    )
-  };
-
-  return updatedChildren;
+            states[key] = schema[key].default ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
+        }
+    }
+    return states;
 };
 
-export const addChildToChildren = (children, splitDropZonePath, item) => {
-  if (splitDropZonePath.length === 1) {
-    const dropZoneIndex = Number(splitDropZonePath[0]);
-    return insert(children, dropZoneIndex, item);
-  }
 
-  const updatedChildren = [...children];
-
-  const curIndex = Number(splitDropZonePath.slice(0, 1));
-
-  // Update the specific node's children
-  const splitItemChildrenPath = splitDropZonePath.slice(1);
-  const nodeChildren = updatedChildren[curIndex];
-  updatedChildren[curIndex] = {
-    ...nodeChildren,
-    children: addChildToChildren(
-      nodeChildren.children,
-      splitItemChildrenPath,
-      item
-    )
-  };
-
-  return updatedChildren;
-};
-
-export const handleMoveWithinParent = (
-  layout,
-  splitDropZonePath,
-  splitItemPath
+export const newStructuredComponent = (
+    name: string,
+    children?: Array<StructuredComponent>,
+    componentRegister?: ComponentRegisterConfig,
 ) => {
-  return reorderChildren(layout, splitDropZonePath, splitItemPath);
+
+    const newRowId = generateId(name);
+
+    const {
+        properties: props,
+        interactions: interactionsProperties,
+        data: dataProperties,
+    } = componentRegister || {};
+
+    const data = getRequiredDataSchema(dataProperties, '');
+    const interactions = getDefaultInteractions(interactionsProperties);
+    const properties = getDefaultProperties(props);
+
+    const newRow: StructuredComponent = {
+        id: newRowId,
+        componentName: name,
+        label: name,
+        properties,
+        children: children || [],
+        tag: '',
+        data,
+        interactions,
+    };
+
+    return newRow;
 };

@@ -7,6 +7,7 @@ import {
     ArrowLeft,
     ArrowRight,
     PlusCircle,
+    Loader2,
 } from 'lucide-react';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -103,7 +104,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         onSubmit: (values, actions) => {
             console.log(t('formSubmittedWithValues')+99, values);
             actions.setSubmitting(false);
-            saveOrOpenProject({ ...formik.values });
+            saveOrOpenProject({ project: { ...formik.values } });
         },
     });
 
@@ -631,6 +632,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         type="submit"
                                         disabled={formik.isSubmitting}
                                     >
+                                        {formik.isSubmitting && (
+                                            <Loader2 className="animate-spin" />
+                                        )}
                                         {t('createProject')}
                                     </Button>
                                 )}

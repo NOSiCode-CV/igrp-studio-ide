@@ -1,4 +1,4 @@
-import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
+import { ComponentRegisterConfig, CustomFunctionConfig, Import, RegisterState, State, TypeDef } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
 
 export type LayoutMode = "vertical" | "horizontal"
 export type DropPosition = "top" | "bottom" | "left" | "right" | "inside"
@@ -43,17 +43,31 @@ export interface ComponentConfig {
 export interface StructuredComponent {
   id: string
   componentName: string
+  tag: string
   label?: string
   type?: string
+  allowTypes?: boolean,
+  dataType?: string
   properties: {
     className?: string;
     content?: string;
     [key: string]: any;
   };
-  children: StructuredComponent[]
+  childProperties?: {
+    [key: string]: any;
+  },
   interactions: {
     [key: string]: any;
-  }
+  },
+  dataProperties?: {
+    [key: string]: any;
+  },
+  children: StructuredComponent[],
+  data?: {
+    [key: string]: {
+      state: State
+    };
+  };
 }
 
 export type StructuredLayout = StructuredComponent
@@ -73,6 +87,8 @@ export interface Source {
   interactions: {
     [key: string]: any;
   }
+  allowTypes: boolean
+  data?: RegisterState[]
 }
 
 export interface EditingComponentParams {
@@ -81,22 +97,65 @@ export interface EditingComponentParams {
 }
 
 export interface DroppedComponentsContextType {
-  addSection: () => StructuredComponent;
-  setInitComponents: (components: StructuredLayout) => void;
-  getAllComponents: () => StructuredLayout;
-  handleAddComponentToRow: (
-    destination: Destination,
-    childComponent: StructuredComponent
-  ) => void;
+  newStructure: (name: string) => StructuredComponent;
+  setAllComponents: (components: StructuredLayout) => void;
+
   handleAddChildToComponent: (
     destination: Destination,
     childComponent: StructuredComponent
   ) => void;
+
   handleRemoveChildFromComponent: (destination: Destination) => void;
+
   handleReorderChildInComponent: (
     draggableId: string,
     source: Destination,
     destination: Destination
   ) => void;
-  updateComponent: (id: string, updatedComponent: StructuredComponent) => void;
+
+  handleUpdateChildComponent: (
+    componentId: string,
+    updates: Partial<StructuredComponent>
+  ) => void;
+
+  removeRow: (rowId: string) => void;
+  setEditingComponent: ({ path, component }: EditingComponentParams) => void;
+  clearEditingComponent: () => void;
+  currentComponent: EditingComponentParams | null;
+
+  components: StructuredLayout;
+
+  //types
+  types: TypeDef[];
+  addType: (type: TypeDef) => void;
+  updateType: (id: string, updates: Partial<TypeDef>) => void;
+  removeType: (id: string) => void;
+  createOrUpdateType: (newType: TypeDef) => void;
+  getTypeByComponentId: (componentId: string) => TypeDef | undefined;
+  setAllTypes: (newTypes: TypeDef[]) => void;
+
+  //functions
+  functions: CustomFunctionConfig[];
+  addFunction: (type: CustomFunctionConfig) => void;
+  updateFunction: (
+    id: string,
+    updates: Partial<CustomFunctionConfig>
+  ) => void;
+  removeFunction: (id: string) => void;
+  setAllFunctions: (newTypes: CustomFunctionConfig[]) => void;
+
+  //states
+  states: State[];
+  addState: (type: State) => void;
+  updateState: (id: string, updates: Partial<State>) => void;
+  removeState: (id: string) => void;
+  setAllStates: (newTypes: State[]) => void;
+
+  //imoports
+  imports: Import[];
+  addImport: (type: Import) => void;
+  updateImport: (id: string, updates: Partial<Import>) => void;
+  removeImport: (id: string) => void;
+  setAllImports: (newImports: Import[]) => void;
+
 }

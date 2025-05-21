@@ -11,7 +11,8 @@ export const GenNoInfoComp = ({ type = 'COMPONENTS' }: GenNoInfoCompProps) => {
             <span className="text-primary">
                 <b>{t('here')}</b>
             </span>
-            <span>{type}</span>
+            <span className="truncate">{type}</span>
         </div>
     );
 };
+

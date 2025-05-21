@@ -16,6 +16,7 @@ import {
 import { cn } from '@renderer/lib/utils';
 import {
     Badge,
+    BrainCircuit,
     ChevronRight,
     Component,
     FileText,
@@ -24,6 +25,7 @@ import {
     GripHorizontal,
     Home,
     ListTodo,
+    SquareFunction,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils/helpers';
@@ -40,8 +42,14 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import useStudio from '@renderer/hooks/use-studio';
 import NavigatorSidebar from './sidebar-navigator';
-import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
+import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
 import SidebarAppComponents from './sidebar-app-components';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import {
+    CustomCodeMenu,
+    SidebarAppCustomCode,
+} from './custom-code/sidebar-app-custom-code';
+import { SidebarAppLogic } from './app-logic/sidebar-app-logic';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -56,8 +64,11 @@ export function AppSidebar({
     const { getRegistryComponent } = useStudio();
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
-    const [activeMenuGroup, setActiveMenuGroup] =
-        useState<string>('widgetPalette');
+    const [activeMenuGroup, setActiveMenuGroup] = useState({
+        icon: ListTodo,
+        label: t('widgetPalette'),
+        id: 'widgetPalette',
+    });
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,30 +84,24 @@ export function AppSidebar({
         setFilteredData(filterSubItems(initialData, searchQuery));
     }, [searchQuery, initialData]);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
-                e.preventDefault();
-                searchInputRef.current?.focus();
-                searchInputRef.current?.select();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    useKeyPress(() => {
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+    }, [KeyboardKey.find]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
     };
 
     const handleNavegationClick = (item: any) => {
-        setActiveMenuGroup(item.id);
+        setActiveMenuGroup(item);
     };
 
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
+        { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
+        { icon: BrainCircuit, label: t('Applogic'), id: 'appLogic' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         {
@@ -161,12 +166,13 @@ export function AppSidebar({
                                                 handleNavegationClick(item);
                                             }}
                                             isActive={
-                                                activeMenuGroup === item.id
+                                                activeMenuGroup.id === item.id
                                             }
                                             size="lg"
                                             className={cn(
                                                 'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
-                                                item.id === activeMenuGroup &&
+                                                item.id ===
+                                                    activeMenuGroup.id &&
                                                     '!text-primary'
                                             )}
                                         >
@@ -190,11 +196,17 @@ export function AppSidebar({
 
             {/* Second Sidebar */}
             <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-                <SidebarHeader className="gap-3.5 border-b p-4">
+                <SidebarHeader className="gap-3.5 border-b">
                     <div className="flex w-full items-center justify-between">
-                        <div className="text-base font-medium text-foreground">
-                            {t(activeMenuGroup)}
+                        <div className="flex flex-1 space-x-2  items-center">
+                            <activeMenuGroup.icon size={20} />
+                            <div className="text-base font-medium text-foreground">
+                                {t(activeMenuGroup.label)}
+                            </div>
                         </div>
+                        {activeMenuGroup.id === 'customCode' && (
+                            <CustomCodeMenu />
+                        )}
                     </div>
                     <SidebarInput
                         placeholder={`Search (${SHORTCUTS.FIND})`}
@@ -205,17 +217,17 @@ export function AppSidebar({
                 </SidebarHeader>
                 <SidebarContent className="overflow-hidden">
                     <ScrollArea className="h-[calc(100vh-230px)]">
-                        {activeMenuGroup === 'explorer' ? (
+                        {activeMenuGroup.id === 'explorer' ? (
                             <FileExplorerSidebar
                                 basePath={basePath}
                                 searchTerm={searchQuery}
                             />
-                        ) : activeMenuGroup === 'navigator' ? (
+                        ) : activeMenuGroup.id === 'navigator' ? (
                             <NavigatorSidebar
                                 basePath={basePath}
                                 searchTerm={searchQuery}
                             />
-                        ) : activeMenuGroup === 'git' ? (
+                        ) : activeMenuGroup.id === 'git' ? (
                             <GitCommitsSidebar
                                 basePath={basePath}
                                 onSelectCommit={(commit) => {
@@ -223,8 +235,12 @@ export function AppSidebar({
                                     // Optional: Handle commit selection
                                 }}
                             />
-                        ) : activeMenuGroup === 'components' ? (
+                        ) : activeMenuGroup.id === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
+                        ) : activeMenuGroup.id === 'customCode' ? (
+                            <SidebarAppCustomCode searchTerm={searchQuery} />
+                        ) : activeMenuGroup.id === 'appLogic' ? (
+                            <SidebarAppLogic searchTerm={searchQuery} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible

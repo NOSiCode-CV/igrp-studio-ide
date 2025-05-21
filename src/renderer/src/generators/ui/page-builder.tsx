@@ -1,12 +1,18 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
+import {
+    forwardRef,
+    useCallback,
+    useEffect,
+    useImperativeHandle,
+    useState,
+} from 'react';
 
-import { useConfigdata } from './utils/useConfigData';
+import { useConfigdata } from './hooks/useConfigData';
 import {
     ComponentConfig,
     PageConfig,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/hooks/useToast';
-import CodeContent from './components/CodeContent';
+import { CodeContentJson, CodeContentTS } from './components/CodeContent';
 
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
@@ -15,15 +21,19 @@ import { SidebarRight } from './components/sidebar/sidebar-right';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { APRESENTATION, ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
 import { Page } from './types/components/Page';
+import { useTagManager } from './hooks/useTagManager';
+import { COMPONENT } from './ComponentTypes';
+import { newStructuredComponent } from './dnd/helpers';
+import useStudio from '@renderer/hooks/use-studio';
 
 interface FormEngineProps {
     basePath: string;
     page: any;
-    isDesign: boolean;
+    activePresentation: string;
     onSave: () => void;
 }
 
@@ -32,28 +42,40 @@ interface FormEngineRef {
 }
 
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
-    ({ basePath, page, isDesign }, ref) => {
+    ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath, label } = page;
         const { type, path } = content;
 
         const {
             handleAddChildToComponent,
             handleReorderChildInComponent,
-            getAllComponents,
             removeRow,
             setEditingComponent,
             clearEditingComponent,
             currentComponent,
-            setInitComponents,
+            types,
+            functions,
+            states,
+            components,
+            imports,
+            setAllImports,
+            setAllTypes,
+            setAllFunctions,
+            setAllComponents,
+            setAllStates,
         } = useDroppedComponents();
-
-        const components: StructuredLayout = getAllComponents();
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { menuItems } = useConfigdata();
+        const { componentsRegistered, findComponentById } = useStudio();
+
+        const { menuItems } = useConfigdata(componentsRegistered);
 
         const dispatch: any = useDispatch();
+
+        const { rebuild, generateTag } = useTagManager(components);
+
+        const [loading, setLoading] = useState<boolean>(false);
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
@@ -67,27 +89,34 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         useEffect(() => {
             clearEditingComponent();
-        }, [isDesign]);
+        }, [activePresentation]);
 
-        const handleSave = async (jsonStructure: StructuredLayout) => {
+        const handleSave = async (components: StructuredLayout) => {
             try {
                 if (basePath === undefined) return;
 
-                const pageConfig: PageConfig = {
+                const config: any = {
                     id,
                     type,
                     path,
+                    components,
+                    functions,
+                    types,
+                    states,
+                    imports,
+                };
+
+                const pageConfig: PageConfig = {
+                    ...config,
                     pageName: label,
-                    components: jsonStructure,
                 };
 
                 const compConfig: ComponentConfig = {
-                    id,
-                    type,
-                    path,
+                    ...config,
                     name: label,
-                    components: jsonStructure,
                 };
+
+                console.log(type === 'page' ? pageConfig : compConfig);
 
                 const { error } = await window.engine.createPage(
                     type === 'page' ? pageConfig : compConfig,
@@ -96,6 +125,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 );
 
                 if (error) {
+                    console.log(error)
                     showErrorToast(error);
                     return;
                 }
@@ -108,7 +138,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         };
 
-        //TODO for refactor after accert new json model
         useEffect(() => {
             const getJsonData = async () => {
                 try {
@@ -116,7 +145,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                     const data = await window.api.getJsonContent(pagePath);
                     if (data.components) {
-                        setInitComponents(data.components);
+                        setLoading(true);
+                        setAllComponents(data.components);
+                        setAllTypes(data.types);
+                        setAllFunctions(data.functions);
+                        setAllStates(data.states);
+                        setAllImports(data.imports);
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
@@ -125,11 +159,39 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             getJsonData();
         }, [basePath, page]);
 
+        useEffect(() => {
+            if (loading) return;
+
+            const pageCompRegister = findComponentById(COMPONENT.PageContent);
+            const sectionCompRegister = findComponentById(COMPONENT.Section);
+
+            const section = newStructuredComponent(
+                COMPONENT.Section,
+                [],
+                sectionCompRegister
+            );
+
+            const pageContent = newStructuredComponent(
+                COMPONENT.PageContent,
+                [{ ...section, tag: generateTag(COMPONENT.Section) }],
+                pageCompRegister
+            );
+            setAllComponents({
+                ...pageContent,
+                tag: generateTag(COMPONENT.PageContent),
+            });
+        }, [menuItems, loading]);
+
+        useEffect(() => {
+            rebuild();
+        }, [components, rebuild]);
+
         const droppedComponentsMethods = {
             setEditingComponent,
             removeRow,
             handleAddChildToComponent,
             handleReorderChildInComponent,
+            generateTag,
         };
 
         const onDragEnd = useCallback((result: DragEndResult) => {
@@ -143,11 +205,19 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
-                        {isDesign ? (
-                            <Page page={components} onDragEnd={onDragEnd} />
-                        ) : (
-                            <CodeContent pagePath={pagePath} />
-                        )}</ContainerScrollArea>
+                            {activePresentation === APRESENTATION.DESIGN ? (
+                                <Page page={components} onDragEnd={onDragEnd} />
+                            ) : activePresentation === APRESENTATION.JSON ? (
+                                <CodeContentJson
+                                    components={components}
+                                    pagePath={pagePath}
+                                />
+                            ) : (
+                                <CodeContentTS
+                                    pagePath={`${basePath}/src/app/(generated)/${page.pagePath}/page.tsx`}
+                                />
+                            )}
+                        </ContainerScrollArea>
                     </div>
                 </SidebarInset>
                 {currentComponent && <SidebarRight />}

@@ -3,23 +3,28 @@ import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { TriggerControls } from './components/TriggerControls';
-import { ShadowValue } from '../style/components/effects/types';
+import { TriggerControls } from './components/trigger-controls';
+import { InteractionValue } from '../style/components/effects/types';
+
+interface InteractionProps {
+    comp: StructuredComponent;
+    path: string;
+    onInteranctionsChange: (
+        componentId: string,
+        updates: Partial<StructuredComponent>
+    ) => void;
+}
 
 const Interactions = ({
     comp,
     path,
-}: {
-    comp: StructuredComponent;
-    path: string;
-}) => {
+    onInteranctionsChange,
+}: InteractionProps) => {
     const { getInteractionsComponent } = useStudio();
+
     const [interactionsType, setInteractionsType] = useState({});
 
-    const [linkedInteraction, setLinkedInteraction] = useState(true);
-    const [interactions, setInteractions] = useState<ShadowValue[]>([]);
-
-    const { componentName } = comp;
+    const { componentName, interactions, id: componentId, tag } = comp;
 
     useEffect(() => {
         if (componentName)
@@ -28,14 +33,27 @@ const Interactions = ({
             );
     }, [getInteractionsComponent, comp, componentName]);
 
+    const handleInteractionsChange = (
+        data: Record<string, InteractionValue>
+    ) => {
+        if (componentId)
+            console.log({
+                ...comp,
+                interactions: { ...data },
+            });
+            onInteranctionsChange(componentId, {
+                ...comp,
+                interactions: { ...data },
+            });
+    };
+
     return (
         <div className="p-3 space-y-2">
             <TriggerControls
                 interactions={interactions}
-                linkedInteraction={linkedInteraction}
-                onInteractionsChange={setInteractions}
-                onLinkedInteranctionChange={setLinkedInteraction}
+                onInteractionsChange={handleInteractionsChange}
                 interactionsType={interactionsType}
+                componentTag={tag}
             />
             {interactions.length === 0 && (
                 <EmptyList
