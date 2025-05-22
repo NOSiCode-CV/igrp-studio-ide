@@ -12,6 +12,7 @@ import {
     CommandItem,
     CommandList,
 } from './ui/command';
+import { useTranslation } from 'react-i18next';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 
 export default function DependencySelector({
@@ -19,6 +20,7 @@ export default function DependencySelector({
 }: {
     onSelectedDependencies: (dependencies: Dependency[]) => void;
 }) {
+    const { t } = useTranslation();
     const [selectedDependencies, setSelectedDependencies] = useState<
         Dependency[]
     >([]);
@@ -103,8 +105,9 @@ export default function DependencySelector({
                         className="h-9"
                     />
                     {open && (
+                        
                         <CommandList className="max-h-[200px] overflow-auto">
-                            <CommandEmpty>No dependencies found.</CommandEmpty>
+                            <CommandEmpty>{t('noDependencies')}</CommandEmpty>
                             <CommandGroup>
                                 {availableForSelection.map((dependency, index) => (
                                     <CommandItem
@@ -158,8 +161,7 @@ export default function DependencySelector({
                     </Badge>
                 ))}
                 <p className="text-sm text-gray-500 mt-2">
-                    IGRP Studio already adds required dependencies. Add your
-                    custom dependencies here.
+                {t('igrpStudioInfo')}
                 </p>
             </div>
         </div>

@@ -6,6 +6,7 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { columnsVariants, columnVariants } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
+import { useTranslation } from 'react-i18next';
 
 export interface ColProps {
     isDisabled?: boolean;
@@ -15,6 +16,7 @@ export interface ColProps {
 
 const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     const { children, properties } = comp;
+     const { t } = useTranslation();
 
     const { variant, className } = properties || {};
 
@@ -60,8 +62,11 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     key={comp.id}
                     item={comp}
                     index={index}
-                    dropZone={false}
-                    className={cn(columnVariants({ variant, className }))}
+                    dropZone={true}
+                    className={cn(
+                        'p-0',
+                        columnVariants({ variant, className })
+                    )}
                 >
                     <BoxWrapper
                         comp={comp}
@@ -73,13 +78,13 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
                     </BoxWrapper>
                 </Draggable>
             ) : (
-                <div key={comp.id}>Loading...</div>
+                <div key={comp.id}>{t('loading')}</div>
             );
         });
     };
 
     return (
-        <div className={cn('p-3', columnsVariants({ variant, className }))}>
+        <div className={cn('p-2', columnsVariants({ variant, className }))}>
             {renderColumns()}
         </div>
     );

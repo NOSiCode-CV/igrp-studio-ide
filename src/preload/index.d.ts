@@ -23,6 +23,8 @@ interface CustomAPI {
 
     getVersions: (endpoint: string) => Promise<HandlerResponse>,
 
+    fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>,
+
     i18nextElectronBackend: any
 }
 
@@ -36,7 +38,7 @@ interface CustomMenu {
 
 declare global {
     interface Window {
-        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage
+        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage | onFolderChange | watchFolder
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
         menu: CustomMenu,

@@ -73,7 +73,7 @@ export function FieldOptionsPopover({
 
                     <TabsContent value="dataType" className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                            Configure additional options for this field.
+                             {t('configureFieldOptions')}
                         </p>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="grid grid-cols-3 gap-2 col-span-2">
@@ -82,7 +82,7 @@ export function FieldOptionsPopover({
                                         htmlFor="required"
                                         className="text-sm"
                                     >
-                                        Required
+                                        {t('required')}
                                     </Label>
                                     <Switch
                                         id="required"
@@ -97,7 +97,7 @@ export function FieldOptionsPopover({
                                         htmlFor="nullable"
                                         className="text-sm"
                                     >
-                                        Nullable
+                                        {t('nullable')}
                                     </Label>
                                     <Switch
                                         id="nullable"
@@ -112,7 +112,7 @@ export function FieldOptionsPopover({
                                         htmlFor="deprecated"
                                         className="text-sm"
                                     >
-                                        Deprecated
+                                        {t('deprecated')}
                                     </Label>
                                     <Switch
                                         id="deprecated"
@@ -134,7 +134,7 @@ export function FieldOptionsPopover({
                                                 htmlFor="enum"
                                                 className="text-sm"
                                             >
-                                                Enum
+                                                {t('enum')}
                                             </Label>
                                             <Switch
                                                 id="enum"
@@ -157,7 +157,7 @@ export function FieldOptionsPopover({
                                                 htmlFor="const"
                                                 className="text-sm"
                                             >
-                                                Const
+                                                {t('const')}
                                             </Label>
                                             <Switch
                                                 id="const"
@@ -177,7 +177,7 @@ export function FieldOptionsPopover({
                                             htmlFor="format"
                                             className="text-sm"
                                         >
-                                            Format
+                                            {t('format')}
                                         </Label>
                                         <Input
                                             id="format"
@@ -196,7 +196,7 @@ export function FieldOptionsPopover({
                                             htmlFor="default"
                                             className="text-sm"
                                         >
-                                            Default
+                                            {t('default')}
                                         </Label>
                                         <Input
                                             id="default"
@@ -215,7 +215,7 @@ export function FieldOptionsPopover({
                                             htmlFor="examples"
                                             className="text-sm"
                                         >
-                                            Examples
+                                            {t('examples')}
                                         </Label>
                                         <Input
                                             id="examples"
@@ -247,7 +247,7 @@ export function FieldOptionsPopover({
                                             htmlFor="minimum"
                                             className="text-sm"
                                         >
-                                            Minimum
+                                            {t('minimum')}
                                         </Label>
                                         <Input
                                             id="minimum"
@@ -267,7 +267,7 @@ export function FieldOptionsPopover({
                                             htmlFor="maximum"
                                             className="text-sm"
                                         >
-                                            Maximum
+                                            {t('maximum')}
                                         </Label>
                                         <Input
                                             id="maximum"
@@ -287,7 +287,7 @@ export function FieldOptionsPopover({
                                             htmlFor="multipleOf"
                                             className="text-sm"
                                         >
-                                            Multiple Of
+                                            {t('multipleOf')}
                                         </Label>
                                         <Input
                                             id="multipleOf"

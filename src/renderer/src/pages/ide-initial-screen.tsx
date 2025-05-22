@@ -13,6 +13,7 @@ import Resources from './workspaces/resources';
 import { WorkspaceDocker } from './workspaces/workspace-docker';
 import { WorkspaceSettings } from './workspaces/workspace-settings';
 import CreateWorkspace from './workspaces/components/create-workspace';
+import { useTranslation } from 'react-i18next';
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
@@ -35,6 +36,8 @@ const IDEInitialScreen = () => {
         checkWorkspaces();
     }, [workspace, workspacesLoading]);
 
+    const { t } = useTranslation();
+
     const handleCreationSuccess = () => {
         setShowWorkspaceDialog(false);
         setHasWorkspace(true);
@@ -52,9 +55,9 @@ const IDEInitialScreen = () => {
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
             {!workspace ? (
                 <div className="p-3">
-                    <h1 className="text-lg font-medium">Workspace not found</h1>
+                    <h1 className="text-lg font-medium">{t('workspaceNotFound')}</h1>
                     <p className="text-sm text-muted-foreground">
-                        The workspace you're looking for doesn't exist.
+                    {t('workspaceNotExist')}
                     </p>
                 </div>
             ) : (
@@ -64,19 +67,19 @@ const IDEInitialScreen = () => {
                         <TabsList className="mb-3">
                             <TabsTrigger value="resources">
                                 <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
-                                Resources
+                                {t('resources')}
                             </TabsTrigger>
                             <TabsTrigger value="diagram">
                                 <Network className="h-3.5 w-3.5 mr-1.5" />
-                                Diagram
+                                {t('diagram')}
                             </TabsTrigger>
                             <TabsTrigger value="config">
                                 <Container className="h-3.5 w-3.5 mr-1.5" />
-                                Docker
+                                {t('docker')}
                             </TabsTrigger>
                             <TabsTrigger value="settings">
                                 <Settings className="h-3.5 w-3.5 mr-1.5" />
-                                Settings
+                                {t('settings')}
                             </TabsTrigger>
                         </TabsList>
 

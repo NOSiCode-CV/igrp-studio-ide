@@ -46,22 +46,22 @@ const AlertDialogDelete: React.FC<DeleteModalProps> = ({
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        Are you absolutely sure?
+                    {t('areYouAbsolutelySure')}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to remove this record{' '}
+                    {t('confirmRemoveRecord')}{' '}
                         {recordId ? recordId : ''}?
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => onClose(false)}>
-                        Cancel
+                        {t('cancel')}
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={onConfirm}
                         className="bg-red-500"
                     >
-                        Continue
+                        {t('continue')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

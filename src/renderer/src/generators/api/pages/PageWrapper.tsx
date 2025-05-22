@@ -69,7 +69,7 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
                 );
                 setSelectors(allSelectors);
             } catch (error) {
-                console.error('Failed to fetch selectors:', error);
+                console.error(t("failedFetchSelectors"), error);
             }
         };
 

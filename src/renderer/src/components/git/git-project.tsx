@@ -6,10 +6,7 @@ import { CardGitProject } from './card-git-project';
 import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-    setBasePath,
-    setConfig,
-} from '@renderer/redux/thunks';
+import { setBasePath, setConfig } from '@renderer/redux/thunks';
 import useGitAuth from '@renderer/hooks/use-git-auth';
 import { LoadingSpinner } from '../loading-spinner';
 import { useGit } from '@renderer/hooks/use-git';
@@ -57,12 +54,14 @@ export default function GitProject() {
                     );
                     try {
                         await saveOrOpenProject({
-                            workspaceId: workspace.id,
-                            name: data.config.name,
-                            framework: data.config.type,
-                            config: data.config.config,
-                            path: data.path,
-                            id: getUUID(),
+                            project: {
+                                workspaceId: workspace.id,
+                                name: data.config.name,
+                                framework: data.config.type,
+                                config: data.config.config,
+                                path: data.path,
+                                id: getUUID(),
+                            },
                         });
 
                         await window.electron.ipcRenderer.invoke(
@@ -89,7 +88,7 @@ export default function GitProject() {
 
                         dispatch(setBasePath(data.path));
                         dispatch(setConfig(data.config));
-                       // navigateToNextPage(navigate, data.config);
+                        // navigateToNextPage(navigate, data.config);
                     } catch (error) {
                         showErrorToast(t('failedOpenProjectAfterCloning'));
                         console.error(t('errorOpeningProject'), error);

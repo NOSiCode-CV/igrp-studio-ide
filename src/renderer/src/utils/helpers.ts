@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker'
 import { Database, Activity, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
 import { v4 as uuidv4 } from 'uuid';
@@ -68,26 +67,6 @@ export function findComponentItem(menus: Array<any>, idFind: string) {
 	return menus.flatMap((menu) => menu.subItems || []).find((sub) => sub.id === idFind) || null
 }
 
-// Function to generate fake data for a field based on its type
-export const generateFakeDataForField = (properties: any) => {
-	const { type } = properties;
-	switch (type) {
-		case 'text':
-			return faker.lorem.words(3);
-		case 'number':
-			return faker.number.int({ min: 1, max: 100 });
-		case 'date':
-			return faker.date.past().toLocaleDateString(); // or use any other date format
-		case 'boolean':
-			return faker.datatype.boolean();
-		case 'email':
-			return faker.internet.email();
-		// Add more cases for different field types as needed
-		default:
-			return faker.lorem.words(2); // Fallback to text if type is unknown
-	}
-};
-
 export const getBadgeColor = (method: string): string | undefined => {
 	return httpMethods.find((item) => item.value === method)?.color;
 };
@@ -103,7 +82,7 @@ export const toInitCap = (text: string) => text.replace(/(?:^|\s|-)\S/g, (match)
 export const getIcon = (folderName: string): LucideIcon => {
 
 	if (!folderName || typeof folderName !== 'string') return Circle;
-  
+
 	switch (folderName.toLowerCase()) {
 		case 'controllers':
 			return Activity;
@@ -162,20 +141,20 @@ export const getLocale = () => {
 export function extractDefaults(schema) {
 	const result = {};
 	for (const key in schema) {
-	  const field = schema[key];
-  
-	  if ("default" in field) {
-		result[key] = field.default;
-	  } else if (field.type === "object" && field.properties) {
-		result[key] = extractDefaults(field.properties);
-	  } else if (field.type === "array") {
-		if (field.default) {
-		  result[key] = field.default;
-		} else if (field.items && field.items.properties) {
-		  // create a dummy item with default values
-		  result[key] = [extractDefaults(field.items.properties)];
+		const field = schema[key];
+
+		if ("default" in field) {
+			result[key] = field.default;
+		} else if (field.type === "object" && field.properties) {
+			result[key] = extractDefaults(field.properties);
+		} else if (field.type === "array") {
+			if (field.default) {
+				result[key] = field.default;
+			} else if (field.items && field.items.properties) {
+				// create a dummy item with default values
+				result[key] = [extractDefaults(field.items.properties)];
+			}
 		}
-	  }
 	}
 	return result;
-  }
+}

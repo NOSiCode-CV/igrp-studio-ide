@@ -85,14 +85,14 @@ export function CloneProjectModal({
                                 className="flex items-center gap-2"
                             >
                                 <Link className="h-4 w-4" />
-                                Repository URL
+                                {t('repositoryUrl')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="search"
                                 className="flex items-center gap-2"
                             >
                                 <GitFork className="h-4 w-4" />
-                                Search Repositories
+                                 {t('searchRepositories')}
                             </TabsTrigger>
                         </TabsList>
 

@@ -15,6 +15,8 @@ import { IWorkspace } from 'src/main/types';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { useTranslation } from 'react-i18next';
+
 
 interface WorkspaceConfigProps {
     workspace: IWorkspace;
@@ -29,6 +31,8 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
     const {
         actions: { saveCustomWorkspaceComposeFile },
     } = useWorkspace();
+
+    const { t } = useTranslation();
 
     const handleCopyYaml = () => {
         if (!content) return;
@@ -54,17 +58,17 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
             <Card>
                 <CardHeader className="compact-card-header">
                     <CardTitle className="text-sm">
-                        Docker Compose Configuration
+                    {t('dockerComposeConfiguration')}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                        Manage your igrp-compose.yml file
+                    {t('manageComposeFile')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="compact-card-content space-y-3">
                     <div className="border rounded-md overflow-hidden">
                         <div className="bg-muted/30 border-b py-1.5 flex items-center justify-between">
                             <div className="text-xs font-medium px-3">
-                                igrp-compose.yml
+                            {t('igrpComposeYml')}
                             </div>
                             <Button
                                 size="sm"
@@ -88,7 +92,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                 <CardFooter className="compact-card-footer flex justify-between">
                     <div className="text-xs text-muted-foreground">
                         {services.filter((s) => s.status === 'running').length}{' '}
-                        services enabled
+                        {t('servicesEnabled')}
                     </div>
                     <div className="flex gap-2">
                         <Button
@@ -100,12 +104,12 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             {copied ? (
                                 <>
                                     <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
-                                    Copied!
+                                    {t('copied')}
                                 </>
                             ) : (
                                 <>
                                     <Copy className="h-3.5 w-3.5 mr-1" />
-                                    Copy
+                                    {t('copy')}
                                 </>
                             )}
                         </Button>
@@ -116,7 +120,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             onClick={() => handleSaveService()}
                         >
                             <Save className="h-3.5 w-3.5 mr-1" />
-                            Save
+                            {t('save')}
                         </Button>
                     </div>
                 </CardFooter>

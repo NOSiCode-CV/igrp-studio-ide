@@ -1,4 +1,5 @@
 import { Button } from '@renderer/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
     TooltipContent,
@@ -16,6 +17,7 @@ import {
 interface LogTerminalProps {
     basePath: string;
 }
+const { t } = useTranslation();
 
 const PreviewMenu = ({ basePath }: LogTerminalProps) => {
     const { tabs, activeTab } = useTabs();
@@ -51,18 +53,18 @@ const PreviewMenu = ({ basePath }: LogTerminalProps) => {
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Preview</p>
+                    <p>{t('preview')}</p>
                 </TooltipContent>
             </Tooltip>
             <DropdownMenuContent>
                 <DropdownMenuItem onClick={handleStart}>
-                    <Play className="h-4 w-4 mr-2" /> Iniciar Next.js
+                    <Play className="h-4 w-4 mr-2" /> {t('startNext')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleStop}>
-                    <StopCircle className="h-4 w-4 mr-2" /> Parar Next.js
+                    <StopCircle className="h-4 w-4 mr-2" /> {t('stopNext')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handlePreview}>
-                    <Eye className="h-4 w-4 mr-2" /> Abrir Preview
+                    <Eye className="h-4 w-4 mr-2" /> {t('openPreview')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

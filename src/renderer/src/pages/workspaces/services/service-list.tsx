@@ -12,24 +12,29 @@ import {
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
 import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
+import { useTranslation } from 'react-i18next';
 
 interface ServiceListProps {
     services: any[];
     workspaceId?: string;
 }
 
+
+
 export function ServiceList({ services }: ServiceListProps) {
+    const { t } = useTranslation();
     return (
+        
         <div className="grid w-full [&>div]:border [&>div]:rounded">
             <Table className="">
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Ports</TableHead>
-                        <TableHead>Dependencies</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="w-[100px]">Actions</TableHead>
+                        <TableHead>{t('name')}</TableHead>
+                        <TableHead>{t('type')}</TableHead>
+                        <TableHead>{t('ports')}</TableHead>
+                        <TableHead>{t('dependencies')}</TableHead>
+                        <TableHead>{t('status')}</TableHead>
+                        <TableHead className="w-[100px]">{t('actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -83,7 +88,7 @@ export function ServiceList({ services }: ServiceListProps) {
                                         />
                                     ) : (
                                         <span className="text-xs text-muted-foreground">
-                                            None
+                                            {t('none')}
                                         </span>
                                     )}
                                 </div>

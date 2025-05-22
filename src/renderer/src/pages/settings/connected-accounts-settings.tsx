@@ -8,9 +8,15 @@ import { Label } from '@renderer/components/ui/label';
 
 // Componente para o formulário de configuração GitLab
 function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
-    const [baseUrl, setBaseUrl] = useState('');
-    const [clientId, setClientId] = useState('');
-    const [clientSecret, setClientSecret] = useState('');
+    const [baseUrl, setBaseUrl] = useState(
+        import.meta.env.VITE_GITLAB_BASE_URL
+    );
+    const [clientId, setClientId] = useState(
+        import.meta.env.VITE_GITLAB_CLIENT_ID
+    );
+    const [clientSecret, setClientSecret] = useState(
+        import.meta.env.VITE_GITLAB_CLIENT_SECRET
+    );
 
     const handleSave = () => {
         onSave({ baseUrl, clientId, clientSecret });
@@ -18,7 +24,7 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
 
     return (
         <div className="space-y-4">
-            <div className='space-y-2'>
+            <div className="space-y-2">
                 <Label>GitLab Base URL</Label>
                 <Input
                     type="text"
@@ -28,7 +34,7 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
                     className="input"
                 />
             </div>
-            <div className='space-y-2'>
+            <div className="space-y-2">
                 <Label>Client ID</Label>
                 <Input
                     type="text"
@@ -37,7 +43,7 @@ function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
                     className="input"
                 />
             </div>
-            <div className='space-y-2'>
+            <div className="space-y-2">
                 <Label>Client Secret</Label>
                 <Input
                     type="password"
@@ -85,7 +91,7 @@ function Account({
                     <span>{t(name)}</span>
                 </div>
 
-                <div className='space-x-2'>
+                <div className="space-x-2">
                     {/* Exibir o botão para configuração GitLab somente se estiver conectado */}
                     {name === 'gitlab' && connected && (
                         <Button
@@ -106,7 +112,9 @@ function Account({
             {/* Formulário de configuração GitLab */}
             {isGitLabConfigVisible && (
                 <div className="mt-4 p-4 border rounded bg-gray-100">
-                    <GitLabConfigForm onSave={onGitLabConfigSave} />
+                    <GitLabConfigForm
+                        onSave={(config) => onGitLabConfigSave?.(config)}
+                    />
                 </div>
             )}
         </>
@@ -128,7 +136,6 @@ export function ConnectedAccountsSettings() {
     const handleGitLabConfigSave = (config: any) => {
         // Salva as configurações do GitLab (por exemplo, em electron-store)
         setGitlabConfig(config);
-        alert('GitLab configuration saved');
     };
 
     return (

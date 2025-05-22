@@ -1,34 +1,23 @@
 import { generateId } from "@renderer/utils/helpers";
 import { Destination, DragEndResult, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { getDefaultInteractions, getDefaultProperties, getRequiredDataSchema } from "./helpers";
 
 export const handleDragEnd = (
     result: any,
-    { handleAddChildToComponent, handleReorderChildInComponent }: any
+    { handleAddChildToComponent, handleReorderChildInComponent, generateTag, addState }: any
 ) => {
 
-    // const { getAcceptedChildren } = useStudio()
-
     const { draggableId, source, destination, mode, type }: DragEndResult = result;
-
-    // const { droppableId } = destination;
 
     if (!destination) {
         return;
     }
 
-
-    /*  useCallback(() => {
-         getAcceptedChildren(parentComponentName, componentName).then((data) => {
-             setComponents(data);
-         });
-     }, [parentComponentName, componentName, getAcceptedChildren]); */
-
-
     if (mode === 'MOVE') {
         handleReorderChildInComponent(draggableId, source, destination);
     } else {
-        handleDropComponent(draggableId, source, destination, type, { handleAddChildToComponent });
+        handleDropComponent(draggableId, source, destination, type, { handleAddChildToComponent, generateTag, addState });
     }
 };
 
@@ -37,35 +26,52 @@ const handleDropComponent = (
     source: Source,
     destination: Destination,
     type: string,
-    { handleAddChildToComponent }: any
+    { handleAddChildToComponent, generateTag }: any
 ) => {
-    const { label, properties, childrenTypes, interactions } = source
+    const { label, properties, childrenTypes, interactions: interactionsProperties, allowTypes, data: dataProperties } = source
 
     const componentId = generateId(draggableId);
+
+    const tag = generateTag(draggableId);
+
+    const data = getRequiredDataSchema(dataProperties, tag);
+
+    const interactions = getDefaultInteractions(interactionsProperties, tag);
 
     // Create the component object
     const component: StructuredComponent = {
         id: componentId,
+        tag,
         componentName: draggableId,
         label,
         type,
-        properties: setDefaultProperties(properties),
         children: [],
-        interactions: setDefaultInteractions(interactions)
+        interactions,
+        allowTypes,
+        data: data,
+        properties: getDefaultProperties(properties),
     };
 
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
-        const { name, label, properties, interactions } = child
+        const { name, label, properties, interactions: interactionsProperties, allowTypes, data: dataProperties } = child
         const childId = generateId(name);
+        const tag = generateTag(name)
+        const data = getRequiredDataSchema(dataProperties, tag);
+        const interactions = getDefaultInteractions(interactionsProperties, tag);
+
         const childComponent: StructuredComponent = {
             id: childId,
+            tag,
             componentName: name,
             label: label,
-            properties: setDefaultProperties(properties),
             children: [],
-            interactions: setDefaultInteractions(interactions)
+            interactions,
+            allowTypes,
+            data,
+            properties: getDefaultProperties(properties),
         };
         component.children?.push(childComponent);
+
     });
 
     // Add the component to the row
@@ -74,29 +80,3 @@ const handleDropComponent = (
 };
 
 
-// Utility function to set default values based on the schema
-const setDefaultProperties = (schema: any) => {
-    const properties: any = {};
-    for (const key in schema) {
-        if (schema[key].default !== undefined) {
-            properties[key] = schema[key].default;
-        }
-        else if (schema[key].type === 'array' && schema[key].items?.enum === undefined) {
-            properties[key] = [];
-        }
-    }
-    return properties;
-};
-
-// Utility function to set default values based on the schema
-const setDefaultInteractions = (schema: any) => {
-    const interactions: any = {};
-    for (const key in schema) {
-        if (schema[key].properties.fnCustomSet.default !== undefined) {
-            interactions[key] = {
-                ['fnCustomSet']: schema[key].properties.fnCustomSet.default
-            };
-        }
-    }
-    return interactions;
-};

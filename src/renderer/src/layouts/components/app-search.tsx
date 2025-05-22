@@ -4,6 +4,7 @@ import { SidebarGroup, SidebarGroupContent, SidebarInput } from "@renderer/compo
 import { cn } from "@renderer/lib/utils";
 import { Search } from "lucide-react";
 import { ChangeEvent } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface SearchProps {
     className?: string,
@@ -13,7 +14,7 @@ interface SearchProps {
 }
 
 const FormSearch = ({ onSearch, sidebarState, className, placeholder }: SearchProps) => {
-
+    const { t } = useTranslation();
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         onSearch(e.target.value)
     }
@@ -24,7 +25,7 @@ const FormSearch = ({ onSearch, sidebarState, className, placeholder }: SearchPr
                 <SidebarGroup className="py-0">
                     <SidebarGroupContent className="relative">
                         <Label htmlFor="search" className="sr-only">
-                            Search
+                            {t('search')}
                         </Label>
                         <SidebarInput
                             id="search"

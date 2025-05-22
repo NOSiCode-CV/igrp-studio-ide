@@ -3,6 +3,7 @@ import { Component, ErrorInfo, ReactNode } from "react";
 import logo from '@renderer/assets/images/igrp-green.svg';
 import { ROUTES } from "@renderer/routes/routeConstants";
 import { useNavigate } from 'react-router-dom'; // Assuming you're using react-router for navigation
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     children: ReactNode;
@@ -36,14 +37,15 @@ class ErrorBoundary extends Component<Props, State> {
 
     render() {
         if (this.state.hasError) {
+            const { t } = useTranslation();
             return (
                 <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-800">
                     <div className="text-center p-6 bg-white dark:bg-gray-700 rounded-lg shadow-md max-w-lg">
                         <div onClick={this.openPage} className="cursor-pointer flex justify-center mb-4">
                             <img src={logo} alt="Logo" className="h-12" />  {/* Adjusted size to 16 for better centering */}
                         </div>
-                        <h2 className="text-2xl font-bold text-black dark:text-white">Something went wrong.</h2>
-                        <p className="text-gray-500 dark:text-gray-300">We're working on fixing the issue. Please try again later.</p>
+                        <h2 className="text-2xl font-bold text-black dark:text-white">{t('somethingWentWrong')}</h2>
+                        <p className="text-gray-500 dark:text-gray-300">{t('workingOnFixing')}</p>
                         <AlertCircle className="text-red-500 mt-4 mx-auto w-16 h-16" />
                     </div>
                 </div>

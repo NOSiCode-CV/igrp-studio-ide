@@ -8,6 +8,7 @@ import {
 } from '@renderer/components/ui/dropdown-menu';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { Ellipsis } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface DropdownItemProps {
     comp: StructuredComponent;
@@ -15,6 +16,7 @@ interface DropdownItemProps {
 
 export function DropdownItem({ comp }: DropdownItemProps) {
     const { children } = comp;
+    const { t } = useTranslation();
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -23,7 +25,7 @@ export function DropdownItem({ comp }: DropdownItemProps) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                 {children.length > 0 &&
                     children.map((child) => (
                         <DropdownMenuItem key={child.id}>

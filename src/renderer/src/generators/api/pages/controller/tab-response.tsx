@@ -8,12 +8,6 @@ import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 import { AddResponseMenu } from './add-response-menu';
 import { Button } from '@renderer/components/ui/button';
 import { ChevronsUpDown, Trash } from 'lucide-react';
@@ -234,7 +228,6 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                           }
                         : null;
 
-
                     return (
                         <div
                             key={statusCode}
@@ -389,11 +382,11 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 />
                             </div>
                             {typeValue === 'object' && (
-                                <Card className="rounded">
-                                    <CardHeader>
-                                        <CardTitle>{t('dataSchema')}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
+                                <>
+                                    <p className="">
+                                        {t('dataSchema')}
+                                    </p>
+                                    <div className="border rounded">
                                         <JSONSchemaBuilder
                                             schemaTypes={schemaTypes}
                                             enumTypes={enumTypes}
@@ -406,8 +399,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                                 );
                                             }}
                                         />
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </>
                             )}
                         </div>
                     );

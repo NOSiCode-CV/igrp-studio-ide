@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createSelector } from 'reselect';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +36,7 @@ import {
 import { EmptyList } from '@renderer/components/empty-list';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
+import useStudio from '@renderer/hooks/use-studio';
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: FileTree) => void;
@@ -47,6 +47,8 @@ const MainPageBuilder = ({
 }: PageBuilderContentProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
+
+    const { basePath, files, config: project } = useStudio();
 
     const [content, setContent] = useState<any>([]);
     const [components, setComponents] = useState<any>([]);
@@ -62,25 +64,17 @@ const MainPageBuilder = ({
         onPageClick?.(page);
     };
 
-    const selectState = (state: any) => state.PageBuilder;
-
-    const selectProperties = createSelector(selectState, (studio) => ({
-        basePath: studio.basePath,
-        config: studio.config,
-        files: studio.filesThree,
-    }));
-
-    const { basePath, files, config: project } = useSelector(selectProperties);
-
     const handleDeletePage = (page: any) => {
         setDeleteModal(true);
         setPage(page);
     };
 
     const confirmDeletion = async () => {
+        console.log(page);
         const pageConfig: DeleteConfig = {
-            type: page.content.type,
-            name: page.content.pageName || page.content.name,
+            type: page.type,
+            name: page.pageName,
+            id: page.id,
         };
         await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
@@ -126,13 +120,16 @@ const MainPageBuilder = ({
 
     const tableData = [
         ...filteredPages.map((page) => ({
+            ...page.content,
             ...page,
-            pageName: page.content?.pageName,
+            pagePath: page.content?.path,
             isPage: true,
         })),
         ...filteredComponents.map((comp) => ({
+            ...page.content,
             ...comp,
             pageName: comp.content?.name,
+            pagePath: page.content.path,
             isPage: false,
         })),
     ];
@@ -167,7 +164,7 @@ const MainPageBuilder = ({
                         size="sm"
                         onClick={() => handleDeletePage(row.original)}
                     >
-                        <Trash className="h-4 w-4 text-red-500" />
+                        <Trash className="h-4 w-4 text-destructive" />
                         <span>{t('delete')}</span>
                     </Button>
                 </div>

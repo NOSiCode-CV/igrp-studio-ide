@@ -62,7 +62,7 @@ export default function SerializationConfigModal({
         setConfig((prev) => ({
             ...prev,
             module,
-            type: type === 'models' ? 'model' : type
+            type: type === t('models') ? 'model' : type
         }));
     }, [item]);
 
@@ -184,10 +184,10 @@ export default function SerializationConfigModal({
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="json">JSON</SelectItem>
-                                    <SelectItem value="sql">SQL</SelectItem>
-                                    <SelectItem value="xml">XML</SelectItem>
-                                    <SelectItem value="ddl">DDL</SelectItem>
+                                    <SelectItem value="json">{t('json')}</SelectItem>
+                                    <SelectItem value="sql">{t('sql')}</SelectItem>
+                                    <SelectItem value="xml">{t('xml')}</SelectItem>
+                                    <SelectItem value="ddl">{t('ddl')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

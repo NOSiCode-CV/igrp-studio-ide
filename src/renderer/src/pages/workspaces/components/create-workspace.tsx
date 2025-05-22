@@ -30,10 +30,10 @@ const CreateWorkspace = ({
     const { t } = useTranslation();
     const { showErrorToast } = useToast();
     const [isCreating, setIsCreating] = useState(false);
-    const [workspaceName, setWorkspaceName] = useState('My Workspace');
-    const [slug, setSlug] = useState('my-workspace');
+    const [workspaceName, setWorkspaceName] = useState(t('myWorkspace'));
+    const [slug, setSlug] = useState(t('myWorkspaceSlug'));
     const [workspaceDescription, setWorkspaceDescription] = useState(
-        'My development workspace with Docker projects'
+        t('myWorkspaceDescription')
     );
     const [directoryPath, setDirectoryPath] = useState('');
     const {
@@ -74,7 +74,7 @@ const CreateWorkspace = ({
                 onOpenChange?.(false);
             }
         } catch (error) {
-            console.error('Workspace creation failed:', error);
+             console.error(t('workspaceCreationFailed'), error);
             showErrorToast(error);
         } finally {
             setIsCreating(false);
@@ -82,9 +82,9 @@ const CreateWorkspace = ({
     };
 
     const handleSelectDirectory = async () => {
-        window.electron.ipcRenderer.send('open-directory-dialog');
+        window.electron.ipcRenderer.send(t('openDirectoryDialog'));
 
-        window.electron.ipcRenderer.on('file-content', (_e, result) => {
+        window.electron.ipcRenderer.on(t('fileContent'), (_e, result) => {
             if (!result.canceled) {
                 setDirectoryPath(result.filePaths[0]);
             }
@@ -97,7 +97,7 @@ const CreateWorkspace = ({
                 <DialogHeader>
                     <DialogTitle>{t('workspace.createTitle')}</DialogTitle>
                     <DialogDescription className="text-xs">
-                        Create a new workspace to organize your projects.
+                    {t('createWorkspaceInfo')}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -126,10 +126,10 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="compact-form-field space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('description')}</Label>
                         <Textarea
                             id="description"
-                            placeholder="Describe your workspace..."
+                            placeholder={t('describeWorkspace')}
                             value={workspaceDescription}
                             onChange={(e) =>
                                 setWorkspaceDescription(e.target.value)

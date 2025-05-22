@@ -1,22 +1,21 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '../ui/tooltip';
-
 import { icons } from 'lucide-react';
-import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '../ui/command';
 import { getLabel } from '@renderer/utils/helpers';
+import {
+    FixedSizeGrid as Grid,
+    type FixedSizeGrid as GridType,
+} from 'react-window';
+import { useDebounce } from 'use-debounce';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
+import { ScrollArea } from '../ui/scroll-area';
+import { Button } from '../ui/button';
 
 interface IconBrowserProps {
     selectedIcon: string;
@@ -25,74 +24,96 @@ interface IconBrowserProps {
 
 const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const [open, setOpen] = useState(false);
-
-    const commandRef = useRef<HTMLDivElement>(null);
+    const [search, setSearch] = useState('');
+    const [debouncedSearch] = useDebounce(search, 200);
 
     const iconsList = useMemo(
         () => Object.keys(icons) as (keyof typeof icons)[],
         []
     );
 
+    const filteredIcons = useMemo(() => {
+        if (!debouncedSearch) return iconsList;
+        return iconsList.filter((name) =>
+            name.toLowerCase().includes(debouncedSearch.toLowerCase())
+        );
+    }, [iconsList, debouncedSearch]);
+
     const handleIconClick = (iconName: string) => {
         onSelectedIcon(iconName);
         setOpen(false);
+        console.log(iconName);
     };
+
+    const gridRef = useRef<GridType>(null);
+
+    const columnCount = 8;
+    const rowCount = Math.ceil(filteredIcons.length / columnCount);
+
+    useEffect(() => {
+        gridRef.current?.scrollTo({ scrollTop: 0 });
+    }, [filteredIcons]);
+
+    const Cell = ({ columnIndex, rowIndex, style }: any) => {
+        const index = rowIndex * columnCount + columnIndex;
+        if (index >= filteredIcons.length) return null;
+
+        const iconName = filteredIcons[index];
+        const IconComponent = icons[iconName];
+
+        return (
+            <div
+                style={style}
+                className="p-2 flex items-center justify-center cursor-pointer"
+                key={index}
+            >
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <IconComponent
+                            onClick={() => handleIconClick(iconName)}
+                        />
+                    </TooltipTrigger>
+                    <TooltipContent>{getLabel(iconName)}</TooltipContent>
+                </Tooltip>
+            </div>
+        );
+    };
+
+    const SelectedIconComp = icons[selectedIcon];
 
     return (
         <TooltipProvider>
-            <div className="space-y-4">
-                <div className="relative" ref={commandRef}>
-                    <Command className="rounded-lg border shadow-md">
-                        <CommandInput
-                            placeholder="Type to search icon ..."
-                            onFocus={() => setOpen(true)}
-                            className="h-9"
-                        />
-                        {open && (
-                            <CommandList className="max-h-[200px] overflow-auto">
-                                <CommandEmpty>
-                                    No icons found.
-                                </CommandEmpty>
-                                <CommandGroup>
-                                    <div className="grid grid-cols-[repeat(auto-fill,_minmax(30px,_1fr))] gap-4 w-full">
-                                        {iconsList.map((iconName, index) => (
-                                            <CommandItem
-                                                key={index}
-                                                onSelect={() =>
-                                                    handleIconClick(iconName)
-                                                }
-                                                className="flex items-center justify-between p-2 cursor-pointer"
-                                                aria-label={`View details for ${iconName}`}
-                                            >
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <>
-                                                            <IGRPIcon
-                                                                iconName={
-                                                                    iconName as any
-                                                                }
-                                                                size="24"
-                                                            />
-                                                            <span className="sr-only">
-                                                                {iconName}
-                                                            </span>
-                                                        </>
-                                                    </TooltipTrigger>
-                                                    {!selectedIcon && (
-                                                        <TooltipContent>
-                                                            {getLabel(iconName)}
-                                                        </TooltipContent>
-                                                    )}
-                                                </Tooltip>
-                                            </CommandItem>
-                                        ))}
-                                    </div>
-                                </CommandGroup>
-                            </CommandList>
-                        )}
-                    </Command>
-                </div>
-            </div>
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button size={'sm'} variant={'outline'}>
+                        {SelectedIconComp && <SelectedIconComp />}
+                        {selectedIcon || 'Select Icon'}
+                    </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-[435px]">
+                    <IGRPInputSearch
+                        placeholder="Type to search icon ..."
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                        }}
+                    />
+                    <ScrollArea>
+                        <Grid
+                            ref={gridRef}
+                            columnCount={columnCount}
+                            columnWidth={50}
+                            height={300}
+                            rowCount={rowCount}
+                            rowHeight={50}
+                            width={columnCount * 50 + 20}
+                        >
+                            {Cell}
+                        </Grid>
+                    </ScrollArea>
+                </PopoverContent>
+            </Popover>
         </TooltipProvider>
     );
 };

@@ -3,6 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 import { ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
+import { WatchEvent } from '../main/helpers/watch-folder'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -33,6 +34,8 @@ const api = {
 	getIDEs: () => ipcRenderer.invoke('igrp-studio:ides'),
 
 	getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
+
+	fetchData: (endpoint: string, headers: object) => ipcRenderer.invoke('fetch-data', endpoint, headers),
 
 	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
 }
@@ -144,6 +147,22 @@ const engine = {
 	getDependencies: async (engineType: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.ENGINE.GET_DEPENDENCIES, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getAppMetadata: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.LOAD_METADATA, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	getCodeSnippets: async (engineType: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.GET_CODE_SNIPPET, engineType)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -273,7 +292,12 @@ if (process.contextIsolated) {
 			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
 			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 			downloadUpdate: () => ipcRenderer.invoke('download-update'),
-			installUpdate: () => ipcRenderer.invoke('install-update')
+			installUpdate: () => ipcRenderer.invoke('install-update'),
+			watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
+			onFolderChange: (callback: (event: WatchEvent) => void) => {
+				ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data));
+			},
+
 		})
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)

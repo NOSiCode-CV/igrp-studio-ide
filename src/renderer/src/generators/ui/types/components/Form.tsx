@@ -60,14 +60,14 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                             item={comp}
                             index={index}
                             dropTargetId={componentId}
-                            className="p-0 border-none"
+                            className="p-1"
                             mode="MOVE"
                         >
                             {Component && (
                                 <BoxWrapper
                                     comp={comp}
-                                    group="group/comp-form"
                                     onEdit={() => handleEditClick(comp)}
+                                    group="group/comp-form"
                                     className="opacity-0 group-hover/comp-form:opacity-100"
                                 >
                                     <Component
@@ -87,17 +87,9 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     };
 
     return (
-        <Droppable
-            component={comp}
-            onDrop={onDragEnd}
-            className="border-none hover:border-dashed"
-        >
-            <div className="border-gray-900/10">
-                <div
-                    className={cn(formVariants({ variant, className }), 'mt-2')}
-                >
-                    {renderFields()}
-                </div>
+        <Droppable component={comp} onDrop={onDragEnd}>
+            <div className={cn(formVariants({ variant, className }))}>
+                {renderFields()}
             </div>
         </Droppable>
     );

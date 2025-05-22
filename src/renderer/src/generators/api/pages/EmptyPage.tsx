@@ -7,11 +7,10 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
-import { SHORTCUTS } from '@renderer/constants/shortcutConstants';
+import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import { FileCode, Database, FileText } from 'lucide-react';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
 
 const EmptyPage = ({ onClick }) => {
     const { t } = useTranslation();
@@ -36,33 +35,21 @@ const EmptyPage = ({ onClick }) => {
             shortcut: SHORTCUTS.NEW_DTO, // Use a constante de atalho
         },
     ];
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.ctrlKey || event.metaKey) {
-                switch (event.key.toUpperCase()) {
-                    case 'M':
-                        event.preventDefault();
-                        onClick(OPTION_TYPE.MODEL); // Criar novo modelo
-                        break;
-                    case 'E':
-                        event.preventDefault();
-                        onClick(OPTION_TYPE.ACTION); // Criar novo controlador
-                        break;
-                    case 'O':
-                        event.preventDefault();
-                        onClick(OPTION_TYPE.DATA_OBJECTS); // Criar novo DTO
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onClick]);
+    useKeyPress(() => {
+        onClick(OPTION_TYPE.MODEL);
+    }, [KeyboardKey.model]);
+
+    useKeyPress(() => {
+        onClick(OPTION_TYPE.ACTION);
+    }, [KeyboardKey.endpoint]);
+
+    useKeyPress(() => {
+        onClick(OPTION_TYPE.DATA_OBJECTS);
+    }, [KeyboardKey.dto]);
+
     return (
-        <IGRPContainer className='mb-0'>
+        <IGRPContainer className="mb-0">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {actions.map((action, key) => (
                     <Card

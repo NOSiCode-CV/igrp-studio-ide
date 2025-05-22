@@ -86,7 +86,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
 
                     <TabsContent value="dataType" className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                            Configure additional options for this field.
+                        {t('configureFieldOptions')}
                         </p>
                         <div className="flex flex-1 gap-2">
                             {['isRequired', 'nullable', 'deprecated'].map(
@@ -161,7 +161,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         {isInteger && (
                             <div className="grid grid-cols-3 gap-2">
                                 <div className="space-y-1">
-                                    <Label htmlFor="minimunm">minimunm</Label>
+                                    <Label htmlFor="minimunm">{t('minimum')}</Label>
                                     <Input
                                         id="minimunm"
                                         type={'number'}
@@ -177,7 +177,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="maximum">minimunm</Label>
+                                    <Label htmlFor="maximum">{t('minimum')}</Label>
                                     <Input
                                         id="maximum"
                                         type={'number'}
@@ -193,7 +193,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="m">minimunm</Label>
+                                    <Label htmlFor="m">{t('minimum')}</Label>
                                     <Input
                                         id="multipleOf"
                                         placeholder=">=0"
@@ -215,7 +215,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                 <>
                                     <div className="space-y-1">
                                         <Label htmlFor="minLength">
-                                            minLength
+                                        {t('minLength')}
                                         </Label>
                                         <Input
                                             id="minLength"
@@ -231,7 +231,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     </div>
                                     <div className="space-y-1">
                                         <Label htmlFor="maxLength">
-                                            maxLength
+                                        {t('maxLength')}
                                         </Label>
                                         <Input
                                             id="maxLength"
@@ -248,7 +248,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                 </>
                             )}
                             <div className="space-y-1">
-                                <Label htmlFor="default">default</Label>
+                                <Label htmlFor="default">{t('default')}</Label>
                                 <Input
                                     id="default"
                                     className="h-8"
@@ -261,7 +261,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             {!isBoolean && (
                                 <>
                                     <div className="space-y-1">
-                                        <Label htmlFor="regex">Pattern</Label>
+                                        <Label htmlFor="regex">{t('pattern')}</Label>
                                         <Input
                                             id="pattern"
                                             className="h-8"
@@ -277,7 +277,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
 
                                     <div className="col-span-2 space-y-1">
                                         <Label htmlFor="examples">
-                                            examples
+                                        {t('examples')}
                                         </Label>
                                         <Input
                                             id="examples"

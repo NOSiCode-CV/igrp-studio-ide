@@ -89,7 +89,7 @@ export function SettingsDialog() {
                         {t('settings')}
                     </DialogTitle>
                     <DialogDescription className="sr-only">
-                        Customize your settings here.
+                       {t('customizeSettingsHere')}
                     </DialogDescription>
                 </DialogHeader>
                 <SidebarProvider className="items-start">
@@ -158,7 +158,7 @@ export function SettingsDialog() {
                                 ) : (
                                     <div className="flex items-center justify-center h-full">
                                         <p className="text-muted-foreground">
-                                            Select a setting to view
+                                            {t('selectSettingToView')}
                                         </p>
                                     </div>
                                 )}

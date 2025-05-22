@@ -1,18 +1,28 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
-import { getFakeComponentData } from '../fakeComponentData';
+import { IGRPButton } from '@igrp/igrp-framework-react-design-system';
+import { useFakedata } from '../hooks/useFakeData';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
 }
 
 const CardComponent = ({ comp }: CardComponentProps) => {
+    const { getFakeComponentData } = useFakedata();
+
     const { componentName, properties } = comp;
 
-    const { commonProperties, iconProperties, error, errorMessage, ...args } =
-        properties;
+    const {
+        commonProperties,
+        iconProperties,
+        dataproperties,
+        dataProperties,
+        error,
+        errorMessage,
+        ...args
+    } = properties;
 
-    const componentLabel = commonProperties?.label || componentName;
+    const componentLabel = properties?.label || componentName;
 
     const Icon = ICON_MAP[componentName];
 
@@ -25,9 +35,9 @@ const CardComponent = ({ comp }: CardComponentProps) => {
             {Component ? (
                 componentName === COMPONENT.Button ? (
                     //@ts-ignore
-                    <Component {...args} onSelectValueChange={() => void 0}>
+                    <IGRPButton {...args} {...iconProperties}>
                         {componentLabel}
-                    </Component>
+                    </IGRPButton>
                 ) : (
                     //@ts-ignore
                     <Component
@@ -38,14 +48,14 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                 )
             ) : (
                 <div className="rounded-lg shadow-xs border p-4 bg-card">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap md:flex-nowrap justify-center">
                         {Icon && (
-                            <div className="w-10 h-10 rounded-lg bg-igrp/20 flex items-center justify-center">
-                                <Icon className="w-5 h-5 text-igrp" />
+                            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                                <Icon className="w-5 h-5 text-primary" />
                             </div>
                         )}
-                        <div className="text-sm font-medium text-gray-700">
-                            {componentName}
+                        <div className="text-sm font-medium text-gray-700 truncate">
+                            {componentLabel}
                         </div>
                     </div>
                 </div>

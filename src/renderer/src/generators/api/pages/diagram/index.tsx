@@ -3,8 +3,10 @@ import ERDDiagram from './ERDDiagram';
 import { useEffect, useState } from 'react';
 import { ModelData, RelationData } from './types';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
+import { useTranslation } from 'react-i18next';
 
 export default function ERDLayout({ currentItem }: { currentItem: any }) {
+    const { t } = useTranslation();
     const { models } = useStudioAPI(currentItem?.module);
 
     const [convertedModelData, setConvertedModelData] = useState<
@@ -27,7 +29,7 @@ export default function ERDLayout({ currentItem }: { currentItem: any }) {
             {convertedModelData && relations ? (
                 <ERDDiagram models={convertedModelData} relations={relations} />
             ) : (
-                <p className="text-foreground">Loading diagram...</p>
+                <p className="text-foreground">{t('loadingDiagram')}</p>
             )}
         </>
     );

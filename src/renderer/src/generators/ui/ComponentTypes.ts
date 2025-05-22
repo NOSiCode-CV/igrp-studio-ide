@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -63,6 +63,11 @@ import {
     CaseSensitive,
     Gauge,
     RadarIcon,
+    MoveRight,
+    Hash,
+    EyeOff,
+    Search,
+    TrendingUp,
 } from 'lucide-react';
 
 // Constants
@@ -82,9 +87,11 @@ export const GROUP_COMPONET: Record<string, string> = {
 };
 
 export const COMPONENT: Record<string, string> = {
+    PageContent: "page",
     Columns: "columns",
     Column: "column",
     Grid: "grid",
+    Flex: "flex",
     Section: "section",
     Container: 'container',
     Form: 'form',
@@ -121,8 +128,20 @@ export const COMPONENT: Record<string, string> = {
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
     TableFilter: 'tableFilters',
+
     TableActionListCell: 'tableActionListCell',
     TableAmountCell: 'tableAmountCell',
+    TableCheckboxCell: 'tableCheckboxCell',
+    TableDateCell: 'tableDateCell',
+    TableableBadgeCell: 'tableBadgeCell',
+
+    TableInputFilter: 'tableInputFilter',
+    TableMinMaxFilter: 'tableMinMaxFilter',
+    TableFilterDate: 'tableDateFilter',
+    TableSelectFilter: 'tableSelectFilter',
+    TableFacetedFilter: 'tableFacetedFilter',
+    TableFilterDropdown: 'tableDropdownFilter',
+
     Headline: 'headline',
     Label: 'label',
     Icon: 'icon',
@@ -133,6 +152,7 @@ export const COMPONENT: Record<string, string> = {
     Tabs: 'tabs',
 
     Badge: 'badge',
+    Search: 'inputSearch',
 
     iFrame: 'iFrame',
     InfoPanel: 'infoPanel',
@@ -154,6 +174,7 @@ export const COMPONENT: Record<string, string> = {
     VerticalBarchart: "verticalBarchart",
     RadialBarchart: "radialBarchart",
     Radarchart: "radarchart",
+    StatsCard: "statsCard",
 }
 
 
@@ -162,9 +183,9 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Input]: FormInput,
     [COMPONENT.InputText]: FormInput,
     [COMPONENT.AddOn]: FormInput,
-    [COMPONENT.Number]: FormInput,
+    [COMPONENT.Number]: Hash,
     [COMPONENT.Label]: CaseSensitive,
-    [COMPONENT.Hidden]: FormInput,
+    [COMPONENT.Hidden]: EyeOff,
     [COMPONENT.Date]: Calendar,
     [COMPONENT.DatePicker]: Calendar,
     [COMPONENT.InputDatePicker]: Calendar,
@@ -208,6 +229,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Form]: Form,
     [COMPONENT.Container]: Square,
     [COMPONENT.Grid]: Grid,
+    [COMPONENT.Flex]: MoveRight,
     [COMPONENT.Columns]: Columns2,
     [COMPONENT.Column]: Columns2,
     [COMPONENT.Headline]: Heading1,
@@ -223,6 +245,9 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Radarchart]: RadarIcon,
 
     [COMPONENT.Chat]: MessageCircle,
+    [COMPONENT.Search]: Search,
+
+    [COMPONENT.StatsCard]: TrendingUp,
 
     accordion: AlignLeft,
     treeView: GitMerge,
@@ -272,6 +297,8 @@ export const COMPONENT_MAP = {
     [COMPONENT.Radio]: IGRPRadioButton,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
+    [COMPONENT.Switch]: IGRPSwitch,
+    [COMPONENT.Search]: IGRPInputSearch,
 
     [COMPONENT.Piechart]: IGRPPieChart,
     [COMPONENT.Areachart]: IGRPAreaChart,
@@ -282,4 +309,13 @@ export const COMPONENT_MAP = {
     [COMPONENT.RadialBarchart]: IGRPRadialBarChart,
 
     [COMPONENT.Badge]: IGRPBadge,
+
+
+    [COMPONENT.TableInputFilter]: IGRPDataTableFilterInput,
+    [COMPONENT.TableMinMaxFilter]: IGRPDataTableFilterMinMax,
+    [COMPONENT.TableFilterDate]: IGRPDataTableFilterDate,
+    [COMPONENT.TableSelectFilter]: IGRPDataTableFilterSelect,
+    [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
+    [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
+    [COMPONENT.StatsCard]: IGRPStatsCard,
 };

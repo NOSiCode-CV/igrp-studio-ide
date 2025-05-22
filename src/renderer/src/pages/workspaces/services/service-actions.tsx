@@ -2,6 +2,7 @@
 
 import { Button } from '@renderer/components/ui/button';
 
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,6 +23,7 @@ import { useState } from 'react';
 import useToast from '@renderer/hooks/useToast';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
+import { useTranslation } from 'react-i18next';
 
 interface ServiceActionsProps {
     service: any;
@@ -39,10 +41,12 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
 
     const { getServiceUrl, stopService, restartService } = useDocker({workspace});
 
+    const { t } = useTranslation();
+
     const handleServiceUrl = () => {
         const url = getServiceUrl(service);
         if (url) {
-            window.electron.ipcRenderer.send('open-external-url', url);
+            window.electron.ipcRenderer.send(t("openExternalUrl"), url);
         }
     };
 
@@ -72,7 +76,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                             className="text-red-600 focus:text-red-600 focus:bg-red-50"
                         >
                             <Square className="mr-2 h-4 w-4 text-red-600" />
-                            Stop Service
+                            {t('stopService')}
                         </DropdownMenuItem>
                     ) : (
                         <DropdownMenuItem
@@ -82,7 +86,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                             className="text-green-600 focus:text-green-600 focus:bg-green-50"
                         >
                             <Play className="mr-2 h-4 w-4 text-green-600" />
-                            Start Service
+                            {t('startService')}
                         </DropdownMenuItem>
                     )}
 
@@ -93,13 +97,13 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         }}
                     >
                         <Edit className="mr-2 h-4 w-4" />
-                        Edit Service
+                        {t('editService')}
                     </DropdownMenuItem>
 
                     {getServiceUrl(service) && (
                         <DropdownMenuItem onClick={handleServiceUrl}>
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            Open in Browser
+                            {t('openInBrowser')}
                         </DropdownMenuItem>
                     )}
 
@@ -111,11 +115,12 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                             }}
                         >
                             <Trash className="mr-2 h-4 w-4 text-red-600" />
-                            Remove Service
+                            {t('removeService')}
                         </DropdownMenuItem>
                     )}
                 </DropdownMenuContent>
             </DropdownMenu>
+
 
             <AlertDialogDelete
                 onConfirm={handleDelete}

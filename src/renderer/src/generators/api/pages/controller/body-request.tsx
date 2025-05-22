@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@renderer/components/ui/badge';
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import {
     Tabs,
     TabsContent,
@@ -14,7 +14,6 @@ import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
-import { Bot } from 'lucide-react';
 
 type TbodyType = 'none' | 'multipart/form-data' | 'application/json';
 

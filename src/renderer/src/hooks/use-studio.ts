@@ -1,14 +1,15 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
-import { FileTree } from 'src/main/types';
+import { FileTree, ProjectData } from 'src/main/types';
 
 interface RootState {
     PageBuilder: {
         filesThree: FileTree[];
         basePath: string;
+        config: ProjectData
     };
 }
 
@@ -16,10 +17,15 @@ const selectState = (state: RootState) => state.PageBuilder;
 const selectProperties = createSelector(selectState, (studio) => ({
     files: studio.filesThree ?? [],
     basePath: studio.basePath,
+    config: studio.config,
 }));
 
 const useStudio = () => {
-    const { files, basePath } = useSelector(selectProperties);
+    const { files, basePath, config } = useSelector(selectProperties);
+
+    const [componentsRegistered, setComponentsRegistered] = useState<ComponentRegisterConfig[]>([]);
+
+    const [pageOptions, setPageOptions] = useState<any[]>([]);
 
     // Fetch components from the files tree
     const fetchComponents = useCallback(() => {
@@ -35,6 +41,7 @@ const useStudio = () => {
             return module.default;
         } catch (error) {
             const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+            console.warn('Failed to load component:', error);
             return fallbackModule.default;
         }
     }, []);
@@ -74,8 +81,10 @@ const useStudio = () => {
 
     // Get all registered components
     const getRegistryComponent = useCallback(async () => {
-        const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
-        return result.components;
+        return await window.engine.getComponent(ENV_TYPES.NEXTJS).then((res) => {
+            setComponentsRegistered(res.result.components);
+            return res.result.components
+        })
     }, []);
 
     // Helper function to find a component by name or within a parent's acceptedChildren
@@ -133,16 +142,48 @@ const useStudio = () => {
         return component ? component.properties : [];
     }, [findComponent]);
 
+    const getChildPropertiesComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
+        return component ? component.childProperties : [];
+    }, [findComponent]);
+
     // Get properties for a component
     const getInteractionsComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.interactions : [];
     }, [findComponent]);
 
+    const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
+        return componentsRegistered.find(component => component.name === id);
+    };
+
+    useEffect(() => {
+        getRegistryComponent();
+    }, []);
+
+    useEffect(() => {
+        const pages = files.find((page) => page.name === 'pages')
+        const options = pages?.children?.map((page) => {
+            const { content } = page
+            return {
+                value: content.pageName,
+                label: content.pageName,
+                metadata: content
+            }
+        }) ?? [];
+        setPageOptions(options)
+    }, [files])
+
     return {
+        files,
         basePath,
+        config,
+        componentsRegistered,
+        pageOptions,
+        findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,
+        getChildPropertiesComponent,
         getRegistryComponent,
         getInteractionsComponent,
         getComponentData,

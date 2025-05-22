@@ -89,12 +89,13 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
             formik.resetForm();
 
-            createGitCommit(basePath, `Add module ${formik.values.name}`);
+             createGitCommit(basePath, `${t("addModule")} ${formik.values.name}`);
 
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
-                `Module ${formik.values.name} have been successfully added.`
+                t('moduleAdded', { name: formik.values.name })
+               // `Module ${formik.values.name} have been successfully added.`
             );
         } catch (error) {
             showErrorToast(error);
@@ -116,12 +117,12 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                         </DialogTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Create new module</p>
+                        <p>{t('createNewModule')}</p>
                     </TooltipContent>
                 </Tooltip>
                 <DialogContent className="max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Create New Module</DialogTitle>
+                        <DialogTitle>{t('createNewModule')}</DialogTitle>
                         <DialogDescription>
                             {t('dialogDescription')}
                         </DialogDescription>
@@ -135,7 +136,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="name" className="text-right">
-                                    Module Name
+                                {t('moduleName')}
                                 </Label>
                                 <div className="col-span-3">
                                     <Input
@@ -160,7 +161,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit">Save Module</Button>
+                            <Button type="submit">{t('saveModule')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
