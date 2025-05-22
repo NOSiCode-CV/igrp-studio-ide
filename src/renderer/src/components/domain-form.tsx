@@ -13,6 +13,7 @@ import {
 import { Plus, Trash2 } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
+import { useTranslation } from 'react-i18next';
 
 interface KeyValuePair {
     id: string;
@@ -25,6 +26,7 @@ export default function DomainForm({
 }: {
     onAdd: (domains: IGRPOptionsProps[]) => void;
 }) {
+    const { t } = useTranslation();
     const [pairs, setPairs] = useState<KeyValuePair[]>([
         { id: '1', value: '', label: '' },
     ]);
@@ -67,8 +69,8 @@ export default function DomainForm({
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Value</TableHead>
-                        <TableHead>Label</TableHead>
+                        <TableHead>{t('value')}</TableHead>
+                        <TableHead>{t('label')}</TableHead>
                         <TableHead>
                             <Button
                                 onClick={addPair}
@@ -77,13 +79,14 @@ export default function DomainForm({
                                 className="text-igrp"
                             >
                                 <Plus className="h-4 w-4" />
-                                <span className="sr-only">Add Row</span>
+                                <span className="sr-only">{t('addRow')}</span>
                             </Button>
                         </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {pairs.map((pair) => (
+                        
                         <TableRow key={pair.id}>
                             <TableCell>
                                 <Input

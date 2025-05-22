@@ -2,9 +2,6 @@ import { BrowserWindow, dialog } from "electron";
 import { app } from "electron/main";
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import { is } from "@electron-toolkit/utils";
-//import { is } from "@electron-toolkit/utils";
-
-
 var allow_quit = false;
 export function closeApp(mainWindow: BrowserWindow) {
     mainWindow.on('close', async function (e) {

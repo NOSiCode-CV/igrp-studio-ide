@@ -1,7 +1,12 @@
 import { Card } from '@renderer/components/ui/card';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
-import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
+import {
+    addNewRow,
+    getOptionsByObject,
+    handleChangeValueObject,
+    removeRow,
+} from '../../helpers';
 import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
 import { useTranslation } from 'react-i18next';
@@ -16,8 +21,14 @@ interface DtoProps {
 }
 
 const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
-    const { formik, tablesColumns, data, handleDelete, onClickSourceCode } =
-        useDto({ selectors, currentItem });
+    const {
+        formik,
+        tablesColumns,
+        data,
+        dto,
+        handleDelete,
+        onClickSourceCode,
+    } = useDto({ selectors, currentItem });
 
     const { t } = useTranslation();
 
@@ -51,6 +62,18 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
         return null;
     };
 
+    const dtos = getOptionsByObject(
+        dto,
+        currentItem.module,
+        currentItem?.content?.name
+    );
+
+    const handleChangeExtends = (option: string) =>
+        formik.setFieldValue('extends', {
+            name: option.split('-')[0],
+            module: option.split('-')[1],
+        });
+
     return (
         <form onSubmit={formik.handleSubmit}>
             <NavigationBar
@@ -78,21 +101,38 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 isRequired
                             />
                             <SelectInput
-                                label={'Template'}
+                                label={'template'}
                                 id="template"
                                 options={TemplateOptions}
                                 value={formik.values.template}
-                                onChange={(option) =>
-                                    formik.setFieldValue('template', option)
-                                }
-                                onBlur={(option) =>
-                                    formik.setFieldValue('template', option)
-                                }
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
                                 error={formik.errors.template}
                                 isTouched={formik.touched.template}
                                 isRequired
                             />
-                            <div className="flex flex-col space-y-2">
+                            <SelectInput
+                                id="extends"
+                                label={'extends'}
+                                value={`${formik.values.extends?.name}-${formik.values.extends?.module}`}
+                                options={
+                                    dtos && dtos.length > 0
+                                        ? dtos.map(
+                                              ({ label, module, value }) => ({
+                                                  label: `${label} (${module})`,
+                                                  value: `${value}-${module}`,
+                                              })
+                                          )
+                                        : []
+                                }
+                                onChange={(option) =>
+                                    handleChangeExtends(option as string)
+                                }
+                                onBlur={formik.handleBlur}
+                                error={formik.errors.extends}
+                                isTouched={formik.touched.extends}
+                            />
+                            <div className="flex flex-1 space-x-2">
                                 <Label htmlFor="enableCustonValidation">
                                     {t('enableCustonValidation')}
                                 </Label>
@@ -111,7 +151,10 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                             </div>
                         </div>
                         {TabList.map(({ value }) => (
-                            <div className="border pt-3 rounded-sm gap-0 p-0" key={value}>
+                            <div
+                                className="border pt-3 rounded-sm gap-0 p-0"
+                                key={value}
+                            >
                                 {renderFormList(value)}
                             </div>
                         ))}

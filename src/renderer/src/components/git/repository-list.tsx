@@ -107,7 +107,7 @@ export function RepositoryList() {
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',
                 repo.clone_url,
-                `${workspace.path}${projectPath}`,
+                `${workspace.path}${projectPath}`
             );
         } catch (error) {
             console.error('Failed to clone repository:', error);
@@ -132,8 +132,8 @@ export function RepositoryList() {
                         const { project, path } = data;
                         const { config, type } = project;
 
-                        await saveOrOpenProject(
-                            {
+                        await saveOrOpenProject({
+                            project: {
                                 workspaceId: workspace.id,
                                 name: config.name,
                                 framework: config.type,
@@ -142,7 +142,7 @@ export function RepositoryList() {
                                 path,
                                 config,
                             },
-                            async () => {
+                            onSuccess: async () => {
                                 // This callback runs after the project is successfully saved
                                 await window.electron.ipcRenderer.invoke(
                                     'add-cloned-repo',
@@ -166,8 +166,8 @@ export function RepositoryList() {
                                     ...prevPaths,
                                     [cloningRepoId!]: data.path,
                                 }));
-                            }
-                        );
+                            },
+                        });
                     } catch (error) {
                         showErrorToast(t('failedOpenProjectAfterCloning'));
                         console.error(t('errorOpeningProject'), error);
@@ -266,14 +266,14 @@ export function RepositoryList() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" className="gap-1">
                             <Filter className="h-4 w-4" />
-                            Filter
+                            {t('filter')}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
                             onClick={() => setPlatformFilter('all')}
                         >
-                            All Platforms
+                            {t('allPlatforms')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => setPlatformFilter('github')}
@@ -283,7 +283,7 @@ export function RepositoryList() {
                                 platform="github"
                                 className="h-4 w-4"
                             />
-                            GitHub
+                            {t('github')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => setPlatformFilter('gitlab')}
@@ -293,7 +293,7 @@ export function RepositoryList() {
                                 platform="gitlab"
                                 className="h-4 w-4"
                             />
-                            GitLab
+                            {t('gitlab')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -301,7 +301,7 @@ export function RepositoryList() {
 
             {platformFilter !== 'all' && (
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">Filtered by:</span>
+                    <span className="text-sm text-gray-500">{t('filterBy')}</span>
                     <Badge
                         variant="secondary"
                         className="flex items-center gap-1"
@@ -318,7 +318,7 @@ export function RepositoryList() {
                             onClick={() => setPlatformFilter('all')}
                         >
                             <X className="h-4 w-4" />
-                            <span className="sr-only">Remove filter</span>
+                            <span className="sr-only">{t('removeFilter')}</span>
                         </Button>
                     </Badge>
                 </div>
@@ -349,10 +349,10 @@ export function RepositoryList() {
                         <div className="p-8 text-center">
                             <AlertCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                             <p className="text-gray-500 font-medium">
-                                No repositories found
+                            {t('noRepositoriesFound')}
                             </p>
                             <p className="text-gray-400 text-sm mt-1">
-                                Try adjusting your search or filters
+                            {t('tryAdjustingSearchOrFilters')}
                             </p>
                         </div>
                     ) : (

@@ -1,6 +1,7 @@
 import { Badge } from '@renderer/components/ui/badge';
 import { cn } from '@renderer/lib/utils';
 import { getServiceColor } from '../services';
+import { useTranslation } from 'react-i18next';
 
 interface DependencyConfig {
     condition?: string;
@@ -13,6 +14,7 @@ interface DependencyProps {
 
 const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
     if (!dependsOn || dependsOn.length === 0) return null;
+    const { t } = useTranslation();
 
     const content = (
         <>
@@ -54,7 +56,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
             ) : (
                 <div className="py-1">
                     <div className="text-xs text-muted-foreground">
-                        Depends on
+                    {t('dependsOn')}
                     </div>
                     <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
                         {content}

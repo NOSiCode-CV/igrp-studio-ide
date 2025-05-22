@@ -1,4 +1,4 @@
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 
 interface AttributesCardProps {

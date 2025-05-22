@@ -1,5 +1,6 @@
 import { Button } from '@renderer/components/ui/button';
 import { Copy, Move, Plus, Trash, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
     TooltipTrigger,
@@ -17,6 +18,7 @@ const SectionTool = ({
     onClickDeleteSection,
     onEdit,
 }: RowOptionsProps) => {
+    const { t } = useTranslation();
     return (
         <div id="row-tools">
             {/* Top-aligned button */}
@@ -30,7 +32,7 @@ const SectionTool = ({
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Add New Row at Top</p>
+                    <p>{t('addNewRowTop')}</p>
                 </TooltipContent>
             </Tooltip>
 
@@ -45,7 +47,7 @@ const SectionTool = ({
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Add New Row at Bottom</p>
+                    <p>{t('addNewRowBottom')}</p>
                 </TooltipContent>
             </Tooltip>
 
@@ -62,7 +64,7 @@ const SectionTool = ({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Ordenar</p>
+                            <p>{t('sort')}</p>
                         </TooltipContent>
                     </Tooltip>
 
@@ -76,7 +78,7 @@ const SectionTool = ({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Clonar</p>
+                            <p>{t('clone')}</p>
                         </TooltipContent>
                     </Tooltip>
 
@@ -90,7 +92,7 @@ const SectionTool = ({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Editar</p>
+                            <p>{t('edit')}</p>
                         </TooltipContent>
                     </Tooltip>
 
@@ -107,7 +109,7 @@ const SectionTool = ({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Eliminar Seção</p>
+                            <p>{t('deleteSection')}</p>
                         </TooltipContent>
                     </Tooltip>
                 </div>

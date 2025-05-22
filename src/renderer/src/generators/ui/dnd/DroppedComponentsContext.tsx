@@ -8,82 +8,51 @@ import React, {
 import { useSidebar } from '@renderer/components/ui/sidebar';
 import {
     Destination,
+    DroppedComponentsContextType,
     EditingComponentParams,
     StructuredComponent,
     StructuredLayout,
 } from '@renderer/lib/dnd/types';
-import { generateId } from '@renderer/utils/helpers';
-import { COMPONENT } from '../ComponentTypes';
-
-interface DroppedComponentsContextType {
-    newStructure: (name: string) => StructuredComponent;
-    setInitComponents: (components: StructuredLayout) => void;
-    getAllComponents: () => StructuredLayout;
-
-    handleAddChildToComponent: (
-        destination: Destination,
-        childComponent: StructuredComponent
-    ) => void;
-
-    handleRemoveChildFromComponent: (destination: Destination) => void;
-
-    handleReorderChildInComponent: (
-        draggableId: string,
-        source: Destination,
-        destination: Destination
-    ) => void;
-
-    handleUpdateChildComponent: (
-        componentId: string,
-        updates: Partial<StructuredComponent>
-    ) => void;
-
-    removeRow: (rowId: string) => void;
-    setEditingComponent: ({
-        path,
-        component,
-    }: EditingComponentParams) => void;
-    clearEditingComponent: () => void;
-    currentComponent: EditingComponentParams | null;
-}
+import {
+    CustomFunctionConfig,
+    Import,
+    State,
+    TypeDef,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { newStructuredComponent } from './helpers';
 
 const DroppedComponentsContext = createContext<
     DroppedComponentsContextType | undefined
 >(undefined);
-
-const newStructuredComponent = (
-    name: string,
-    children?: Array<StructuredComponent>
-) => {
-    const newRowId = generateId(name);
-    const newRow: StructuredComponent = {
-        id: newRowId,
-        componentName: name,
-        label: name,
-        properties: {
-            variant: 'default',
-        },
-        children: children || [],
-        interactions: [],
-    };
-
-    return newRow;
-};
 
 export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
     const { toggleSidebar, setOpen } = useSidebar();
 
-    const [components, setComponents] = useState<StructuredLayout>(
-        newStructuredComponent(COMPONENT.Container, [
-            newStructuredComponent(COMPONENT.Section),
-        ])
-    );
+    const [components, setComponents] = useState<StructuredComponent>({
+        id: '',
+        tag: '',
+        componentName: '',
+        label: '',
+        type: '',
+        properties: {},
+        interactions: {},
+        children: [],
+    });
+
+    const [types, setTypes] = useState<TypeDef[]>([]);
+
+    const [functions, setFunctions] = useState<CustomFunctionConfig[]>([]);
+
+    const [states, setStates] = useState<State[]>([]);
+
+    const [imports, setImports] = useState<Import[]>([]);
+
     const [currentComponent, setCurrentComponent] =
         useState<EditingComponentParams | null>(null);
 
-    const setInitComponents = (components: StructuredLayout) => {
+    const setAllComponents = (components: StructuredLayout) => {
         setComponents(components);
     };
 
@@ -288,52 +257,56 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
                 return updatedComponents;
             });
+
+            setCurrentComponent(null);
         },
         []
     );
     //Funcao para fazer update de um component
     const handleUpdateChildComponent = useCallback(
-        (
-            componentId: string, // ID of the component to update
-            updates: Partial<StructuredComponent> // Partial updates to apply
-        ) => {
-            // Validate inputs
+        (componentId: string, updates: Partial<StructuredComponent>) => {
             if (!componentId || !updates) {
                 console.error('Invalid component ID or updates');
                 return;
             }
 
-            // Recursive function to find and update the target component
-            const updateComponentTree = (
-                component: StructuredComponent
-            ): StructuredComponent => {
-                // If the current component matches the target ID, apply the updates
-                if (component.id === componentId) {
+            setComponents((prev) => {
+                // First check if we're updating the root component
+                if (prev.id === componentId) {
                     return {
-                        ...component,
+                        ...prev,
                         ...updates,
                     };
                 }
 
-                // If the current component has children, search recursively
-                if (component.children) {
-                    const updatedChildren =
-                        component.children.map(updateComponentTree);
-                    return {
-                        ...component,
-                        children: updatedChildren,
-                    };
-                }
+                // Recursive function to find and update child components
+                const updateComponentTree = (
+                    component: StructuredComponent
+                ): StructuredComponent => {
+                    if (component.id === componentId) {
+                        return {
+                            ...component,
+                            ...updates,
+                        };
+                    }
 
-                // If no match is found, return the component unchanged
-                return component;
-            };
+                    if (component.children) {
+                        const updatedChildren =
+                            component.children.map(updateComponentTree);
+                        return {
+                            ...component,
+                            children: updatedChildren,
+                        };
+                    }
 
-            // Update the components state
-            setComponents((prev) => ({
-                ...prev,
-                children: (prev.children || []).map(updateComponentTree),
-            }));
+                    return component;
+                };
+
+                return {
+                    ...prev,
+                    children: (prev.children || []).map(updateComponentTree),
+                };
+            });
         },
         []
     );
@@ -353,7 +326,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     }, []);
 
     // Função que obtém todos os componentes
-    const getAllComponents = (): StructuredLayout => components;
 
     const setEditingComponent = ({
         path,
@@ -368,20 +340,154 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         setCurrentComponent(null);
     };
 
+    //types
+    const addType = (type: TypeDef) => {
+        setTypes((prev) => [...prev, type]);
+    };
+
+    const updateType = (id: string, updates: Partial<TypeDef>) => {
+        setTypes((prev) =>
+            prev.map((type) =>
+                type.componentId === id ? { ...type, ...updates } : type
+            )
+        );
+    };
+
+    const removeType = (id: string) => {
+        setTypes((prev) => prev.filter((type) => type.componentId !== id));
+    };
+
+    const createOrUpdateType = (newType: TypeDef) => {
+        setTypes((prevTypes) => {
+            const existingIndex = prevTypes.findIndex(
+                (t) => t.componentId === newType.componentId
+            );
+
+            if (existingIndex !== -1) {
+                // Update
+                const updated = [...prevTypes];
+                updated[existingIndex] = newType;
+                return updated;
+            } else {
+                // Create
+                return [...prevTypes, newType];
+            }
+        });
+    };
+
+    const getTypeByComponentId = (componentId: string): TypeDef | undefined => {
+        return types.find((t) => t.componentId === componentId);
+    };
+
+    const setAllTypes = (newTypes: TypeDef[]) => {
+        setTypes(newTypes);
+    };
+
+    //functions
+    const addFunction = (fnc: CustomFunctionConfig) => {
+        setFunctions((prev = []) => [...prev, fnc]); // Fallback to empty array
+    };
+
+    const updateFunction = (
+        id: string,
+        updates: Partial<CustomFunctionConfig>
+    ) => {
+        setFunctions((prev) =>
+            prev.map((fnc) => (fnc.id === id ? { ...fnc, ...updates } : fnc))
+        );
+    };
+
+    const removeFunction = (id: string) => {
+        setFunctions((prev) => prev.filter((fnc) => fnc.id !== id));
+    };
+
+    const setAllFunctions = (fncs: CustomFunctionConfig[]) => {
+        setFunctions(Array.isArray(fncs) ? fncs : []); // Ensure array
+    };
+
+    //states
+    const addState = (state: State) => {
+        setStates((prev = []) => [...prev, state]); // Fallback to empty array
+    };
+
+    const updateState = (id: string, updates: Partial<State>) => {
+        setStates((prev) =>
+            prev.map((state) =>
+                state.id === id ? { ...state, ...updates } : state
+            )
+        );
+    };
+
+    const removeState = (id: string) => {
+        setStates((prev) => prev.filter((state) => state.id !== id));
+    };
+
+    const setAllStates = (states: State[]) => {
+        setStates(Array.isArray(states) ? states : []);
+    };
+
+    //imports
+    const addImport = (importPath: Import) => {
+        setImports((prev = []) => [...prev, importPath]); // Fallback to empty array
+    };
+
+    const updateImport = (id: string, updates: Partial<Import>) => {
+        setImports((prev) =>
+            prev.map((importPath) =>
+                importPath.id === id
+                    ? { ...importPath, ...updates }
+                    : importPath
+            )
+        );
+    };
+    const removeImport = (id: string) => {
+        setImports((prev) => prev.filter((importPath) => importPath.id !== id));
+    };
+    const setAllImports = (imports: Import[]) => {
+        setImports(Array.isArray(imports) ? imports : []); // Ensure array
+    };
+
     return (
         <DroppedComponentsContext.Provider
             value={{
                 newStructure,
-                setInitComponents,
+                setAllComponents,
                 handleAddChildToComponent,
                 handleRemoveChildFromComponent,
                 handleReorderChildInComponent,
                 handleUpdateChildComponent,
                 removeRow,
-                getAllComponents,
                 setEditingComponent,
                 clearEditingComponent,
+
+                addType,
+                updateType,
+                removeType,
+                createOrUpdateType,
+                getTypeByComponentId,
+                setAllTypes,
+
+                addFunction,
+                updateFunction,
+                removeFunction,
+                setAllFunctions,
+
+                addState,
+                updateState,
+                removeState,
+                setAllStates,
+
+                addImport,
+                updateImport,
+                removeImport,
+                setAllImports,
+
+                components,
                 currentComponent,
+                types,
+                functions,
+                states,
+                imports,
             }}
         >
             {children}

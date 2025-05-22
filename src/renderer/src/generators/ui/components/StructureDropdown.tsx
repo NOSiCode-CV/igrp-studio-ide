@@ -14,6 +14,7 @@ import {
 } from '@renderer/components/ui/tooltip';
 import { LayoutGrid } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface StructureDropdownProps {
     onClickStructure: (layout: string) => void;
@@ -21,6 +22,7 @@ interface StructureDropdownProps {
 
 const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const { t } = useTranslation();
 
     const closeDropdown = () => setDropdownOpen(false);
 
@@ -51,13 +53,13 @@ const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
                             </a>
                         </DropdownMenuTrigger>
                     </TooltipTrigger>
-                    <TooltipContent>Columns Settings</TooltipContent>
+                    <TooltipContent>{t('columnsSettings')}</TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent
                     className="w-56"
                     onPointerLeave={closeDropdown}
                 >
-                    <DropdownMenuLabel>Columns Settings</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('columnsSettings')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <div className="grid grid-cols-3 gap-2 p-2">
                         {gridStructures.map((structure, index) => (

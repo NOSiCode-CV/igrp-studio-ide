@@ -1,6 +1,6 @@
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
 import { Connection, DockerComposeService, Handler, HandlerResponse, PageableProjects, ProjectData } from "./types";
-import { ComponentRegistrationConfig, DockerServiceRegistrationConfig, ProjectWorkspace, ServiceWorkspace } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { AppExportsConfig, ComponentRegistrationConfig, DockerServiceRegistrationConfig, ProjectWorkspace, ServiceWorkspace } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -77,6 +77,11 @@ export interface BaseEngine {
     getServices?(): Promise<DockerServiceRegistrationConfig>;
 
     getDependencies?(): Promise<Dependency[]>
+
+    getAppMetadata?: (basePath: string) => Promise<PayloadConfig>;
+
+    getCodeSnippets?(): CodeSnippetsRegistrationConfig;
+
 }
 
 
@@ -99,6 +104,10 @@ export interface IBaseEngine {
     getComponent: (engineType: string) => Promise<HandlerResponse>;
     getService: (engineType: string) => Promise<Record<string, Component>>;
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
+
+    getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
+
+    getCodeSnippets(engineType: string): CodeSnippetsRegistrationConfig;
 }
 
 export interface IDocker {

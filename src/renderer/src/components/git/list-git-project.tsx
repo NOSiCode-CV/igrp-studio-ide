@@ -110,7 +110,7 @@ export function ListGitProject({
                                             </span>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>Private repository</p>
+                                            <p>{t('privateRepository')}</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 )}
@@ -118,8 +118,7 @@ export function ListGitProject({
                             <p className="text-sm text-gray-600 truncate">
                                 {repo.description || (
                                     <span className="flex items-center gap-1 text-gray-400 italic">
-                                        <AlertCircle className="h-3 w-3" /> No
-                                        description provided
+                                        <AlertCircle className="h-3 w-3" /> {t('noDescriptionProvided')}
                                     </span>
                                 )}
                             </p>
@@ -145,11 +144,11 @@ export function ListGitProject({
                                 onClick={() => window.open(repo.html_url)}
                             >
                                 <ExternalLink className="h-4 w-4" />
-                                <span className="sr-only">View</span>
+                                <span className="sr-only">{t('view')}</span>
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>View repository</p>
+                            <p>{t('viewRepository')}</p>
                         </TooltipContent>
                     </Tooltip>
 
@@ -160,7 +159,7 @@ export function ListGitProject({
                             onClick={handleOpen}
                         >
                             <FolderOpen className="h-4 w-4 mr-2" />
-                            Open
+                            {t('open')}
                         </Button>
                     ) : (
                         <Button

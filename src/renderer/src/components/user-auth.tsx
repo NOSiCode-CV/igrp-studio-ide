@@ -1,5 +1,6 @@
 import { Github, Gitlab, GitlabIcon, LogOut, User2Icon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useTranslation } from 'react-i18next';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,6 +12,7 @@ import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function GitConnectionMenu() {
+    const { t } = useTranslation();
     const {
         loginGithub,
         loginGitLab,
@@ -80,7 +82,7 @@ function GitConnectionMenu() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Logout</p>
+                                    <p>{t('logout')}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </div>
@@ -90,7 +92,7 @@ function GitConnectionMenu() {
                             onClick={loginGithub}
                         >
                             <Github className="mr-2 h-4 w-4" />
-                            <span>Connect GitHub</span>
+                            <span>{t('connectGitHub')}</span>
                         </div>
                     )}
                 </DropdownMenuItem>
@@ -120,7 +122,7 @@ function GitConnectionMenu() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Logout</p>
+                                    <p>{t('logout')}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </div>
@@ -130,7 +132,7 @@ function GitConnectionMenu() {
                             onClick={loginGitLab}
                         >
                             <GitlabIcon className="mr-2 h-4 w-4" />
-                            <span>Connect GitLab</span>
+                            <span>{t('connectGitLab')}</span>
                         </div>
                     )}
                 </DropdownMenuItem>

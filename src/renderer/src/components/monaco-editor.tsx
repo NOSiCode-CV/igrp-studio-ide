@@ -1,7 +1,12 @@
-import React, { useRef, useEffect, useState } from 'react';
+import {
+    useRef,
+    useEffect,
+    useState,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
 import Editor, { Monaco, OnChange, Theme } from '@monaco-editor/react';
 import { useTheme } from './theme-provider';
-
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -22,7 +27,6 @@ self.MonacoEnvironment = {
             return new htmlWorker();
         }
         if (label === 'typescript' || label === 'javascript') {
-            console.log('使用ts worker........................');
             return new tsWorker();
         }
         return new editorWorker();
@@ -40,105 +44,150 @@ interface MonacoEditorProps {
     language?: string;
 }
 
-const MonacoEditor: React.FC<MonacoEditorProps> = ({
-    filePath = 'file:///untitled',
-    content,
-    onChange,
-    height = '100vh',
-    options,
-    language,
-}) => {
-    const editorRef = useRef<any>(null);
-    const { theme } = useTheme();
-    const [editorTheme, setEditorTheme] = useState<Theme>('vs-dark');
+export interface MonacoEditorHandle {
+    insertTextAtCursor: (text: string) => void;
+    getEditor: () => monaco.editor.IStandaloneCodeEditor | null;
+}
 
-    // Update editor theme based on app theme
-    useEffect(() => {
-        if (theme === 'light') setEditorTheme('light');
-        else setEditorTheme('vs-dark');
-    }, [theme]);
+const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(
+    (
+        {
+            filePath = 'file:///untitled',
+            content,
+            onChange,
+            height = '100vh',
+            options,
+            language,
+        },
+        ref
+    ) => {
+        const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
+            null
+        );
+        const monacoRef = useRef<Monaco | null>(null);
+        const { theme } = useTheme();
+        const [editorTheme, setEditorTheme] = useState<Theme>('vs-dark');
 
-    // Handle editor mount
-    const handleEditorDidMount = (editor: any, monaco: Monaco) => {
-        editorRef.current = editor;
+        // Expose editor methods via ref
+        useImperativeHandle(ref, () => ({
+            insertTextAtCursor: (text: string) => {
+                if (editorRef.current) {
+                    const editor = editorRef.current;
+                    const selection = editor.getSelection();
+                    const range = selection
+                        ? new monaco.Range(
+                              selection.startLineNumber,
+                              selection.startColumn,
+                              selection.endLineNumber,
+                              selection.endColumn
+                          )
+                        : new monaco.Range(1, 1, 1, 1);
 
-        if (!monaco) {
-            console.error('Monaco instance is undefined');
-            return;
-        }
+                    editor.executeEdits('insert-text', [
+                        {
+                            range,
+                            text,
+                            forceMoveMarkers: true,
+                        },
+                    ]);
+                }
+            },
+            getEditor: () => editorRef.current,
+        }));
 
-        if (filePath) {
-            try {
-                const uri = monaco.Uri.parse(filePath);
-                const existingModel = monaco.editor.getModel(uri);
+        // Update editor theme based on app theme
+        useEffect(() => {
+            if (theme === 'light') setEditorTheme('light');
+            else setEditorTheme('vs-dark');
+        }, [theme]);
 
-                if (!existingModel) {
-                    console.log('Creating new model for URI:', uri.toString());
-                    const model = monaco.editor.createModel(
+        // Handle editor mount
+        const handleEditorDidMount = (
+            editor: monaco.editor.IStandaloneCodeEditor,
+            monacoInstance: Monaco
+        ) => {
+            editorRef.current = editor;
+            monacoRef.current = monacoInstance;
+
+            if (!monacoInstance) {
+                console.error('Monaco instance is undefined');
+                return;
+            }
+
+            if (filePath) {
+                try {
+                    const uri = monacoInstance.Uri.parse(filePath);
+                    const existingModel = monacoInstance.editor.getModel(uri);
+
+                    if (!existingModel) {
+                        const model = monacoInstance.editor.createModel(
+                            content,
+                            language,
+                            uri
+                        );
+                        editor.setModel(model);
+                    } else {
+                        editor.setModel(existingModel);
+                    }
+                } catch (error) {
+                    console.error('Error setting Monaco Editor model:', error);
+                    const uri = monacoInstance.Uri.parse('file:///untitled');
+                    const model = monacoInstance.editor.createModel(
                         content,
                         language,
                         uri
                     );
                     editor.setModel(model);
-                } else {
-                    console.log(
-                        'Using existing model for URI:',
-                        uri.toString()
-                    );
-                    editor.setModel(existingModel);
                 }
-            } catch (error) {
-                console.error('Error setting Monaco Editor model:', error);
-                console.log('Fallback: Using default untitled file path');
-                const uri = monaco.Uri.parse('file:///untitled');
-                const model = monaco.editor.createModel(content, language, uri);
-                editor.setModel(model);
-            }
-        }
-    };
-
-    // Handle content changes
-    const handleChange: OnChange = (value) => {
-        onChange?.(value || '');
-    };
-
-    // Update editor content when `content` prop changes
-    useEffect(() => {
-        if (editorRef.current) {
-            const editor = editorRef.current;
-            const model = editor.getModel();
-            if (model && model.getValue() !== content) {
-                model.setValue(content);
-            }
-        }
-    }, [content]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (editorRef.current) {
-                editorRef.current.dispose();
             }
         };
-    }, []);
 
-    return (
-        <Editor
-            path={filePath}
-            height={height}
-            theme={editorTheme}
-            value={content}
-            language={language}
-            onChange={handleChange}
-            onMount={handleEditorDidMount}
-            options={{
-                ...options,
-                minimap: { enabled: false },
-                wordWrap: 'on',
-                autoIndent: 'full',
-            }}
-        />
-    );
-};
+        // Handle content changes
+        const handleChange: OnChange = (value) => {
+            onChange?.(value || '');
+        };
 
-export default React.memo(MonacoEditor);
+        // Update editor content when `content` prop changes
+        useEffect(() => {
+            if (editorRef.current) {
+                const editor = editorRef.current;
+                const model = editor.getModel();
+                if (model && model.getValue() !== content) {
+                    model.setValue(content);
+                }
+            }
+        }, [content]);
+
+        // Cleanup on unmount
+        useEffect(() => {
+            return () => {
+                if (editorRef.current) {
+                    editorRef.current.dispose();
+                }
+            };
+        }, []);
+
+        return (
+            <Editor
+                path={filePath}
+                height={height}
+                theme={editorTheme}
+                value={content}
+                language={language}
+                onChange={handleChange}
+                onMount={handleEditorDidMount}
+                options={{
+                    ...options,
+                    minimap: { enabled: false },
+                    wordWrap: 'on',
+                    autoIndent: 'full',
+                    tabSize: 2,
+                }}
+            />
+        );
+    }
+);
+
+MonacoEditor.displayName = 'MonacoEditor';
+
+export default MonacoEditor;

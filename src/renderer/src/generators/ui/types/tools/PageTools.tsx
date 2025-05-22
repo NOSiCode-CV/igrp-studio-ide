@@ -1,4 +1,5 @@
 import { Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
     TooltipContent,
@@ -11,6 +12,7 @@ interface ToolsProps {
 }
 
 const PageTools = ({ onEdit }: ToolsProps) => {
+    const { t } = useTranslation();
     return (
         <div className="absolute z-10 right-0 rounded opacity-0 group-hover/page:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
             <TooltipProvider>
@@ -24,7 +26,7 @@ const PageTools = ({ onEdit }: ToolsProps) => {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Edit</p>
+                        <p>{t('edit')}</p>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>

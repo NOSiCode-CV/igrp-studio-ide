@@ -54,7 +54,7 @@ export function NextConfig({
                     onChange={(e) =>
                         onChange({ ...data, description: e.target.value })
                     }
-                    placeholder="Project description"
+                    placeholder={t('projectDescription')}
                 />
             </div>
         </div>

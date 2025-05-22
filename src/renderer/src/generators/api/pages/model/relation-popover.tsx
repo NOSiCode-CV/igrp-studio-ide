@@ -180,7 +180,7 @@ export function RelationPopover({
                                                     })
                                                 }
                                                 placeholder={t(
-                                                    'entityNamePlaceholder'
+                                                    t('entityNamePlaceholder')
                                                 )}
                                             />
                                             <p className="text-xs text-muted-foreground ">
@@ -265,7 +265,7 @@ export function RelationPopover({
                                                 })
                                             }
                                             placeholder={t(
-                                                'fieldNamePlaceholder'
+                                                t('fieldNamePlaceholder')
                                             )}
                                         />
                                     </div>
@@ -289,7 +289,7 @@ export function RelationPopover({
                                                 })
                                             }
                                             placeholder={t(
-                                                'fieldNamePlaceholder'
+                                               t('fieldNamePlaceholder')
                                             )}
                                         />
                                     </div>
@@ -368,7 +368,7 @@ export function RelationPopover({
                                         ),
                                     });
                                 }}
-                                placeholder="Select cascade types..."
+                                placeholder={t('selectCascadeTypes')}
                             />
                         </div>
                     </TabsContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import {
@@ -33,12 +34,15 @@ export default function MultipleSelector({
     placeholder = 'Select items...',
 }: MultiSelectProps) {
     const [open, setOpen] = React.useState(false);
+    
+    const { t } = useTranslation();
 
     const handleUnselect = (item: string) => {
         onChange(value.filter((i) => i !== item));
     };
 
     return (
+        
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
@@ -83,7 +87,7 @@ export default function MultipleSelector({
                     <div className="max-h-[60svh]">
                         <Command>
                             <CommandInput placeholder={placeholder} />
-                            <CommandEmpty>No item found.</CommandEmpty>
+                            <CommandEmpty>{t('noItemFound')}</CommandEmpty>
                             <CommandGroup>
                                 {options && options.map((option) => (
                                     <CommandItem

@@ -1,6 +1,7 @@
 'use client';
 
 import { Bug } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -26,6 +27,7 @@ interface ConsoleMessage {
 }
 
 export function DebugTerminal() {
+    const { t } = useTranslation();
     return (
         <Drawer modal={false}>
             <Tooltip>
@@ -36,7 +38,7 @@ export function DebugTerminal() {
                         </Button>
                     </DrawerTrigger>
                 </TooltipTrigger>
-                <TooltipContent>Debug</TooltipContent>
+                <TooltipContent>{t('debug')}</TooltipContent>
             </Tooltip>
             <DrawerContent
                 aria-describedby={undefined}
@@ -56,7 +58,7 @@ export function DebugTerminal() {
                                 className="rounded-none data-[state=active]:border-b-1 data-[state=active]:border-primary data-[state=active]:shadow-none px-4"
                             >
                                 <Bug className="h-4 w-4 mr-2" />
-                                Debug
+                                {t('debug')}
                             </IGRPTabsTrigger>
                         </IGRPTabsList>
                         <div className="flex-1 overflow-hidden">
@@ -103,6 +105,7 @@ function ConsoleTab() {
             });
         }
     }, [logs]);
+    const { t } = useTranslation();
 
     return (
         <div className="h-full">
@@ -121,7 +124,7 @@ function ConsoleTab() {
                         </pre>
                     ) : (
                         <div className="text-muted-foreground">
-                            No console logs available
+                            {t('noConsoleLogs')}
                         </div>
                     )}
                 </div>

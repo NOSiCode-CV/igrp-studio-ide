@@ -10,7 +10,7 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import { useModel } from './useModel';
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import { addNewRow, handleChangeValueObject, removeRow } from '../../helpers';
 import { btnLabels, defaultValues, TabList } from './config';
 import { useTranslation } from 'react-i18next';

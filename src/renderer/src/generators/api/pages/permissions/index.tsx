@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import { usePermisisonValidation } from './validation';
-import { FormList } from '../../components/form-list';
+import { FormList } from '../../../../components/form-list';
 import { getTablesColumns, defaultInitialValues } from './config';
 import { PermissionConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
@@ -73,7 +73,7 @@ export const PermissionsLayout = ({
                             return data;
                         } catch (error) {
                             console.error(
-                                `Failed to load JSON content for permission ${permission.name}:`,
+                               t("errorLoadJsonPermission", { permissionName: "ReadAccess" }),
                                 error
                             );
                             return null;
@@ -88,11 +88,11 @@ export const PermissionsLayout = ({
                     filteredPermissions as PermissionConfig[]
                 );
                 formik.setFieldValue(
-                    'permissions',
+                    t('permissions'),
                     filteredPermissions as PermissionConfig[]
                 );
             } catch (error) {
-                console.error('Failed to load JSON content:', error);
+                console.error(t("failedLoadJsonContent"), error);
             }
         };
 
@@ -131,7 +131,7 @@ export const PermissionsLayout = ({
     ) => {
         try {
             const config = {
-                name: 'Prmisison',
+                name: 'Permisison',
                 type: 'permission',
                 module: currentItem.module,
             };
@@ -147,7 +147,7 @@ export const PermissionsLayout = ({
             }
 
             formik.setFieldValue(
-                'permissions',
+                 t("permissions"),
                 formik.values.permissions.filter((_, i) => i !== index)
             );
 
@@ -159,9 +159,9 @@ export const PermissionsLayout = ({
     };
 
     const addNewPermission = () => {
-        formik.setFieldValue('permissions', [
+        formik.setFieldValue(t("permissions"), [
             ...formik.values.permissions,
-            { type: 'permission', name: '', description: '', endpoints: [] },
+            { type: t("permission"), name: '', description: '', endpoints: [] },
         ]);
     };
 
@@ -173,7 +173,7 @@ export const PermissionsLayout = ({
         });
     };
 
-    const tabName = 'permissions';
+    const tabName = t("permissions");
 
     console.log(tablesColumns[tabName]);
 

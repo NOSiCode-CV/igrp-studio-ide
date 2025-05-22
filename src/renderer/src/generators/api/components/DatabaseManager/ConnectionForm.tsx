@@ -2,6 +2,7 @@ import { Form, Formik } from 'formik';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
+import { useTranslation } from 'react-i18next';
 import {
     Tabs,
     TabsContent,
@@ -28,22 +29,15 @@ interface ConnectionFormProps {
     onCancel: () => void;
 }
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Connection name is required'),
-    databaseType: Yup.string().required('Database type is required'),
-    host: Yup.string().required('Host is required'),
-    port: Yup.number()
-        .required('Port is required')
-        .min(1, 'Port must be greater than 0'),
-    user: Yup.string().required('Username is required'),
-    password: Yup.string().required('Password is required'),
-});
+
 
 export function ConnectionForm({
     connection,
     onSubmit,
     onCancel,
 }: ConnectionFormProps) {
+    
+    const { t } = useTranslation()
     const { showErrorToast, showSuccessToast } = useToast();
 
     const handleTestConnection = async (e, values) => {
@@ -56,7 +50,19 @@ export function ConnectionForm({
         } else showErrorToast(message);
     };
 
+    const validationSchema = Yup.object({
+    name: Yup.string().required(t('ConnectionNameRequired')),
+    databaseType: Yup.string().required(t('DatabaseTypeRequired')),
+    host: Yup.string().required(t('HostRequired')),
+    port: Yup.number()
+        .required(t('PortRequired'))
+        .min(1, t('PortGreaterThanZero')),
+    user: Yup.string().required(t('UsernameRequired')),
+    password: Yup.string().required(t('PasswordRequired')),
+});
+
     return (
+        
         <Formik
             initialValues={{
                 name: connection.name || '',
@@ -86,17 +92,17 @@ export function ConnectionForm({
                     <Tabs defaultValue="general" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="general">
-                                General Connection
+                            {t('generalConnection')}
                             </TabsTrigger>
                             <TabsTrigger value="ssh">
-                                SSH Connection
+                            {t('sshConnection')}
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="general">
                             <div className="space-y-4 grid md:grid-cols-1">
                                 <div>
                                     <Label htmlFor="name">
-                                        Connection Name
+                                    {t('connectionName')}
                                     </Label>
                                     <Input
                                         id="name"
@@ -104,7 +110,7 @@ export function ConnectionForm({
                                         value={values.name}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        placeholder="My Database Connection"
+                                        placeholder={t('general')}
                                         required
                                     />
                                     {errors.name && touched.name && (
@@ -114,14 +120,14 @@ export function ConnectionForm({
 
                                 <div className="flex flex-col space-y-1">
                                     <Label htmlFor="databaseType">
-                                        Database Type
+                                    {t('databaseType')}
                                     </Label>
                                     <IGRPCombobox
                                         options={databaseTypes}
                                         value={values.databaseType}
                                         onChange={(value) => {
                                             setFieldValue(
-                                                'databaseType',
+                                                t('databaseType'),
                                                 value
                                             );
                                         }}
@@ -136,7 +142,7 @@ export function ConnectionForm({
                                 <div className="grid grid-cols-12 gap-2">
                                     <div className="col-span-9">
                                         <div>
-                                            <Label htmlFor="host">Host</Label>
+                                            <Label htmlFor="host">{t('host')}</Label>
                                             <Input
                                                 id="host"
                                                 name="host"
@@ -156,7 +162,7 @@ export function ConnectionForm({
 
                                     <div className="col-span-3">
                                         <div>
-                                            <Label htmlFor="port">Port</Label>
+                                            <Label htmlFor="port">{t('port')}</Label>
                                             <Input
                                                 id="port"
                                                 name="port"
@@ -177,14 +183,14 @@ export function ConnectionForm({
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <Label htmlFor="user">Username</Label>
+                                        <Label htmlFor="user">{t('username')}</Label>
                                         <Input
                                             id="user"
                                             name="user"
                                             value={values.user}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            placeholder="Username"
+                                            placeholder={t('username')}
                                         />
                                         {errors.user && touched.user && (
                                             <div className="text-xs">
@@ -195,7 +201,7 @@ export function ConnectionForm({
 
                                     <div>
                                         <Label htmlFor="password">
-                                            Password
+                                        {t('password')}
                                         </Label>
                                         <Input
                                             id="password"
@@ -204,7 +210,7 @@ export function ConnectionForm({
                                             value={values.password}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            placeholder="Password"
+                                            placeholder={t('Password')}
                                         />
                                         {errors.password &&
                                             touched.password && (
@@ -216,7 +222,7 @@ export function ConnectionForm({
                                 </div>
                                 <div>
                                     <Label htmlFor="database">
-                                        Database Name
+                                    {t('databaseName')}
                                     </Label>
                                     <Input
                                         id="database"
@@ -247,14 +253,14 @@ export function ConnectionForm({
                             type="button"
                             onClick={(e) => handleTestConnection(e, values)}
                         >
-                            Test connection
+                            {t('testConnection')}
                         </Button>
                         <div className="flex space-x-2 mt-4">
                             <Button variant="outline" onClick={onCancel}>
-                                Cancel
+                            {t('cancel')}
                             </Button>
                             <Button type="submit">
-                                {connection.name ? 'Update' : 'Add'} Connection
+                                {connection.name ? t('Update') : t('Add')} Connection
                             </Button>
                         </div>
                     </div>

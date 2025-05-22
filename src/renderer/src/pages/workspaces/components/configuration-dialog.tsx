@@ -426,12 +426,12 @@ export function ConfigurationDialog({
             <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                     <DialogTitle>
-                        {isNew ? 'Add New Service' : 'Edit Service'}
+                        {isNew ? t('addNewService') : t('addNewService')}
                     </DialogTitle>
                     <DialogDescription>
                         {isNew
-                            ? 'Configure a new Docker service for your workspace.'
-                            : 'Modify the configuration for this Docker service.'}
+                            ? t('configureNewDockerService')
+                            : t('modifyDockerService')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -440,12 +440,12 @@ export function ConfigurationDialog({
                     className="flex-1 overflow-hidden flex flex-col"
                 >
                     <TabsList className="grid grid-cols-4 mb-4 w-full">
-                        <TabsTrigger value="basic">Basic</TabsTrigger>
-                        <TabsTrigger value="config">Configuration</TabsTrigger>
+                        <TabsTrigger value="basic">{t('basic')}</TabsTrigger>
+                        <TabsTrigger value="config">{t('configuration')}</TabsTrigger>
                         <TabsTrigger value="dependencies">
-                            Dependencies
+                        {t('dependencies')}
                         </TabsTrigger>
-                        <TabsTrigger value="network">Network</TabsTrigger>
+                        <TabsTrigger value="network">{t('network')}</TabsTrigger>
                     </TabsList>
 
                     <ScrollArea className="flex-1 pr-4">
@@ -456,7 +456,7 @@ export function ConfigurationDialog({
                             >
                                 {isNew && (
                                     <div className="space-y-2">
-                                        <Label>Template (Optional)</Label>
+                                        <Label>{t('templateOptional')}</Label>
                                         <IGRPCombobox
                                             value={template}
                                             onChange={(tmpl) =>
@@ -470,18 +470,17 @@ export function ConfigurationDialog({
                                                     };
                                                 }
                                             )}
-                                            placeholder="Select a template"
+                                            placeholder={t('selectTemplate')}
                                             className="w-1/2"
                                         />
                                         <p className="text-xs text-muted-foreground">
-                                            Select a template to pre-fill
-                                            configuration or configure manually.
+                                        {t('selectTemplate')}
                                         </p>
                                     </div>
                                 )}
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Service Name</Label>
+                                    <Label htmlFor="name">{t('serviceName')}</Label>
                                     <Input
                                         id="name"
                                         value={name}
@@ -495,7 +494,7 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <Label htmlFor="description">
-                                        Description
+                                    {t('description')}
                                     </Label>
                                     <Textarea
                                         id="description"
@@ -503,7 +502,7 @@ export function ConfigurationDialog({
                                         onChange={(e) =>
                                             setDescription(e.target.value)
                                         }
-                                        placeholder="Describe this service..."
+                                        placeholder={t('describeServicePlaceholder')}
                                         className="h-20 resize-none"
                                     />
                                 </div>
@@ -511,7 +510,7 @@ export function ConfigurationDialog({
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="image">
-                                            Docker Image
+                                        {t('dockerImage')}
                                         </Label>
                                         <Input
                                             id="image"
@@ -526,7 +525,7 @@ export function ConfigurationDialog({
 
                                     <div className="space-y-2">
                                         <Label htmlFor="type">
-                                            Service Type
+                                        {t('serviceType')}
                                         </Label>
                                         <IGRPCombobox
                                             value={type}
@@ -534,7 +533,7 @@ export function ConfigurationDialog({
                                                 setType(type as string)
                                             }
                                             options={serviceTypes}
-                                            placeholder="Select a type"
+                                            placeholder={t('selectType')}
                                         />
                                     </div>
                                 </div>
@@ -546,7 +545,7 @@ export function ConfigurationDialog({
                             >
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>Ports</Label>
+                                        <Label>{t('ports')}</Label>
                                         <Badge
                                             variant="outline"
                                             className="text-xs"
@@ -585,7 +584,7 @@ export function ConfigurationDialog({
                                             </div>
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
-                                                No ports configured
+                                                {t('noPortsConfigured')}
                                             </p>
                                         )}
 
@@ -609,22 +608,22 @@ export function ConfigurationDialog({
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            Format: HOST_PORT:CONTAINER_PORT
+                                        {t('portsFormat')}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>Environment Variables</Label>
+                                        <Label>{t('environmentVariables')}</Label>
                                         <Badge
                                             variant="outline"
                                             className="text-xs"
                                         >
                                             {environments.length}{' '}
                                             {environments.length === 1
-                                                ? 'variable'
-                                                : 'variables'}
+                                                ? t('variable')
+                                                : t('variables')}
                                         </Badge>
                                     </div>
 
@@ -663,8 +662,7 @@ export function ConfigurationDialog({
                                             </div>
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
-                                                No environment variables
-                                                configured
+                                                {t('noEnvConfigured')}
                                             </p>
                                         )}
 
@@ -676,7 +674,7 @@ export function ConfigurationDialog({
                                                         e.target.value
                                                     )
                                                 }
-                                                placeholder="Variable name"
+                                                placeholder={t('variableName')}
                                                 className="h-8"
                                             />
                                             <div className="flex gap-2">
@@ -687,7 +685,7 @@ export function ConfigurationDialog({
                                                             e.target.value
                                                         )
                                                     }
-                                                    placeholder="Value"
+                                                    placeholder={t('value')}
                                                     className="h-8 flex-1"
                                                 />
                                                 <Button
@@ -706,15 +704,15 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>Volumes</Label>
+                                        <Label>{t('volumes')}</Label>
                                         <Badge
                                             variant="outline"
                                             className="text-xs"
                                         >
                                             {volumes.length}{' '}
                                             {volumes.length === 1
-                                                ? 'volume'
-                                                : 'volumes'}
+                                                ? t('volume')
+                                                : t('volumes')}
                                         </Badge>
                                     </div>
 
@@ -749,7 +747,7 @@ export function ConfigurationDialog({
                                             </div>
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
-                                                No volumes configured
+                                                {t('noVolumesConfigured')}
                                             </p>
                                         )}
 
@@ -773,22 +771,20 @@ export function ConfigurationDialog({
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            Format: VOLUME_NAME:CONTAINER_PATH
-                                            or ./local/path:/container/path
+                                        {t('volumesFormat')}
                                         </p>
                                     </div>
                                 </div>
                             </TabsContent>
 
                             <TabsContent
-                                value="dependencies"
+                                value={t('dependencies')}
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <Label>Connected Services</Label>
+                                    <Label>{t('describeServicePlaceholder')}</Label>
                                     <p className="text-xs text-muted-foreground">
-                                        Select services that must be started
-                                        before this service.
+                                    {t('connectedService')}
                                     </p>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -839,16 +835,15 @@ export function ConfigurationDialog({
                                             </div>
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
-                                                No other services available
+                                                {t('noOtherServices')}
                                             </p>
                                         )}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Project Dependencies</Label>
+                                    <Label>{t('projectDependencies')}</Label>
                                     <p className="text-xs text-muted-foreground">
-                                        Select projects that this project
-                                        depends on.
+                                    {t('selectProjects')}
                                     </p>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -891,7 +886,7 @@ export function ConfigurationDialog({
                                             </div>
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
-                                                No other projects available
+                                                {t('noOtherProjects')}
                                             </p>
                                         )}
                                     </div>
@@ -903,13 +898,13 @@ export function ConfigurationDialog({
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <Label>Network Type</Label>
+                                    <Label>{t('networkType')}</Label>
                                     <Select
                                         value={networkType}
                                         onValueChange={setNetworkType}
                                     >
                                         <SelectTrigger className="h-8">
-                                            <SelectValue placeholder="Select network type" />
+                                            <SelectValue placeholder={t('selectNetworkType')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {networkTypes.map((network) => (
@@ -923,8 +918,7 @@ export function ConfigurationDialog({
                                         </SelectContent>
                                     </Select>
                                     <p className="text-xs text-muted-foreground">
-                                        The type of Docker network to use for
-                                        this service.
+                                    {t('networkDescription')}
                                     </p>
                                 </div>
 
@@ -938,14 +932,14 @@ export function ConfigurationDialog({
                                             }
                                         />
                                         <Label htmlFor="custom-network">
-                                            Use custom network
+                                        {t('useCustomNetwork')}
                                         </Label>
                                     </div>
 
                                     {useCustomNetwork && (
                                         <div className="pl-6 space-y-2">
                                             <Label htmlFor="network-name">
-                                                Network Name
+                                            {t('networkName')}
                                             </Label>
                                             <Input
                                                 id="network-name"
@@ -955,12 +949,11 @@ export function ConfigurationDialog({
                                                         e.target.value
                                                     )
                                                 }
-                                                placeholder="e.g., app_network"
+                                                placeholder={t('exampleNetwork')}
                                                 className="h-8"
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                Custom network name for
-                                                connecting related services.
+                                            {t('customNetworkName')}
                                             </p>
                                         </div>
                                     )}
@@ -978,7 +971,7 @@ export function ConfigurationDialog({
                         onClick={handleSave}
                         disabled={isSubmitting || !name}
                     >
-                        {isSubmitting ? 'Saving...' : 'Save Service'}
+                        {isSubmitting ?  t('saving') : t('saveService')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

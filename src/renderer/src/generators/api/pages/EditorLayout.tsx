@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import MonacoEditor from '@renderer/components/monaco-editor';
+import { useTranslation } from 'react-i18next';
 
 export const EditorLayout = ({ currentItem }) => {
+    const { t } = useTranslation();
     const [data, setData] = useState<any>(null);
     const [filePath, setFilePath] = useState<string>('');
 
@@ -12,7 +14,7 @@ export const EditorLayout = ({ currentItem }) => {
             setData(data);
             setFilePath(currentItem.path);
         } catch (error) {
-            console.error('Failed to load JSON content:', error);
+            console.error(t("failedLoadJsonContent"), error);
         }
     };
 
@@ -29,7 +31,7 @@ export const EditorLayout = ({ currentItem }) => {
                 />
             ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
-                    Select a file to edit
+                   {t('selectFileToEdit')}
                 </div>
             )}
         </div>

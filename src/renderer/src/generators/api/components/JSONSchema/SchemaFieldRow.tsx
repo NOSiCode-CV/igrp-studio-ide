@@ -73,7 +73,7 @@ export function SchemaFieldRow({
 
     const handleSave = () => {
         if (name.trim() === '') {
-            onAlert('Field name cannot be empty. Please enter a valid name.');
+            onAlert(t('FieldNameEmpty'));
             return;
         }
         const updatedField = { ...field, name, type, description };
@@ -90,7 +90,7 @@ export function SchemaFieldRow({
 
     const handleNameBlur = () => {
         if (name.trim() === '') {
-            onAlert('Field name cannot be empty. Please enter a valid name.');
+            onAlert(t('FieldNameEmpty'));
             return;
         }
         if (field.name !== name) {

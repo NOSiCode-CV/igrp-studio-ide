@@ -1,19 +1,16 @@
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-import { useTabs } from '@renderer/components/navigation/TabContext';
 import { Button } from '@renderer/components/ui/button';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
-import { OPTION_TYPE } from '@renderer/constants/appConstants';
-import { AppWindowMac,  Eye, FileJsonIcon } from 'lucide-react';
+import { APRESENTATION } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
-import PreviewMenu from './preview-menu';
 
 interface NavigationBarProps {
-    isDesign: boolean;
-    onSwitch?: () => void;
+    activePresentation: string;
+    onSwitch: (activePresentation: string) => void;
     onSave?: () => void;
     basePath: string;
     page: string;
@@ -22,21 +19,18 @@ interface NavigationBarProps {
 const NavigationBar = ({
     onSwitch,
     onSave,
-    basePath,
-    isDesign,
+    activePresentation,
 }: NavigationBarProps) => {
     const { t } = useTranslation();
 
-    const { tabs, activeTab, initializeTabFromCurrentItem } = useTabs();
-
+    /*     const { tabs, activeTab, initializeTabFromCurrentItem } = useTabs();
+     */
     const handleSaveClick = () => {
         onSave?.();
     };
 
-    const onClickSourceCode = () => {
+    /*     const onClickSourceCode = () => {
         const tab = tabs.filter((t) => t.id === activeTab);
-
-        console.log(tab);
 
         const page = tab[0];
         initializeTabFromCurrentItem({
@@ -44,13 +38,14 @@ const NavigationBar = ({
             type: OPTION_TYPE.FILE_THREE,
             label: `${page.item.label}.tsx`,
         });
-    };
+    }; */
 
     return (
         <TooltipProvider>
             <div className="flex flex-1 justify-end items-center space-x-2">
-                <PreviewMenu basePath={basePath}/>
-                <Tooltip>
+                {/*  <PreviewMenu basePath={basePath} /> */}
+
+                {/*   <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
                             size="sm"
@@ -61,27 +56,64 @@ const NavigationBar = ({
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>{t('sourceCode')}</TooltipContent>
-                </Tooltip>
+                </Tooltip> */}
+                <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
+                    <Button
+                        size="sm"
+                        variant={
+                            activePresentation === APRESENTATION.CODE
+                                ? 'outline'
+                                : 'ghost'
+                        }
+                        onClick={() => onSwitch(APRESENTATION.CODE)}
+                        className="h-7"
+                    >
+                        Code
+                    </Button>
+                    <Button
+                        size="sm"
+                        onClick={() => onSwitch(APRESENTATION.DESIGN)}
+                        variant={
+                            activePresentation === APRESENTATION.DESIGN
+                                ? 'outline'
+                                : 'ghost'
+                        }
+                        className="h-7"
+                    >
+                        Design
+                    </Button>
+                    <Button
+                        size="sm"
+                        onClick={() => onSwitch(APRESENTATION.JSON)}
+                        variant={
+                            activePresentation === APRESENTATION.JSON
+                                ? 'outline'
+                                : 'ghost'
+                        }
+                        className="h-7"
+                    >
+                        Json
+                    </Button>
+                </div>
+                {/*  <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="sm"
+                                onClick={onSwitch}
+                                variant={'secondary'}
+                            >
+                                {isDesign ? <FileJsonIcon /> : <Eye />}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {isDesign ? 'Show Code [JSON]' : 'Show Design'}
+                        </TooltipContent>
+                    </Tooltip>
+                </div> */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button
-                            size="sm"
-                            onClick={onSwitch}
-                            variant={'secondary'}
-                        >
-                            {isDesign ? <FileJsonIcon /> : <Eye />}
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        {isDesign ? 'Show Code [JSON]' : 'Show Design'}
-                    </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            size="sm"
-                            onClick={handleSaveClick}
-                        >
+                        <Button size="sm" onClick={handleSaveClick}>
                             {t('save')}
                         </Button>
                     </TooltipTrigger>

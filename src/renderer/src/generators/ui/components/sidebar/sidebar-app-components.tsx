@@ -61,7 +61,6 @@ const SidebarAppComponents = ({ searchTerm }: { searchTerm: string }) => {
                     <EmptyList
                         title="No components created yet"
                         description="Components let you reuse designs in your application. To create a component."
-                        shortcut="Command + Shift + P"
                         className="py-12"
                     />
                 </div>

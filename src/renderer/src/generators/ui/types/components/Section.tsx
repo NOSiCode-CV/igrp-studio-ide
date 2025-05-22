@@ -11,6 +11,7 @@ import { APP_COMPONENT } from '../../ComponentTypes';
 import { ComponentRenderer } from '../ComponentRenderer';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import SectionTool from '../tools/SectionTool';
+import { useTranslation } from 'react-i18next';
 
 export interface SectionProps {
     isDisabled?: boolean;
@@ -25,6 +26,7 @@ const Section = ({
     onDragEnd,
     onAddControl,
 }: SectionProps) => {
+    const { t } = useTranslation();
     const { children: components, id: componentId } = comp || {};
 
     const { initializeTabFromCurrentItem } = useTabs();
@@ -90,8 +92,8 @@ const Section = ({
                 onDrop={handleDrop}
                 component={comp}
                 className={cn(
-                    'hover:border-none space-y-6',
-                    isDisabled && 'border-none hover:border-red-500'
+                    'hover:border-none space-y-1',
+                    isDisabled && 'border-none hover:border-destructive'
                 )}
             >
                 {components && components.length > 0 ? (
@@ -109,7 +111,7 @@ const Section = ({
                                     isDisabled={isDisabled}
                                     className={cn(
                                         comp.type === APP_COMPONENT &&
-                                            'hover:border-red-500'
+                                            'hover:border-destructive'
                                     )}
                                 >
                                     <BoxContainer
@@ -137,7 +139,7 @@ const Section = ({
                                     </BoxContainer>
                                 </Draggable>
                             ) : (
-                                <div key={comp.id}>Loading...</div>
+                                <div key={comp.id}>{t('loading')}</div>
                             );
                         }
                     )

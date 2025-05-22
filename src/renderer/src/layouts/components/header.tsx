@@ -203,13 +203,13 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                         </BreadcrumbItem>
                                         <BreadcrumbItem className="md:hidden lg:flex">
                                             <BreadcrumbPage>
-                                                {workspace?.name}
+                                                {workspace.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator />
                                         <BreadcrumbItem>
                                             <BreadcrumbPage className="truncate">
-                                                {config?.name}
+                                                {config.name}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                     </BreadcrumbList>
@@ -269,7 +269,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                                         iconName={config.icon}
                                                     />
                                                     <span>
-                                                        Open in {config.name}
+                                                        {t('openIn')} {config.name}
                                                     </span>
                                                 </DropdownMenuItem>
                                             );

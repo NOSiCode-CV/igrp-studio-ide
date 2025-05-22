@@ -1,5 +1,3 @@
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -16,12 +14,22 @@ import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils/helpers';
 import { Button } from '@renderer/components/ui/button';
+import { FocusEvent } from 'react';
+import {
+    CheckboxInput,
+    TextInput,
+} from '@renderer/generators/api/components/inputs-form';
 
 const initialValues: PageConfig = {
     type: 'page',
     pageName: '',
-    path: 'teste',
-    id: getId()
+    path: '',
+    description: undefined,
+    forceDynamic: false,
+    id: '',
+    types: [],
+    states: [],
+    functions: [],
 };
 
 interface NewPageModalProps {
@@ -46,7 +54,7 @@ export function NewPageModal({
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
             const { error } = await window.engine.createPage(
-                pageConfig,
+                { ...pageConfig, id: getId() },
                 ENV_TYPES.NEXTJS,
                 basePath
             );
@@ -73,6 +81,15 @@ export function NewPageModal({
         pageName: Yup.string()
             .required(t('thisFieldRequired', { name: t('pageName') }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
+
+        path: Yup.string()
+            .required(t('thisFieldRequired', { name: t('path') }))
+            .matches(
+                PATTERNS.VALID_SEGMENT_PATTERN,
+                t(
+                    'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
+                )
+            ),
     });
 
     const formik = useFormik<PageConfig>({
@@ -85,36 +102,62 @@ export function NewPageModal({
         },
     });
 
+    const handleNameBlur = async (
+        e: FocusEvent<HTMLInputElement>
+    ): Promise<void> => {
+        formik.handleBlur(e);
+
+        if (formik.values.path) return;
+        const generatedPath = `${formik.values.pageName.toLowerCase().replace(/\s+/g, '-')}`;
+        formik.setFieldValue('path', generatedPath);
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogTitle>{t('createNewPage')}</DialogTitle>
-                <DialogDescription>{t('comonDialogtDescription', {'name':'Page'})}</DialogDescription>
+                <DialogDescription>
+                    {t('comonDialogtDescription', { name: 'Page' })}
+                </DialogDescription>
                 <form
-                    className="needs-validation"
+                    className="needs-validation space-y-4"
                     onSubmit={(e) => {
                         e.preventDefault();
                         formik.handleSubmit();
                     }}
                 >
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="pageName">{t('pageName')}</Label>
-                            <Input
-                                id="pageName"
-                                className="col-span-3"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.pageName || ''}
-                            />
-                        </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        <TextInput
+                            id="pageName"
+                            label={t('pageName')}
+                            onChange={formik.handleChange}
+                            onBlur={handleNameBlur}
+                            value={formik.values.pageName || ''}
+                            isTouched={formik.touched.pageName}
+                            error={formik.errors.pageName}
+                            isRequired
+                        />
+                        <TextInput
+                            id="path"
+                            label="Path"
+                            placeholder="e.g. /docs/[[...slug]] or /(auth)/dashboard"
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            value={formik.values.path || ''}
+                            isTouched={formik.touched.path}
+                            error={formik.errors.path}
+                            isRequired
+                        />
+
+                        <CheckboxInput
+                            id="forceDynamic"
+                            label={t('forceDynamic')}
+                            onChange={formik.handleChange}
+                            value={formik.values.forceDynamic}
+                        />
                     </div>
-                    <DialogFooter className='flex justify-between'>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={onClose}
-                        >
+                    <DialogFooter className="flex justify-between">
+                        <Button type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
                         </Button>
                         <Button
@@ -122,7 +165,7 @@ export function NewPageModal({
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? 'Saving...' : 'Save'}
+                            {formik.isSubmitting ?  t("saving") : t("save")}
                         </Button>
                     </DialogFooter>
                 </form>

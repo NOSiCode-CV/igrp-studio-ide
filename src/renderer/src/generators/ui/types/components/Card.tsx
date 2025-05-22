@@ -5,7 +5,6 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { COMPONENT } from '../../ComponentTypes';
 import {
-    IGRPCard,
     IGRPCardContent,
     IGRPCardFooter,
     IGRPCardHeader,
@@ -13,9 +12,9 @@ import {
 import { getLabel } from '@renderer/utils/helpers';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
-import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
+import TableTool from '../tools/tableTool';
 
 export interface CardProps {
     isDisabled?: boolean;
@@ -35,7 +34,9 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
         id: componentId,
         componentName: parentComponentName,
     } = comp;
-    const [loadedComponents, setLoadedComponents] = useState<Record<string, React.ComponentType<any>>>({});
+    const [loadedComponents, setLoadedComponents] = useState<
+        Record<string, React.ComponentType<any>>
+    >({});
     const { setEditingComponent } = useDroppedComponents();
     const { dynamicImport } = useStudio();
 
@@ -43,15 +44,20 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     useEffect(() => {
         const loadComponents = async () => {
             const comps: Record<string, React.ComponentType<any>> = {};
-            
+
             // Load all child components in parallel
-            const loadPromises = components.flatMap(child => 
+            const loadPromises = components.flatMap((child) =>
                 child.children.map(async (grandChild) => {
                     try {
-                        const component = await dynamicImport(grandChild.componentName);
+                        const component = await dynamicImport(
+                            grandChild.componentName
+                        );
                         comps[grandChild.id] = component;
                     } catch (error) {
-                        console.error(`Failed to load component ${grandChild.componentName}:`, error);
+                        console.error(
+                            `Failed to load component ${grandChild.componentName}:`,
+                            error
+                        );
                     }
                 })
             );
@@ -63,75 +69,104 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
         loadComponents();
     }, [dynamicImport, components]);
 
-    const handleEdit = useCallback((component: StructuredComponent, path: string) => {
-        setEditingComponent({ path, component });
-    }, [setEditingComponent]);
+    const handleEdit = useCallback(
+        (component: StructuredComponent, path: string) => {
+            setEditingComponent({ path, component });
+        },
+        [setEditingComponent]
+    );
 
-    const renderChildComp = useCallback((component: StructuredComponent) => {
-        const { children: childComponents, componentName } = component;
-        const path = parentComponentName;
+    const renderChildComp = useCallback(
+        (component: StructuredComponent) => {
+            const { children: childComponents, componentName } = component;
+            const path = parentComponentName;
 
-        return (
-            <Droppable component={component} onDrop={onDragEnd} className="p-0">
-                <TableTool
-                    comp={component}
-                    parentComp={comp}
-                    onEdit={() => handleEdit(component, path)}
-                />
-                {childComponents.length === 0 ? (
-                    <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
-                ) : (
-                    childComponents.map((child, index) => {
-                        const Component = loadedComponents[child.id];
-                        if (!Component) return null;
+            return (
+                <Droppable
+                    component={component}
+                    onDrop={onDragEnd}
+                    className="space-y-2"
+                >
+                    {childComponents.length === 0 ? (
+                        <GenNoInfoComp
+                            type={getLabel(componentName).toUpperCase()}
+                        />
+                    ) : (
+                        childComponents.map((child, index) => {
+                            const Component = loadedComponents[child.id];
+                            if (!Component) return null;
 
-                        return (
-                            <Draggable
-                                key={child.id}
-                                item={child}
-                                index={index}
-                                mode="MOVE"
-                                layout="horizontal"
-                                dropTargetId={componentId}
-                                className={cn('border-none')}
-                            >
-                                <BoxField
+                            return (
+                                <Draggable
+                                    key={child.id}
+                                    item={child}
                                     index={index}
-                                    parentComp={comp}
-                                    comp={child}
-                                    path={path}
-                                    onEdit={() => handleEdit(child, path)}
+                                    mode="MOVE"
+                                    dropTargetId={componentId}
+                                    className="p-1"
                                 >
-                                    <Component comp={child} onDragEnd={onDragEnd} />
-                                </BoxField>
-                            </Draggable>
-                        );
-                    })
-                )}
-            </Droppable>
-        );
-    }, [componentId, handleEdit, loadedComponents, onDragEnd, parentComponentName, comp]);
+                                    <BoxField
+                                        index={index}
+                                        parentComp={comp}
+                                        comp={child}
+                                        path={path}
+                                        onEdit={() => handleEdit(child, path)}
+                                        group="group/card-content-item"
+                                        className="opacity-0 group-hover/card-content-item:opacity-100"
+                                    >
+                                        <Component
+                                            comp={child}
+                                            onDragEnd={onDragEnd}
+                                        />
+                                    </BoxField>
+                                </Draggable>
+                            );
+                        })
+                    )}
+                </Droppable>
+            );
+        },
+        [
+            componentId,
+            handleEdit,
+            loadedComponents,
+            onDragEnd,
+            parentComponentName,
+            comp,
+        ]
+    );
 
     return (
-        <IGRPCard className="flex flex-col gap-1">
+        <div className="w-full flex flex-col gap-3">
             {components.map((child, index) => {
                 const { componentName, properties } = child;
-                const { className, commonProperties, ...args } = properties || {};
+                const { className, commonProperties, ...args } =
+                    properties || {};
                 const Component = COMPONENT_MAP[componentName];
-                
+
                 if (!Component) return null;
 
                 return (
-                    <Component
+                    <div
                         key={index}
                         {...args}
-                        className={cn('w-full group/table', className)}
+                        className={cn(
+                            'bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table',
+                            className
+                        )}
                     >
+                        <TableTool
+                            parentComp={comp}
+                            comp={child}
+                            onEdit={() => handleEdit(child, componentName)}
+                            group="group/card-comp"
+                            className="opacity-0 group-hover/card-comp:opacity-100"
+                        />
                         {renderChildComp(child)}
-                    </Component>
+                    </div>
                 );
             })}
-        </IGRPCard>
+        </div>
     );
 };
 

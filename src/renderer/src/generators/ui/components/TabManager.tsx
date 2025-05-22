@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import FormEngine from '../FormEngine';
+import FormEngine from '../page-builder';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import MainPageBuilder from '../page/list-pages';
 import { Separator } from '@renderer/components/ui/separator';
@@ -14,7 +14,7 @@ import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
 import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout';
-import { OPTION_TYPE } from '@renderer/constants/appConstants';
+import { APRESENTATION, OPTION_TYPE } from '@renderer/constants/appConstants';
 
 interface ContentProps {
     basePath: string;
@@ -34,8 +34,8 @@ export default function TabManager({ basePath }: ContentProps) {
     } = useTabs();
 
     // Track the isDesign state for each tab
-    const [isDesignStates, setIsDesignStates] = useState<{
-        [key: string]: boolean;
+    const [activePresentation, setAtivePresentation] = useState<{
+        [key: string]: string;
     }>({});
 
     // Ref to hold the handleSave function from FormEngine
@@ -56,15 +56,15 @@ export default function TabManager({ basePath }: ContentProps) {
         formEngineRefs.current[activeTab]?.handleSave();
     };
 
-    const handleSwitchClick = () => {
-        setIsDesignStates((prevState) => ({
+    const handleSwitchClick = (activePresentation: string) => {
+        setAtivePresentation((prevState) => ({
             ...prevState,
-            [activeTab]: !prevState[activeTab],
+            [activeTab]: activePresentation,
         }));
     };
 
     return (
-        <div className='flex-1'>
+        <div className="flex-1">
             <TabsNavigation
                 tabs={tabs}
                 activeTab={activeTab}
@@ -74,7 +74,10 @@ export default function TabManager({ basePath }: ContentProps) {
             >
                 {activeTab !== TAB_DEFAULT && (
                     <NavigationBar
-                        isDesign={isDesignStates[activeTab] ?? true}
+                        activePresentation={
+                            activePresentation[activeTab] ??
+                            APRESENTATION.DESIGN
+                        }
                         onSave={handleSave}
                         onSwitch={handleSwitchClick}
                         page={activeTab}
@@ -123,8 +126,9 @@ export default function TabManager({ basePath }: ContentProps) {
                                             }}
                                             basePath={basePath}
                                             page={tab.item}
-                                            isDesign={
-                                                isDesignStates[tab.id] ?? true
+                                            activePresentation={
+                                                activePresentation[tab.id] ??
+                                                APRESENTATION.DESIGN
                                             }
                                             onSave={handleSave}
                                         />

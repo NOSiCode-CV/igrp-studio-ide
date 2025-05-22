@@ -12,7 +12,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
-import { FileTree, HandlerResponse, IOpenProject } from './types';
+import { FileTree, IOpenProject } from './types';
 
 import {
     checkAndReadBaseApi,
@@ -37,6 +37,7 @@ import './handlers/workspace-handler';
 import './handlers/git-handler';
 import './handlers/docker-handler';
 import './handlers/global-handler';
+import './helpers/fetch-request';
 
 import { buildTaskbar } from './helpers/taskbar';
 import {
@@ -53,6 +54,7 @@ import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection';
 import { NextjsEngine } from './engines/NextjsEngine';
 import { WorkspaceRepository } from './services/workspace-service';
 import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
+import { folderWatcher } from './helpers/watch-folder';
 
 const backend = require('i18next-electron-fs-backend');
 
@@ -445,50 +447,6 @@ ipcMain.on('start-drag', (_event) => {
     });
 });
 
-// Handler para buscar versões
-ipcMain.handle(
-    'get-versions',
-    async (_event, endpoint: string): Promise<HandlerResponse> => {
-        try {
-            const response = await fetch(endpoint);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Erro na API: ${response.status} - ${response.statusText}`
-                );
-            }
-
-            const data = await response.json();
-
-            if (!data.items || !Array.isArray(data.items)) {
-                throw new Error('Formato de resposta inesperado');
-            }
-
-            // Retorna somente os números de versão
-            return {
-                result: data.items
-                    .filter((item) => item.version !== null)
-                    .map(
-                        (item: {
-                            version: string;
-                            maven2: { version: string };
-                        }) => item.version || item.maven2?.version
-                    ),
-            };
-        } catch (error) {
-            console.error('Erro ao buscar versões:', error);
-
-            // Retorna o erro no formato definido
-            return {
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : 'Erro desconhecido',
-            };
-        }
-    }
-);
-
 ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
     try {
         const { folderExists, config } = await checkAndReadBaseApi(targetDir);
@@ -569,4 +527,12 @@ ipcMain.handle('download-update', async () => {
 // 📌 IPC para instalar a atualização quando o usuário clicar
 ipcMain.handle('install-update', async () => {
     autoUpdater.quitAndInstall();
+});
+
+
+// Handle folder watching
+ipcMain.handle('watch-folder', (_, folderPath: string) => {
+    return folderWatcher.watchFolder(folderPath, (event) => {
+        mainWindow?.webContents.send('folder-change', event);
+    });
 });
