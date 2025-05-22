@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     Tooltip,
     TooltipContent,
@@ -6,17 +6,16 @@ import {
     TooltipTrigger,
 } from '../ui/tooltip';
 import { icons } from 'lucide-react';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '../ui/command';
 import { getLabel } from '@renderer/utils/helpers';
-import { FixedSizeGrid as Grid } from 'react-window';
+import {
+    FixedSizeGrid as Grid,
+    type FixedSizeGrid as GridType,
+} from 'react-window';
 import { useDebounce } from 'use-debounce';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
+import { ScrollArea } from '../ui/scroll-area';
+import { Button } from '../ui/button';
 
 interface IconBrowserProps {
     selectedIcon: string;
@@ -27,7 +26,6 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 200);
-    const commandRef = useRef<HTMLDivElement>(null);
 
     const iconsList = useMemo(
         () => Object.keys(icons) as (keyof typeof icons)[],
@@ -44,9 +42,17 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const handleIconClick = (iconName: string) => {
         onSelectedIcon(iconName);
         setOpen(false);
+        console.log(iconName);
     };
 
+    const gridRef = useRef<GridType>(null);
+
     const columnCount = 8;
+    const rowCount = Math.ceil(filteredIcons.length / columnCount);
+
+    useEffect(() => {
+        gridRef.current?.scrollTo({ scrollTop: 0 });
+    }, [filteredIcons]);
 
     const Cell = ({ columnIndex, rowIndex, style }: any) => {
         const index = rowIndex * columnCount + columnIndex;
@@ -56,60 +62,58 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
         const IconComponent = icons[iconName];
 
         return (
-            <div style={style} className="p-2 flex items-center justify-center">
-                <CommandItem
-                    key={iconName}
-                    onSelect={() => handleIconClick(iconName)}
-                    className="cursor-pointer"
-                >
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <IconComponent className="h-6 w-6" />
-                        </TooltipTrigger>
-                        <TooltipContent>{getLabel(iconName)}</TooltipContent>
-                    </Tooltip>
-                </CommandItem>
+            <div
+                style={style}
+                className="p-2 flex items-center justify-center cursor-pointer"
+                key={index}
+            >
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <IconComponent
+                            onClick={() => handleIconClick(iconName)}
+                        />
+                    </TooltipTrigger>
+                    <TooltipContent>{getLabel(iconName)}</TooltipContent>
+                </Tooltip>
             </div>
         );
     };
 
+    const SelectedIconComp = icons[selectedIcon];
+
     return (
         <TooltipProvider>
-            <div className="space-y-4">
-                <div className="relative" ref={commandRef}>
-                    <Command className="rounded-lg border shadow-md">
-                        <CommandInput
-                            placeholder="Type to search icon ..."
-                            value={search}
-                            onFocus={() => setOpen(true)}
-                            onValueChange={(val) => {
-                                setSearch(val);
-                                setOpen(true);
-                            }}
-                            className="h-9"
-                        />
-                        {open && (
-                            <CommandList className="max-h-[300px] overflow-auto">
-                                <CommandEmpty>No icons found.</CommandEmpty>
-                                <CommandGroup>
-                                    <Grid
-                                        columnCount={8}
-                                        columnWidth={40}
-                                        height={300}
-                                        rowCount={Math.ceil(
-                                            filteredIcons.length / 8
-                                        )}
-                                        rowHeight={40}
-                                        width={400}
-                                    >
-                                        {Cell}
-                                    </Grid>
-                                </CommandGroup>
-                            </CommandList>
-                        )}
-                    </Command>
-                </div>
-            </div>
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button size={'sm'} variant={'outline'}>
+                        {SelectedIconComp && <SelectedIconComp />}
+                        {selectedIcon || 'Select Icon'}
+                    </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-[435px]">
+                    <IGRPInputSearch
+                        placeholder="Type to search icon ..."
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                        }}
+                    />
+                    <ScrollArea>
+                        <Grid
+                            ref={gridRef}
+                            columnCount={columnCount}
+                            columnWidth={50}
+                            height={300}
+                            rowCount={rowCount}
+                            rowHeight={50}
+                            width={columnCount * 50 + 20}
+                        >
+                            {Cell}
+                        </Grid>
+                    </ScrollArea>
+                </PopoverContent>
+            </Popover>
         </TooltipProvider>
     );
 };

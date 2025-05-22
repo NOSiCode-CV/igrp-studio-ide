@@ -25,6 +25,8 @@ import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
+import { capitalize } from '@renderer/utils/helpers';
+import { COMPONENT } from '../ComponentTypes';
 
 interface LabeledElementField extends ElementField {
     componentId: string;
@@ -105,7 +107,7 @@ export const BindingConfigurationModal = ({
     const compType = getTypeByComponentId(componentId);
 
     const [newBinding, setNewBinding] = useState<boolean>(
-        compType?.path !== ''
+        compType?.path === '' || compType?.path === undefined
     );
 
     const columns = [
@@ -201,15 +203,46 @@ export const BindingConfigurationModal = ({
                     });
 =======
                 ...values,
-                path: !newBinding ? typeFilePath : '',
+                path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 
             if (componentId) {
+<<<<<<< HEAD
                 handleUpdateChildComponent(componentId, {
                     ...comp,
                     dataType: values.name,
                 });
 >>>>>>> parent of 6a765cf (UI: component table and form)
+=======
+                //TODO For revisions
+
+                let defaultValues: any = undefined;
+                if (comp.componentName === COMPONENT.Form) {
+                    defaultValues = {
+                        ...comp.data?.defaultValues,
+                        state: {
+                            ...comp.data?.defaultValues.state,
+                            name: comp.data?.defaultValues.state?.name ?? '',
+                            defaultValue: `init${capitalize(values.name)}`,
+                            type: comp.data?.defaultValues.state?.type ?? '',
+                            id: comp.data?.defaultValues.state?.id ?? '',
+                        },
+                    };
+
+                    handleUpdateChildComponent(componentId, {
+                        ...comp,
+                        dataType: values.name,
+                        data: {
+                            ...comp.data,
+                            defaultValues,
+                        },
+                    });
+                } else
+                    handleUpdateChildComponent(componentId, {
+                        ...comp,
+                        dataType: values.name,
+                    });
+>>>>>>> parent of 8b487e9 (Revert "UI: component table and form")
 
                 values.fields.forEach(({ componentId: id, name }) => {
                     const component = componentMap.get(id);

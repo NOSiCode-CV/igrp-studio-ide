@@ -437,6 +437,7 @@ const FncComponent = ({
                     formik={formik}
                     editorRef={editorRef}
                     side="right"
+                    componentTag={''}
                 />
             </DialogContent>
         </Dialog>
