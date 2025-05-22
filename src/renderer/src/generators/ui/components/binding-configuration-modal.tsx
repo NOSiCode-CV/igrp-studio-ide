@@ -25,8 +25,6 @@ import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
-import { capitalize } from '@renderer/utils/helpers';
-import { COMPONENT } from '../ComponentTypes';
 
 interface LabeledElementField extends ElementField {
     componentId: string;
@@ -107,7 +105,7 @@ export const BindingConfigurationModal = ({
     const compType = getTypeByComponentId(componentId);
 
     const [newBinding, setNewBinding] = useState<boolean>(
-        compType?.path === '' || compType?.path === undefined
+        compType?.path !== ''
     );
 
     const columns = [
@@ -168,6 +166,7 @@ export const BindingConfigurationModal = ({
             const { label, ...rest } = values;
 
             createOrUpdateType({
+<<<<<<< HEAD
                 ...rest,
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
@@ -200,6 +199,17 @@ export const BindingConfigurationModal = ({
                         ...comp,
                         dataType: values.name,
                     });
+=======
+                ...values,
+                path: !newBinding ? typeFilePath : '',
+            });
+
+            if (componentId) {
+                handleUpdateChildComponent(componentId, {
+                    ...comp,
+                    dataType: values.name,
+                });
+>>>>>>> parent of 6a765cf (UI: component table and form)
 
                 values.fields.forEach(({ componentId: id, name }) => {
                     const component = componentMap.get(id);
