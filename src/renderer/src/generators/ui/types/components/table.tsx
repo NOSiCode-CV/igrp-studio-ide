@@ -23,6 +23,7 @@ import TableTool from '../tools/tableTool';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { Badge } from '@renderer/components/ui/badge';
 import { useFakedata } from '../../hooks/useFakeData';
+import { faker } from '@faker-js/faker';
 
 export interface TableProps {
     isDisabled?: boolean;
@@ -138,7 +139,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             <Checkbox id={child.id} checked={row[child.id]} />
                         ) : child.componentName ===
                           COMPONENT.TableableBadgeCell ? (
-                            <Badge variant="secondary">Badge</Badge>
+                            <Badge variant="secondary">{faker.lorem.words(1)}</Badge>
                         ) : child.componentName ===
                           COMPONENT.TableActionListCell ? (
                             <Button variant="secondary" size="icon">
