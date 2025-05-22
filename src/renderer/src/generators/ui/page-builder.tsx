@@ -144,6 +144,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     if (pagePath === undefined) return;
 
                     const data = await window.api.getJsonContent(pagePath);
+                 
                     if (data.components) {
                         setLoading(true);
                         setAllComponents(data.components);

@@ -7,8 +7,6 @@ import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
-import { getLabel } from '@renderer/utils/helpers';
 import GenNoInfoField from '../../components/GenNoInfoField';
 
 export interface FormComponentProps {

@@ -60,7 +60,7 @@ export const ResponseLayout = ({
                                 value={formik.values.statusCode}
                                 onChange={(value) => {
                                     formik.setFieldValue(t("statusCode"), value);
-                                    handleChangeCode(value);
+                                    handleChangeCode(value as string);
                                 }}
                                 onBlur={(value) => {
                                     formik.setFieldValue(t("statusCode"), value);

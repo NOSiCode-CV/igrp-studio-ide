@@ -251,7 +251,7 @@ const ResourceList = <T extends { id?: string; name: string }>({
 const CustomCodeMenu = () => {
     const [openfnc, setOpenFnc] = useState<boolean>(false);
     const [openState, setOpenState] = useState<boolean>(false);
-    console.log(openfnc);
+    
     return (
         <>
             <DropdownMenu>

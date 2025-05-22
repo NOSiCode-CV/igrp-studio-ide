@@ -1,7 +1,6 @@
 import { State, CustomFunctionConfig, CodeSnippetsRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { useDroppedComponents } from "@renderer/generators/ui/dnd/DroppedComponentsContext";
 import useStudio from "@renderer/hooks/use-studio";
-import { StructuredComponent } from "@renderer/lib/dnd/types";
 import { EngineService } from "@renderer/services/EngineService";
 import { useMemo, useState, useEffect } from "react";
 import { useComponents } from "./useComponents";
@@ -24,7 +23,7 @@ interface CustomCodeHook {
 }
 
 const useCustomCode = (): CustomCodeHook => {
-    const { states: drpoppedStates, functions: droppedFunctions, components } = useDroppedComponents();
+    const { states: drpoppedStates, functions: droppedFunctions } = useDroppedComponents();
     const { extractAllStates } = useComponents()
     const [metadataFunctions, setMetadataFunctions] = useState<CustomFunctionConfig[]>([]);
     const [metadataStates, setMetadataStates] = useState<State[]>([]);

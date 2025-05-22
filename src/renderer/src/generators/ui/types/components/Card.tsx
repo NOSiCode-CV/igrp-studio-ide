@@ -111,8 +111,8 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                                         comp={child}
                                         path={path}
                                         onEdit={() => handleEdit(child, path)}
-                                        group="group/card"
-                                        className="opacity-0 group-hover/card:opacity-100"
+                                        group="group/card-content-item"
+                                        className="opacity-0 group-hover/card-content-item:opacity-100"
                                     >
                                         <Component
                                             comp={child}
@@ -159,6 +159,8 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                             parentComp={comp}
                             comp={child}
                             onEdit={() => handleEdit(child, componentName)}
+                            group="group/card-comp"
+                            className="opacity-0 group-hover/card-comp:opacity-100"
                         />
                         {renderChildComp(child)}
                     </div>

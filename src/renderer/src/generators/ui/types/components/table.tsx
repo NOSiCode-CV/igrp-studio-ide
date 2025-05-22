@@ -115,6 +115,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 comp={child}
                                 path={path}
                                 onEdit={() => handleEdit(child, path)}
+                                group="group/table-header"
+                                className="opacity-0 group-hover/table-header:opacity-100"
                             >
                                 <span>{headerTitle || label}</span>
                             </BoxField>
@@ -181,6 +183,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     comp={child}
                                     path={path}
                                     onEdit={() => handleEdit(child, path)}
+                                    group="group/table-filter"
+                                    className="opacity-0 group-hover/table-filter:opacity-100"
                                 >
                                     <Component
                                         comp={child}
@@ -223,6 +227,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             comp={tableComp}
                             onEdit={() => handleEdit(tableComp, componentName)}
                             tableColumns={tableColumns[0].children}
+                            group="group/table-filter"
+                            className="opacity-0 group-hover/table-filter:opacity-100"
                         />
                         {renderTableFilters(compName, id)}
                     </Droppable>
@@ -243,6 +249,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             parentComp={comp}
                             comp={tableComp}
                             onEdit={() => handleEdit(tableComp, componentName)}
+                            group="group/table-column"
+                            className="opacity-0 group-hover/table-column:opacity-100"
                         />
                         {columns.length === 0 ? (
                             <GenNoInfoComp

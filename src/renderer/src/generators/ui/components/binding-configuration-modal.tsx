@@ -10,7 +10,7 @@ import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
 import { FormList } from '@renderer/components/form-list';
 import { handleChangeValueObject } from '@renderer/generators/api/helpers';
-import { FormikProps, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -19,7 +19,6 @@ import {
 } from '@renderer/generators/api/components/inputs-form';
 import { SchemaTypeItem } from 'src/main/types';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import { ElementField } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
@@ -28,7 +27,7 @@ import useToast from '@renderer/hooks/useToast';
 import { capitalize } from '@renderer/utils/helpers';
 import { COMPONENT } from '../ComponentTypes';
 
-interface LabeledElementField extends ElementField {
+interface LabeledElementField {
     componentId: string;
     name: string;
     type: string;
@@ -37,14 +36,6 @@ interface LabeledElementField extends ElementField {
     required: boolean;
     label: string;
 }
-
-type LabeledTypeDef = {
-    componentId: string;
-    name: string;
-    path: string;
-    tags?: string[];
-    fields: LabeledElementField[];
-};
 
 const defaultFieldType: LabeledElementField = {
     componentId: '',
@@ -151,7 +142,7 @@ export const BindingConfigurationModal = ({
         return true;
     };
 
-    const formik: FormikProps<LabeledTypeDef> = useFormik({
+    const formik = useFormik({
         enableReinitialize: true,
         initialValues: {
             componentId,
@@ -165,57 +156,13 @@ export const BindingConfigurationModal = ({
 
             if (!validate()) return;
 
-            const { label, ...rest } = values;
-
             createOrUpdateType({
-<<<<<<< HEAD
-                ...rest,
-                path: !newBinding && typeFilePath ? typeFilePath : '',
-            });
-
-            if (componentId) {
-                //TODO For revisions
-                let defaultValues: any = undefined;
-                if (comp.componentName === COMPONENT.Form) {
-                    defaultValues = {
-                        ...comp.data?.defaultValues,
-                        state: {
-                            ...comp.data?.defaultValues.state,
-                            name: comp.data?.defaultValues.state?.name ?? '',
-                            defaultValue: `init${capitalize(values.name)}`,
-                            type: comp.data?.defaultValues.state?.type ?? '',
-                            id: comp.data?.defaultValues.state?.id ?? '',
-                        },
-                    };
-
-                    handleUpdateChildComponent(componentId, {
-                        ...comp,
-                        dataType: values.name,
-                        data: {
-                            ...comp.data,
-                            defaultValues,
-                        },
-                    });
-                } else
-                    handleUpdateChildComponent(componentId, {
-                        ...comp,
-                        dataType: values.name,
-                    });
-=======
                 ...values,
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 
             if (componentId) {
-<<<<<<< HEAD
-                handleUpdateChildComponent(componentId, {
-                    ...comp,
-                    dataType: values.name,
-                });
->>>>>>> parent of 6a765cf (UI: component table and form)
-=======
                 //TODO For revisions
-
                 let defaultValues: any = undefined;
                 if (comp.componentName === COMPONENT.Form) {
                     defaultValues = {
@@ -242,7 +189,6 @@ export const BindingConfigurationModal = ({
                         ...comp,
                         dataType: values.name,
                     });
->>>>>>> parent of 8b487e9 (Revert "UI: component table and form")
 
                 values.fields.forEach(({ componentId: id, name }) => {
                     const component = componentMap.get(id);

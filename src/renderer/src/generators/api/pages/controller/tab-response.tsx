@@ -8,12 +8,6 @@ import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 import { AddResponseMenu } from './add-response-menu';
 import { Button } from '@renderer/components/ui/button';
 import { ChevronsUpDown, Trash } from 'lucide-react';

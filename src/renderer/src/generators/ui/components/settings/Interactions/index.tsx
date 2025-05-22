@@ -3,8 +3,7 @@ import useStudio from '@renderer/hooks/use-studio';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { TriggerControls } from './components/trigger-controls';
-import { InteractionValue } from '../style/components/effects/types';
+import { Action, TriggerControls } from './components/trigger-controls';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -33,14 +32,8 @@ const Interactions = ({
             );
     }, [getInteractionsComponent, comp, componentName]);
 
-    const handleInteractionsChange = (
-        data: Record<string, InteractionValue>
-    ) => {
+    const handleInteractionsChange = (data: Record<string, Action>) => {
         if (componentId)
-            console.log({
-                ...comp,
-                interactions: { ...data },
-            });
             onInteranctionsChange(componentId, {
                 ...comp,
                 interactions: { ...data },

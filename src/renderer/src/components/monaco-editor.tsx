@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import {
+    useRef,
+    useEffect,
+    useState,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
 import Editor, { Monaco, OnChange, Theme } from '@monaco-editor/react';
 import { useTheme } from './theme-provider';
 import * as monaco from 'monaco-editor';
@@ -43,131 +49,145 @@ export interface MonacoEditorHandle {
     getEditor: () => monaco.editor.IStandaloneCodeEditor | null;
 }
 
-const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(({
-    filePath = 'file:///untitled',
-    content,
-    onChange,
-    height = '100vh',
-    options,
-    language,
-}, ref) => {
-    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<Monaco | null>(null);
-    const { theme } = useTheme();
-    const [editorTheme, setEditorTheme] = useState<Theme>('vs-dark');
-
-    // Expose editor methods via ref
-    useImperativeHandle(ref, () => ({
-        insertTextAtCursor: (text: string) => {
-            if (editorRef.current) {
-                const editor = editorRef.current;
-                const selection = editor.getSelection();
-                const range = selection 
-                    ? new monaco.Range(
-                        selection.startLineNumber,
-                        selection.startColumn,
-                        selection.endLineNumber,
-                        selection.endColumn
-                    )
-                    : new monaco.Range(1, 1, 1, 1);
-                
-                editor.executeEdits("insert-text", [
-                    {
-                        range,
-                        text,
-                        forceMoveMarkers: true
-                    }
-                ]);
-            }
+const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(
+    (
+        {
+            filePath = 'file:///untitled',
+            content,
+            onChange,
+            height = '100vh',
+            options,
+            language,
         },
-        getEditor: () => editorRef.current
-    }));
+        ref
+    ) => {
+        const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
+            null
+        );
+        const monacoRef = useRef<Monaco | null>(null);
+        const { theme } = useTheme();
+        const [editorTheme, setEditorTheme] = useState<Theme>('vs-dark');
 
-    // Update editor theme based on app theme
-    useEffect(() => {
-        if (theme === 'light') setEditorTheme('light');
-        else setEditorTheme('vs-dark');
-    }, [theme]);
+        // Expose editor methods via ref
+        useImperativeHandle(ref, () => ({
+            insertTextAtCursor: (text: string) => {
+                if (editorRef.current) {
+                    const editor = editorRef.current;
+                    const selection = editor.getSelection();
+                    const range = selection
+                        ? new monaco.Range(
+                              selection.startLineNumber,
+                              selection.startColumn,
+                              selection.endLineNumber,
+                              selection.endColumn
+                          )
+                        : new monaco.Range(1, 1, 1, 1);
 
-    // Handle editor mount
-    const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) => {
-        editorRef.current = editor;
-        monacoRef.current = monacoInstance;
+                    editor.executeEdits('insert-text', [
+                        {
+                            range,
+                            text,
+                            forceMoveMarkers: true,
+                        },
+                    ]);
+                }
+            },
+            getEditor: () => editorRef.current,
+        }));
 
-        if (!monacoInstance) {
-            console.error('Monaco instance is undefined');
-            return;
-        }
+        // Update editor theme based on app theme
+        useEffect(() => {
+            if (theme === 'light') setEditorTheme('light');
+            else setEditorTheme('vs-dark');
+        }, [theme]);
 
-        if (filePath) {
-            try {
-                const uri = monacoInstance.Uri.parse(filePath);
-                const existingModel = monacoInstance.editor.getModel(uri);
+        // Handle editor mount
+        const handleEditorDidMount = (
+            editor: monaco.editor.IStandaloneCodeEditor,
+            monacoInstance: Monaco
+        ) => {
+            editorRef.current = editor;
+            monacoRef.current = monacoInstance;
 
-                if (!existingModel) {
+            if (!monacoInstance) {
+                console.error('Monaco instance is undefined');
+                return;
+            }
+
+            if (filePath) {
+                try {
+                    const uri = monacoInstance.Uri.parse(filePath);
+                    const existingModel = monacoInstance.editor.getModel(uri);
+
+                    if (!existingModel) {
+                        const model = monacoInstance.editor.createModel(
+                            content,
+                            language,
+                            uri
+                        );
+                        editor.setModel(model);
+                    } else {
+                        editor.setModel(existingModel);
+                    }
+                } catch (error) {
+                    console.error('Error setting Monaco Editor model:', error);
+                    const uri = monacoInstance.Uri.parse('file:///untitled');
                     const model = monacoInstance.editor.createModel(
                         content,
                         language,
                         uri
                     );
                     editor.setModel(model);
-                } else {
-                    editor.setModel(existingModel);
                 }
-            } catch (error) {
-                console.error('Error setting Monaco Editor model:', error);
-                const uri = monacoInstance.Uri.parse('file:///untitled');
-                const model = monacoInstance.editor.createModel(content, language, uri);
-                editor.setModel(model);
-            }
-        }
-    };
-
-    // Handle content changes
-    const handleChange: OnChange = (value) => {
-        onChange?.(value || '');
-    };
-
-    // Update editor content when `content` prop changes
-    useEffect(() => {
-        if (editorRef.current) {
-            const editor = editorRef.current;
-            const model = editor.getModel();
-            if (model && model.getValue() !== content) {
-                model.setValue(content);
-            }
-        }
-    }, [content]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (editorRef.current) {
-                editorRef.current.dispose();
             }
         };
-    }, []);
 
-    return (
-        <Editor
-            path={filePath}
-            height={height}
-            theme={editorTheme}
-            value={content}
-            language={language}
-            onChange={handleChange}
-            onMount={handleEditorDidMount}
-            options={{
-                ...options,
-                minimap: { enabled: false },
-                wordWrap: 'on',
-                autoIndent: 'full',
-                tabSize: 2,
-            }}
-        />
-    );
-});
+        // Handle content changes
+        const handleChange: OnChange = (value) => {
+            onChange?.(value || '');
+        };
+
+        // Update editor content when `content` prop changes
+        useEffect(() => {
+            if (editorRef.current) {
+                const editor = editorRef.current;
+                const model = editor.getModel();
+                if (model && model.getValue() !== content) {
+                    model.setValue(content);
+                }
+            }
+        }, [content]);
+
+        // Cleanup on unmount
+        useEffect(() => {
+            return () => {
+                if (editorRef.current) {
+                    editorRef.current.dispose();
+                }
+            };
+        }, []);
+
+        return (
+            <Editor
+                path={filePath}
+                height={height}
+                theme={editorTheme}
+                value={content}
+                language={language}
+                onChange={handleChange}
+                onMount={handleEditorDidMount}
+                options={{
+                    ...options,
+                    minimap: { enabled: false },
+                    wordWrap: 'on',
+                    autoIndent: 'full',
+                    tabSize: 2,
+                }}
+            />
+        );
+    }
+);
 
 MonacoEditor.displayName = 'MonacoEditor';
 
-export default MonacoEditor
+export default MonacoEditor;

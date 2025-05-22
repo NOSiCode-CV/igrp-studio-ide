@@ -12,7 +12,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
-import { FileTree, HandlerResponse, IOpenProject } from './types';
+import { FileTree, IOpenProject } from './types';
 
 import {
     checkAndReadBaseApi,

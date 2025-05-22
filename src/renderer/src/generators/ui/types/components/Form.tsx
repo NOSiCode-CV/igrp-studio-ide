@@ -66,8 +66,8 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                             {Component && (
                                 <BoxWrapper
                                     comp={comp}
-                                    group="group/comp-form"
                                     onEdit={() => handleEditClick(comp)}
+                                    group="group/comp-form"
                                     className="opacity-0 group-hover/comp-form:opacity-100"
                                 >
                                     <Component

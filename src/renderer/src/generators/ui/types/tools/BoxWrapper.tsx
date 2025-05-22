@@ -72,7 +72,8 @@ const BoxWrapper = ({
                             variant: `span${colSize.toString()}`,
                         },
                         children: [],
-                        interactions:[]
+                        interactions: [],
+                        tag: '',
                     };
                     handleAddChildToComponent(
                         { droppableId: id, index },

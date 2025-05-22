@@ -10,7 +10,6 @@ import {
 import { FlexControls } from './FlexControls';
 import { GridControls } from './GridControls';
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
-import { TabsContent } from '@radix-ui/react-tabs';
 
 export function LayoutSection() {
     const [isOpen, setIsOpen] = useState(false);

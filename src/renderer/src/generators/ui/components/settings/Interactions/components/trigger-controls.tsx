@@ -46,7 +46,7 @@ interface FormSubmitAction {
     validation?: boolean;
 }
 
-interface Action {
+export interface Action {
     type: ActionType;
     function?: {
         fnName?: string;
@@ -61,10 +61,10 @@ interface Action {
 }
 
 interface TriggerControlsProps {
-    interactions: Action;
+    interactions: any;
     interactionsType: any;
     componentTag: string;
-    onInteractionsChange: (interactions: Action) => void;
+    onInteractionsChange: (interactions: Record<string, Action>) => void;
 }
 
 interface InteractionEditorProps {
@@ -72,10 +72,10 @@ interface InteractionEditorProps {
     interactionKey: string;
     open: boolean;
     setOpen: (open: boolean) => void;
-    onInteractionsChange: (interactions: Action) => void;
+    onInteractionsChange: (interactions: Record<string, Action>) => void;
     interactionsType: any;
-    setLocalInteractions: (interactions: Action) => void;
-    localInteractions: Action;
+    setLocalInteractions: (interactions: Record<string, Action>) => void;
+    localInteractions: Record<string, Action>;
     componentTag: string;
 }
 
@@ -85,9 +85,9 @@ export function TriggerControls({
     componentTag,
     onInteractionsChange,
 }: TriggerControlsProps) {
-    const [localInteractions, setLocalInteractions] = useState<Action>({
-        type: 'function',
-    });
+    const [localInteractions, setLocalInteractions] = useState<
+        Record<string, Action>
+    >({});
 
     useEffect(() => {
         setLocalInteractions(interactions);
@@ -96,7 +96,9 @@ export function TriggerControls({
     const addInteraction = (int: string) => {
         const updated = {
             ...localInteractions,
-            [int]: {},
+            [int]: {
+                type: 'function' as ActionType,
+            } as Action,
         };
 
         onInteractionsChange(updated);

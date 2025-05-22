@@ -33,7 +33,6 @@ import {
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { useTagManager } from '../hooks/useTagManager';
 import * as LucideIcons from 'lucide-react';
-import { cn } from '@renderer/lib/utils';
 
 interface AddComponentProps {
     path: string;

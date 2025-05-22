@@ -132,7 +132,7 @@ export const GitLabService = {
     return {}; // Example: return an empty object or actual configuration
   },
 
-  async setConfig(config: any): Promise<void> {
+  async setConfig(_config: any): Promise<void> {
     // Add logic to retrieve GitLab configuration
   }
 };

@@ -94,6 +94,10 @@ export function AppSidebar({
         setSearchQuery(e.target.value);
     };
 
+     const handleNavegationClick = (item: MenuItem) => {
+        setActiveMenuGroup(item);
+    };
+
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: Component, label: t('components'), id: 'components' },
@@ -152,7 +156,7 @@ export function AppSidebar({
                                             }}
                                             onClick={() => {
                                                 setOpen(true);
-                                                setActiveMenuGroup(item);
+                                                handleNavegationClick(item);
                                             }}
                                             isActive={
                                                 activeMenuGroup.id === item.id

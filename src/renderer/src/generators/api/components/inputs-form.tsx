@@ -1,4 +1,3 @@
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { LabelRequired } from '@renderer/components/label-required';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';

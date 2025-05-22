@@ -10,12 +10,15 @@ import { useTranslation } from 'react-i18next';
 import { BindingConfigurationFilterModal } from '../../components/binding-config-filter-modal';
 import { useState } from 'react';
 import { Badge } from '@renderer/components/ui/badge';
+import { cn } from '@renderer/lib/utils';
 
 interface RowOptionsProps {
     comp: StructuredComponent;
     parentComp: StructuredComponent;
     tableColumns?: StructuredComponent[];
     onEdit: () => void;
+    group?: string;
+    className?: string;
 }
 
 const TableTool = ({
@@ -23,6 +26,8 @@ const TableTool = ({
     parentComp,
     tableColumns = [],
     onEdit,
+    group,
+    className,
 }: RowOptionsProps) => {
     const { t } = useTranslation();
 
@@ -32,9 +37,14 @@ const TableTool = ({
         useState<StructuredComponent | null>(null);
 
     return (
-        <div id="table-tools relative">
+        <div className={cn('table-tools relative', group)}>
             {/* Action buttons */}
-            <div className="absolute px-1 z-10 left-4 -mt-3 rounded opacity-0 group-hover/table:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
+            <div
+                className={cn(
+                    'absolute px-1 z-10 left-4 -mt-3 rounded opacity-0 group-hover/table:opacity-100 transition-opacity duration-200 bg-gray-600 text-white',
+                    className
+                )}
+            >
                 <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
                     <div className="flex align-middle items-center">
                         <span className="text-xs">{comp.label}</span>

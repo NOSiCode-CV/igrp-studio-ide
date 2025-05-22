@@ -57,7 +57,6 @@ const ImportComponent = ({
             <div className="flex items-center justify-between">
                 <Label>{t('imports.title')}</Label>
                 <Badge variant="outline" className="text-xs">
-                    {imports.length}{' '}
                     {t('imports.count', { count: imports.length })}
                 </Badge>
             </div>
@@ -115,13 +114,3 @@ const ImportComponent = ({
 };
 
 export { ImportComponent };
-
-/* {
-  "imports": {
-    "title": "Imports",
-    "count": "{count} import | {count} imports",
-    "empty": "No imports configured",
-    "placeholder": "e.g., import { lib } from 'react-library'"
-  },
-  "add": "Add"
-} */

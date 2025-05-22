@@ -41,6 +41,7 @@ const useStudio = () => {
             return module.default;
         } catch (error) {
             const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+            console.warn('Failed to load component:', error);
             return fallbackModule.default;
         }
     }, []);
