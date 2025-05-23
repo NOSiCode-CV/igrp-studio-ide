@@ -8,8 +8,8 @@ import {
     Move,
     Layers,
     Settings2,
-    Square,
     Variable,
+    SquareIcon,
 } from 'lucide-react';
 import { LayoutSection } from './components/LayoutSection';
 import { SpacingSection } from './components/SpacingSection';
@@ -20,16 +20,52 @@ import { BordersSection } from './components/BordersSection';
 import { PositionSection } from './components/PositionSection';
 import { EffectsSection } from './components/EffectsSection';
 import { CustomPropertiesSection } from './components/CustomPropertiesSection';
+import { StyleComponent } from './types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 interface StyleSection {
     id: string;
     title: string;
     icon: React.ReactNode;
     isOpen: boolean;
-    component: React.ComponentType;
+    component: React.ComponentType<{
+        onChangeStyles: (styles: StyleComponent) => void;
+        styles: StyleComponent;
+    }>;
 }
 
-export function StyleTab() {
+interface StyleTabProps {
+    comp: StructuredComponent;
+    path: string;
+    onInteranctionsChange: (
+        componentId: string,
+        updates: Partial<StructuredComponent>
+    ) => void;
+}
+
+export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
+    const { id: componentId, style } = comp;
+
+    const [styleState, setStyleState] = React.useState<StyleComponent>(
+        style || {}
+    );
+
+    const onChangeStyles = (styles: Partial<StyleComponent>) => {
+        // Update state with deep merge
+        setStyleState((prev) => {
+            const merged = {
+                ...prev,
+                ...styles,
+            };
+            return merged;
+        });
+
+        if (componentId)
+            onInteranctionsChange(componentId, {
+                style: { ...styleState },
+            });
+    };
+
     const [sections, setSections] = React.useState<StyleSection[]>([
         {
             id: 'layout',
@@ -69,7 +105,7 @@ export function StyleTab() {
         {
             id: 'borders',
             title: 'Borders',
-            icon: <Square size={12} />,
+            icon: <SquareIcon size={12} />,
             isOpen: false,
             component: BordersSection,
         },
@@ -128,7 +164,10 @@ export function StyleTab() {
 
                     {section.isOpen && (
                         <div className="mt-0.5 p-1.5 bg-gray-50 dark:bg-gray-800/50 rounded-md">
-                            <section.component />
+                            <section.component
+                                onChangeStyles={onChangeStyles}
+                                styles={styleState}
+                            />
                         </div>
                     )}
                 </div>

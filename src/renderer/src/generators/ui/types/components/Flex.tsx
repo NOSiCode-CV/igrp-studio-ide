@@ -12,9 +12,16 @@ import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 export interface FlexProps {
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
+    group?: string;
+    className?: string;
 }
 
-const Flex: React.FC<FlexProps> = ({ comp, onDragEnd }: FlexProps) => {
+const Flex: React.FC<FlexProps> = ({
+    comp,
+    className: providedClassName,
+    group,
+    onDragEnd,
+}: FlexProps) => {
     const { children, properties, id: componentId } = comp;
 
     const { variant, className } = properties || {};
@@ -51,33 +58,46 @@ const Flex: React.FC<FlexProps> = ({ comp, onDragEnd }: FlexProps) => {
 
     const renderColumns = () => {
         const fields =
-            children.length > 0 ?
-            children.map((comp: StructuredComponent, index: number) => {
-                const Component = loadedComponents[comp.id];
+            children.length > 0 ? (
+                children.map((comp: StructuredComponent, index: number) => {
+                    const Component = loadedComponents[comp.id];
 
-                return Component ? (
-                    <Draggable
-                        key={comp.id}
-                        item={comp.id}
-                        layout="horizontal"
-                        index={index}
-                        dropTargetId={componentId}
-                        mode="MOVE"
-                        className="p-1"
-                    >
-                        <BoxWrapper
-                            comp={comp}
-                            group="group/flex"
-                            onEdit={() => handleEditClick(comp)}
-                            className="opacity-0 group-hover/flex:opacity-100"
+                    return Component ? (
+                        <Draggable
+                            key={comp.id}
+                            item={comp.id}
+                            layout="horizontal"
+                            index={index}
+                            dropTargetId={componentId}
+                            mode="MOVE"
+                            className="p-1 min-w-32 text-center"
                         >
-                            <Component comp={comp} onDragEnd={onDragEnd} />
-                        </BoxWrapper>
-                    </Draggable>
-                ) : (
-                    <div key={comp.id}>Loading...</div>
-                );
-            }): (<EmptySlotComponent></EmptySlotComponent>);
+                            <BoxWrapper
+                                comp={comp}
+                                group={cn(group ?? `group/comp-flex`)}
+                                onEdit={() => handleEditClick(comp)}
+                                className={
+                                    providedClassName ??
+                                    `opacity-0 group-hover/comp-flex:opacity-100`
+                                }
+                            >
+                                <Component
+                                    comp={comp}
+                                    onDragEnd={onDragEnd}
+                                    group={'group/comp-flex-child'}
+                                    className={
+                                        'opacity-0 group-hover/comp-flex-child:opacity-100'
+                                    }
+                                />
+                            </BoxWrapper>
+                        </Draggable>
+                    ) : (
+                        <div key={comp.id}>Loading...</div>
+                    );
+                })
+            ) : (
+                <EmptySlotComponent></EmptySlotComponent>
+            );
 
         return <>{fields}</>;
     };
@@ -87,9 +107,14 @@ const Flex: React.FC<FlexProps> = ({ comp, onDragEnd }: FlexProps) => {
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className='p-1'
+            className="p-2"
         >
-            <div className={cn(flexVariants({ variant, className }))}>
+            <div
+                className={cn(
+                    flexVariants({ variant, className }),
+                    'space-y-2'
+                )}
+            >
                 {renderColumns()}
             </div>
         </Droppable>

@@ -83,6 +83,8 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     React.useEffect(() => {
         if (!componentName) return;
 
+        console.log(currentPath, componentName)
+
         const loadProps = async () => {
             try {
                 const data = await getPropertiesComponent(
@@ -127,7 +129,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         };
 
         loadProps();
-    }, [componentName]);
+    }, [componentId]);
 
     // Load properties component
     React.useEffect(() => {
@@ -161,7 +163,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         };
 
         loadProps();
-    }, [componentName]);
+    }, [componentId]);
 
     // Debounced component update
     React.useEffect(() => {
@@ -338,7 +340,13 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                                 </Accordion>
                             </TabsContent>
                             <TabsContent value="styles" className="space-y-6">
-                                <StyleTab />
+                                <StyleTab
+                                    comp={currentComp}
+                                    path={currentPath}
+                                    onInteranctionsChange={
+                                        handleUpdateChildComponent
+                                    }
+                                />
                             </TabsContent>
                             <TabsContent
                                 value="interactions"

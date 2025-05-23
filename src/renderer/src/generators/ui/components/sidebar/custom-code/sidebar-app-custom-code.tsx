@@ -345,7 +345,6 @@ const FncComponent = ({
                     updateFunction(fncData.id, fncData);
                 }
 
-                console.log('Function data:', fncData);
                 setOpen(false);
             } catch (error) {
                 console.error('Submission failed:', error);
@@ -433,12 +432,13 @@ const FncComponent = ({
                         </div>
                     </form>
                 </SidebarInset>
-                <FunctionSettingsSidebar
+                 <FunctionSettingsSidebar
                     formik={formik}
                     editorRef={editorRef}
                     side="right"
                     componentTag={''}
-                />
+                    onInsertImport={()=>void 0}
+                /> 
             </DialogContent>
         </Dialog>
     );

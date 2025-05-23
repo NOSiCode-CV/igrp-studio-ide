@@ -145,6 +145,11 @@ export const useFakedata = () => {
                 }]
             }
         },
+        [COMPONENT.StatsCard]: {
+            properties: {
+                value: faker.number.int({ min: 1, max: 1000 })
+            }
+        },
         // Default fallback component
         Default: {
             componentName: 'UnknownComponent',
