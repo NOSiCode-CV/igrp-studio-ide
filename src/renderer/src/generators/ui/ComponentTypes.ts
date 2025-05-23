@@ -1,4 +1,5 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { Separator } from '@radix-ui/react-separator';
 import {
     Type,
     FormInput,
@@ -68,6 +69,7 @@ import {
     EyeOff,
     Search,
     TrendingUp,
+    SeparatorHorizontal,
 } from 'lucide-react';
 
 // Constants
@@ -175,6 +177,7 @@ export const COMPONENT: Record<string, string> = {
     RadialBarchart: "radialBarchart",
     Radarchart: "radarchart",
     StatsCard: "statsCard",
+    Separator: "separator",
 }
 
 
@@ -249,6 +252,8 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 
     [COMPONENT.StatsCard]: TrendingUp,
 
+    [COMPONENT.Separator]: SeparatorHorizontal,
+
     accordion: AlignLeft,
     treeView: GitMerge,
 
@@ -318,4 +323,5 @@ export const COMPONENT_MAP = {
     [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
     [COMPONENT.StatsCard]: IGRPStatsCard,
+    [COMPONENT.Separator]: IGRPSeparator
 };

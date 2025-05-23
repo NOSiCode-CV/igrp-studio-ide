@@ -1,6 +1,7 @@
 import { StructuredComponent } from "@renderer/lib/dnd/types";
 import { generateId } from "@renderer/utils/helpers";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { E } from "@faker-js/faker/dist/airline-BUL6NtOJ";
 
 // Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
 export const getDefaultProperties = (schema: any): any => {
@@ -43,6 +44,7 @@ export const getDefaultInteractions = (schema: any, tag?: string) => {
 
 export const getRequiredDataSchema = (schema: any, tag: string) => {
     const states: any = {};
+    console.log(schema)
     for (const key in schema) {
         if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
             states[key] = getRequiredDataSchema(schema[key].properties, tag);
@@ -50,8 +52,7 @@ export const getRequiredDataSchema = (schema: any, tag: string) => {
         else if (schema[key].type === 'array' && !schema[key].items?.enum) {
             states[key] = [];
         }
-        else {
-
+        else {//TODO Test
             states[key] = schema[key].default ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
         }
     }

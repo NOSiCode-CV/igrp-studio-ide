@@ -17,9 +17,17 @@ export interface ContainerProps {
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
     onAddControl?: (type: string, componentId: string) => void;
+    group?: string;
+    className?: string;
 }
 
-const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
+const Container = ({
+    isDisabled,
+    comp,
+    group,
+    className,
+    onDragEnd,
+}: ContainerProps) => {
     const { t } = useTranslation();
     const { children: components, id: componentId } = comp || {};
 
@@ -72,7 +80,7 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
             onDrop={handleDrop}
             component={comp}
             className={cn(
-                'space-y-1 group/row relative hover:border-1 hover:border-primary rounded-lg p-1',
+                'space-y-3 relative hover:border-1 hover:border-primary rounded-lg p-3',
                 isDisabled && 'border-none hover:border-destructive'
             )}
         >
@@ -96,11 +104,12 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
                             <BoxContainer
                                 comp={comp}
                                 onEdit={() => handleEdit(comp)}
-                                group="group/row-fragment"
+                                group={group ?? `group/row-container`}
                                 className={cn(
-                                    'left-0 right-auto opacity-0',
+                                    'opacity-0',
                                     !isDisabled &&
-                                        'group-hover/row-fragment:opacity-100'
+                                        (className ??
+                                            'group-hover/row-container:opacity-100')
                                 )}
                             >
                                 {comp.type === APP_COMPONENT ? (
@@ -113,6 +122,10 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
                                         comp={comp}
                                         onDragEnd={onDragEnd}
                                         isDisabled={isDisabled}
+                                        group={`group/row-container-child`}
+                                        className={
+                                            'opacity-0 group-hover/row-container-child:opacity-100'
+                                        }
                                     />
                                 )}
                             </BoxContainer>

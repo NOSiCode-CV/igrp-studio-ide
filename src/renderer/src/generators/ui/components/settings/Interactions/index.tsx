@@ -35,7 +35,6 @@ const Interactions = ({
     const handleInteractionsChange = (data: Record<string, Action>) => {
         if (componentId)
             onInteranctionsChange(componentId, {
-                ...comp,
                 interactions: { ...data },
             });
     };
