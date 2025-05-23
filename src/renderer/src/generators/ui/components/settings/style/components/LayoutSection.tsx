@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
     Square,
     LayoutGrid,
@@ -10,66 +10,202 @@ import {
 import { FlexControls } from './FlexControls';
 import { GridControls } from './GridControls';
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
+import { LayoutStyle, SectionProps } from '../types';
 
-export function LayoutSection() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedDisplay, setSelectedDisplay] = useState('Block');
-    // Flex controls
-    const [flexDirection, setFlexDirection] = useState('row');
-    const [flexWrap, setFlexWrap] = useState('nowrap');
-    const [alignItems, setAlignItems] = useState('stretch');
-    const [justifyContent, setJustifyContent] = useState('flex-start');
-    const [gap, setGap] = useState('0');
-    // Grid controls
-    const [gridColumns, setGridColumns] = useState('1');
-    const [gridRows, setGridRows] = useState('1');
-    const [gridGap, setGridGap] = useState('0');
-    const [justifyItems, setJustifyItems] = useState('start');
-    const [alignItems2, setAlignItems2] = useState('start');
-
-    const mainOptions = [
-        { value: 'Block', label: 'Block', icon: <Square size={14} /> },
-        { value: 'Flex', label: 'Flex', icon: <AlignCenter size={14} /> },
-        { value: 'Grid', label: 'Grid', icon: <LayoutGrid size={14} /> },
-        { value: 'None', label: 'None', icon: <XSquare size={14} /> },
-    ];
-
-    const additionalOptions = [
-        {
-            value: 'Inline-block',
-            label: 'Inline-block',
-            icon: <Square size={14} />,
-        },
-        {
-            value: 'Inline-flex',
-            label: 'Inline-flex',
-            icon: <AlignCenter size={14} />,
-        },
-        {
-            value: 'Inline-grid',
-            label: 'Inline-grid',
-            icon: <LayoutGrid size={14} />,
-        },
-        { value: 'Inline', label: 'Inline', icon: <AlignCenter size={14} /> },
-    ];
-
-    const allOptions = [...mainOptions, ...additionalOptions];
-    const selectedOption = allOptions.find(
-        (opt) => opt.value === selectedDisplay
-    );
-    const isAdditionalOptionSelected = additionalOptions.some(
-        (opt) => opt.value === selectedDisplay
-    );
-    const isFlexDisplay =
-        selectedDisplay === 'Flex' || selectedDisplay === 'Inline-flex';
-    const isGridDisplay =
-        selectedDisplay === 'Grid' || selectedDisplay === 'Inline-grid';
-
-    const handleClickOutside = (e: React.MouseEvent) => {
-        if (e.target === e.currentTarget) {
-            setIsOpen(false);
+export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [layoutStyle, setLayoutStyle] = React.useState<LayoutStyle>(
+        styles.layout || {
+            type: 'block',
+            flex: {
+                direction: 'row',
+                wrap: 'nowrap',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
+                gap: '2',
+            },
+            grid: {
+                templateColumns: '1',
+                templateRows: '1',
+                gap: '2',
+                justifyItems: 'start',
+                alignItems: 'start',
+                direction: 'row',
+                dense: false,
+            },
+            block: {},
         }
+    );
+
+    const updateLayoutStyle = (updates: Partial<LayoutStyle>) => {
+        setLayoutStyle((prev) => {
+            // Create a deep merge of the previous state and updates
+            const merged = {
+                ...prev,
+                ...updates,
+                flex: {
+                    ...prev.flex,
+                    ...(updates.flex || {}),
+                },
+                grid: {
+                    ...prev.grid,
+                    ...(updates.grid || {}),
+                },
+                block: {
+                    ...prev.block,
+                    ...(updates.block || {}),
+                },
+            };
+            return merged as LayoutStyle;
+        });
     };
+
+    // Layout type options
+    const layoutTypes = {
+        main: [
+            { value: 'block', label: 'Block', icon: <Square size={14} /> },
+            { value: 'flex', label: 'Flex', icon: <AlignCenter size={14} /> },
+            { value: 'grid', label: 'Grid', icon: <LayoutGrid size={14} /> },
+            { value: 'none', label: 'None', icon: <XSquare size={14} /> },
+        ],
+        additional: [
+            {
+                value: 'inline-block',
+                label: 'Inline-block',
+                icon: <Square size={14} />,
+            },
+            {
+                value: 'inline-flex',
+                label: 'Inline-flex',
+                icon: <AlignCenter size={14} />,
+            },
+            {
+                value: 'inline-grid',
+                label: 'Inline-grid',
+                icon: <LayoutGrid size={14} />,
+            },
+            {
+                value: 'inline',
+                label: 'Inline',
+                icon: <AlignCenter size={14} />,
+            },
+        ],
+    };
+
+    const allOptions = [...layoutTypes.main, ...layoutTypes.additional];
+    const selectedOption = allOptions.find(
+        (opt) => opt.value === layoutStyle.type
+    );
+    const isAdditionalOption = layoutTypes.additional.some(
+        (opt) => opt.value === layoutStyle.type
+    );
+    const isFlex = layoutStyle.type.includes('flex');
+    const isGrid = layoutStyle.type.includes('grid');
+    const isBlock = layoutStyle.type.includes('block') && !isAdditionalOption;
+
+    const handleDisplayChange = (value: string) => {
+        updateLayoutStyle({ type: value as LayoutStyle['type'] });
+    };
+
+    useEffect(() => {
+        onChangeStyles({ layout: layoutStyle });
+    }, [layoutStyle]);
+
+    const renderBlockControls = () => (
+        <div className="p-2 rounded-md text-center">
+            <p className="text-xs text-muted-foreground mb-2">
+                Block display properties will appear here
+            </p>
+        </div>
+    );
+
+    const renderFlexControls = () => (
+        <div className="mt-3">
+            <FlexControls
+                direction={layoutStyle.flex?.direction || 'row'}
+                wrap={layoutStyle.flex?.wrap || 'nowrap'}
+                alignItems={layoutStyle.flex?.alignItems || 'stretch'}
+                justifyContent={
+                    layoutStyle.flex?.justifyContent || 'flex-start'
+                }
+                gap={layoutStyle.flex?.gap || '0'}
+                onDirectionChange={(value) =>
+                    updateLayoutStyle({
+                        flex: { ...layoutStyle.flex, direction: value },
+                    })
+                }
+                onWrapChange={(value) =>
+                    updateLayoutStyle({
+                        flex: { ...layoutStyle.flex, wrap: value },
+                    })
+                }
+                onAlignItemsChange={(value) =>
+                    updateLayoutStyle({
+                        flex: { ...layoutStyle.flex, alignItems: value },
+                    })
+                }
+                onJustifyContentChange={(value) =>
+                    updateLayoutStyle({
+                        flex: { ...layoutStyle.flex, justifyContent: value },
+                    })
+                }
+                onGapChange={(value) =>
+                    updateLayoutStyle({
+                        flex: { ...layoutStyle.flex, gap: value },
+                    })
+                }
+            />
+        </div>
+    );
+
+    const renderGridControls = () => (
+        <div className="mt-3">
+            <GridControls
+                columns={layoutStyle.grid?.templateColumns || '1'}
+                rows={layoutStyle.grid?.templateRows || '1'}
+                justifyItems={layoutStyle.grid?.justifyItems || 'start'}
+                alignItems={layoutStyle.grid?.alignItems || 'start'}
+                gap={layoutStyle.grid?.gap || '0'}
+                direction={layoutStyle.grid?.direction || 'row'}
+                dense={layoutStyle.grid?.dense || false}
+                onColumnsChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, templateColumns: value },
+                    })
+                }
+                onRowsChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, templateRows: value },
+                    })
+                }
+                onJustifyItemsChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, justifyItems: value },
+                    })
+                }
+                onAlignItemsChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, alignItems: value },
+                    })
+                }
+                onGapChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, gap: value },
+                    })
+                }
+                onDirectionChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, direction: value },
+                    })
+                }
+                onDenseChange={(value) =>
+                    updateLayoutStyle({
+                        grid: { ...layoutStyle.grid, dense: value },
+                    })
+                }
+            />
+        </div>
+    );
 
     return (
         <div className="space-y-2">
@@ -77,17 +213,24 @@ export function LayoutSection() {
                 <label className="text-[10px] text-gray-500 dark:text-gray-400">
                     Display
                 </label>
-                <Tabs defaultValue="Block">
+
+                <Tabs defaultValue="block" value={layoutStyle.type}>
                     <TabsList className="grid w-full grid-cols-4">
-                        {mainOptions.map((option) => (
+                        {layoutTypes.main.map((option) => (
                             <TabsTrigger
                                 key={option.value}
                                 value={option.value}
-                                onClick={() => setSelectedDisplay(option.value)}
+                                onClick={() =>
+                                    handleDisplayChange(option.value)
+                                }
                                 className="flex flex-1 items-center justify-center text-xs"
                             >
                                 <div
-                                    className={`mb-0.5 transition-transform duration-200 ${selectedDisplay === option.value ? 'scale-110' : ''}`}
+                                    className={`mb-0.5 transition-transform duration-200 ${
+                                        layoutStyle.type === option.value
+                                            ? 'scale-110'
+                                            : ''
+                                    }`}
                                 >
                                     {option.icon}
                                 </div>
@@ -102,18 +245,18 @@ export function LayoutSection() {
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className={`
-              w-full flex items-center justify-between px-2 py-1.5 text-[10px] rounded
-              ${
-                  isAdditionalOptionSelected
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-              }
-              hover:bg-opacity-90 transition-all duration-200
-              ${isOpen ? 'ring-2 ring-blue-500' : ''}
-            `}
+                                w-full flex items-center justify-between px-2 py-1.5 text-[10px] rounded
+                                ${
+                                    isAdditionalOption
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                }
+                                hover:bg-opacity-90 transition-all duration-200
+                                ${isOpen ? 'ring-2 ring-blue-500' : ''}
+                            `}
                         >
                             <div className="flex items-center gap-1.5">
-                                {isAdditionalOptionSelected ? (
+                                {isAdditionalOption ? (
                                     selectedOption?.icon
                                 ) : (
                                     <Plus
@@ -122,14 +265,16 @@ export function LayoutSection() {
                                     />
                                 )}
                                 <span className="font-medium">
-                                    {isAdditionalOptionSelected
+                                    {isAdditionalOption
                                         ? selectedOption?.label
                                         : 'More display options'}
                                 </span>
                             </div>
                             <ChevronDown
                                 size={14}
-                                className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                                className={`transform transition-transform duration-200 ${
+                                    isOpen ? 'rotate-180' : ''
+                                }`}
                             />
                         </button>
 
@@ -137,30 +282,36 @@ export function LayoutSection() {
                             <>
                                 <div
                                     className="fixed inset-0 z-10"
-                                    onClick={handleClickOutside}
+                                    onClick={() => setIsOpen(false)}
                                 />
                                 <div className="absolute z-20 w-full mt-0.5 py-0.5 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700">
-                                    {additionalOptions.map((option) => (
+                                    {layoutTypes.additional.map((option) => (
                                         <button
                                             key={option.value}
                                             onClick={() => {
-                                                setSelectedDisplay(
+                                                handleDisplayChange(
                                                     option.value
                                                 );
                                                 setIsOpen(false);
                                             }}
                                             className={`
-                      w-full flex items-center gap-1.5 px-2 py-1.5 text-[10px]
-                      transition-colors duration-200
-                      ${
-                          selectedDisplay === option.value
-                              ? 'bg-blue-500 text-white'
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }
-                    `}
+                                                w-full flex items-center gap-1.5 px-2 py-1.5 text-[10px]
+                                                transition-colors duration-200
+                                                ${
+                                                    layoutStyle.type ===
+                                                    option.value
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                                }
+                                            `}
                                         >
                                             <div
-                                                className={`transition-transform duration-200 ${selectedDisplay === option.value ? 'scale-110' : ''}`}
+                                                className={`transition-transform duration-200 ${
+                                                    layoutStyle.type ===
+                                                    option.value
+                                                        ? 'scale-110'
+                                                        : ''
+                                                }`}
                                             >
                                                 {option.icon}
                                             </div>
@@ -173,40 +324,11 @@ export function LayoutSection() {
                             </>
                         )}
                     </div>
-                    
-                    {isFlexDisplay && (
-                        <div className="mt-3">
-                            <FlexControls
-                                direction={flexDirection}
-                                wrap={flexWrap}
-                                alignItems={alignItems}
-                                justifyContent={justifyContent}
-                                gap={gap}
-                                onDirectionChange={setFlexDirection}
-                                onWrapChange={setFlexWrap}
-                                onAlignItemsChange={setAlignItems}
-                                onJustifyContentChange={setJustifyContent}
-                                onGapChange={setGap}
-                            />
-                        </div>
-                    )}
 
-                    {isGridDisplay && (
-                        <div className="mt-3">
-                            <GridControls
-                                columns={gridColumns}
-                                rows={gridRows}
-                                justifyItems={justifyItems}
-                                alignItems={alignItems2}
-                                gap={gridGap}
-                                onColumnsChange={setGridColumns}
-                                onRowsChange={setGridRows}
-                                onJustifyItemsChange={setJustifyItems}
-                                onAlignItemsChange={setAlignItems2}
-                                onGapChange={setGridGap}
-                            />
-                        </div>
-                    )}
+                    {/* Render appropriate controls based on display type */}
+                    {isBlock && renderBlockControls()}
+                    {isFlex && renderFlexControls()}
+                    {isGrid && renderGridControls()}
                 </Tabs>
             </div>
         </div>

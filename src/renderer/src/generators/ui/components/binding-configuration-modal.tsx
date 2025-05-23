@@ -42,7 +42,6 @@ const defaultFieldType: LabeledElementField = {
     name: '',
     type: 'string',
     required: false,
-    validation: '',
     defaultValue: '',
     label: '',
 };
@@ -156,8 +155,18 @@ export const BindingConfigurationModal = ({
 
             if (!validate()) return;
 
-            createOrUpdateType({
+            const updatedComponent = {
                 ...values,
+                fields: (values.fields as LabeledElementField[]).map(
+                    (field) => {
+                        const { label, ...rest } = field; // Removes the 'label' property
+                        return rest;
+                    }
+                ),
+            };
+
+            createOrUpdateType({
+                ...updatedComponent,
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 

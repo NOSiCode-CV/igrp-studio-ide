@@ -92,9 +92,14 @@ export const AddComponentModal = ({
         [handleAddChildToComponent]
     );
 
-    const onEditComponent = (component: StructuredComponent) => {
+    const onEditComponent = (
+        component: StructuredComponent,
+        parentComponent?: string
+    ) => {
         setCurrentComponent(component);
-        setCurrentPath(`${path}/${comp.componentName}`);
+        setCurrentPath(
+            `${path}/${comp.componentName}${parentComponent ? '/' + parentComponent : ''}`
+        );
     };
 
     return (
@@ -141,7 +146,11 @@ export const AddComponentModal = ({
                             </div>
                         </div>
                     </SidebarInset>
-                    <SidebarRight comp={currentComponent} path={currentPath} className='h-full' />
+                    <SidebarRight
+                        comp={currentComponent}
+                        path={currentPath}
+                        className="h-full"
+                    />
                 </DialogContent>
             </Dialog>
         </>
@@ -181,14 +190,18 @@ const renderAddComponents = (
 const renderCreatedComponents = (
     components: StructuredComponent[],
     registryComponents: ComponentRegisterConfig[],
-    onEdit: (comp: StructuredComponent) => void,
+    onEdit: (comp: StructuredComponent, parentComponent?: string) => void,
     handleAddComponent: (item: any, droppableId: string) => void,
-    level: number = 0 // Add a level parameter to track nesting depth
+    level: number = 0, // Add a level parameter to track nesting depth
+    parentComponent?: string
 ) => {
     const { handleRemoveChildFromComponent } = useDroppedComponents();
 
-    const handleEditComponent = (component: StructuredComponent) => {
-        onEdit(component);
+    const handleEditComponent = (
+        component: StructuredComponent,
+        parentComponent?: string
+    ) => {
+        onEdit(component, parentComponent);
     };
 
     // Render the icon for a component
@@ -218,7 +231,8 @@ const renderCreatedComponents = (
     // Recursively render child components
     const renderChildComponents = (
         children: StructuredComponent[],
-        level: number
+        level: number,
+        parentComponent: string
     ) => {
         return (
             <>
@@ -227,7 +241,8 @@ const renderCreatedComponents = (
                     registryComponents,
                     onEdit,
                     handleAddComponent,
-                    level + 1
+                    level + 1,
+                    parentComponent
                 )}
             </>
         );
@@ -257,7 +272,10 @@ const renderCreatedComponents = (
                                         variant="ghost"
                                         size="sm"
                                         onClick={() =>
-                                            handleEditComponent(component)
+                                            handleEditComponent(
+                                                component,
+                                                parentComponent
+                                            )
                                         }
                                     >
                                         Edit
@@ -286,7 +304,11 @@ const renderCreatedComponents = (
                         </TableRow>
                         {component.children &&
                             component.children.length > 0 &&
-                            renderChildComponents(component.children, level)}
+                            renderChildComponents(
+                                component.children,
+                                level,
+                                component.componentName
+                            )}
                     </React.Fragment>
                 );
             })}
@@ -303,7 +325,7 @@ const ComponentTable = ({
 }: {
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
-    onEdit: (comp: StructuredComponent) => void;
+    onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
     handleAddComponent: (item: any, droppableId: string) => void;
 }) => {
     return (

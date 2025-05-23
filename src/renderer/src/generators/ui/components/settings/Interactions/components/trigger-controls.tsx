@@ -237,22 +237,6 @@ const InteractionEditor = ({
     const fnCustomSetEditorRef = useRef<any>(null);
     const fnCustomCodeEditorRef = useRef<any>(null);
 
-    /*     // Dados para navegação
-    const [selectedPage, setSelectedPage] = useState<{
-        id: string;
-        name: string;
-    } | null>(null);
-
-    const [navigationParams, setNavigationParams] = useState<
-        Record<string, string>
-    >({});
-
-    // Dados para submit de formulário
-    const [selectedForm, setSelectedForm] = useState<{
-        id: string;
-        name: string;
-    } | null>(null); */
-
     const fnCustomSetRef = useRef<string>('');
     const fnCustomCodeRef = useRef<string>('');
 
@@ -437,7 +421,6 @@ const InteractionEditor = ({
                                 const page = availablePages.find(
                                     (p) => p.value === id
                                 );
-                                console.log(page);
                                 if (page) {
                                     setCurrentAction({
                                         ...currentAction,

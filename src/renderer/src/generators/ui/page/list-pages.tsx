@@ -70,7 +70,6 @@ const MainPageBuilder = ({
     };
 
     const confirmDeletion = async () => {
-        console.log(page);
         const pageConfig: DeleteConfig = {
             type: page.type,
             name: page.pageName,
@@ -136,7 +135,7 @@ const MainPageBuilder = ({
 
     const columns: ColumnDef<any>[] = [
         {
-            accessorKey: 'pageName',
+            accessorKey: 'description', 
             header: 'Name',
         },
         {

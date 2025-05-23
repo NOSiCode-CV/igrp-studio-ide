@@ -19,6 +19,7 @@ import {
     CheckboxInput,
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
+import { camelCase } from 'lodash-es';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -78,6 +79,9 @@ export function NewPageModal({
     };
 
     const validationSchema = Yup.object({
+        description: Yup.string().required(
+            t('thisFieldRequired', { name: t('Page Title') })
+        ),
         pageName: Yup.string()
             .required(t('thisFieldRequired', { name: t('pageName') }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
@@ -112,6 +116,16 @@ export function NewPageModal({
         formik.setFieldValue('path', generatedPath);
     };
 
+    const handleDescriptionBlur = async (
+        e: FocusEvent<HTMLInputElement>
+    ): Promise<void> => {
+        formik.handleBlur(e);
+
+        if (formik.values.pageName) return;
+        const generatedPath = `${camelCase(e.target.value)}`;
+        formik.setFieldValue('pageName', generatedPath);
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
@@ -128,6 +142,17 @@ export function NewPageModal({
                 >
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
+                            id="description"
+                            label={t('Page Title')}
+                            onChange={formik.handleChange}
+                            onBlur={handleDescriptionBlur}
+                            value={formik.values.description || ''}
+                            isTouched={formik.touched.description}
+                            error={formik.errors.description}
+                            placeholder="Todo List"
+                            isRequired
+                        />
+                        <TextInput
                             id="pageName"
                             label={t('pageName')}
                             onChange={formik.handleChange}
@@ -135,12 +160,13 @@ export function NewPageModal({
                             value={formik.values.pageName || ''}
                             isTouched={formik.touched.pageName}
                             error={formik.errors.pageName}
+                            placeholder="TodoList"
                             isRequired
                         />
                         <TextInput
                             id="path"
                             label="Path"
-                            placeholder="e.g. /docs/[[...slug]] or /(auth)/dashboard"
+                            placeholder="e.g. /docs/[[...slug]] or /(auth)/todo-list"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.path || ''}
@@ -165,7 +191,7 @@ export function NewPageModal({
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ?  t("saving") : t("save")}
+                            {formik.isSubmitting ? t('saving') : t('save')}
                         </Button>
                     </DialogFooter>
                 </form>

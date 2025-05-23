@@ -1,4 +1,5 @@
 import { ComponentRegisterConfig, CustomFunctionConfig, Import, RegisterState, State, TypeDef } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
+import { StyleComponent } from "@renderer/generators/ui/components/settings/style/types"
 
 export type LayoutMode = "vertical" | "horizontal"
 export type DropPosition = "top" | "bottom" | "left" | "right" | "inside"
@@ -68,6 +69,7 @@ export interface StructuredComponent {
       state: State
     };
   };
+  style?: StyleComponent
 }
 
 export type StructuredLayout = StructuredComponent
