@@ -1,7 +1,8 @@
 // utils/spacingToClasses.ts
-import type { SpacingState } from '../types';
 
-export function spacingToClasses(spacing: SpacingState): string {
+import { SpacingSytle } from "../types";
+
+export function spacingToClasses(spacing: SpacingSytle): string {
   const classes: string[] = [];
 
   // Map Tailwind class prefixes to spacing types

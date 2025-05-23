@@ -157,10 +157,12 @@ export const BindingConfigurationModal = ({
 
             const updatedComponent = {
                 ...values,
-                fields: values.fields.map((field) => {
-                    const { label, ...rest } = field; // Removes the 'input' property
-                    return rest;
-                }),
+                fields: (values.fields as LabeledElementField[]).map(
+                    (field) => {
+                        const { label, ...rest } = field; // Removes the 'label' property
+                        return rest;
+                    }
+                ),
             };
 
             createOrUpdateType({

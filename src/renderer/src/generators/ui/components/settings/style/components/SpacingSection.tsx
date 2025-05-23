@@ -6,7 +6,6 @@ import {
     Side,
     SpacingSytle,
     SpacingType,
-    StyleComponent,
     Unit,
 } from '../types';
 

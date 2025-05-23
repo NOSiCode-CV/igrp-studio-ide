@@ -23,9 +23,6 @@ const BoxWrapper = ({
 }: BoxContainerProps) => {
     const { id, componentName, children: components } = comp;
 
-    console.log( group,
-    className,)
-
     const {
         handleRemoveChildFromComponent,
         handleAddChildToComponent,

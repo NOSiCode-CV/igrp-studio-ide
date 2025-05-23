@@ -989,10 +989,10 @@
     vaul "1.1.2"
     zod "3.25.17"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.295":
-  version "0.0.1-alpha.295"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.295.tgz#72a59628b58391eed70bc72f365df669a0029efd"
-  integrity sha512-c+2ULTXFETSfVZdX7ku6P7U5LEHwMz2RO4MddgLLCBY/tiE+frv5afNqBObHZktMAwwiUBz31oR6X/oyrSJG6w==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.297":
+  version "0.0.1-alpha.297"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.297.tgz#bd18d5787857760f8953049279603449550b7876"
+  integrity sha512-c5vc/2Ah7jl/kqggZtn5PcXFS99pA/B/Cisz3xB6ee/5SWcV26nUs+XG5do73py9Mc8kqlUuja5krkye2cikRQ==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -4593,10 +4593,10 @@ electron-winstaller@5.4.0:
   optionalDependencies:
     "@electron/windows-sign" "^1.1.2"
 
-electron@36.3.0:
-  version "36.3.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-36.3.0.tgz#2f08fb25fb57338e80f33b324ed292f8d3c05b25"
-  integrity sha512-xk5AJtjxfFRAmehcChWSz/duxI+bJiUCIkH2IX2z8K1SyGsWdpqg+NoJ20JRQ6dpSJw89KXH6juESp8nSyBexA==
+electron@36.3.1:
+  version "36.3.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-36.3.1.tgz#12a8c1b1cd9163a4bd0cb60f89816243b26ab788"
+  integrity sha512-LeOZ+tVahmctHaAssLCGRRUa2SAO09GXua3pKdG+WzkbSDMh+3iOPONNVPTqGp8HlWnzGj4r6mhsIbM2RgH+eQ==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"
