@@ -62,7 +62,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                         <button
                             type="button"
                             onClick={() => toggleCollapse(key)}
-                            className="flex items-center justify-between w-full p-2 bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full p-2 rounded-md"
                         >
                             <Label htmlFor={key}>{label}</Label>
                             <span>
@@ -187,6 +187,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                         handleInputChange(fieldPath, value)
                                     }
                                     className=""
+                                    id={parentKey ? `${parentKey}.${key}` : key}
                                 />
                             );
                         case 'array':

@@ -24,26 +24,23 @@ const AlertDialogSync: React.FC<SyncAlertProps> = ({
     branch,
 }) => {
     const { t } = useTranslation();
-    
+
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{t('confirmSynchronization')}</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        {t('confirmSynchronization')}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                        {t('syncDescription', {
-                            branch: <b>"{branch}"</b>
-                        })}
+                        {t('syncDescription', { branch })}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => onClose(false)}>
                         {t('cancel')}
                     </AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={onConfirm}
-                        className="bg-igrp"
-                    >
+                    <AlertDialogAction onClick={onConfirm}>
                         {t('syncChanges')}
                     </AlertDialogAction>
                 </AlertDialogFooter>

@@ -33,7 +33,8 @@ function StatsCard({
             <div
                 className={cn(
                     `absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg`,
-                    gradient
+                    gradient,
+                    'z-0'
                 )}
             ></div>
             <CardHeader>
@@ -46,7 +47,8 @@ function StatsCard({
                         <button
                             className={cn(
                                 `text-primary-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-r p-2.5 rounded-full hover:shadow-lg hover:scale-110 transform`,
-                                buttonGradient
+                                buttonGradient,
+                                'z-10'
                             )}
                             onClick={onClick}
                         >

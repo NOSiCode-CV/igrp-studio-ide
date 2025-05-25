@@ -74,7 +74,7 @@ const CreateWorkspace = ({
                 onOpenChange?.(false);
             }
         } catch (error) {
-             console.error(t('workspaceCreationFailed'), error);
+            console.error(t('workspaceCreationFailed'), error);
             showErrorToast(error);
         } finally {
             setIsCreating(false);
@@ -97,7 +97,7 @@ const CreateWorkspace = ({
                 <DialogHeader>
                     <DialogTitle>{t('workspace.createTitle')}</DialogTitle>
                     <DialogDescription className="text-xs">
-                    {t('createWorkspaceInfo')}
+                        {t('createWorkspaceInfo')}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

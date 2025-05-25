@@ -44,7 +44,6 @@ interface FormEngineRef {
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
     ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath, label } = page;
-        const { type, path } = content;
 
         const {
             handleAddChildToComponent,
@@ -96,9 +95,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 if (basePath === undefined) return;
 
                 const config: any = {
+                    ...content,
                     id,
-                    type,
-                    path,
                     components,
                     functions,
                     types,
@@ -116,16 +114,16 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     name: label,
                 };
 
-                console.log(type === 'page' ? pageConfig : compConfig);
+                console.log(content.type === 'page' ? pageConfig : compConfig);
 
                 const { error } = await window.engine.createPage(
-                    type === 'page' ? pageConfig : compConfig,
+                    content.type === 'page' ? pageConfig : compConfig,
                     ENV_TYPES.NEXTJS,
                     basePath
                 );
 
                 if (error) {
-                    console.log(error)
+                    console.log(error);
                     showErrorToast(error);
                     return;
                 }
@@ -144,7 +142,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     if (pagePath === undefined) return;
 
                     const data = await window.api.getJsonContent(pagePath);
-                 
+
                     if (data.components) {
                         setLoading(true);
                         setAllComponents(data.components);
