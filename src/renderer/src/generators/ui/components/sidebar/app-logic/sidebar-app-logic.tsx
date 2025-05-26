@@ -21,6 +21,7 @@ import { EmptyList } from '@renderer/components/empty-list';
 import { Button } from '@renderer/components/ui/button';
 import { useEffect, useState } from 'react';
 import useCore from '@renderer/hooks/use-core';
+import useToast from '@renderer/hooks/useToast';
 
 interface Webhook {
     id: string;
@@ -35,22 +36,13 @@ interface ApplogicItem {
 }
 
 const SidebarAppLogic = ({ searchTerm = '' }: { searchTerm?: string }) => {
-    return (
-        <div className='p-4'>
-            <EmptyList
-                title={'Coming soon'}
-                description={'No applogics available for this application'}
-                icon={<Workflow className="h-12 w-12" />}
-            />
-        </div>
-    );
-
     const { fetchData } = useCore();
     const [applogics, setApplogics] = useState<ApplogicItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [expandedApplogics, setExpandedApplogics] = useState<string[]>([]);
     const [retryCount, setRetryCount] = useState(0);
+    const { showErrorToast } = useToast();
 
     const endpoint = import.meta.env.VITE_APPLOGIC_API_URL;
     const apiKey = import.meta.env.VITE__APPLOGIC_API_KEY;
@@ -86,12 +78,15 @@ const SidebarAppLogic = ({ searchTerm = '' }: { searchTerm?: string }) => {
                     ...(apiKey && { 'API-KEY': apiKey }),
                 };
 
-                const result = await fetchData(
+                const { result, error } = await fetchData(
                     `${endpoint}/${appCode}/endpoints`,
                     headers
                 );
-
-                if (!result) throw new Error('Failed to fetch applogics');
+                console.log(result);
+                if (error) {
+                    showErrorToast(error);
+                    throw new Error('Failed to fetch applogics: ' + error);
+                }
                 if (!Array.isArray(result))
                     throw new Error('Invalid API response format');
 
@@ -102,7 +97,7 @@ const SidebarAppLogic = ({ searchTerm = '' }: { searchTerm?: string }) => {
                         ? item.nodes.map((node) => ({
                               id: node.resourceId || '',
                               path: node.path || '',
-                              method: node.httpMethod,
+                              method: node.method,
                           }))
                         : [],
                 }));
