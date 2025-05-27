@@ -51,7 +51,7 @@ export const getRequiredDataSchema = (schema: any, tag: string) => {
             states[key] = [];
         }
         else {//TODO Test
-            states[key] = schema[key].default ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
+            states[key] = schema[key].default //? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
         }
     }
     return states;

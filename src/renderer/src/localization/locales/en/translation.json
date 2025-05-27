@@ -779,5 +779,6 @@
     "empty": "No imports configured",
     "placeholder": "e.g., import { lib } from 'react-library'"
   },
-  "addNewRowBottom":"Add new row bottom"
+  "addNewRowBottom":"Add New Row Bottom",
+  "addNewRowTop":"Add New Row Top"
 }

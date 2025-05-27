@@ -2,6 +2,7 @@ import { ProjectData } from 'src/main/types';
 import { projectIcons } from '@renderer/constants/appConstants';
 import { LucideIcon, Search } from 'lucide-react';
 import { Input } from './ui/input';
+import * as LucideIcons from 'lucide-react';
 
 interface HeadlineProps {
     icon?: LucideIcon; // Optional icon
@@ -110,4 +111,10 @@ function SubHeadline({
         </div>
     );
 }
-export { ProjectIcon, Headline, SearchInput, SubHeadline };
+
+function getIcon(iconName: string) {
+    console.log(iconName);
+    return LucideIcons[iconName] || undefined;
+}
+
+export { ProjectIcon, Headline, SearchInput, SubHeadline, getIcon };

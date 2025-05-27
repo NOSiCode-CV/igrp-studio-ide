@@ -20,12 +20,12 @@ export const useComponents = () => {
             Object.entries(currentNode.data).forEach(([key, value]) => {
                 // Caso 1: Estado direto (data.state)
                 if (key === 'state' && isState(value)) {
-                    states.push(validateState(value));
+                    states.push(validateState(value, currentNode.tag));
                 }
                 // Caso 2: Objeto aninhado que pode conter state
                 else if (value && typeof value === 'object') {
                     if ('state' in value && isState(value.state)) {
-                        states.push(validateState(value.state));
+                        states.push(validateState(value.state, currentNode.tag));
                     }
                 }
             });
@@ -42,10 +42,10 @@ export const useComponents = () => {
         }
 
         // Garante que o state tenha todas propriedades necessárias
-        function validateState(state: Partial<State>): State {
+        function validateState(state: Partial<State>, tag: string): State {
             return {
                 id: state.id || '',
-                type: state.type || 'any',
+                type: state.type?.replace('{{id}}', tag) || 'any',
                 name: state.name || 'unnamed',
                 defaultValue: state.defaultValue,
                 imports: state.imports || [],

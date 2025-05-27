@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -115,7 +115,8 @@ export const COMPONENT: Record<string, string> = {
     Password: "inputPassword",
     Textarea: 'inputTextarea',
     ColorPicker: "inputColor",
-    Select: "combobox",
+    Select: "select",
+    Combobox: "combobox",
     AddOn: "inputAddOn",
     Checkbox: "checkbox",
     Radio: "radio",
@@ -198,6 +199,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Phone]: Phone,
     [COMPONENT.FileUpload]: Upload,
     [COMPONENT.Select]: List,
+    [COMPONENT.Combobox]: List,
     [COMPONENT.Checkbox]: CheckSquare,
     [COMPONENT.Radio]: Radio,
     [COMPONENT.Switch]: ToggleLeft,
@@ -294,7 +296,8 @@ export const COMPONENT_MAP = {
     [COMPONENT.Textarea]: IGRPTextarea,
     [COMPONENT.Link]: IGRPInputUrl,
     [COMPONENT.AddOn]: IGRPInputAddOn,
-    [COMPONENT.Select]: IGRPCombobox,
+    [COMPONENT.Select]: IGRPSelect,
+    [COMPONENT.Combobox]: IGRPCombobox,
     [COMPONENT.Button]: IGRPButton,
     [COMPONENT.Label]: IGRPLabel,
     [COMPONENT.Checkbox]: IGRPCheckbox,
