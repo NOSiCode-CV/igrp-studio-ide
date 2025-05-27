@@ -118,7 +118,7 @@ export const useFakedata = () => {
                 angleAxisKey: "month",
             }
         },
-        [COMPONENT.Select]: {
+        [COMPONENT.Select || COMPONENT.Combobox]: {
             properties: {
                 options: [
                 ]

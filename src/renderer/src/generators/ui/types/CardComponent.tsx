@@ -1,6 +1,6 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
-import { IGRPButton } from '@igrp/igrp-framework-react-design-system';
+import { IGRPBadge, IGRPButton } from '@igrp/igrp-framework-react-design-system';
 import { useFakedata } from '../hooks/useFakeData';
 
 export interface CardComponentProps {
@@ -38,6 +38,11 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                     <IGRPButton {...args} {...iconProperties}>
                         {componentLabel}
                     </IGRPButton>
+                ) : componentName === COMPONENT.Badge ? (
+                    //@ts-ignore
+                    <IGRPBadge {...args} {...iconProperties}>
+                        {componentLabel}
+                    </IGRPBadge>
                 ) : (
                     //@ts-ignore
                     <Component

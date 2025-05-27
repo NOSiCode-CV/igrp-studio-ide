@@ -48,7 +48,7 @@ export function RemoteUrlDialog({ isOpen, onClose, onConfirm }: RemoteUrlDialogP
                   <Button variant="outline" onClick={onClose}>
                       {t('cancel')}
                   </Button>
-                  <Button onClick={handleConfirm} disabled={!url.trim()}>
+                  <Button onClick={handleConfirm} disabled={!url.trim()} variant={"default"}>
                       {t('addRemote')}
                   </Button>
               </DialogFooter>

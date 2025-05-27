@@ -197,7 +197,7 @@ export const useWorkspace = () => {
                 return data
             })
 
-            if (openProject)
+            if (!openProject)
                 showSuccessToast(t('savedSuccessfully', { name: result.name }));
 
             dispatch(setBasePath(result.path));
