@@ -6,7 +6,7 @@ export function useProjectValidation({ t, step }) {
         name: Yup.string().required(
             t('fieldRequired', { name: t('projectName') })
         ).matches(
-            PATTERNS.SPECIAL_CHARACTERS,
+            PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME,
             t('msgSpecialCharactersRegex')
         ).max(
             50,

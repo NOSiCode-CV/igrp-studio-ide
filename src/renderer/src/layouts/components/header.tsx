@@ -48,6 +48,7 @@ import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
+import { getIcon } from '@renderer/components/shared-ui';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -63,8 +64,9 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const { workspace } = useWorkspace();
 
-    const { loading, startContainers, stopContainers, stopService } =
-        useDocker({workspace});
+    const { loading, startContainers, stopContainers, stopService } = useDocker(
+        { workspace }
+    );
 
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([]);
 
@@ -96,6 +98,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
         const path = basePath || workspace.path;
         if (!path) return;
         try {
+            console.log('Opening IDE:', ideType, 'at path:', path);
             await window.api.openIDE({ basePath: path, ideType });
         } catch (error) {
             console.error(error);
@@ -169,7 +172,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
     };
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
-
     return (
         <>
             <TooltipProvider>
@@ -265,11 +267,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                                     onClick={() => openIDE(key)}
                                                     className="flex items-center"
                                                 >
-                                                    <IGRPIcon
-                                                        iconName={config.icon}
-                                                    />
-                                                    <span>
-                                                        {t('openIn')} {config.name}
+                                                   {/*  {getIcon(config.icon)} */}
+                                                    <span className=''>
+                                                        {t('openIn')}{'  '}
+                                                        {config.name}
                                                     </span>
                                                 </DropdownMenuItem>
                                             );

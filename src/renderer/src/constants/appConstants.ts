@@ -13,6 +13,7 @@ export const PATTERNS = {
     PARAMS_VALIDATION: /^[a-zA-Z0-9_]+$/,
     PATH_VALIDATION: /^[a-zA-Z_/]+$/,
     SPECIAL_CHARACTERS: /^[a-zA-Z0-9\s]*$/,
+    SPECIAL_CHARACTERS_PROJECT_NAME: /^[a-zA-ZÀ-ÿ0-9\s]+$/,
     NO_SPACE_BUT_ALLOW_HYPHEN: /^[^\s]+$/,
     NAME_APP_VALIDATION: /^[a-zA-Z_-]+$/,
     // Next.js route segment validation (improved readability)

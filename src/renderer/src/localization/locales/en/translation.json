@@ -356,7 +356,7 @@
   "noRemoteConfigured": "No remote configured for this repository.",
   "commitsPending": "Commits pending. Please commit changes before syncing.",
   "confirmSynchronization": "Confirm Synchronization",
-  "syncDescription": "This will sync your local branch {{branch}} with remote. This action will pull changes from remote and push your local changes. Make sure you've committed all your changes.",
+  "syncDescription": "This will sync your local branch  \"{{branch}}\" with remote. This action will pull changes from remote and push your local changes. Make sure you've committed all your changes.",
   "syncChanges": "Sync Changes",
   "projectPathNotFound": "Project path not found",
   "invalidProjectStructure": "Invalid project structure",
@@ -778,5 +778,7 @@
     "count": "{{count}} imports",
     "empty": "No imports configured",
     "placeholder": "e.g., import { lib } from 'react-library'"
-  }
+  },
+  "addNewRowBottom":"Add New Row Bottom",
+  "addNewRowTop":"Add New Row Top"
 }
