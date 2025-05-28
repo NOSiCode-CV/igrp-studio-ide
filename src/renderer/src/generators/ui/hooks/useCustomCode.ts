@@ -74,13 +74,21 @@ const useCustomCode = (): CustomCodeHook => {
                     extractAllStates()
                 ]);
 
+
+                const { result } = metadataResponse
+
+                console.log(result)
+
+
                 setMetadataStates(metadataStates || []);
 
                 setSnippets(snippetsResponse.result?.codes || []);
+                if (result) {
+                    setMetadataFunctions(result.functions || []);
 
-                setMetadataFunctions(metadataResponse.result.functions || []);
+                    setTypes(result.types || [])
 
-                setTypes(metadataResponse.result.types || [])
+                }
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to load resources'));
                 console.error('Error loading data:', err);
@@ -90,14 +98,14 @@ const useCustomCode = (): CustomCodeHook => {
         };
         fetchData();
 
-        /*   window.electron.ipcRenderer.on('folder-change', fetchData);
-  
-          return () => {
-              window.electron.ipcRenderer.removeListener(
-                  'folder-change',
-                  fetchData
-              );
-          }; */
+        window.electron.ipcRenderer.on('folder-change', fetchData);
+
+        return () => {
+            window.electron.ipcRenderer.removeListener(
+                'folder-change',
+                fetchData
+            );
+        };
     }, [basePath]);
 
     return {

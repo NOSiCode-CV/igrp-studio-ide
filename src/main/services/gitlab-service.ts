@@ -1,6 +1,7 @@
 import { Gitlab } from '@gitbeaker/node';
 import { GitStore } from './git-store';
 import { BrowserWindow } from 'electron';
+import { GitProviderConfig } from '../types';
 
 let gitlab: any = null;
 
@@ -127,12 +128,15 @@ export const GitLabService = {
     }
   },
 
-  async getConfig(): Promise<any> {
-    // Add logic to retrieve GitLab configuration
-    return {}; // Example: return an empty object or actual configuration
+  async getGitlabConfigs(): Promise<GitProviderConfig[]> {
+    return GitStore.getGitlabConfigs()
   },
 
-  async setConfig(_config: any): Promise<void> {
-    // Add logic to retrieve GitLab configuration
+  async saveGitlabConfig(config: GitProviderConfig) {
+    GitStore.saveGitlabConfig(config)
+  },
+
+  async setActiveGitlabConfig(id: string) {
+    GitStore.setActiveGitlabConfig(id)
   }
 };

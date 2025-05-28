@@ -52,6 +52,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
     const dispatch: any = useDispatch();
     const { showSuccessToast } = useToast();
 
+    const { t } = useTranslation();
+
+
     const {
         actions: { updateWorkspace, deleteWorkspace },
     } = useWorkspace();
@@ -76,7 +79,6 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
             setIsSaving(false);
         }, 800);
     };
-    const { t } = useTranslation();
 
     const handleDeleteWorkspace = () => {
         setIsDeleting(true);

@@ -225,3 +225,13 @@ export interface ServiceInfo {
     labels: Record<string, string>
     env_file: { file: string }[]
 }
+
+export interface GitProviderConfig {
+    id: string;
+    name: string;
+    baseUrl: string;
+    clientId: string;
+    clientSecret: string;
+    active: boolean;
+    isDefault?: boolean;
+  }

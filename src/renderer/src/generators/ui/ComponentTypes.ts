@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -126,6 +126,7 @@ export const COMPONENT: Record<string, string> = {
     RangeSlider: "slider",
     FileUpload: "inputFile",
     Hidden: "inputHidden",
+    DatePickerRange: "datePickerRange",
 
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
@@ -215,6 +216,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Maps]: Map,
     [COMPONENT.Carousel]: Play,
     [COMPONENT.Fingerprint]: Fingerprint,
+    [COMPONENT.DatePickerRange]: Calendar,
 
     [COMPONENT.Panel]: Layout,
     [COMPONENT.Card]: CreditCard,
@@ -301,11 +303,12 @@ export const COMPONENT_MAP = {
     [COMPONENT.Button]: IGRPButton,
     [COMPONENT.Label]: IGRPLabel,
     [COMPONENT.Checkbox]: IGRPCheckbox,
-    [COMPONENT.Radio]: IGRPRadioButton,
+    [COMPONENT.Radio]: IGRPRadioGroup,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
     [COMPONENT.Switch]: IGRPSwitch,
     [COMPONENT.Search]: IGRPInputSearch,
+    [COMPONENT.DatePickerRange]: IGRPDatePickerRange,
 
     [COMPONENT.Piechart]: IGRPPieChart,
     [COMPONENT.Areachart]: IGRPAreaChart,

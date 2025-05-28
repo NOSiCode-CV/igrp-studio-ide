@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import Header from './components/header';
-import withRouter from '@renderer/common/withRouter';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import {
     IGRPSidebar,
@@ -80,4 +79,4 @@ const MainLayout = (props: LayoutProps) => {
     );
 };
 
-export default withRouter(MainLayout);
+export default MainLayout;

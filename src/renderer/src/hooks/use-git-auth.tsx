@@ -158,10 +158,10 @@ const useGitAuth = () => {
         dispatch(setRepositoriesGitLab([]));
     };
 
-    const setGitlabConfig = async (config: any) => {
+    const saveGitlabConfig = async (config: any) => {
         try {
             await window.electron.ipcRenderer.invoke(
-                'set-gitlab-config',
+                'save-gitlab-config',
                 config
             );
         } catch (error) {
@@ -186,6 +186,20 @@ const useGitAuth = () => {
         return null;
     };
 
+    const setActiveGitlabConfig = async () => {
+        try {
+            return await window.electron.ipcRenderer.invoke(
+                'set-ative-gitlab-config'
+            );
+        } catch (error) {
+            console.error(
+                'Falha ao carregar carregar informações do GitLab:',
+                error
+            );
+        }
+        return null;
+    };
+
     return {
         userGitHub,
         userGitLab,
@@ -197,8 +211,9 @@ const useGitAuth = () => {
         logoutGithub: handleLogout,
         logoutGitLab: handleLogoutGitLab,
         reloadData: loadGithubData,
-        setGitlabConfig,
+        saveGitlabConfig,
         getGitlabConfig,
+        setActiveGitlabConfig,
         isLoading,
     };
 };

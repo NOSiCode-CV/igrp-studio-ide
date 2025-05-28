@@ -46,7 +46,7 @@ export default function TabManager({ basePath }: ContentProps) {
     const handleClickOpenGerador = (page: any) => {
         initializeTabFromCurrentItem({
             ...page,
-            label: page.content.pageName || page.content.name,
+            label: page.content.description || page.content.pageName,
             id: page.content.id,
         });
     };
