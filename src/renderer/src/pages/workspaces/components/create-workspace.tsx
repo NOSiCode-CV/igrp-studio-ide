@@ -83,7 +83,6 @@ const CreateWorkspace = ({
 
     const handleSelectDirectory = async () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
-
         window.electron.ipcRenderer.on('file-content', (_e, result) => {
             if (!result.canceled) {
                 setDirectoryPath(result.filePaths[0]);
@@ -150,7 +149,7 @@ const CreateWorkspace = ({
                                 variant="outline"
                                 size="icon"
                                 onClick={handleSelectDirectory}
-                                //disabled={isCreating}
+                                disabled={isCreating}
                                 type="button"
                             >
                                 <FolderOpen className="h-4 w-4" />

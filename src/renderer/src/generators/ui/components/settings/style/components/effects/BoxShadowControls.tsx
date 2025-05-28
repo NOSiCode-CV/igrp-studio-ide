@@ -23,6 +23,8 @@ export function BoxShadowControls({
     const popoverRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const { t } = useTranslation();
+
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -65,7 +67,6 @@ export function BoxShadowControls({
             updatePopoverPosition();
         }
     }, [editingIndex]);
-    const { t } = useTranslation();
 
     const addShadow = () => {
         const newShadow = {

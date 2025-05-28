@@ -321,10 +321,12 @@ ipcMain.handle('get-app-version', () => {
     return app.getVersion();
 });
 
+
 ipcMain.on('open-directory-dialog', async (event) => {
+
     await dialog
         .showOpenDialog(mainWindow, {
-            properties: ['openDirectory', 'createDirectory'],
+            properties: ['openDirectory', 'createDirectory', 'showHiddenFiles'],
             buttonLabel: 'Select Destination Folder',
         })
         .then((result) => {

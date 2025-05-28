@@ -1,29 +1,68 @@
 import { Button } from '@renderer/components/ui/button';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
-import { Github, Gitlab } from 'lucide-react';
+import { Github, Gitlab, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
+import useToast from '@renderer/hooks/useToast';
+import { nanoid } from '@reduxjs/toolkit';
+
+
+interface GitProviderConfig {
+    id: string;
+    name: string;
+    baseUrl: string;
+    clientId: string;
+    clientSecret: string;
+    active: boolean;
+    isDefault?: boolean;
+}
+
+const DEFAULT_PROVIDERS: GitProviderConfig[] = [
+    {
+        id: 'gitlab_nosi',
+        name: 'GitLab NOSi',
+        baseUrl: import.meta.env.VITE_GITLAB_BASE_URL,
+        clientId: import.meta.env.VITE_GITLAB_CLIENT_ID,
+        clientSecret: import.meta.env.VITE_GITLAB_CLIENT_SECRET,
+        active: false,
+        isDefault: true,
+    },
+];
+
 
 // Componente para o formulário de configuração GitLab
-function GitLabConfigForm({ onSave }: { onSave: (config: any) => void }) {
-    const [baseUrl, setBaseUrl] = useState(
-        import.meta.env.VITE_GITLAB_BASE_URL
-    );
-    const [clientId, setClientId] = useState(
-        import.meta.env.VITE_GITLAB_CLIENT_ID
-    );
-    const [clientSecret, setClientSecret] = useState(
-        import.meta.env.VITE_GITLAB_CLIENT_SECRET
-    );
+function GitLabConfigForm({ config, onSave }: { config: GitProviderConfig; onSave: (config: GitProviderConfig) => void }) {
+
+    const [name, setName] = useState(config.name);
+    const [baseUrl, setBaseUrl] = useState(config.baseUrl);
+    const [clientId, setClientId] = useState(config.clientId);
+    const [clientSecret, setClientSecret] = useState(config.clientSecret);
+
+    useEffect(() => {
+        setName(config.name);
+        setBaseUrl(config.baseUrl);
+        setClientId(config.clientId);
+        setClientSecret(config.clientSecret);
+    }, [config]);
 
     const handleSave = () => {
-        onSave({ baseUrl, clientId, clientSecret });
+        onSave({ ...config, name, baseUrl, clientId, clientSecret });
     };
 
     return (
         <div className="space-y-4">
+            <div className="space-y-2">
+                <Label>Custom GitLab Name</Label>
+                <Input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Custom GitLab Name"
+                    className="input"
+                />
+            </div>
             <div className="space-y-2">
                 <Label>GitLab Base URL</Label>
                 <Input
@@ -62,25 +101,18 @@ interface AccountProps {
     icon: React.ReactNode;
     connected: boolean;
     action?: () => void;
-    onGitLabConfigSave?: (config: any) => void; // Função para salvar a configuração
 }
 
 function Account({
     name,
     icon,
     connected,
-    action,
-    onGitLabConfigSave,
+    action
 }: AccountProps) {
     const { t } = useTranslation();
-    const [isGitLabConfigVisible, setIsGitLabConfigVisible] = useState(false); // Controla a visibilidade do formulário de configuração GitLab
 
     const handleClick = () => {
         if (action) action();
-    };
-
-    const handleGitLabConfigClick = () => {
-        setIsGitLabConfigVisible(!isGitLabConfigVisible); // Alterna a visibilidade do formulário
     };
 
     return (
@@ -92,15 +124,6 @@ function Account({
                 </div>
 
                 <div className="space-x-2">
-                    {/* Exibir o botão para configuração GitLab somente se estiver conectado */}
-                    {name === 'gitlab' && connected && (
-                        <Button
-                            variant="outline"
-                            onClick={handleGitLabConfigClick} // Alterna a visibilidade do formulário de configuração GitLab
-                        >
-                            {t('configure')}
-                        </Button>
-                    )}
                     <Button
                         variant={connected ? 'outline' : 'default'}
                         onClick={handleClick}
@@ -109,14 +132,6 @@ function Account({
                     </Button>
                 </div>
             </div>
-            {/* Formulário de configuração GitLab */}
-            {isGitLabConfigVisible && (
-                <div className="mt-4 p-4 border rounded bg-gray-100">
-                    <GitLabConfigForm
-                        onSave={(config) => onGitLabConfigSave?.(config)}
-                    />
-                </div>
-            )}
         </>
     );
 }
@@ -130,13 +145,27 @@ export function ConnectedAccountsSettings() {
         userGitLab,
         logoutGithub,
         logoutGitLab,
-        setGitlabConfig,
+        saveGitlabConfig,
+        getGitlabConfig
     } = useGithubAuth();
 
-    const handleGitLabConfigSave = (config: any) => {
-        // Salva as configurações do GitLab (por exemplo, em electron-store)
-        setGitlabConfig(config);
+    const { showSuccessToast } = useToast();
+
+    const [isGitLabConfigVisible, setIsGitLabConfigVisible] = useState(false); // Controla a visibilidade do formulário de configuração GitLab
+
+    const [providers, setProviders] = useState<GitProviderConfig[]>([...DEFAULT_PROVIDERS]);
+
+    const handleGitLabConfigSave = async (config: GitProviderConfig) => {
+        const response = await saveGitlabConfig(config);
+        showSuccessToast(t('configSaved'));
     };
+
+    useEffect(() => {
+        getGitlabConfig().then((config) => {
+            setProviders(config || []);
+            console.log(config)
+        });
+    }, []);
 
     return (
         <div>
@@ -155,13 +184,40 @@ export function ConnectedAccountsSettings() {
                     connected={userGitHub}
                     action={userGitHub ? logoutGithub : loginGithub}
                 />
-                <Account
-                    name="gitlab"
-                    icon={<Gitlab size={20} />}
-                    connected={userGitLab}
-                    action={userGitLab ? logoutGitLab : loginGitLab}
-                    onGitLabConfigSave={handleGitLabConfigSave} // Função para salvar as configurações do GitLab
-                />
+
+                {providers
+                    .map((provider) => (
+                        <Account
+                            name={provider.name}
+                            icon={<Gitlab size={20} />}
+                            connected={userGitLab}
+                            action={userGitLab ? logoutGitLab : loginGitLab}
+                        />
+                    ))}
+
+                {/* Formulário de configuração GitLab */}
+                {isGitLabConfigVisible && (
+                    <div className="mt-4 p-4 border rounded bg-gray-100">
+                        <GitLabConfigForm
+                            config={{
+                                id: nanoid(),
+                                name: '',
+                                baseUrl: '',
+                                clientId: '',
+                                clientSecret: '',
+                                active: false,
+                                isDefault: false,
+                            }}
+                            onSave={(config) => handleGitLabConfigSave(config)}
+                        />
+                    </div>
+                )}
+
+                <div className="pt-2 hidden">
+                    <Button variant="outline" onClick={() => setIsGitLabConfigVisible(!isGitLabConfigVisible)}>
+                        <Plus /> Adicionar GitLab
+                    </Button>
+                </div>
             </div>
         </div>
     );

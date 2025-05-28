@@ -106,12 +106,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                 const pageConfig: PageConfig = {
                     ...config,
-                    pageName: label,
                 };
 
                 const compConfig: ComponentConfig = {
                     ...config,
-                    name: label,
                 };
 
                 console.log(content.type === 'page' ? pageConfig : compConfig);

@@ -1,3 +1,5 @@
+import { GitProviderConfig } from '../types';
+
 let store: any = null;
 
 export const GitStore = {
@@ -64,10 +66,36 @@ export const GitStore = {
 
   getClonedRepos(): number[] {
     const repos = store.get('cloned_repos', []);
-    return repos || []; 
+    return repos || [];
   },
 
   getProjectPaths(): Record<number, string> {
     return store.get('project_paths', {});
+  },
+
+  getGitlabConfigs: (): GitProviderConfig[] =>
+    store.get('gitlabConfigs', []) as GitProviderConfig[],
+
+  saveGitlabConfig: (config: GitProviderConfig) => {
+    const configs = GitStore.getGitlabConfigs();
+    const existingIndex = configs.findIndex((c) => c.id === config.id);
+
+    let newConfigs;
+    if (existingIndex !== -1) {
+      configs[existingIndex] = config; // Atualiza o existente
+      newConfigs = [...configs];
+    } else {
+      newConfigs = [...configs, config]; // Adiciona novo
+    }
+
+    store.set('gitlabConfigs', newConfigs);
+  },
+
+  setActiveGitlabConfig: (id: string) => {
+    const configs = GitStore.getGitlabConfigs().map((c) => ({
+      ...c,
+      active: c.id === id,
+    }));
+    store.set('gitlabConfigs', configs);
   }
 };
