@@ -19,6 +19,7 @@ export function FilterControls({
   const popoverRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,7 +86,6 @@ export function FilterControls({
     return `${filter.type}(${filter.value}${filter.unit})`;
   };
   
-  const { t } = useTranslation();
   const FilterEditor = ({ filter, index }: { filter: FilterValue; index: number }) => {
     const filterType = filterTypes.find(t => t.name === filter.type);
 

@@ -29,8 +29,8 @@
 		"@hello-pangea/dnd": "^18.0.1",
 		"@hookform/resolvers": "^5.0.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
-		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.185",
-		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.300",
+		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.188",
+		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.302",
 		"@igrp/igrp-studio-springboot-engine": "0.0.1-alpha.85",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^22.0.0",
@@ -113,7 +113,7 @@
 		"use-debounce": "^10.0.4",
 		"vaul": "^1.1.2",
 		"yup": "^1.6.1",
-		"zod": "^3.25.28"
+		"zod": "^3.25.30"
 	},
 	"devDependencies": {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",
@@ -121,10 +121,10 @@
 		"@electron-toolkit/tsconfig": "^1.0.1",
 		"@tailwindcss/postcss": "^4.1.7",
 		"@types/node": "^22.15.21",
-		"@types/react": "^19.1.5",
+		"@types/react": "^19.1.6",
 		"@types/react-dom": "^19.1.5",
 		"@vitejs/plugin-react": "^4.5.0",
-		"electron": "36.3.1",
+		"electron": "36.2.1",
 		"electron-builder": "^26.0.12",
 		"electron-builder-squirrel-windows": "26.0.12",
 		"electron-devtools-installer": "^4.0.0",

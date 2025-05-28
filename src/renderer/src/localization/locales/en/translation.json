@@ -454,7 +454,7 @@
   "projects": "Projects",
   "newService": "New Service",
   "services": "Services",
-  "enableCustonValidation": "Enable Custon Validation",
+  "enableCustonValidation": "Enable Custom Validation",
   "run": "Run",
   "savedSuccessfully": "'{{name}}' saved successfully",
   "stop": "Stop",

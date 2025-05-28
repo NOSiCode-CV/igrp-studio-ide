@@ -936,10 +936,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.185":
-  version "0.0.0-alpha.185"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.185.tgz#55e318c7673b9f5fbbabadbac17f09839d5f72f3"
-  integrity sha512-zioXaa4PCNiYhC/AbxEBAT+swSecDIxZNHCA4GFjnpo/JRQs4NEUtWH/lj57Hf9mH3ArvCoIw0fx8sFEL9VxaQ==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.188":
+  version "0.0.0-alpha.188"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.188.tgz#ac23c2792a03179bf5f88d73def0e6ae70b1ba34"
+  integrity sha512-2d/s7xJwyz7DOS5x4/uLjsgRFsFfs45BzS2i3LI2ZbQDpL4qBt+aG87M3h07Vwt31r40vT+aHEVSnqwFO3NE5A==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.11"
@@ -989,10 +989,10 @@
     vaul "1.1.2"
     zod "3.25.17"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.300":
-  version "0.0.1-alpha.300"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.300.tgz#0841cca06169ef93b7af453fefd0b5b9bdf6d1f2"
-  integrity sha512-KRy766DEJ3zDjplf6de90b4dTTzgTfTCzodNFm3/ynDyojO2j/ezhlwFEw0kRfX3GltVCkhM5KtUeXKo7x1IMw==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.302":
+  version "0.0.1-alpha.302"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.302.tgz#456eb32a06e5dea35e34cb169892eff8c9457fc1"
+  integrity sha512-PLvLk6mHHztikVJuWdK+CGVkAnlTMpPdKxTWnV0JeS7oZcQmWT04MsfstpglXHAElCHe3w4fLeM4DXC10w3JyA==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1014,10 +1014,10 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.90":
-  version "0.0.1-alpha.90"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.90.tgz#1f686a4648d0cb9c805b6523c547ce7a9379fce9"
-  integrity sha512-gfxL01HRfBBZ/EaurZYJ/Z982jleFXvCVKRVT8N5fSTLfaqGvY0gOT1FYcHk8zhKxUqP+xKHuG1LNCNw2Fdhlw==
+"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.85":
+  version "0.0.1-alpha.85"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.85.tgz#1563fa0de6db6690489522a128380dfc2ec45e49"
+  integrity sha512-PQQQSxOBE3WpRUTkhFbG++aexV/hQO9QW/VRpC1taYy0T1CQ9wrq9A/UfyFCCTCvfkiPG6ErcRHgLv7iRauDwQ==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -2881,10 +2881,17 @@
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.12.tgz#b5d76568485b02a307238270bfe96cb51ee2a044"
   integrity sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==
 
-"@types/react@*", "@types/react@^19.1.5":
+"@types/react@*":
   version "19.1.5"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-19.1.5.tgz#9feb3bdeb506d0c79d8533b6ebdcacdbcb4756db"
   integrity sha512-piErsCVVbpMMT2r7wbawdZsq4xMvIAhQuac2gedQHysu1TZYEigE6pnFfgZT+/jQnrRuF5r+SHzuehFjfRjr4g==
+  dependencies:
+    csstype "^3.0.2"
+
+"@types/react@^19.1.6":
+  version "19.1.6"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-19.1.6.tgz#dee39f3e1e9a7d693f156a5840570b6d57f325ea"
+  integrity sha512-JeG0rEWak0N6Itr6QUx+X60uQmN+5t3j9r/OVDtWzFXKaj6kD1BwJzOksD0FF6iWxZlbE1kB0q9vtnU2ekqa1Q==
   dependencies:
     csstype "^3.0.2"
 
@@ -4593,10 +4600,10 @@ electron-winstaller@5.4.0:
   optionalDependencies:
     "@electron/windows-sign" "^1.1.2"
 
-electron@36.3.1:
-  version "36.3.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-36.3.1.tgz#12a8c1b1cd9163a4bd0cb60f89816243b26ab788"
-  integrity sha512-LeOZ+tVahmctHaAssLCGRRUa2SAO09GXua3pKdG+WzkbSDMh+3iOPONNVPTqGp8HlWnzGj4r6mhsIbM2RgH+eQ==
+electron@36.2.1:
+  version "36.2.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-36.2.1.tgz#7c9d7c6c7076a3ddb7b1c326a851cb92c775b0b1"
+  integrity sha512-mm1Y+Ms46xcOTA69h8hpqfX392HfV4lga9aEkYkd/Syx1JBStvcACOIouCgGrnZpxNZPVS1jM8NTcMkNjuK6BQ==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"
@@ -10044,7 +10051,7 @@ zod@^3.20.2:
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.20.tgz#c36739c52f6d01cf04c53bf56d99f2f5488739ee"
   integrity sha512-z03fqpTMDF1G02VLKUMt6vyACE7rNWkh3gpXVHgPTw28NPtDFRGvcpTtPwn2kMKtQ0idtYJUTxchytmnqYswcw==
 
-zod@^3.25.28:
-  version "3.25.28"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.28.tgz#8ab13d04afa05933598fd9fca32490ca92c7ea3a"
-  integrity sha512-/nt/67WYKnr5by3YS7LroZJbtcCBurDKKPBPWWzaxvVCGuG/NOsiKkrjoOhI8mJ+SQUXEbUzeB3S+6XDUEEj7Q==
+zod@^3.25.30:
+  version "3.25.30"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.30.tgz#ffd1b5cc06ff6de4ab35134d8eadb945314c4898"
+  integrity sha512-VolhdEtu6TJr/fzGuHA/SZ5ixvXqA6ADOG9VRcQ3rdOKmF5hkmcJbyaQjUH5BgmpA9gej++zYRX7zjSmdReIwA==

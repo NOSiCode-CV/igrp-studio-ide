@@ -1,6 +1,5 @@
 import React from 'react';
 import Header from './components/header';
-import withRouter from '@renderer/common/withRouter';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
 import { SidebarProvider } from '@renderer/components/ui/sidebar';
@@ -55,4 +54,4 @@ const Layout = (props: LayoutProps) => {
     );
 };
 
-export default withRouter(Layout);
+export default Layout;

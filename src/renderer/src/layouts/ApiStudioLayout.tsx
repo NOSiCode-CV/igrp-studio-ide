@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import withRouter from '@renderer/common/withRouter';
 import { useDispatch } from 'react-redux';
 
 import {
@@ -92,4 +91,4 @@ const Layout = (props: LayoutProps) => {
     );
 };
 
-export default withRouter(Layout);
+export default Layout;

@@ -7,7 +7,7 @@ export const EngineService = {
     },
 
     async startWatching(folderPath: string): Promise<void> {
-        await window.electron.watchFolder(folderPath);
+        await window.electron.watchFolder(`${folderPath}/src/app/(myapp)`);
     }
     ,
     async getCodeSnippets(): Promise<HandlerResponse> {

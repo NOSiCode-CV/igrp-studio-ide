@@ -3,6 +3,7 @@ import { GitHubService } from "../services/github-service";
 import { GitLabService } from "../services/gitlab-service";
 import { GitStore } from "../services/git-store";
 import { GitService } from "../services/git-service";
+import { GitProviderConfig } from "../types";
 
 // GitHub
 ipcMain.handle('gitauth-initialize', async (_event, token) => {
@@ -125,8 +126,12 @@ ipcMain.handle('is-auto-commit', async () => {
 
 ///GitLabService store config
 ipcMain.handle('get-gitlab-config', async () => {
-    return GitLabService.getConfig();
+    return GitLabService.getGitlabConfigs();
 });
-ipcMain.handle('set-gitlab-config', async (config: any) => {
-    return GitLabService.setConfig(config);
+ipcMain.handle('set-ative-gitlab-config', async (_event, id: string): Promise<void> => {
+    return GitLabService.setActiveGitlabConfig(id);
 });
+
+ipcMain.handle('save-gitlab-config', async (_event, config: GitProviderConfig) => {
+    return GitLabService.saveGitlabConfig(config);
+}); 
