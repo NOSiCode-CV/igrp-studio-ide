@@ -780,5 +780,7 @@
     "placeholder": "e.g., import { lib } from 'react-library'"
   },
   "addNewRowBottom":"Add New Row Bottom",
-  "addNewRowTop":"Add New Row Top"
+  "addNewRowTop":"Add New Row Top",
+  "forceDynamic": "Force Dynamic",
+  "pageTitle": "Page Title"
 }

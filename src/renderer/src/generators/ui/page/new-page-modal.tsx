@@ -90,9 +90,7 @@ export function NewPageModal({
             .required(t('thisFieldRequired', { name: t('path') }))
             .matches(
                 PATTERNS.VALID_SEGMENT_PATTERN,
-                t(
-                    'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
-                )
+                'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
             ),
     });
 
@@ -143,7 +141,7 @@ export function NewPageModal({
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
                             id="description"
-                            label={t('Page Title')}
+                            label={t('pageTitle')}
                             onChange={formik.handleChange}
                             onBlur={handleDescriptionBlur}
                             value={formik.values.description || ''}
