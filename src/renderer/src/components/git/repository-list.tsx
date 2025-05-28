@@ -39,7 +39,7 @@ export function RepositoryList() {
     const [nameDialog, setNameDialog] = useState({
         isOpen: false,
         defaultName: '',
-        onConfirm: (_name: string) => {},
+        onConfirm: (_name: string) => { },
     });
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -121,6 +121,7 @@ export function RepositoryList() {
         window.electron.ipcRenderer.on(
             'clone-progress',
             async (_event, data) => {
+                console.log(data)
                 if (data.status === 'success' || data.status === 'error') {
                     setCloningRepoId(null);
                 }
@@ -129,6 +130,7 @@ export function RepositoryList() {
                         t('repositoryClonedSuccessfully', { path: data.path })
                     );
                     try {
+
                         const { project, path } = data;
                         const { config, type } = project;
 
@@ -349,10 +351,10 @@ export function RepositoryList() {
                         <div className="p-8 text-center">
                             <AlertCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                             <p className="text-gray-500 font-medium">
-                            {t('noRepositoriesFound')}
+                                {t('noRepositoriesFound')}
                             </p>
                             <p className="text-gray-400 text-sm mt-1">
-                            {t('tryAdjustingSearchOrFilters')}
+                                {t('tryAdjustingSearchOrFilters')}
                             </p>
                         </div>
                     ) : (

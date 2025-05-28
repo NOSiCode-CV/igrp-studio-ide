@@ -83,8 +83,6 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
     React.useEffect(() => {
         if (!componentName) return;
 
-        console.log(currentPath, componentName)
-
         const loadProps = async () => {
             try {
                 const data = await getPropertiesComponent(
@@ -146,10 +144,8 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                 );
 
                 // Initialize form values
-                //TODO : fix this subtree values
                 const initialValues = Object.entries(data ?? {}).reduce(
                     (acc, [key, config]) => {
-                        console.log(config);
                         acc[key] = childProperties[key] ?? config.default;
                         return acc;
                     },
