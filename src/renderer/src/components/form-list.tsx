@@ -371,23 +371,23 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                         type
                                     )
                                         ? (
-                                              dynamicOptions?.[
-                                                  `${index}-${key}`
-                                              ] || options
-                                          )?.filter(
-                                              (d) =>
-                                                  row[key] &&
-                                                  d.value === row[key]
-                                          )[0]?.value
+                                            dynamicOptions?.[
+                                            `${index}-${key}`
+                                            ] || options
+                                        )?.filter(
+                                            (d) =>
+                                                row[key] &&
+                                                d.value === row[key]
+                                        )[0]?.value
                                         : '';
                                     const selectMultiValues = [
                                         'multiSelect',
                                     ].includes(type)
                                         ? options
-                                              ?.filter((d) =>
-                                                  row[key]?.includes(d.value)
-                                              )
-                                              .map((d) => d.value)
+                                            ?.filter((d) =>
+                                                row[key]?.includes(d.value)
+                                            )
+                                            .map((d) => d.value)
                                         : [];
                                     return (
                                         <TableCell
@@ -404,8 +404,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                     </button>
                                                 )}
                                                 {type === 'group' &&
-                                                items &&
-                                                items?.length > 0 ? (
+                                                    items &&
+                                                    items?.length > 0 ? (
                                                     <div className="flex gap-2 align-center">
                                                         {items.map(
                                                             (
@@ -414,7 +414,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                             ) => {
                                                                 const itemValue =
                                                                     row[
-                                                                        item.key
+                                                                    item.key
                                                                     ] || '';
                                                                 const itemOptions =
                                                                     item.options ||
@@ -428,153 +428,153 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                                     >
                                                                         {item.type ===
                                                                             'select' && (
-                                                                            <IGRPCombobox
-                                                                                placeholder={`Select ${item.name}`}
-                                                                                options={
-                                                                                    itemOptions ||
-                                                                                    []
-                                                                                }
-                                                                                value={
-                                                                                    itemValue
-                                                                                }
-                                                                                onChange={(
-                                                                                    selectedOption
-                                                                                ) =>
-                                                                                    changeValue(
-                                                                                        item.key,
-                                                                                        index,
+                                                                                <IGRPCombobox
+                                                                                    placeholder={`Select ${item.name}`}
+                                                                                    options={
+                                                                                        itemOptions ||
+                                                                                        []
+                                                                                    }
+                                                                                    value={
+                                                                                        itemValue
+                                                                                    }
+                                                                                    onChange={(
                                                                                         selectedOption
-                                                                                    )
-                                                                                }
-                                                                                className="w-auto h-8"
-                                                                            />
-                                                                        )}
+                                                                                    ) =>
+                                                                                        changeValue(
+                                                                                            item.key,
+                                                                                            index,
+                                                                                            selectedOption
+                                                                                        )
+                                                                                    }
+                                                                                    className="w-auto h-8"
+                                                                                />
+                                                                            )}
                                                                         {item.type ===
                                                                             'checkbox' && (
-                                                                            <TooltipProvider>
-                                                                                <Tooltip>
-                                                                                    <TooltipTrigger
-                                                                                        asChild
-                                                                                    >
-                                                                                        <div className="flex align-center">
-                                                                                            <Checkbox
-                                                                                                id={`${item.key}_${index2}`}
-                                                                                                onCheckedChange={(
-                                                                                                    checked
-                                                                                                ) =>
-                                                                                                    changeValue(
-                                                                                                        item.key,
-                                                                                                        index,
+                                                                                <TooltipProvider>
+                                                                                    <Tooltip>
+                                                                                        <TooltipTrigger
+                                                                                            asChild
+                                                                                        >
+                                                                                            <div className="flex align-center">
+                                                                                                <Checkbox
+                                                                                                    id={`${item.key}_${index2}`}
+                                                                                                    onCheckedChange={(
                                                                                                         checked
-                                                                                                    )
-                                                                                                }
-                                                                                                checked={
-                                                                                                    row?.[
+                                                                                                    ) =>
+                                                                                                        changeValue(
+                                                                                                            item.key,
+                                                                                                            index,
+                                                                                                            checked
+                                                                                                        )
+                                                                                                    }
+                                                                                                    checked={
+                                                                                                        row?.[
                                                                                                         item
                                                                                                             .key
-                                                                                                    ] ||
-                                                                                                    false
-                                                                                                }
-                                                                                            />
-                                                                                        </div>
-                                                                                    </TooltipTrigger>
-                                                                                    <TooltipContent>
-                                                                                        {
-                                                                                            item.name
-                                                                                        }
-                                                                                    </TooltipContent>
-                                                                                </Tooltip>
-                                                                            </TooltipProvider>
-                                                                        )}
+                                                                                                        ] ||
+                                                                                                        false
+                                                                                                    }
+                                                                                                />
+                                                                                            </div>
+                                                                                        </TooltipTrigger>
+                                                                                        <TooltipContent>
+                                                                                            {
+                                                                                                item.name
+                                                                                            }
+                                                                                        </TooltipContent>
+                                                                                    </Tooltip>
+                                                                                </TooltipProvider>
+                                                                            )}
                                                                         {item.type ===
                                                                             'popoverController' && (
-                                                                            <PopoverController
-                                                                                key={
-                                                                                    itemIndex
-                                                                                }
-                                                                                row={
-                                                                                    row
-                                                                                }
-                                                                                changeValue={(
-                                                                                    element,
-                                                                                    value
-                                                                                ) =>
-                                                                                    changeValue(
+                                                                                <PopoverController
+                                                                                    key={
+                                                                                        itemIndex
+                                                                                    }
+                                                                                    row={
+                                                                                        row
+                                                                                    }
+                                                                                    changeValue={(
                                                                                         element,
-                                                                                        index,
                                                                                         value
-                                                                                    )
-                                                                                }
-                                                                                options={
-                                                                                    itemOptions ||
-                                                                                    []
-                                                                                }
-                                                                            />
-                                                                        )}
+                                                                                    ) =>
+                                                                                        changeValue(
+                                                                                            element,
+                                                                                            index,
+                                                                                            value
+                                                                                        )
+                                                                                    }
+                                                                                    options={
+                                                                                        itemOptions ||
+                                                                                        []
+                                                                                    }
+                                                                                />
+                                                                            )}
                                                                         {item.type ===
                                                                             'popoverModel' && (
-                                                                            <PopoverModel
-                                                                                key={
-                                                                                    itemIndex
-                                                                                }
-                                                                                index={
-                                                                                    index
-                                                                                }
-                                                                                row={
-                                                                                    row
-                                                                                }
-                                                                                changeValue={(
-                                                                                    element,
-                                                                                    position,
-                                                                                    value
-                                                                                ) =>
-                                                                                    changeValue(
+                                                                                <PopoverModel
+                                                                                    key={
+                                                                                        itemIndex
+                                                                                    }
+                                                                                    index={
+                                                                                        index
+                                                                                    }
+                                                                                    row={
+                                                                                        row
+                                                                                    }
+                                                                                    changeValue={(
                                                                                         element,
                                                                                         position,
                                                                                         value
-                                                                                    )
-                                                                                }
-                                                                                options={
-                                                                                    itemOptions ||
-                                                                                    []
-                                                                                }
-                                                                            />
-                                                                        )}
+                                                                                    ) =>
+                                                                                        changeValue(
+                                                                                            element,
+                                                                                            position,
+                                                                                            value
+                                                                                        )
+                                                                                    }
+                                                                                    options={
+                                                                                        itemOptions ||
+                                                                                        []
+                                                                                    }
+                                                                                />
+                                                                            )}
                                                                         {item.type ===
                                                                             'popoverDto' && (
-                                                                            <PopoverDto
-                                                                                key={
-                                                                                    itemIndex
-                                                                                }
-                                                                                index={
-                                                                                    index
-                                                                                }
-                                                                                row={
-                                                                                    row
-                                                                                }
-                                                                                changeValue={(
-                                                                                    element,
-                                                                                    position,
-                                                                                    value
-                                                                                ) =>
-                                                                                    changeValue(
+                                                                                <PopoverDto
+                                                                                    key={
+                                                                                        itemIndex
+                                                                                    }
+                                                                                    index={
+                                                                                        index
+                                                                                    }
+                                                                                    row={
+                                                                                        row
+                                                                                    }
+                                                                                    changeValue={(
                                                                                         element,
                                                                                         position,
                                                                                         value
-                                                                                    )
-                                                                                }
-                                                                                collectionTypes={
-                                                                                    itemOptions ||
-                                                                                    []
-                                                                                }
-                                                                            />
-                                                                        )}
+                                                                                    ) =>
+                                                                                        changeValue(
+                                                                                            element,
+                                                                                            position,
+                                                                                            value
+                                                                                        )
+                                                                                    }
+                                                                                    collectionTypes={
+                                                                                        itemOptions ||
+                                                                                        []
+                                                                                    }
+                                                                                />
+                                                                            )}
                                                                         {item.type ===
                                                                             'popoverRelation' &&
                                                                             row[
-                                                                                'type'
+                                                                            'type'
                                                                             ] ===
-                                                                                'relation' && (
+                                                                            'relation' && (
                                                                                 <RelationPopover
                                                                                     key={
                                                                                         itemIndex

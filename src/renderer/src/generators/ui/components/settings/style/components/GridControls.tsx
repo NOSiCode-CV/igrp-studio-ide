@@ -39,13 +39,13 @@ export function GridControls({
         <div className="space-y-2">
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('direction')}
                     </label>
                     <select
                         value={direction}
                         onChange={(e) => onDirectionChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="row">{t('row')}</option>
                         <option value="column">{t('column')}</option>
@@ -53,7 +53,7 @@ export function GridControls({
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('densePacking')}
                     </label>
                     <div className="flex items-center h-[26px] px-2">
@@ -74,7 +74,7 @@ export function GridControls({
 
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('columns')}
                     </label>
                     <input
@@ -82,12 +82,12 @@ export function GridControls({
                         min="1"
                         value={columns}
                         onChange={(e) => onColumnsChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('rows')}
                     </label>
                     <input
@@ -95,20 +95,20 @@ export function GridControls({
                         min="1"
                         value={rows}
                         onChange={(e) => onRowsChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('alignItems')}
                     </label>
                     <select
                         value={alignItems}
                         onChange={(e) => onAlignItemsChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="start">{t('start')}</option>
                         <option value="end">{t('end')}</option>
@@ -118,13 +118,13 @@ export function GridControls({
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('justifyItems')}
                     </label>
                     <select
                         value={justifyItems}
                         onChange={(e) => onJustifyItemsChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="start">{t('start')}</option>
                         <option value="end">{t('end')}</option>
@@ -135,7 +135,7 @@ export function GridControls({
             </div>
 
             <div className="space-y-1">
-                <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                <label className="text-xs text-gray-500 dark:text-gray-400">
                     {t('gap')}
                 </label>
                 <div className="flex items-center gap-1">
@@ -143,10 +143,10 @@ export function GridControls({
                         type="text"
                         value={gap}
                         onChange={(e) => onGapChange(e.target.value)}
-                        className="flex-1 px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         placeholder="0"
                     />
-                    <select className="w-16 px-1 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500">
+                    <select className="w-16 px-1 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500">
                         <option value="px">{t('px')}</option>
                         <option value="rem">{t('rem')}</option>
                         <option value="%">{t('%')}</option>

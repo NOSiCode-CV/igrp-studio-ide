@@ -62,10 +62,51 @@ export interface SizeSytle {
     aspectRatioLocked: boolean;
 }
 
+
+//Typography
+export interface TypographyValue {
+    value: string;
+    unit: string;
+}
+
+export interface TypographyStyle {
+    fontSize: TypographyValue;
+    lineHeight: TypographyValue;
+    letterSpacing: TypographyValue;
+    wordSpacing: TypographyValue;
+    textAlign: string;
+    fontWeight: string;
+    fontStyle: string;
+    textDecoration: string;
+    textTransform: string;
+    fontFamily: string;
+}
+
+//Borders
+export interface BorderValue {
+    width: string;
+    style: string;
+    color: string;
+}
+
+export interface BorderRadius {
+    topLeft: string;
+    topRight: string;
+    bottomRight: string;
+    bottomLeft: string;
+}
+
+export interface BordersStyle {
+    borders: Record<string, BorderValue>;
+    borderRadius: BorderRadius;
+}
+
 export interface StyleComponent {
     layout?: LayoutStyle;
     spacing?: SpacingSytle;
     size?: SizeSytle;
+    typography?: TypographyStyle;
+    borders?: BordersStyle;
 }
 
 export interface SectionProps {

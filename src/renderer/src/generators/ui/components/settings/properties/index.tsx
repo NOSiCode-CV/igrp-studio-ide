@@ -5,15 +5,14 @@ import {
 import DomainForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import MultipleSelector from '@renderer/components/multiples-selector';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@renderer/components/ui/accordion';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { Separator } from '@renderer/components/ui/separator';
 import { Switch } from '@renderer/components/ui/switch';
 import { cn } from '@renderer/lib/utils';
 import { getLabel } from '@renderer/utils/helpers';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 const toMap = (items: any) => {
     return (
@@ -36,15 +35,7 @@ const getNestedValue = (obj: any, path: string) => {
 };
 
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
-    const [collapsed, setCollapsed] = useState({});
-
-    const toggleCollapse = (key: string) => {
-        setCollapsed((prev) => ({
-            ...prev,
-            [key]: !prev[key],
-        }));
-    };
-
+   
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const label = getLabel(key);
@@ -57,41 +48,16 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
         if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties;
             return (
-                <>
-                    <div className="flex flex-col gap-2" key={key}>
-                        <button
-                            type="button"
-                            onClick={() => toggleCollapse(key)}
-                            className="flex items-center justify-between w-full p-2 rounded-md"
-                        >
-                            <Label htmlFor={key}>{label}</Label>
-                            <span>
-                                {collapsed[key] ? (
-                                    <ChevronDown className="h-4 w-4" />
-                                ) : (
-                                    <ChevronUp className="h-4 w-4" />
-                                )}
-                            </span>
-                        </button>
-                        {collapsed[key] && (
-                            <>
-                                <div className="space-y-3">
-                                    {Object.keys(props).map((nestedKey) =>
-                                        renderField(
-                                            nestedKey,
-                                            props[nestedKey],
-                                            parentKey
-                                                ? `${parentKey}.${key}`
-                                                : key
-                                        )
-                                    )}
-                                </div>
-
-                                <Separator />
-                            </>
-                        )}
-                    </div>
-                </>
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem key={key} value={key}>
+                        <AccordionTrigger>{label}</AccordionTrigger>
+                        <AccordionContent className="space-">
+                            {Object.keys(props).map((nestedKey) =>
+                                renderField(nestedKey, props[nestedKey], parentKey ? `${parentKey}.${key}` : key)
+                            )}
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             );
         } else if (key === 'iconName') {
             return (
@@ -116,8 +82,8 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
             <div
                 className={cn(
                     type === 'boolean' &&
-                        'flex flex-1 space-x-3 align-middle justify-between',
-                    type !== 'boolean' && 'flex flex-col gap-2'
+                    'flex flex-1 space-x-3 align-middle justify-between space-y-2',
+                    type !== 'boolean' && 'flex flex-col space-y-2'
                 )}
                 key={key}
             >

@@ -1,22 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SectionProps, TypographyStyle, TypographyValue } from '../types';
 
-interface TypographyValue {
-  value: string;
-  unit: string;
-}
+export function TypographySection({ onChangeStyles, styles }: SectionProps) {
+  const [typographyStyle, setTypographyStyle] = useState<TypographyStyle>(
+    styles.typography || {
+      fontSize: { value: '16', unit: 'px' },
+      lineHeight: { value: '1.5', unit: 'em' },
+      letterSpacing: { value: '0', unit: 'px' },
+      wordSpacing: { value: '0', unit: 'px' },
+      textAlign: 'left',
+      fontWeight: '400',
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      textTransform: 'none',
+      fontFamily: 'Inter'
+    }
+  );
 
-export function TypographySection() {
-  const [fontSize, setFontSize] = useState<TypographyValue>({ value: '16', unit: 'px' });
-  const [lineHeight, setLineHeight] = useState<TypographyValue>({ value: '1.5', unit: 'em' });
-  const [letterSpacing, setLetterSpacing] = useState<TypographyValue>({ value: '0', unit: 'px' });
-  const [wordSpacing, setWordSpacing] = useState<TypographyValue>({ value: '0', unit: 'px' });
-  const [textAlign, setTextAlign] = useState('left');
-  const [fontWeight, setFontWeight] = useState('400');
-  const [fontStyle, setFontStyle] = useState('normal');
-  const [textDecoration, setTextDecoration] = useState('none');
-  const [textTransform, setTextTransform] = useState('none');
+  const updateTypographyStyle = (updates: Partial<TypographyStyle>) => {
+    setTypographyStyle(prev => ({
+      ...prev,
+      ...updates,
+      fontSize: updates.fontSize || prev.fontSize,
+      lineHeight: updates.lineHeight || prev.lineHeight,
+      letterSpacing: updates.letterSpacing || prev.letterSpacing,
+      wordSpacing: updates.wordSpacing || prev.wordSpacing
+    }));
+  };
+
+  const resetTypography = () => {
+    updateTypographyStyle({
+      fontSize: { value: '16', unit: 'px' },
+      lineHeight: { value: '1.5', unit: 'em' },
+      letterSpacing: { value: '0', unit: 'px' },
+      wordSpacing: { value: '0', unit: 'px' },
+      textAlign: 'left',
+      fontWeight: '400',
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      textTransform: 'none',
+      fontFamily: 'Inter'
+    });
+  };
+
+  useEffect(() => {
+    onChangeStyles({ typography: typographyStyle });
+  }, [typographyStyle]);
 
   const units = {
     fontSize: ['px', 'rem', 'em', '%'],
@@ -45,14 +76,16 @@ export function TypographySection() {
     { value: 'Arial', label: 'Arial' },
     { value: 'monospace', label: 'Monospace' }
   ];
+
   const { t } = useTranslation();
-  const SizeInput = ({ 
+
+  const SizeInput = ({
     value,
     onChange,
     label,
     availableUnits,
     icon
-  }: { 
+  }: {
     value: TypographyValue,
     onChange: (value: TypographyValue) => void,
     label: string,
@@ -60,7 +93,7 @@ export function TypographySection() {
     icon?: React.ReactNode
   }) => (
     <div className="space-y-0.5">
-      <label className="text-[9px] text-gray-500 dark:text-gray-400 flex items-center gap-0.5">
+      <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-0.5">
         {icon}
         {label}
       </label>
@@ -69,12 +102,12 @@ export function TypographySection() {
           type="text"
           value={value.value}
           onChange={(e) => onChange({ ...value, value: e.target.value })}
-          className="w-[52px] px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+          className="w-[52px] px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
         />
         <select
           value={value.unit}
           onChange={(e) => onChange({ ...value, unit: e.target.value })}
-          className="w-12 px-1 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+          className="w-12 px-1 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
         >
           {availableUnits.map(unit => (
             <option key={unit} value={unit}>{unit}</option>
@@ -89,14 +122,9 @@ export function TypographySection() {
       {/* Font Family and Weight */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Font</h3>
+          <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">Font</h3>
           <button
-            onClick={() => {
-              setFontSize({ value: '16', unit: 'px' });
-              setLineHeight({ value: '1.5', unit: 'em' });
-              setLetterSpacing({ value: '0', unit: 'px' });
-              setWordSpacing({ value: '0', unit: 'px' });
-            }}
+            onClick={resetTypography}
             className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             title="Reset typography"
           >
@@ -105,9 +133,11 @@ export function TypographySection() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">{t('family')}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">{t('family')}</label>
             <select
-              className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+              value={typographyStyle.fontFamily}
+              onChange={(e) => updateTypographyStyle({ fontFamily: e.target.value })}
+              className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
               {fontFamilies.map(font => (
                 <option key={font.value} value={font.value}>{font.label}</option>
@@ -115,11 +145,11 @@ export function TypographySection() {
             </select>
           </div>
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">{t('weight')}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">{t('weight')}</label>
             <select
-              value={fontWeight}
-              onChange={(e) => setFontWeight(e.target.value)}
-              className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+              value={typographyStyle.fontWeight}
+              onChange={(e) => updateTypographyStyle({ fontWeight: e.target.value })}
+              className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
               {fontWeights.map(weight => (
                 <option key={weight.value} value={weight.value}>{weight.label}</option>
@@ -131,18 +161,18 @@ export function TypographySection() {
 
       {/* Size and Line Height */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('sizeHeight')}</h3>
+        <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('sizeHeight')}</h3>
         <div className="grid grid-cols-2 gap-2">
           <SizeInput
-            value={fontSize}
-            onChange={setFontSize}
+            value={typographyStyle.fontSize}
+            onChange={(value) => updateTypographyStyle({ fontSize: value })}
             label="Font Size"
             availableUnits={units.fontSize}
             icon={<Type size={9} />}
           />
           <SizeInput
-            value={lineHeight}
-            onChange={setLineHeight}
+            value={typographyStyle.lineHeight}
+            onChange={(value) => updateTypographyStyle({ lineHeight: value })}
             label="Line Height"
             availableUnits={units.lineHeight}
           />
@@ -151,17 +181,17 @@ export function TypographySection() {
 
       {/* Spacing */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('spacing')}</h3>
+        <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('spacing')}</h3>
         <div className="grid grid-cols-2 gap-2">
           <SizeInput
-            value={letterSpacing}
-            onChange={setLetterSpacing}
+            value={typographyStyle.letterSpacing}
+            onChange={(value) => updateTypographyStyle({ letterSpacing: value })}
             label="Letter"
             availableUnits={units.spacing}
           />
           <SizeInput
-            value={wordSpacing}
-            onChange={setWordSpacing}
+            value={typographyStyle.wordSpacing}
+            onChange={(value) => updateTypographyStyle({ wordSpacing: value })}
             label="Word"
             availableUnits={units.spacing}
           />
@@ -170,7 +200,7 @@ export function TypographySection() {
 
       {/* Text Alignment */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('alignment')}</h3>
+        <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('alignment')}</h3>
         <div className="grid grid-cols-4 gap-0.5">
           {[
             { value: 'left', icon: <AlignLeft size={12} /> },
@@ -180,12 +210,11 @@ export function TypographySection() {
           ].map((align) => (
             <button
               key={align.value}
-              onClick={() => setTextAlign(align.value)}
-              className={`p-1.5 rounded ${
-                textAlign === align.value
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+              onClick={() => updateTypographyStyle({ textAlign: align.value })}
+              className={`p-1.5 rounded ${typographyStyle.textAlign === align.value
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
             >
               {align.icon}
             </button>
@@ -195,14 +224,14 @@ export function TypographySection() {
 
       {/* Style and Decoration */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">{t('style')}</h3>
+        <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('style')}</h3>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">{t('fontStyle')}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">{t('fontStyle')}</label>
             <select
-              value={fontStyle}
-              onChange={(e) => setFontStyle(e.target.value)}
-              className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+              value={typographyStyle.fontStyle}
+              onChange={(e) => updateTypographyStyle({ fontStyle: e.target.value })}
+              className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
               <option value="normal">{t('normal')}</option>
               <option value="italic">{t('italic')}</option>
@@ -210,11 +239,11 @@ export function TypographySection() {
             </select>
           </div>
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400">Decoration</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">Decoration</label>
             <select
-              value={textDecoration}
-              onChange={(e) => setTextDecoration(e.target.value)}
-              className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+              value={typographyStyle.textDecoration}
+              onChange={(e) => updateTypographyStyle({ textDecoration: e.target.value })}
+              className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
               <option value="none">{t('none')}</option>
               <option value="underline">{t('underline')}</option>
@@ -227,11 +256,11 @@ export function TypographySection() {
 
       {/* Text Transform */}
       <div className="space-y-1.5">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Transform</h3>
+        <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">Transform</h3>
         <select
-          value={textTransform}
-          onChange={(e) => setTextTransform(e.target.value)}
-          className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+          value={typographyStyle.textTransform}
+          onChange={(e) => updateTypographyStyle({ textTransform: e.target.value })}
+          className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
         >
           <option value="none">{t('none')}</option>
           <option value="uppercase">{t('uppercase')}</option>

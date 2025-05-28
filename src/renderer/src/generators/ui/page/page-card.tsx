@@ -29,10 +29,10 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
                     {description || pageName}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                    {t('Path')}: {pagePath}
+                    {t('path')}: {pagePath}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                    {t('Type')}: {isPage ? 'Page' : 'Component'}
+                    {t('type')}: {isPage ? 'Page' : 'Component'}
                 </p>
             </CardContent>
             <CardFooter className="flex justify-between">

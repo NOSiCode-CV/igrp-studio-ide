@@ -210,7 +210,7 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
     return (
         <div className="space-y-2">
             <div className="space-y-0.5 relative">
-                <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                <label className="text-xs text-gray-500 dark:text-gray-400">
                     Display
                 </label>
 
@@ -245,7 +245,7 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className={`
-                                w-full flex items-center justify-between px-2 py-1.5 text-[10px] rounded
+                                w-full flex items-center justify-between px-2 py-1.5 text-xs rounded
                                 ${
                                     isAdditionalOption
                                         ? 'bg-blue-500 text-white'
@@ -295,7 +295,7 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                                                 setIsOpen(false);
                                             }}
                                             className={`
-                                                w-full flex items-center gap-1.5 px-2 py-1.5 text-[10px]
+                                                w-full flex items-center gap-1.5 px-2 py-1.5 text-xs
                                                 transition-colors duration-200
                                                 ${
                                                     layoutStyle.type ===

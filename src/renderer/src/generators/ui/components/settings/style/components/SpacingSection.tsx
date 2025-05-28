@@ -108,7 +108,7 @@ export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
     return (
         <div className="space-y-2">
             {/* Command Bar */}
-            <div className="flex items-center gap-1 bg-gray-800 dark:bg-gray-900 text-white px-1.5 py-1 rounded text-[9px]">
+            <div className="flex items-center gap-1 bg-gray-800 dark:bg-gray-900 text-white px-1.5 py-1 rounded text-xs">
                 <Terminal size={10} />
                 <span className="font-medium tracking-wide flex-1 truncate">
                     {lastCommand || 'Ready'}
@@ -123,7 +123,7 @@ export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
 
             {/* Shortcuts Panel */}
             {showShortcuts && (
-                <div className="bg-gray-100 dark:bg-gray-800 rounded p-1.5 text-[9px] space-y-1">
+                <div className="bg-gray-100 dark:bg-gray-800 rounded p-1.5 text-xs space-y-1">
                     <div className="flex justify-between">
                         <span>⌘/Ctrl + M</span>
                         <span className="text-gray-500">
@@ -160,7 +160,7 @@ export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
                             setActiveType(type);
                             setLastCommand(`Switched to ${type}`);
                         }}
-                        className={`flex-1 px-2 py-1 rounded text-[9px] font-medium transition-colors ${
+                        className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
                             activeType === type
                                 ? 'bg-blue-500 text-white'
                                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -175,7 +175,7 @@ export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
             <div className="grid grid-cols-2 gap-2">
                 {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
                     <div key={side} className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500 flex items-center gap-0.5">
+                        <label className="text-xs text-gray-500 flex items-center gap-0.5">
                             <Code2 size={9} />
                             {side}
                         </label>
@@ -191,7 +191,7 @@ export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
                                         e.target.value
                                     )
                                 }
-                                className="w-[52px] bg-gray-100 dark:bg-gray-800 border-0 rounded px-1.5 py-0.5 text-[9px]"
+                                className="w-[52px] bg-gray-100 dark:bg-gray-800 border-0 rounded px-1.5 py-0.5 text-xs"
                             />
                             <select
                                 value={spacing[activeType][side].unit}
@@ -203,7 +203,7 @@ export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
                                         e.target.value
                                     )
                                 }
-                                className="w-12 bg-gray-100 dark:bg-gray-800 border-0 rounded px-1 py-0.5 text-[9px]"
+                                className="w-12 bg-gray-100 dark:bg-gray-800 border-0 rounded px-1 py-0.5 text-xs"
                             >
                                 {['px', 'rem', '%', 'em', 'auto'].map(
                                     (unit) => (
