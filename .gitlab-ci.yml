@@ -35,7 +35,7 @@ build_packagedev:
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --ignore-engines
     - yarn release:win
     - yarn release:linux
     #- yarn release:mac
