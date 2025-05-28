@@ -41,7 +41,7 @@ const useStudio = () => {
             return module.default;
         } catch (error) {
             const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
-           // console.warn('Failed to load component:', error);
+            // console.warn('Failed to load component:', error);
             return fallbackModule.default;
         }
     }, []);
@@ -153,6 +153,12 @@ const useStudio = () => {
         return component ? component.interactions : [];
     }, [findComponent]);
 
+    // Get rukes for a component
+    const getRulesComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
+        return component ? component.rules : [];
+    }, [findComponent]);
+
     const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
         return componentsRegistered.find(component => component.name === id);
     };
@@ -186,6 +192,7 @@ const useStudio = () => {
         getChildPropertiesComponent,
         getRegistryComponent,
         getInteractionsComponent,
+        getRulesComponent,
         getComponentData,
         getPageData,
         fetchComponents,

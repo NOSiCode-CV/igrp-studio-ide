@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -18,23 +18,19 @@ import {
 import { GitFork, Key, Link, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RepositoryList } from './repository-list';
+import { IWorkspace } from 'src/main/types';
+import useToast from '@renderer/hooks/useToast';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { getUUID } from '@renderer/utils/helpers';
 
 interface CloneProjectModalProps {
-    handleCloneProject: (
-        url: string,
-        auth: {
-            type: string;
-            username?: string;
-            password?: string;
-            token?: string;
-        }
-    ) => void;
+    workspace: IWorkspace;
     open: boolean;
     setOpen: (open: boolean) => void;
 }
 
 export function CloneProjectModal({
-    handleCloneProject,
+    workspace,
     open,
     setOpen,
 }: CloneProjectModalProps) {
@@ -45,17 +41,21 @@ export function CloneProjectModal({
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
 
-    const onClone = () => {
-        const auth = {
-            type: authType,
-            ...(authType === 'basic' && { username, password }),
-            ...(authType === 'token' && { token }),
-        };
-        handleCloneProject(projectUrl, auth);
+    const [clonedProject, hasclonedProject] = useState(false);
 
-        setOpen(false);
-        resetForm();
-    };
+    const { showErrorToast, showSuccessToast } = useToast();
+
+    const { actions: { saveOrOpenProject } } = useWorkspace()
+
+    /* const onClone = () => {
+          const auth = {
+             type: authType,
+             ...(authType === 'basic' && { username, password }),
+             ...(authType === 'token' && { token }),
+         }; 
+        handleCloneProject(projectUrl);
+
+    }; */
 
     const resetForm = () => {
         setProjectUrl('');
@@ -64,6 +64,81 @@ export function CloneProjectModal({
         setPassword('');
         setToken('');
     };
+
+    const handleCloneProject = async (): Promise<void> => {
+        const extractProjectPath = (projectUrl: string): string => {
+            const match = projectUrl.match(/\/([^\/]+)\.git$/);
+            return match ? match[1] : '';
+        };
+
+        const projectPath = `/projects/${extractProjectPath(projectUrl)}`;
+
+        try {
+
+            hasclonedProject(true)
+
+            await window.electron.ipcRenderer.invoke(
+                'clone-repository',
+                projectUrl,
+                `${workspace.path}${projectPath}`
+            );
+
+        } catch (error) {
+            console.error(t('errorCloningRepository'), error);
+            showErrorToast(error);
+        }
+
+    };
+
+    useEffect(() => {
+        window.electron.ipcRenderer.on(
+            'clone-progress',
+            async (_event, data) => {
+                if (data.status === 'success') {
+
+                    resetForm();
+
+
+                    showSuccessToast(
+                        t('repositoryClonedSuccessfully', { path: data.path })
+                    );
+                    try {
+
+                        const { project, path } = data;
+                        const { config, type } = project;
+
+                        await saveOrOpenProject({
+                            project: {
+                                workspaceId: workspace.id,
+                                name: config.name,
+                                framework: config.type,
+                                id: config.id || getUUID(),
+                                type,
+                                path,
+                                config,
+                            },
+                            onSuccess: async () => {
+                            }
+                        });
+                    } catch (error) {
+                        showErrorToast(t('failedOpenProjectAfterCloning'));
+                        console.error(t('errorOpeningProject'), error);
+                    }
+                } else if (data.status === 'error') {
+                    showErrorToast(
+                        t('failedCloneRepository', { message: data.message })
+                    );
+                }
+            }
+        );
+
+        return () => {
+            window.electron.ipcRenderer.removeAllListeners('clone-progress');
+            window.electron.ipcRenderer.removeAllListeners(
+                'request-project-name'
+            );
+        };
+    }, []);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -92,7 +167,7 @@ export function CloneProjectModal({
                                 className="flex items-center gap-2"
                             >
                                 <GitFork className="h-4 w-4" />
-                                 {t('searchRepositories')}
+                                {t('searchRepositories')}
                             </TabsTrigger>
                         </TabsList>
 
@@ -226,7 +301,7 @@ export function CloneProjectModal({
                                     </Tabs>
                                 </div>
                             </div>
-                            <Button onClick={onClone} className="w-full">
+                            <Button onClick={handleCloneProject} className="w-full">
                                 <GitFork className="w-4 h-4 mr-2" />
                                 {t('cloneProject')}
                             </Button>

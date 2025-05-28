@@ -4,6 +4,7 @@ import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Action, TriggerControls } from './components/trigger-controls';
+import Rules from './components/rules';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -19,17 +20,23 @@ const Interactions = ({
     path,
     onInteranctionsChange,
 }: InteractionProps) => {
-    const { getInteractionsComponent } = useStudio();
+    const { getInteractionsComponent, getRulesComponent } = useStudio();
 
     const [interactionsType, setInteractionsType] = useState({});
+
+    const [rulesProperties, setRulesProperties] = useState({});
 
     const { componentName, interactions, id: componentId, tag } = comp;
 
     useEffect(() => {
-        if (componentName)
+        if (componentName) {
             getInteractionsComponent(path, componentName).then((data) =>
                 setInteractionsType(data)
             );
+            getRulesComponent(path, componentName).then((data) =>
+                setRulesProperties(data)
+            );
+        }
     }, [getInteractionsComponent, comp, componentName]);
 
     const handleInteractionsChange = (data: Record<string, Action>) => {
@@ -55,6 +62,7 @@ const Interactions = ({
                     icon={<MousePointer />}
                 />
             )}
+            <Rules rulesProperties={rulesProperties} componentTag={tag}/>
         </div>
     );
 };
