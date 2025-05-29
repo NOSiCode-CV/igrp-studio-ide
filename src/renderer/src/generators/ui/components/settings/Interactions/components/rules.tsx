@@ -9,13 +9,13 @@ import { useRef, useState } from "react";
 import { TabStates } from "../../../sidebar/custom-code/custom-code-tabs";
 import useCustomCode from "@renderer/generators/ui/hooks/useCustomCode";
 import MonacoEditor from "@renderer/components/monaco-editor";
-import { State } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { RuleDefinition, State } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 interface RulesProps {
     rulesProperties: any;
     componentTag: string;
     rules: any;
-    onRulesChange: (rules: any) => void;
+    onRulesChange: (rules: RuleDefinition[]) => void;
 }
 const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
     const { items } = rulesProperties;
@@ -27,12 +27,12 @@ const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
 
     const [currentRule, setCurrentRule] = useState<string>('')
     const [currentRuleType, setCurrentRuleType] = useState<string>('')
-    const [allRules, setAllRules] = useState<any[]>(rules);
+    const [allRules, setAllRules] = useState<RuleDefinition[]>(rules);
 
     const onSave = () => {
 
         const rule = {
-            type: currentRuleType,
+            type: currentRuleType as "visibility",
             condition: currentRule
         }
 
@@ -148,8 +148,8 @@ const RuleEditor = ({ open, setOpen, setCurrentRule, currentRule, onSave }: { op
 
                 <div className="w-1/3 flex gap-4">
                     <Separator orientation="vertical" />
-                    <div className="flex flex-col gap-4 pb-4">
-                        <div className="flex flex-col mt-2">
+                    <div className="flex flex-col gap-4 py-4 pr-4 w-full">
+                        <div className="flex flex-col">
                             <h1 className="text-2xl font-bold mb-1">
                                 States
                             </h1>
@@ -166,16 +166,3 @@ const RuleEditor = ({ open, setOpen, setCurrentRule, currentRule, onSave }: { op
 }
 
 export default Rules;
-
-
-{/* <p className="text-sm text-muted-foreground border rounded p-2 bg-muted">
-Use the states to control visibility or behavior of components. For example:
-<br />
-<code className="block text-xs mt-1 bg-background p-2 rounded border">
-    {'{state1 && <MyComponent />}'}
-    <br />
-    {'{state2 === "value"}'}
-    <br />
-    {'{state1 && state2 && <MyComponent />}'}
-</code>
-</p> */}

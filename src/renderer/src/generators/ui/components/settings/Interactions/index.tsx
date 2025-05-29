@@ -5,6 +5,7 @@ import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Action, TriggerControls } from './components/trigger-controls';
 import Rules from './components/rules';
+import { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -46,10 +47,11 @@ const Interactions = ({
             });
     };
 
-    const handleRulesChange = (data: any) => {
+    const handleRulesChange = (data: RuleDefinition[]) => {
+        console.log(data)
         if (componentId)
             onInteranctionsChange(componentId, {
-                rules: { ...data },
+                rules: data
             });
     };
 

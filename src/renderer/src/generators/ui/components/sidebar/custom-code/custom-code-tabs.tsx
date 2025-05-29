@@ -33,7 +33,7 @@ function capitalizeFirstLetter(string: string) {
 const TabStates = ({ states, editorRef, onSelectState }: TabStatesProps) => {
     const handleInsertState = (state: State) => {
         if (editorRef && editorRef.current) {
-            const textToInsert = `set${capitalizeFirstLetter(state.name)}(${state.defaultValue || 'null'});\n`;
+            const textToInsert = `set${capitalizeFirstLetter(state.name)}(${state.defaultValue || 'null'})\n`;
             editorRef.current.insertTextAtCursor(textToInsert);
         }
 
@@ -46,7 +46,7 @@ const TabStates = ({ states, editorRef, onSelectState }: TabStatesProps) => {
                 states.map((state, index) => (
                     <div
                         key={index}
-                        className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
+                        className="flex justify-between items-center w-full border p-2 rounded-sm hover:bg-accent hover:text-accent-foreground"
                     >
                         <div className="flex flex-col space-x-2">
                             <span className="font-medium truncate max-w-[150px]">{state.name}</span>
