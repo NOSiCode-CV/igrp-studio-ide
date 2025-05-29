@@ -27,6 +27,18 @@ export const IDES: IDEConfig = {
         name: 'IntelliJ IDEA',
         detectionCommand: 'idea --version',
         icon: "Lightbulb"
+    },
+    sublime: {
+        command: 'subl',
+        name: 'Sublime Text',
+        detectionCommand: 'subl --version',
+        icon: "Type" // or "FileText" depending on your icon set
+    },
+    cursor: {
+        command: 'cursor',
+        name: 'Cursor',
+        detectionCommand: 'cursor --version',
+        icon: "MousePointer2" // or "Pointer" depending on your icon set
     }
 };
 

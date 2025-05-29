@@ -2,6 +2,7 @@ import {
     IGRPCombobox,
     IGRPDatePicker,
 } from '@igrp/igrp-framework-react-design-system';
+import DynamicKeyValueForm from '@renderer/components/domain-form';
 import DomainForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import MultipleSelector from '@renderer/components/multiples-selector';
@@ -70,7 +71,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
             );
         } else if (key === 'options') {
             return (
-                <DomainForm
+                <DynamicKeyValueForm
                     onAdd={(opt) => {
                         handleInputChange(fieldPath, opt);
                     }}

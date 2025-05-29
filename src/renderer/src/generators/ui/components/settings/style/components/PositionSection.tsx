@@ -90,7 +90,7 @@ export function PositionSection({ onChangeStyles, styles }: SectionProps) {
             {/* Position Type */}
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                         <Move size={10} />
                         {t('position')}
                     </h3>
@@ -105,7 +105,7 @@ export function PositionSection({ onChangeStyles, styles }: SectionProps) {
                 <select
                     value={positionStyle.type}
                     onChange={(e) => updatePositionStyle({ type: e.target.value as PositionType })}
-                    className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                 >
                     {positionTypes.map((type) => (
                         <option key={type.value} value={type.value}>
@@ -120,7 +120,7 @@ export function PositionSection({ onChangeStyles, styles }: SectionProps) {
                     {/* Offset Controls */}
                     <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {t('offset')}
                             </h3>
                             <button
@@ -138,7 +138,7 @@ export function PositionSection({ onChangeStyles, styles }: SectionProps) {
                         <div className="grid grid-cols-2 gap-2">
                             {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
                                 <div key={side} className="space-y-0.5">
-                                    <label className="text-[9px] text-gray-500 dark:text-gray-400 capitalize">
+                                    <label className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                                         {side}
                                     </label>
                                     <div className="flex items-center gap-1">
@@ -146,13 +146,13 @@ export function PositionSection({ onChangeStyles, styles }: SectionProps) {
                                             type="text"
                                             value={positionStyle.positions[side].value}
                                             onChange={(e) => updatePosition(side, 'value', e.target.value)}
-                                            className="w-[52px] px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                                            className="w-[52px] px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                                             placeholder="auto"
                                         />
                                         <select
                                             value={positionStyle.positions[side].unit}
                                             onChange={(e) => updatePosition(side, 'unit', e.target.value)}
-                                            className="w-12 px-1 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                                            className="w-12 px-1 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                                         >
                                             {units.map((unit) => (
                                                 <option key={unit} value={unit}>
@@ -168,14 +168,14 @@ export function PositionSection({ onChangeStyles, styles }: SectionProps) {
 
                     {/* Z-Index */}
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             {t('zIndex')}
                         </label>
                         <input
                             type="number"
                             value={positionStyle.zIndex}
                             onChange={(e) => updatePositionStyle({ zIndex: e.target.value })}
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                             placeholder="auto"
                         />
                     </div>

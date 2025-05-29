@@ -25,6 +25,7 @@ import { FunctionSettingsSidebar } from '../../../sidebar/custom-code/functions-
 import { getId } from '@renderer/utils/helpers';
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
+import DynamicKeyValueForm from '@renderer/components/domain-form';
 
 type ActionType = 'function' | 'navigate' | 'formSubmit';
 
@@ -244,6 +245,7 @@ const InteractionEditor = ({
         currentAction?.function?.fnCustomCode?.imports || []
     );
 
+
     const { functionOptions } = useCustomCode();
 
     const interactions = interactionsType[interactionKey];
@@ -412,9 +414,9 @@ const InteractionEditor = ({
                             value={
                                 currentAction.navigate?.name
                                     ? currentAction.navigate.name.replace(
-                                          'onClick',
-                                          ''
-                                      )
+                                        'goTo',
+                                        ''
+                                    )
                                     : ''
                             }
                             onChange={(id) => {
@@ -426,7 +428,7 @@ const InteractionEditor = ({
                                         ...currentAction,
                                         navigate: {
                                             path: page.metadata.path,
-                                            name: `onClick${id}`,
+                                            name: `goTo${id}`,
                                         },
                                     });
                                 }
@@ -434,38 +436,28 @@ const InteractionEditor = ({
                             options={availablePages}
                         />
 
-                        {/*  <div className="space-y-2">
+                        <div className="space-y-2">
                             <Label>Navigation Parameters</Label>
-                            {Object.entries(navigationParams).map(
-                                ([key, value]) => (
-                                    <div key={key} className="flex gap-2">
-                                        <Input value={key} disabled />
-                                        <Input
-                                            value={value}
-                                            onChange={(e) =>
-                                                setNavigationParams({
-                                                    ...navigationParams,
-                                                    [key]: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                )
-                            )}
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                    setNavigationParams({
-                                        ...navigationParams,
-                                        [`param${Object.keys(navigationParams).length + 1}`]:
-                                            '',
-                                    })
-                                }
-                            >
-                                Add Parameter
-                            </Button>
-                        </div> */}
+                            <DynamicKeyValueForm
+                                onAdd={(items) => {
+                                    setCurrentAction({
+                                        ...currentAction,
+                                        navigate: {
+                                            path: currentAction?.navigate?.path || '',
+                                            name: currentAction?.navigate?.name || '',
+                                            params: items.reduce((acc, item) => {
+                                                acc[item.paramName] = item.paramValue;
+                                                return acc;
+                                            }, {} as Record<string, string>),
+                                        },
+                                    });
+                                }}
+                                fieldPairs={[
+                                    { key: 'paramValue', label: 'Param Value' },
+                                    { key: 'paramName', label: 'Param Name' }
+                                ]}
+                            />
+                        </div>
                     </div>
                 );
 

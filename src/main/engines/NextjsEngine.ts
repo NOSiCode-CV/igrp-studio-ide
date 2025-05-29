@@ -1,5 +1,5 @@
 // engines/NextjsEngine.ts
-import { deleteElement, initCodeSnippets, initComponents, initServices, loadAppExports, loadCodeSnippetsRegistry, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage } from '@igrp/igrp-studio-nextjs-engine';
+import { deleteElement, initCodeSnippets, initComponents, initServices, loadAppExports, loadCodeSnippetsRegistry, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage, registerComponents } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
 import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
@@ -26,6 +26,10 @@ export class NextjsEngine implements BaseEngine {
   getComponents(): ComponentRegistrationConfig {
     const result = loadRegistry()
     return result;
+  }
+
+  registerComponent(config: ComponentRegistrationConfig): void {
+    registerComponents(config)
   }
 
   getCodeSnippets(): CodeSnippetsRegistrationConfig {

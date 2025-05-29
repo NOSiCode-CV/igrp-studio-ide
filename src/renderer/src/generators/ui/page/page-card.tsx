@@ -37,7 +37,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
             </CardContent>
             <CardFooter className="flex justify-between">
                 <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => onAddComponents(page)}
                 >
@@ -49,7 +49,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
                     size="sm"
                     onClick={() => onDelete(page)}
                 >
-                    <Trash className="h-4 w-4 text-red-500" />
+                    <Trash className="h-4 w-4 text-destructive" />
                     <span>{t('delete')}</span>
                 </Button>
             </CardFooter>

@@ -59,10 +59,10 @@ export function BackgroundListItem({
         style={getBackgroundStyles(background)}
       />
       <div className="flex-1 min-w-0">
-        <div className="text-[9px] font-medium text-gray-700 dark:text-gray-300">
+        <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
           {background.type.charAt(0).toUpperCase() + background.type.slice(1)} {t('background')}
         </div>
-        <div className="text-[8px] text-gray-500 dark:text-gray-400 truncate">
+        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
           {background.type === 'gradient'
             ? `${(background.value as any).type} gradient`
             : background.type === 'image'

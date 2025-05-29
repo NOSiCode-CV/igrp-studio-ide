@@ -30,6 +30,7 @@ import { COMPONENT } from './ComponentTypes';
 import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
+import { EngineService } from '@renderer/services/EngineService';
 
 interface FormEngineProps {
     basePath: string;
@@ -71,7 +72,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { customComponents } = useCustomCode();
 
-        const { menuItems } = useConfigdata(componentsRegistered, customComponents);
+        const { menuItems } = useConfigdata(componentsRegistered);
 
         const dispatch: any = useDispatch();
 
@@ -92,6 +93,25 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         useEffect(() => {
             clearEditingComponent();
         }, [activePresentation]);
+
+        useEffect(() => {
+
+            const registerComponents = () => {
+                EngineService.registerComponent(customComponents);
+            }
+
+            registerComponents()
+
+            window.electron.ipcRenderer.on('folder-change', registerComponents);
+
+            return () => {
+                window.electron.ipcRenderer.removeListener(
+                    'folder-change',
+                    registerComponents
+                );
+            };
+
+        }, [customComponents]);
 
         const handleSave = async (components: StructuredLayout) => {
             try {

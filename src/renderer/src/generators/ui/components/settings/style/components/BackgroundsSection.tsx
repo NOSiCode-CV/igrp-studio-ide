@@ -53,7 +53,7 @@ export function BackgroundsSection() {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <Layers size={10} />
           Backgrounds
         </h3>

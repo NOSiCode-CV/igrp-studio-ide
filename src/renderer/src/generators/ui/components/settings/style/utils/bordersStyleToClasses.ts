@@ -1,5 +1,5 @@
 // utils/bordersStyleToClasses.ts
-import type { BorderValue, BorderRadius } from '../types';
+import type { BorderValue, BorderRadius, BordersStyle } from '../types';
 
 function getBorderWidthClass(width: string): string {
   if (!width) return '';
@@ -41,7 +41,7 @@ function getBorderSideClasses(side: string, border: BorderValue): string[] {
   if (!border.width) return classes;
 
   const sidePrefix = side === 'all' ? 'border' : `border-${side}`;
-  
+
   // Width
   if (side === 'all') {
     classes.push(getBorderWidthClass(border.width));
@@ -69,7 +69,7 @@ function getBorderSideClasses(side: string, border: BorderValue): string[] {
 function getBorderRadiusClass(corner: string, value: string): string {
   if (!value || value === '0') return '';
   const size = parseInt(value);
-  
+
   // Map common radius values
   const radiusMap: Record<number, string> = {
     0: 'rounded-none',
@@ -84,20 +84,22 @@ function getBorderRadiusClass(corner: string, value: string): string {
   };
 
   const cornerPrefix = corner === 'all' ? 'rounded' : `rounded-${corner}`;
-  
+
   if (corner === 'all') {
     return radiusMap[size] || `rounded-[${value}px]`;
   }
-  
-  return radiusMap[size] 
-    ? `${cornerPrefix}-${radiusMap[size].split('-')[1]}` 
+
+  return radiusMap[size]
+    ? `${cornerPrefix}-${radiusMap[size].split('-')[1]}`
     : `${cornerPrefix}-[${value}px]`;
 }
 
 export function bordersStyleToClasses(
-  borders: Record<string, BorderValue>,
-  borderRadius: BorderRadius
+  style: BordersStyle
 ): string {
+
+  const { borders, borderRadius } = style;
+
   const classes: string[] = [];
 
   // Process borders
@@ -114,7 +116,7 @@ export function bordersStyleToClasses(
   }
 
   // Process border radius
-  const allCornersSame = 
+  const allCornersSame =
     borderRadius.topLeft === borderRadius.topRight &&
     borderRadius.topRight === borderRadius.bottomRight &&
     borderRadius.bottomRight === borderRadius.bottomLeft;
