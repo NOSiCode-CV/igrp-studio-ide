@@ -4,7 +4,7 @@ import { COMPONENT, GROUP_COMPONET, ICON_MAP } from '../ComponentTypes';
 
 const HIDDEN_COMPONENTS = [COMPONENT.Column, COMPONENT.PageContent]
 
-const useConfigdata = (components: ComponentRegisterConfig[]) => {
+const useConfigdata = (components: ComponentRegisterConfig[], customComponents: any[]) => {
 
     const menuItems = useMemo(() => {
         if (!components || components.length === 0) return [];
@@ -17,7 +17,15 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
             acc[group].push(component);
             return acc;
         }, {});
+
+        // Adiciona os custom components no grupo "Custom Components"
+        groupedComponents['customComponents'] = [
+            ...(groupedComponents['customComponents'] || []),
+            ...customComponents
+        ];
+
         console.log(groupedComponents)
+
         return Object.keys(groupedComponents).map((group) => ({
             id: group,
             label: GROUP_COMPONET[group] || group,
@@ -26,7 +34,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
                 !HIDDEN_COMPONENTS.includes(component.name)
             ).map((component: ComponentRegisterConfig) => ({
                 id: component.name,
-                label: component.label,
+                label: component.label || component.name,
                 icon: ICON_MAP[component.name],
                 properties: component.properties,
                 interactions: component.interactions,

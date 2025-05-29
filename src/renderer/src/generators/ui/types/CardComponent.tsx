@@ -59,7 +59,7 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                                 <Icon className="w-5 h-5 text-primary" />
                             </div>
                         )}
-                        <div className="text-sm font-medium text-gray-700 truncate">
+                        <div className="text-sm font-medium text-muted-foreground truncate">
                             {componentLabel}
                         </div>
                     </div>

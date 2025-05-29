@@ -144,8 +144,8 @@ export function TriggerControls({
     return (
         <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                    <Mouse size={16} />
+                <h3 className="text-sm font-medium flex items-center gap-1">
+                    <Mouse className="w-5 h-5" />
                     Trigger Element
                 </h3>
                 <div className="flex items-center gap-1">

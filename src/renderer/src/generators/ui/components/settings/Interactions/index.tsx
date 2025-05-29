@@ -26,7 +26,7 @@ const Interactions = ({
 
     const [rulesProperties, setRulesProperties] = useState({});
 
-    const { componentName, interactions, id: componentId, tag } = comp;
+    const { componentName, interactions, id: componentId, tag, rules } = comp;
 
     useEffect(() => {
         if (componentName) {
@@ -46,8 +46,15 @@ const Interactions = ({
             });
     };
 
+    const handleRulesChange = (data: any) => {
+        if (componentId)
+            onInteranctionsChange(componentId, {
+                rules: { ...data },
+            });
+    };
+
     return (
-        <div className="p-3 space-y-2">
+        <div className="p-3 space-y-4">
             <TriggerControls
                 interactions={interactions}
                 onInteractionsChange={handleInteractionsChange}
@@ -62,7 +69,7 @@ const Interactions = ({
                     icon={<MousePointer />}
                 />
             )}
-            <Rules rulesProperties={rulesProperties} componentTag={tag}/>
+            <Rules rulesProperties={rulesProperties} rules={rules} componentTag={tag} onRulesChange={handleRulesChange} />
         </div>
     );
 };

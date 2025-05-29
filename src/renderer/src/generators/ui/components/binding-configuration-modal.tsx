@@ -105,29 +105,29 @@ export const BindingConfigurationModal = ({
         { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
         ...(!newBinding
             ? [
-                  {
-                      key: 'newType',
-                      name: t('type'),
-                      type: 'select',
-                      options: fieldsTypeOptions,
-                  },
-              ]
+                {
+                    key: 'newType',
+                    name: t('type'),
+                    type: 'select',
+                    options: fieldsTypeOptions,
+                },
+            ]
             : []),
 
         ...(newBinding
             ? [
-                  {
-                      key: 'type',
-                      name: t('dataType'),
-                      type: 'typeSelectorDropdown',
-                      options: FIELD_TYPES,
-                  },
-                  {
-                      key: 'required',
-                      name: '',
-                      type: 'checkbox',
-                  },
-              ]
+                {
+                    key: 'type',
+                    name: t('dataType'),
+                    type: 'typeSelectorDropdown',
+                    options: FIELD_TYPES,
+                },
+                {
+                    key: 'required',
+                    name: '',
+                    type: 'checkbox',
+                },
+            ]
             : []),
         { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
     ];
@@ -283,7 +283,7 @@ export const BindingConfigurationModal = ({
                         ...defaultFieldType,
                         name: child.tag,
                         componentId: child.id,
-                        label: child.properties.label ?? child.label,
+                        label: child.properties.label ?? child.properties.headerTitle ?? child.label,
                     });
                     newExistingNames.add(child.id);
                 }

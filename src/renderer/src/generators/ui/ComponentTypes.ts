@@ -84,7 +84,8 @@ export const GROUP_COMPONET: Record<string, string> = {
     layout: "Layout",
     widget: "Widgets",
     advanced: "Advanced",
-    typography: "Typograpgy"
+    typography: "Typograpgy",
+    customComponents: "Custom Components"
 };
 
 export const COMPONENT: Record<string, string> = {

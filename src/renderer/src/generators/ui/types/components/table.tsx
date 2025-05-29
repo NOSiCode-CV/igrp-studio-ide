@@ -20,7 +20,6 @@ import { Button } from '@renderer/components/ui/button';
 import { Ellipsis } from 'lucide-react';
 import BoxField from '../tools/BoxFields';
 import TableTool from '../tools/tableTool';
-import Droppable from '@renderer/lib/dnd/Droppable';
 import { Badge } from '@renderer/components/ui/badge';
 import { useFakedata } from '../../hooks/useFakeData';
 import { faker } from '@faker-js/faker';
@@ -117,7 +116,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 path={path}
                                 onEdit={() => handleEdit(child, path)}
                                 group="group/table-header"
-                                className="opacity-0 group-hover/table-header:opacity-100"
+                                className="opacity-0 group-hover/table-header:opacity-100 mt-3 z-50"
                             >
                                 <span>{headerTitle || label}</span>
                             </BoxField>
@@ -138,10 +137,10 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                         {child.componentName === COMPONENT.TableCheckboxCell ? (
                             <Checkbox id={child.id} checked={row[child.id]} />
                         ) : child.componentName ===
-                          COMPONENT.TableableBadgeCell ? (
+                            COMPONENT.TableableBadgeCell ? (
                             <Badge variant="secondary">{faker.lorem.words(1)}</Badge>
                         ) : child.componentName ===
-                          COMPONENT.TableActionListCell ? (
+                            COMPONENT.TableActionListCell ? (
                             <Button variant="secondary" size="icon">
                                 <Ellipsis />
                             </Button>
@@ -176,7 +175,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 mode="MOVE"
                                 layout="horizontal"
                                 dropTargetId={dropTargetId}
-                                className={cn('border-none')}
+                                className={cn('border-none min-w-32 py-4')}
                             >
                                 <BoxField
                                     index={index}
@@ -190,6 +189,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     <Component
                                         comp={child}
                                         onDragEnd={onDragEnd}
+                                        className="min-w-32"
                                     />
                                 </BoxField>
                             </Draggable>
@@ -217,11 +217,9 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                 const { componentName: compName, id } = tableComp;
 
                 return (
-                    <Droppable
+                    <div
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
-                        component={tableComp}
-                        onDrop={onDragEnd}
                     >
                         <TableTool
                             parentComp={comp}
@@ -232,7 +230,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             className="opacity-0 group-hover/table-filter:opacity-100"
                         />
                         {renderTableFilters(compName, id)}
-                    </Droppable>
+                    </div>
                 );
             })}
 
@@ -240,11 +238,9 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
             {tableColumns.map((tableComp, index) => {
                 const { componentName, id } = tableComp;
                 return (
-                    <Droppable
+                    <div
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
-                        component={tableComp}
-                        onDrop={onDragEnd}
                     >
                         <TableTool
                             parentComp={comp}
@@ -272,7 +268,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 </Table>
                             </div>
                         )}
-                    </Droppable>
+                    </div>
                 );
             })}
         </div>

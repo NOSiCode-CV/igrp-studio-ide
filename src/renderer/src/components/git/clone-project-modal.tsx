@@ -41,8 +41,6 @@ export function CloneProjectModal({
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
 
-    const [clonedProject, hasclonedProject] = useState(false);
-
     const { showErrorToast, showSuccessToast } = useToast();
 
     const { actions: { saveOrOpenProject } } = useWorkspace()
@@ -74,8 +72,6 @@ export function CloneProjectModal({
         const projectPath = `/projects/${extractProjectPath(projectUrl)}`;
 
         try {
-
-            hasclonedProject(true)
 
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',

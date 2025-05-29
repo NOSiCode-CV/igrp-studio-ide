@@ -11,6 +11,7 @@ import { FunctionSquare } from 'lucide-react';
 interface TabStatesProps {
     states: State[];
     editorRef?: React.RefObject<any>;
+    onSelectState?: (state: State) => void;
 }
 
 interface TabFunctionsProps {
@@ -29,12 +30,14 @@ function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TabStates = ({ states, editorRef }: TabStatesProps) => {
+const TabStates = ({ states, editorRef, onSelectState }: TabStatesProps) => {
     const handleInsertState = (state: State) => {
         if (editorRef && editorRef.current) {
             const textToInsert = `set${capitalizeFirstLetter(state.name)}(${state.defaultValue || 'null'});\n`;
             editorRef.current.insertTextAtCursor(textToInsert);
         }
+
+        onSelectState?.(state);
     };
 
     return (
@@ -45,9 +48,9 @@ const TabStates = ({ states, editorRef }: TabStatesProps) => {
                         key={index}
                         className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
                     >
-                        <div className="flex items-center space-x-2">
-                            <span className="font-medium">{state.name}</span>
-                            <span className="text-gray-400 text-sm">
+                        <div className="flex flex-col space-x-2">
+                            <span className="font-medium truncate max-w-[150px]">{state.name}</span>
+                            <span className="text-muted-foreground text-sm">
                                 {state.type}
                             </span>
                         </div>

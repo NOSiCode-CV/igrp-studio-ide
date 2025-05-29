@@ -99,7 +99,7 @@ const BoxWrapper = ({
         <div className={cn('relative', group)} id={id}>
             <div
                 className={cn(
-                    `absolute -top-6 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
+                    `absolute -top-8 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
                     className
                 )}
             >

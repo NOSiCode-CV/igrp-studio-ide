@@ -779,8 +779,9 @@
     "empty": "No imports configured",
     "placeholder": "e.g., import { lib } from 'react-library'"
   },
-  "addNewRowBottom":"Add New Row Bottom",
-  "addNewRowTop":"Add New Row Top",
+  "addNewRowBottom": "Add New Row Bottom",
+  "addNewRowTop": "Add New Row Top",
   "forceDynamic": "Force Dynamic",
-  "pageTitle": "Page Title"
+  "pageTitle": "Page Title",
+  "searchRepositories": "Search Repositories"
 }

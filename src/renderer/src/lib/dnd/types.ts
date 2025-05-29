@@ -69,6 +69,10 @@ export interface StructuredComponent {
       state: State
     };
   };
+  rules?: {
+    type: string,
+    condition: string
+  };
   style?: StyleComponent
 }
 

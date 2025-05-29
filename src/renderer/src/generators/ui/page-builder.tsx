@@ -29,6 +29,7 @@ import { useTagManager } from './hooks/useTagManager';
 import { COMPONENT } from './ComponentTypes';
 import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
+import useCustomCode from './hooks/useCustomCode';
 
 interface FormEngineProps {
     basePath: string;
@@ -43,7 +44,7 @@ interface FormEngineRef {
 
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
     ({ basePath, page, activePresentation }, ref) => {
-        const { id, content, path: pagePath, label } = page;
+        const { id, content, path: pagePath } = page;
 
         const {
             handleAddChildToComponent,
@@ -68,7 +69,9 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { componentsRegistered, findComponentById } = useStudio();
 
-        const { menuItems } = useConfigdata(componentsRegistered);
+        const { customComponents } = useCustomCode();
+
+        const { menuItems } = useConfigdata(componentsRegistered, customComponents);
 
         const dispatch: any = useDispatch();
 
