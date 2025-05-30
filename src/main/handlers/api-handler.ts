@@ -6,7 +6,7 @@ import { engineTypes } from '@igrp/igrp-studio-springboot-engine'
 
 import { ipcMain } from 'electron';
 import { ProjectData } from '../types';
-import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ComponentRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { EVENTS } from '../constants/events';
 
 handleWithCustomErrors(
@@ -152,6 +152,15 @@ handleWithCustomErrors(
         return engine.getAppMetadata?.(basePath);
     }
 );
+
+handleWithCustomErrors(
+    EVENTS.NEXT.REGISTER_COMPONENT,
+    async (_event, engineType: string, config: ComponentRegistrationConfig) => {
+        const engine = EngineFactory.getEngine(engineType);
+        return engine.registerComponent?.(config);
+    }
+);
+
 
 ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
     return await engineTypes(module, basePath);

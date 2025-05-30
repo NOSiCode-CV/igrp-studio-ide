@@ -12,7 +12,7 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import { Button } from '@renderer/components/ui/button';
 import { FocusEvent } from 'react';
 import {

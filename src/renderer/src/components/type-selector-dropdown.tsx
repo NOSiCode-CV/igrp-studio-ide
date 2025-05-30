@@ -11,7 +11,7 @@ import {
 } from '@renderer/components/ui/dropdown-menu';
 import { SchemaTypeItem } from 'src/main/types';
 import { cn } from '@renderer/lib/utils';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { ScrollArea } from './ui/scroll-area';
 
 interface TypeSelectorDropdownProps {

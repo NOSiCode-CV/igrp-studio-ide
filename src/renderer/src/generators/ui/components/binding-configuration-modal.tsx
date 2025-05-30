@@ -24,7 +24,7 @@ import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
-import { capitalize } from '@renderer/utils/helpers';
+import { capitalize } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
 
 interface LabeledElementField {
@@ -105,29 +105,29 @@ export const BindingConfigurationModal = ({
         { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
         ...(!newBinding
             ? [
-                  {
-                      key: 'newType',
-                      name: t('type'),
-                      type: 'select',
-                      options: fieldsTypeOptions,
-                  },
-              ]
+                {
+                    key: 'newType',
+                    name: t('type'),
+                    type: 'select',
+                    options: fieldsTypeOptions,
+                },
+            ]
             : []),
 
         ...(newBinding
             ? [
-                  {
-                      key: 'type',
-                      name: t('dataType'),
-                      type: 'typeSelectorDropdown',
-                      options: FIELD_TYPES,
-                  },
-                  {
-                      key: 'required',
-                      name: '',
-                      type: 'checkbox',
-                  },
-              ]
+                {
+                    key: 'type',
+                    name: t('dataType'),
+                    type: 'typeSelectorDropdown',
+                    options: FIELD_TYPES,
+                },
+                {
+                    key: 'required',
+                    name: '',
+                    type: 'checkbox',
+                },
+            ]
             : []),
         { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
     ];
@@ -283,7 +283,7 @@ export const BindingConfigurationModal = ({
                         ...defaultFieldType,
                         name: child.tag,
                         componentId: child.id,
-                        label: child.properties.label ?? child.label,
+                        label: child.properties.label ?? child.properties.headerTitle ?? child.label,
                     });
                     newExistingNames.add(child.id);
                 }
@@ -337,8 +337,8 @@ export const BindingConfigurationModal = ({
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
-                    <ScrollArea className="h-full p-4">
+                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[80vh]">
+                    <ScrollArea className="h-full p-4 max-h-[70vh] overflow-auto">
                         <DialogHeader className="mb-4">
                             <DialogTitle>Binding Configuration</DialogTitle>
                             <DialogDescription>

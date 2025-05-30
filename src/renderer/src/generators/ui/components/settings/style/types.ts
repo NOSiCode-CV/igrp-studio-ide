@@ -101,12 +101,29 @@ export interface BordersStyle {
     borderRadius: BorderRadius;
 }
 
+//Position
+
+export interface PositionValue {
+    value: string;
+    unit: string;
+}
+
+export type PositionType = 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
+
+export interface PositionStyle {
+    type: PositionType;
+    positions: Record<Side, PositionValue>;
+    zIndex: string;
+    linked: boolean;
+}
+
 export interface StyleComponent {
     layout?: LayoutStyle;
     spacing?: SpacingSytle;
     size?: SizeSytle;
     typography?: TypographyStyle;
     borders?: BordersStyle;
+    position?: PositionStyle;
 }
 
 export interface SectionProps {

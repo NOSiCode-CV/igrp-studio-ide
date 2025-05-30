@@ -28,7 +28,7 @@ import {
     SquareFunction,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { filterSubItems } from '@renderer/utils/helpers';
+import { filterSubItems } from '@renderer/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { MenuItem } from 'src/main/types';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';

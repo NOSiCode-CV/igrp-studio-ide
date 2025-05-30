@@ -40,7 +40,7 @@ import {
     networkTypes,
     serviceTypes,
 } from '../services';
-import { extractDefaults } from '@renderer/utils/helpers';
+import { extractDefaults } from '@renderer/utils';
 import {
     Dependency,
     Environment,
@@ -448,7 +448,7 @@ export function ConfigurationDialog({
                         <TabsTrigger value="network">{t('network')}</TabsTrigger>
                     </TabsList>
 
-                    <ScrollArea className="flex-1 pr-4">
+                    <ScrollArea className="flex-1 pr-4 max-h-[60vh] overflow-auto">
                         <div className="pb-4">
                             <TabsContent
                                 value="basic"

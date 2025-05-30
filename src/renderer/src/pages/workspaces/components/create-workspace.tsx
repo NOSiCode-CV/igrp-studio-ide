@@ -30,10 +30,10 @@ const CreateWorkspace = ({
     const { t } = useTranslation();
     const { showErrorToast } = useToast();
     const [isCreating, setIsCreating] = useState(false);
-    const [workspaceName, setWorkspaceName] = useState(t('myWorkspace'));
-    const [slug, setSlug] = useState(t('myWorkspaceSlug'));
+    const [workspaceName, setWorkspaceName] = useState('My Workspace');
+    const [slug, setSlug] = useState('my-workspace');
     const [workspaceDescription, setWorkspaceDescription] = useState(
-        t('myWorkspaceDescription')
+        'My development workspace with Docker projects'
     );
     const [directoryPath, setDirectoryPath] = useState('');
     const {

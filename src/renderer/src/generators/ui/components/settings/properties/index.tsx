@@ -2,7 +2,7 @@ import {
     IGRPCombobox,
     IGRPDatePicker,
 } from '@igrp/igrp-framework-react-design-system';
-import DomainForm from '@renderer/components/domain-form';
+import DynamicKeyValueForm from '@renderer/components/domain-form';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import MultipleSelector from '@renderer/components/multiples-selector';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@renderer/components/ui/accordion';
@@ -10,7 +10,7 @@ import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { Switch } from '@renderer/components/ui/switch';
 import { cn } from '@renderer/lib/utils';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 
 import React from 'react';
 
@@ -35,7 +35,9 @@ const getNestedValue = (obj: any, path: string) => {
 };
 
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
-   
+
+    console.log(propsComp)
+
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const label = getLabel(key);
@@ -51,7 +53,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                 <Accordion type="single" collapsible className="w-full">
                     <AccordionItem key={key} value={key}>
                         <AccordionTrigger>{label}</AccordionTrigger>
-                        <AccordionContent className="space-">
+                        <AccordionContent className="space-y-3">
                             {Object.keys(props).map((nestedKey) =>
                                 renderField(nestedKey, props[nestedKey], parentKey ? `${parentKey}.${key}` : key)
                             )}
@@ -70,7 +72,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
             );
         } else if (key === 'options') {
             return (
-                <DomainForm
+                <DynamicKeyValueForm
                     onAdd={(opt) => {
                         handleInputChange(fieldPath, opt);
                     }}
@@ -113,6 +115,7 @@ const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
                                 />
                             );
                         case 'string':
+                        case 'any':
                             return (
                                 <Input
                                     id={parentKey ? `${parentKey}.${key}` : key}

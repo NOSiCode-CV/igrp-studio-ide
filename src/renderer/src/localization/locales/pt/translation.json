@@ -771,46 +771,7 @@
     "failedLoadJsonContent": "Falha ao carregar conteúdo JSON:",
     "permissions": "Permissões",
     "statusCode": "Código de status",
-    "failedFetchSelectors": "Falha ao buscar seletores:"
-
-
-  
-  
-
-
-
-  
-  
-    
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
+    "failedFetchSelectors": "Falha ao buscar seletores:",
+    "componentAssociation": "Você pode associar este componente a uma das páginas disponíveis neste combobox. A página associada será incluída no mesmo path da página atual, dentro da pasta 'components'."
 
 }

@@ -1,4 +1,4 @@
-import { generateId } from "@renderer/utils/helpers";
+import { generateId } from "@renderer/utils";
 import { Destination, DragEndResult, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { getDefaultInteractions, getDefaultProperties, getRequiredDataSchema } from "./helpers";

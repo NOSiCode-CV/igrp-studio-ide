@@ -21,7 +21,7 @@ import { RepositoryList } from './repository-list';
 import { IWorkspace } from 'src/main/types';
 import useToast from '@renderer/hooks/useToast';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { getUUID } from '@renderer/utils/helpers';
+import { getUUID } from '@renderer/utils';
 
 interface CloneProjectModalProps {
     workspace: IWorkspace;
@@ -40,8 +40,6 @@ export function CloneProjectModal({
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
-
-    const [clonedProject, hasclonedProject] = useState(false);
 
     const { showErrorToast, showSuccessToast } = useToast();
 
@@ -74,8 +72,6 @@ export function CloneProjectModal({
         const projectPath = `/projects/${extractProjectPath(projectUrl)}`;
 
         try {
-
-            hasclonedProject(true)
 
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',

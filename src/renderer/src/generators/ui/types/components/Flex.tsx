@@ -78,7 +78,7 @@ const Flex: React.FC<FlexProps> = ({
                                 onEdit={() => handleEditClick(comp)}
                                 className={
                                     providedClassName ??
-                                    `opacity-0 group-hover/comp-flex:opacity-100`
+                                    `opacity-0 group-hover/comp-flex:opacity-100 `
                                 }
                             >
                                 <Component

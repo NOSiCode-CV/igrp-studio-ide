@@ -20,7 +20,7 @@ import { useGit } from '@renderer/hooks/use-git';
 import { SearchInput } from '../shared-ui';
 import { useTranslation } from 'react-i18next';
 import useToast from '@renderer/hooks/useToast';
-import { getUUID } from '@renderer/utils/helpers';
+import { getUUID } from '@renderer/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDispatch } from 'react-redux';
 import { ProjectNameDialog } from './dialog-project-name';

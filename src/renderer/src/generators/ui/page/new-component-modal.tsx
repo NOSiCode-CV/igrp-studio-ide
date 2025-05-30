@@ -15,21 +15,27 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { ComponentConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import IconBrowser from '@renderer/components/icon/icon-browser';
 import { useEffect } from 'react';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 
 const initialValues: ComponentConfig = {
     type: 'component',
-    name: '',
-    path: 'teste',
+    scope: "page",
+    pagePath: '',
+    pageName: "",
     icon: '',
+    name: '',
     id: '',
+
+
 };
 
 interface NewComponentModalProps {
     isOpen: boolean;
     basePath: string;
+    pageOptions: any[]
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -39,6 +45,7 @@ export function NewComponentModal({
     basePath,
     onClose,
     onConfirm,
+    pageOptions
 }: NewComponentModalProps) {
     const { t } = useTranslation();
 
@@ -59,6 +66,8 @@ export function NewComponentModal({
                 ENV_TYPES.NEXTJS,
                 basePath
             );
+
+            console.log(pageConfig)
 
             if (error) {
                 showErrorToast(error);
@@ -122,12 +131,30 @@ export function NewComponentModal({
                                 value={formik.values.name || ''}
                             />
                         </div>
+                        <div className="grid grid-cols-1 items-center gap-3">
+                            <Label htmlFor="Associar">
+                                {t('pages')}
+                            </Label>
+                            <IGRPCombobox
+                                name="pagePath"
+                                className="col-span-3"
+                                value={formik.values.pagePath || ''}
+                                options={pageOptions}
+                                placeholder='Select page'
+                                helperText={t('componentAssociation')}
+                                onChange={(selectedValue) => {
+                                    const selected = pageOptions.find(opt => opt.value === selectedValue);
+                                    formik.setFieldValue('pagePath', selected?.path || '');
+                                    formik.setFieldValue('pageName', selected?.value || '');
+                                    formik.setFieldValue('scope', selectedValue ? 'page' : 'app');
+                                }} />
+                        </div>
                         <div className="flex-1 overflow-hidden">
                             <IconBrowser
                                 onSelectedIcon={(icon) => {
                                     formik.setFieldValue('icon', icon);
                                 }}
-                                selectedIcon={''}
+                                selectedIcon={formik.values.icon || ''}
                             />
                         </div>
                     </div>

@@ -2,7 +2,7 @@ import { AlertDialog, IGRPContainer, IGRPDataTable } from '@igrp/igrp-framework-
 import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals'
 import { IGRPTabs, IGRPTabsContent, IGRPTabsList, IGRPTabsTrigger } from '@renderer/components/tabs'
 import { Button } from '@renderer/components/ui/button'
-import { getBadgeColor } from '@renderer/utils/helpers'
+import { getBadgeColor } from '@renderer/utils'
 import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 

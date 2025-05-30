@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
-import { getBadgeColor, getIcon } from '@renderer/utils/helpers';
+import { getBadgeColor, getIcon } from '@renderer/utils';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { FileTree, MenuItem } from 'src/main/types';

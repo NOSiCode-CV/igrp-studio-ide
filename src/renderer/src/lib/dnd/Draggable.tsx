@@ -65,7 +65,7 @@ const Draggable = ({
                 handleDragOver(e, componentId, index, dropTargetId);
                 handleLayoutChange(layout);
             }}
-            className={cn(
+            className={cn('min-w-32',
                 dropZone &&
                     'relative border border-dashed  hover:border-primary/50 rounded-lg bg-card transition-all p-2',
                 draggedId === componentId && dropZone

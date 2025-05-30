@@ -80,7 +80,7 @@ const Container = ({
             onDrop={handleDrop}
             component={comp}
             className={cn(
-                'space-y-3 relative hover:border-1 hover:border-primary rounded-lg p-3',
+                'space-y-3 relative  p-3',//hover:border-1 hover:border-primary rounded-lg
                 isDisabled && 'border-none hover:border-destructive'
             )}
         >
@@ -124,7 +124,7 @@ const Container = ({
                                         isDisabled={isDisabled}
                                         group={`group/row-container-child`}
                                         className={
-                                            'opacity-0 group-hover/row-container-child:opacity-100'
+                                            'opacity-0 group-hover/row-container-child:opacity-100 left-0 right-auto'
                                         }
                                     />
                                 )}

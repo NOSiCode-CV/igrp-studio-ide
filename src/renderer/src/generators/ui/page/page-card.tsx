@@ -3,18 +3,10 @@ import { Card, CardContent, CardFooter } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
 import { Edit, Trash } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PageDefinition } from './list-pages';
 
 interface PageCardProps {
-    page: {
-        name: string;
-        description: string;
-        path: string;
-        pagePath: string;
-        status: string;
-        created: string;
-        pageName: string;
-        isPage: boolean;
-    };
+    page: PageDefinition
     onDelete: (page: any) => void;
     onAddComponents: (page: any) => void;
 }
@@ -37,7 +29,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
             </CardContent>
             <CardFooter className="flex justify-between">
                 <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => onAddComponents(page)}
                 >
@@ -49,7 +41,7 @@ export function PageCard({ page, onDelete, onAddComponents }: PageCardProps) {
                     size="sm"
                     onClick={() => onDelete(page)}
                 >
-                    <Trash className="h-4 w-4 text-red-500" />
+                    <Trash className="h-4 w-4 text-destructive" />
                     <span>{t('delete')}</span>
                 </Button>
             </CardFooter>

@@ -44,11 +44,9 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@renderer/components/ui/breadcrumb';
-import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
-import { getIcon } from '@renderer/components/shared-ui';
 
 interface HeaderProps {
     config?: ProjectData;

@@ -82,6 +82,8 @@ export interface BaseEngine {
 
     getCodeSnippets?(): CodeSnippetsRegistrationConfig;
 
+    registerComponent?(config: ComponentRegistrationConfig): void
+
 }
 
 
@@ -108,6 +110,8 @@ export interface IBaseEngine {
     getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
 
     getCodeSnippets(engineType: string): CodeSnippetsRegistrationConfig;
+
+    registerComponent: (engineType: string, config: ComponentRegistrationConfig) => Promise<HandlerResponse>
 }
 
 export interface IDocker {

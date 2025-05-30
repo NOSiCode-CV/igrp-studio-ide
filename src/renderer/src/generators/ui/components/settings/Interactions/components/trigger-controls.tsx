@@ -22,9 +22,11 @@ import { ImportComponent } from '../../../sidebar/custom-code/custom-code-import
 import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { FunctionSettingsSidebar } from '../../../sidebar/custom-code/functions-settings';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
+import DynamicKeyValueForm from '@renderer/components/domain-form';
+import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 type ActionType = 'function' | 'navigate' | 'formSubmit';
 
@@ -144,8 +146,8 @@ export function TriggerControls({
     return (
         <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                    <Mouse size={16} />
+                <h3 className="text-sm font-medium flex items-center gap-1">
+                    <Mouse className="w-5 h-5" />
                     Trigger Element
                 </h3>
                 <div className="flex items-center gap-1">
@@ -412,9 +414,9 @@ const InteractionEditor = ({
                             value={
                                 currentAction.navigate?.name
                                     ? currentAction.navigate.name.replace(
-                                          'onClick',
-                                          ''
-                                      )
+                                        'goTo',
+                                        ''
+                                    )
                                     : ''
                             }
                             onChange={(id) => {
@@ -426,7 +428,7 @@ const InteractionEditor = ({
                                         ...currentAction,
                                         navigate: {
                                             path: page.metadata.path,
-                                            name: `onClick${id}`,
+                                            name: `goTo${id}`,
                                         },
                                     });
                                 }
@@ -434,38 +436,28 @@ const InteractionEditor = ({
                             options={availablePages}
                         />
 
-                        {/*  <div className="space-y-2">
+                        <div className="space-y-2">
                             <Label>Navigation Parameters</Label>
-                            {Object.entries(navigationParams).map(
-                                ([key, value]) => (
-                                    <div key={key} className="flex gap-2">
-                                        <Input value={key} disabled />
-                                        <Input
-                                            value={value}
-                                            onChange={(e) =>
-                                                setNavigationParams({
-                                                    ...navigationParams,
-                                                    [key]: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                )
-                            )}
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                    setNavigationParams({
-                                        ...navigationParams,
-                                        [`param${Object.keys(navigationParams).length + 1}`]:
-                                            '',
-                                    })
-                                }
-                            >
-                                Add Parameter
-                            </Button>
-                        </div> */}
+                            <DynamicKeyValueForm
+                                onAdd={(items) => {
+                                    setCurrentAction({
+                                        ...currentAction,
+                                        navigate: {
+                                            path: currentAction?.navigate?.path || '',
+                                            name: currentAction?.navigate?.name || '',
+                                            params: items.reduce((acc, item) => {
+                                                acc[item.paramName] = item.paramValue;
+                                                return acc;
+                                            }, {} as Record<string, string>),
+                                        },
+                                    });
+                                }}
+                                fieldPairs={[
+                                    { key: 'paramValue', label: 'Param Value' },
+                                    { key: 'paramName', label: 'Param Name' }
+                                ]}
+                            />
+                        </div>
                     </div>
                 );
 
@@ -497,9 +489,11 @@ const InteractionEditor = ({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
-                <SidebarInset className="p-4 space-y-4">
-                    <DialogHeader>
+            <DialogContent className="p-0 flex overflow-hidden [--header-height:calc(--spacing(99))] [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
+
+                <SidebarInset className="space-y-4">
+
+                    <DialogHeader className='p-4'>
                         <div className="flex flex-1 justify-between">
                             <div className="space-y-2">
                                 <DialogTitle>Edit Interaction</DialogTitle>
@@ -518,25 +512,28 @@ const InteractionEditor = ({
                             </div>
                         </div>
                     </DialogHeader>
-                    <div className="space-y-4">
-                        <IGRPCombobox
-                            label="Action Type"
-                            placeholder="Select action type"
-                            name="action-type"
-                            value={actionType}
-                            onChange={(value) => {
-                                setCurrentAction({
-                                    ...currentAction,
-                                    type: value as ActionType,
-                                });
-                                setActionType(value as ActionType);
-                            }}
-                            options={actionTypeOptions}
-                        />
+                    <ScrollArea className="h-[calc(100svh-var(--header-height))]">
+                        <div className="space-y-4 p-4">
+                            <IGRPCombobox
+                                label="Action Type"
+                                placeholder="Select action type"
+                                name="action-type"
+                                value={actionType}
+                                onChange={(value) => {
+                                    setCurrentAction({
+                                        ...currentAction,
+                                        type: value as ActionType,
+                                    });
+                                    setActionType(value as ActionType);
+                                }}
+                                options={actionTypeOptions}
+                            />
 
-                        {renderActionConfig()}
-                    </div>
+                            {renderActionConfig()}
+                        </div>
+                    </ScrollArea>
                 </SidebarInset>
+
                 {/* Sidebar com configurações adicionais */}
                 {actionType === 'function' && (
                     <FunctionSettingsSidebar

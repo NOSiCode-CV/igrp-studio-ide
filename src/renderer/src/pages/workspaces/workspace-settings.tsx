@@ -30,7 +30,7 @@ import {
 import { IWorkspace } from 'src/main/types';
 import { Textarea } from '@renderer/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
-import { getLocale } from '@renderer/utils/helpers';
+import { getLocale } from '@renderer/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import useToast from '@renderer/hooks/useToast';
 import { setWorkspace } from '@renderer/redux/thunks';

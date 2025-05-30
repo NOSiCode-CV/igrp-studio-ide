@@ -62,7 +62,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
             name: '',
             type: 'string',
             defaultValue: '',
-            imports: '',
+            imports: [],
         },
         validationSchema: stateValidationSchema,
         onSubmit: (values, actions) => {

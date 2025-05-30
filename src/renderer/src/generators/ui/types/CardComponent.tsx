@@ -2,6 +2,13 @@ import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
 import { IGRPBadge, IGRPButton } from '@igrp/igrp-framework-react-design-system';
 import { useFakedata } from '../hooks/useFakeData';
+import { layoutStyleToClasses } from '../components/settings/style/utils/layoutStyleToClasses';
+import { sizeStyleToClasses } from '../components/settings/style/utils/sizeStyleToClasses';
+import { spacingToClasses } from '../components/settings/style/utils/spacingToClasses';
+import { bordersStyleToClasses } from '../components/settings/style/utils/bordersStyleToClasses';
+import { typographyStyleToClasses } from '../components/settings/style/utils/typographyStyleToClasses';
+import { StyleComponent } from '../components/settings/style/types';
+import { positionStyleToClasses } from '../components/settings/style/utils/positionStyleToClasses';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
@@ -10,7 +17,7 @@ export interface CardComponentProps {
 const CardComponent = ({ comp }: CardComponentProps) => {
     const { getFakeComponentData } = useFakedata();
 
-    const { componentName, properties } = comp;
+    const { componentName, properties, style } = comp;
 
     const {
         commonProperties,
@@ -29,6 +36,11 @@ const CardComponent = ({ comp }: CardComponentProps) => {
     const Component = COMPONENT_MAP[componentName];
 
     const FAKE_COMPONENT_DATA = getFakeComponentData(componentName);
+
+    const classes = generateAllClasses(style);
+
+    if (classes)
+        console.log(classes)
 
     return (
         <>
@@ -59,7 +71,7 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                                 <Icon className="w-5 h-5 text-primary" />
                             </div>
                         )}
-                        <div className="text-sm font-medium text-gray-700 truncate">
+                        <div className="text-sm font-medium text-muted-foreground truncate">
                             {componentLabel}
                         </div>
                     </div>
@@ -67,6 +79,40 @@ const CardComponent = ({ comp }: CardComponentProps) => {
             )}
         </>
     );
+};
+
+const generateAllClasses = (style: StyleComponent | undefined) => {
+    if (!style) return '';
+
+    console.log(style)
+
+    const classes: string[] = [];
+
+    if (style.layout) {
+        classes.push(layoutStyleToClasses(style.layout));
+    }
+
+    if (style.spacing) {
+        classes.push(spacingToClasses(style.spacing));
+    }
+
+    if (style.size) {
+        classes.push(sizeStyleToClasses(style.size));
+    }
+
+    if (style.typography) {
+        classes.push(typographyStyleToClasses(style.typography));
+    }
+
+    if (style.borders) {
+        classes.push(bordersStyleToClasses(style.borders));
+    }
+
+    if (style.position) {
+        classes.push(positionStyleToClasses(style.position));
+    }
+
+    return classes.filter(Boolean).join(' ');
 };
 
 export default CardComponent;

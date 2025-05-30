@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
 import { EVENTS } from '../main/constants/events'
-import { ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
+import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 const backend = require('i18next-electron-fs-backend')
 
@@ -131,6 +131,14 @@ const engine = {
 	getComponent: async (engineType: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.NEXT.GET_COMPONENT, engineType)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	registerComponent: async (engineType: string, config: ComponentRegistrationConfig): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.REGISTER_COMPONENT, engineType, config)
 		} catch (error) {
 			return handleError(error)
 		}

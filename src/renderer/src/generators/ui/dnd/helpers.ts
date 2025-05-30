@@ -1,5 +1,5 @@
 import { StructuredComponent } from "@renderer/lib/dnd/types";
-import { generateId } from "@renderer/utils/helpers";
+import { generateId } from "@renderer/utils";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 // Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {

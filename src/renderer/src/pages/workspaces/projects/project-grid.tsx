@@ -9,7 +9,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { Clock, Folder } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { getLocale } from '@renderer/utils/helpers';
+import { getLocale } from '@renderer/utils';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import { ProjectActions } from './project-actions';
 import { Button } from '@renderer/components/ui/button';
