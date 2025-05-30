@@ -11,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
@@ -23,6 +23,7 @@ import TableTool from '../tools/tableTool';
 import { Badge } from '@renderer/components/ui/badge';
 import { useFakedata } from '../../hooks/useFakeData';
 import { faker } from '@faker-js/faker';
+import Droppable from '@renderer/lib/dnd/Droppable';
 
 export interface TableProps {
     isDisabled?: boolean;
@@ -217,9 +218,11 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                 const { componentName: compName, id } = tableComp;
 
                 return (
-                    <div
+                    <Droppable
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
+                        component={tableComp}
+                        onDrop={onDragEnd}
                     >
                         <TableTool
                             parentComp={comp}
@@ -230,7 +233,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             className="opacity-0 group-hover/table-filter:opacity-100"
                         />
                         {renderTableFilters(compName, id)}
-                    </div>
+                    </Droppable>
                 );
             })}
 
@@ -238,9 +241,11 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
             {tableColumns.map((tableComp, index) => {
                 const { componentName, id } = tableComp;
                 return (
-                    <div
+                    <Droppable
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
+                        component={tableComp}
+                        onDrop={onDragEnd}
                     >
                         <TableTool
                             parentComp={comp}
@@ -268,7 +273,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 </Table>
                             </div>
                         )}
-                    </div>
+                    </Droppable>
                 );
             })}
         </div>

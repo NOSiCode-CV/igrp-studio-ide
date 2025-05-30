@@ -3,7 +3,7 @@ import { Dialog, DialogDescription, DialogHeader, DialogTitle } from "@renderer/
 import { DialogContent } from "@renderer/components/ui/dialog";
 import { Separator } from "@renderer/components/ui/separator";
 import { SidebarInset } from "@renderer/components/ui/sidebar";
-import { capitalize } from "@renderer/utils/helpers";
+import { capitalize } from "@renderer/utils";
 import { Edit, Key } from "lucide-react";
 import { useRef, useState } from "react";
 import { TabStates } from "../../../sidebar/custom-code/custom-code-tabs";

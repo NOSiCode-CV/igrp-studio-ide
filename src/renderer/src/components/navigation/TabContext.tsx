@@ -1,5 +1,5 @@
 import { OptionType } from '@renderer/constants/appConstants';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import React, { createContext, useContext, useState } from 'react';
 
 export interface TabItem {

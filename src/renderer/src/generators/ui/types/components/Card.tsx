@@ -9,7 +9,7 @@ import {
     IGRPCardFooter,
     IGRPCardHeader,
 } from '@igrp/igrp-framework-react-design-system';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';

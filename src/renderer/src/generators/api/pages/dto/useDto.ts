@@ -6,7 +6,7 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import { DTOConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { getTablesColumns, initialValues } from './config';

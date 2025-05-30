@@ -13,7 +13,7 @@ import { useGit } from '@renderer/hooks/use-git';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { getUUID } from '@renderer/utils/helpers';
+import { getUUID } from '@renderer/utils';
 
 export default function GitProject() {
     const { t } = useTranslation();

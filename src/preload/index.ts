@@ -4,7 +4,6 @@ import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData 
 import { EVENTS } from '../main/constants/events'
 import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
-import { registerComponents } from '@igrp/igrp-studio-nextjs-engine'
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({

@@ -48,7 +48,6 @@ const Interactions = ({
     };
 
     const handleRulesChange = (data: RuleDefinition[]) => {
-        console.log(data)
         if (componentId)
             onInteranctionsChange(componentId, {
                 rules: data

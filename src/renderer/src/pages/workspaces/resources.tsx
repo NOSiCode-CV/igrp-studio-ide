@@ -42,7 +42,7 @@ import { useDocker } from '@renderer/hooks/use-docker';
 import { ServiceList } from './services/service-list';
 import { ProjectList } from './projects/project-list';
 import ProjectGrid from './projects/project-grid';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 
 type ResourceType = 'project' | 'service';
 type ViewMode = 'grid' | 'list';

@@ -38,12 +38,23 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import useStudio from '@renderer/hooks/use-studio';
 
+export interface PageDefinition {
+    name: string;
+    description: string;
+    path: string;
+    pagePath: string;
+    status: string;
+    created: string;
+    pageName: string;
+    isPage: boolean;
+}
+
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: FileTree) => void;
 }
 
 const MainPageBuilder = ({
-    onPageClick = (): void => {},
+    onPageClick = (): void => { },
 }: PageBuilderContentProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
@@ -117,7 +128,7 @@ const MainPageBuilder = ({
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const tableData = [
+    const tableData: PageDefinition[] = [
         ...filteredPages.map((page) => ({
             ...page.content,
             ...page,
@@ -132,10 +143,17 @@ const MainPageBuilder = ({
             isPage: false,
         })),
     ];
+    const pageOptions = tableData
+        .filter((p) => p.isPage)
+        .map(({ description, pageName, path }) => ({
+            label: description || pageName,
+            value: pageName,
+            path
+        }));
 
     const columns: ColumnDef<any>[] = [
         {
-            accessorKey: 'description', 
+            accessorKey: 'description',
             header: 'Name',
         },
         {
@@ -171,9 +189,8 @@ const MainPageBuilder = ({
         },
     ];
 
-    const tableCountText = `${tableData.length} ${
-        tableData.length === 1 ? 'page' : 'pages'
-    }`;
+    const tableCountText = `${tableData.length} ${tableData.length === 1 ? 'page' : 'pages'
+        }`;
 
     const tableQueryText = searchTerm ? ` matching "${searchTerm}"` : '';
 
@@ -306,6 +323,7 @@ const MainPageBuilder = ({
                 isOpen={showNewComponentModal}
                 onClose={() => setNewComponentModal(false)}
                 onConfirm={handleNewPage}
+                pageOptions={pageOptions}
             />
 
             <AlertDialogDelete

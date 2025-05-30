@@ -21,7 +21,7 @@ import { RepositoryList } from './repository-list';
 import { IWorkspace } from 'src/main/types';
 import useToast from '@renderer/hooks/useToast';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { getUUID } from '@renderer/utils/helpers';
+import { getUUID } from '@renderer/utils';
 
 interface CloneProjectModalProps {
     workspace: IWorkspace;

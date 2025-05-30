@@ -4,22 +4,17 @@ type Prop = {
     isOptional: boolean;
 };
 
-type Component = {
-    name: string;
-    props: Prop[];
-};
-
 export function convertComponentsToJSONSchema(props: Prop[]) {
     const properties: Record<string, any> = {};
     const required: string[] = [];
 
-    props.forEach((prop) => {
+    props.filter((prop) => prop.name !== '').forEach((prop) => {
         properties[prop.name] = { type: mapToJSONSchemaType(prop.type) };
         if (!prop.isOptional) {
             required.push(prop.name);
         }
     });
-    
+
     return properties;
 }
 

@@ -4,7 +4,7 @@ function isValidTailwindUnit(unit: string) {
   return ['px', '%', 'rem', 'em', 'vw', 'vh'].includes(unit);
 }
 
-function getSideClass(side: Side, value: PositionValue, linked: boolean): string {
+function getSideClass(side: Side, value: PositionValue, _linked: boolean): string {
   if (!value.value) return '';
   const isNumeric = !isNaN(Number(value.value));
   const val = isNumeric ? `${value.value}${value.unit}` : value.value;

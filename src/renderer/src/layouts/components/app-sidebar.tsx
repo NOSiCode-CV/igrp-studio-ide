@@ -15,7 +15,7 @@ import {
 import { ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
-import { filterSubItems } from '@renderer/utils/helpers';
+import { filterSubItems } from '@renderer/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {

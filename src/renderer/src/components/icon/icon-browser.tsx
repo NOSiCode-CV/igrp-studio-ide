@@ -6,7 +6,7 @@ import {
     TooltipTrigger,
 } from '../ui/tooltip';
 import { icons } from 'lucide-react';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import {
     FixedSizeGrid as Grid,
     type FixedSizeGrid as GridType,

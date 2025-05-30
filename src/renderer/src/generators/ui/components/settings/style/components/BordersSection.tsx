@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Square, RefreshCw } from 'lucide-react';
-import { SectionProps } from '../types';
+import { BorderRadius, BordersStyle, BorderValue, SectionProps } from '../types';
 
 
 export function BordersSection({ onChangeStyles, styles }: SectionProps) {
@@ -226,11 +226,10 @@ export function BordersSection({ onChangeStyles, styles }: SectionProps) {
             </button>
             <button
               onClick={() => setIndividualBorders(!individualBorders)}
-              className={`px-2 py-0.5 rounded text-xs font-medium ${
-                individualBorders
+              className={`px-2 py-0.5 rounded text-xs font-medium ${individualBorders
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-              }`}
+                }`}
             >
               {individualBorders ? 'Individual' : 'All Sides'}
             </button>

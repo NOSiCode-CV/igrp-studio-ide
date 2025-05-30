@@ -1,6 +1,7 @@
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { ENV_TYPES } from "@renderer/constants/appConstants";
 import { convertComponentsToJSONSchema } from "@renderer/utils/convertComponentsToJSONSchema";
+import { getLabel } from "@renderer/utils";
 import { HandlerResponse } from "src/main/types";
 
 export const EngineService = {
@@ -10,16 +11,17 @@ export const EngineService = {
 
     async startWatching(folderPath: string): Promise<void> {
         await window.electron.watchFolder(`${folderPath}/src/app/(myapp)`);
-    }
-    ,
+    },
+
     async getCodeSnippets(): Promise<HandlerResponse> {
         return await window.engine.getCodeSnippets(ENV_TYPES.NEXTJS);
     },
+
     async registerComponent(config: any): Promise<void> {
         console.log(config)
         const components: ComponentRegisterConfig[] = config.map((component: any) => ({
             name: component.name,
-            label: component.name,
+            label: getLabel(component.name),
             properties: {
                 customProperties: {
                     type: 'object',

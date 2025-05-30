@@ -24,7 +24,7 @@ import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
-import { capitalize } from '@renderer/utils/helpers';
+import { capitalize } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
 
 interface LabeledElementField {
@@ -337,8 +337,8 @@ export const BindingConfigurationModal = ({
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
-                    <ScrollArea className="h-full p-4">
+                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[80vh]">
+                    <ScrollArea className="h-full p-4 max-h-[70vh] overflow-auto">
                         <DialogHeader className="mb-4">
                             <DialogTitle>Binding Configuration</DialogTitle>
                             <DialogDescription>
