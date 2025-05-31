@@ -442,7 +442,9 @@
     "createButton": "Criar Workspace",
     "createError": "Falha ao criar workspace",
     "createSuccess": "Workspace '{{name}}' criado com sucesso!",
-    "slug": "Slug"
+    "slug": "Slug",
+    "createFailed": "Falha na criação do workspace:",
+    "describe": "Descreva seu espaço de trabalho (workspace)..."
   },
   "creating": "Criando...",
   "enableGraalVm": "Ativar Graal Vm",
@@ -492,6 +494,7 @@
    "workspaceAndProjects": "Espaço de trabalho e todos os projetos e configurações associadas.",
    "id": "ID:",
    "noServicesFound": "Nenhum serviço encontrado",
+  "noServicesYet": "Este espaço de trabalho ainda não possui serviços.",
    "addNewService": "Adicionar Novo Serviço",
    "resources": "Recursos",
    "diagram": "Diagrama",
