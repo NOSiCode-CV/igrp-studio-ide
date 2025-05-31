@@ -142,7 +142,7 @@ const useStudio = () => {
         return component ? component.properties : [];
     }, [findComponent]);
 
-     // Get properties for a childProperties
+    // Get properties for a childProperties
     const getChildPropertiesComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.childProperties : [];
@@ -160,8 +160,8 @@ const useStudio = () => {
         return component ? component.rules : [];
     }, [findComponent]);
 
-     // Get rukes for a data
-     const getDataComponent = useCallback(async (path: string | undefined, componentName: string) => {
+    // Get rukes for a data
+    const getDataComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.data : [];
     }, [findComponent]);
@@ -177,7 +177,7 @@ const useStudio = () => {
 
     useEffect(() => {
         const pages = files.find((page) => page.name === 'pages')
-        const options = pages?.children?.map((page) => {
+        const options = pages?.children?.filter((page) => page?.content?.pageName).map((page) => {
             const { content } = page
             return {
                 value: content.pageName,
