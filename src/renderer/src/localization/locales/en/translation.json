@@ -443,7 +443,9 @@
     "createButton": "Create Workspace",
     "createError": "Failed to create workspace",
     "createSuccess": "Workspace '{{name}}' created successfully!",
-    "slug": "Slug"
+    "slug": "Slug",
+    "createFailed": "Workspace creation failed:",
+    "describe": "Describe your workspace..."
   },
   "creating": "Creating...",
   "enableGraalVm": "Enable Graal Vm",
@@ -493,6 +495,7 @@
   "workspaceAndProjects": "workspace and all associated projects and configurations.",
   "id": "ID:",
   "noServicesFound": "No services found",
+  "noServicesYet": "This workspace doesn't have any services yet.",
   "addNewService": "Add New Service",
   "resources": "Resources",
   "diagram": "Diagram",

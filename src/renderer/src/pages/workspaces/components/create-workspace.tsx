@@ -74,7 +74,7 @@ const CreateWorkspace = ({
                 onOpenChange?.(false);
             }
         } catch (error) {
-            console.error(t('workspaceCreationFailed'), error);
+            console.error(t('workspace.creationFailed'), error);
             showErrorToast(error);
         } finally {
             setIsCreating(false);
@@ -128,7 +128,7 @@ const CreateWorkspace = ({
                         <Label htmlFor="description">{t('description')}</Label>
                         <Textarea
                             id="description"
-                            placeholder={t('describeWorkspace')}
+                            placeholder={t('workspace.describe')}
                             value={workspaceDescription}
                             onChange={(e) =>
                                 setWorkspaceDescription(e.target.value)

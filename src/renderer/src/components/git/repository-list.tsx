@@ -354,7 +354,7 @@ export function RepositoryList() {
                                 {t('noRepositoriesFound')}
                             </p>
                             <p className="text-gray-400 text-sm mt-1">
-                                {t('tryAdjustingSearchOrFilters')}
+                                {t('tryAdjustingYourSearchOrFilters')}
                             </p>
                         </div>
                     ) : (
