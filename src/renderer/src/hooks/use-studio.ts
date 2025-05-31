@@ -142,22 +142,30 @@ const useStudio = () => {
         return component ? component.properties : [];
     }, [findComponent]);
 
+     // Get properties for a childProperties
     const getChildPropertiesComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.childProperties : [];
     }, [findComponent]);
 
-    // Get properties for a component
+    // Get properties for a interactions
     const getInteractionsComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.interactions : [];
     }, [findComponent]);
 
-    // Get rukes for a component
+    // Get rukes for a rules
     const getRulesComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.rules : [];
     }, [findComponent]);
+
+     // Get rukes for a data
+     const getDataComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
+        return component ? component.data : [];
+    }, [findComponent]);
+
 
     const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
         return componentsRegistered.find(component => component.name === id);
@@ -189,6 +197,7 @@ const useStudio = () => {
         findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,
+        getDataComponent,
         getChildPropertiesComponent,
         getRegistryComponent,
         getInteractionsComponent,

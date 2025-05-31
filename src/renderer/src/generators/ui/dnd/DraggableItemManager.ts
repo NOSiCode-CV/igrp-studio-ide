@@ -34,9 +34,9 @@ const handleDropComponent = (
 
     const tag = generateTag(draggableId);
 
-    const data = getRequiredDataSchema(dataProperties, tag);
+    const data = getRequiredDataSchema(dataProperties);
 
-    const interactions = getDefaultInteractions(interactionsProperties, tag);
+    const interactions = getDefaultInteractions(interactionsProperties);
 
     // Create the component object
     const component: StructuredComponent = {
@@ -56,8 +56,8 @@ const handleDropComponent = (
         const { name, label, properties, interactions: interactionsProperties, allowTypes, data: dataProperties } = child
         const childId = generateId(name);
         const tag = generateTag(name)
-        const data = getRequiredDataSchema(dataProperties, tag);
-        const interactions = getDefaultInteractions(interactionsProperties, tag);
+        const data = getRequiredDataSchema(dataProperties);
+        const interactions = getDefaultInteractions(interactionsProperties);
 
         const childComponent: StructuredComponent = {
             id: childId,

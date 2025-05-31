@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Action, TriggerControls } from './components/trigger-controls';
 import Rules from './components/rules';
 import { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import StateData from './components/StateData';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -21,13 +22,23 @@ const Interactions = ({
     path,
     onInteranctionsChange,
 }: InteractionProps) => {
-    const { getInteractionsComponent, getRulesComponent } = useStudio();
+    const { getInteractionsComponent, getRulesComponent, getDataComponent } =
+        useStudio();
 
     const [interactionsType, setInteractionsType] = useState({});
 
     const [rulesProperties, setRulesProperties] = useState({});
 
-    const { componentName, interactions, id: componentId, tag, rules } = comp;
+    const [dataProperties, setDataProperties] = useState({});
+
+    const {
+        componentName,
+        interactions,
+        id: componentId,
+        tag,
+        rules,
+        data,
+    } = comp;
 
     useEffect(() => {
         if (componentName) {
@@ -36,6 +47,9 @@ const Interactions = ({
             );
             getRulesComponent(path, componentName).then((data) =>
                 setRulesProperties(data)
+            );
+            getDataComponent(path, componentName).then((data) =>
+                setDataProperties(data)
             );
         }
     }, [getInteractionsComponent, comp, componentName]);
@@ -50,12 +64,19 @@ const Interactions = ({
     const handleRulesChange = (data: RuleDefinition[]) => {
         if (componentId)
             onInteranctionsChange(componentId, {
-                rules: data
+                rules: data,
+            });
+    };
+
+    const handleDataChange = (data: any) => {
+        if (componentId)
+            onInteranctionsChange(componentId, {
+               data
             });
     };
 
     return (
-        <div className="p-3 space-y-4">
+        <div className="p-3 space-y-2">
             <TriggerControls
                 interactions={interactions}
                 onInteractionsChange={handleInteractionsChange}
@@ -70,7 +91,18 @@ const Interactions = ({
                     icon={<MousePointer />}
                 />
             )}
-            <Rules rulesProperties={rulesProperties} rules={rules} componentTag={tag} onRulesChange={handleRulesChange} />
+            <Rules
+                rulesProperties={rulesProperties}
+                rules={rules}
+                componentTag={tag}
+                onRulesChange={handleRulesChange}
+            />
+            <StateData
+                dataProperties={dataProperties}
+                data={data}
+                componentTag={tag}
+                onDataChange={handleDataChange}
+            />
         </div>
     );
 };

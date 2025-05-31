@@ -39,6 +39,8 @@ import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import useStudio from '@renderer/hooks/use-studio';
 
 export interface PageDefinition {
+    id: string,
+    type: "page" | "component";
     name: string;
     description: string;
     path: string;
@@ -47,14 +49,15 @@ export interface PageDefinition {
     created: string;
     pageName: string;
     isPage: boolean;
+    content: { [key: string]: string }
 }
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: FileTree) => void;
+    onPageClick?: (pageFile: PageDefinition) => void;
 }
 
 const MainPageBuilder = ({
-    onPageClick = (): void => { },
+    onPageClick,
 }: PageBuilderContentProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
@@ -63,7 +66,7 @@ const MainPageBuilder = ({
 
     const [content, setContent] = useState<any>([]);
     const [components, setComponents] = useState<any>([]);
-    const [page, setPage] = useState<any>();
+    const [page, setPage] = useState<PageDefinition>();
     const [newPageModal, setNewPageModal] = useState<boolean>(false);
     const [showNewComponentModal, setNewComponentModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -71,16 +74,17 @@ const MainPageBuilder = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
-    const handleAddComponents = (page: any) => {
+    const handleAddComponents = (page: PageDefinition) => {
         onPageClick?.(page);
     };
 
-    const handleDeletePage = (page: any) => {
+    const handleDeletePage = (page: PageDefinition) => {
         setDeleteModal(true);
         setPage(page);
     };
 
     const confirmDeletion = async () => {
+        if (!page) return
         const pageConfig: DeleteConfig = {
             type: page.type,
             name: page.pageName,
@@ -89,7 +93,7 @@ const MainPageBuilder = ({
         await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
         isLoadingTable(true);
-        setPage(null);
+        setPage(undefined);
     };
 
     const handleNewPage = () => {
@@ -120,35 +124,36 @@ const MainPageBuilder = ({
         }
     }, [files]);
 
-    const filteredPages = content.filter((page) =>
+    const filteredPages = content.filter((page: FileTree) =>
         page.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const filteredComponents = components.filter((comp) =>
+    const filteredComponents = components.filter((comp: FileTree) =>
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const tableData: PageDefinition[] = [
-        ...filteredPages.map((page) => ({
-            ...page.content,
+        ...filteredPages.map((page: FileTree) => ({
+            ...page?.content,
             ...page,
             pagePath: page.content?.path,
             isPage: true,
         })),
-        ...filteredComponents.map((comp) => ({
-            ...page.content,
+        ...filteredComponents.map((comp: FileTree) => ({
+            ...comp?.content,
             ...comp,
-            pageName: comp.content?.name,
-            pagePath: page.content.path,
+            pageName: comp?.content?.name,
+            pagePath: comp?.content?.path,
             isPage: false,
         })),
     ];
+
     const pageOptions = tableData
         .filter((p) => p.isPage)
-        .map(({ description, pageName, path }) => ({
+        .map(({ description, pageName, content }) => ({
             label: description || pageName,
             value: pageName,
-            path
+            path: content?.path
         }));
 
     const columns: ColumnDef<any>[] = [
@@ -331,6 +336,7 @@ const MainPageBuilder = ({
                 onClose={() => setDeleteModal(false)}
                 onConfirm={confirmDeletion}
                 hasTrigger={false}
+                recordId={page?.pageName}
             />
         </div>
     );

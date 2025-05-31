@@ -43,7 +43,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import useStudio from '@renderer/hooks/use-studio';
 import NavigatorSidebar from './sidebar-navigator';
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
-import SidebarAppComponents from './sidebar-app-components';
+//import SidebarAppComponents from './sidebar-app-components';
 import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import {
     CustomCodeMenu,
@@ -100,7 +100,7 @@ export function AppSidebar({
 
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
-        { icon: Component, label: t('components'), id: 'components' },
+       /// { icon: Component, label: t('components'), id: 'components' },
         { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
         { icon: BrainCircuit, label: t('Applogic'), id: 'appLogic' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
@@ -228,9 +228,9 @@ export function AppSidebar({
                                     // Optional: Handle commit selection
                                 }}
                             />
-                        ) : activeMenuGroup.id === 'components' ? (
+                        ) /* : activeMenuGroup.id === 'components' ? (
                             <SidebarAppComponents searchTerm={searchQuery} />
-                        ) : activeMenuGroup.id === 'customCode' ? (
+                        ) */ : activeMenuGroup.id === 'customCode' ? (
                             <SidebarAppCustomCode searchTerm={searchQuery} />
                         ) : activeMenuGroup.id === 'appLogic' ? (
                             <SidebarAppLogic searchTerm={searchQuery} />

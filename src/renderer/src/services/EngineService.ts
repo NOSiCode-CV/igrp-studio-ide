@@ -2,7 +2,7 @@ import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/in
 import { ENV_TYPES } from "@renderer/constants/appConstants";
 import { convertComponentsToJSONSchema } from "@renderer/utils/convertComponentsToJSONSchema";
 import { getLabel } from "@renderer/utils";
-import { HandlerResponse } from "src/main/types";
+import { FileTree, HandlerResponse } from "src/main/types";
 
 export const EngineService = {
     async getAppMetadata(basePath: string): Promise<HandlerResponse> {
@@ -17,9 +17,9 @@ export const EngineService = {
         return await window.engine.getCodeSnippets(ENV_TYPES.NEXTJS);
     },
 
-    async registerComponent(config: any): Promise<void> {
-        console.log(config)
-        const components: ComponentRegisterConfig[] = config.map((component: any) => ({
+    async registerComponent({ customComponents, appComponents, currentPage }: { customComponents: any, appComponents: FileTree[], currentPage: string }): Promise<void> {
+
+        const components: ComponentRegisterConfig[] = customComponents.map((component: any) => ({
             name: component.name,
             label: getLabel(component.name),
             properties: {
@@ -30,7 +30,7 @@ export const EngineService = {
             },
             interactions: component.interactions,
             childrenTypes: [],
-            imports: [`import {${component.name}} from '${component.path}'`],
+            imports: component.path ? [`import {${component.name}} from '${component.path}'`] : [],
             defaultValue: false,
             allowTypes: false,
             group: 'customComponents',
@@ -53,8 +53,47 @@ export const EngineService = {
             templatePath: ''
         }));
 
-        const { result, error } = await window.engine.registerComponent(ENV_TYPES.NEXTJS, { components });
+        const _components: ComponentRegisterConfig[] = appComponents.filter((component) => component.content.scope === 'app' || ((component.content.type === 'page' && component.content.pageName === currentPage) || component.content.name !== currentPage))
+            .map((component: any) => ({
+                name: component.content.name,
+                label: component.content.description || getLabel(component.content.name),
+                properties: {
+                    customProperties: {
+                        type: 'object',
+                        properties: component.props ? convertComponentsToJSONSchema(component.props) : undefined,
+                    }
+                },
+                interactions: component.interactions,
+                childrenTypes: [],
+                imports: component.content.path ? [`import {${component.content.name}} from '${component.path}'`] : [],
+                defaultValue: false,
+                allowTypes: false,
+                group: 'appComponents',
+                customClassName: component.customClassName,
+                customComponentTag: component.content.name,
+                variants: {},
+                propertiesMapping: {},
+                interactionsMapping: {},
+                data: component.data,
+                dataMapping: {},
+                style: component.style,
+                styleMapping: {},
+                rules: component.rules,
+                rulesMapping: {},
+                childProperties: {},
+                childPropertiesMapping: {},
+                states: [],
+                acceptedChildren: [],
+                renderer: 'custom',
+                templatePath: '',
+                metadata: component.content
 
-        console.log(result, error)
+            }));
+
+        const componentsToRegister = [...components, ..._components]
+
+        const { result, error } = await window.engine.registerComponent(ENV_TYPES.NEXTJS, { components: componentsToRegister });
+        if (error)
+            console.log(result, error)
     }
 };

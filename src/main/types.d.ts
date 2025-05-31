@@ -234,4 +234,13 @@ export interface GitProviderConfig {
     clientSecret: string;
     active: boolean;
     isDefault?: boolean;
-  }
+}
+
+export type ToolCheck = {
+    name: string;
+    command: string;
+    success: boolean;
+    version?: string;
+    error?: string;
+    link: string;
+};

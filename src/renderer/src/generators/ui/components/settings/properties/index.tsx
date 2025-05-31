@@ -36,8 +36,6 @@ const getNestedValue = (obj: any, path: string) => {
 
 const RenderPropsConfig = ({ propsComp, formValues, handleInputChange }) => {
 
-    console.log(propsComp)
-
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const label = getLabel(key);

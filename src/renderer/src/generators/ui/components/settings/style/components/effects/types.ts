@@ -117,7 +117,7 @@ export interface GradientValue {
   stops: GradientStop[];
 }
 
-export interface BackgroundValue {
+export interface BackgroundStyle {
   type: 'color' | 'image' | 'gradient';
   value: string | GradientValue;
   size: string;

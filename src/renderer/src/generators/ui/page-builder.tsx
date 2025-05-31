@@ -68,7 +68,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { componentsRegistered, findComponentById } = useStudio();
+        const { componentsRegistered, findComponentById, fetchComponents } = useStudio();
 
         const { customComponents } = useCustomCode();
 
@@ -96,8 +96,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         useEffect(() => {
 
+            const appComponents = fetchComponents();
+
             const registerComponents = () => {
-                EngineService.registerComponent(customComponents);
+                EngineService.registerComponent({ customComponents, appComponents, currentPage: page.pageName });
             }
 
             registerComponents()
