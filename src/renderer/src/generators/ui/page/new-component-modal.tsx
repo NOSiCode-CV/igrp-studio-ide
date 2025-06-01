@@ -22,10 +22,11 @@ import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { TextInput } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
 import { FocusEvent } from 'react';
+import { PageDefinition } from './list-pages';
 
 const initialValues: ComponentConfig = {
     type: 'component',
-    scope: "app",
+    scope: 'app',
     pagePath: undefined,
     pageName: undefined,
     description: '',
@@ -37,7 +38,8 @@ const initialValues: ComponentConfig = {
 interface NewComponentModalProps {
     isOpen: boolean;
     basePath: string;
-    pageOptions: any[]
+    pageOptions: any[];
+   
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -49,6 +51,7 @@ export function NewComponentModal({
     onConfirm,
     pageOptions
 }: NewComponentModalProps) {
+    
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
@@ -69,7 +72,7 @@ export function NewComponentModal({
                 basePath
             );
 
-            console.log(pageConfig)
+            console.log(pageConfig);
 
             if (error) {
                 showErrorToast(error);
@@ -80,7 +83,10 @@ export function NewComponentModal({
                 `Component ${pageConfig.name} has been successfully added.`
             );
             // commit after creating the page
-            createGitCommit(basePath, t("addComponent", { name: pageConfig.name }));
+            createGitCommit(
+                basePath,
+                t('addComponent', { name: pageConfig.name })
+            );
             onConfirm?.();
 
             formik.resetForm();
@@ -97,7 +103,6 @@ export function NewComponentModal({
         name: Yup.string()
             .required(t('thisFieldRequired', { name: t('name') }))
             .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
-
     });
 
     const formik = useFormik<ComponentConfig>({
@@ -160,22 +165,32 @@ export function NewComponentModal({
                             />
                         </div>
                         <div className="grid grid-cols-1 items-center gap-3">
-                            <Label htmlFor="Associar">
-                                {t('pages')}
-                            </Label>
+                            <Label htmlFor="Associar">{t('pages')}</Label>
                             <IGRPCombobox
                                 name="pagePath"
                                 className="col-span-3"
                                 value={formik.values.pagePath || ''}
                                 options={pageOptions}
-                                placeholder='Select page'
+                                placeholder="Select page"
                                 helperText={t('componentAssociation')}
                                 onChange={(selectedValue) => {
-                                    const selected = pageOptions.find(opt => opt.value === selectedValue);
-                                    formik.setFieldValue('pagePath', selected?.path || undefined);
-                                    formik.setFieldValue('pageName', selected?.value || undefined);
-                                    formik.setFieldValue('scope', selectedValue ? 'page' : 'app');
-                                }} />
+                                    const selected = pageOptions.find(
+                                        (opt) => opt.value === selectedValue
+                                    );
+                                    formik.setFieldValue(
+                                        'pagePath',
+                                        selected?.path || undefined
+                                    );
+                                    formik.setFieldValue(
+                                        'pageName',
+                                        selected?.value || undefined
+                                    );
+                                    formik.setFieldValue(
+                                        'scope',
+                                        selectedValue ? 'page' : 'app'
+                                    );
+                                }}
+                            />
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <IconBrowser
@@ -195,7 +210,7 @@ export function NewComponentModal({
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? t("saving") : t("save")}
+                            {formik.isSubmitting ? t('saving') : t('save')}
                         </Button>
                     </DialogFooter>
                 </form>
