@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { Action, TriggerControls } from './components/trigger-controls';
 import Rules from './components/rules';
 import { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import StateData from './components/StateData';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -22,23 +21,14 @@ const Interactions = ({
     path,
     onInteranctionsChange,
 }: InteractionProps) => {
-    const { getInteractionsComponent, getRulesComponent, getDataComponent } =
+    const { getInteractionsComponent, getRulesComponent } =
         useStudio();
 
     const [interactionsType, setInteractionsType] = useState({});
 
     const [rulesProperties, setRulesProperties] = useState({});
 
-    const [dataProperties, setDataProperties] = useState({});
-
-    const {
-        componentName,
-        interactions,
-        id: componentId,
-        tag,
-        rules,
-        data,
-    } = comp;
+    const { componentName, interactions, id: componentId, tag, rules } = comp;
 
     useEffect(() => {
         if (componentName) {
@@ -48,9 +38,9 @@ const Interactions = ({
             getRulesComponent(path, componentName).then((data) =>
                 setRulesProperties(data)
             );
-            getDataComponent(path, componentName).then((data) =>
+            /*  getDataComponent(path, componentName).then((data) =>
                 setDataProperties(data)
-            );
+            ); */
         }
     }, [getInteractionsComponent, comp, componentName]);
 
@@ -68,12 +58,12 @@ const Interactions = ({
             });
     };
 
-    const handleDataChange = (data: any) => {
+/*     const handleDataChange = (data: any) => {
         if (componentId)
             onInteranctionsChange(componentId, {
-               data
+                data,
             });
-    };
+    }; */
 
     return (
         <div className="p-3 space-y-2">
@@ -97,12 +87,12 @@ const Interactions = ({
                 componentTag={tag}
                 onRulesChange={handleRulesChange}
             />
-            <StateData
+            {/*  <StateData
                 dataProperties={dataProperties}
                 data={data}
                 componentTag={tag}
                 onDataChange={handleDataChange}
-            />
+            /> */}
         </div>
     );
 };

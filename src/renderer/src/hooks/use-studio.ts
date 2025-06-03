@@ -34,16 +34,19 @@ const useStudio = () => {
     }, [files]);
 
     // Dynamically import a component by name
-    const dynamicImport = useCallback(async (componentName: string) => {
-        try {
-            /* @vite-ignore */
-            const module = await import(`../generators/ui/types/components/${componentName}`);
-            return module.default;
-        } catch (error) {
-            const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
-            // console.warn('Failed to load component:', error);
-            return fallbackModule.default;
-        }
+    const dynamicImport = useCallback(async (_componentName: string) => {
+
+        const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+
+        return fallbackModule.default;
+        /*   try {
+              const module = await import(`../generators/ui/types/components/${componentName}`);
+              return module.default;
+          } catch (error) {
+              const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+              // console.warn('Failed to load component:', error);
+              return fallbackModule.default;
+          } */
     }, []);
 
     // Get component data from a JSON file
@@ -181,7 +184,7 @@ const useStudio = () => {
             const { content } = page
             return {
                 value: content.pageName,
-                label: content.pageName,
+                label: content.description || content.pageName,
                 metadata: content
             }
         }) ?? [];

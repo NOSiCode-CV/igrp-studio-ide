@@ -47,7 +47,7 @@ export function NewPageModal({
     basePath,
     onClose,
     onConfirm,
-    pageEditing
+    pageEditing,
 }: NewPageModalProps) {
     const { t } = useTranslation();
 
@@ -102,8 +102,15 @@ export function NewPageModal({
         initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
+            const newValues = pageEditing
+                ? {
+                      ...values,
+                      path: `${pageEditing?.content?.path}/${values.path}`,
+                  }
+                : values;
+
             actions.setSubmitting(false);
-            handleConfirm(values);
+            handleConfirm(newValues);
         },
     });
 
@@ -130,7 +137,9 @@ export function NewPageModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
-                <DialogTitle>{t('createNewPage')}</DialogTitle>
+                <DialogTitle>
+                    {pageEditing ? t('createSubNewPage') : t('createNewPage')}
+                </DialogTitle>
                 <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Page' })}
                 </DialogDescription>
@@ -167,7 +176,7 @@ export function NewPageModal({
                         <TextInput
                             id="path"
                             label="Path"
-                            placeholder="e.g. /docs/[[...slug]] or /(auth)/todo-list"
+                            placeholder="e.g. docs/[[...slug]] or /(auth)/todo-list"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.path || ''}

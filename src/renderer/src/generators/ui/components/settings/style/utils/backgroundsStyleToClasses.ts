@@ -1,6 +1,6 @@
 import { BackgroundStyle } from "../components/effects/types";
 
-export function backgroundToTailwind(background: BackgroundValue): string {
+export function backgroundToTailwind(background: BackgroundStyle): string {
   const {
     type,
     value,

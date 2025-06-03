@@ -5,7 +5,7 @@ import { EngineService } from "@renderer/services/EngineService";
 import { useMemo, useState, useEffect } from "react";
 import { useComponents } from "./useComponents";
 
-interface Option {
+export interface Option {
     label: string;
     value: string;
     metadata?: any
@@ -16,6 +16,7 @@ interface CustomCodeHook {
     states: State[];
     functionOptions: Option[];
     typesOptions: Option[];
+    statesOptions: Option[]
     snippets: CodeSnippetsRegisterConfig[];
     types: any[];
     customComponents: any[];
@@ -57,6 +58,13 @@ const useCustomCode = (): CustomCodeHook => {
 
     const typesOptions = useMemo<Option[]>(() => {
         return types.map((type) => ({
+            label: type.name,
+            value: type.name,
+        }));
+    }, [types]);
+
+    const statesOptions = useMemo<Option[]>(() => {
+        return states.map((type) => ({
             label: type.name,
             value: type.name,
         }));
@@ -108,6 +116,7 @@ const useCustomCode = (): CustomCodeHook => {
         states,
         functionOptions,
         typesOptions,
+        statesOptions,
         snippets,
         types,
         customComponents,

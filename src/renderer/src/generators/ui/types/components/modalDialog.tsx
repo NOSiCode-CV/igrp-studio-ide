@@ -26,7 +26,10 @@ export const COMPONENT_MAP: Record<string, React.ElementType> = {
     [COMPONENT.CardHeader]: IGRPCardHeader,
 };
 
-const ModalDialog: React.FC<ModalDialogProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
+    comp,
+    onDragEnd,
+}) => {
     const {
         children: components,
         id: componentId,
@@ -113,4 +116,4 @@ const ModalDialog: React.FC<ModalDialogProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default ModalDialog;
+export default IGRPStudioModalDialog;

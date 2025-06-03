@@ -13,6 +13,7 @@ import {
 import { Plus, Trash2 } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
 import { useTranslation } from 'react-i18next';
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 
 interface DynamicKeyValuePair {
     id: string;
@@ -22,8 +23,10 @@ interface DynamicKeyValuePair {
 interface DynamicFormProps {
     onAdd: (items: Record<string, string>[]) => void;
     fieldPairs?: {
-        key: string;   // ex: 'paramValue'
+        key: string; // ex: 'paramValue'
         label: string; // ex: 'Param Value'
+        options?: { label: string; value: string }[];
+        placeholder?: string;
     }[];
     defaultItems?: Record<string, string>[];
     required?: boolean;
@@ -31,7 +34,10 @@ interface DynamicFormProps {
 
 export default function DynamicKeyValueForm({
     onAdd,
-    fieldPairs = [{ key: 'value', label: 'Value' }, { key: 'label', label: 'Label' }],
+    fieldPairs = [
+        { key: 'value', label: 'Value' },
+        { key: 'label', label: 'Label' },
+    ],
     defaultItems = [{}],
     required = false,
 }: DynamicFormProps) {
@@ -39,10 +45,13 @@ export default function DynamicKeyValueForm({
     const [items, setItems] = useState<DynamicKeyValuePair[]>(() => {
         return defaultItems.map((item, index) => ({
             id: Date.now().toString() + index,
-            ...fieldPairs.reduce((acc, pair) => {
-                acc[pair.key] = item[pair.key] || '';
-                return acc;
-            }, {} as Record<string, string>)
+            ...fieldPairs.reduce(
+                (acc, pair) => {
+                    acc[pair.key] = item[pair.key] || '';
+                    return acc;
+                },
+                {} as Record<string, string>
+            ),
         }));
     });
 
@@ -51,10 +60,13 @@ export default function DynamicKeyValueForm({
     const addItem = () => {
         const newItem: DynamicKeyValuePair = {
             id: Date.now().toString(),
-            ...fieldPairs.reduce((acc, pair) => {
-                acc[pair.key] = '';
-                return acc;
-            }, {} as Record<string, string>)
+            ...fieldPairs.reduce(
+                (acc, pair) => {
+                    acc[pair.key] = '';
+                    return acc;
+                },
+                {} as Record<string, string>
+            ),
         };
         setItems([...items, newItem]);
     };
@@ -73,7 +85,7 @@ export default function DynamicKeyValueForm({
 
         // Clear error when field is updated
         if (errors[id]) {
-            setErrors(prev => {
+            setErrors((prev) => {
                 const newErrors = { ...prev };
                 delete newErrors[id];
                 return newErrors;
@@ -89,11 +101,12 @@ export default function DynamicKeyValueForm({
 
         items.forEach((item) => {
             const missingFields = fieldPairs
-                .filter(pair => !item[pair.key])
-                .map(pair => pair.label);
+                .filter((pair) => !item[pair.key])
+                .map((pair) => pair.label);
 
             if (missingFields.length > 0) {
-                newErrors[item.id] = `${missingFields.join(', ')} ${t('areRequired')}`;
+                newErrors[item.id] =
+                    `${missingFields.join(', ')} ${t('areRequired')}`;
                 isValid = false;
             }
         });
@@ -105,7 +118,7 @@ export default function DynamicKeyValueForm({
     useEffect(() => {
         if (validateItems()) {
             const validItems = items
-                .filter(item => fieldPairs.every(pair => item[pair.key]))
+                .filter((item) => fieldPairs.every((pair) => item[pair.key]))
                 .map(({ id, ...rest }) => rest);
             onAdd(validItems);
         }
@@ -117,7 +130,9 @@ export default function DynamicKeyValueForm({
                 <TableHeader>
                     <TableRow>
                         {fieldPairs.map((pair) => (
-                            <TableHead key={pair.key}>{t(pair.label)}</TableHead>
+                            <TableHead key={pair.key}>
+                                {t(pair.label)}
+                            </TableHead>
                         ))}
                         <TableHead>
                             <Button
@@ -139,16 +154,42 @@ export default function DynamicKeyValueForm({
                             {fieldPairs.map((pair) => (
                                 <TableCell key={`${item.id}-${pair.key}`}>
                                     <div className="flex flex-col">
-                                        <Input
-                                            value={item[pair.key] || ''}
-                                            onChange={(e) =>
-                                                updateItem(item.id, pair.key, e.target.value)
-                                            }
-                                            placeholder={`Enter ${pair.label}`}
-                                            className={`border-0 focus-visible:ring-0 p-0 h-8 ${errors[item.id] ? 'border-red-500' : ''
+                                        {pair.options &&
+                                        pair.options.length > 0 ? (
+                                            <IGRPCombobox
+                                                value={item[pair.key] || ''}
+                                                onChange={(val) =>
+                                                    updateItem(
+                                                        item.id,
+                                                        pair.key,
+                                                        val as string
+                                                    )
+                                                }
+                                                options={pair.options}
+                                                placeholder={pair.placeholder}
+                                            />
+                                        ) : (
+                                            <Input
+                                                value={item[pair.key] || ''}
+                                                onChange={(e) =>
+                                                    updateItem(
+                                                        item.id,
+                                                        pair.key,
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder={
+                                                    pair.placeholder ??
+                                                    `Enter ${pair.label}`
+                                                }
+                                                className={`border-0 focus-visible:ring-0 p-0 h-8 ${
+                                                    errors[item.id]
+                                                        ? 'border-red-500'
+                                                        : ''
                                                 }`}
-                                            required={required}
-                                        />
+                                                required={required}
+                                            />
+                                        )}
                                     </div>
                                 </TableCell>
                             ))}

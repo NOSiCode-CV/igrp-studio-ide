@@ -22,13 +22,7 @@ export interface CardProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-export const COMPONENT_MAP: Record<string, React.ElementType> = {
-    [COMPONENT.CardFooter]: IGRPCardFooter,
-    [COMPONENT.CardContent]: IGRPCardContent,
-    [COMPONENT.CardHeader]: IGRPCardHeader,
-};
-
-const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     const {
         children: components,
         id: componentId,
@@ -39,6 +33,12 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     >({});
     const { setEditingComponent } = useDroppedComponents();
     const { dynamicImport } = useStudio();
+
+    const COMPONENT_MAP: Record<string, React.ElementType> = {
+        [COMPONENT.CardFooter]: IGRPCardFooter,
+        [COMPONENT.CardContent]: IGRPCardContent,
+        [COMPONENT.CardHeader]: IGRPCardHeader,
+    };
 
     // Load components dynamically
     useEffect(() => {
@@ -170,4 +170,4 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default Card;
+export default IGRPStudioCard;

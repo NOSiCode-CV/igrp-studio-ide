@@ -1,4 +1,4 @@
-import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
 import {
     IGRPBadge,
@@ -10,9 +10,17 @@ import { cn } from '@renderer/lib/utils';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
+    group?: string;
+    hoverClass?: string;
 }
 
-const CardComponent = ({ comp }: CardComponentProps) => {
+const CardComponent = ({
+    comp,
+    group,
+    hoverClass,
+    onDragEnd,
+}: CardComponentProps) => {
     const { getFakeComponentData } = useFakedata();
 
     const { componentName, properties, style } = comp;
@@ -65,7 +73,11 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                         {...args}
                         {...FAKE_COMPONENT_DATA?.properties}
                         className={cn(classes, className)}
-                    ></Component>
+                        comp={comp}
+                        onDragEnd={onDragEnd}
+                        hoverClass={hoverClass}
+                        group={group}
+                    />
                 )
             ) : (
                 <div className="rounded-lg shadow-xs border p-4 bg-card">

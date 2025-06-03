@@ -7,17 +7,11 @@ import { Button } from '@renderer/components/ui/button';
 import {
     ChevronDown,
     ChevronRight,
-    Edit,
     LayoutGrid,
     Plus,
     TableIcon,
-    Trash,
 } from 'lucide-react';
 import { PageCard } from './page-card';
-import {
-    IGRPDataTable,
-    IGRPPageHeader,
-} from '@igrp/igrp-framework-react-design-system';
 import { NewPageModal } from './new-page-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
@@ -47,6 +41,10 @@ import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import useStudio from '@renderer/hooks/use-studio';
 import { Badge } from '@renderer/components/ui/badge';
 import { IconPage, PageActions } from './shared';
+import {
+    IGRPDataTable,
+    IGRPPageHeader,
+} from '@igrp/igrp-framework-react-design-system';
 
 export interface PageDefinition {
     id: string;
@@ -146,12 +144,25 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const getPageComponet = (pageName: string) => {
+        return filteredComponents
+            .filter((comp: FileTree) => comp.content.pageName === pageName)
+            .map((comp: FileTree) => ({
+                ...comp?.content,
+                ...comp,
+                pageName: comp?.content?.name,
+                pagePath: comp?.content?.path,
+                isPage: false,
+            }));
+    };
+
     const tableData: PageDefinition[] = [
         ...filteredPages.map((page: FileTree) => ({
             ...page?.content,
             ...page,
             pagePath: page.content?.path,
             isPage: true,
+            children: getPageComponet(page.content.pageName),
         })),
         ...filteredComponents
             .filter((comp: FileTree) => comp.content.scope === 'app')
@@ -171,18 +182,6 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             value: pageName,
             path: content?.path,
         }));
-
-    const getPageComponet = (pageName: string) => {
-        return filteredComponents
-            .filter((comp: FileTree) => comp.content.pageName === pageName)
-            .map((comp: FileTree) => ({
-                ...comp?.content,
-                ...comp,
-                pageName: comp?.content?.name,
-                pagePath: comp?.content?.path,
-                isPage: false,
-            }));
-    };
 
     const columns: ColumnDef<any>[] = [
         {
@@ -246,7 +245,9 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                     <ChevronRight className="h-3 w-3" />
                                 )}
                             </Button>
-                        ):<>-</>}
+                        ) : (
+                            <>-</>
+                        )}
                     </div>
                 );
             },
@@ -262,6 +263,21 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                     openDialogNewPage={openDialogNewPage}
                 />
             ),
+        },
+        {
+            header: 'Children',
+            cell: ({ row }) => {
+                return row.getCanExpand() ? (
+                    <button
+                        onClick={row.getToggleExpandedHandler()}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {row.getIsExpanded() ? '👇' : '👉'}
+                    </button>
+                ) : (
+                    ''
+                );
+            },
         },
     ];
 

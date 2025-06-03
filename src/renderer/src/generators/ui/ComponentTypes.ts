@@ -70,9 +70,30 @@ import {
     TrendingUp,
     SeparatorHorizontal,
 } from 'lucide-react';
+import TableComp from './types/components/Table';
+import Column from './types/components/Column';
+import Columns from './types/components/Columns';
+import Section from './types/components/Section';
+import PageHeader from './types/components/PageHeader';
+import Page from './types/components/Page';
+import FormComp from './types/components/Form';
+import Container from './types/components/Container';
+import Fragment from './types/components/Fragment';
+import Card from './types/components/Card';
+import Flex from './types/components/Flex';
+import IGRPStudioFlex from './types/components/Flex';
+import IGRPStudioGrid from './types/components/Grid';
+import IGRPStudioTable from './types/components/Table';
+import IGRPStudioSection from './types/components/Section';
+import IGRPStudioColumns from './types/components/Columns';
+import IGRPStudioColumn from './types/components/Column';
+import IGRPStudioPageHeader from './types/components/PageHeader';
+import IGRPStudioForm from './types/components/Form';
+import IGRPStudioContainer from './types/components/Container';
+import IGRPStudioFragment from './types/components/Fragment';
+import IGRPStudioCard from './types/components/Card';
+import IGRPStudioPage from './types/components/Page';
 
-// Constants
-export const APP_COMPONENT = 'appComponent';
 
 // Component Categories
 export const GROUP_COMPONET: Record<string, string> = {
@@ -99,6 +120,7 @@ export const COMPONENT: Record<string, string> = {
     Container: 'container',
     Form: 'form',
     PageHeader: 'pageHeader',
+
     Link: 'inputUrl',
     Button: "button",
     Text: "text",
@@ -267,7 +289,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     stack: Table2,
     section: RectangleHorizontal,
 
-    pageHeader: Heading,
+    [COMPONENT.PageHeader]: Heading,
     paragraph: WrapText,
     repetitiveList: LayoutList,
     fragment: Code,
@@ -286,7 +308,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableBadgeCell: Badge,
 };
 
-export const COMPONENT_MAP = {
+export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ColorPicker]: IGRPInputColor,
     [COMPONENT.Date]: IGRPDatePicker,
     [COMPONENT.DatePicker]: IGRPDatePicker,
@@ -330,5 +352,18 @@ export const COMPONENT_MAP = {
     [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
     [COMPONENT.StatsCard]: IGRPStatsCard,
-    [COMPONENT.Separator]: IGRPSeparator
+    [COMPONENT.Separator]: IGRPSeparator,
+
+    [COMPONENT.Table]: IGRPStudioTable,
+    [COMPONENT.Section]: IGRPStudioSection,
+    [COMPONENT.Columns]: IGRPStudioColumns,
+    [COMPONENT.Column]: IGRPStudioColumn,
+    [COMPONENT.PageContent]: IGRPStudioPage,
+    [COMPONENT.PageHeader]: IGRPStudioPageHeader,
+    [COMPONENT.Form]: IGRPStudioForm,
+    [COMPONENT.Container]: IGRPStudioContainer,
+    [COMPONENT.Fragment]: IGRPStudioFragment,
+    [COMPONENT.Card]: IGRPStudioCard,
+    [COMPONENT.Flex]: IGRPStudioFlex,
+    [COMPONENT.Grid]: IGRPStudioGrid
 };

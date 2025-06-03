@@ -8,18 +8,21 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxWrapper from '../tools/BoxWrapper';
 import { flexVariants } from '../../utils/layout-mapping';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
+import { COMPONENT } from '../../ComponentTypes';
+import { nanoid } from '@reduxjs/toolkit';
+import { getHoverClasses } from '../../utils/tailwindGroups';
 
 export interface FlexProps {
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
     group?: string;
-    className?: string;
+    hoverClass?: string;
 }
 
-const Flex: React.FC<FlexProps> = ({
+const IGRPStudioFlex: React.FC<FlexProps> = ({
     comp,
-    className: providedClassName,
     group,
+    hoverClass,
     onDragEnd,
 }: FlexProps) => {
     const { children, properties, id: componentId } = comp;
@@ -56,6 +59,13 @@ const Flex: React.FC<FlexProps> = ({
         loadComponents();
     }, [children, dynamicImport]);
 
+    //RESET Hover if parent is diff current component
+    const { group: _group, hoverClass: _hoverClass } = getHoverClasses({
+        group,
+        hoverClass,
+        componentName: COMPONENT.Flex,
+    });
+
     const renderColumns = () => {
         const fields =
             children.length > 0 ? (
@@ -74,20 +84,19 @@ const Flex: React.FC<FlexProps> = ({
                         >
                             <BoxWrapper
                                 comp={comp}
-                                group={cn(group ?? `group/comp-flex`)}
+                                group={cn(_group ?? 'group/comp-flex')}
                                 onEdit={() => handleEditClick(comp)}
-                                className={
-                                    providedClassName ??
-                                    `opacity-0 group-hover/comp-flex:opacity-100 `
-                                }
+                                className={cn(
+                                    'opacity-0',
+                                    _hoverClass ??
+                                        'group-hover/comp-flex:opacity-100'
+                                )}
                             >
                                 <Component
                                     comp={comp}
                                     onDragEnd={onDragEnd}
-                                    group={'group/comp-flex-child'}
-                                    className={
-                                        'opacity-0 group-hover/comp-flex-child:opacity-100'
-                                    }
+                                    group={`group/comp-flex-child`}
+                                    hoverClass={`group-hover/comp-flex-child:opacity-100`}
                                 />
                             </BoxWrapper>
                         </Draggable>
@@ -121,4 +130,4 @@ const Flex: React.FC<FlexProps> = ({
     );
 };
 
-export default Flex;
+export default IGRPStudioFlex;

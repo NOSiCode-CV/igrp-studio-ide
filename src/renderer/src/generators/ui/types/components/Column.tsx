@@ -14,7 +14,7 @@ export interface ColProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
+const IGRPStudioColumn: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     const { children, id: componentId } = comp;
     const { t } = useTranslation();
     const [loadedComponents, setLoadedComponents] = useState<{
@@ -85,4 +85,4 @@ const Column: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     );
 };
 
-export default Column;
+export default IGRPStudioColumn;

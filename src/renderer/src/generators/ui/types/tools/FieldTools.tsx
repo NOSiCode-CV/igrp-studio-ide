@@ -139,6 +139,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                     <AddComponentModal
                         path={path}
                         comp={comp}
+                        parentComp={parentComp}
                         open={isOpen}
                         setOpen={setIsOpen}
                     />
