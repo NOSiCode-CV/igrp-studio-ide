@@ -15,7 +15,6 @@ import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
 import { Button } from '@renderer/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
 import useToast from '@renderer/hooks/useToast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -72,8 +71,6 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const navigate = useNavigate();
-
     const handleMinimize = () => {
         window.menu.minimizeWindow();
         window.menu.isMaximized;
@@ -88,15 +85,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
         window.menu.closeWindow();
     };
 
-    const openPage = () => {
-        navigate(ROUTES.HOME);
-    };
-
     const openIDE = async (ideType: string) => {
         const path = basePath || workspace.path;
         if (!path) return;
         try {
-            console.log('Opening IDE:', ideType, 'at path:', path);
             await window.api.openIDE({ basePath: path, ideType });
         } catch (error) {
             console.error(error);
@@ -175,9 +167,9 @@ const Header = ({ config, basePath }: HeaderProps) => {
             <TooltipProvider>
                 <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
                     <div className="flex h-(--header-height) w-full items-center  px-4 justify-between">
-                        <div className="flex items-center space-x-4 home cursor-pointer">
-                            <div
-                                onClick={openPage}
+                        <div className="flex items-center space-x-4 home">
+                            <a
+                                href={ROUTES.HOME}
                                 className={cn(
                                     'flex items-center gap-2',
                                     isMac && isMaximized && 'pl-12'
@@ -191,7 +183,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 <p className="text-sm font-medium">
                                     {import.meta.env.VITE_APP_TITLE}
                                 </p>
-                            </div>
+                            </a>
 
                             {isProjectAtive && (
                                 <Breadcrumb className="hidden lg:flex">
@@ -265,9 +257,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                                     onClick={() => openIDE(key)}
                                                     className="flex items-center"
                                                 >
-                                                   {/*  {getIcon(config.icon)} */}
-                                                    <span className=''>
-                                                        {t('openIn')}{'  '}
+                                                    {/*  {getIcon(config.icon)} */}
+                                                    <span className="">
+                                                        {t('openIn')}
+                                                        {'  '}
                                                         {config.name}
                                                     </span>
                                                 </DropdownMenuItem>

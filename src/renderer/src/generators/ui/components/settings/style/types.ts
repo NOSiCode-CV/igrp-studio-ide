@@ -1,3 +1,5 @@
+import { BackgroundStyle } from "./components/effects/types";
+
 // First, update your types.ts (or wherever you define LayoutStyle)
 export interface FlexProperties {
     direction: string;
@@ -124,6 +126,7 @@ export interface StyleComponent {
     typography?: TypographyStyle;
     borders?: BordersStyle;
     position?: PositionStyle;
+    backgrounds?: BackgroundStyle[]
 }
 
 export interface SectionProps {

@@ -10,7 +10,7 @@ interface PageProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-export const Page = ({ onDragEnd, page }: PageProps) => {
+const IGRPStudioPage = ({ onDragEnd, page }: PageProps) => {
     const { children: components } = page;
 
     const { newStructure, setEditingComponent, setAllComponents } =
@@ -104,3 +104,5 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         </div>
     );
 };
+
+export default IGRPStudioPage;

@@ -15,7 +15,7 @@ export interface FormComponentProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioForm: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     const { id: componentId, properties, children } = comp;
     const { className, variant } = properties || {};
 
@@ -95,4 +95,4 @@ const Form: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default Form;
+export default IGRPStudioForm;

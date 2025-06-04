@@ -234,6 +234,8 @@ const InteractionEditor = ({
     const { pageOptions: availablePages } = useStudio();
     const { getFormOptions } = useComponents();
     const availableForms = getFormOptions();
+    const { functionOptions } = useCustomCode();
+
 
     // Refs e states para diferentes editores
     const fnCustomSetEditorRef = useRef<any>(null);
@@ -245,8 +247,6 @@ const InteractionEditor = ({
     const [imports, setImports] = useState<Import[]>(
         currentAction?.function?.fnCustomCode?.imports || []
     );
-
-    const { functionOptions } = useCustomCode();
 
     const interactions = interactionsType[interactionKey];
 
@@ -342,11 +342,14 @@ const InteractionEditor = ({
                         {hasImportOption && (
                             <ImportComponent
                                 initialImports={imports}
-                                onChange={(imports) => setImports(imports)}
+                                onChange={(imports) => {
+                                    console.log(imports)
+                                    setImports(imports)
+                                }}
                             />
                         )}
                         {hasfnCustomSetOption && (
-                            <div className="flex-1 border rounded">
+                            <><div className="flex-1 border rounded">
                                 <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                     Inline Function
                                 </Label>
@@ -370,6 +373,19 @@ const InteractionEditor = ({
                                     ref={fnCustomSetEditorRef}
                                 />
                             </div>
+
+                                {/* Helper Section */}
+                                <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t">
+                                    Write a custom inline function to execute when the component is clicked.
+                                    <br />
+                                    Accepted examples:
+                                    <ul className="list-disc list-inside mt-1 space-y-1">
+                                        <li><code>showFilter</code></li>
+                                        <li><code>(e) =&gt; showFilter(e)</code></li>
+                                        <li><code>() =&gt; showFilter()</code></li>
+                                    </ul>
+                                </div>
+                            </>
                         )}
 
                         {hasfnCodeOption && (

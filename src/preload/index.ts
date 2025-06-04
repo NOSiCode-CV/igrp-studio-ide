@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ToolCheck } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
@@ -37,7 +37,10 @@ const api = {
 
 	fetchData: (endpoint: string, headers: object) => ipcRenderer.invoke('fetch-data', endpoint, headers),
 
-	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process)
+	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process),
+
+	runDoctorChecks: (): Promise<ToolCheck[]> => ipcRenderer.invoke('run-doctor-checks'),
+	saveDoctorReport: (results) => ipcRenderer.invoke('save-doctor-report', results),
 }
 
 const engine = {

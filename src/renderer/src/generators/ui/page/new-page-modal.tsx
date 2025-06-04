@@ -20,6 +20,7 @@ import {
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
+import { PageDefinition } from './list-pages';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -36,6 +37,7 @@ const initialValues: PageConfig = {
 interface NewPageModalProps {
     isOpen: boolean;
     basePath: string;
+    pageEditing?: PageDefinition;
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -45,6 +47,7 @@ export function NewPageModal({
     basePath,
     onClose,
     onConfirm,
+    pageEditing,
 }: NewPageModalProps) {
     const { t } = useTranslation();
 
@@ -99,8 +102,15 @@ export function NewPageModal({
         initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
+            const newValues = pageEditing
+                ? {
+                      ...values,
+                      path: `${pageEditing?.content?.path}/${values.path}`,
+                  }
+                : values;
+
             actions.setSubmitting(false);
-            handleConfirm(values);
+            handleConfirm(newValues);
         },
     });
 
@@ -127,7 +137,9 @@ export function NewPageModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
-                <DialogTitle>{t('createNewPage')}</DialogTitle>
+                <DialogTitle>
+                    {pageEditing ? t('createSubNewPage') : t('createNewPage')}
+                </DialogTitle>
                 <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Page' })}
                 </DialogDescription>
@@ -164,7 +176,7 @@ export function NewPageModal({
                         <TextInput
                             id="path"
                             label="Path"
-                            placeholder="e.g. /docs/[[...slug]] or /(auth)/todo-list"
+                            placeholder="e.g. docs/[[...slug]] or /(auth)/todo-list"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.path || ''}

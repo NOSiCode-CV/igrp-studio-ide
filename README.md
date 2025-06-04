@@ -24,11 +24,13 @@ $ yarn dev
 
 ```bash
 # For windows
-$ yarn build:win
+$ yarn release:win
 
 # For macOS
-$ yarn build:mac
+$ yarn release:mac
+or
+$ yarn release:mac:x64
 
 # For Linux
-$ yarn build:linux
+$ yarn release:linux
 ```

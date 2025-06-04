@@ -38,7 +38,7 @@ const SidebarAppLogic = ({ searchTerm = '' }: { searchTerm?: string }) => {
     return (
         <div className='p-4'>
             <EmptyList
-                title={'Commin Soon'}
+                title={'Coming soon'}
                 description={'No applogics available for this application'}
                 icon={<Workflow className="h-12 w-12" />}
             />

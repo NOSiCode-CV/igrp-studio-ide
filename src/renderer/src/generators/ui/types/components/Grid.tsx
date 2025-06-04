@@ -15,7 +15,7 @@ export interface GridProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
+const IGRPStudioGrid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
     const { t } = useTranslation();
     const { children, properties, id: componentId } = comp;
 
@@ -114,4 +114,4 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
     );
 };
 
-export default Grid;
+export default IGRPStudioGrid;

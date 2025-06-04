@@ -29,20 +29,32 @@ import Interactions from '../settings/Interactions';
 import { StyleTab } from '../settings/style';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
+import useCustomCode from '../../hooks/useCustomCode';
+import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
 
 interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
+    parentComp?: StructuredComponent;
     path?: string;
 }
 
-export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
+export function SidebarRight({
+    comp,
+    path,
+    parentComp,
+    ...props
+}: SidebarRightProps) {
     const { t } = useTranslation();
-    const { getPropertiesComponent, getChildPropertiesComponent } = useStudio();
+    const { getPropertiesComponent, getChildPropertiesComponent, pageOptions } =
+        useStudio();
     const {
         currentComponent: editingComponentParams,
         handleUpdateChildComponent,
         clearEditingComponent,
     } = useDroppedComponents();
+
+    const { statesOptions } = useCustomCode();
 
     // Memoized derived state
     const currentComp = React.useMemo(
@@ -57,6 +69,7 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         id: componentId,
         properties = {},
         childProperties = {},
+        data,
     } = currentComp || {};
 
     // State management
@@ -75,9 +88,31 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
 
     const [currentTag, setCurrentTag] = React.useState<string>(tag || '');
 
+    const [columnsOptions, setColumnsOptions] = React.useState<
+        IGRPOptionsProps[]
+    >([]);
+
     React.useEffect(() => {
         setCurrentTag(tag || '');
     }, [tag]);
+
+    React.useEffect(() => {
+        const options =
+            parentComp?.children
+                .filter(
+                    (column) =>
+                        column?.properties?.dataProperties &&
+                        !column.properties.dataProperties.isVirtual &&
+                        column.properties.dataProperties.isType
+                )
+                .map((column) => {
+                    return {
+                        value: column.tag,
+                        label: column.properties.headerTitle,
+                    };
+                }) ?? [];
+        setColumnsOptions(options);
+    }, [parentComp]);
 
     // Load properties component
     React.useEffect(() => {
@@ -218,6 +253,31 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
         setCurrentTag(e.target.value);
     };
 
+    const udpateDataProperties = ({
+        field,
+        state,
+    }: {
+        field: string;
+        state: State;
+    }) => {
+        if (!componentId) return;
+
+        const updatedData = { ...data };
+
+        if (state) {
+            updatedData[field] = {
+                state: state,
+            };
+        } else {
+            delete updatedData[field];
+        }
+
+        handleUpdateChildComponent(componentId, {
+            ...currentComp,
+            data: updatedData,
+        });
+    };
+
     return (
         <Sidebar
             collapsible="none"
@@ -293,15 +353,36 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                                                 <RenderPropsConfig
                                                     propsComp={propsComponent}
                                                     formValues={formValues}
-                                                    handleInputChange={(
+                                                    pageOptions={pageOptions}
+                                                    statesOptions={
+                                                        statesOptions
+                                                    }
+                                                    columnsOptions={
+                                                        columnsOptions
+                                                    }
+                                                    tag={currentTag}
+                                                    onInputChange={(
                                                         fieldPath: string,
                                                         value: any
-                                                    ) =>
+                                                    ) => {
+                                                        console.log(
+                                                            fieldPath,
+                                                            value
+                                                        );
                                                         handleInputChange(
                                                             fieldPath,
                                                             value,
                                                             setFormValues
-                                                        )
+                                                        );
+                                                    }}
+                                                    onSelectState={(
+                                                        field: string,
+                                                        state: State
+                                                    ) =>
+                                                        udpateDataProperties({
+                                                            field,
+                                                            state,
+                                                        })
                                                     }
                                                 />
                                             )}
@@ -319,7 +400,15 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                                                         propsComponentChild
                                                     }
                                                     formValues={childformValues}
-                                                    handleInputChange={(
+                                                    pageOptions={pageOptions}
+                                                    statesOptions={
+                                                        statesOptions
+                                                    }
+                                                    columnsOptions={
+                                                        columnsOptions
+                                                    }
+                                                    tag={currentTag}
+                                                    onInputChange={(
                                                         fieldPath: string,
                                                         value: any
                                                     ) =>
@@ -328,6 +417,15 @@ export function SidebarRight({ comp, path, ...props }: SidebarRightProps) {
                                                             value,
                                                             setChildformValues
                                                         )
+                                                    }
+                                                    onSelectState={(
+                                                        field: string,
+                                                        state: State
+                                                    ) =>
+                                                        udpateDataProperties({
+                                                            field,
+                                                            state,
+                                                        })
                                                     }
                                                 />
                                             </AccordionContent>

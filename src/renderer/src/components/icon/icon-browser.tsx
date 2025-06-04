@@ -42,7 +42,6 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const handleIconClick = (iconName: string) => {
         onSelectedIcon(iconName);
         setOpen(false);
-        console.log(iconName);
     };
 
     const gridRef = useRef<GridType>(null);

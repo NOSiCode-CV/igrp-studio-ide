@@ -9,13 +9,13 @@ import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import GenNoInfoField from '../../components/GenNoInfoField';
 
-export interface FormComponentProps {
+export interface PageHeaderProps {
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
     isDisabled?: boolean;
 }
 
-const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     const {
         id: componentId,
         children: fields,
@@ -116,4 +116,4 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default PageHeader;
+export default IGRPStudioPageHeader;

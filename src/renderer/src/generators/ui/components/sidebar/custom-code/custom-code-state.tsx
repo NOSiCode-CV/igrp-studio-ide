@@ -152,7 +152,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                     />
 
                     <DialogFooter className="space-x-2">
-                        <DialogClose>close</DialogClose>
+                        <DialogClose>Close</DialogClose>
                         <Button type="submit" disabled={formik.isSubmitting}>
                             {formik.isSubmitting && (
                                 <Loader2 className="animate-spin" />

@@ -22,30 +22,33 @@ export const getDefaultProperties = (schema: any): any => {
 };
 
 // Utility function to set default values based on the schema
-export const getDefaultInteractions = (schema: any, tag?: string) => {
+export const getDefaultInteractions = (schema: any) => {
+
     const interactions: any = {};
     for (const key in schema) {
-        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
+        if (schema[key].type === 'object' && schema[key].properties &&
+            (schema[key].required || schema[key].required === undefined)) {
             interactions[key] = getDefaultInteractions(schema[key].properties);
         }
-        else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
-            interactions[key] = getDefaultInteractions(schema[key].properties);
-        }
+        /*  else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
+             interactions[key] = getDefaultInteractions(schema[key].properties);
+         } */
         else if (schema[key].type === 'array' && !schema[key].items?.enum) {
             interactions[key] = [];
         }
         else if (schema[key].required || schema[key].visible) {
-            interactions[key] = schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
+            interactions[key] = /* schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : */
+                schema[key].default;
         }
     }
     return interactions;
 };
 
-export const getRequiredDataSchema = (schema: any, tag: string) => {
+export const getRequiredDataSchema = (schema: any) => {
     const states: any = {};
     for (const key in schema) {
         if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
-            states[key] = getRequiredDataSchema(schema[key].properties, tag);
+            states[key] = getRequiredDataSchema(schema[key].properties);
         }
         else if (schema[key].type === 'array' && !schema[key].items?.enum) {
             states[key] = [];
@@ -72,7 +75,7 @@ export const newStructuredComponent = (
         data: dataProperties,
     } = componentRegister || {};
 
-    const data = getRequiredDataSchema(dataProperties, '');
+    const data = getRequiredDataSchema(dataProperties);
     const interactions = getDefaultInteractions(interactionsProperties);
     const properties = getDefaultProperties(props);
 

@@ -34,16 +34,19 @@ const useStudio = () => {
     }, [files]);
 
     // Dynamically import a component by name
-    const dynamicImport = useCallback(async (componentName: string) => {
-        try {
-            /* @vite-ignore */
-            const module = await import(`../generators/ui/types/components/${componentName}`);
-            return module.default;
-        } catch (error) {
-            const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
-            // console.warn('Failed to load component:', error);
-            return fallbackModule.default;
-        }
+    const dynamicImport = useCallback(async (_componentName: string) => {
+
+        const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+
+        return fallbackModule.default;
+        /*   try {
+              const module = await import(`../generators/ui/types/components/${componentName}`);
+              return module.default;
+          } catch (error) {
+              const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
+              // console.warn('Failed to load component:', error);
+              return fallbackModule.default;
+          } */
     }, []);
 
     // Get component data from a JSON file
@@ -142,22 +145,30 @@ const useStudio = () => {
         return component ? component.properties : [];
     }, [findComponent]);
 
+    // Get properties for a childProperties
     const getChildPropertiesComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.childProperties : [];
     }, [findComponent]);
 
-    // Get properties for a component
+    // Get properties for a interactions
     const getInteractionsComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.interactions : [];
     }, [findComponent]);
 
-    // Get rukes for a component
+    // Get rukes for a rules
     const getRulesComponent = useCallback(async (path: string | undefined, componentName: string) => {
         const component = await findComponent(path, componentName);
         return component ? component.rules : [];
     }, [findComponent]);
+
+    // Get rukes for a data
+    const getDataComponent = useCallback(async (path: string | undefined, componentName: string) => {
+        const component = await findComponent(path, componentName);
+        return component ? component.data : [];
+    }, [findComponent]);
+
 
     const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
         return componentsRegistered.find(component => component.name === id);
@@ -169,11 +180,11 @@ const useStudio = () => {
 
     useEffect(() => {
         const pages = files.find((page) => page.name === 'pages')
-        const options = pages?.children?.map((page) => {
+        const options = pages?.children?.filter((page) => page?.content?.pageName).map((page) => {
             const { content } = page
             return {
                 value: content.pageName,
-                label: content.pageName,
+                label: content.description || content.pageName,
                 metadata: content
             }
         }) ?? [];
@@ -189,6 +200,7 @@ const useStudio = () => {
         findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,
+        getDataComponent,
         getChildPropertiesComponent,
         getRegistryComponent,
         getInteractionsComponent,

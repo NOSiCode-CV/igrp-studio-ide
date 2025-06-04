@@ -44,12 +44,12 @@ export const useComponents = () => {
         // Garante que o state tenha todas propriedades necessárias
         function validateState(state: Partial<State>, tag: string): State {
             return {
+                ...state, // Mantém outras propriedades
                 id: state.id || '',
                 type: state.type?.replace('{{id}}', tag) || 'any',
-                name: state.name || 'unnamed',
+                name: state.name?.replace('{{id}}', tag) || '',
                 defaultValue: state.defaultValue,
                 imports: state.imports || [],
-                ...state // Mantém outras propriedades
             };
         }
 

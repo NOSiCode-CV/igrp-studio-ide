@@ -5,15 +5,15 @@ import { ImageEditor } from './editors/ImageEditor';
 import { GradientEditor } from './editors/GradientEditor';
 import { CommonControls } from './editors/CommonControls';
 import { getBackgroundStyles } from './utils';
-import type { BackgroundValue } from '../effects/types';
+import type { BackgroundStyle } from '../effects/types';
 import { useTranslation } from 'react-i18next';
 
 interface BackgroundEditorProps {
-    background: BackgroundValue;
+    background: BackgroundStyle;
     index: number;
     onClose: () => void;
     onRemove: () => void;
-    onChange: (background: BackgroundValue) => void;
+    onChange: (background: BackgroundStyle) => void;
 }
 
 export function BackgroundEditor({

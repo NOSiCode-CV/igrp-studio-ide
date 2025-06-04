@@ -31,7 +31,7 @@ export interface TableProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
     const { children: components, id: componentId, componentName } = comp;
     const [columns, setColumns] = useState<StructuredComponent[]>([]);
     const [filters, setFilters] = useState<StructuredComponent[]>([]);
@@ -91,7 +91,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
 
     // Render table headers
     const renderTableHeaders = useCallback(
-        (compName: string, dropTargetId: string) => {
+        (compName: string, dropTargetId: string, tableColumn: StructuredComponent) => {
             return columns.map((child, index) => {
                 const Component = loadedComponents[child.id];
                 const { label, properties } = child;
@@ -112,7 +112,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                         >
                             <BoxField
                                 index={index}
-                                parentComp={comp}
+                                parentComp={tableColumn}
                                 comp={child}
                                 path={path}
                                 onEdit={() => handleEdit(child, path)}
@@ -265,7 +265,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                         <TableRow>
                                             {renderTableHeaders(
                                                 componentName,
-                                                id
+                                                id,
+                                                tableComp
                                             )}
                                         </TableRow>
                                     </TableHeader>
@@ -280,4 +281,4 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default TableComp;
+export default IGRPStudioTable;

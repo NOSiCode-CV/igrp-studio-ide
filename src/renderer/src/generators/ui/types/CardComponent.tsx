@@ -1,20 +1,26 @@
-import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
-import { IGRPBadge, IGRPButton } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPBadge,
+    IGRPButton,
+} from '@igrp/igrp-framework-react-design-system';
 import { useFakedata } from '../hooks/useFakeData';
-import { layoutStyleToClasses } from '../components/settings/style/utils/layoutStyleToClasses';
-import { sizeStyleToClasses } from '../components/settings/style/utils/sizeStyleToClasses';
-import { spacingToClasses } from '../components/settings/style/utils/spacingToClasses';
-import { bordersStyleToClasses } from '../components/settings/style/utils/bordersStyleToClasses';
-import { typographyStyleToClasses } from '../components/settings/style/utils/typographyStyleToClasses';
-import { StyleComponent } from '../components/settings/style/types';
-import { positionStyleToClasses } from '../components/settings/style/utils/positionStyleToClasses';
+import { generateAllClasses } from '../components/settings/style/utils';
+import { cn } from '@renderer/lib/utils';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
+    group?: string;
+    hoverClass?: string;
 }
 
-const CardComponent = ({ comp }: CardComponentProps) => {
+const CardComponent = ({
+    comp,
+    group,
+    hoverClass,
+    onDragEnd,
+}: CardComponentProps) => {
     const { getFakeComponentData } = useFakedata();
 
     const { componentName, properties, style } = comp;
@@ -26,6 +32,7 @@ const CardComponent = ({ comp }: CardComponentProps) => {
         dataProperties,
         error,
         errorMessage,
+        className,
         ...args
     } = properties;
 
@@ -39,20 +46,25 @@ const CardComponent = ({ comp }: CardComponentProps) => {
 
     const classes = generateAllClasses(style);
 
-    if (classes)
-        console.log(classes)
-
     return (
         <>
             {Component ? (
                 componentName === COMPONENT.Button ? (
                     //@ts-ignore
-                    <IGRPButton {...args} {...iconProperties}>
+                    <IGRPButton
+                        {...args}
+                        {...iconProperties}
+                        className={cn(classes, className)}
+                    >
                         {componentLabel}
                     </IGRPButton>
                 ) : componentName === COMPONENT.Badge ? (
                     //@ts-ignore
-                    <IGRPBadge {...args} {...iconProperties}>
+                    <IGRPBadge
+                        {...args}
+                        {...iconProperties}
+                        className={cn(classes, className)}
+                    >
                         {componentLabel}
                     </IGRPBadge>
                 ) : (
@@ -60,8 +72,12 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                     <Component
                         {...args}
                         {...FAKE_COMPONENT_DATA?.properties}
-                        onSelectValueChange={() => void 0}
-                    ></Component>
+                        className={cn(classes, className)}
+                        comp={comp}
+                        onDragEnd={onDragEnd}
+                        hoverClass={hoverClass}
+                        group={group}
+                    />
                 )
             ) : (
                 <div className="rounded-lg shadow-xs border p-4 bg-card">
@@ -79,40 +95,6 @@ const CardComponent = ({ comp }: CardComponentProps) => {
             )}
         </>
     );
-};
-
-const generateAllClasses = (style: StyleComponent | undefined) => {
-    if (!style) return '';
-
-    console.log(style)
-
-    const classes: string[] = [];
-
-    if (style.layout) {
-        classes.push(layoutStyleToClasses(style.layout));
-    }
-
-    if (style.spacing) {
-        classes.push(spacingToClasses(style.spacing));
-    }
-
-    if (style.size) {
-        classes.push(sizeStyleToClasses(style.size));
-    }
-
-    if (style.typography) {
-        classes.push(typographyStyleToClasses(style.typography));
-    }
-
-    if (style.borders) {
-        classes.push(bordersStyleToClasses(style.borders));
-    }
-
-    if (style.position) {
-        classes.push(positionStyleToClasses(style.position));
-    }
-
-    return classes.filter(Boolean).join(' ');
 };
 
 export default CardComponent;

@@ -24,13 +24,13 @@ import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { APRESENTATION, ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
-import { Page } from './types/components/Page';
 import { useTagManager } from './hooks/useTagManager';
 import { COMPONENT } from './ComponentTypes';
 import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
 import { EngineService } from '@renderer/services/EngineService';
+import Page from './types/components/Page';
 
 interface FormEngineProps {
     basePath: string;
@@ -68,7 +68,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { componentsRegistered, findComponentById } = useStudio();
+        const { componentsRegistered, findComponentById, fetchComponents } = useStudio();
 
         const { customComponents } = useCustomCode();
 
@@ -96,8 +96,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         useEffect(() => {
 
+            const appComponents = fetchComponents();
+
             const registerComponents = () => {
-                EngineService.registerComponent(customComponents);
+                EngineService.registerComponent({ customComponents, appComponents, currentPage: page.pageName });
             }
 
             registerComponents()
