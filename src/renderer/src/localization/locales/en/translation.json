@@ -789,5 +789,6 @@
   "searchRepositories": "Search Repositories",
   "componentAssociation": "You can associate this component with one of the pages available in this combobox. The associated page will be included in the same path as the current page, inside the 'components' folder.",
   "createSubNewPage": "Create SubPage",
-  "areRequired": "Are Required"
+  "areRequired": "Are Required",
+  "componentTitle": "Component Title"
 }

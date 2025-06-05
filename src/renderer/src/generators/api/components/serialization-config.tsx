@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -62,7 +62,7 @@ export default function SerializationConfigModal({
         setConfig((prev) => ({
             ...prev,
             module,
-            type: type === t('models') ? 'model' : type
+            type: type === 'models' ? 'model' : type
         }));
     }, [item]);
 
@@ -90,7 +90,7 @@ export default function SerializationConfigModal({
             .join('\n')
             .replace(/\s+/g, ' ') // Substitui múltiplos espaços e quebras de linha por um único espaço
             .trim();
-    }   
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
