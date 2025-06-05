@@ -85,6 +85,7 @@ import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/Page';
 import IGRPStudioModalDialog from './types/components/ModalDialog';
+import IGRPStudioTabs from './types/components/Tabs';
 
 
 // Component Categories
@@ -369,5 +370,6 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Card]: IGRPStudioCard,
     [COMPONENT.Flex]: IGRPStudioFlex,
     [COMPONENT.Grid]: IGRPStudioGrid,
-    [COMPONENT.ModalDialog]: IGRPStudioModalDialog
+    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
+    [COMPONENT.Tabs]: IGRPStudioTabs
 };
