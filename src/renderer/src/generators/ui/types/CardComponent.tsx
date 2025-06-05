@@ -33,6 +33,7 @@ const CardComponent = ({
         error,
         errorMessage,
         className,
+        content,
         ...args
     } = properties;
 
@@ -56,7 +57,7 @@ const CardComponent = ({
                         {...iconProperties}
                         className={cn(classes, className)}
                     >
-                        {componentLabel}
+                        {content}
                     </IGRPButton>
                 ) : componentName === COMPONENT.Badge ? (
                     //@ts-ignore

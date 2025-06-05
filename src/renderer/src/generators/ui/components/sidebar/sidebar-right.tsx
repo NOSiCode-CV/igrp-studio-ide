@@ -258,7 +258,7 @@ export function SidebarRight({
         state,
     }: {
         field: string;
-        state: State;
+        state: State | undefined;
     }) => {
         if (!componentId) return;
 
@@ -354,6 +354,7 @@ export function SidebarRight({
                                                     propsComp={propsComponent}
                                                     formValues={formValues}
                                                     pageOptions={pageOptions}
+                                                    dataProperties={data}
                                                     statesOptions={
                                                         statesOptions
                                                     }
@@ -365,10 +366,6 @@ export function SidebarRight({
                                                         fieldPath: string,
                                                         value: any
                                                     ) => {
-                                                        console.log(
-                                                            fieldPath,
-                                                            value
-                                                        );
                                                         handleInputChange(
                                                             fieldPath,
                                                             value,
@@ -377,7 +374,7 @@ export function SidebarRight({
                                                     }}
                                                     onSelectState={(
                                                         field: string,
-                                                        state: State
+                                                        state: State | undefined
                                                     ) =>
                                                         udpateDataProperties({
                                                             field,
@@ -401,6 +398,7 @@ export function SidebarRight({
                                                     }
                                                     formValues={childformValues}
                                                     pageOptions={pageOptions}
+                                                    dataProperties={data}
                                                     statesOptions={
                                                         statesOptions
                                                     }
@@ -420,7 +418,7 @@ export function SidebarRight({
                                                     }
                                                     onSelectState={(
                                                         field: string,
-                                                        state: State
+                                                        state: State | undefined
                                                     ) =>
                                                         udpateDataProperties({
                                                             field,

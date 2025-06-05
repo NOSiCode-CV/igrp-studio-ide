@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     Type,
     Box,
@@ -65,12 +65,14 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
             };
             return merged;
         });
+    };
 
+    useEffect(() => {
         if (componentId)
             onInteranctionsChange(componentId, {
-                style: { ...styleState },
+                style: styleState,
             });
-    };
+    }, [styleState]);
 
     const sections: StyleSection[] = [
         {

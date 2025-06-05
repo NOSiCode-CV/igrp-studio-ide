@@ -32,6 +32,7 @@ const initialValues: PageConfig = {
     types: [],
     states: [],
     functions: [],
+    parentName: undefined,
 };
 
 interface NewPageModalProps {
@@ -106,6 +107,7 @@ export function NewPageModal({
                 ? {
                       ...values,
                       path: `${pageEditing?.content?.path}/${values.path}`,
+                      parentName: pageEditing?.content.pageName,
                   }
                 : values;
 

@@ -50,7 +50,9 @@ export class NextjsEngine implements BaseEngine {
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
-    const { id, config, workspaceId } = project
+    //const appVersion = app.getVersion()
+
+    const { id, config, workspaceId,/*  engineVersion: appVersion */ } = project
 
     const appConfig: AppConfig = {
       ...config as NextConfigData,

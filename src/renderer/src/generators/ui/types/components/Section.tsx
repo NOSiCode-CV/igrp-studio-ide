@@ -9,30 +9,51 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxContainer from '../tools/BoxWrapper';
 import SectionTool from '../tools/SectionTool';
 import { useTranslation } from 'react-i18next';
+import { newStructuredComponent } from '../../dnd/helpers';
+import { COMPONENT } from '../../ComponentTypes';
 
 export interface SectionProps {
     isDisabled?: boolean;
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
-    onAddControl?: (type: string, componentId: string) => void;
 }
 
-const IGRPStudioSection = ({
-    isDisabled,
-    comp,
-    onDragEnd,
-    onAddControl,
-}: SectionProps) => {
+const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
     const { t } = useTranslation();
     const { children: components, id: componentId } = comp || {};
 
-    const { removeRow, setEditingComponent } = useDroppedComponents();
+    const {
+        removeRow,
+        setEditingComponent,
+        setAllComponents,
+        components: allComponents,
+    } = useDroppedComponents();
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
     }>({});
 
     const { dynamicImport } = useStudio();
+
+    const handleAddControl = (type: string, componentId: string) => {
+        const newRow = newStructuredComponent(COMPONENT.Section);
+        const rowIndex = allComponents.children.findIndex(
+            (section) => section.id === componentId
+        );
+
+        if (rowIndex !== -1) {
+            const newRows = [...allComponents.children];
+            if (type === 'top') {
+                newRows.splice(rowIndex, 0, newRow);
+            } else if (type === 'bottom') {
+                newRows.splice(rowIndex + 1, 0, newRow);
+            }
+            setAllComponents({
+                ...allComponents,
+                children: newRows,
+            });
+        }
+    };
 
     useEffect(() => {
         const loadComponents = async () => {
@@ -66,15 +87,13 @@ const IGRPStudioSection = ({
 
     return (
         <div className="group/row relative hover:border-2 hover:border-primary rounded-lg px-1">
-            {!isDisabled && (
-                <SectionTool
-                    onClickAddControl={(type) =>
-                        onAddControl?.(type, componentId)
-                    }
-                    onClickDeleteSection={handleDeleteSection}
-                    onEdit={() => handleEdit(comp)}
-                />
-            )}
+            <SectionTool
+                onClickAddControl={(type) => {
+                    handleAddControl?.(type, componentId);
+                }}
+                onClickDeleteSection={handleDeleteSection}
+                onEdit={() => handleEdit(comp)}
+            />
             <Droppable
                 onDrop={handleDrop}
                 component={comp}

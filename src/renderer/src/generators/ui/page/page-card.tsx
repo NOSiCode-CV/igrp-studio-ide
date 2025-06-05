@@ -34,6 +34,7 @@ import { IconPage, PageActions } from './shared';
 export interface PageCardProps {
     page: PageDefinition;
     components?: PageDefinition[];
+    subPages?: PageDefinition[];
     onDelete: (page: any) => void;
     onAddComponents: (page: PageDefinition) => void;
     openDialogNewPage?: (page: PageDefinition) => void;
@@ -45,13 +46,14 @@ export function PageCard({
     onDelete,
     onAddComponents,
     openDialogNewPage,
+    subPages,
 }: PageCardProps) {
     const { isPage, description, pageName, pagePath } = page;
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <Card className="p-3">
-            <CardContent className="group px-0">
+        <Card className="">
+            <CardContent className="group">
                 <Collapsible
                     className="flex w-full flex-col gap-2 group/collapsible"
                     open={isOpen}
@@ -59,25 +61,26 @@ export function PageCard({
                 >
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                            {components && components.length > 0 ? (
-                                <CollapsibleTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-5 w-5 p-0 mr-1"
-                                    >
-                                        <ChevronRight
-                                            className={cn(
-                                                'transition-transform group-data-[state=open]/collapsible:rotate-90',
-                                                'text-purple-600'
-                                            )}
-                                        />
-                                        <span className="sr-only">Toggle</span>
-                                    </Button>
-                                </CollapsibleTrigger>
-                            ) : (
-                                <></>
-                            )}
+                            {(components && components.length > 0) ||
+                                (subPages && subPages.length > 0 && (
+                                    <CollapsibleTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-5 w-5 p-0 mr-1"
+                                        >
+                                            <ChevronRight
+                                                className={cn(
+                                                    'transition-transform group-data-[state=open]/collapsible:rotate-90',
+                                                    'text-purple-600'
+                                                )}
+                                            />
+                                            <span className="sr-only">
+                                                Toggle
+                                            </span>
+                                        </Button>
+                                    </CollapsibleTrigger>
+                                ))}
                             <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <div className="flex items-center gap-1">
                                     <IconPage
@@ -101,6 +104,12 @@ export function PageCard({
                                         <span className="text-xs text-purple-600 font-medium">
                                             {components.length} component
                                             {components.length !== 1 ? 's' : ''}
+                                        </span>
+                                    )}
+                                    {subPages && subPages.length > 0 && (
+                                        <span className="text-xs text-purple-600 font-medium">
+                                            {subPages.length} page
+                                            {subPages.length !== 1 ? 's' : ''}
                                         </span>
                                     )}
                                 </div>
@@ -130,15 +139,47 @@ export function PageCard({
                     </div>
                     <CollapsibleContent className="flex flex-col gap-2">
                         <Separator />
-                        <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
-                            <ComponentIcon className="h-3 w-3" />
-                            Components
-                        </div>
+                        {components && components.length > 0 && (
+                            <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                <ComponentIcon className="h-3 w-3" />
+                                Components
+                            </div>
+                        )}
 
-                        {/* Subpages */}
+                        {subPages && subPages.length > 0 && (
+                            <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                <ComponentIcon className="h-3 w-3" />
+                                Pages
+                            </div>
+                        )}
+
+                        {/* Subcomponents */}
                         {components && components.length > 0 && (
                             <div className="space-y-1">
                                 {components.map((subpage) => (
+                                    <div
+                                        key={subpage.name}
+                                        className="flex items-center justify-between text-xs p-1 rounded hover:bg-muted"
+                                    >
+                                        <div className="flex items-center gap-1 flex-1 min-w-0">
+                                            <span className="truncate">
+                                                {subpage.description ||
+                                                    subpage.pageName}
+                                            </span>
+                                        </div>
+                                        <PageActions
+                                            page={subpage}
+                                            onDelete={() => onDelete(subpage)}
+                                            onAddComponents={onAddComponents}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {/* subpages */}
+                        {subPages && subPages.length > 0 && (
+                            <div className="space-y-1">
+                                {subPages.map((subpage) => (
                                     <div
                                         key={subpage.name}
                                         className="flex items-center justify-between text-xs p-1 rounded hover:bg-muted"

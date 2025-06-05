@@ -39,15 +39,22 @@ interface Segment {
     value?: string;
 }
 
-interface settingsProps {
+interface SettingsProps {
     propsComp: Record<string, any>;
     formValues: Record<string, any>;
     pageOptions?: any;
     statesOptions: Option[];
     columnsOptions: IGRPOptionsProps[];
+    dataProperties:
+        | {
+              [key: string]: {
+                  state: State;
+              };
+          }
+        | undefined;
     tag: string;
     onInputChange: (fieldPath: string, value: any) => void;
-    onSelectState: (field: string, value: State) => void;
+    onSelectState: (field: string, value: State | undefined) => void;
 }
 
 const toMap = (items: any) => {
@@ -87,24 +94,27 @@ const RenderPropsConfig = ({
     statesOptions,
     columnsOptions,
     tag,
+    dataProperties,
     onInputChange,
     onSelectState,
-}: settingsProps) => {
+}: SettingsProps) => {
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
-        const label = getLabel(key);
         const type = enumValues ? 'enum' : typeDefault;
 
         const fieldPath = parentKey ? `${parentKey}.${key}` : key;
 
         const value = getNestedValue(formValues, fieldPath);
 
+        const xUiWidget = fieldConfig['x-ui-widget'];
+        const xMetaLabel = fieldConfig['x-meta']?.['label'] || getLabel(key);
+
         if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties;
             return (
                 <Accordion type="single" collapsible className="w-full">
                     <AccordionItem key={key} value={key}>
-                        <AccordionTrigger>{label}</AccordionTrigger>
+                        <AccordionTrigger>{xMetaLabel}</AccordionTrigger>
                         <AccordionContent className="space-y-3">
                             {Object.keys(props).map((nestedKey) =>
                                 renderField(
@@ -117,14 +127,19 @@ const RenderPropsConfig = ({
                     </AccordionItem>
                 </Accordion>
             );
-        } else if (key === 'iconName') {
+        } else if (key === 'iconName' || xUiWidget === 'icon') {
             return (
-                <IconBrowser
-                    selectedIcon={value}
-                    onSelectedIcon={(icon: string) => {
-                        onInputChange(fieldPath, icon);
-                    }}
-                />
+                <>
+                    <Label htmlFor={key} className="flex justify-between ">
+                        <span>{xMetaLabel}</span>
+                    </Label>
+                    <IconBrowser
+                        selectedIcon={value}
+                        onSelectedIcon={(icon: string) => {
+                            onInputChange(fieldPath, icon);
+                        }}
+                    />
+                </>
             );
         } else if (key === 'options') {
             return (
@@ -160,8 +175,11 @@ const RenderPropsConfig = ({
                 )}
                 key={key}
             >
-                <Label htmlFor={key} className="flex justify-between ">
-                    <span>{label}</span>
+                <Label
+                    htmlFor={key}
+                    className="flex justify-between items-center"
+                >
+                    <span>{xMetaLabel}</span>
                     {type !== 'boolean' && (
                         <FieldActions
                             field={key}
@@ -170,6 +188,7 @@ const RenderPropsConfig = ({
                             tag={tag}
                             type={type}
                             onSelectState={onSelectState}
+                            dataProperties={dataProperties}
                         />
                     )}
                 </Label>
@@ -178,7 +197,7 @@ const RenderPropsConfig = ({
                     switch (type) {
                         case 'boolean':
                             return (
-                                <div>
+                                <div className="flex space-x-2 items-center">
                                     <FieldActions
                                         field={key}
                                         statesOptions={statesOptions}
@@ -186,6 +205,7 @@ const RenderPropsConfig = ({
                                         tag={tag}
                                         type={type}
                                         onSelectState={onSelectState}
+                                        dataProperties={dataProperties}
                                     />
 
                                     <Switch
@@ -290,6 +310,7 @@ const FieldActions = ({
     value,
     tag,
     type,
+    dataProperties,
     onSelectState,
 }: {
     field: string;
@@ -297,7 +318,14 @@ const FieldActions = ({
     tag: string;
     type: string;
     statesOptions: Option[];
-    onSelectState: (field: string, value: State) => void;
+    dataProperties:
+        | {
+              [key: string]: {
+                  state: State;
+              };
+          }
+        | undefined;
+    onSelectState: (field: string, value: State | undefined) => void;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
 
@@ -309,6 +337,8 @@ const FieldActions = ({
         defaultValue: value,
     };
 
+    const stateSaved = dataProperties?.[field];
+
     return (
         <>
             <Popover>
@@ -316,8 +346,13 @@ const FieldActions = ({
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-0 opacity-0 group-hover:opacity-100 transition-opacity h-6"
                     >
+                        {stateSaved && (
+                            <div className="bg-muted rounded-sm p-0.5">
+                                {stateSaved.state?.name}
+                            </div>
+                        )}
                         <MoreVertical className="w-3 h-3" />
                     </Button>
                 </PopoverTrigger>
@@ -329,7 +364,7 @@ const FieldActions = ({
                     <div className="space-y-2">
                         <Label>State</Label>
                         <IGRPCombobox
-                            value={''}
+                            value={stateSaved?.state?.name || ''}
                             onChange={(selectedState) =>
                                 onSelectState(
                                     field,
@@ -340,9 +375,9 @@ const FieldActions = ({
                                               type: '',
                                               imports: [],
                                               defaultValue: undefined,
-                                              generate: true,
+                                              generate: false,
                                           }
-                                        : {}
+                                        : undefined
                                 )
                             }
                             options={statesOptions}
@@ -357,7 +392,9 @@ const FieldActions = ({
                             onClick={() => setOpen(!open)}
                             className="w-full"
                         >
-                            <span><Plus/></span>
+                            <span>
+                                <Plus />
+                            </span>
                             Generate New State
                         </Button>
                     </div>

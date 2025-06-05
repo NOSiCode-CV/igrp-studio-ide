@@ -43,7 +43,7 @@ import {
     State,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { AlertDialog } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAlertDialog } from '@igrp/igrp-framework-react-design-system';
 import * as Yup from 'yup';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { Label } from '@renderer/components/ui/label';
@@ -213,15 +213,15 @@ const ResourceList = <T extends { id?: string; name: string }>({
                                                             )}
                                                         {onDelete &&
                                                             item.id && (
-                                                                <AlertDialog
-                                                                    onConfirm={() =>
+                                                                <IGRPAlertDialog
+                                                                    onAction={() =>
                                                                         onDelete(
                                                                             item
                                                                         )
                                                                     }
-                                                                    recordId={
+                                                                   /*  recordId={
                                                                         item.name
-                                                                    }
+                                                                    } */
                                                                 >
                                                                     <Button
                                                                         variant="ghost"
@@ -230,7 +230,7 @@ const ResourceList = <T extends { id?: string; name: string }>({
                                                                     >
                                                                         <Trash2 className="h-3 w-3" />
                                                                     </Button>
-                                                                </AlertDialog>
+                                                                </IGRPAlertDialog>
                                                             )}
                                                     </div>
                                                 </div>
@@ -251,7 +251,7 @@ const ResourceList = <T extends { id?: string; name: string }>({
 const CustomCodeMenu = () => {
     const [openfnc, setOpenFnc] = useState<boolean>(false);
     const [openState, setOpenState] = useState<boolean>(false);
-    
+
     return (
         <>
             <DropdownMenu>
@@ -432,13 +432,13 @@ const FncComponent = ({
                         </div>
                     </form>
                 </SidebarInset>
-                 <FunctionSettingsSidebar
+                <FunctionSettingsSidebar
                     formik={formik}
                     editorRef={editorRef}
                     side="right"
                     componentTag={''}
-                    onInsertImport={()=>void 0}
-                /> 
+                    onInsertImport={() => void 0}
+                />
             </DialogContent>
         </Dialog>
     );
