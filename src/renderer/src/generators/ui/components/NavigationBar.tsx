@@ -118,7 +118,7 @@ const NavigationBar = ({
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        {t('Add Components to Page')}
+                        {'Add Components to Page'}
                     </TooltipContent>
                 </Tooltip>
             </div>

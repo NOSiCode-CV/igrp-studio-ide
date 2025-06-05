@@ -545,7 +545,6 @@
   "dockerSupport": "Suporte a Docker",
   "repository_url": "URL do Repositório",
   "search_repositories": "Procurar Repositórios",
-  "searchRepositories": "Procurar Repositórios",
   "privateRepository": "Repositório privado",
   "noDescriptionProvided": "Nenhuma descrição fornecida",
   "viewRepository": "Visualizar repositório",
@@ -775,6 +774,21 @@
     "permissions": "Permissões",
     "statusCode": "Código de status",
     "failedFetchSelectors": "Falha ao buscar seletores:",
-    "componentAssociation": "Você pode associar este componente a uma das páginas disponíveis neste combobox. A página associada será incluída no mesmo path da página atual, dentro da pasta 'components'."
+  "imports": {
+    "title": "Importações",
+    "count": "{{count}} importações",
+    "empty": "Nenhuma importação configurada",
+    "placeholder": "ex: import { lib } from 'react-library'"
+  },
+  "addNewRowBottom": "Adicionar Nova Linha Abaixo",
+  "addNewRowTop": "Adicionar Nova Linha Acima",
+  "forceDynamic": "Forçar Dinâmico",
+  "pageTitle": "Título da Página",
+  "searchRepositories": "Procurar Repositórios",
+  "componentAssociation": "Você pode associar este componente a uma das páginas disponíveis neste combobox. A página associada será incluída no mesmo path da página atual, dentro da pasta 'components'.",
+  "componentTitle": "Título do Componente"
+
+
+
 
 }

@@ -39,7 +39,7 @@ interface NewComponentModalProps {
     isOpen: boolean;
     basePath: string;
     pageOptions: any[];
-   
+
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -51,7 +51,7 @@ export function NewComponentModal({
     onConfirm,
     pageOptions
 }: NewComponentModalProps) {
-    
+
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
@@ -98,7 +98,7 @@ export function NewComponentModal({
 
     const validationSchema = Yup.object({
         description: Yup.string().required(
-            t('thisFieldRequired', { name: t('Component Title') })
+            t('thisFieldRequired', { name: t('componentTitle') })
         ),
         name: Yup.string()
             .required(t('thisFieldRequired', { name: t('name') }))
@@ -142,7 +142,7 @@ export function NewComponentModal({
                     <div className="grid gap-4 py-4">
                         <TextInput
                             id="description"
-                            label={t('Component Title')}
+                            label={t('componentTitle')}
                             onChange={formik.handleChange}
                             onBlur={handleDescriptionBlur}
                             value={formik.values.description || ''}
