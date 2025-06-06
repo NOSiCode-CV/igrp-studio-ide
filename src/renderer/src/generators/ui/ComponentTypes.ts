@@ -86,7 +86,7 @@ import IGRPStudioPage from './types/components/Page';
 import IGRPStudioModalDialog from './types/components/ModalDialog';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
-import IGRPStudioTabs from './types/components/tabs';
+import IGRPStudioTabs from './types/components/Tabs';
 
 
 // Component Categories
