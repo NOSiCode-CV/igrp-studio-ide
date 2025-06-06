@@ -74,7 +74,7 @@ import {
 } from 'lucide-react';
 import IGRPStudioFlex from './types/components/Flex';
 import IGRPStudioGrid from './types/components/Grid';
-import IGRPStudioTable from './types/components/Table';
+import IGRPStudioTable from './types/components/table';
 import IGRPStudioSection from './types/components/Section';
 import IGRPStudioColumns from './types/components/Columns';
 import IGRPStudioColumn from './types/components/Column';
@@ -84,8 +84,9 @@ import IGRPStudioContainer from './types/components/Container';
 import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/Page';
-import IGRPStudioModalDialog from './types/components/ModalDialog';
+import IGRPStudioModalDialog from './types/components/modalDialog';
 import IGRPStudioTabs from './types/components/Tabs';
+import React from 'react';
 
 
 // Component Categories
