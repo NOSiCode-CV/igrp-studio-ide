@@ -1,26 +1,9 @@
 // page-card.tsx
 import { Card, CardContent } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
-import {
-    ChevronRight,
-    Component,
-    ComponentIcon,
-    Edit,
-    FileText,
-    Folder,
-    FolderOpen,
-    MoreHorizontal,
-    Trash,
-} from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { ChevronRight, ComponentIcon } from 'lucide-react';
 import { PageDefinition } from './list-pages';
 import { Badge } from '@renderer/components/ui/badge';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
 import {
     Collapsible,
     CollapsibleContent,
