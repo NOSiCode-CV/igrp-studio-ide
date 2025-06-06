@@ -87,12 +87,6 @@ const Interactions = ({
                 componentTag={tag}
                 onRulesChange={handleRulesChange}
             />
-            {/*  <StateData
-                dataProperties={dataProperties}
-                data={data}
-                componentTag={tag}
-                onDataChange={handleDataChange}
-            /> */}
         </div>
     );
 };

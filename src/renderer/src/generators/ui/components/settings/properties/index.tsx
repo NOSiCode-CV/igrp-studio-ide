@@ -57,6 +57,19 @@ interface SettingsProps {
     onSelectState: (field: string, value: State | undefined) => void;
 }
 
+interface PageSelectionConfigProps {
+    value: string;
+    fieldPath: string;
+    key: string;
+    parentKey?: string;
+    selectedPagePath: string | undefined;
+    pageOptions: any;
+    columnsOptions: IGRPOptionsProps[];
+    segments: Segment[];
+    onInputChange?: (fieldPath: string, value: any) => void;
+    onPageChange: (value: string) => void;
+}
+
 const toMap = (items: any) => {
     return (
         items &&
@@ -67,7 +80,7 @@ const toMap = (items: any) => {
     );
 };
 
-const toMapPages = (items: any) => {
+export const toMapPages = (items: any) => {
     return (
         items &&
         items.map(({ label, metadata }) => ({
@@ -406,6 +419,114 @@ const FieldActions = ({
     );
 };
 
+export const PageSelectionConfig = ({
+    value,
+    fieldPath,
+    pageOptions,
+    columnsOptions,
+    segments,
+    onInputChange,
+    onPageChange,
+    selectedPagePath,
+}: PageSelectionConfigProps) => {
+    const [dynamicSegments, setDynamicPagePath] = useState(
+        getDynamicSegments(selectedPagePath) ?? []
+    );
+
+    useEffect(() => {
+        setDynamicPagePath(getDynamicSegments(selectedPagePath));
+    }, [selectedPagePath]);
+
+    console.log(selectedPagePath)
+
+    return (
+        <div className="space-y-4">
+            <IGRPCombobox
+                value={value}
+                onChange={(value) => {
+                    onInputChange?.(fieldPath, value as string);
+                    onPageChange(value as string);
+                }}
+                options={toMapPages(pageOptions)}
+                placeholder="Select Page"
+                className="w-full"
+            />
+
+            {selectedPagePath && dynamicSegments.length > 0 && (
+                <div className="space-y-2">
+                    <Label>Available Dynamic Segments</Label>
+                    <div className="flex flex-wrap gap-2">
+                        {dynamicSegments.map((segment, index) => (
+                            <Badge key={index} variant="outline">
+                                {segment.name} ({segment.type})
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {selectedPagePath && dynamicSegments.length === 0 && (
+                <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                        This route has no dynamic segments. Only static routes
+                        detected.
+                    </p>
+                </div>
+            )}
+
+            {selectedPagePath && dynamicSegments.length > 0 && (
+                <>
+                    <p className="text-sm text-muted-foreground">
+                        Map route segments to table columns
+                    </p>
+
+                    <DynamicKeyValueForm
+                        required
+                        defaultItems={
+                            (segments &&
+                                segments.map((item: Segment) => ({
+                                    name: item.name,
+                                    columnName: item.tag,
+                                    value: '',
+                                }))) ||
+                            []
+                        }
+                        onAdd={(items) =>
+                            onInputChange?.(
+                                'segments',
+                                items.map((item) => ({
+                                    name: item.name,
+                                    tag: item.columnName,
+                                    value: undefined,
+                                }))
+                            )
+                        }
+                        fieldPairs={[
+                            {
+                                key: 'name',
+                                label: 'Name',
+                                options:
+                                    dynamicSegments.map(
+                                        (segment: RouteSegment) => ({
+                                            label: `${segment.name} (${segment.type})`,
+                                            value: segment.originalSegment,
+                                        })
+                                    ) || [],
+                                placeholder: 'Select Route Segment',
+                            },
+                            {
+                                key: 'columnName',
+                                label: 'Column Name',
+                                options: columnsOptions,
+                            },
+                        ]}
+                    />
+                </>
+            )}
+        </div>
+    );
+};
+
 const SlugBindingConfig = ({
     value,
     fieldPath,
@@ -429,13 +550,6 @@ const SlugBindingConfig = ({
 }) => {
     const [linkType, setLinkType] = useState<string>();
     const [selectedPagePath, setSelectedPagePath] = useState<string>();
-    const [dynamicSegments, setDynamicPagePath] = useState(
-        getDynamicSegments(selectedPagePath) ?? []
-    );
-
-    useEffect(() => {
-        setDynamicPagePath(getDynamicSegments(selectedPagePath));
-    }, [selectedPagePath]);
 
     useEffect(() => {
         const defaultType =
@@ -474,88 +588,18 @@ const SlugBindingConfig = ({
                     onChange={(e) => onInputChange(fieldPath, e.target.value)}
                 />
             ) : (
-                <div className="space-y-4">
-                    <IGRPCombobox
-                        value={value}
-                        onChange={(value) => {
-                            onInputChange(fieldPath, value as string);
-                            setSelectedPagePath(value as string);
-                        }}
-                        options={toMapPages(pageOptions)}
-                        placeholder="Select Page"
-                        className="w-full"
-                    />
-                    {selectedPagePath && dynamicSegments.length > 0 && (
-                        <div className="space-y-2">
-                            <Label>Available Dynamic Segments</Label>
-                            <div className="flex flex-wrap gap-2">
-                                {dynamicSegments.map((segment, index) => (
-                                    <Badge key={index} variant="outline">
-                                        {segment.name} ({segment.type})
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                    {selectedPagePath && dynamicSegments.length === 0 && (
-                        <div className="p-4 bg-muted rounded-lg">
-                            <p className="text-sm text-muted-foreground">
-                                This route has no dynamic segments. Only static
-                                routes detected.
-                            </p>
-                        </div>
-                    )}
-
-                    {selectedPagePath && dynamicSegments.length > 0 && (
-                        <>
-                            <p className="text-sm text-muted-foreground">
-                                Map route segments to table columns
-                            </p>
-
-                            <DynamicKeyValueForm
-                                required
-                                defaultItems={
-                                    (segments &&
-                                        segments.map((item: Segment) => ({
-                                            name: item.name,
-                                            columnName: item.tag,
-                                            value: '',
-                                        }))) ||
-                                    []
-                                }
-                                onAdd={(items) =>
-                                    onInputChange(
-                                        'segments',
-                                        items.map((item) => ({
-                                            name: item.name,
-                                            tag: item.columnName,
-                                            value: undefined,
-                                        }))
-                                    )
-                                }
-                                fieldPairs={[
-                                    {
-                                        key: 'name',
-                                        label: 'Name',
-                                        options:
-                                            dynamicSegments.map(
-                                                (segment: RouteSegment) => ({
-                                                    label: `${segment.name} (${segment.type})`,
-                                                    value: segment.originalSegment,
-                                                })
-                                            ) || [],
-                                        placeholder: 'Select Route Segment',
-                                    },
-                                    {
-                                        key: 'columnName',
-                                        label: 'Column Name',
-                                        options: columnsOptions,
-                                    },
-                                ]}
-                            />
-                        </>
-                    )}
-                </div>
+                <PageSelectionConfig
+                    value={value}
+                    fieldPath={fieldPath}
+                    key={key}
+                    parentKey={parentKey}
+                    pageOptions={pageOptions}
+                    columnsOptions={columnsOptions}
+                    segments={segments}
+                    onInputChange={onInputChange}
+                    onPageChange={setSelectedPagePath}
+                    selectedPagePath={selectedPagePath}
+                />
             )}
         </>
     );

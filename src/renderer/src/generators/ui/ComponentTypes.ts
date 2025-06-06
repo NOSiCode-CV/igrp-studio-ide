@@ -85,7 +85,8 @@ import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/Page';
 import IGRPStudioModalDialog from './types/components/ModalDialog';
-import IGRPStudioTabs from './types/components/Tabs';
+import IGRPStudioParagraph from './types/components/Paragraph';
+import IGRPStudioTabs from './types/components/tabs';
 
 
 // Component Categories
@@ -200,7 +201,8 @@ export const COMPONENT: Record<string, string> = {
     ModalDialog: 'modalDialog',
     AlertDialog: 'alertDialog',
     Aspect: 'aspect',
-    Fragment: 'fragment'
+    Fragment: 'fragment',
+    Paragraph: 'paragraph'
 
 }
 
@@ -294,7 +296,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 
     [COMPONENT.PageHeader]: Heading,
     [COMPONENT.Fragment]: Code,
-    paragraph: WrapText,
+    [COMPONENT.Paragraph]: WrapText,
     repetitiveList: LayoutList,
 
     tableDateFilter: CalendarIcon,
@@ -371,5 +373,6 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Flex]: IGRPStudioFlex,
     [COMPONENT.Grid]: IGRPStudioGrid,
     [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
-    [COMPONENT.Tabs]: IGRPStudioTabs
+    [COMPONENT.Tabs]: IGRPStudioTabs,
+    [COMPONENT.Paragraph]: IGRPStudioParagraph
 };

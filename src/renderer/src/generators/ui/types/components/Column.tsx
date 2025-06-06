@@ -14,7 +14,10 @@ export interface ColProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const IGRPStudioColumn: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
+const IGRPStudioColumn: React.FC<ColProps> = ({
+    comp,
+    onDragEnd,
+}: ColProps) => {
     const { children, id: componentId } = comp;
     const { t } = useTranslation();
     const [loadedComponents, setLoadedComponents] = useState<{
@@ -50,24 +53,25 @@ const IGRPStudioColumn: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => 
     const renderComponents = () => {
         if (children.length === 0) return <EmptySlotComponent />;
 
-        return children.map((comp: StructuredComponent, index: number) => {
-            const Component = loadedComponents[comp.id];
+        return children.map((child: StructuredComponent, index: number) => {
+            const Component = loadedComponents[child.id];
 
             return Component ? (
                 <Draggable
-                    key={comp.id}
-                    item={comp}
+                    key={child.id}
+                    item={child}
                     index={index}
                     dropTargetId={componentId}
                     mode="MOVE"
                 >
                     <BoxWrapper
-                        comp={comp}
+                        parentComp={comp}
+                        comp={child}
                         group="group/column"
-                        onEdit={() => handleEditClick(comp)}
+                        onEdit={() => handleEditClick(child)}
                         className="top-0 opacity-0 group-hover/column:opacity-100"
                     >
-                        <Component comp={comp} onDragEnd={onDragEnd} />
+                        <Component comp={child} onDragEnd={onDragEnd} />
                     </BoxWrapper>
                 </Draggable>
             ) : (
