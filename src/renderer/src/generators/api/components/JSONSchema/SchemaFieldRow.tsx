@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
@@ -40,23 +40,20 @@ export function SchemaFieldRow({
     schemaTypes,
     enumTypes,
 }: SchemaFieldRowProps) {
-    if (!field) return;
-
     const { t } = useTranslation();
-
     const [isExpanded, setIsExpanded] = useState(
-        field.type === 'object' || field.type === 'array'
+        field?.type === 'object' || field?.type === 'array'
     );
-    const [name, setName] = useState(field.name || '');
-    const [type, setType] = useState<string>(field.type);
-    const [description, setDescrition] = useState(field.description || '');
+    const [name, setName] = useState(field?.name || '');
+    const [type, setType] = useState<string>(field?.type);
+    const [description, setDescrition] = useState(field?.description || '');
 
     const nameInputRef = useRef<HTMLInputElement>(null);
     const descInputRef = useRef<HTMLInputElement>(null);
 
     const isObjectEmpty =
         type === 'object' &&
-        (!field.properties || Object.keys(field.properties).length === 0);
+        (!field?.properties || Object.keys(field?.properties).length === 0);
 
     useEffect(() => {
         if (isNew && nameInputRef.current) {
@@ -66,10 +63,13 @@ export function SchemaFieldRow({
     }, [isNew]);
 
     useEffect(() => {
-        setName(field.name || '');
-        setType(field.type);
-        setDescrition(field.description || '');
-    }, [field]);
+        // Verificar internamente se "field" está definido
+        if (field) {
+            setName(field.name || '');
+            setType(field.type);
+            setDescrition(field.description || '');
+        }
+    }, [field]); // Hook observado sempre que "field" muda
 
     const handleSave = () => {
         if (name.trim() === '') {
@@ -84,7 +84,7 @@ export function SchemaFieldRow({
         onAlert(null);
     };
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
     };
 
@@ -93,7 +93,7 @@ export function SchemaFieldRow({
             onAlert(t('FieldNameEmpty'));
             return;
         }
-        if (field.name !== name) {
+        if (field?.name !== name) {
             const isDuplicate = checkForDuplicateName(name);
             if (isDuplicate) {
                 onAlert(
@@ -139,7 +139,7 @@ export function SchemaFieldRow({
         onUpdate(updatedField, index);
     };
 
-    const handleDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDescChange = (e: ChangeEvent<HTMLInputElement>) => {
         setDescrition(e.target.value);
     };
 
@@ -153,7 +153,7 @@ export function SchemaFieldRow({
     };
 
     const checkForDuplicateName = (newName: string): boolean => {
-        if ((type === 'object' || type === 'array') && field.properties) {
+        if ((type === 'object' || type === 'array') && field?.properties) {
             return Object.keys(field.properties).some(
                 (key) => key !== field.name && key === newName
             );
@@ -162,7 +162,7 @@ export function SchemaFieldRow({
     };
 
     const renderSubfields = () => {
-        if ((type === 'object' || type === 'array') && field.properties) {
+        if ((type === 'object' || type === 'array') && field?.properties) {
             return Object.entries(field.properties).map(
                 ([subId, subfield], subIndex) => (
                     <SchemaFieldRow
@@ -199,6 +199,9 @@ export function SchemaFieldRow({
         }
         return null;
     };
+    if (!field) {
+        return null;
+    }
 
     return (
         <>

@@ -70,7 +70,7 @@ export const AddComponentModal = ({
         getAcceptedChildren(path, componentName).then((data) => {
             setComponents(data);
         });
-    }, [getAcceptedChildren]);
+    }, [componentName, getAcceptedChildren, path]);
 
     // Handle adding a component
     const handleAddComponent = useCallback(
@@ -91,7 +91,7 @@ export const AddComponentModal = ({
                 generateTag,
             });
         },
-        [handleAddChildToComponent]
+        [children.length, generateTag, handleAddChildToComponent]
     );
 
     const onEditComponent = (

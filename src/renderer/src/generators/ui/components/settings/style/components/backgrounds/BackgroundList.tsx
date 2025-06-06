@@ -1,12 +1,12 @@
 import { BackgroundListItem } from './BackgroundListItem';
-import type { BackgroundValue } from '../effects/types';
+import type { BackgroundStyle } from '../effects/types';
 
 interface BackgroundListProps {
-  backgrounds: BackgroundValue[];
+  backgrounds: BackgroundStyle[];
   editingIndex: number | null;
   onEdit: (index: number) => void;
   onRemove: (index: number) => void;
-  onChange: (index: number, background: BackgroundValue) => void;
+  onChange: (index: number, background: BackgroundStyle) => void;
 }
 
 export function BackgroundList({

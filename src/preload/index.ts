@@ -4,6 +4,8 @@ import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData,
 import { EVENTS } from '../main/constants/events'
 import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
+
+
 const backend = require('i18next-electron-fs-backend')
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -318,8 +320,6 @@ if (process.contextIsolated) {
 		console.error(error)
 	}
 } else {
-	// @ts-ignore (define in dts)
 	window.electron = electronAPI
-	// @ts-ignore (define in dts)
 	window.api = api
 }
