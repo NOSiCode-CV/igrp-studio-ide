@@ -84,9 +84,9 @@ import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/Page';
 import IGRPStudioModalDialog from './types/components/ModalDialog';
-import IGRPStudioTabs from './types/components/Tabs';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
+import IGRPStudioTabs from './types/components/tabs';
 
 
 // Component Categories
