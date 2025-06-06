@@ -1,6 +1,7 @@
-import type { BackgroundValue, GradientValue } from '../effects/types';
+import type { BackgroundStyle, GradientValue } from '../effects/types';
+import React from 'react';
 
-export function getBackgroundPreview(background: BackgroundValue): string {
+export function getBackgroundPreview(background: BackgroundStyle): string {
   if (background.type === 'color') {
     return background.value as string;
   } else if (background.type === 'image') {
@@ -10,7 +11,7 @@ export function getBackgroundPreview(background: BackgroundValue): string {
     const stops = gradient.stops
       .map(stop => `${stop.color} ${stop.position}%`)
       .join(', ');
-    
+
     return gradient.type === 'linear'
       ? `linear-gradient(${gradient.angle}deg, ${stops})`
       : gradient.type === 'radial'
@@ -19,7 +20,7 @@ export function getBackgroundPreview(background: BackgroundValue): string {
   }
 }
 
-export function getBackgroundStyles(background: BackgroundValue): React.CSSProperties {
+export function getBackgroundStyles(background: BackgroundStyle): React.CSSProperties {
   return {
     backgroundImage: background.type === 'color' ? 'none' : getBackgroundPreview(background),
     backgroundColor: background.type === 'color' ? background.value as string : 'transparent',

@@ -39,15 +39,35 @@ interface Segment {
     value?: string;
 }
 
-interface settingsProps {
+interface SettingsProps {
     propsComp: Record<string, any>;
     formValues: Record<string, any>;
     pageOptions?: any;
     statesOptions: Option[];
     columnsOptions: IGRPOptionsProps[];
+    dataProperties:
+        | {
+              [key: string]: {
+                  state: State;
+              };
+          }
+        | undefined;
     tag: string;
     onInputChange: (fieldPath: string, value: any) => void;
-    onSelectState: (field: string, value: State) => void;
+    onSelectState: (field: string, value: State | undefined) => void;
+}
+
+interface PageSelectionConfigProps {
+    value: string;
+    fieldPath: string;
+    key: string;
+    parentKey?: string;
+    selectedPagePath: string | undefined;
+    pageOptions: any;
+    columnsOptions: IGRPOptionsProps[];
+    segments: Segment[];
+    onInputChange?: (fieldPath: string, value: any) => void;
+    onPageChange: (value: string) => void;
 }
 
 const toMap = (items: any) => {
@@ -60,7 +80,7 @@ const toMap = (items: any) => {
     );
 };
 
-const toMapPages = (items: any) => {
+export const toMapPages = (items: any) => {
     return (
         items &&
         items.map(({ label, metadata }) => ({
@@ -87,24 +107,27 @@ const RenderPropsConfig = ({
     statesOptions,
     columnsOptions,
     tag,
+    dataProperties,
     onInputChange,
     onSelectState,
-}: settingsProps) => {
+}: SettingsProps) => {
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
-        const label = getLabel(key);
         const type = enumValues ? 'enum' : typeDefault;
 
         const fieldPath = parentKey ? `${parentKey}.${key}` : key;
 
         const value = getNestedValue(formValues, fieldPath);
 
+        const xUiWidget = fieldConfig['x-ui-widget'];
+        const xMetaLabel = fieldConfig['x-meta']?.['label'] || getLabel(key);
+
         if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties;
             return (
                 <Accordion type="single" collapsible className="w-full">
                     <AccordionItem key={key} value={key}>
-                        <AccordionTrigger>{label}</AccordionTrigger>
+                        <AccordionTrigger>{xMetaLabel}</AccordionTrigger>
                         <AccordionContent className="space-y-3">
                             {Object.keys(props).map((nestedKey) =>
                                 renderField(
@@ -117,14 +140,19 @@ const RenderPropsConfig = ({
                     </AccordionItem>
                 </Accordion>
             );
-        } else if (key === 'iconName') {
+        } else if (key === 'iconName' || xUiWidget === 'icon') {
             return (
-                <IconBrowser
-                    selectedIcon={value}
-                    onSelectedIcon={(icon: string) => {
-                        onInputChange(fieldPath, icon);
-                    }}
-                />
+                <>
+                    <Label htmlFor={key} className="flex justify-between ">
+                        <span>{xMetaLabel}</span>
+                    </Label>
+                    <IconBrowser
+                        selectedIcon={value}
+                        onSelectedIcon={(icon: string) => {
+                            onInputChange(fieldPath, icon);
+                        }}
+                    />
+                </>
             );
         } else if (key === 'options') {
             return (
@@ -160,8 +188,11 @@ const RenderPropsConfig = ({
                 )}
                 key={key}
             >
-                <Label htmlFor={key} className="flex justify-between ">
-                    <span>{label}</span>
+                <Label
+                    htmlFor={key}
+                    className="flex justify-between items-center"
+                >
+                    <span>{xMetaLabel}</span>
                     {type !== 'boolean' && (
                         <FieldActions
                             field={key}
@@ -170,6 +201,7 @@ const RenderPropsConfig = ({
                             tag={tag}
                             type={type}
                             onSelectState={onSelectState}
+                            dataProperties={dataProperties}
                         />
                     )}
                 </Label>
@@ -178,7 +210,7 @@ const RenderPropsConfig = ({
                     switch (type) {
                         case 'boolean':
                             return (
-                                <div>
+                                <div className="flex space-x-2 items-center">
                                     <FieldActions
                                         field={key}
                                         statesOptions={statesOptions}
@@ -186,6 +218,7 @@ const RenderPropsConfig = ({
                                         tag={tag}
                                         type={type}
                                         onSelectState={onSelectState}
+                                        dataProperties={dataProperties}
                                     />
 
                                     <Switch
@@ -290,6 +323,7 @@ const FieldActions = ({
     value,
     tag,
     type,
+    dataProperties,
     onSelectState,
 }: {
     field: string;
@@ -297,7 +331,14 @@ const FieldActions = ({
     tag: string;
     type: string;
     statesOptions: Option[];
-    onSelectState: (field: string, value: State) => void;
+    dataProperties:
+        | {
+              [key: string]: {
+                  state: State;
+              };
+          }
+        | undefined;
+    onSelectState: (field: string, value: State | undefined) => void;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
 
@@ -309,6 +350,8 @@ const FieldActions = ({
         defaultValue: value,
     };
 
+    const stateSaved = dataProperties?.[field];
+
     return (
         <>
             <Popover>
@@ -316,8 +359,13 @@ const FieldActions = ({
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-0 opacity-0 group-hover:opacity-100 transition-opacity h-6"
                     >
+                        {stateSaved && (
+                            <div className="bg-muted rounded-sm p-0.5">
+                                {stateSaved.state?.name}
+                            </div>
+                        )}
                         <MoreVertical className="w-3 h-3" />
                     </Button>
                 </PopoverTrigger>
@@ -329,7 +377,7 @@ const FieldActions = ({
                     <div className="space-y-2">
                         <Label>State</Label>
                         <IGRPCombobox
-                            value={''}
+                            value={stateSaved?.state?.name || ''}
                             onChange={(selectedState) =>
                                 onSelectState(
                                     field,
@@ -340,9 +388,9 @@ const FieldActions = ({
                                               type: '',
                                               imports: [],
                                               defaultValue: undefined,
-                                              generate: true,
+                                              generate: false,
                                           }
-                                        : {}
+                                        : undefined
                                 )
                             }
                             options={statesOptions}
@@ -357,7 +405,9 @@ const FieldActions = ({
                             onClick={() => setOpen(!open)}
                             className="w-full"
                         >
-                            <span><Plus/></span>
+                            <span>
+                                <Plus />
+                            </span>
                             Generate New State
                         </Button>
                     </div>
@@ -366,6 +416,114 @@ const FieldActions = ({
 
             <StateComponent setOpen={setOpen} open={open} state={state} />
         </>
+    );
+};
+
+export const PageSelectionConfig = ({
+    value,
+    fieldPath,
+    pageOptions,
+    columnsOptions,
+    segments,
+    onInputChange,
+    onPageChange,
+    selectedPagePath,
+}: PageSelectionConfigProps) => {
+    const [dynamicSegments, setDynamicPagePath] = useState(
+        getDynamicSegments(selectedPagePath) ?? []
+    );
+
+    useEffect(() => {
+        setDynamicPagePath(getDynamicSegments(selectedPagePath));
+    }, [selectedPagePath]);
+
+    console.log(selectedPagePath)
+
+    return (
+        <div className="space-y-4">
+            <IGRPCombobox
+                value={value}
+                onChange={(value) => {
+                    onInputChange?.(fieldPath, value as string);
+                    onPageChange(value as string);
+                }}
+                options={toMapPages(pageOptions)}
+                placeholder="Select Page"
+                className="w-full"
+            />
+
+            {selectedPagePath && dynamicSegments.length > 0 && (
+                <div className="space-y-2">
+                    <Label>Available Dynamic Segments</Label>
+                    <div className="flex flex-wrap gap-2">
+                        {dynamicSegments.map((segment, index) => (
+                            <Badge key={index} variant="outline">
+                                {segment.name} ({segment.type})
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {selectedPagePath && dynamicSegments.length === 0 && (
+                <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                        This route has no dynamic segments. Only static routes
+                        detected.
+                    </p>
+                </div>
+            )}
+
+            {selectedPagePath && dynamicSegments.length > 0 && (
+                <>
+                    <p className="text-sm text-muted-foreground">
+                        Map route segments to table columns
+                    </p>
+
+                    <DynamicKeyValueForm
+                        required
+                        defaultItems={
+                            (segments &&
+                                segments.map((item: Segment) => ({
+                                    name: item.name,
+                                    columnName: item.tag,
+                                    value: '',
+                                }))) ||
+                            []
+                        }
+                        onAdd={(items) =>
+                            onInputChange?.(
+                                'segments',
+                                items.map((item) => ({
+                                    name: item.name,
+                                    tag: item.columnName,
+                                    value: undefined,
+                                }))
+                            )
+                        }
+                        fieldPairs={[
+                            {
+                                key: 'name',
+                                label: 'Name',
+                                options:
+                                    dynamicSegments.map(
+                                        (segment: RouteSegment) => ({
+                                            label: `${segment.name} (${segment.type})`,
+                                            value: segment.originalSegment,
+                                        })
+                                    ) || [],
+                                placeholder: 'Select Route Segment',
+                            },
+                            {
+                                key: 'columnName',
+                                label: 'Column Name',
+                                options: columnsOptions,
+                            },
+                        ]}
+                    />
+                </>
+            )}
+        </div>
     );
 };
 
@@ -392,13 +550,6 @@ const SlugBindingConfig = ({
 }) => {
     const [linkType, setLinkType] = useState<string>();
     const [selectedPagePath, setSelectedPagePath] = useState<string>();
-    const [dynamicSegments, setDynamicPagePath] = useState(
-        getDynamicSegments(selectedPagePath) ?? []
-    );
-
-    useEffect(() => {
-        setDynamicPagePath(getDynamicSegments(selectedPagePath));
-    }, [selectedPagePath]);
 
     useEffect(() => {
         const defaultType =
@@ -437,88 +588,18 @@ const SlugBindingConfig = ({
                     onChange={(e) => onInputChange(fieldPath, e.target.value)}
                 />
             ) : (
-                <div className="space-y-4">
-                    <IGRPCombobox
-                        value={value}
-                        onChange={(value) => {
-                            onInputChange(fieldPath, value as string);
-                            setSelectedPagePath(value as string);
-                        }}
-                        options={toMapPages(pageOptions)}
-                        placeholder="Select Page"
-                        className="w-full"
-                    />
-                    {selectedPagePath && dynamicSegments.length > 0 && (
-                        <div className="space-y-2">
-                            <Label>Available Dynamic Segments</Label>
-                            <div className="flex flex-wrap gap-2">
-                                {dynamicSegments.map((segment, index) => (
-                                    <Badge key={index} variant="outline">
-                                        {segment.name} ({segment.type})
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                    {selectedPagePath && dynamicSegments.length === 0 && (
-                        <div className="p-4 bg-muted rounded-lg">
-                            <p className="text-sm text-muted-foreground">
-                                This route has no dynamic segments. Only static
-                                routes detected.
-                            </p>
-                        </div>
-                    )}
-
-                    {selectedPagePath && dynamicSegments.length > 0 && (
-                        <>
-                            <p className="text-sm text-muted-foreground">
-                                Map route segments to table columns
-                            </p>
-
-                            <DynamicKeyValueForm
-                                required
-                                defaultItems={
-                                    (segments &&
-                                        segments.map((item: Segment) => ({
-                                            name: item.name,
-                                            columnName: item.tag,
-                                            value: '',
-                                        }))) ||
-                                    []
-                                }
-                                onAdd={(items) =>
-                                    onInputChange(
-                                        'segments',
-                                        items.map((item) => ({
-                                            name: item.name,
-                                            tag: item.columnName,
-                                            value: undefined,
-                                        }))
-                                    )
-                                }
-                                fieldPairs={[
-                                    {
-                                        key: 'name',
-                                        label: 'Name',
-                                        options:
-                                            dynamicSegments.map(
-                                                (segment: RouteSegment) => ({
-                                                    label: `${segment.name} (${segment.type})`,
-                                                    value: segment.originalSegment,
-                                                })
-                                            ) || [],
-                                        placeholder: 'Select Route Segment',
-                                    },
-                                    {
-                                        key: 'columnName',
-                                        label: 'Column Name',
-                                        options: columnsOptions,
-                                    },
-                                ]}
-                            />
-                        </>
-                    )}
-                </div>
+                <PageSelectionConfig
+                    value={value}
+                    fieldPath={fieldPath}
+                    key={key}
+                    parentKey={parentKey}
+                    pageOptions={pageOptions}
+                    columnsOptions={columnsOptions}
+                    segments={segments}
+                    onInputChange={onInputChange}
+                    onPageChange={setSelectedPagePath}
+                    selectedPagePath={selectedPagePath}
+                />
             )}
         </>
     );

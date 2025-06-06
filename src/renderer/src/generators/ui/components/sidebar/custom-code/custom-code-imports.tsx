@@ -6,7 +6,7 @@ import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import { Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ImportComponentProps {
@@ -21,11 +21,16 @@ const ImportComponent = ({
     const { t } = useTranslation();
     const [imports, setImports] = useState<Import[]>(initialImports);
     const [newImport, setNewImport] = useState<string>('');
-    const { showWarningToast } = useToast()
+    const { showWarningToast } = useToast();
 
     const parseImport = (input: string): Import | null => {
-        const match = input.match(/import\s+\{?\s*([^}]*)\s*\}?\s+from\s+['"]([^'"]+)['"]/);
-        if (!match) { showWarningToast("Invalid import"); return null };
+        const match = input.match(
+            /import\s+\{?\s*([^}]*)\s*\}?\s+from\s+['"]([^'"]+)['"]/
+        );
+        if (!match) {
+            showWarningToast('Invalid import');
+            return null;
+        }
 
         return {
             id: `import_${nanoid(6).replace(/-/g, '')}`,
@@ -46,14 +51,14 @@ const ImportComponent = ({
     };
 
     const removeImport = (id: string) => {
-        const unRemovedImports = imports.filter((imp) => imp.id !== id)
+        const unRemovedImports = imports.filter((imp) => imp.id !== id);
         setImports(unRemovedImports);
         onChange?.(unRemovedImports);
     };
 
-    /* useEffect(() => {
+    useEffect(() => {
         setImports(initialImports);
-    }, [initialImports]); */
+    }, [initialImports]);
 
     return (
         <div className="space-y-2">

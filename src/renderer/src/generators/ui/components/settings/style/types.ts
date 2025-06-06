@@ -1,4 +1,4 @@
-import { BackgroundStyle } from "./components/effects/types";
+import { BackgroundStyle, FilterValue, OutlineValue, ShadowValue, TransformValue, TransitionValue } from "./components/effects/types";
 
 // First, update your types.ts (or wherever you define LayoutStyle)
 export interface FlexProperties {
@@ -119,6 +119,21 @@ export interface PositionStyle {
     linked: boolean;
 }
 
+//Efects
+
+export interface EffectsStyle {
+    opacity: string;
+    mixBlendMode: string;
+    cursor: string;
+    outline: OutlineValue;
+    linkedShadow: boolean;
+    boxShadows: ShadowValue[];
+    filters: FilterValue[];
+    backdropFilters: FilterValue[];
+    transforms: TransformValue[];
+    transitions: TransitionValue[];
+}
+
 export interface StyleComponent {
     layout?: LayoutStyle;
     spacing?: SpacingSytle;
@@ -127,6 +142,7 @@ export interface StyleComponent {
     borders?: BordersStyle;
     position?: PositionStyle;
     backgrounds?: BackgroundStyle[]
+    effects?: EffectsStyle
 }
 
 export interface SectionProps {

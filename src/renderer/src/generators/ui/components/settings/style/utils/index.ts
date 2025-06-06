@@ -1,6 +1,7 @@
 import { StyleComponent } from "../types";
 import { backgroundsStyleToClasses } from "./backgroundsStyleToClasses";
 import { bordersStyleToClasses } from "./bordersStyleToClasses";
+import { effectsToSyleClasses } from "./effectsStyleToClassses";
 import { layoutStyleToClasses } from "./layoutStyleToClasses";
 import { positionStyleToClasses } from "./positionStyleToClasses";
 import { sizeStyleToClasses } from "./sizeStyleToClasses";
@@ -39,6 +40,11 @@ export const generateAllClasses = (style: StyleComponent | undefined) => {
     if (style.backgrounds) {
         classes.push(backgroundsStyleToClasses(style.backgrounds));
     }
+
+    if (style.effects) {
+        classes.push(effectsToSyleClasses(style.effects));
+    }
+
 
     return classes.filter(Boolean).join(' ');
 };

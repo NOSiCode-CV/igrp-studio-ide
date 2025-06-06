@@ -5,88 +5,95 @@ import { BoxShadowControls } from './effects/BoxShadowControls';
 import { FilterControls } from './effects/FilterControls';
 import { TransformControls } from './effects/TransformControls';
 import { TransitionControls } from './effects/TransitionControls';
-import type {
-    ShadowValue,
-    FilterValue,
-    TransformValue,
-    TransitionValue,
-} from './effects/types';
+import { EffectsStyle, SectionProps } from '../types';
 
-export function EffectsSection() {
-    const [opacity, setOpacity] = useState('100');
-    const [mixBlendMode, setMixBlendMode] = useState('normal');
-    const [cursor, setCursor] = useState('default');
-    const [outline, setOutline] = useState({
-        width: '0',
-        style: 'solid',
-        color: '#000000',
-    });
-    const [linkedShadow, setLinkedShadow] = useState(true);
-    const [boxShadows, setBoxShadows] = useState<ShadowValue[]>([
-        {
-            x: '0',
-            y: '4',
-            blur: '8',
-            spread: '0',
-            color: '#00000040',
-            inset: false,
-        },
-    ]);
-    const [filters, setFilters] = useState<FilterValue[]>([]);
-    const [backdropFilters, setBackdropFilters] = useState<FilterValue[]>([]);
-    const [transforms, setTransforms] = useState<TransformValue[]>([]);
-    const [transitions, setTransitions] = useState<TransitionValue[]>([]);
+const DEFAULT_EFFECTS: EffectsStyle = {
+  opacity: '100',
+  mixBlendMode: 'normal',
+  cursor: 'default',
+  outline: {
+    width: '0',
+    style: 'solid',
+    color: '#000000',
+  },
+  boxShadows: [
+    {
+      x: '0',
+      y: '4',
+      blur: '8',
+      spread: '0',
+      color: '#00000040',
+      inset: false,
+    },
+  ],
+  linkedShadow: true,
+  filters: [],
+  backdropFilters: [],
+  transforms: [],
+  transitions: [],
+};
 
-    return (
-        <div className="space-y-2">
-            <VisibilityControls
-                opacity={opacity}
-                mixBlendMode={mixBlendMode}
-                onOpacityChange={setOpacity}
-                onBlendModeChange={setMixBlendMode}
-                onReset={() => {
-                    setOpacity('100');
-                    setMixBlendMode('normal');
-                }}
-            />
+export function EffectsSection({ styles, onChangeStyles }: SectionProps) {
+  const [effects, setEffects] = useState<EffectsStyle>(
+    styles.effects || DEFAULT_EFFECTS
+  );
 
-            <InteractionControls
-                cursor={cursor}
-                outline={outline}
-                onCursorChange={setCursor}
-                onOutlineChange={(field, value) =>
-                    setOutline({ ...outline, [field]: value })
-                }
-            />
+  const updateEffect = <K extends keyof EffectsStyle>(key: K, value: EffectsStyle[K]) => {
+    const updated = { ...effects, [key]: value };
+    setEffects(updated);
+    onChangeStyles({ effects: updated });
+  };
 
-            <BoxShadowControls
-                shadows={boxShadows}
-                linkedShadow={linkedShadow}
-                onShadowsChange={setBoxShadows}
-                onLinkedShadowChange={setLinkedShadow}
-            />
+  return (
+    <div className="space-y-2">
+      <VisibilityControls
+        opacity={effects.opacity}
+        mixBlendMode={effects.mixBlendMode}
+        onOpacityChange={(v) => updateEffect('opacity', v)}
+        onBlendModeChange={(v) => updateEffect('mixBlendMode', v)}
+        onReset={() => {
+          updateEffect('opacity', DEFAULT_EFFECTS.opacity);
+          updateEffect('mixBlendMode', DEFAULT_EFFECTS.mixBlendMode);
+        }}
+      />
 
-            <FilterControls
-                title="Filters"
-                filters={filters}
-                onFiltersChange={setFilters}
-            />
+      <InteractionControls
+        cursor={effects.cursor}
+        outline={effects.outline}
+        onCursorChange={(v) => updateEffect('cursor', v)}
+        onOutlineChange={(field, value) =>
+          updateEffect('outline', { ...effects.outline, [field]: value })
+        }
+      />
 
-            <FilterControls
-                title="Backdrop Filters"
-                filters={backdropFilters}
-                onFiltersChange={setBackdropFilters}
-            />
+      <BoxShadowControls
+        shadows={effects.boxShadows}
+        linkedShadow={effects.linkedShadow}
+        onShadowsChange={(v) => updateEffect('boxShadows', v)}
+        onLinkedShadowChange={(v) => updateEffect('linkedShadow', v)}
+      />
 
-            <TransformControls
-                transforms={transforms}
-                onTransformsChange={setTransforms}
-            />
+      <FilterControls
+        title="Filters"
+        filters={effects.filters}
+        onFiltersChange={(v) => updateEffect('filters', v)}
+      />
 
-            <TransitionControls
-                transitions={transitions}
-                onTransitionsChange={setTransitions}
-            />
-        </div>
-    );
+      <FilterControls
+        title="Backdrop Filters"
+        filters={effects.backdropFilters}
+        onFiltersChange={(v) => updateEffect('backdropFilters', v)}
+      />
+
+      <TransformControls
+        transforms={effects.transforms}
+        onTransformsChange={(v) => updateEffect('transforms', v)}
+      />
+
+      <TransitionControls
+        transitions={effects.transitions}
+        onTransitionsChange={(v) => updateEffect('transitions', v)}
+      />
+    </div>
+  );
 }

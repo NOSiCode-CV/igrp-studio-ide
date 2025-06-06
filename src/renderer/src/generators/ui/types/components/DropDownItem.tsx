@@ -14,7 +14,7 @@ interface DropdownItemProps {
     comp: StructuredComponent;
 }
 
-export function DropdownItem({ comp }: DropdownItemProps) {
+export function DropDownItem({ comp }: DropdownItemProps) {
     const { children } = comp;
     const { t } = useTranslation();
     return (

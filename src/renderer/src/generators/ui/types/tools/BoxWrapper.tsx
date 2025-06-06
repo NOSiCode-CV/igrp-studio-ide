@@ -10,12 +10,14 @@ interface BoxContainerProps {
     group?: string;
     className?: string;
     comp: StructuredComponent;
+    parentComp?: StructuredComponent;
     onEdit: () => void;
     children: React.ReactElement;
 }
 
 const BoxWrapper = ({
     comp,
+    parentComp,
     children,
     group,
     className,
@@ -105,6 +107,7 @@ const BoxWrapper = ({
             >
                 <CompTools
                     comp={comp}
+                    parentComp={parentComp}
                     handleClickDeleteComp={onClickDeleteComp}
                     handleClickBtnEdition={onClickBtnEdition}
                     handleClickStructComp={onClickStructure}

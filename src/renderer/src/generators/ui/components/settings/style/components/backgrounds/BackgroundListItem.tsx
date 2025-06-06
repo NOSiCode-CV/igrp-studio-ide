@@ -2,16 +2,16 @@ import { useRef, useEffect } from 'react';
 import { Edit2, Trash2 } from 'lucide-react';
 import { BackgroundEditor } from './BackgroundEditor';
 import { getBackgroundStyles } from './utils';
-import type { BackgroundValue } from '../effects/types';
+import type { BackgroundStyle } from '../effects/types';
 import { useTranslation } from 'react-i18next';
 
 interface BackgroundListItemProps {
-  background: BackgroundValue;
+  background: BackgroundStyle;
   index: number;
   isEditing: boolean;
   onEdit: () => void;
   onRemove: () => void;
-  onChange: (background: BackgroundValue) => void;
+  onChange: (background: BackgroundStyle) => void;
 }
 
 export function BackgroundListItem({
@@ -28,7 +28,7 @@ export function BackgroundListItem({
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-  
+
     function handleClickOutside(event: MouseEvent) {
       if (
         isEditing &&
@@ -47,14 +47,14 @@ export function BackgroundListItem({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isEditing, onEdit]);
-  
+
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="group relative flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
     >
-      <div 
+      <div
         className="w-6 h-6 rounded border border-gray-200 dark:border-gray-700"
         style={getBackgroundStyles(background)}
       />

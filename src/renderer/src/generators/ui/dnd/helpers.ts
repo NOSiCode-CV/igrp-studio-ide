@@ -47,7 +47,7 @@ export const getDefaultInteractions = (schema: any) => {
 export const getRequiredDataSchema = (schema: any) => {
     const states: any = {};
     for (const key in schema) {
-        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
+        if (schema[key].type === 'object' && schema[key].properties) {//&& schema[key].required) {
             states[key] = getRequiredDataSchema(schema[key].properties);
         }
         else if (schema[key].type === 'array' && !schema[key].items?.enum) {

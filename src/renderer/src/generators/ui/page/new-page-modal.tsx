@@ -32,6 +32,7 @@ const initialValues: PageConfig = {
     types: [],
     states: [],
     functions: [],
+    parentName: undefined,
 };
 
 interface NewPageModalProps {
@@ -83,7 +84,7 @@ export function NewPageModal({
 
     const validationSchema = Yup.object({
         description: Yup.string().required(
-            t('thisFieldRequired', { name: t('Page Title') })
+            t('thisFieldRequired', { name: t('pageTitle') })
         ),
         pageName: Yup.string()
             .required(t('thisFieldRequired', { name: t('pageName') }))
@@ -106,6 +107,7 @@ export function NewPageModal({
                 ? {
                       ...values,
                       path: `${pageEditing?.content?.path}/${values.path}`,
+                      parentName: pageEditing?.content.pageName,
                   }
                 : values;
 

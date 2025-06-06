@@ -3,28 +3,17 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { COMPONENT } from '../../ComponentTypes';
-import {
-    IGRPCardContent,
-    IGRPCardFooter,
-    IGRPCardHeader,
-} from '@igrp/igrp-framework-react-design-system';
 import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
+import { cn } from '@renderer/lib/utils';
 
 export interface ModalDialogProps {
     isDisabled?: boolean;
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
 }
-
-export const COMPONENT_MAP: Record<string, React.ElementType> = {
-    [COMPONENT.CardFooter]: IGRPCardFooter,
-    [COMPONENT.CardContent]: IGRPCardContent,
-    [COMPONENT.CardHeader]: IGRPCardHeader,
-};
 
 const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
     comp,
@@ -34,7 +23,9 @@ const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
         children: components,
         id: componentId,
         componentName: parentComponentName,
+        properties,
     } = comp;
+    const { title, description } = properties;
     const [loadedComponents, setLoadedComponents] = useState<
         Record<string, React.ComponentType<any>>
     >({});
@@ -77,6 +68,16 @@ const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
 
     return (
         <Droppable component={comp} onDrop={onDragEnd} className="space-y-2">
+            <div className={cn('flex flex-col gap-2 text-center sm:text-left')}>
+                <p className={cn('text-lg leading-none font-semibold')}>
+                    {title}
+                </p>
+
+                <p className={cn('ttext-muted-foreground text-sm')}>
+                    {description}
+                </p>
+            </div>
+
             {components.length === 0 ? (
                 <GenNoInfoComp
                     type={getLabel(parentComponentName).toUpperCase()}

@@ -27,6 +27,7 @@ import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { PageSelectionConfig } from '../../properties';
 
 type ActionType = 'function' | 'navigate' | 'formSubmit';
 
@@ -226,6 +227,8 @@ const InteractionEditor = ({
     localInteractions,
     componentTag,
 }: InteractionEditorProps) => {
+    const [selectedPagePath, setSelectedPagePath] = useState<string>();
+
     const [actionType, setActionType] = useState<ActionType>(
         interaction.type || 'function'
     );
@@ -235,7 +238,6 @@ const InteractionEditor = ({
     const { getFormOptions } = useComponents();
     const availableForms = getFormOptions();
     const { functionOptions } = useCustomCode();
-
 
     // Refs e states para diferentes editores
     const fnCustomSetEditorRef = useRef<any>(null);
@@ -343,46 +345,53 @@ const InteractionEditor = ({
                             <ImportComponent
                                 initialImports={imports}
                                 onChange={(imports) => {
-                                    console.log(imports)
-                                    setImports(imports)
+                                    setImports(imports);
                                 }}
                             />
                         )}
                         {hasfnCustomSetOption && (
-                            <><div className="flex-1 border rounded">
-                                <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
-                                    Inline Function
-                                </Label>
-                                <MonacoEditor
-                                    content={
-                                        currentAction.function?.fnCustomSet ||
-                                        ''
-                                    }
-                                    filePath=""
-                                    onChange={(newCode) =>
-                                        setCurrentAction({
-                                            ...currentAction,
-                                            function: {
-                                                ...currentAction.function,
-                                                fnCustomSet: newCode,
-                                            },
-                                        })
-                                    }
-                                    height="5vh"
-                                    language="typescript"
-                                    ref={fnCustomSetEditorRef}
-                                />
-                            </div>
+                            <>
+                                <div className="flex-1 border rounded">
+                                    <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                                        Inline Function
+                                    </Label>
+                                    <MonacoEditor
+                                        content={
+                                            currentAction.function
+                                                ?.fnCustomSet || ''
+                                        }
+                                        filePath=""
+                                        onChange={(newCode) =>
+                                            setCurrentAction({
+                                                ...currentAction,
+                                                function: {
+                                                    ...currentAction.function,
+                                                    fnCustomSet: newCode,
+                                                },
+                                            })
+                                        }
+                                        height="5vh"
+                                        language="typescript"
+                                        ref={fnCustomSetEditorRef}
+                                    />
+                                </div>
 
                                 {/* Helper Section */}
                                 <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t">
-                                    Write a custom inline function to execute when the component is clicked.
+                                    Write a custom inline function to execute
+                                    when the component is clicked.
                                     <br />
                                     Accepted examples:
                                     <ul className="list-disc list-inside mt-1 space-y-1">
-                                        <li><code>showFilter</code></li>
-                                        <li><code>(e) =&gt; showFilter(e)</code></li>
-                                        <li><code>() =&gt; showFilter()</code></li>
+                                        <li>
+                                            <code>showFilter</code>
+                                        </li>
+                                        <li>
+                                            <code>(e) =&gt; showFilter(e)</code>
+                                        </li>
+                                        <li>
+                                            <code>() =&gt; showFilter()</code>
+                                        </li>
                                     </ul>
                                 </div>
                             </>
@@ -424,33 +433,39 @@ const InteractionEditor = ({
             case 'navigate':
                 return (
                     <div className="space-y-4">
-                        <IGRPCombobox
-                            label="Target Page"
-                            placeholder="Select page"
-                            value={
-                                currentAction.navigate?.name
-                                    ? currentAction.navigate.name.replace(
-                                        'goTo',
-                                        ''
-                                    )
-                                    : ''
-                            }
-                            onChange={(id) => {
-                                const page = availablePages.find(
-                                    (p) => p.value === id
-                                );
-                                if (page) {
-                                    setCurrentAction({
-                                        ...currentAction,
-                                        navigate: {
-                                            path: page.metadata.path,
-                                            name: `goTo${id}`,
-                                        },
-                                    });
+                        <div className="space-y-2">
+                            <Label>Target Page</Label>
+                            <PageSelectionConfig
+                                value={
+                                    currentAction.navigate?.name
+                                        ? currentAction.navigate.name.replace(
+                                              'goTo',
+                                              ''
+                                          )
+                                        : ''
                                 }
-                            }}
-                            options={availablePages}
-                        />
+                                fieldPath="navigate.name"
+                                key="navigate"
+                                selectedPagePath={selectedPagePath}
+                                onPageChange={(value) => {
+                                    const page = availablePages.find(
+                                        (p) => p.value === value
+                                    );
+
+                                    setSelectedPagePath(value);
+                                    if (page) {
+                                        setCurrentAction({
+                                            ...currentAction,
+                                            navigate: {
+                                                path: page.metadata.path,
+                                                name: `goTo${value}`,
+                                            },
+                                        });
+                                    }
+                                }}
+                                pageOptions={availablePages}
+                            />
+                        </div>
 
                         <div className="space-y-2">
                             <Label>Navigation Parameters</Label>
@@ -459,18 +474,26 @@ const InteractionEditor = ({
                                     setCurrentAction({
                                         ...currentAction,
                                         navigate: {
-                                            path: currentAction?.navigate?.path || '',
-                                            name: currentAction?.navigate?.name || '',
-                                            params: items.reduce((acc, item) => {
-                                                acc[item.paramName] = item.paramValue;
-                                                return acc;
-                                            }, {} as Record<string, string>),
+                                            path:
+                                                currentAction?.navigate?.path ||
+                                                '',
+                                            name:
+                                                currentAction?.navigate?.name ||
+                                                '',
+                                            params: items.reduce(
+                                                (acc, item) => {
+                                                    acc[item.paramName] =
+                                                        item.paramValue;
+                                                    return acc;
+                                                },
+                                                {} as Record<string, string>
+                                            ),
                                         },
                                     });
                                 }}
                                 fieldPairs={[
                                     { key: 'paramValue', label: 'Param Value' },
-                                    { key: 'paramName', label: 'Param Name' }
+                                    { key: 'paramName', label: 'Param Name' },
                                 ]}
                             />
                         </div>
@@ -506,10 +529,8 @@ const InteractionEditor = ({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="p-0 flex overflow-hidden [--header-height:calc(--spacing(99))] [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
-
                 <SidebarInset className="space-y-4">
-
-                    <DialogHeader className='p-4'>
+                    <DialogHeader className="p-4">
                         <div className="flex flex-1 justify-between">
                             <div className="space-y-2">
                                 <DialogTitle>Edit Interaction</DialogTitle>

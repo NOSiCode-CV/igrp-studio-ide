@@ -144,7 +144,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getPageComponet = (pageName: string) => {
+    const getPageComponent = (pageName: string) => {
         return filteredComponents
             .filter((comp: FileTree) => comp.content.pageName === pageName)
             .map((comp: FileTree) => ({
@@ -156,14 +156,28 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             }));
     };
 
+    const getSubPages = (pageName: string) => {
+        return filteredPages
+            .filter((page: FileTree) => page.content.parentName === pageName)
+            .map((page: FileTree) => ({
+                ...page?.content,
+                ...page,
+                pageName: page?.content?.pageName,
+                pagePath: page?.content?.path,
+                isPage: false,
+            }));
+    };
+
     const tableData: PageDefinition[] = [
-        ...filteredPages.map((page: FileTree) => ({
-            ...page?.content,
-            ...page,
-            pagePath: page.content?.path,
-            isPage: true,
-            children: getPageComponet(page.content.pageName),
-        })),
+        ...filteredPages
+            .filter((page: FileTree) => page.content.parentName === undefined)
+            .map((page: FileTree) => ({
+                ...page?.content,
+                ...page,
+                pagePath: page.content?.path,
+                isPage: true,
+                children: getPageComponent(page.content.pageName),
+            })),
         ...filteredComponents
             .filter((comp: FileTree) => comp.content.scope === 'app')
             .map((comp: FileTree) => ({
@@ -225,7 +239,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             accessorKey: 'type',
             header: 'Subpages/Components',
             cell: ({ row }) => {
-                const components = getPageComponet(row.original.pageName);
+                const components = getPageComponent(row.original.pageName);
                 return (
                     <div className="flex gap-2">
                         {components && components.length > 0 ? (
@@ -372,9 +386,12 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
 
                         {viewMode === 'card' ? (
                             tableData.length > 0 ? (
-                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                <div className="grid gap-4 md:grid-cols-4">
                                     {tableData.map((page) => {
-                                        const components = getPageComponet(
+                                        const components = getPageComponent(
+                                            page.pageName
+                                        );
+                                        const subPages = getSubPages(
                                             page.pageName
                                         );
                                         return (
@@ -388,6 +405,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                                     handleAddComponents
                                                 }
                                                 components={components}
+                                                subPages={subPages}
                                                 openDialogNewPage={
                                                     openDialogNewPage
                                                 }

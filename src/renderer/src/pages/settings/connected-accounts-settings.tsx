@@ -2,7 +2,7 @@ import { Button } from '@renderer/components/ui/button';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
@@ -98,7 +98,7 @@ function GitLabConfigForm({ config, onSave }: { config: GitProviderConfig; onSav
 
 interface AccountProps {
     name: string;
-    icon: React.ReactNode;
+    icon: ReactNode;
     connected: boolean;
     action?: () => void;
 }

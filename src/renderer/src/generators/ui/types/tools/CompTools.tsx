@@ -11,12 +11,14 @@ import { COMPONENT } from '../../ComponentTypes';
 import { BindingConfigurationModal } from '../../components/binding-configuration-modal';
 import { Badge } from '@renderer/components/ui/badge';
 import { useEffect, useState } from 'react';
+import { AddComponentPopover } from '../../components/add-components-popover';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
     handleClickStructComp: (layout: string) => void;
     comp: StructuredComponent;
+    parentComp?: StructuredComponent;
 }
 
 const CompTools = ({
@@ -24,6 +26,7 @@ const CompTools = ({
     handleClickDeleteComp,
     handleClickStructComp,
     comp,
+    parentComp,
 }: ToolsProps) => {
     const { componentName, label, allowTypes } = comp;
 
@@ -33,12 +36,12 @@ const CompTools = ({
         useState<StructuredComponent | null>(null);
 
     const isGrids = [COMPONENT.Columns].includes(componentName);
-    
+
     useEffect(() => {
         if (!isOpen) {
             setCurrentComponent(null);
         }
-    },[isOpen, comp]);
+    }, [isOpen, comp]);
 
     return (
         <TooltipProvider>
@@ -101,6 +104,10 @@ const CompTools = ({
                         <p>Delete</p>
                     </TooltipContent>
                 </Tooltip>
+
+                {parentComp && (
+                    <AddComponentPopover comp={comp} parentComp={parentComp} />
+                )}
 
                 {allowTypes && (
                     <>

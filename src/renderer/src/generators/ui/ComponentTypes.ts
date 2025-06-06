@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -69,21 +69,11 @@ import {
     Search,
     TrendingUp,
     SeparatorHorizontal,
+    CheckCircle,
+    Ratio,
 } from 'lucide-react';
-import TableComp from './types/components/Table';
-import Column from './types/components/Column';
-import Columns from './types/components/Columns';
-import Section from './types/components/Section';
-import PageHeader from './types/components/PageHeader';
-import Page from './types/components/Page';
-import FormComp from './types/components/Form';
-import Container from './types/components/Container';
-import Fragment from './types/components/Fragment';
-import Card from './types/components/Card';
-import Flex from './types/components/Flex';
 import IGRPStudioFlex from './types/components/Flex';
 import IGRPStudioGrid from './types/components/Grid';
-import IGRPStudioTable from './types/components/Table';
 import IGRPStudioSection from './types/components/Section';
 import IGRPStudioColumns from './types/components/Columns';
 import IGRPStudioColumn from './types/components/Column';
@@ -93,6 +83,10 @@ import IGRPStudioContainer from './types/components/Container';
 import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/Page';
+import IGRPStudioModalDialog from './types/components/ModalDialog';
+import IGRPStudioTable from './types/components/Table';
+import IGRPStudioParagraph from './types/components/Paragraph';
+import IGRPStudioTabs from './types/components/Tabs';
 
 
 // Component Categories
@@ -203,6 +197,13 @@ export const COMPONENT: Record<string, string> = {
     Radarchart: "radarchart",
     StatsCard: "statsCard",
     Separator: "separator",
+
+    ModalDialog: 'modalDialog',
+    AlertDialog: 'alertDialog',
+    Aspect: 'aspect',
+    Fragment: 'fragment',
+    Paragraph: 'paragraph'
+
 }
 
 
@@ -281,6 +282,10 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 
     [COMPONENT.Separator]: SeparatorHorizontal,
 
+    [COMPONENT.ModalDialog]: CheckCircle,
+    [COMPONENT.AlertDialog]: Info,
+    [COMPONENT.Aspect]: Ratio,
+
     accordion: AlignLeft,
     treeView: GitMerge,
 
@@ -290,9 +295,9 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     section: RectangleHorizontal,
 
     [COMPONENT.PageHeader]: Heading,
-    paragraph: WrapText,
+    [COMPONENT.Fragment]: Code,
+    [COMPONENT.Paragraph]: WrapText,
     repetitiveList: LayoutList,
-    fragment: Code,
 
     tableDateFilter: CalendarIcon,
     tableTextFilter: FormInput,
@@ -353,6 +358,7 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
     [COMPONENT.StatsCard]: IGRPStatsCard,
     [COMPONENT.Separator]: IGRPSeparator,
+    [COMPONENT.AlertDialog]: IGRPAlertDialog,
 
     [COMPONENT.Table]: IGRPStudioTable,
     [COMPONENT.Section]: IGRPStudioSection,
@@ -365,5 +371,8 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Fragment]: IGRPStudioFragment,
     [COMPONENT.Card]: IGRPStudioCard,
     [COMPONENT.Flex]: IGRPStudioFlex,
-    [COMPONENT.Grid]: IGRPStudioGrid
+    [COMPONENT.Grid]: IGRPStudioGrid,
+    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
+    [COMPONENT.Tabs]: IGRPStudioTabs,
+    [COMPONENT.Paragraph]: IGRPStudioParagraph
 };

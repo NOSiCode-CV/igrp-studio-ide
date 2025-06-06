@@ -1,13 +1,10 @@
 import { MousePointer2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { OutlineValue } from './types';
 
 interface InteractionControlsProps {
   cursor: string;
-  outline: {
-    width: string;
-    style: string;
-    color: string;
-  };
+  outline: OutlineValue;
   onCursorChange: (value: string) => void;
   onOutlineChange: (field: string, value: string) => void;
 }
@@ -32,7 +29,7 @@ export function InteractionControls({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <MousePointer2 size={10} />
           {t('interaction')}
         </h3>

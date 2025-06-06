@@ -88,7 +88,7 @@ export function TransitionControls({
     >
       <div className="space-y-2">
         <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
-          <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {t('editTransition')} {index + 1}
           </span>
           <button
@@ -100,11 +100,11 @@ export function TransitionControls({
         </div>
 
         <div className="space-y-0.5">
-          <label className="text-[9px] text-gray-500">Property</label>
+          <label className="text-xs text-gray-500">Property</label>
           <select
             value={transition.property}
             onChange={(e) => updateTransition(index, 'property', e.target.value)}
-            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
             {transitionProperties.map(prop => (
               <option key={prop} value={prop}>{prop}</option>
@@ -113,7 +113,7 @@ export function TransitionControls({
         </div>
 
         <div className="space-y-0.5">
-          <label className="text-[9px] text-gray-500">Duration</label>
+          <label className="text-xs text-gray-500">Duration</label>
           <div className="flex items-center gap-1">
             <input
               type="range"
@@ -130,19 +130,19 @@ export function TransitionControls({
                 min="0"
                 value={transition.duration}
                 onChange={(e) => updateTransition(index, 'duration', e.target.value)}
-                className="w-14 px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                className="w-14 px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
               />
-              <span className="text-[9px] text-gray-500">ms</span>
+              <span className="text-xs text-gray-500">ms</span>
             </div>
           </div>
         </div>
 
         <div className="space-y-0.5">
-          <label className="text-[9px] text-gray-500">Timing Function</label>
+          <label className="text-xs text-gray-500">Timing Function</label>
           <select
             value={transition.timing}
             onChange={(e) => updateTransition(index, 'timing', e.target.value)}
-            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
           >
             {timingFunctions.map(timing => (
               <option key={timing} value={timing}>{timing}</option>
@@ -151,7 +151,7 @@ export function TransitionControls({
         </div>
 
         <div className="space-y-0.5">
-          <label className="text-[9px] text-gray-500">Delay</label>
+          <label className="text-xs text-gray-500">Delay</label>
           <div className="flex items-center gap-1">
             <input
               type="range"
@@ -168,15 +168,15 @@ export function TransitionControls({
                 min="0"
                 value={transition.delay}
                 onChange={(e) => updateTransition(index, 'delay', e.target.value)}
-                className="w-14 px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                className="w-14 px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
               />
-              <span className="text-[9px] text-gray-500">ms</span>
+              <span className="text-xs text-gray-500">ms</span>
             </div>
           </div>
         </div>
 
         <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
-          <div className="text-[9px] text-gray-500 mb-1">Preview</div>
+          <div className="text-xs text-gray-500 mb-1">Preview</div>
           <div className="relative w-full h-12">
             <div 
               className="absolute inset-0 m-auto w-8 h-8 bg-blue-500 rounded cursor-pointer"
@@ -197,7 +197,7 @@ export function TransitionControls({
   return (
     <div className="space-y-1.5" ref={containerRef}>
       <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <Timer size={10} />
           Transitions
         </h3>
@@ -231,10 +231,10 @@ export function TransitionControls({
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[9px] font-medium text-gray-700 dark:text-gray-300">
+              <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {transition.property.charAt(0).toUpperCase() + transition.property.slice(1)}
               </div>
-              <div className="text-[8px] text-gray-500 dark:text-gray-400 truncate">
+              <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {getTransitionPreview(transition)}
               </div>
             </div>

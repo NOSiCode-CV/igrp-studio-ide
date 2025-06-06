@@ -51,7 +51,7 @@ const handleDropComponent = (
         data: data,
         properties: getDefaultProperties(properties),
     };
-
+    
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
         const { name, label, properties, interactions: interactionsProperties, allowTypes, data: dataProperties } = child
         const childId = generateId(name);

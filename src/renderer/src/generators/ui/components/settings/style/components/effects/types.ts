@@ -127,6 +127,12 @@ export interface BackgroundStyle {
   blendMode: string;
 }
 
+export interface OutlineValue {
+  width: string;
+  style: string;
+  color: string;
+}
+
 export const backgroundSizes = [
   'cover',
   'contain',

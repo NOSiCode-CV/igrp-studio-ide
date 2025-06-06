@@ -5,7 +5,6 @@ import PageController from '../pages/PageWrapper';
 import Overview from '../pages/overview';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation';
-import { useTranslation } from 'react-i18next';
 
 const TAB_DEFAULT = 'tab-0';
 
@@ -16,8 +15,7 @@ interface ContentProps {
 
 const TabManager = ({ currentItem }: ContentProps) => {
 
-    
-    const { t } = useTranslation();
+
 
     const {
         tabs,
@@ -52,7 +50,7 @@ const TabManager = ({ currentItem }: ContentProps) => {
                 {tabs.map((tab) => (
                     <div
                         key={tab.id}
-                        className={activeTab === tab.id ? t('block') : t('hidden')}
+                        className={activeTab === tab.id ? 'block' : 'hidden'}
                     >
                         {tab.id === TAB_DEFAULT ? (
                             <Overview />
