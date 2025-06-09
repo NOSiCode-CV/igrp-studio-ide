@@ -85,8 +85,8 @@ const useStudio = () => {
     // Get all registered components
     const getRegistryComponent = useCallback(async () => {
         return await window.engine.getComponent(ENV_TYPES.NEXTJS).then((res) => {
-            setComponentsRegistered(res.result.components);
-            return res.result.components
+            setComponentsRegistered(res.result?.components ?? []);
+            return res.result?.components ?? [];
         })
     }, []);
 
@@ -95,11 +95,16 @@ const useStudio = () => {
         async (path: string | undefined, componentName: string) => {
             if (!componentName) return null;
 
-            const { result } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
+            const { result, error } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
+
+            if (error) {
+                console.error('Failed to load JSON content:', error);
+                return null;
+            }
 
             // If no path is provided, search for the component directly by name
 
-            let component: ComponentRegisterConfig | null = result.components.find((comp: ComponentRegisterConfig) => comp.name === componentName) || null;
+            let component: ComponentRegisterConfig | null = result?.components.find((comp: ComponentRegisterConfig) => comp.name === componentName) || null;
 
             if (path && !component) {
                 // Split the path into parts (e.g., "table/tableColumns/tableTextCell" => ["table", "tableColumns", "tableTextCell"])

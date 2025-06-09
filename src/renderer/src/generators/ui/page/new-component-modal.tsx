@@ -14,15 +14,22 @@ import {
 } from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
-import { ComponentConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    Argument,
+    ComponentConfig,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
 import IconBrowser from '@renderer/components/icon/icon-browser';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { TextInput } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
 import { FocusEvent } from 'react';
-import { PageDefinition } from './list-pages';
+import { Separator } from '@renderer/components/ui/separator';
+import {
+    FunctionArguments,
+    returnTypeOptions,
+} from '../components/sidebar/custom-code/functions-settings';
 
 const initialValues: ComponentConfig = {
     type: 'component',
@@ -33,13 +40,13 @@ const initialValues: ComponentConfig = {
     icon: undefined,
     name: '',
     id: '',
+    args: [],
 };
 
 interface NewComponentModalProps {
     isOpen: boolean;
     basePath: string;
     pageOptions: any[];
-
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -49,14 +56,15 @@ export function NewComponentModal({
     basePath,
     onClose,
     onConfirm,
-    pageOptions
+    pageOptions,
 }: NewComponentModalProps) {
-
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
+
+    const [arguments_, setArguments] = useState<Argument[]>([]);
 
     useEffect(() => {
         formik.resetForm();
@@ -125,9 +133,13 @@ export function NewComponentModal({
         formik.setFieldValue('name', generatedPath);
     };
 
+    useEffect(() => {
+        formik.setFieldValue('args', arguments_);
+    }, [arguments_]);
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
+            <DialogContent className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
                 <DialogTitle>{t('createNewComponent')}</DialogTitle>
                 <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Component' })}
@@ -139,66 +151,80 @@ export function NewComponentModal({
                         formik.handleSubmit();
                     }}
                 >
-                    <div className="grid gap-4 py-4">
-                        <TextInput
-                            id="description"
-                            label={t('componentTitle')}
-                            onChange={formik.handleChange}
-                            onBlur={handleDescriptionBlur}
-                            value={formik.values.description || ''}
-                            isTouched={formik.touched.description}
-                            error={formik.errors.description}
-                            placeholder="Todo Item"
-                            isRequired
-                        />
-                        <div className="grid grid-cols-1 items-center gap-3">
-                            <Label htmlFor="componentName">
-                                {t('componentName')}
-                            </Label>
-                            <Input
-                                id="name"
-                                className="col-span-3"
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-4 py-4">
+                            <TextInput
+                                id="description"
+                                label={t('componentTitle')}
                                 onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.name || ''}
-                                placeholder="TodoItem"
+                                onBlur={handleDescriptionBlur}
+                                value={formik.values.description || ''}
+                                isTouched={formik.touched.description}
+                                error={formik.errors.description}
+                                placeholder="Todo Item"
+                                isRequired
                             />
+                            <div className="grid grid-cols-1 items-center gap-3">
+                                <Label htmlFor="componentName">
+                                    {t('componentName')}
+                                </Label>
+                                <Input
+                                    id="name"
+                                    className="col-span-3"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.name || ''}
+                                    placeholder="TodoItem"
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 items-center gap-3">
+                                <Label htmlFor="Associar">{t('pages')}</Label>
+                                <IGRPCombobox
+                                    name="pagePath"
+                                    className="col-span-3"
+                                    value={formik.values.pagePath || ''}
+                                    options={pageOptions}
+                                    placeholder="Select page"
+                                    helperText={t('componentAssociation')}
+                                    onChange={(selectedValue) => {
+                                        const selected = pageOptions.find(
+                                            (opt) => opt.value === selectedValue
+                                        );
+                                        formik.setFieldValue(
+                                            'pagePath',
+                                            selected?.path || undefined
+                                        );
+                                        formik.setFieldValue(
+                                            'pageName',
+                                            selected?.value || undefined
+                                        );
+                                        formik.setFieldValue(
+                                            'scope',
+                                            selectedValue ? 'page' : 'app'
+                                        );
+                                    }}
+                                />
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                                <IconBrowser
+                                    onSelectedIcon={(icon) => {
+                                        formik.setFieldValue('icon', icon);
+                                    }}
+                                    selectedIcon={formik.values.icon || ''}
+                                />
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 items-center gap-3">
-                            <Label htmlFor="Associar">{t('pages')}</Label>
-                            <IGRPCombobox
-                                name="pagePath"
-                                className="col-span-3"
-                                value={formik.values.pagePath || ''}
-                                options={pageOptions}
-                                placeholder="Select page"
-                                helperText={t('componentAssociation')}
-                                onChange={(selectedValue) => {
-                                    const selected = pageOptions.find(
-                                        (opt) => opt.value === selectedValue
-                                    );
-                                    formik.setFieldValue(
-                                        'pagePath',
-                                        selected?.path || undefined
-                                    );
-                                    formik.setFieldValue(
-                                        'pageName',
-                                        selected?.value || undefined
-                                    );
-                                    formik.setFieldValue(
-                                        'scope',
-                                        selectedValue ? 'page' : 'app'
-                                    );
-                                }}
-                            />
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                            <IconBrowser
-                                onSelectedIcon={(icon) => {
-                                    formik.setFieldValue('icon', icon);
-                                }}
-                                selectedIcon={formik.values.icon || ''}
-                            />
+                        <div className="col-span-1 py-4">
+                            <div className="flex flex-row space-x-3 w-full h-full">
+                                <Separator orientation="vertical" />
+                                <div className="w-full flex-1">
+                                    <FunctionArguments
+                                        value={formik.values?.args || []}
+                                        onChange={setArguments}
+                                        returnTypeOptions={returnTypeOptions}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter className="flex justify-between">

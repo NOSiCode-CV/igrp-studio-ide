@@ -112,15 +112,18 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                     onBlur={formik.handleBlur}
                                     onChange={(e) =>
                                         formik.setFieldValue(
-                                            t('path'),
+                                            'path',
                                             e.target.value
                                         )
                                     }
                                     onSelectValueChange={(value) => {
-                                        formik.setFieldValue('method', value || currentItem.content?.method);
+                                        formik.setFieldValue(
+                                            'method',
+                                            value || currentItem.content?.method
+                                        );
                                     }}
                                     classNameLabel={cn(
-                                        'w-full h-8 mb-6',
+                                        'w-full',
                                         formik.touched.path &&
                                             formik.errors.path &&
                                             'border-red-500'

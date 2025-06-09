@@ -23,7 +23,7 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
         label,
         properties,
     } = comp;
-    const { title, description } = properties;
+    const { title } = properties;
 
     const [buttonComponents, setButtonComponents] = useState<
         StructuredComponent[]
@@ -42,7 +42,7 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
             const buttons = fields;
             setButtonComponents(buttons);
         }
-    }, [comp]);
+    }, [comp, fields]);
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -105,8 +105,8 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     return (
         <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
             <IGRPPageHeader
+                {...properties}
                 title={title || label || componentName}
-                description={description}
             >
                 <div className={cn('flex flex-1 justify-end gap-3')}>
                     {renderButtons()}

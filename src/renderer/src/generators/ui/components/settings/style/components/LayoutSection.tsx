@@ -25,10 +25,10 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                 gap: '2',
             },
             grid: {
-                templateColumns: '1',
+                templateColumns: '4',
                 templateRows: '1',
                 gap: '2',
-                justifyItems: 'start',
+                justifyItems: 'stretch',
                 alignItems: 'start',
                 direction: 'row',
                 dense: false,

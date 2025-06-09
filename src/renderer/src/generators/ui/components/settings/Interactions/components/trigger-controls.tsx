@@ -433,39 +433,65 @@ const InteractionEditor = ({
             case 'navigate':
                 return (
                     <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>Target Page</Label>
-                            <PageSelectionConfig
-                                value={
-                                    currentAction.navigate?.name
-                                        ? currentAction.navigate.name.replace(
-                                              'goTo',
-                                              ''
-                                          )
-                                        : ''
+                        <IGRPCombobox
+                            label="Target Page"
+                            placeholder="Select page"
+                            value={
+                                currentAction.navigate?.name
+                                    ? currentAction.navigate.name.replace(
+                                          'goTo',
+                                          ''
+                                      )
+                                    : ''
+                            }
+                            onChange={(id) => {
+                                const page = availablePages.find(
+                                    (p) => p.value === id
+                                );
+                                if (page) {
+                                    setCurrentAction({
+                                        ...currentAction,
+                                        navigate: {
+                                            path: page.metadata.path,
+                                            name: `goTo${id}`,
+                                        },
+                                    });
                                 }
-                                fieldPath="navigate.name"
-                                key="navigate"
-                                selectedPagePath={selectedPagePath}
-                                onPageChange={(value) => {
-                                    const page = availablePages.find(
-                                        (p) => p.value === value
-                                    );
+                            }}
+                            options={availablePages}
+                        />
 
-                                    setSelectedPagePath(value);
-                                    if (page) {
-                                        setCurrentAction({
-                                            ...currentAction,
-                                            navigate: {
-                                                path: page.metadata.path,
-                                                name: `goTo${value}`,
-                                            },
-                                        });
-                                    }
-                                }}
-                                pageOptions={availablePages}
-                            />
-                        </div>
+                        {/* TODO: Fix this */}
+                        {/* <PageSelectionConfig
+                            value={
+                                currentAction.navigate?.name
+                                    ? currentAction.navigate.name.replace(
+                                          'goTo',
+                                          ''
+                                      )
+                                    : ''
+                            }
+                            fieldPath="navigate.name"
+                            key="navigate"
+                            selectedPagePath={selectedPagePath}
+                            onPageChange={(value) => {
+                                const page = availablePages.find(
+                                    (p) => p.value === value
+                                );
+
+                                setSelectedPagePath(value);
+                                if (page) {
+                                    setCurrentAction({
+                                        ...currentAction,
+                                        navigate: {
+                                            path: page.metadata.path,
+                                            name: `goTo${value}`,
+                                        },
+                                    });
+                                }
+                            }}
+                            pageOptions={availablePages}
+                        /> */}
 
                         <div className="space-y-2">
                             <Label>Navigation Parameters</Label>

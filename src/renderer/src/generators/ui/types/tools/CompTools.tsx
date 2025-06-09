@@ -115,7 +115,7 @@ const CompTools = ({
                             <TooltipTrigger asChild>
                                 <Badge
                                     variant={'secondary'}
-                                    className="rounded-sm cursor-pointer my-0.5"
+                                    className="my-1 rounded-sm cursor-pointer ml-2"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setCurrentComponent(comp);

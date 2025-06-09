@@ -408,9 +408,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -887,10 +887,17 @@
     react-redux "^9.2.0"
     redux "^5.0.1"
 
-"@hookform/resolvers@5.0.1", "@hookform/resolvers@^5.0.1":
+"@hookform/resolvers@5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-5.0.1.tgz#0a5e90310149e3ac5b017efcb5beb9bdbb711f38"
   integrity sha512-u/+Jp83luQNx9AdyW2fIPGY6Y7NG68eN2ZW8FOJYL+M0i4s49+refdJdOp/A9n9HFQtQs3HIDHQvX3ZET2o7YA==
+  dependencies:
+    "@standard-schema/utils" "^0.3.0"
+
+"@hookform/resolvers@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-5.1.1.tgz#91074ba4fb749cc74e6465e75d38256146b0c4ab"
+  integrity sha512-J/NVING3LMAEvexJkyTLjruSm7aOFx7QX21pzkiJfMoNG0wl5aFEjLTl7ay7IQb9EWY6AkrBy7tHL2Alijpdcg==
   dependencies:
     "@standard-schema/utils" "^0.3.0"
 
@@ -936,10 +943,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.201":
-  version "0.0.0-alpha.201"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.201.tgz#cdb8d085d7dc3b4d0d460e4fb801c86c168c6195"
-  integrity sha512-96vBXcFINdkaZe7qzWLzXBqgetTofRZk7z4dnAygutx8iTI7EjNmqp/qI06IObBXq/Aapsbd+V4vTh2ag+hUCA==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.205":
+  version "0.0.0-alpha.205"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.205.tgz#344031041fc161dcb99144a8b1bd3dd2701527e0"
+  integrity sha512-dAOwArGT8sGklM5jevWAxe6KEvnSacuqMZss7C1B7tIRyhOREEcmN08n7Crdo1HIHTjFw2a/yQudKyS2acJCFw==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.11"
@@ -990,10 +997,10 @@
     vaul "1.1.2"
     zod "3.25.17"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.339":
-  version "0.0.1-alpha.339"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.339.tgz#78046e611977be9271eb911a7fd1a9821732f006"
-  integrity sha512-W2tZaZ1bNqWB9kUXuRnIQN0NfsZCM9YtjuVwfgEt0lCWdKeGhjKPhEvrOqfNG3g/DupbFbhwnLEnhGMCcZvW1A==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.346":
+  version "0.0.1-alpha.346"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.346.tgz#9ee15404526897e76a2b42a7c8e5df7654cf5d91"
+  integrity sha512-rE0X+0nYRyuKpa7AQJb7kHULYDjOeil1OdSD1kLN41UZxem/B80leow4EHGgxK/Yk+5mRFWR5nwYR112lZz0Rg==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -2908,10 +2915,10 @@
     "@types/range-parser" "*"
     "@types/send" "*"
 
-"@types/express@^5.0.2":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@types/express/-/express-5.0.2.tgz#7be9e337a5745d6b43ef5b0c352dad94a7f0c256"
-  integrity sha512-BtjL3ZwbCQriyb0DGw+Rt12qAXPiBTPs815lsUvtt1Grk0vLRMZNMUZ741d5rjk+UQOxfDiBZ3dxpX00vSkK3g==
+"@types/express@^5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-5.0.3.tgz#6c4bc6acddc2e2a587142e1d8be0bce20757e956"
+  integrity sha512-wGA0NX93b19/dZC1J18tKWVIYWyyF2ZjT9vin/NRu0qzzvfVzWjs04iq2rQ3H65vCTQYlRqs3YHfY7zjdV+9Kw==
   dependencies:
     "@types/body-parser" "*"
     "@types/express-serve-static-core" "^5.0.0"
@@ -3020,7 +3027,7 @@
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-2.1.0.tgz#052aa67a48eccc4309d7f0191b7e41434b90bb78"
   integrity sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==
 
-"@types/node@*", "@types/node@>=13.7.0", "@types/node@^22.15.29", "@types/node@^22.7.7":
+"@types/node@*", "@types/node@>=13.7.0", "@types/node@^22.15.30", "@types/node@^22.7.7":
   version "22.15.30"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.30.tgz#3a20431783e28dd0b0326f84ab386a2ec81d921d"
   integrity sha512-6Q7lr06bEHdlfplU6YRbgG1SFBdlsfNC4/lX+SkhiTs0cpJkOElmWls8PxDFv4yY/xKb8Y6SO0OmSX4wgqTZbA==
@@ -3125,7 +3132,7 @@
   dependencies:
     "@types/node" "*"
 
-"@typescript-eslint/eslint-plugin@8.33.1", "@typescript-eslint/eslint-plugin@^8.33.0":
+"@typescript-eslint/eslint-plugin@8.33.1", "@typescript-eslint/eslint-plugin@^8.33.1":
   version "8.33.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.33.1.tgz#532641b416ed2afd5be893cddb2a58e9cd1f7a3e"
   integrity sha512-TDCXj+YxLgtvxvFlAvpoRv9MAncDLBV2oT9Bd7YBGC/b/sEURoOYuIwLI99rjWOfY3QtDzO+mk0n4AmdFExW8A==
@@ -3140,7 +3147,7 @@
     natural-compare "^1.4.0"
     ts-api-utils "^2.1.0"
 
-"@typescript-eslint/parser@8.33.1", "@typescript-eslint/parser@^8.33.0":
+"@typescript-eslint/parser@8.33.1", "@typescript-eslint/parser@^8.33.1":
   version "8.33.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-8.33.1.tgz#ef9a5ee6aa37a6b4f46cc36d08a14f828238afe2"
   integrity sha512-qwxv6dq682yVvgKKp2qWwLgRbscDAYktPptK4JPojCwwi3R9cwrvIxS4lvBpzmcqzR4bdn54Z0IG1uHFskW4dA==
@@ -4632,7 +4639,7 @@ docker-modem@^5.0.6:
     split-ca "^1.0.1"
     ssh2 "^1.15.0"
 
-dockerode@^4.0.6:
+dockerode@^4.0.7:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/dockerode/-/dockerode-4.0.7.tgz#8c68a80f4e057723a07a1e886416248945056621"
   integrity sha512-R+rgrSRTRdU5mH14PZTCPZtW/zw3HDWNTS/1ZAQpL/5Upe/ye5K9WQkIysu4wBoiMwKynsz0a8qWuGsHgEvSAA==
@@ -10039,10 +10046,10 @@ use-callback-ref@^1.3.3:
   dependencies:
     tslib "^2.0.0"
 
-use-debounce@^10.0.4:
-  version "10.0.4"
-  resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-10.0.4.tgz#2135be498ad855416c4495cfd8e0e130bd33bb24"
-  integrity sha512-6Cf7Yr7Wk7Kdv77nnJMf6de4HuDE4dTxKij+RqE9rufDsI6zsbjyAxcH5y2ueJCQAnfgKbzXbZHYlkFwmBlWkw==
+use-debounce@^10.0.5:
+  version "10.0.5"
+  resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-10.0.5.tgz#dfad6efbab981a9cff6c7cd8678509d1bc21e34f"
+  integrity sha512-Q76E3lnIV+4YT9AHcrHEHYmAd9LKwUAbPXDm7FlqVGDHiSOhX3RDjT8dm0AxbJup6WgOb1YEcKyCr11kBJR5KQ==
 
 use-isomorphic-layout-effect@^1.2.0:
   version "1.2.1"
@@ -10388,7 +10395,12 @@ zod@3.25.17:
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.17.tgz#6089bd3f72de38e15a25e129fe1ef443d9440ad4"
   integrity sha512-8hQzQ/kMOIFbwOgPrm9Sf9rtFHpFUMy4HvN0yEB0spw14aYi0uT5xG5CE2DB9cd51GWNsz+DNO7se1kztHMKnw==
 
-zod@^3.20.2, zod@^3.25.51:
+zod@^3.20.2:
   version "3.25.55"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.55.tgz#b1ffd48a34f558d1a912d1ed6bf84a6ca692fbe1"
   integrity sha512-219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==
+
+zod@^3.25.56:
+  version "3.25.56"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.56.tgz#4cff0340b7cd3778314dac1e74d6a663ffeef914"
+  integrity sha512-rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ==
