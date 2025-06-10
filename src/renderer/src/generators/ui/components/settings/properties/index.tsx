@@ -162,7 +162,7 @@ const RenderPropsConfig = ({
                     }}
                 />
             );
-        } else if (key === 'href') {
+        } else if (key === 'href' || xUiWidget === 'uri') {
             return (
                 <SlugBindingConfig
                     key={key}

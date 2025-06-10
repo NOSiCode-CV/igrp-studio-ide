@@ -1,0 +1,90 @@
+---
+title: Custom Code
+sidebar_position: 4
+---
+
+# Custom Code
+
+The **Custom Code** section allows you to add custom logic to your project using reusable functions and internal **States**. This functionality is useful for encapsulating business logic, processing data, or reacting to user events in a controlled and organized manner.
+
+## 📌 Overview
+
+The interface allows you to:
+
+- Create **Functions** with arguments, return types, and external dependencies.
+- Create and manage reusable **States** for reactive data control.
+- Organize and reuse code **Snippets**.
+
+## 🔧 Creating a Function
+
+In the `Custom Code` Navigation, clicking on `+` `Dropdown` and selecting `Function` will display a function creation interface with the following options:
+
+### 🧩 Function Settings
+
+- **Imports**: add external libraries using the `import` syntax.
+- **Function Body**: function body where the code is inserted.
+- **Function Settings**:
+  - `Name`: function name.
+  - `Return Type`: return type (`Void`, `String`, `Number`, etc).
+  - `Is List` / `Nullable`: defines if the return is a list and if it allows `null`.
+  - `Arguments`: add arguments with name, type, and default value.
+
+### Example:
+
+```tsx
+function getStatusBadge(status: string): string {
+  if (status === "active") return "✅ Active";
+  if (status === "inactive") return "❌ Inactive";
+  return "ℹ️ Unknown";
+}
+```
+
+When creating a function, you can reuse other `functions`, `states`, or `code snippets` by clicking on `Insert code` in the item within the respective tab.
+
+![Pages List Preview](../img/page-builder-custon-code.png)
+
+## 🧠 Reactive States
+
+**States** work as reactive variables that store and control interface values. They can be updated in real-time based on user interactions.
+
+### 📌 State example:
+
+```js
+const [counter, setCounter] = useState(0);
+```
+
+![Pages List Preview](../img/page-build-custon-code-state.png)
+
+## Notes
+
+    - All **Custom Code** created here remains within the page being edited
+
+## ⚙️ Configuration Registry – `igrp.studio.ts`
+
+> 📌 **Important**: All configuration described below is done in the  
+> **`igrp.studio.ts`** file
+
+This file acts as a central point for registering custom elements organized by interface context. If a developer doesn't want to use the function registration functionality within the page, they can register globally for the entire application.
+
+It allows registering:
+
+- **Types**: TypeScript interfaces or aliases for structured data models.
+- **Actions**: Executable logic for operations.
+- **Functions**: Application-specific reusable logic.
+
+### 📘 Registration Rules
+
+1. All entries must be arrays of importable paths (without extension).
+2. Paths are relative to the `src/app/(myapp)` directory.
+3. Categories are optional, but each must contain at least one valid entry.
+
+### ✅ Valid Examples
+
+```ts
+{
+  types: ['types/User'],
+  actions: ['server/actions/saveUser'],
+  functions: ['client/forms/useUserForm']
+  components: ['components/shared-ui']
+}
+``` 

@@ -74,7 +74,7 @@ const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
                                     {structure.map((col, i) => (
                                         <div
                                             key={i}
-                                            className="bg-muted-foreground hover:bg-igrp transition-colors"
+                                            className="bg-muted-foreground hover:bg-primary transition-colors"
                                             style={{
                                                 width: `${(col / 12) * 100}%`,
                                                 height: '20px',

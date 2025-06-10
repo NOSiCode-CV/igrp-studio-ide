@@ -57,7 +57,7 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                         handleClick(response.content);
                     }}
                 >
-                    <div className="flex items-center justify-center w-5 h-5 rounded bg-igrp/25 text-igrp">
+                    <div className="flex items-center justify-center w-5 h-5 rounded bg-primary/25 text-igrp">
                         R
                     </div>
                     {` ${response.content.name} (${response.content.statusCode})`}

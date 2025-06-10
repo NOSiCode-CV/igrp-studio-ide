@@ -288,7 +288,7 @@ export const BindingConfigurationModal = ({
                 child.properties.dataProperties.isType;
 
             const isDynamicRepeater =
-                child.componentName === COMPONENT.DynamicRepeater;
+                child.componentName === COMPONENT.FormList;
 
             if (isDynamicRepeater) {
                 // Process children first to get the nested fields structure
@@ -418,6 +418,7 @@ export const BindingConfigurationModal = ({
                 'fields'
             );
         }
+
     };
 
     return (
@@ -494,10 +495,14 @@ export const BindingConfigurationModal = ({
                                     columns={columns}
                                     formik={formik}
                                     data={formik.values.fields}
-                                    changeValue={(element, position, result) =>
-                                        handleChange(element, position, result)
-                                    }
-                                    name={'Type'}
+                                    changeValue={(
+                                        element,
+                                        position,
+                                        result
+                                    ) => {
+                                        handleChange(element, position, result);
+                                    }}
+                                    name={'fields'}
                                 />
                             </div>
 

@@ -16,6 +16,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import TableTool from '../tools/tableTool';
 import { generateAllClasses } from '../../components/settings/style/utils';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface CardProps {
     isDisabled?: boolean;
@@ -111,11 +112,11 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                                     layout="horizontal"
                                     className={cn('p-1', childClassName)}
                                 >
-                                    <BoxField
-                                        index={index}
+                                    <BoxWrapper
+                                        //index={index}
                                         parentComp={comp}
                                         comp={child}
-                                        path={path}
+                                       // path={path}
                                         onEdit={() => handleEdit(child, path)}
                                         group="group/card-content-item"
                                         className="opacity-0 group-hover/card-content-item:opacity-100"
@@ -124,7 +125,7 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                                             comp={child}
                                             onDragEnd={onDragEnd}
                                         />
-                                    </BoxField>
+                                    </BoxWrapper>
                                 </Draggable>
                             );
                         })
@@ -133,7 +134,6 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
             );
         },
         [
-            componentId,
             handleEdit,
             loadedComponents,
             onDragEnd,
@@ -157,6 +157,7 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                 const classes = generateAllClasses(style);
 
                 if (!Component) return null;
+
 
                 return (
                     <div

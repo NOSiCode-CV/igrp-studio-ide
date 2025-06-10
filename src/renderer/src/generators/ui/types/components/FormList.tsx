@@ -9,6 +9,8 @@ import { cn } from '@renderer/lib/utils';
 import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
+import { Button } from '@renderer/components/ui/button';
+import { Plus } from 'lucide-react';
 
 export interface RepetitiveProps {
     isDisabled?: boolean;
@@ -16,10 +18,7 @@ export interface RepetitiveProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const IGRPStudioDynamicRepeater: React.FC<RepetitiveProps> = ({
-    comp,
-    onDragEnd,
-}) => {
+const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
     const {
         children: components,
         id: componentId,
@@ -71,48 +70,57 @@ const IGRPStudioDynamicRepeater: React.FC<RepetitiveProps> = ({
             const path = parentComponentName;
 
             return (
-                <Droppable component={component} onDrop={onDragEnd}>
-                    <TableTool
-                        comp={component}
-                        parentComp={comp}
-                        onEdit={() => handleEdit(component, path)}
-                    />
-                    {childComponents.length === 0 ? (
-                        <GenNoInfoComp
-                            type={getLabel(componentName).toUpperCase()}
-                        />
-                    ) : (
-                        childComponents.map((child, index) => {
-                            const Component = loadedComponents[child.id];
-                            if (!Component) return null;
+                <>
+                    <Droppable component={component} onDrop={onDragEnd}>
+                        {childComponents.length === 0 ? (
+                            <GenNoInfoComp
+                                type={getLabel(componentName).toUpperCase()}
+                            />
+                        ) : (
+                            childComponents.map((child, index) => {
+                                const Component = loadedComponents[child.id];
+                                if (!Component) return null;
 
-                            return (
-                                <Draggable
-                                    key={child.id}
-                                    item={child}
-                                    index={index}
-                                    mode="MOVE"
-                                    layout="horizontal"
-                                    dropTargetId={componentId}
-                                    className={cn('border-none')}
-                                >
-                                    <BoxField
+                                return (
+                                    <Draggable
+                                        key={child.id}
+                                        item={child}
                                         index={index}
-                                        parentComp={comp}
-                                        comp={child}
-                                        path={path}
-                                        onEdit={() => handleEdit(child, path)}
+                                        mode="MOVE"
+                                        layout="horizontal"
+                                        dropTargetId={componentId}
+                                        className={cn('border-none')}
                                     >
-                                        <Component
+                                        <BoxField
+                                            index={index}
+                                            parentComp={comp}
                                             comp={child}
-                                            onDragEnd={onDragEnd}
-                                        />
-                                    </BoxField>
-                                </Draggable>
-                            );
-                        })
-                    )}
-                </Droppable>
+                                            path={path}
+                                            onEdit={() =>
+                                                handleEdit(child, path)
+                                            }
+                                        >
+                                            <Component
+                                                comp={child}
+                                                onDragEnd={onDragEnd}
+                                            />
+                                        </BoxField>
+                                    </Draggable>
+                                );
+                            })
+                        )}
+                    </Droppable>
+
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => void 0}
+                        className="w-full"
+                    >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Adicionar Atividade
+                    </Button>
+                </>
             );
         },
         [
@@ -128,4 +136,4 @@ const IGRPStudioDynamicRepeater: React.FC<RepetitiveProps> = ({
     return <>{renderChildComp(comp)}</>;
 };
 
-export default IGRPStudioDynamicRepeater;
+export default IGRPStudioFormList;
