@@ -71,6 +71,7 @@ import {
     SeparatorHorizontal,
     CheckCircle,
     Ratio,
+    Menu,
 } from 'lucide-react';
 import IGRPStudioFlex from './types/components/Flex';
 import IGRPStudioGrid from './types/components/Grid';
@@ -87,6 +88,9 @@ import IGRPStudioModalDialog from './types/components/ModalDialog';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
 import IGRPStudioTabs from './types/components/Tabs';
+import IGRPStudioRepetitive from './types/components/RepetitiveList';
+import IGRPStudioMenuNavigation from './types/components/MenuNavigation';
+import IGRPStudioFormList from './types/components/FormList';
 
 
 // Component Categories
@@ -202,7 +206,10 @@ export const COMPONENT: Record<string, string> = {
     AlertDialog: 'alertDialog',
     Aspect: 'aspect',
     Fragment: 'fragment',
-    Paragraph: 'paragraph'
+    Paragraph: 'paragraph',
+    RepetitiveList: 'repetitiveList',
+    FormList: 'formList',
+    MenuNavigation: 'menuNavigation'
 
 }
 
@@ -285,6 +292,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.ModalDialog]: CheckCircle,
     [COMPONENT.AlertDialog]: Info,
     [COMPONENT.Aspect]: Ratio,
+    [COMPONENT.MenuNavigation]: Menu,
 
     accordion: AlignLeft,
     treeView: GitMerge,
@@ -297,7 +305,8 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.PageHeader]: Heading,
     [COMPONENT.Fragment]: Code,
     [COMPONENT.Paragraph]: WrapText,
-    repetitiveList: LayoutList,
+    [COMPONENT.RepetitiveList]: LayoutList,
+    [COMPONENT.FormList]: LayoutList,
 
     tableDateFilter: CalendarIcon,
     tableTextFilter: FormInput,
@@ -374,5 +383,8 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Grid]: IGRPStudioGrid,
     [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
     [COMPONENT.Tabs]: IGRPStudioTabs,
-    [COMPONENT.Paragraph]: IGRPStudioParagraph
+    [COMPONENT.Paragraph]: IGRPStudioParagraph,
+    [COMPONENT.RepetitiveList]: IGRPStudioRepetitive,
+    [COMPONENT.FormList]: IGRPStudioFormList,
+    [COMPONENT.MenuNavigation]: IGRPStudioMenuNavigation
 };

@@ -35,6 +35,9 @@ interface LabeledElementField {
     defaultValue?: string;
     required: boolean;
     label: string;
+    options?: {
+        columns: LabeledElementField[];
+    };
 }
 
 const defaultFieldType: LabeledElementField = {
@@ -105,29 +108,29 @@ export const BindingConfigurationModal = ({
         { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
         ...(!newBinding
             ? [
-                {
-                    key: 'newType',
-                    name: t('type'),
-                    type: 'select',
-                    options: fieldsTypeOptions,
-                },
-            ]
+                  {
+                      key: 'newType',
+                      name: t('type'),
+                      type: 'select',
+                      options: fieldsTypeOptions,
+                  },
+              ]
             : []),
 
         ...(newBinding
             ? [
-                {
-                    key: 'type',
-                    name: t('dataType'),
-                    type: 'typeSelectorDropdown',
-                    options: FIELD_TYPES,
-                },
-                {
-                    key: 'required',
-                    name: '',
-                    type: 'checkbox',
-                },
-            ]
+                  {
+                      key: 'type',
+                      name: t('dataType'),
+                      type: 'typeSelectorDropdown',
+                      options: FIELD_TYPES,
+                  },
+                  {
+                      key: 'required',
+                      name: '',
+                      type: 'checkbox',
+                  },
+              ]
             : []),
         { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
     ];
@@ -155,10 +158,13 @@ export const BindingConfigurationModal = ({
 
             if (!validate()) return;
 
+            console.log('values', values);
+
             const updatedComponent = {
                 ...values,
                 fields: (values.fields as LabeledElementField[]).map(
                     (field) => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         const { label, ...rest } = field; // Removes the 'label' property
                         return rest;
                     }
@@ -253,6 +259,7 @@ export const BindingConfigurationModal = ({
             }));
 
             formik.setFieldValue('fields', [...updatedFields]);
+
             setComponentMap(updatedMap);
         }
     }, [components, comp.children]);
@@ -268,7 +275,10 @@ export const BindingConfigurationModal = ({
         const fields: LabeledElementField[] = [];
         const newExistingNames = new Set(existingNames);
 
-        const processComponent = (child: StructuredComponent) => {
+        const processComponent = (
+            child: StructuredComponent,
+            parentIsRepeater = false
+        ) => {
             if (!child) return;
 
             // Check if component should be included as a field
@@ -277,13 +287,87 @@ export const BindingConfigurationModal = ({
                 !child.properties.dataProperties.isVirtual &&
                 child.properties.dataProperties.isType;
 
-            if (shouldInclude) {
+            const isDynamicRepeater =
+                child.componentName === COMPONENT.FormList;
+
+            if (isDynamicRepeater) {
+                // Process children first to get the nested fields structure
+                const nestedFields: LabeledElementField[] = [];
+                const nestedComponentMap: Map<string, StructuredComponent> =
+                    new Map();
+
+                // Temporary process to get nested structure
+                const tempProcess = (nestedChild: StructuredComponent) => {
+                    if (!nestedChild) return;
+
+                    const nestedShouldInclude =
+                        nestedChild?.properties?.dataProperties &&
+                        !nestedChild.properties.dataProperties.isVirtual &&
+                        nestedChild.properties.dataProperties.isType;
+
+                    if (nestedShouldInclude) {
+                        nestedFields.push({
+                            ...defaultFieldType,
+                            name: nestedChild.tag,
+                            componentId: nestedChild.id,
+                            label:
+                                nestedChild.properties.label ??
+                                nestedChild.label,
+                        });
+                        nestedComponentMap.set(nestedChild.id, nestedChild);
+                    }
+
+                    if (Array.isArray(nestedChild.children)) {
+                        nestedChild.children.forEach(tempProcess);
+                    }
+                };
+
+                child.children.forEach(tempProcess);
+
+                // Only add the repeater field if it hasn't been added yet
                 if (!newExistingNames.has(child.id)) {
                     fields.push({
                         ...defaultFieldType,
                         name: child.tag,
                         componentId: child.id,
-                        label: child.properties.label ?? child.properties.headerTitle ?? child.label,
+                        label:
+                            child.properties.label ??
+                            child.properties.headerTitle ??
+                            child.label,
+                        type: 'array',
+                        // Add nested fields structure as options
+                        options: {
+                            columns: nestedFields.map((field) => ({
+                                ...defaultFieldType,
+                                ...field,
+                            })),
+                        },
+                    });
+                    newExistingNames.add(child.id);
+                }
+
+                // Add all components to the main map
+                componentMap.set(child.id, child);
+                nestedComponentMap.forEach((value, key) =>
+                    componentMap.set(key, value)
+                );
+
+                return; // Skip further processing for repeater children
+            }
+
+            if (shouldInclude && !parentIsRepeater) {
+                if (!newExistingNames.has(child.id)) {
+                    fields.push({
+                        ...defaultFieldType,
+                        name: child.tag,
+                        componentId: child.id,
+                        label:
+                            child.properties.label ??
+                            child.properties.headerTitle ??
+                            child.label,
+                        // Include type if available
+                        type:
+                            child.properties.dataProperties?.type || undefined,
                     });
                     newExistingNames.add(child.id);
                 }
@@ -291,13 +375,15 @@ export const BindingConfigurationModal = ({
                 componentMap.set(child.id, child);
             }
 
-            // Process children recursively
-            if (Array.isArray(child.children)) {
-                child.children.forEach(processComponent);
+            // Process children recursively (unless parent is a repeater)
+            if (Array.isArray(child.children) && !parentIsRepeater) {
+                child.children.forEach((c) =>
+                    processComponent(c, isDynamicRepeater)
+                );
             }
         };
 
-        components.forEach(processComponent);
+        components.forEach((component) => processComponent(component));
 
         return { fields, componentMap };
     };
@@ -332,6 +418,7 @@ export const BindingConfigurationModal = ({
                 'fields'
             );
         }
+
     };
 
     return (
@@ -408,10 +495,14 @@ export const BindingConfigurationModal = ({
                                     columns={columns}
                                     formik={formik}
                                     data={formik.values.fields}
-                                    changeValue={(element, position, result) =>
-                                        handleChange(element, position, result)
-                                    }
-                                    name={'Type'}
+                                    changeValue={(
+                                        element,
+                                        position,
+                                        result
+                                    ) => {
+                                        handleChange(element, position, result);
+                                    }}
+                                    name={'fields'}
                                 />
                             </div>
 

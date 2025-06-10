@@ -56,26 +56,26 @@ const IGRPStudioColumn: React.FC<ColProps> = ({
         return children.map((child: StructuredComponent, index: number) => {
             const Component = loadedComponents[child.id];
 
-            return Component ? (
-                <Draggable
-                    key={child.id}
-                    item={child}
-                    index={index}
-                    dropTargetId={componentId}
-                    mode="MOVE"
-                >
-                    <BoxWrapper
-                        parentComp={comp}
-                        comp={child}
-                        group="group/column"
-                        onEdit={() => handleEditClick(child)}
-                        className="top-0 opacity-0 group-hover/column:opacity-100"
+            return (
+                Component && (
+                    <Draggable
+                        key={child.id}
+                        item={child}
+                        index={index}
+                        dropTargetId={componentId}
+                        mode="MOVE"
                     >
-                        <Component comp={child} onDragEnd={onDragEnd} />
-                    </BoxWrapper>
-                </Draggable>
-            ) : (
-                <div key={comp.id}>{t('loading')}</div>
+                        <BoxWrapper
+                            parentComp={comp}
+                            comp={child}
+                            group="group/column"
+                            onEdit={() => handleEditClick(child)}
+                            className="top-0 opacity-0 group-hover/column:opacity-100"
+                        >
+                            <Component comp={child} onDragEnd={onDragEnd} />
+                        </BoxWrapper>
+                    </Draggable>
+                )
             );
         });
     };

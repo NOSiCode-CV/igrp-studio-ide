@@ -1,5 +1,9 @@
 import { Button } from '@renderer/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
 import { cn } from '@renderer/lib/utils';
 import React from 'react';
 
@@ -77,13 +81,12 @@ export function RelationTypeSelector({
     value,
     onChange,
 }: RelationTypeSelectorProps) {
-
     return (
         <>
             <div className="flex items-center justify-center">
                 <div className="flex items-center relative">
-                    <div className="w-6 h-0.5 bg-igrp" />
-                    {(Object.keys(relationTypeIcons)).map(
+                    <div className="w-6 h-0.5 bg-primary" />
+                    {Object.keys(relationTypeIcons).map(
                         (type, index, array) => (
                             <React.Fragment key={type}>
                                 <Tooltip>
@@ -93,9 +96,8 @@ export function RelationTypeSelector({
                                             onClick={() => onChange(type)}
                                             className={cn(
                                                 'transition-colors relative',
-                                                value === type
-                                                    ? 'bg-igrp text-white'
-                                                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800'
+                                                value === type &&
+                                                    'text-muted-foreground bg-secondary/10 border border-secondary shadow-lg'
                                             )}
                                         >
                                             {relationTypeIcons[type]}
@@ -106,12 +108,12 @@ export function RelationTypeSelector({
                                     </TooltipContent>
                                 </Tooltip>
                                 {index < array.length - 1 && (
-                                    <div className="w-6 h-0.5 bg-igrp" />
+                                    <div className="w-6 h-0.5 bg-primary" />
                                 )}
                             </React.Fragment>
                         )
                     )}
-                    <div className="w-6 h-0.5 bg-igrp" />
+                    <div className="w-6 h-0.5 bg-primary" />
                 </div>
             </div>
         </>

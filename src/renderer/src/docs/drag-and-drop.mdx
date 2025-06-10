@@ -1,0 +1,186 @@
+---
+sidebar_position: 3
+---
+
+# drag-and-drop
+
+The components used in `igrp studio` allow the visual construction of dynamic and functional interfaces. They support actions such as **add**, **edit**, **clone**, **remove**, and **move**, as well as **bindings** configuration for logical integration between inputs and tables.
+
+### 🔁 Available Component Actions
+
+Each interface component can be:
+
+- 📝 **Edited** → Opens a _sidebar_ with property tabs
+- ❌ **Removed**
+- 📋 **Cloned**
+- 🔀 **Moved** by _drag & drop_ between different components
+
+### ⚙️ Edit Sidebar
+
+When editing a component, a **lateral sidebar** opens with **three main tabs**:
+
+1. **Props** – Component-specific properties
+2. **Styles** – Visual settings (margins, fonts, colors, etc.)
+3. **Interaction** – Events, Rules, and interactions (_onClick_, _onChange_, _visibility_, etc.)
+
+### 📥 Component Binding
+
+Bindings allow the creation of component `ts` interface. The following table summarizes their features:
+
+| Component Type | Available Binding | Purpose                                                                        |
+| -------------- | ---------------- | ------------------------------------------------------------------------------ |
+| `form and table` | `Binding Config` | Connects input fields with logic                                               |
+| `table`        | `Binding Filter` | Connects table fields with filters, used when having `client side` filters      |
+
+> 📌 **Binding** is essential for developers to understand the table or form data input.
+
+### ➕ Adding Components (Dropzones)
+
+#### Inside Forms, Container, Section, etc.
+
+- Components can be added directly via _drag & drop_
+
+#### Inside Tables (`table`)
+
+- Allows adding components from the table
+- The `Add Component` button is displayed over the table, opening a **popover** for selection
+- If an `Actions Column` is added, an `Add Component` is displayed over the column, opening a **modal** to add various supported components
+
+### 📦 Available Component Types for Drop
+
+- Form Elements (`Text`, `Number`, `Date`, `Checkbox`, `Radio`)
+- Basic Elements (`Dropdown`, `Separator`, `Card`, `Charts`)
+- Structure (`Flex`, `Grid`, `Fragment`, `Container`)
+
+### 🧪 Visual Example – Drag-and-drop Flow
+
+```mermaid
+flowchart LR
+    A[User drag-and-drops component from "Widget palette"]
+    B[By default created with two children (table columns, table filters)]
+    C[On hover, a popover is displayed with component types]
+    D[User selects a component]
+    E[Component is added to the visual structure]
+    F[User edits via Sidebar (Props, Styles, Interaction)]
+
+    A --> B --> C --> D --> E --> F
+```
+
+## ⚡ Interactions
+
+You can associate various actions — such as `Function`, `Navigation`, or `Form Submit` — to common interface events to reactively control application behaviors and flows.
+
+### 🔄 Main Events
+
+- **`onLoad`** – Automatically executed when loading a component or page.  
+  Ideal for initializing data, configuring interface state, or dynamically populating elements like forms, tables, and comboboxes.
+
+- **`onClick`** – Triggered when clicking buttons or other interactive elements.  
+  Perfect for page navigation, executing custom functions, or making API calls.
+
+- **`onChange`** – Triggered whenever an input field value changes.  
+  Useful for real-time validation, updating states, or applying dynamic filters.
+
+- **`onSubmit`** – Executed when submitting a form.  
+  Used for final field validation and sending data to the backend.
+
+![Onload](../img/page-builder-event-load.png)
+
+## 🧩 Supported Actions
+
+### 🔧 Function
+
+Allows associating a **custom function** to an interface event, such as `onClick`, `onChange`, `onLoad`, and others.
+
+For example, when clicking a button with the `onClick` event, you can trigger a previously defined function in:
+
+Users can choose different function types, depending on the engine's options:
+
+- **Registered Function**: Select a previously declared and registered function in the system.
+- **Inline Function**: Write the function directly and receive arguments like click return. When clicking the "Function" tab, the system can automatically import dependencies.
+
+```ts
+(event) => myClickHandler(event);
+```
+
+or
+
+```ts
+myClickHandler;
+```
+
+- **Custom Code**: Custom code that defines specific logic for the event.
+
+> ⚠️ Available options may vary according to the engine support in use in the project.
+
+### 🔀 Navigation
+
+Allows redirecting the User to another page:
+
+1. Select an event like **`onClick`**
+2. Choose **Action Type** as `Navigation`
+3. Define the desired destination page
+
+### 📤 Form Submit
+
+Allows submitting a form with filled data:
+
+1. Select the **`onSubmit`** event on components like buttons
+2. Choose **Action Type** as `Form Submit`
+3. Define which form will be submitted
+
+### Example
+
+Here we have an example of a `custom code` to execute on the page's onLoad event, with imports.
+
+![alt text](../img/page-builder-interaction.png)
+
+> ⚙️ The association of events and actions allows creating dynamic, reactive, and user-centered interfaces, facilitating the construction of modern applications with intelligent behavior.
+
+### ⚙️ How to Use Rules
+
+The **Rules** functionality allows creating dynamic behaviors, such as visibility, read-only mode, or component disabling based on conditions you define.
+
+---
+
+### 💡 Purpose
+
+Associate conditional logic to components, for example:
+
+- Display a field only when another field has a specific value
+- Make a component read-only based on a rule
+- Disable an action if a checkbox is unchecked
+
+---
+
+### 🔁 Example 1: Conditional Rendering
+
+Show a component only if a rule is satisfied:
+
+```tsx
+state1
+```
+
+### ⚙️ Example 2: Comparison Logic
+
+Show a component only if a rule is satisfied:
+
+```tsx
+state2 === "value"
+```
+
+### 🧩 Example 3: Multiple State Combination
+
+Show a component only if a rule is satisfied:
+
+```tsx
+state1 && state2
+```
+
+> ✨ Tip: Use the `Custom Code` tab to create a state like
+> **_showFilter_**, and set this state through a button with the
+> **_onClick_** event. This way, you can control visibility with:
+
+```tsx
+() => setShowFilter(!showFilter)
+``` 
