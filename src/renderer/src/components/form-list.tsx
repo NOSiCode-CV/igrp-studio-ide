@@ -543,10 +543,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         //TODO: Refatorar para usar o findFieldPath para pegar o path do campo
         if (row) {
             formik.setFieldValue(
-                `${name}[${rowIndex}].options.columns[${index}].${key}`,
+                `${name}[${rowIndex}].fields[${index}].${key}`,
                 value
             );
-            changeValue(key, index, value);
         } else changeValue(key, index, value);
 
     };
@@ -568,9 +567,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     const rowId =
                                         row.id || `row-${name}-${index}`;
                                     const isDataArray =
-                                        row.options &&
-                                        row.options?.columns &&
-                                        row.options.columns?.length > 0;
+                                        row.fields &&
+                                        row.fields.length > 0;
 
                                     return (
                                         <React.Fragment key={rowId}>
@@ -594,7 +592,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 }
                                             )}
                                             {isDataArray &&
-                                                row?.options?.columns.map(
+                                                row?.fields.map(
                                                     (col: any, ii: number) =>
                                                         renderTableRow(
                                                             col.id ||

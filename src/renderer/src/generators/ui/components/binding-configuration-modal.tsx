@@ -5,6 +5,7 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
+    DialogClose,
 } from '@renderer/components/ui/dialog';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
@@ -19,7 +20,6 @@ import {
 } from '@renderer/generators/api/components/inputs-form';
 import { SchemaTypeItem } from 'src/main/types';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import { DialogClose } from '@radix-ui/react-dialog';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
@@ -35,9 +35,8 @@ interface LabeledElementField {
     defaultValue?: string;
     required: boolean;
     label: string;
-    options?: {
-        columns: LabeledElementField[];
-    };
+    fields?: LabeledElementField[];
+    isList?: boolean;
 }
 
 const defaultFieldType: LabeledElementField = {
@@ -157,8 +156,6 @@ export const BindingConfigurationModal = ({
             actions.setSubmitting(false);
 
             if (!validate()) return;
-
-            console.log('values', values);
 
             const updatedComponent = {
                 ...values,
@@ -334,14 +331,13 @@ export const BindingConfigurationModal = ({
                             child.properties.label ??
                             child.properties.headerTitle ??
                             child.label,
-                        type: 'array',
+                        isList: true,
+                        type: 'object',
                         // Add nested fields structure as options
-                        options: {
-                            columns: nestedFields.map((field) => ({
-                                ...defaultFieldType,
-                                ...field,
-                            })),
-                        },
+                        fields: nestedFields.map((field) => ({
+                            ...defaultFieldType,
+                            ...field,
+                        })),
                     });
                     newExistingNames.add(child.id);
                 }
@@ -418,7 +414,6 @@ export const BindingConfigurationModal = ({
                 'fields'
             );
         }
-
     };
 
     return (

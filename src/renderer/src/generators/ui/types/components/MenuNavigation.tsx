@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
-import BoxWrapper from '../tools/BoxWrapper';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { getLabel } from '@renderer/utils';
 import Droppable from '@renderer/lib/dnd/Droppable';

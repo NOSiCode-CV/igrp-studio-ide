@@ -32,6 +32,7 @@ import { Input } from '@renderer/components/ui/input';
 import useCustomCode from '../../hooks/useCustomCode';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
+import { useComponents } from '../../hooks/useComponents';
 
 interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -55,6 +56,7 @@ export function SidebarRight({
     } = useDroppedComponents();
 
     const { statesOptions } = useCustomCode();
+    const { getRefsOptions } = useComponents();
 
     // Memoized derived state
     const currentComp = React.useMemo(
@@ -361,6 +363,7 @@ export function SidebarRight({
                                                     columnsOptions={
                                                         columnsOptions
                                                     }
+                                                    refsOptions={getRefsOptions()}
                                                     tag={currentTag}
                                                     onInputChange={(
                                                         fieldPath: string,
@@ -405,6 +408,7 @@ export function SidebarRight({
                                                     columnsOptions={
                                                         columnsOptions
                                                     }
+                                                    refsOptions={getRefsOptions()}
                                                     tag={currentTag}
                                                     onInputChange={(
                                                         fieldPath: string,
