@@ -53,6 +53,7 @@ interface SettingsProps {
           }
         | undefined;
     tag: string;
+    refsOptions: Option[];
     onInputChange: (fieldPath: string, value: any) => void;
     onSelectState: (field: string, value: State | undefined) => void;
 }
@@ -110,6 +111,7 @@ const RenderPropsConfig = ({
     dataProperties,
     onInputChange,
     onSelectState,
+    refsOptions,
 }: SettingsProps) => {
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
@@ -175,6 +177,24 @@ const RenderPropsConfig = ({
                     columnsOptions={columnsOptions}
                     segments={formValues['segments']}
                 />
+            );
+        } else if (xUiWidget === 'ref') {
+            return (
+                <div>
+                    <Label
+                        htmlFor={key}
+                        className="flex justify-between items-center"
+                    ></Label>
+                    <IGRPCombobox
+                        value={value}
+                        onChange={(value) => {
+                            onInputChange?.(fieldPath, value as string);
+                        }}
+                        options={refsOptions}
+                        placeholder="Select target component"
+                        className="w-full"
+                    />
+                </div>
             );
         }
 
@@ -436,8 +456,6 @@ export const PageSelectionConfig = ({
     useEffect(() => {
         setDynamicPagePath(getDynamicSegments(selectedPagePath));
     }, [selectedPagePath]);
-
-    console.log(selectedPagePath)
 
     return (
         <div className="space-y-4">

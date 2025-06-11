@@ -282,21 +282,21 @@ const InteractionEditor = ({
     };
 
     const handleChangeFnName = (fnName: string) => {
-        if (!fnName) return;
+        if (fnName) {
+            const functionOption = functionOptions.find(
+                (option) => option.value === fnName
+            );
 
-        const functionOption = functionOptions.find(
-            (option) => option.value === fnName
-        );
+            const namespace = `import {${fnName}} from '${functionOption?.metadata?.path}'`;
 
-        const namespace = `import {${fnName}} from '${functionOption?.metadata?.path}'`;
-
-        setImports?.((prev) => [
-            ...prev,
-            {
-                namespace,
-                id: getId(),
-            },
-        ]);
+            setImports?.((prev) => [
+                ...prev,
+                {
+                    namespace,
+                    id: getId(),
+                },
+            ]);
+        }
 
         setCurrentAction({
             ...currentAction,

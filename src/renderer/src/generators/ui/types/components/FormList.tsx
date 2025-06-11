@@ -6,11 +6,11 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
-import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { Button } from '@renderer/components/ui/button';
 import { Plus } from 'lucide-react';
+import { Badge } from '@renderer/components/ui/badge';
 
 export interface RepetitiveProps {
     isDisabled?: boolean;
@@ -23,7 +23,11 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
         children: components,
         id: componentId,
         componentName: parentComponentName,
+        properties,
     } = comp;
+
+    const { addButtonLabel, badgeValue, label, description } = properties || {};
+
     const [loadedComponents, setLoadedComponents] = useState<
         Record<string, React.ComponentType<any>>
     >({});
@@ -70,8 +74,20 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
             const path = parentComponentName;
 
             return (
-                <>
-                    <Droppable component={component} onDrop={onDragEnd}>
+                <div className='space-y-1'>
+                    <div className="flex flex-1 justify-between">
+                        <div>
+                            <p className="text-sm font-medium">{label}</p>
+                            <p className="text-xs">{description}</p>
+                        </div>
+                        <Badge
+                            variant="outline"
+                            className="font-normal text-xs"
+                        >
+                            {badgeValue || 'Obrigatório'}
+                        </Badge>
+                    </div>
+                    <Droppable component={component} onDrop={onDragEnd} className='border'>
                         {childComponents.length === 0 ? (
                             <GenNoInfoComp
                                 type={getLabel(componentName).toUpperCase()}
@@ -118,12 +134,13 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
                         className="w-full"
                     >
                         <Plus className="h-4 w-4 mr-1" />
-                        Adicionar Atividade
+                        {addButtonLabel || 'Add'}
                     </Button>
-                </>
+                </div>
             );
         },
         [
+            addButtonLabel,
             componentId,
             handleEdit,
             loadedComponents,
