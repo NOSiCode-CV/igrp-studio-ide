@@ -13,6 +13,7 @@ export interface CardComponentProps {
     onDragEnd: (result: DragEndResult) => void;
     group?: string;
     hoverClass?: string;
+    className?: string
 }
 
 const CardComponent = ({

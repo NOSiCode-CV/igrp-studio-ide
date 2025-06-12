@@ -5,7 +5,7 @@ import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { getLabel } from '@renderer/utils';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import {
     Card,
     CardContent,
@@ -50,10 +50,6 @@ const IGRPStudioMenuNavigation: React.FC<TabsProps> = ({
 
     const scrollToSection = (sectionId: string) => {
         setActiveSection(sectionId);
-        /* const sectionRef = sectionRefs[sectionId as keyof typeof sectionRefs];
-        if (sectionRef && sectionRef.current) {
-            sectionRef.current.scrollIntoView({ behavior: 'smooth' });
-        } */
     };
 
     const renderContent = () => {
@@ -78,9 +74,9 @@ const IGRPStudioMenuNavigation: React.FC<TabsProps> = ({
                         onEdit={() =>
                             handleEditClick(child, parentComponentName)
                         }
-                        group="group/tab-content"
+                        group="group/tab-menu"
                         className={cn(
-                            'left-0 right-auto opacity-0 group-hover/tab-content:opacity-100'
+                            'left-0 right-auto opacity-0 group-hover/tab-menu:opacity-100'
                         )}
                     >
                         <button
@@ -96,7 +92,7 @@ const IGRPStudioMenuNavigation: React.FC<TabsProps> = ({
                             )}
                         >
                             <div className="flex items-center gap-2">
-                                {Icon && <Icon className="h-4 w-4" />}
+                                {Icon ? <Icon className="h-4 w-4" /> : <ArrowRight />}
                                 <span>{title || label}</span>
                             </div>
                             <ChevronRight

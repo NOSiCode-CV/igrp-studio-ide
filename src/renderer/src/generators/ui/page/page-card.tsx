@@ -144,6 +144,9 @@ export function PageCard({
                                                 {subpage.description ||
                                                     subpage.pageName}
                                             </span>
+                                            <span className="truncate text-muted-foreground">
+                                                [{subpage.content?.path}]
+                                            </span>
                                         </div>
                                         <PageActions
                                             page={subpage}

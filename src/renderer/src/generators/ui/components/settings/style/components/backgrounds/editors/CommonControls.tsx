@@ -17,13 +17,13 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
         <>
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-0.5">
-                    <label className="text-text-xs text-gray-500">Size</label>
+                    <label className="text-xs text-gray-500">Size</label>
                     <select
                         value={background.size}
                         onChange={(e) =>
                             onChange({ ...background, size: e.target.value })
                         }
-                        className="w-full px-1.5 py-0.5 text-text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         {backgroundSizes.map((size) => (
                             <option key={size} value={size}>
@@ -33,7 +33,7 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
                     </select>
                 </div>
                 <div className="space-y-0.5">
-                    <label className="text-text-xs text-gray-500">
+                    <label className="text-xs text-gray-500">
                         Position
                     </label>
                     <select
@@ -44,7 +44,7 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
                                 position: e.target.value,
                             })
                         }
-                        className="w-full px-1.5 py-0.5 text-text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         {backgroundPositions.map((position) => (
                             <option key={position} value={position}>
@@ -57,13 +57,13 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
 
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-0.5">
-                    <label className="text-text-xs text-gray-500">Repeat</label>
+                    <label className="text-xs text-gray-500">Repeat</label>
                     <select
                         value={background.repeat}
                         onChange={(e) =>
                             onChange({ ...background, repeat: e.target.value })
                         }
-                        className="w-full px-1.5 py-0.5 text-text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         {backgroundRepeats.map((repeat) => (
                             <option key={repeat} value={repeat}>
@@ -73,7 +73,7 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
                     </select>
                 </div>
                 <div className="space-y-0.5">
-                    <label className="text-text-xs text-gray-500">
+                    <label className="text-xs text-gray-500">
                         Attachment
                     </label>
                     <select
@@ -84,7 +84,7 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
                                 attachment: e.target.value,
                             })
                         }
-                        className="w-full px-1.5 py-0.5 text-text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         {backgroundAttachments.map((attachment) => (
                             <option key={attachment} value={attachment}>
@@ -96,13 +96,13 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
             </div>
 
             <div className="space-y-0.5">
-                <label className="text-text-xs text-gray-500">Blend Mode</label>
+                <label className="text-xs text-gray-500">Blend Mode</label>
                 <select
                     value={background.blendMode}
                     onChange={(e) =>
                         onChange({ ...background, blendMode: e.target.value })
                     }
-                    className="w-full px-1.5 py-0.5 text-text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                 >
                     {blendModes.map((mode) => (
                         <option key={mode} value={mode}>

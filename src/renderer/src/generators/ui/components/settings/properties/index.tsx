@@ -180,11 +180,13 @@ const RenderPropsConfig = ({
             );
         } else if (xUiWidget === 'ref') {
             return (
-                <div>
+                <div className="space-y-2">
                     <Label
                         htmlFor={key}
                         className="flex justify-between items-center"
-                    ></Label>
+                    >
+                        <span>{xMetaLabel}</span>
+                    </Label>
                     <IGRPCombobox
                         value={value}
                         onChange={(value) => {
