@@ -9,8 +9,7 @@ import CardComponent, { CardComponentProps } from '../CardComponent';
 import { COMPONENT } from '../../ComponentTypes';
 import { getHoverClasses } from '../../utils/tailwindGroups';
 
-
-const IGRPStudioContainer = ({
+const IGRPStudioInfoCard = ({
     comp,
     group,
     hoverClass,
@@ -81,4 +80,4 @@ const IGRPStudioContainer = ({
     );
 };
 
-export default IGRPStudioContainer;
+export default IGRPStudioInfoCard;

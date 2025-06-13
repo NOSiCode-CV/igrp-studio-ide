@@ -230,7 +230,10 @@ export const FunctionArguments = ({
                 name: `argument${arguments_.length + 1}`,
                 type: 'string',
                 isList: false,
-                isNullable: false,
+                isOptional: false,
+                isInterface: false,
+                isFunction: false,
+                isState: false,
             },
         ]);
     };
@@ -289,7 +292,7 @@ export const FunctionArguments = ({
                                         options={returnTypeOptions}
                                     />
                                     <div className="flex items-center gap-4 justify-between">
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <div className="flex items-center space-x-2">
                                                 <CheckboxInput
                                                     id={`isList-${arg.id}`}
@@ -304,15 +307,54 @@ export const FunctionArguments = ({
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <CheckboxInput
-                                                    id={`isNullable-${arg.id}`}
-                                                    value={arg.isNullable}
+                                                    id={`isOptional-${arg.id}`}
+                                                    value={arg.isOptional}
                                                     onChange={() =>
                                                         updateArgument(arg.id, {
-                                                            isNullable:
-                                                                !arg.isNullable,
+                                                            isOptional:
+                                                                !arg.isOptional,
                                                         })
                                                     }
-                                                    label="Nullable"
+                                                    label="isOptional"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isInterface-${arg.id}`}
+                                                    value={arg.isInterface}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isInterface:
+                                                                !arg.isInterface,
+                                                        })
+                                                    }
+                                                    label="isInterface"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isFunction-${arg.id}`}
+                                                    value={arg.isFunction}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isFunction:
+                                                                !arg.isFunction,
+                                                        })
+                                                    }
+                                                    label="isFunction"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isState-${arg.id}`}
+                                                    value={arg.isState}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isState:
+                                                                !arg.isState,
+                                                        })
+                                                    }
+                                                    label="isState"
                                                 />
                                             </div>
                                         </div>

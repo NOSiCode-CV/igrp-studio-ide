@@ -179,7 +179,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 }
             };
             getJsonData();
-        }, [basePath, page]);
+        }, [pagePath, page]);
 
         useEffect(() => {
             if (loading) return;

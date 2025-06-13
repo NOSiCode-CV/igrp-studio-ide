@@ -1,7 +1,7 @@
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { ENV_TYPES } from "@renderer/constants/appConstants";
 import { convertComponentsToJSONSchema } from "@renderer/utils/convertComponentsToJSONSchema";
-import { getLabel } from "@renderer/utils";
+import { capitalize, getLabel } from "@renderer/utils";
 import { FileTree, HandlerResponse } from "src/main/types";
 
 export const EngineService = {
@@ -55,17 +55,17 @@ export const EngineService = {
 
         const _components: ComponentRegisterConfig[] = appComponents.filter((component) => component.content.scope === 'app' || ((component.content.type === 'page' && component.content.pageName === currentPage) || component.content.name !== currentPage))
             .map((component: any) => ({
-                name: component.content.name,
+                name: capitalize(component.content.name),
                 label: component.content.description || getLabel(component.content.name),
                 properties: {
                     customProperties: {
                         type: 'object',
-                        properties: component.props ? convertComponentsToJSONSchema(component.props) : undefined,
+                        properties: component.content.args ? convertComponentsToJSONSchema(component.content.args) : undefined,
                     }
                 },
                 interactions: component.interactions,
                 childrenTypes: [],
-                imports: component.content.path ? [`import {${component.content.name}} from '${component.path}'`] : [],
+                imports: component.content.pagePath ? [`import ${capitalize(component.content.name)} from '${component.content.pageName ? `./components/${component.content.name.toLowerCase()}` : `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name}`}'`] : [],
                 defaultValue: false,
                 allowTypes: false,
                 group: 'appComponents',

@@ -302,7 +302,7 @@ const InteractionEditor = ({
             ...currentAction,
             function: {
                 ...currentAction.function,
-                fnName: fnName,
+                fnName: fnName || undefined,
             },
         });
     };
