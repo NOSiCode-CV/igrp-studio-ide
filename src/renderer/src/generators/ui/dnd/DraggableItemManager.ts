@@ -1,4 +1,4 @@
-import { generateId } from "@renderer/utils/helpers";
+import { generateId } from "@renderer/utils";
 import { Destination, DragEndResult, Source, StructuredComponent } from "@renderer/lib/dnd/types";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { getDefaultInteractions, getDefaultProperties, getRequiredDataSchema } from "./helpers";
@@ -34,9 +34,9 @@ const handleDropComponent = (
 
     const tag = generateTag(draggableId);
 
-    const data = getRequiredDataSchema(dataProperties, tag);
+    const data = getRequiredDataSchema(dataProperties);
 
-    const interactions = getDefaultInteractions(interactionsProperties, tag);
+    const interactions = getDefaultInteractions(interactionsProperties);
 
     // Create the component object
     const component: StructuredComponent = {
@@ -51,13 +51,13 @@ const handleDropComponent = (
         data: data,
         properties: getDefaultProperties(properties),
     };
-
+    
     childrenTypes && childrenTypes.filter((child) => child.defaultValue).map((child: ComponentRegisterConfig) => {
         const { name, label, properties, interactions: interactionsProperties, allowTypes, data: dataProperties } = child
         const childId = generateId(name);
         const tag = generateTag(name)
-        const data = getRequiredDataSchema(dataProperties, tag);
-        const interactions = getDefaultInteractions(interactionsProperties, tag);
+        const data = getRequiredDataSchema(dataProperties);
+        const interactions = getDefaultInteractions(interactionsProperties);
 
         const childComponent: StructuredComponent = {
             id: childId,

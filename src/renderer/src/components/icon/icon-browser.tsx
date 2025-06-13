@@ -6,7 +6,7 @@ import {
     TooltipTrigger,
 } from '../ui/tooltip';
 import { icons } from 'lucide-react';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import {
     FixedSizeGrid as Grid,
     type FixedSizeGrid as GridType,
@@ -42,7 +42,6 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const handleIconClick = (iconName: string) => {
         onSelectedIcon(iconName);
         setOpen(false);
-        console.log(iconName);
     };
 
     const gridRef = useRef<GridType>(null);

@@ -20,7 +20,7 @@ import { Button } from '@renderer/components/ui/button';
 import { getValuesToSubmit, initialValues } from '../../pages/model/config';
 import useToast from '@renderer/hooks/useToast';
 import { useTranslation } from 'react-i18next';
-import { getId, toFullCamelCaseFromSnakeCase } from '@renderer/utils/helpers';
+import { getId, toFullCamelCaseFromSnakeCase } from '@renderer/utils';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 import { useGit } from '@renderer/hooks/use-git';

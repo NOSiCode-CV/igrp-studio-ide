@@ -121,39 +121,59 @@ export const useFakedata = () => {
         [COMPONENT.Select]: {
             properties: {
                 options: [
+                    { value: 1, label: "Option 1" },
+                    { value: 2, label: "Option 2", }
                 ]
             }
         },
         [COMPONENT.Combobox]: {
             properties: {
                 options: [
+                    { value: 1, label: "Option 1" },
+                    { value: 2, label: "Option 2", }
                 ]
             }
         },
         [COMPONENT.TableSelectFilter]: {
             properties: {
-                options: [{
-                    value: 186, label: "Option 1",
-                }]
+                options: [
+                    { value: 1, label: "Option 1" },
+                    { value: 2, label: "Option 2", }
+                ]
             }
         },
         [COMPONENT.TableFilterDropdown]: {
             properties: {
-                options: [{
-                    value: 186, label: "Option 1",
-                }]
+                options: [
+                    { value: 1, label: "Option 1" },
+                    { value: 2, label: "Option 2", }
+                ]
             }
         },
         [COMPONENT.TableFacetedFilter]: {
             properties: {
-                options: [{
-                    value: 186, label: "Option 1",
-                }]
+                options: [
+                    { value: 1, label: "Option 1" },
+                    { value: 2, label: "Option 2", }
+                ]
             }
         },
         [COMPONENT.StatsCard]: {
             properties: {
                 value: faker.number.int({ min: 1, max: 1000 })
+            }
+        },
+        [COMPONENT.Radio]: {
+            properties: {
+                options: [
+                    { value: 1, label: "Option 1" },
+                    { value: 2, label: "Option 2", }
+                ]
+            }
+        },
+        [COMPONENT.Text]: {
+            properties: {
+                content: faker.lorem.paragraph(1)
             }
         },
         // Default fallback component

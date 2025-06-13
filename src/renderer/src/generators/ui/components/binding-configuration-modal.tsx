@@ -5,6 +5,7 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
+    DialogClose,
 } from '@renderer/components/ui/dialog';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
@@ -19,13 +20,13 @@ import {
 } from '@renderer/generators/api/components/inputs-form';
 import { SchemaTypeItem } from 'src/main/types';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import { DialogClose } from '@radix-ui/react-dialog';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
-import { capitalize } from '@renderer/utils/helpers';
+import { capitalize } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
+import { ElementField } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface LabeledElementField {
     componentId: string;
@@ -35,6 +36,8 @@ interface LabeledElementField {
     defaultValue?: string;
     required: boolean;
     label: string;
+    fields?: LabeledElementField[];
+    isList?: boolean;
 }
 
 const defaultFieldType: LabeledElementField = {
@@ -159,6 +162,7 @@ export const BindingConfigurationModal = ({
                 ...values,
                 fields: (values.fields as LabeledElementField[]).map(
                     (field) => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         const { label, ...rest } = field; // Removes the 'label' property
                         return rest;
                     }
@@ -235,40 +239,61 @@ export const BindingConfigurationModal = ({
     useEffect(() => {
         // Auto-add fields from children if not already in the list
         if (comp.children?.length) {
-            const currentFields = formik.values.fields || [];
-            const existingNames = []; /* currentFields.map(
-                (f: ElementField) => f.componentId
-            ); */
+            const currentFields: any[] = formik.values.fields || [];
 
             const { fields, componentMap: updatedMap } = extractValidFields(
-                comp.children,
-                existingNames
+                comp.children
             );
 
-            const updatedFields = fields.map((field) => ({
-                ...field,
-                ...currentFields.find(
-                    (f) => f.componentId === field.componentId
-                ),
-            }));
+            const updatedFields = updateFieldsWithSubFields(
+                fields,
+                currentFields
+            );
 
             formik.setFieldValue('fields', [...updatedFields]);
+
             setComponentMap(updatedMap);
         }
     }, [components, comp.children]);
 
+    const updateFieldsWithSubFields = (
+        originalFields: LabeledElementField[],
+        currentFields: LabeledElementField[]
+    ): LabeledElementField[] => {
+        return originalFields.map((field) => {
+            const currentField = currentFields.find(
+                (f) => f.componentId === field.componentId
+            );
+
+            const mergedField: LabeledElementField = {
+                ...field,
+                ...currentField,
+            };
+
+            if (field.fields && currentField?.fields) {
+                mergedField.fields = updateFieldsWithSubFields(
+                    field.fields,
+                    currentField.fields
+                );
+            }
+
+            return mergedField;
+        });
+    };
+
     const extractValidFields = (
-        components: StructuredComponent[],
-        existingNames: string[] = []
+        components: StructuredComponent[]
     ): {
         fields: LabeledElementField[];
         componentMap: Map<string, StructuredComponent>;
     } => {
         const componentMap: Map<string, StructuredComponent> = new Map();
         const fields: LabeledElementField[] = [];
-        const newExistingNames = new Set(existingNames);
 
-        const processComponent = (child: StructuredComponent) => {
+        const processComponent = (
+            child: StructuredComponent,
+            parentIsRepeater = false
+        ) => {
             if (!child) return;
 
             // Check if component should be included as a field
@@ -277,27 +302,95 @@ export const BindingConfigurationModal = ({
                 !child.properties.dataProperties.isVirtual &&
                 child.properties.dataProperties.isType;
 
-            if (shouldInclude) {
-                if (!newExistingNames.has(child.id)) {
-                    fields.push({
+            const isDynamicRepeater =
+                child.componentName === COMPONENT.FormList;
+
+            if (isDynamicRepeater) {
+                // Process children first to get the nested fields structure
+                const nestedFields: LabeledElementField[] = [];
+                const nestedComponentMap: Map<string, StructuredComponent> =
+                    new Map();
+
+                // Temporary process to get nested structure
+                const tempProcess = (nestedChild: StructuredComponent) => {
+                    if (!nestedChild) return;
+
+                    const nestedShouldInclude =
+                        nestedChild?.properties?.dataProperties &&
+                        !nestedChild.properties.dataProperties.isVirtual &&
+                        nestedChild.properties.dataProperties.isType;
+
+                    if (nestedShouldInclude) {
+                        nestedFields.push({
+                            ...defaultFieldType,
+                            name: nestedChild.tag,
+                            componentId: nestedChild.id,
+                            label:
+                                nestedChild.properties.label ??
+                                nestedChild.label,
+                        });
+                        nestedComponentMap.set(nestedChild.id, nestedChild);
+                    }
+
+                    if (Array.isArray(nestedChild.children)) {
+                        nestedChild.children.forEach(tempProcess);
+                    }
+                };
+
+                child.children.forEach(tempProcess);
+
+                // Only add the repeater field if it hasn't been added yet
+                fields.push({
+                    ...defaultFieldType,
+                    name: child.tag,
+                    componentId: child.id,
+                    label:
+                        child.properties.label ??
+                        child.properties.headerTitle ??
+                        child.label,
+                    isList: true,
+                    type: 'object',
+                    // Add nested fields structure as options
+                    fields: nestedFields.map((field) => ({
                         ...defaultFieldType,
-                        name: child.tag,
-                        componentId: child.id,
-                        label: child.properties.label ?? child.label,
-                    });
-                    newExistingNames.add(child.id);
-                }
+                        ...field,
+                    })),
+                });
+
+                // Add all components to the main map
+                componentMap.set(child.id, child);
+                nestedComponentMap.forEach((value, key) =>
+                    componentMap.set(key, value)
+                );
+
+                return; // Skip further processing for repeater children
+            }
+
+            if (shouldInclude && !parentIsRepeater) {
+                fields.push({
+                    ...defaultFieldType,
+                    name: child.tag,
+                    componentId: child.id,
+                    label:
+                        child.properties.label ??
+                        child.properties.headerTitle ??
+                        child.label,
+                    // Include type if available
+                    type: child.properties.dataProperties?.type || undefined,
+                });
 
                 componentMap.set(child.id, child);
             }
 
-            // Process children recursively
-            if (Array.isArray(child.children)) {
-                child.children.forEach(processComponent);
+            // Process children recursively (unless parent is a repeater)
+            if (Array.isArray(child.children) && !parentIsRepeater) {
+                child.children.forEach((c) =>
+                    processComponent(c, isDynamicRepeater)
+                );
             }
         };
 
-        components.forEach(processComponent);
+        components.forEach((component) => processComponent(component));
 
         return { fields, componentMap };
     };
@@ -337,8 +430,8 @@ export const BindingConfigurationModal = ({
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl h-[70vh]">
-                    <ScrollArea className="h-full p-4">
+                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[80vh]">
+                    <ScrollArea className="h-full p-4 max-h-[70vh] overflow-auto">
                         <DialogHeader className="mb-4">
                             <DialogTitle>Binding Configuration</DialogTitle>
                             <DialogDescription>
@@ -408,10 +501,14 @@ export const BindingConfigurationModal = ({
                                     columns={columns}
                                     formik={formik}
                                     data={formik.values.fields}
-                                    changeValue={(element, position, result) =>
-                                        handleChange(element, position, result)
-                                    }
-                                    name={'Type'}
+                                    changeValue={(
+                                        element,
+                                        position,
+                                        result
+                                    ) => {
+                                        handleChange(element, position, result);
+                                    }}
+                                    name={'fields'}
                                 />
                             </div>
 

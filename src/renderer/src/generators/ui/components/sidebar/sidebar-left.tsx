@@ -18,7 +18,6 @@ import {
     Badge,
     BrainCircuit,
     ChevronRight,
-    Component,
     FileText,
     FolderTree,
     GitBranch,
@@ -28,7 +27,7 @@ import {
     SquareFunction,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { filterSubItems } from '@renderer/utils/helpers';
+import { filterSubItems } from '@renderer/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { MenuItem } from 'src/main/types';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
@@ -38,18 +37,19 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import useStudio from '@renderer/hooks/use-studio';
 import NavigatorSidebar from './sidebar-navigator';
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
-import SidebarAppComponents from './sidebar-app-components';
+//import SidebarAppComponents from './sidebar-app-components';
 import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import {
     CustomCodeMenu,
     SidebarAppCustomCode,
 } from './custom-code/sidebar-app-custom-code';
 import { SidebarAppLogic } from './app-logic/sidebar-app-logic';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>;
@@ -94,13 +94,12 @@ export function AppSidebar({
         setSearchQuery(e.target.value);
     };
 
-     const handleNavegationClick = (item: MenuItem) => {
+    const handleNavegationClick = (item: MenuItem) => {
         setActiveMenuGroup(item);
     };
 
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
-        { icon: Component, label: t('components'), id: 'components' },
         { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
         { icon: BrainCircuit, label: t('Applogic'), id: 'appLogic' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
@@ -190,7 +189,7 @@ export function AppSidebar({
             {/* Second Sidebar */}
             <Sidebar collapsible="none" className="hidden flex-1 md:flex">
                 <SidebarHeader className="gap-3.5 border-b">
-                    <div className="flex w-full items-center justify-between">
+                    <div className="flex w-full items-center justify-between max-w-72">
                         <div className="flex flex-1 space-x-2  items-center">
                             <activeMenuGroup.icon size={20} />
                             <div className="text-base font-medium text-foreground">
@@ -209,7 +208,7 @@ export function AppSidebar({
                     />
                 </SidebarHeader>
                 <SidebarContent className="overflow-hidden">
-                    <ScrollArea className="h-[calc(100vh-230px)]">
+                    <ScrollArea className="h-[calc(100vh-230px)] w-[300px]">
                         {activeMenuGroup.id === 'explorer' ? (
                             <FileExplorerSidebar
                                 basePath={basePath}
@@ -228,8 +227,6 @@ export function AppSidebar({
                                     // Optional: Handle commit selection
                                 }}
                             />
-                        ) : activeMenuGroup.id === 'components' ? (
-                            <SidebarAppComponents searchTerm={searchQuery} />
                         ) : activeMenuGroup.id === 'customCode' ? (
                             <SidebarAppCustomCode searchTerm={searchQuery} />
                         ) : activeMenuGroup.id === 'appLogic' ? (
@@ -266,7 +263,7 @@ export function AppSidebar({
                                                             >
                                                                 <Draggable
                                                                     item={
-                                                                        subItem
+                                                                        subItem as StructuredComponent
                                                                     }
                                                                     className="w-full h-full p-2 rounded-lg cursor-move flex flex-col items-center gap-2
                                                                      shadow-sm border text-xs border-gray-200 hover:shadow-md transition-shadow duration-200 bg-card "
@@ -300,6 +297,7 @@ export function AppSidebar({
                                 </Collapsible>
                             ))
                         )}
+                         <ScrollBar orientation="horizontal" />
                     </ScrollArea>
                 </SidebarContent>
             </Sidebar>

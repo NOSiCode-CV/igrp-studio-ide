@@ -65,7 +65,7 @@ const Droppable = ({
             setComponents(component.children);
         }
     }, [component]);
-    
+
     return (
         <div
             onDrop={handleDropItem}
@@ -74,11 +74,11 @@ const Droppable = ({
             onDragOverCapture={onDragOverCapture}
             id={componentId}
             className={cn(
-                'p-3 min-h-12 rounded-lg bg-card hover:border', //border border-dashed border-gray-400
+                'p-3 min-h-12 rounded-lg bg-card', //border border-dashed border-gray-400 hover:border
                 draggingItem &&
-                    (activeDropZone?.dropTargetId === componentId ||
-                        targetHovered === componentId) &&
-                    'bg-primary/35',
+                (activeDropZone?.dropTargetId === componentId ||
+                    targetHovered === componentId) &&
+                'bg-primary/35',
                 className
             )}
         >

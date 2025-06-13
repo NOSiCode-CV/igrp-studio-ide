@@ -11,7 +11,7 @@ import { JSONSchema } from '../../types/schema';
 import { useResponseValidation } from './validation';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
 import useToast from '@renderer/hooks/useToast';
-import { getStatusLabel } from '@renderer/utils/helpers';
+import { getStatusLabel } from '@renderer/utils';
 
 const contentType = 'application/json';
 

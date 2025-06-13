@@ -40,7 +40,7 @@ export function VisibilityControls({
         
         <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-                <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                     <Eye size={10} />
                     {t('visibility')}
                 </h3>
@@ -54,7 +54,7 @@ export function VisibilityControls({
             </div>
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-0.5">
-                    <label className="text-[9px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                     {t('opacity')}
                     </label>
                     <div className="flex items-center gap-1">
@@ -64,19 +64,19 @@ export function VisibilityControls({
                             max="100"
                             value={opacity}
                             onChange={(e) => onOpacityChange(e.target.value)}
-                            className="w-14 px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-14 px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-[9px] text-gray-500">%</span>
+                        <span className="text-xs text-gray-500">%</span>
                     </div>
                 </div>
                 <div className="space-y-0.5">
-                    <label className="text-[9px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                     {t('blendMode')}
                     </label>
                     <select
                         value={mixBlendMode}
                         onChange={(e) => onBlendModeChange(e.target.value)}
-                        className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         {blendModes.map((mode) => (
                             <option key={mode} value={mode}>

@@ -12,7 +12,7 @@ import { Label } from '@renderer/components/ui/label';
 import React, { useState } from 'react';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
-import { getStatusLabel } from '@renderer/utils/helpers';
+import { getStatusLabel } from '@renderer/utils';
 import { useTranslation } from 'react-i18next';
 
 interface AddResponseModalProps {

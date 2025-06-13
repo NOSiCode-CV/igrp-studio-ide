@@ -23,7 +23,7 @@ export function closeApp(mainWindow: BrowserWindow) {
 }
 
 export function installExtensions(mainWindow: BrowserWindow): void {
-    if (is.dev && process.platform === 'darwin' ) {
+    if (is.dev && process.platform === 'darwin') {
         // Open the DevTools.
         mainWindow.webContents.openDevTools();
         // Install extensions
@@ -34,4 +34,10 @@ export function installExtensions(mainWindow: BrowserWindow): void {
             .then(name => console.log(`Added Extension:  ${name}`))
             .catch(err => console.log('An error occurred: ', err));
     }
+}
+
+
+export function escapePath(pathString: string): string {
+    // Escape spaces and special characters in paths
+    return `"${pathString.replace(/"/g, '\\"')}"`;
 }

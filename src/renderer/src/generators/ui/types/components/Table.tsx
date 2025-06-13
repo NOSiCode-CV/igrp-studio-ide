@@ -11,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
@@ -20,10 +20,10 @@ import { Button } from '@renderer/components/ui/button';
 import { Ellipsis } from 'lucide-react';
 import BoxField from '../tools/BoxFields';
 import TableTool from '../tools/tableTool';
-import Droppable from '@renderer/lib/dnd/Droppable';
 import { Badge } from '@renderer/components/ui/badge';
 import { useFakedata } from '../../hooks/useFakeData';
 import { faker } from '@faker-js/faker';
+import Droppable from '@renderer/lib/dnd/Droppable';
 
 export interface TableProps {
     isDisabled?: boolean;
@@ -31,7 +31,7 @@ export interface TableProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
     const { children: components, id: componentId, componentName } = comp;
     const [columns, setColumns] = useState<StructuredComponent[]>([]);
     const [filters, setFilters] = useState<StructuredComponent[]>([]);
@@ -91,7 +91,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
 
     // Render table headers
     const renderTableHeaders = useCallback(
-        (compName: string, dropTargetId: string) => {
+        (compName: string, dropTargetId: string, tableColumn: StructuredComponent) => {
             return columns.map((child, index) => {
                 const Component = loadedComponents[child.id];
                 const { label, properties } = child;
@@ -112,12 +112,12 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                         >
                             <BoxField
                                 index={index}
-                                parentComp={comp}
+                                parentComp={tableColumn}
                                 comp={child}
                                 path={path}
                                 onEdit={() => handleEdit(child, path)}
                                 group="group/table-header"
-                                className="opacity-0 group-hover/table-header:opacity-100"
+                                className="opacity-0 group-hover/table-header:opacity-100 mt-3 z-50"
                             >
                                 <span>{headerTitle || label}</span>
                             </BoxField>
@@ -138,10 +138,10 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                         {child.componentName === COMPONENT.TableCheckboxCell ? (
                             <Checkbox id={child.id} checked={row[child.id]} />
                         ) : child.componentName ===
-                          COMPONENT.TableableBadgeCell ? (
+                            COMPONENT.TableableBadgeCell ? (
                             <Badge variant="secondary">{faker.lorem.words(1)}</Badge>
                         ) : child.componentName ===
-                          COMPONENT.TableActionListCell ? (
+                            COMPONENT.TableActionListCell ? (
                             <Button variant="secondary" size="icon">
                                 <Ellipsis />
                             </Button>
@@ -176,7 +176,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                 mode="MOVE"
                                 layout="horizontal"
                                 dropTargetId={dropTargetId}
-                                className={cn('border-none')}
+                                className={cn('border-none min-w-32 py-4')}
                             >
                                 <BoxField
                                     index={index}
@@ -190,6 +190,7 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     <Component
                                         comp={child}
                                         onDragEnd={onDragEnd}
+                                        className="min-w-32"
                                     />
                                 </BoxField>
                             </Draggable>
@@ -264,7 +265,8 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                         <TableRow>
                                             {renderTableHeaders(
                                                 componentName,
-                                                id
+                                                id,
+                                                tableComp
                                             )}
                                         </TableRow>
                                     </TableHeader>
@@ -279,4 +281,4 @@ const TableComp: React.FC<TableProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default TableComp;
+export default IGRPStudioTable;

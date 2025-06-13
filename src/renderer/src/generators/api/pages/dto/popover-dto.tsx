@@ -16,7 +16,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toInitCap } from '@renderer/utils/helpers';
+import { toInitCap } from '@renderer/utils';
 import {
     Tooltip,
     TooltipContent,

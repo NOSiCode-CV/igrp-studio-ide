@@ -442,7 +442,9 @@
     "createButton": "Criar Workspace",
     "createError": "Falha ao criar workspace",
     "createSuccess": "Workspace '{{name}}' criado com sucesso!",
-    "slug": "Slug"
+    "slug": "Slug",
+    "createFailed": "Falha na criação do workspace:",
+    "describe": "Descreva seu espaço de trabalho (workspace)..."
   },
   "creating": "Criando...",
   "enableGraalVm": "Ativar Graal Vm",
@@ -492,6 +494,7 @@
    "workspaceAndProjects": "Espaço de trabalho e todos os projetos e configurações associadas.",
    "id": "ID:",
    "noServicesFound": "Nenhum serviço encontrado",
+  "noServicesYet": "Este espaço de trabalho ainda não possui serviços.",
    "addNewService": "Adicionar Novo Serviço",
    "resources": "Recursos",
    "diagram": "Diagrama",
@@ -542,7 +545,6 @@
   "dockerSupport": "Suporte a Docker",
   "repository_url": "URL do Repositório",
   "search_repositories": "Procurar Repositórios",
-  "searchRepositories": "Procurar Repositórios",
   "privateRepository": "Repositório privado",
   "noDescriptionProvided": "Nenhuma descrição fornecida",
   "viewRepository": "Visualizar repositório",
@@ -771,46 +773,22 @@
     "failedLoadJsonContent": "Falha ao carregar conteúdo JSON:",
     "permissions": "Permissões",
     "statusCode": "Código de status",
-    "failedFetchSelectors": "Falha ao buscar seletores:"
-
-
-  
-  
-
-
-
-  
-  
-    
-
-
-
-
-  
-
+    "failedFetchSelectors": "Falha ao buscar seletores:",
+  "imports": {
+    "title": "Importações",
+    "count": "{{count}} importações",
+    "empty": "Nenhuma importação configurada",
+    "placeholder": "ex: import { lib } from 'react-library'"
+  },
+  "addNewRowBottom": "Adicionar Nova Linha Abaixo",
+  "addNewRowTop": "Adicionar Nova Linha Acima",
+  "forceDynamic": "Forçar Dinâmico",
+  "pageTitle": "Título da Página",
+  "searchRepositories": "Procurar Repositórios",
+  "componentAssociation": "Você pode associar este componente a uma das páginas disponíveis neste combobox. A página associada será incluída no mesmo path da página atual, dentro da pasta 'components'.",
+  "componentTitle": "Título do Componente"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
 }

@@ -68,7 +68,7 @@ export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [val
     return {
         requestParams: [
             { key: 'name', name: t('name'), type: 'text' },
-            { key: 'value', name: t('value'), type: 'text' },
+            { key: 'value', name: t('defaultValue'), type: 'text' },
             {
                 key: 'group', name: '', type: 'group', items: [
                     {
@@ -86,7 +86,7 @@ export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [val
         ],
         pathVariables: [
             { key: 'name', name: t('name'), type: 'text' },
-            { key: 'value', name: t('value'), type: 'text' },
+            { key: 'value', name: t('defaultValue'), type: 'text' },
             {
                 key: 'group', name: '', type: 'group', items: [
                     {

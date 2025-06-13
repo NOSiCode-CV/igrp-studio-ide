@@ -9,12 +9,13 @@ import {
     IGRPCardFooter,
     IGRPCardHeader,
 } from '@igrp/igrp-framework-react-design-system';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxField from '../tools/BoxFields';
 import TableTool from '../tools/tableTool';
+import { generateAllClasses } from '../../components/settings/style/utils';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface CardProps {
     isDisabled?: boolean;
@@ -22,13 +23,7 @@ export interface CardProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-export const COMPONENT_MAP: Record<string, React.ElementType> = {
-    [COMPONENT.CardFooter]: IGRPCardFooter,
-    [COMPONENT.CardContent]: IGRPCardContent,
-    [COMPONENT.CardHeader]: IGRPCardHeader,
-};
-
-const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     const {
         children: components,
         id: componentId,
@@ -39,6 +34,12 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     >({});
     const { setEditingComponent } = useDroppedComponents();
     const { dynamicImport } = useStudio();
+
+    const COMPONENT_MAP: Record<string, React.ElementType> = {
+        [COMPONENT.CardFooter]: IGRPCardFooter,
+        [COMPONENT.CardContent]: IGRPCardContent,
+        [COMPONENT.CardHeader]: IGRPCardHeader,
+    };
 
     // Load components dynamically
     useEffect(() => {
@@ -77,15 +78,23 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     );
 
     const renderChildComp = useCallback(
-        (component: StructuredComponent) => {
-            const { children: childComponents, componentName } = component;
+        (
+            component: StructuredComponent,
+            className: string,
+            childClassName: string
+        ) => {
+            const {
+                children: childComponents,
+                componentName,
+                id: componentId,
+            } = component;
             const path = parentComponentName;
 
             return (
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className="space-y-2"
+                    className={cn('space-y-2 p-2', className)}
                 >
                     {childComponents.length === 0 ? (
                         <GenNoInfoComp
@@ -103,13 +112,14 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                                     index={index}
                                     mode="MOVE"
                                     dropTargetId={componentId}
-                                    className="p-1"
+                                    layout="horizontal"
+                                    className={cn('p-1', childClassName)}
                                 >
-                                    <BoxField
-                                        index={index}
+                                    <BoxWrapper
+                                        //index={index}
                                         parentComp={comp}
                                         comp={child}
-                                        path={path}
+                                        // path={path}
                                         onEdit={() => handleEdit(child, path)}
                                         group="group/card-content-item"
                                         className="opacity-0 group-hover/card-content-item:opacity-100"
@@ -118,7 +128,7 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                                             comp={child}
                                             onDragEnd={onDragEnd}
                                         />
-                                    </BoxField>
+                                    </BoxWrapper>
                                 </Draggable>
                             );
                         })
@@ -126,23 +136,22 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                 </Droppable>
             );
         },
-        [
-            componentId,
-            handleEdit,
-            loadedComponents,
-            onDragEnd,
-            parentComponentName,
-            comp,
-        ]
+        [handleEdit, loadedComponents, onDragEnd, parentComponentName, comp]
     );
 
     return (
         <div className="w-full flex flex-col gap-3">
             {components.map((child, index) => {
-                const { componentName, properties } = child;
+                const { componentName, properties, style, childProperties } =
+                    child;
                 const { className, commonProperties, ...args } =
                     properties || {};
+
+                const { className: childClassName } = childProperties || {};
+
                 const Component = COMPONENT_MAP[componentName];
+
+                const classes = generateAllClasses(style);
 
                 if (!Component) return null;
 
@@ -151,18 +160,23 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                         key={index}
                         {...args}
                         className={cn(
-                            'bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table',
-                            className
+                            'bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table'
                         )}
                     >
                         <TableTool
                             parentComp={comp}
                             comp={child}
-                            onEdit={() => handleEdit(child, componentName)}
+                            onEdit={() =>
+                                handleEdit(child, parentComponentName)
+                            }
                             group="group/card-comp"
                             className="opacity-0 group-hover/card-comp:opacity-100"
                         />
-                        {renderChildComp(child)}
+                        {renderChildComp(
+                            child,
+                            `${classes}, ${className}`,
+                            childClassName
+                        )}
                     </div>
                 );
             })}
@@ -170,4 +184,4 @@ const Card: React.FC<CardProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default Card;
+export default IGRPStudioCard;

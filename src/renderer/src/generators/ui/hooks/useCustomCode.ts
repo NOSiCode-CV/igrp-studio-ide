@@ -5,7 +5,7 @@ import { EngineService } from "@renderer/services/EngineService";
 import { useMemo, useState, useEffect } from "react";
 import { useComponents } from "./useComponents";
 
-interface Option {
+export interface Option {
     label: string;
     value: string;
     metadata?: any
@@ -16,8 +16,10 @@ interface CustomCodeHook {
     states: State[];
     functionOptions: Option[];
     typesOptions: Option[];
+    statesOptions: Option[]
     snippets: CodeSnippetsRegisterConfig[];
     types: any[];
+    customComponents: any[];
     isLoading: boolean;
     error: Error | null;
 }
@@ -27,6 +29,7 @@ const useCustomCode = (): CustomCodeHook => {
     const { extractAllStates } = useComponents()
     const [metadataFunctions, setMetadataFunctions] = useState<CustomFunctionConfig[]>([]);
     const [metadataStates, setMetadataStates] = useState<State[]>([]);
+    const [customComponents, setCustomComponents] = useState<[]>([]);
 
     const [snippets, setSnippets] = useState<CodeSnippetsRegisterConfig[]>([]);
     const [types, setTypes] = useState<any[]>([]);
@@ -60,7 +63,12 @@ const useCustomCode = (): CustomCodeHook => {
         }));
     }, [types]);
 
-
+    const statesOptions = useMemo<Option[]>(() => {
+        return states.map((type) => ({
+            label: type.name,
+            value: type.name,
+        }));
+    }, [types]);
 
     // Fetch code snippets and metadata
     useEffect(() => {
@@ -74,20 +82,15 @@ const useCustomCode = (): CustomCodeHook => {
                     extractAllStates()
                 ]);
 
-
                 const { result } = metadataResponse
-
-                console.log(result)
-
 
                 setMetadataStates(metadataStates || []);
 
                 setSnippets(snippetsResponse.result?.codes || []);
                 if (result) {
                     setMetadataFunctions(result.functions || []);
-
                     setTypes(result.types || [])
-
+                    setCustomComponents(result.components || [])
                 }
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to load resources'));
@@ -113,8 +116,10 @@ const useCustomCode = (): CustomCodeHook => {
         states,
         functionOptions,
         typesOptions,
+        statesOptions,
         snippets,
         types,
+        customComponents,
         isLoading,
         error,
     };

@@ -4,16 +4,13 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import path from 'path';
 import { DockerComposeConfig, ServiceInfo } from '../types';
+import { escapePath } from '../helpers/utils';
 
 const execAsync = promisify(exec);
 
 export class DockerService {
     private composeCache: Record<string, DockerComposeConfig> = {};
 
-    private escapePath(pathString: string): string {
-        // Escape spaces and special characters in paths
-        return `"${pathString.replace(/"/g, '\\"')}"`;
-    }
 
     async loadComposeFile(projectPath: string): Promise<DockerComposeConfig> {
         const composePath = path.join(projectPath, 'igrp-compose.yaml');
@@ -70,11 +67,11 @@ export class DockerService {
 
     async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
         const composeFile = path.join(projectPath, 'igrp-compose.yaml');
-        const escapedComposeFile = this.escapePath(composeFile);
+        const escapedComposeFile = escapePath(composeFile);
         const serviceParam = service || '';
 
         const envFilePath = path.join(projectPath, '.igrp.env');
-        const escapedEnvFilePath = this.escapePath(envFilePath);
+        const escapedEnvFilePath = escapePath(envFilePath);
 
 
         // Prepare the init script first

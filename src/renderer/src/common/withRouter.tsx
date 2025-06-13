@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 /* function withRouter(Component: any) {
   function ComponentWithRouterProp(props: any) {

@@ -7,9 +7,6 @@ import useStudio from '@renderer/hooks/use-studio';
 import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxContainer from '../tools/BoxWrapper';
-import { APP_COMPONENT } from '../../ComponentTypes';
-import { ComponentRenderer } from '../ComponentRenderer';
-import { useTabs } from '@renderer/components/navigation/TabContext';
 import { useTranslation } from 'react-i18next';
 
 export interface ContainerProps {
@@ -19,11 +16,9 @@ export interface ContainerProps {
     onAddControl?: (type: string, componentId: string) => void;
 }
 
-const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
+const IGRPStudioFragment = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
     const { t } = useTranslation();
     const { children: components, id: componentId } = comp || {};
-
-    const { initializeTabFromCurrentItem } = useTabs();
 
     const { setEditingComponent } = useDroppedComponents();
 
@@ -31,7 +26,7 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
         [key: string]: React.ComponentType<any>;
     }>({});
 
-    const { dynamicImport, getPageData } = useStudio();
+    const { dynamicImport } = useStudio();
 
     useEffect(() => {
         const loadComponents = async () => {
@@ -53,18 +48,10 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
     };
 
     const handleEdit = async (component: StructuredComponent) => {
-        if (component.type === APP_COMPONENT) {
-            const page = await getPageData(component.componentName);
-            initializeTabFromCurrentItem({
-                ...page,
-                id: page?.content.id,
-                label: page?.content.name,
-            });
-        } else
-            setEditingComponent({
-                path: '',
-                component,
-            });
+        setEditingComponent({
+            path: '',
+            component,
+        });
     };
 
     return (
@@ -88,10 +75,6 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
                             dropTargetId={componentId}
                             mode="MOVE"
                             isDisabled={isDisabled}
-                            className={cn(
-                                comp.type === APP_COMPONENT &&
-                                    'hover:border-destructive'
-                            )}
                         >
                             <BoxContainer
                                 comp={comp}
@@ -103,18 +86,11 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
                                         'group-hover/row-container:opacity-100'
                                 )}
                             >
-                                {comp.type === APP_COMPONENT ? (
-                                    <ComponentRenderer
-                                        comp={comp}
-                                        onDragEnd={onDragEnd}
-                                    />
-                                ) : (
-                                    <Component
-                                        comp={comp}
-                                        onDragEnd={onDragEnd}
-                                        isDisabled={isDisabled}
-                                    />
-                                )}
+                                <Component
+                                    comp={comp}
+                                    onDragEnd={onDragEnd}
+                                    isDisabled={isDisabled}
+                                />
                             </BoxContainer>
                         </Draggable>
                     ) : (
@@ -128,4 +104,4 @@ const Container = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
     );
 };
 
-export default Container;
+export default IGRPStudioFragment;

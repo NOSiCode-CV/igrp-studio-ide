@@ -9,13 +9,13 @@ import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import GenNoInfoField from '../../components/GenNoInfoField';
 
-export interface FormComponentProps {
+export interface PageHeaderProps {
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
     isDisabled?: boolean;
 }
 
-const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     const {
         id: componentId,
         children: fields,
@@ -23,7 +23,7 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
         label,
         properties,
     } = comp;
-    const { title, description } = properties;
+    const { title } = properties;
 
     const [buttonComponents, setButtonComponents] = useState<
         StructuredComponent[]
@@ -42,7 +42,7 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
             const buttons = fields;
             setButtonComponents(buttons);
         }
-    }, [comp]);
+    }, [comp, fields]);
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -105,8 +105,8 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     return (
         <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
             <IGRPPageHeader
+                {...properties}
                 title={title || label || componentName}
-                description={description}
             >
                 <div className={cn('flex flex-1 justify-end gap-3')}>
                     {renderButtons()}
@@ -116,4 +116,4 @@ const PageHeader: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
     );
 };
 
-export default PageHeader;
+export default IGRPStudioPageHeader;

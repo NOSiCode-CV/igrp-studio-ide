@@ -7,13 +7,15 @@ import {
     TabsList,
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
-import { Container, FolderKanban, Network, Settings } from 'lucide-react';
+import { Container, FolderKanban, Network, Settings, Timer } from 'lucide-react';
 import WelcomeHeader from './workspaces/welcome-header';
 import Resources from './workspaces/resources';
 import { WorkspaceDocker } from './workspaces/workspace-docker';
 import { WorkspaceSettings } from './workspaces/workspace-settings';
 import CreateWorkspace from './workspaces/components/create-workspace';
 import { useTranslation } from 'react-i18next';
+import { EmptyList } from '@renderer/components/empty-list';
+
 
 const IDEInitialScreen = () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
@@ -55,9 +57,11 @@ const IDEInitialScreen = () => {
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
             {!workspace ? (
                 <div className="p-3">
-                    <h1 className="text-lg font-medium">{t('workspaceNotFound')}</h1>
+                    <h1 className="text-lg font-medium">
+                        {t('workspaceNotFound')}
+                    </h1>
                     <p className="text-sm text-muted-foreground">
-                    {t('workspaceNotExist')}
+                        {t('workspaceNotExist')}
                     </p>
                 </div>
             ) : (
@@ -91,7 +95,14 @@ const IDEInitialScreen = () => {
                         </TabsContent>
 
                         <TabsContent value="diagram" className="mt-0">
-                            {/* <WorkspaceDiagram workspace={workspace} /> */}
+                            {/* <WorkspaceDiagram workspace={workspace} /> */
+                                <EmptyList
+                                    title="Coming soon"
+                                    description="Here you will find soon a diagram of your workspace using React Flow."
+                                    className="py-12"
+                                    icon={<Timer className="h-12 w-12" />}
+                                />
+                            }
                         </TabsContent>
 
                         <TabsContent value="config" className="mt-0">
@@ -106,7 +117,7 @@ const IDEInitialScreen = () => {
             )}
 
             {showWorkspaceDialog && (
-                <CreateWorkspace 
+                <CreateWorkspace
                     open={showWorkspaceDialog}
                     onSuccess={handleCreationSuccess}
                 />

@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Switch } from '@renderer/components/ui/switch';
 import { Separator } from '@renderer/components/ui/separator';
 import { Input } from '@renderer/components/ui/input';
-import { toInitCap } from '@renderer/utils/helpers';
+import { toInitCap } from '@renderer/utils';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import MonacoEditor from '@renderer/components/monaco-editor';
 

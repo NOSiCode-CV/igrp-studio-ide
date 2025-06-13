@@ -1,4 +1,4 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioButton, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -69,10 +69,31 @@ import {
     Search,
     TrendingUp,
     SeparatorHorizontal,
+    CheckCircle,
+    Ratio,
+    Menu,
 } from 'lucide-react';
+import IGRPStudioFlex from './types/components/Flex';
+import IGRPStudioGrid from './types/components/Grid';
+import IGRPStudioSection from './types/components/Section';
+import IGRPStudioColumns from './types/components/Columns';
+import IGRPStudioColumn from './types/components/Column';
+import IGRPStudioPageHeader from './types/components/PageHeader';
+import IGRPStudioForm from './types/components/Form';
+import IGRPStudioContainer from './types/components/Container';
+import IGRPStudioFragment from './types/components/Fragment';
+import IGRPStudioCard from './types/components/Card';
+import IGRPStudioPage from './types/components/Page';
+import IGRPStudioModalDialog from './types/components/ModalDialog';
+import IGRPStudioTable from './types/components/Table';
+import IGRPStudioParagraph from './types/components/Paragraph';
+import IGRPStudioTabs from './types/components/Tabs';
+import IGRPStudioRepetitive from './types/components/RepetitiveList';
+import IGRPStudioMenuNavigation from './types/components/MenuNavigation';
+import IGRPStudioFormList from './types/components/FormList';
+import IGRPStudioInfoCard from './types/components/InfoCard';
+import IGRPStudioAlert from './types/components/Alert';
 
-// Constants
-export const APP_COMPONENT = 'appComponent';
 
 // Component Categories
 export const GROUP_COMPONET: Record<string, string> = {
@@ -84,7 +105,9 @@ export const GROUP_COMPONET: Record<string, string> = {
     layout: "Layout",
     widget: "Widgets",
     advanced: "Advanced",
-    typography: "Typograpgy"
+    typography: "Typograpgy",
+    customComponents: "Custom Components",
+    appComponents: 'Application Components'
 };
 
 export const COMPONENT: Record<string, string> = {
@@ -97,6 +120,7 @@ export const COMPONENT: Record<string, string> = {
     Container: 'container',
     Form: 'form',
     PageHeader: 'pageHeader',
+
     Link: 'inputUrl',
     Button: "button",
     Text: "text",
@@ -179,6 +203,18 @@ export const COMPONENT: Record<string, string> = {
     Radarchart: "radarchart",
     StatsCard: "statsCard",
     Separator: "separator",
+
+    ModalDialog: 'modalDialog',
+    AlertDialog: 'alertDialog',
+    Aspect: 'aspect',
+    Fragment: 'fragment',
+    Paragraph: 'paragraph',
+    RepetitiveList: 'repetitiveList',
+    FormList: 'formList',
+    MenuNavigation: 'menuNavigation',
+    InfoCard: 'infoCard',
+    PdfViewer: 'pdfViewer',
+    Alert: 'alert'
 }
 
 
@@ -257,6 +293,11 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 
     [COMPONENT.Separator]: SeparatorHorizontal,
 
+    [COMPONENT.ModalDialog]: CheckCircle,
+    [COMPONENT.AlertDialog]: Info,
+    [COMPONENT.Aspect]: Ratio,
+    [COMPONENT.MenuNavigation]: Menu,
+
     accordion: AlignLeft,
     treeView: GitMerge,
 
@@ -265,10 +306,13 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     stack: Table2,
     section: RectangleHorizontal,
 
-    pageHeader: Heading,
-    paragraph: WrapText,
-    repetitiveList: LayoutList,
-    fragment: Code,
+    [COMPONENT.PageHeader]: Heading,
+    [COMPONENT.Fragment]: Code,
+    [COMPONENT.Paragraph]: WrapText,
+    [COMPONENT.RepetitiveList]: LayoutList,
+    [COMPONENT.FormList]: LayoutList,
+    [COMPONENT.InfoCard]: CreditCard,
+    [COMPONENT.PdfViewer]: FileText,
 
     tableDateFilter: CalendarIcon,
     tableTextFilter: FormInput,
@@ -284,7 +328,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableBadgeCell: Badge,
 };
 
-export const COMPONENT_MAP = {
+export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ColorPicker]: IGRPInputColor,
     [COMPONENT.Date]: IGRPDatePicker,
     [COMPONENT.DatePicker]: IGRPDatePicker,
@@ -306,6 +350,7 @@ export const COMPONENT_MAP = {
     [COMPONENT.Radio]: IGRPRadioGroup,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
+    [COMPONENT.Text]: IGRPText,
     [COMPONENT.Switch]: IGRPSwitch,
     [COMPONENT.Search]: IGRPInputSearch,
     [COMPONENT.DatePickerRange]: IGRPDatePickerRange,
@@ -319,7 +364,7 @@ export const COMPONENT_MAP = {
     [COMPONENT.RadialBarchart]: IGRPRadialBarChart,
 
     [COMPONENT.Badge]: IGRPBadge,
-
+    [COMPONENT.PdfViewer]: IGRPPdfViewer,
 
     [COMPONENT.TableInputFilter]: IGRPDataTableFilterInput,
     [COMPONENT.TableMinMaxFilter]: IGRPDataTableFilterMinMax,
@@ -328,5 +373,27 @@ export const COMPONENT_MAP = {
     [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
     [COMPONENT.StatsCard]: IGRPStatsCard,
-    [COMPONENT.Separator]: IGRPSeparator
-};
+    [COMPONENT.Separator]: IGRPSeparator,
+    [COMPONENT.AlertDialog]: IGRPAlertDialog,
+
+    [COMPONENT.Table]: IGRPStudioTable,
+    [COMPONENT.Section]: IGRPStudioSection,
+    [COMPONENT.Columns]: IGRPStudioColumns,
+    [COMPONENT.Column]: IGRPStudioColumn,
+    [COMPONENT.PageContent]: IGRPStudioPage,
+    [COMPONENT.PageHeader]: IGRPStudioPageHeader,
+    [COMPONENT.Form]: IGRPStudioForm,
+    [COMPONENT.Container]: IGRPStudioContainer,
+    [COMPONENT.Fragment]: IGRPStudioFragment,
+    [COMPONENT.Card]: IGRPStudioCard,
+    [COMPONENT.Flex]: IGRPStudioFlex,
+    [COMPONENT.Grid]: IGRPStudioGrid,
+    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
+    [COMPONENT.Tabs]: IGRPStudioTabs,
+    [COMPONENT.Paragraph]: IGRPStudioParagraph,
+    [COMPONENT.RepetitiveList]: IGRPStudioRepetitive,
+    [COMPONENT.FormList]: IGRPStudioFormList,
+    [COMPONENT.MenuNavigation]: IGRPStudioMenuNavigation,
+    [COMPONENT.InfoCard]: IGRPStudioInfoCard,
+    [COMPONENT.Alert]: IGRPStudioAlert,
+ };

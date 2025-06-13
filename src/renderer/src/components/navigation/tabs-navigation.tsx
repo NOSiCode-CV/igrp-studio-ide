@@ -2,7 +2,7 @@ import React, { ReactNode, useRef } from 'react';
 import { Book, Plus, X } from 'lucide-react';
 import { Separator } from '@renderer/components/ui/separator';
 import { cn } from '@renderer/lib/utils';
-import { getIcon } from '@renderer/utils/helpers';
+import { getIcon } from '@renderer/utils';
 import {
     ContextMenu,
     ContextMenuContent,

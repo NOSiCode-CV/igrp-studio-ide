@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, HelpCircle, AlertCircle } from 'lucide-react';
+import {
+    Wifi,
+    WifiOff,
+    HelpCircle,
+    AlertCircle,
+    Stethoscope,
+} from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -13,11 +19,13 @@ import {
 import { Separator } from '@renderer/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { DebugTerminal } from '@renderer/components/debug-terminal';
+import Doctor from '@renderer/components/doctor';
 
 export function Footer() {
     const [isOnline, setIsOnline] = useState(true);
     const [appVersion, setAppVersion] = useState('');
     const [newVersion, setNewVersion] = useState<string>('');
+    const [open, setOpen] = useState<boolean>(false);
     const [log, setLog] = useState<string>('');
     const { t } = useTranslation();
 
@@ -108,6 +116,20 @@ export function Footer() {
                 <div className="flex items-center space-x-3">
                     <Separator orientation="vertical" className="h-4" />
 
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size={'icon'}
+                                variant={'ghost'}
+                                className="h-6 w-6"
+                                onClick={() => setOpen(!open)}
+                            >
+                                <Stethoscope className='text-muted-foreground'/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Doctor</TooltipContent>
+                    </Tooltip>
+
                     <DebugTerminal />
 
                     <Tooltip>
@@ -142,6 +164,8 @@ export function Footer() {
                             <p>{t('helpCenter')}</p>
                         </TooltipContent>
                     </Tooltip>
+
+                    <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
         </TooltipProvider>

@@ -5,7 +5,7 @@ const CodeContentJson = ({ components, pagePath }: any) => {
     return <MonacoEditor language="json" content={code} filePath={pagePath} />;
 };
 
-const CodeContentTS = ({ pagePath }: any) => {
+const CodeContentTS = ({ pagePath }: { pagePath: string }) => {
     return (
         <MonacoEditor language="typescript" content={''} filePath={pagePath} />
     );

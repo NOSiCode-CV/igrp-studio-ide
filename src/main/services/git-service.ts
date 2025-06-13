@@ -3,6 +3,7 @@ import { BrowserWindow, dialog } from 'electron';
 import { promisify } from 'util';
 import { checkAndReadBaseApi } from '../helpers';
 import { Commit, Repository } from '../types';
+import { escapePath } from '../helpers/utils';
 
 const execAsync = promisify(exec);
 
@@ -99,6 +100,9 @@ export const GitService = {
 
     async cloneRepository(repoUrl: string, basePath: string, window: BrowserWindow) {
         try {
+
+            const encapeBasePath = escapePath(basePath);
+
             if (!basePath) {
                 const { canceled, filePaths } = await dialog.showOpenDialog(window, {
                     title: 'Choose Clone Location',
@@ -129,11 +133,12 @@ export const GitService = {
 
             window.webContents.send('clone-progress', {
                 status: 'starting',
-                message: `Starting to clone into ${basePath}...`,
+                message: `Starting to clone into ${encapeBasePath}...`,
             });
 
             return new Promise((resolve, reject) => {
-                exec(`git clone ${repoUrl} "${basePath}"`, async (error) => {
+                exec(`git clone ${repoUrl} ${encapeBasePath}`, async (error) => {
+
                     if (error) {
                         window.webContents.send('clone-progress', {
                             status: 'error',
@@ -153,7 +158,7 @@ export const GitService = {
 
                         window.webContents.send('clone-progress', {
                             status: 'success',
-                            message: `Successfully cloned to ${basePath}`,
+                            message: `Successfully cloned to ${encapeBasePath}`,
                             path: basePath,
                             project: config
                         });
@@ -447,10 +452,10 @@ export const GitService = {
         }
     },
 
-    async getContributors(projectPath: string): Promise<{name: string, email: string}[]> {
+    async getContributors(projectPath: string): Promise<{ name: string, email: string }[]> {
         try {
             const { stdout } = await execAsync('git shortlog -sne --all', { cwd: projectPath });
-            
+
             const contributors = stdout
                 .split('\n')
                 .filter(line => line.trim().length > 0)
@@ -458,10 +463,10 @@ export const GitService = {
                     const match = line.trim().match(/^\d+\s+(.+)\s+<(.+)>$/);
                     return match ? { name: match[1], email: match[2] } : null;
                 })
-                .filter(Boolean) as {name: string, email: string}[];
+                .filter(Boolean) as { name: string, email: string }[];
 
-             // Filter distinct emails (case-insensitive)
-             const uniqueContributors = contributors.reduce<{name: string, email: string}[]>(
+            // Filter distinct emails (case-insensitive)
+            const uniqueContributors = contributors.reduce<{ name: string, email: string }[]>(
                 (acc, contributor) => {
                     if (!acc.some(c => c.email.toLowerCase() === contributor.email.toLowerCase())) {
                         acc.push(contributor);

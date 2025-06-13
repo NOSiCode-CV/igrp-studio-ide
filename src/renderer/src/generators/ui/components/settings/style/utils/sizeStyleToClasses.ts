@@ -1,6 +1,6 @@
 import { SizeSytle, SizeValue } from "../types";
 
-export function sizeToTailwindClasses(sizeState: SizeSytle): string {
+export function sizeStyleToClasses(sizeState: SizeSytle): string {
     const classes: string[] = [];
 
     // Helper to generate dimension classes

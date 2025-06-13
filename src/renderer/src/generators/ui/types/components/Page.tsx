@@ -10,7 +10,7 @@ interface PageProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-export const Page = ({ onDragEnd, page }: PageProps) => {
+const IGRPStudioPage = ({ onDragEnd, page }: PageProps) => {
     const { children: components } = page;
 
     const { newStructure, setEditingComponent, setAllComponents } =
@@ -41,26 +41,6 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         if (components) loadComponents();
     }, [components, dynamicImport]);
 
-    const handleAddControl = (type: string, componentId: string) => {
-        const newRow = newStructure(COMPONENT.Section);
-        const rowIndex = components.findIndex(
-            (section) => section.id === componentId
-        );
-
-        if (rowIndex !== -1) {
-            const newRows = [...components];
-            if (type === 'top') {
-                newRows.splice(rowIndex, 0, newRow);
-            } else if (type === 'bottom') {
-                newRows.splice(rowIndex + 1, 0, newRow);
-            }
-            setAllComponents({
-                ...page,
-                children: newRows,
-            });
-        }
-    };
-
     useEffect(() => {
         if (components.length === 0) {
             const newRow = newStructure(COMPONENT.Section);
@@ -88,7 +68,6 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
                                 isDisabled={false}
                                 comp={row}
                                 onDragEnd={onDragEnd}
-                                onAddControl={handleAddControl}
                             />
                         ) : (
                             <div
@@ -104,3 +83,5 @@ export const Page = ({ onDragEnd, page }: PageProps) => {
         </div>
     );
 };
+
+export default IGRPStudioPage;

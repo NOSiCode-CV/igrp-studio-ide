@@ -117,10 +117,13 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                         )
                                     }
                                     onSelectValueChange={(value) => {
-                                        formik.setFieldValue('method', value || currentItem.content?.method);
+                                        formik.setFieldValue(
+                                            'method',
+                                            value || currentItem.content?.method
+                                        );
                                     }}
-                                    classNameGlobal={cn(
-                                        'w-full h-8 mb-6',
+                                    classNameLabel={cn(
+                                        'w-full',
                                         formik.touched.path &&
                                             formik.errors.path &&
                                             'border-red-500'

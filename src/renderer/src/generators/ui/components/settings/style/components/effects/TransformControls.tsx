@@ -128,7 +128,7 @@ export function TransformControls({
             >
                 <div className="space-y-2">
                     <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
-                        <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {t('editTransform')} {index + 1}
                         </span>
                         <button
@@ -140,13 +140,13 @@ export function TransformControls({
                     </div>
 
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500">Type</label>
+                        <label className="text-xs text-gray-500">Type</label>
                         <select
                             value={transform.type}
                             onChange={(e) =>
                                 updateTransform(index, 'type', e.target.value)
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         >
                             {transformTypes.map((type) => (
                                 <option key={type.name} value={type.name}>
@@ -158,7 +158,7 @@ export function TransformControls({
                     </div>
 
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500">
+                        <label className="text-xs text-gray-500">
                         {t('value')}
                         </label>
                         <div className="flex items-center gap-1">
@@ -172,7 +172,7 @@ export function TransformControls({
                                         e.target.value
                                     )
                                 }
-                                className="flex-1 px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                             />
                             <select
                                 value={transform.unit}
@@ -183,7 +183,7 @@ export function TransformControls({
                                         e.target.value
                                     )
                                 }
-                                className="w-16 px-1 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                                className="w-16 px-1 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                             >
                                 {transformType?.units.map((unit) => (
                                     <option key={unit} value={unit}>
@@ -195,7 +195,7 @@ export function TransformControls({
                     </div>
 
                     <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                        <div className="text-[9px] text-gray-500 mb-1">
+                        <div className="text-xs text-gray-500 mb-1">
                         {t('preview')}
                         </div>
                         <div className="relative w-full h-12">
@@ -215,7 +215,7 @@ export function TransformControls({
     return (
         <div className="space-y-1.5" ref={containerRef}>
             <div className="flex items-center justify-between">
-                <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                     <RotateCw size={10} />
                     Transform
                 </h3>
@@ -243,11 +243,11 @@ export function TransformControls({
                             />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <div className="text-[9px] font-medium text-gray-700 dark:text-gray-300">
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
                                 {transform.type.charAt(0).toUpperCase() +
                                     transform.type.slice(1)}
                             </div>
-                            <div className="text-[8px] text-gray-500 dark:text-gray-400 truncate">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                 {getTransformPreview(transform)}
                             </div>
                         </div>

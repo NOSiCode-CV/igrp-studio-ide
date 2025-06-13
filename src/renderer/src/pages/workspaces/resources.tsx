@@ -42,7 +42,7 @@ import { useDocker } from '@renderer/hooks/use-docker';
 import { ServiceList } from './services/service-list';
 import { ProjectList } from './projects/project-list';
 import ProjectGrid from './projects/project-grid';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 
 type ResourceType = 'project' | 'service';
 type ViewMode = 'grid' | 'list';
@@ -232,15 +232,6 @@ const Resources = () => {
         });
     };
 
-    const handleCloneProject = async (url: string): Promise<void> => {
-        try {
-            await window.electron.ipcRenderer.invoke(t('cloneRepository'), url);
-        } catch (error) {
-            console.error(t('errorCloningRepository'), error);
-            showErrorToast(t('cloneProjectError'));
-        }
-    };
-
     const ProjectActions = () => {
         const [openCloneProject, setOpenCloneProject] = useState(false);
         return (
@@ -267,9 +258,9 @@ const Resources = () => {
                 <ProjectWizard />
                 {openCloneProject && (
                     <CloneProjectModal
-                        handleCloneProject={handleCloneProject}
                         open={openCloneProject}
                         setOpen={setOpenCloneProject}
+                        workspace={workspace}
                     />
                 )}
             </>
@@ -305,7 +296,7 @@ const Resources = () => {
             <p className="text-xs text-muted-foreground mb-3">
                 {projectSearchQuery
                     ? `${t('noProjectsMatching')} "${projectSearchQuery}"`
-                    :t('noProjectsYet')}
+                    : t('noProjectsYet')}
             </p>
             <ProjectWizard>
                 <Button size="sm">

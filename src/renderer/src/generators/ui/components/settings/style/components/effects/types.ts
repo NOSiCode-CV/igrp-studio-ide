@@ -117,7 +117,7 @@ export interface GradientValue {
   stops: GradientStop[];
 }
 
-export interface BackgroundValue {
+export interface BackgroundStyle {
   type: 'color' | 'image' | 'gradient';
   value: string | GradientValue;
   size: string;
@@ -125,6 +125,12 @@ export interface BackgroundValue {
   repeat: string;
   attachment: string;
   blendMode: string;
+}
+
+export interface OutlineValue {
+  width: string;
+  style: string;
+  color: string;
 }
 
 export const backgroundSizes = [

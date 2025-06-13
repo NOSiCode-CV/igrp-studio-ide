@@ -6,38 +6,54 @@ import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/use-studio';
 import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxContainer from '../tools/BoxWrapper';
-import { APP_COMPONENT } from '../../ComponentTypes';
-import { ComponentRenderer } from '../ComponentRenderer';
-import { useTabs } from '@renderer/components/navigation/TabContext';
 import SectionTool from '../tools/SectionTool';
 import { useTranslation } from 'react-i18next';
+import { newStructuredComponent } from '../../dnd/helpers';
+import { COMPONENT } from '../../ComponentTypes';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface SectionProps {
     isDisabled?: boolean;
     comp: StructuredComponent;
     onDragEnd: (result: DragEndResult) => void;
-    onAddControl?: (type: string, componentId: string) => void;
 }
 
-const Section = ({
-    isDisabled,
-    comp,
-    onDragEnd,
-    onAddControl,
-}: SectionProps) => {
+const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
     const { t } = useTranslation();
     const { children: components, id: componentId } = comp || {};
 
-    const { initializeTabFromCurrentItem } = useTabs();
-
-    const { removeRow, setEditingComponent } = useDroppedComponents();
+    const {
+        removeRow,
+        setEditingComponent,
+        setAllComponents,
+        components: allComponents,
+    } = useDroppedComponents();
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
     }>({});
 
-    const { dynamicImport, getPageData } = useStudio();
+    const { dynamicImport } = useStudio();
+
+    const handleAddControl = (type: string, componentId: string) => {
+        const newRow = newStructuredComponent(COMPONENT.Section);
+        const rowIndex = allComponents.children.findIndex(
+            (section) => section.id === componentId
+        );
+
+        if (rowIndex !== -1) {
+            const newRows = [...allComponents.children];
+            if (type === 'top') {
+                newRows.splice(rowIndex, 0, newRow);
+            } else if (type === 'bottom') {
+                newRows.splice(rowIndex + 1, 0, newRow);
+            }
+            setAllComponents({
+                ...allComponents,
+                children: newRows,
+            });
+        }
+    };
 
     useEffect(() => {
         const loadComponents = async () => {
@@ -63,83 +79,59 @@ const Section = ({
     };
 
     const handleEdit = async (component: StructuredComponent) => {
-        if (component.type === APP_COMPONENT) {
-            const page = await getPageData(component.componentName);
-            initializeTabFromCurrentItem({
-                ...page,
-                id: page?.content.id,
-                label: page?.content.name,
-            });
-        } else
-            setEditingComponent({
-                path: '',
-                component,
-            });
+        setEditingComponent({
+            path: '',
+            component,
+        });
     };
 
     return (
         <div className="group/row relative hover:border-2 hover:border-primary rounded-lg px-1">
-            {!isDisabled && (
-                <SectionTool
-                    onClickAddControl={(type) =>
-                        onAddControl?.(type, componentId)
-                    }
-                    onClickDeleteSection={handleDeleteSection}
-                    onEdit={() => handleEdit(comp)}
-                />
-            )}
+            <SectionTool
+                onClickAddControl={(type) => {
+                    handleAddControl?.(type, componentId);
+                }}
+                onClickDeleteSection={handleDeleteSection}
+                onEdit={() => handleEdit(comp)}
+            />
             <Droppable
                 onDrop={handleDrop}
                 component={comp}
                 className={cn(
                     'hover:border-none space-y-1',
-                    isDisabled && 'border-none hover:border-destructive'
                 )}
             >
                 {components && components.length > 0 ? (
                     components.map(
-                        (comp: StructuredComponent, index: number) => {
-                            const Component = loadedComponents[comp.id];
+                        (childComp: StructuredComponent, index: number) => {
+                            const Component = loadedComponents[childComp.id];
 
                             return Component ? (
                                 <Draggable
-                                    key={comp.id}
-                                    item={comp}
+                                    key={childComp.id}
+                                    item={childComp}
                                     index={index}
                                     dropTargetId={componentId}
                                     mode="MOVE"
-                                    isDisabled={isDisabled}
-                                    className={cn(
-                                        comp.type === APP_COMPONENT &&
-                                            'hover:border-destructive'
-                                    )}
                                 >
-                                    <BoxContainer
-                                        comp={comp}
-                                        onEdit={() => handleEdit(comp)}
+                                    <BoxWrapper
+                                        parentComp={comp}
+                                        comp={childComp}
+                                        onEdit={() => handleEdit(childComp)}
                                         group="group/row-comp"
                                         className={cn(
-                                            'left-0 right-auto opacity-0',
-                                            !isDisabled &&
-                                                'group-hover/row-comp:opacity-100'
+                                            'left-0 right-auto opacity-0 group-hover/row-comp:opacity-100'
                                         )}
                                     >
-                                        {comp.type === APP_COMPONENT ? (
-                                            <ComponentRenderer
-                                                comp={comp}
-                                                onDragEnd={onDragEnd}
-                                            />
-                                        ) : (
-                                            <Component
-                                                comp={comp}
-                                                onDragEnd={onDragEnd}
-                                                isDisabled={isDisabled}
-                                            />
-                                        )}
-                                    </BoxContainer>
+                                        <Component
+                                            comp={childComp}
+                                            onDragEnd={onDragEnd}
+                                            isDisabled={isDisabled}
+                                        />
+                                    </BoxWrapper>
                                 </Draggable>
                             ) : (
-                                <div key={comp.id}>{t('loading')}</div>
+                                <div key={childComp.id}>{t('loading')}</div>
                             );
                         }
                     )
@@ -151,4 +143,4 @@ const Section = ({
     );
 };
 
-export default Section;
+export default IGRPStudioSection;

@@ -1,6 +1,38 @@
+import {
+    Component,
+    ModuleConfig,
+    ModelConfig,
+    DTOConfig,
+    ControllerConfig,
+    DeleteConfig,
+    ResponseConfig,
+    EnumConfig,
+    PageConfig,
+    PayloadConfig,
+    CodeSnippetsRegistrationConfig,
+    ServiceInfo
+} from './types';  // Ajuste o caminho conforme a localização real dos seus tipos
+
 import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
-import { Connection, DockerComposeService, Handler, HandlerResponse, PageableProjects, ProjectData } from "./types";
-import { AppExportsConfig, ComponentRegistrationConfig, DockerServiceRegistrationConfig, ProjectWorkspace, ServiceWorkspace } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import {
+    Connection,
+    HandlerResponse,
+    PageableProjects,
+    ProjectData
+} from "./types";
+import {
+    ComponentRegistrationConfig,
+    DockerServiceRegistrationConfig,
+    ProjectWorkspace,
+    ServiceWorkspace
+} from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import {
+    IWorkspace,
+    DatabaseResponse
+} from 'src/main/types';
+import {
+    WorkspaceService
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -39,17 +71,17 @@ export interface IWorkspaceRepository {
 }
 
 export interface IProjectRepository {
-    async save(project: ProjectData): Promise<ProjectData>;
-    async delete(project: ProjectData): Promise<void>;
-    async findAllRecent(): Promise<PageableProjects>;
-    async findAll(): Promise<Array<ProjectData>>;
+     save(project: ProjectData): Promise<ProjectData>;
+     delete(project: ProjectData): Promise<void>;
+     findAllRecent(): Promise<PageableProjects>;
+     findAll(): Promise<Array<ProjectData>>;
 }
 
 export interface IConnenctionRepository {
-    async save(connection: Connection): Promise<Connection>;
-    async delete(connectionName: string): Promise<void>;
-    async findAll(): Promise<Array<Connection>>;
-    async findOne(name: string): Promise<Connection>;
+     save(connection: Connection): Promise<Connection>;
+     delete(connectionName: string): Promise<void>;
+     findAll(): Promise<Array<Connection>>;
+     findOne(name: string): Promise<Connection>;
 
     connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
     getTables: (connectionName: string) => Promise<DatabaseResponse>,
@@ -82,6 +114,8 @@ export interface BaseEngine {
 
     getCodeSnippets?(): CodeSnippetsRegistrationConfig;
 
+    registerComponent?(config: ComponentRegistrationConfig): void
+
 }
 
 
@@ -108,6 +142,8 @@ export interface IBaseEngine {
     getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
 
     getCodeSnippets(engineType: string): CodeSnippetsRegistrationConfig;
+
+    registerComponent: (engineType: string, config: ComponentRegistrationConfig) => Promise<HandlerResponse>
 }
 
 export interface IDocker {

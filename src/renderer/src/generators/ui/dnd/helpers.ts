@@ -1,6 +1,6 @@
 import { StructuredComponent } from "@renderer/lib/dnd/types";
-import { generateId } from "@renderer/utils/helpers";
-import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { generateId } from "@renderer/utils";
+import { ComponentRegisterConfig, State } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 // Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
 export const getDefaultProperties = (schema: any): any => {
@@ -22,40 +22,79 @@ export const getDefaultProperties = (schema: any): any => {
 };
 
 // Utility function to set default values based on the schema
-export const getDefaultInteractions = (schema: any, tag?: string) => {
+export const getDefaultInteractions = (schema: any) => {
+
     const interactions: any = {};
     for (const key in schema) {
-        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
+        if (schema[key].type === 'object' && schema[key].properties &&
+            (schema[key].required || schema[key].required === undefined)) {
             interactions[key] = getDefaultInteractions(schema[key].properties);
         }
-        else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
-            interactions[key] = getDefaultInteractions(schema[key].properties);
-        }
+        /*  else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
+             interactions[key] = getDefaultInteractions(schema[key].properties);
+         } */
         else if (schema[key].type === 'array' && !schema[key].items?.enum) {
             interactions[key] = [];
         }
         else if (schema[key].required || schema[key].visible) {
-            interactions[key] = schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
+            interactions[key] = /* schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : */
+                schema[key].default;
         }
     }
     return interactions;
 };
 
-export const getRequiredDataSchema = (schema: any, tag: string) => {
-    const states: any = {};
-    for (const key in schema) {
-        if (schema[key].type === 'object' && schema[key].properties && schema[key].required) {
-            states[key] = getRequiredDataSchema(schema[key].properties, tag);
-        }
-        else if (schema[key].type === 'array' && !schema[key].items?.enum) {
-            states[key] = [];
-        }
-        else {//TODO Test
-            states[key] = schema[key].default //? schema[key].default.replace(/{{id}}/g, tag || '') : schema[key].default;
-        }
+export const getRequiredDataSchema = (schema: any): any => {
+    const result: any = {};
+
+    // Verifica se é um objeto com propriedades
+
+    for (const index in schema) {
+
+        const tempResult: any = {}
+
+        Object.entries(schema[index].properties).forEach(([key, property]: [string, any]) => {
+
+            // Se for o objeto state que queremos validar
+            if (key === 'state' && property.type === 'object') {
+                if (isState(property.properties))
+                    tempResult[key] = {
+                        id: property.properties?.id?.default ?? "",
+                        type: property.properties?.type?.default ?? "any",
+                        name: property.properties?.name?.default ?? "",
+                        defaultValue: property.properties?.defaultValue?.default ?? "undefined",
+                        imports: property.properties?.imports?.default ?? [],
+                        generate: property.properties?.generate?.default ?? true
+                    };
+                else tempResult[key] = undefined
+            }
+            // Para outras propriedades, mantemos a estrutura básica
+            /*   else {
+                  tempResult[key] = property.default !== undefined ? property.default : null;
+  
+                  // Se for um objeto (não-state), pegamos seus defaults
+                  if (property.type === 'object' && property.properties) {
+                      tempResult[key] = {};
+                      Object.entries(property.properties).forEach(([subKey, subProp]: [string, any]) => {
+                          tempResult[key][subKey] = subProp.default !== undefined ? subProp.default : null;
+                      });
+                  }
+                  // Se for array, pegamos o padrão do item
+                  else if (property.type === 'array' && property.items) {
+                      tempResult[key] = property.items.default !== undefined ? property.items.default : [];
+                  }
+              } */
+
+            result[index] = tempResult;
+        });
     }
-    return states;
+
+    return result;
 };
+
+function isState(obj: any) {
+    return obj?.name && obj?.name?.default && obj?.name?.default !== undefined
+}
 
 
 export const newStructuredComponent = (
@@ -72,7 +111,7 @@ export const newStructuredComponent = (
         data: dataProperties,
     } = componentRegister || {};
 
-    const data = getRequiredDataSchema(dataProperties, '');
+    const data = getRequiredDataSchema(dataProperties);
     const interactions = getDefaultInteractions(interactionsProperties);
     const properties = getDefaultProperties(props);
 

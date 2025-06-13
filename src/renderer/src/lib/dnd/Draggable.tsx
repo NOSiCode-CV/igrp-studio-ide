@@ -1,14 +1,14 @@
 import { cn } from '../utils';
 import { useDragDrop } from './drag-drop-context';
 import { DropZone } from './DropZone';
-import { LayoutMode } from './types';
+import { LayoutMode, StructuredComponent } from './types';
 import type { DragEvent } from 'react';
 
 interface DraggableProps {
     index?: number;
     dropTargetId?: string;
     className?: string;
-    item: any;
+    item: StructuredComponent;
     layout?: LayoutMode;
     dropZone?: boolean;
     children: React.ReactNode;
@@ -65,7 +65,7 @@ const Draggable = ({
                 handleDragOver(e, componentId, index, dropTargetId);
                 handleLayoutChange(layout);
             }}
-            className={cn(
+            className={cn('min-w-32',
                 dropZone &&
                     'relative border border-dashed  hover:border-primary/50 rounded-lg bg-card transition-all p-2',
                 draggedId === componentId && dropZone

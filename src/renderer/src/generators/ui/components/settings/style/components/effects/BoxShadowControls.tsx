@@ -127,7 +127,7 @@ export function BoxShadowControls({
         >
             <div className="space-y-2">
                 <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
-                    <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t('editShadow')}{index + 1}
                     </span>
                     <button
@@ -147,14 +147,14 @@ export function BoxShadowControls({
                             }
                             className="w-3 h-3 rounded text-blue-500 focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-[9px] text-gray-500">
+                        <span className="text-xs text-gray-500">
                         {t('insideShadow')}
                         </span>
                     </label>
                 </div>
                 <div className="grid grid-cols-2 gap-1">
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500">
+                        <label className="text-xs text-gray-500">
                         {t('offsetX')}
                         </label>
                         <input
@@ -163,11 +163,11 @@ export function BoxShadowControls({
                             onChange={(e) =>
                                 updateShadow(index, 'x', e.target.value)
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500">
+                        <label className="text-xs text-gray-500">
                         {t('offsetY')}
                         </label>
                         <input
@@ -176,13 +176,13 @@ export function BoxShadowControls({
                             onChange={(e) =>
                                 updateShadow(index, 'y', e.target.value)
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-1">
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500">Blur</label>
+                        <label className="text-xs text-gray-500">Blur</label>
                         <input
                             type="number"
                             min="0"
@@ -190,11 +190,11 @@ export function BoxShadowControls({
                             onChange={(e) =>
                                 updateShadow(index, 'blur', e.target.value)
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500">
+                        <label className="text-xs text-gray-500">
                         {t('spread')}
                         </label>
                         <input
@@ -203,12 +203,12 @@ export function BoxShadowControls({
                             onChange={(e) =>
                                 updateShadow(index, 'spread', e.target.value)
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
                 <div className="space-y-0.5">
-                    <label className="text-[9px] text-gray-500">Color</label>
+                    <label className="text-xs text-gray-500">Color</label>
                     <div className="flex gap-1">
                         <input
                             type="color"
@@ -224,7 +224,7 @@ export function BoxShadowControls({
                             onChange={(e) =>
                                 updateShadow(index, 'color', e.target.value)
                             }
-                            className="flex-1 px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
@@ -235,7 +235,7 @@ export function BoxShadowControls({
     return (
         <div className="space-y-1.5" ref={containerRef}>
             <div className="flex items-center justify-between">
-                <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                     <BoxSelect size={10} />
                     Box Shadow
                 </h3>
@@ -280,11 +280,11 @@ export function BoxShadowControls({
                             style={{ boxShadow: getShadowPreview(shadow) }}
                         />
                         <div className="flex-1 min-w-0">
-                            <div className="text-[9px] font-medium text-gray-700 dark:text-gray-300">
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
                                 {shadow.inset ? 'Inside' : 'Outside'} Shadow{' '}
                                 {index + 1}
                             </div>
-                            <div className="text-[8px] text-gray-500 dark:text-gray-400 truncate">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                 {getShadowPreview(shadow)}
                             </div>
                         </div>

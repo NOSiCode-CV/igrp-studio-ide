@@ -34,7 +34,7 @@ import useCustomCode from '../../../hooks/useCustomCode';
 import { TabsFunctions, TabSnipptes, TabStates } from './custom-code-tabs';
 import { cn } from '@renderer/lib/utils';
 
-const returnTypeOptions = [
+export const returnTypeOptions = [
     { value: 'string', label: 'String' },
     { value: 'number', label: 'Number' },
     { value: 'boolean', label: 'Boolean' },
@@ -66,54 +66,6 @@ export const FunctionSettingsSidebar = ({
     const [arguments_, setArguments] = useState<Argument[]>(
         formik && formik.values?.arguments ? formik.values?.arguments : []
     );
-
-    const removeArgument = (id: string) => {
-        setArguments(arguments_.filter((arg) => arg.id !== id));
-    };
-
-    const addArgument = () => {
-        const newId = (
-            Number.parseInt(arguments_[arguments_.length - 1]?.id || '0') + 1
-        ).toString();
-        setArguments([
-            ...arguments_,
-            {
-                id: newId,
-                name: '',
-                type: 'String',
-                isList: false,
-                isNullable: false,
-            },
-        ]);
-    };
-
-    const updateArgumentName = (id: string, name: string) => {
-        setArguments(
-            arguments_.map((arg) => (arg.id === id ? { ...arg, name } : arg))
-        );
-    };
-
-    const updateArgumentType = (id: string, type: string) => {
-        setArguments(
-            arguments_.map((arg) => (arg.id === id ? { ...arg, type } : arg))
-        );
-    };
-
-    const toggleArgumentNullable = (id: string) => {
-        setArguments(
-            arguments_.map((arg) =>
-                arg.id === id ? { ...arg, isNullable: !arg.isNullable } : arg
-            )
-        );
-    };
-
-    const toggleArgumentList = (id: string) => {
-        setArguments(
-            arguments_.map((arg) =>
-                arg.id === id ? { ...arg, isList: !arg.isList } : arg
-            )
-        );
-    };
 
     useEffect(() => {
         if (formik) formik.setFieldValue('arguments', arguments_);
@@ -221,123 +173,11 @@ export const FunctionSettingsSidebar = ({
                                 </div>
                             </div>
                             <Separator />
-                            <div className="flex flex-col gap-2">
-                                <Label>Define Arguments</Label>
-                                <Accordion
-                                    type="single"
-                                    collapsible
-                                    className="w-full"
-                                >
-                                    {arguments_ &&
-                                        arguments_.map((arg, index) => (
-                                            <AccordionItem
-                                                value={`argName-${index}`}
-                                                key={index}
-                                            >
-                                                <AccordionTrigger>
-                                                    <div className="flex justify-between items-center w-full">
-                                                        <div className="flex items-center space-x-2">
-                                                            <span className="font-medium">
-                                                                Arguments{' '}
-                                                                {arg.id}
-                                                            </span>
-                                                            <span className=" text-gray-400 text-sm">
-                                                                {arg.type}
-                                                            </span>
-                                                        </div>
-                                                        <button
-                                                            className="text-destructive text-sm"
-                                                            onClick={() => {
-                                                                removeArgument(
-                                                                    arg.id
-                                                                );
-                                                            }}
-                                                        >
-                                                            <Trash2 size={14} />
-                                                            <span className="sr-only">
-                                                                Remove
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </AccordionTrigger>
-                                                <AccordionContent>
-                                                    <div className="p-2 border-t space-y-3">
-                                                        <TextInput
-                                                            id={`argName-${arg.id}`}
-                                                            label={t('Name')}
-                                                            value={arg.name}
-                                                            onChange={(e) =>
-                                                                updateArgumentName(
-                                                                    arg.id,
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-
-                                                        <div className="space-y-2">
-                                                            <SelectInput
-                                                                label={t(
-                                                                    'Type'
-                                                                )}
-                                                                id="type"
-                                                                value={arg.type}
-                                                                onChange={(
-                                                                    value
-                                                                ) =>
-                                                                    updateArgumentType(
-                                                                        arg.id,
-                                                                        value as string
-                                                                    )
-                                                                }
-                                                                options={
-                                                                    returnTypeOptions
-                                                                }
-                                                            />
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="flex items-center space-x-2">
-                                                                    <CheckboxInput
-                                                                        id={`isList-${arg.id}`}
-                                                                        value={
-                                                                            arg.isList
-                                                                        }
-                                                                        onChange={() =>
-                                                                            toggleArgumentList(
-                                                                                arg.id
-                                                                            )
-                                                                        }
-                                                                        label="Is List"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex items-center space-x-2">
-                                                                    <CheckboxInput
-                                                                        id={`isNullable-${arg.id}`}
-                                                                        value={
-                                                                            arg.isNullable
-                                                                        }
-                                                                        onChange={() =>
-                                                                            toggleArgumentNullable(
-                                                                                arg.id
-                                                                            )
-                                                                        }
-                                                                        label="Nullable"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        ))}
-                                </Accordion>
-                                <Button
-                                    onClick={addArgument}
-                                    className="w-full"
-                                >
-                                    <Plus className="h-4 w-4 mr-2" /> Add
-                                    Arguments
-                                </Button>
-                            </div>
+                            <FunctionArguments
+                                value={arguments_}
+                                onChange={setArguments}
+                                returnTypeOptions={returnTypeOptions}
+                            />
                         </TabsContent>
                     )}
                     <TabsContent value="states" className="space-y-4">
@@ -361,5 +201,192 @@ export const FunctionSettingsSidebar = ({
                 </Tabs>
             </SidebarContent>
         </Sidebar>
+    );
+};
+
+interface FunctionArgumentsProps {
+    value: Argument[];
+    onChange: (args: Argument[]) => void;
+    returnTypeOptions: { value: string; label: string }[];
+}
+
+export const FunctionArguments = ({
+    value: arguments_,
+    onChange,
+    returnTypeOptions,
+}: FunctionArgumentsProps) => {
+    const removeArgument = (id: string) => {
+        onChange(arguments_.filter((arg) => arg.id !== id));
+    };
+
+    const addArgument = () => {
+        const newId = (
+            Number.parseInt(arguments_[arguments_.length - 1]?.id || '0') + 1
+        ).toString();
+        onChange([
+            ...arguments_,
+            {
+                id: newId,
+                name: `argument${arguments_.length + 1}`,
+                type: 'string',
+                isList: false,
+                isOptional: false,
+                isInterface: false,
+                isFunction: false,
+                isState: false,
+            },
+        ]);
+    };
+
+    const updateArgument = (id: string, updates: Partial<Argument>) => {
+        onChange(
+            arguments_.map((arg) =>
+                arg.id === id ? { ...arg, ...updates } : arg
+            )
+        );
+    };
+
+    return (
+        <div className="flex flex-col gap-2">
+            <Label>Define Arguments</Label>
+            <Accordion type="single" collapsible className="w-full">
+                {arguments_.map((arg, index) => (
+                    <AccordionItem value={`argName-${index}`} key={arg.id}>
+                        <AccordionTrigger>
+                            <div className="flex justify-between items-center w-full">
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-medium">
+                                        Argument {index + 1}
+                                    </span>
+                                    <span className="text-gray-400 text-sm">
+                                        {arg.type}
+                                        {arg.isList ? '[]' : ''}
+                                        {arg.isNullable ? '?' : ''}
+                                    </span>
+                                </div>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <div className="p-1 space-y-3">
+                                <TextInput
+                                    id={`argName-${arg.id}`}
+                                    label="Name"
+                                    value={arg.name}
+                                    onChange={(e) =>
+                                        updateArgument(arg.id, {
+                                            name: e.target.value,
+                                        })
+                                    }
+                                />
+
+                                <div className="space-y-2">
+                                    <SelectInput
+                                        label="Type"
+                                        id="type"
+                                        value={arg.type}
+                                        onChange={(value) =>
+                                            updateArgument(arg.id, {
+                                                type: value as string,
+                                            })
+                                        }
+                                        options={returnTypeOptions}
+                                    />
+                                    <div className="flex items-center gap-4 justify-between">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isList-${arg.id}`}
+                                                    value={arg.isList}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isList: !arg.isList,
+                                                        })
+                                                    }
+                                                    label="Is List"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isOptional-${arg.id}`}
+                                                    value={arg.isOptional}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isOptional:
+                                                                !arg.isOptional,
+                                                        })
+                                                    }
+                                                    label="isOptional"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isInterface-${arg.id}`}
+                                                    value={arg.isInterface}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isInterface:
+                                                                !arg.isInterface,
+                                                        })
+                                                    }
+                                                    label="isInterface"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isFunction-${arg.id}`}
+                                                    value={arg.isFunction}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isFunction:
+                                                                !arg.isFunction,
+                                                        })
+                                                    }
+                                                    label="isFunction"
+                                                />
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <CheckboxInput
+                                                    id={`isState-${arg.id}`}
+                                                    value={arg.isState}
+                                                    onChange={() =>
+                                                        updateArgument(arg.id, {
+                                                            isState:
+                                                                !arg.isState,
+                                                        })
+                                                    }
+                                                    label="isState"
+                                                />
+                                            </div>
+                                        </div>
+                                        <Button
+                                            variant={'ghost'}
+                                            size={'icon'}
+                                            className="text-destructive text-sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeArgument(arg.id);
+                                            }}
+                                        >
+                                            <Trash2 size={14} />
+                                            <span className="sr-only">
+                                                Remove
+                                            </span>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+            </Accordion>
+            <Button
+                onClick={addArgument}
+                className="w-full"
+                variant="outline"
+                type="button"
+            >
+                <Plus className="h-4 w-4 mr-2" /> Add Argument
+            </Button>
+        </div>
     );
 };

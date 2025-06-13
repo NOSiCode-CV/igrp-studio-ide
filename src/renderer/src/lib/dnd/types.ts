@@ -1,4 +1,4 @@
-import { ComponentRegisterConfig, CustomFunctionConfig, Import, RegisterState, State, TypeDef } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
+import { ComponentRegisterConfig, CustomFunctionConfig, Import, RegisterState, RuleDefinition, State, TypeDef } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
 import { StyleComponent } from "@renderer/generators/ui/components/settings/style/types"
 
 export type LayoutMode = "vertical" | "horizontal"
@@ -69,6 +69,7 @@ export interface StructuredComponent {
       state: State
     };
   };
+  rules?:RuleDefinition[];
   style?: StyleComponent
 }
 

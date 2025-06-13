@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { Connection, FileTree, ProjectData } from 'src/main/types';
+import { Connection, FileTree, ProjectData, ToolCheck } from 'src/main/types';
 import { IConnenctionRepository, IWorkspaceRepository, IBaseEngine, IDocker } from 'src/main/interfaces';
 import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
 
@@ -25,7 +25,11 @@ interface CustomAPI {
 
     fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>,
 
-    i18nextElectronBackend: any
+    runDoctorChecks: () => Promise<ToolCheck[]>;
+    saveDoctorReport: (results: ToolCheck[] ) => Promise<void>
+
+    i18nextElectronBackend: any,
+
 }
 
 interface CustomMenu {

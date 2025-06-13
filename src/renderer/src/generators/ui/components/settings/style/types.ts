@@ -1,3 +1,5 @@
+import { BackgroundStyle, FilterValue, OutlineValue, ShadowValue, TransformValue, TransitionValue } from "./components/effects/types";
+
 // First, update your types.ts (or wherever you define LayoutStyle)
 export interface FlexProperties {
     direction: string;
@@ -62,10 +64,85 @@ export interface SizeSytle {
     aspectRatioLocked: boolean;
 }
 
+
+//Typography
+export interface TypographyValue {
+    value: string;
+    unit: string;
+}
+
+export interface TypographyStyle {
+    fontSize: TypographyValue;
+    lineHeight: TypographyValue;
+    letterSpacing: TypographyValue;
+    wordSpacing: TypographyValue;
+    textAlign: string;
+    fontWeight: string;
+    fontStyle: string;
+    textDecoration: string;
+    textTransform: string;
+    fontFamily: string;
+}
+
+//Borders
+export interface BorderValue {
+    width: string;
+    style: string;
+    color: string;
+}
+
+export interface BorderRadius {
+    topLeft: string;
+    topRight: string;
+    bottomRight: string;
+    bottomLeft: string;
+}
+
+export interface BordersStyle {
+    borders: Record<string, BorderValue>;
+    borderRadius: BorderRadius;
+}
+
+//Position
+
+export interface PositionValue {
+    value: string;
+    unit: string;
+}
+
+export type PositionType = 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
+
+export interface PositionStyle {
+    type: PositionType;
+    positions: Record<Side, PositionValue>;
+    zIndex: string;
+    linked: boolean;
+}
+
+//Efects
+
+export interface EffectsStyle {
+    opacity: string;
+    mixBlendMode: string;
+    cursor: string;
+    outline: OutlineValue;
+    linkedShadow: boolean;
+    boxShadows: ShadowValue[];
+    filters: FilterValue[];
+    backdropFilters: FilterValue[];
+    transforms: TransformValue[];
+    transitions: TransitionValue[];
+}
+
 export interface StyleComponent {
     layout?: LayoutStyle;
     spacing?: SpacingSytle;
     size?: SizeSytle;
+    typography?: TypographyStyle;
+    borders?: BordersStyle;
+    position?: PositionStyle;
+    backgrounds?: BackgroundStyle[]
+    effects?: EffectsStyle
 }
 
 export interface SectionProps {

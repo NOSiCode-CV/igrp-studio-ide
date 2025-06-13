@@ -37,6 +37,7 @@ import * as LucideIcons from 'lucide-react';
 interface AddComponentProps {
     path: string;
     comp: StructuredComponent;
+    parentComp: StructuredComponent;
     open: boolean;
     setOpen: (open: boolean) => void;
 }
@@ -44,6 +45,7 @@ interface AddComponentProps {
 export const AddComponentModal = ({
     path,
     comp,
+    parentComp,
     open,
     setOpen,
 }: AddComponentProps) => {
@@ -68,7 +70,7 @@ export const AddComponentModal = ({
         getAcceptedChildren(path, componentName).then((data) => {
             setComponents(data);
         });
-    }, [getAcceptedChildren]);
+    }, [componentName, getAcceptedChildren, path]);
 
     // Handle adding a component
     const handleAddComponent = useCallback(
@@ -89,7 +91,7 @@ export const AddComponentModal = ({
                 generateTag,
             });
         },
-        [handleAddChildToComponent]
+        [children.length, generateTag, handleAddChildToComponent]
     );
 
     const onEditComponent = (
@@ -149,6 +151,7 @@ export const AddComponentModal = ({
                     <SidebarRight
                         comp={currentComponent}
                         path={currentPath}
+                        parentComp={parentComp}
                         className="h-full"
                     />
                 </DialogContent>
@@ -269,7 +272,7 @@ const renderCreatedComponents = (
                             <TableCell>
                                 <div className="flex gap-2">
                                     <Button
-                                        variant="ghost"
+                                        variant="outline"
                                         size="sm"
                                         onClick={() =>
                                             handleEditComponent(

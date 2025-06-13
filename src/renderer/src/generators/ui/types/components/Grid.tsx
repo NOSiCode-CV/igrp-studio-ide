@@ -3,23 +3,23 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/use-studio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { gridVariants } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
 import { useTranslation } from 'react-i18next';
+import { CardComponentProps } from '../CardComponent';
 
-export interface GridProps {
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
+const IGRPStudioGrid: React.FC<CardComponentProps> = ({
+    comp,
+    onDragEnd,
+    className,
+}: CardComponentProps) => {
     const { t } = useTranslation();
     const { children, properties, id: componentId } = comp;
 
-    const { variant, className } = properties || {};
+    const { variant } = properties || {};
 
     const [loadedComponents, setLoadedComponents] = useState<{
         [key: string]: React.ComponentType<any>;
@@ -51,7 +51,7 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
         loadComponents();
     }, [children, dynamicImport]);
 
-    const renderColumns = () => {
+    const renderChild = () => {
         const fields =
             children.length > 0 &&
             children.map((comp: StructuredComponent, index: number) => {
@@ -60,18 +60,18 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
                 return Component ? (
                     <Draggable
                         key={comp.id}
-                        item={comp.id}
+                        item={comp}
                         layout="horizontal"
                         index={index}
                         dropTargetId={componentId}
                         mode="MOVE"
-                        className="p-1"
+                        className="border-none p-1"
                     >
                         <BoxWrapper
                             comp={comp}
                             group="group/column-grid"
                             onEdit={() => handleEditClick(comp)}
-                            className="opacity-0 group-hover/column-grid:opacity-100"
+                            className="opacity-0 group-hover/column-grid:opacity-100  -top-4"
                         >
                             <Component comp={comp} onDragEnd={onDragEnd} />
                         </BoxWrapper>
@@ -105,13 +105,13 @@ const Grid: React.FC<GridProps> = ({ comp, onDragEnd }: GridProps) => {
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className='p-1'
+            className="px-1 py-1.5"
         >
             <div className={cn(gridVariants({ variant, className }))}>
-                {renderColumns()}
+                {renderChild()}
             </div>
         </Droppable>
     );
 };
 
-export default Grid;
+export default IGRPStudioGrid;

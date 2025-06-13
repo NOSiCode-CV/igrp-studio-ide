@@ -328,7 +328,7 @@
   "header": "Header",
   "widgetPalette": "Widget Palette",
   "addPage": "Add Page",
-  "seachPages": "Search pages...",
+  "seachPages": "Search pages or components...",
   "addComponents": "Add Components",
   "editComponents": "Edit Component",
   "components": "Components",
@@ -443,7 +443,9 @@
     "createButton": "Create Workspace",
     "createError": "Failed to create workspace",
     "createSuccess": "Workspace '{{name}}' created successfully!",
-    "slug": "Slug"
+    "slug": "Slug",
+    "createFailed": "Workspace creation failed:",
+    "describe": "Describe your workspace..."
   },
   "creating": "Creating...",
   "enableGraalVm": "Enable Graal Vm",
@@ -493,6 +495,7 @@
   "workspaceAndProjects": "workspace and all associated projects and configurations.",
   "id": "ID:",
   "noServicesFound": "No services found",
+  "noServicesYet": "This workspace doesn't have any services yet.",
   "addNewService": "Add New Service",
   "resources": "Resources",
   "diagram": "Diagram",
@@ -779,6 +782,13 @@
     "empty": "No imports configured",
     "placeholder": "e.g., import { lib } from 'react-library'"
   },
-  "addNewRowBottom":"Add New Row Bottom",
-  "addNewRowTop":"Add New Row Top"
+  "addNewRowBottom": "Add New Row Bottom",
+  "addNewRowTop": "Add New Row Top",
+  "forceDynamic": "Force Dynamic",
+  "pageTitle": "Page Title",
+  "searchRepositories": "Search Repositories",
+  "componentAssociation": "You can associate this component with one of the pages available in this combobox. The associated page will be included in the same path as the current page, inside the 'components' folder.",
+  "createSubNewPage": "Create SubPage",
+  "areRequired": "Are Required",
+  "componentTitle": "Component Title"
 }

@@ -1,16 +1,31 @@
-import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
-import { IGRPBadge, IGRPButton } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPBadge,
+    IGRPButton,
+    IGRPText,
+} from '@igrp/igrp-framework-react-design-system';
 import { useFakedata } from '../hooks/useFakeData';
+import { generateAllClasses } from '../components/settings/style/utils';
+import { cn } from '@renderer/lib/utils';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
+    onDragEnd: (result: DragEndResult) => void;
+    group?: string;
+    hoverClass?: string;
+    className?: string;
 }
 
-const CardComponent = ({ comp }: CardComponentProps) => {
+const CardComponent = ({
+    comp,
+    group,
+    hoverClass,
+    onDragEnd,
+}: CardComponentProps) => {
     const { getFakeComponentData } = useFakedata();
 
-    const { componentName, properties } = comp;
+    const { componentName, properties, style } = comp;
 
     const {
         commonProperties,
@@ -19,6 +34,8 @@ const CardComponent = ({ comp }: CardComponentProps) => {
         dataProperties,
         error,
         errorMessage,
+        className,
+        content,
         ...args
     } = properties;
 
@@ -30,26 +47,45 @@ const CardComponent = ({ comp }: CardComponentProps) => {
 
     const FAKE_COMPONENT_DATA = getFakeComponentData(componentName);
 
+    const classes = generateAllClasses(style);
+
     return (
         <>
             {Component ? (
                 componentName === COMPONENT.Button ? (
                     //@ts-ignore
-                    <IGRPButton {...args} {...iconProperties}>
-                        {componentLabel}
+                    <IGRPButton
+                        {...args}
+                        {...iconProperties}
+                        className={cn(classes, className)}
+                    >
+                        {content}
                     </IGRPButton>
                 ) : componentName === COMPONENT.Badge ? (
                     //@ts-ignore
-                    <IGRPBadge {...args} {...iconProperties}>
+                    <IGRPBadge
+                        {...args}
+                        {...iconProperties}
+                        className={cn(classes, className)}
+                    >
                         {componentLabel}
                     </IGRPBadge>
+                ) : componentName === COMPONENT.Text ? (
+                    //@ts-ignore
+                    <IGRPText {...args} className={cn(classes, className)}>
+                        {FAKE_COMPONENT_DATA?.properties?.content}
+                    </IGRPText>
                 ) : (
                     //@ts-ignore
                     <Component
                         {...args}
                         {...FAKE_COMPONENT_DATA?.properties}
-                        onSelectValueChange={() => void 0}
-                    ></Component>
+                        className={cn(classes, className)}
+                        comp={comp}
+                        onDragEnd={onDragEnd}
+                        hoverClass={hoverClass}
+                        group={group}
+                    />
                 )
             ) : (
                 <div className="rounded-lg shadow-xs border p-4 bg-card">
@@ -59,7 +95,7 @@ const CardComponent = ({ comp }: CardComponentProps) => {
                                 <Icon className="w-5 h-5 text-primary" />
                             </div>
                         )}
-                        <div className="text-sm font-medium text-gray-700 truncate">
+                        <div className="text-sm font-medium text-muted-foreground truncate">
                             {componentLabel}
                         </div>
                     </div>

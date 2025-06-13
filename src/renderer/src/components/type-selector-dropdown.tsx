@@ -11,7 +11,7 @@ import {
 } from '@renderer/components/ui/dropdown-menu';
 import { SchemaTypeItem } from 'src/main/types';
 import { cn } from '@renderer/lib/utils';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { ScrollArea } from './ui/scroll-area';
 
 interface TypeSelectorDropdownProps {
@@ -43,7 +43,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
         const { module } = item;
         if (module) {
             return (
-                <div className="flex items-center justify-center w-4 h-4 rounded bg-igrp/25 text-igrp">
+                <div className="flex items-center justify-center w-4 h-4 rounded bg-primary/25 text-igrp">
                     {module === 'shared' ? 'C' : module.charAt(0).toUpperCase()}
                 </div>
             );

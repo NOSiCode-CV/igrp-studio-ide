@@ -5,12 +5,13 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Button } from '@renderer/components/ui/button';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import { FunctionSquare } from 'lucide-react';
 
 interface TabStatesProps {
     states: State[];
     editorRef?: React.RefObject<any>;
+    onSelectState?: (state: State) => void;
 }
 
 interface TabFunctionsProps {
@@ -29,48 +30,74 @@ function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TabStates = ({ states, editorRef }: TabStatesProps) => {
+const TabStates = ({ states, editorRef, onSelectState }: TabStatesProps) => {
     const handleInsertState = (state: State) => {
         if (editorRef && editorRef.current) {
-            const textToInsert = `set${capitalizeFirstLetter(state.name)}(${state.defaultValue || 'null'});\n`;
+            editorRef.current.insertTextAtCursor(state.name);
+        }
+
+        onSelectState?.(state);
+    };
+
+    const handleInsertStateSet = (state: State) => {
+        if (editorRef && editorRef.current) {
+            const textToInsert = `set${capitalizeFirstLetter(state.name)}(${state.defaultValue || ''})\n`;
             editorRef.current.insertTextAtCursor(textToInsert);
         }
+
+        onSelectState?.(state);
     };
 
     return (
-        <div className="flex flex-col gap-2">
-            {states.length > 0 ? (
-                states.map((state, index) => (
-                    <div
-                        key={index}
-                        className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
-                    >
-                        <div className="flex items-center space-x-2">
-                            <span className="font-medium">{state.name}</span>
-                            <span className="text-gray-400 text-sm">
-                                {state.type}
-                            </span>
-                        </div>
-                        <Button
-                            size={'sm'}
-                            variant="outline"
-                            onClick={() => {
-                                handleInsertState(state);
-                            }}
+        <>
+            <p className="text-muted-foreground text-xs">
+                Use <strong>Name</strong> to insert the state name, or <strong>Set</strong> to insert the setter function with its default value.
+            </p>
+
+            <div className="flex flex-col gap-2">
+                {states.length > 0 ? (
+                    states.map((state, index) => (
+                        <div
+                            key={index}
+                            className="flex justify-between items-center w-full border p-2 rounded-sm hover:bg-accent hover:text-accent-foreground"
                         >
-                            Insert State
-                        </Button>
-                    </div>
-                ))
-            ) : (
-                <EmptyList
-                    icon={<FunctionSquare />}
-                    title="No States"
-                    description="Create your first custom state to add functionality to your page!"
-                    className="py-12"
-                />
-            )}
-        </div>
+                            <div className="flex flex-col space-x-2">
+                                <span className="font-medium truncate max-w-[150px]">{state.name}</span>
+                                <span className="text-muted-foreground text-sm">
+                                    {state.type}
+                                </span>
+                            </div>
+                            <div className='space-x-2 flex flex-1 justify-end'>
+                                <Button
+                                    size={'sm'}
+                                    variant="outline"
+                                    onClick={() => {
+                                        handleInsertState(state);
+                                    }}
+                                >
+                                    Name
+                                </Button>
+                                <Button
+                                    size={'sm'}
+                                    variant="outline"
+                                    onClick={() => {
+                                        handleInsertStateSet(state);
+                                    }}
+                                >
+                                    Set
+                                </Button>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <EmptyList
+                        icon={<FunctionSquare />}
+                        title="No States"
+                        description="Create your first custom state to add functionality to your page!"
+                        className="py-12"
+                    />
+                )}
+            </div></>
     );
 };
 
@@ -138,7 +165,7 @@ const TabsFunctions = ({
     const handleInsertFunction = (funct: CustomFunctionConfig) => {
         if (editorRef && editorRef.current) {
             let code = funct.code;
-            if (!code && funct.name) {
+            if ((funct.id || !code ) && funct.name) {
                 code = `${funct.name}();`;
             }
             editorRef.current.insertTextAtCursor(code);

@@ -89,7 +89,7 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
     }, [isDockerRunning, dockerOperations]);
 
     const getServiceUrl = (service: ServiceInfo) => {
-        if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.labels.type?.includes(type))) return null;
+        if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.labels?.type?.includes(type))) return null;
 
         const normalizedPorts = service.ports.map(port => {
             if (typeof port === 'string') {

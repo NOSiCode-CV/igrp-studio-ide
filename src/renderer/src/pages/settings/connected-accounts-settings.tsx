@@ -2,7 +2,7 @@ import { Button } from '@renderer/components/ui/button';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
@@ -20,7 +20,7 @@ interface GitProviderConfig {
 }
 
 const DEFAULT_PROVIDERS: GitProviderConfig[] = [
-    {
+   /*  {
         id: 'gitlab_nosi',
         name: 'GitLab NOSi',
         baseUrl: import.meta.env.VITE_GITLAB_BASE_URL,
@@ -28,7 +28,7 @@ const DEFAULT_PROVIDERS: GitProviderConfig[] = [
         clientSecret: import.meta.env.VITE_GITLAB_CLIENT_SECRET,
         active: false,
         isDefault: true,
-    },
+    }, */
 ];
 
 
@@ -98,7 +98,7 @@ function GitLabConfigForm({ config, onSave }: { config: GitProviderConfig; onSav
 
 interface AccountProps {
     name: string;
-    icon: React.ReactNode;
+    icon: ReactNode;
     connected: boolean;
     action?: () => void;
 }
@@ -151,7 +151,7 @@ export function ConnectedAccountsSettings() {
 
     const { showSuccessToast } = useToast();
 
-    const [isGitLabConfigVisible, setIsGitLabConfigVisible] = useState(false); // Controla a visibilidade do formulário de configuração GitLab
+    const [isGitLabConfigVisible, setIsGitLabConfigVisible] = useState(false);
 
     const [providers, setProviders] = useState<GitProviderConfig[]>([...DEFAULT_PROVIDERS]);
 
@@ -162,7 +162,7 @@ export function ConnectedAccountsSettings() {
 
     useEffect(() => {
         getGitlabConfig().then((config) => {
-            setProviders(config || []);
+            //setProviders(config || []);
             console.log(config)
         });
     }, []);
@@ -185,9 +185,17 @@ export function ConnectedAccountsSettings() {
                     action={userGitHub ? logoutGithub : loginGithub}
                 />
 
+                <Account
+                    name={"GitLab NOSi"}
+                    icon={<Gitlab size={20} />}
+                    connected={userGitLab}
+                    action={userGitLab ? logoutGitLab : loginGitLab}
+                />
+
                 {providers
-                    .map((provider) => (
+                    .map((provider, index) => (
                         <Account
+                            key={index}
                             name={provider.name}
                             icon={<Gitlab size={20} />}
                             connected={userGitLab}

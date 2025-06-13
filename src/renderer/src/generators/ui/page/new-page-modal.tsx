@@ -12,7 +12,7 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { getId } from '@renderer/utils/helpers';
+import { getId } from '@renderer/utils';
 import { Button } from '@renderer/components/ui/button';
 import { FocusEvent } from 'react';
 import {
@@ -20,6 +20,7 @@ import {
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
+import { PageDefinition } from './list-pages';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -31,11 +32,13 @@ const initialValues: PageConfig = {
     types: [],
     states: [],
     functions: [],
+    parentName: undefined,
 };
 
 interface NewPageModalProps {
     isOpen: boolean;
     basePath: string;
+    pageEditing?: PageDefinition;
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -45,6 +48,7 @@ export function NewPageModal({
     basePath,
     onClose,
     onConfirm,
+    pageEditing,
 }: NewPageModalProps) {
     const { t } = useTranslation();
 
@@ -80,7 +84,7 @@ export function NewPageModal({
 
     const validationSchema = Yup.object({
         description: Yup.string().required(
-            t('thisFieldRequired', { name: t('Page Title') })
+            t('thisFieldRequired', { name: t('pageTitle') })
         ),
         pageName: Yup.string()
             .required(t('thisFieldRequired', { name: t('pageName') }))
@@ -90,9 +94,7 @@ export function NewPageModal({
             .required(t('thisFieldRequired', { name: t('path') }))
             .matches(
                 PATTERNS.VALID_SEGMENT_PATTERN,
-                t(
-                    'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
-                )
+                'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
             ),
     });
 
@@ -101,8 +103,16 @@ export function NewPageModal({
         initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
+            const newValues = pageEditing
+                ? {
+                      ...values,
+                      path: `${pageEditing?.content?.path}/${values.path}`,
+                      parentName: pageEditing?.content.pageName,
+                  }
+                : values;
+
             actions.setSubmitting(false);
-            handleConfirm(values);
+            handleConfirm(newValues);
         },
     });
 
@@ -129,7 +139,9 @@ export function NewPageModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
-                <DialogTitle>{t('createNewPage')}</DialogTitle>
+                <DialogTitle>
+                    {pageEditing ? t('createSubNewPage') : t('createNewPage')}
+                </DialogTitle>
                 <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Page' })}
                 </DialogDescription>
@@ -143,7 +155,7 @@ export function NewPageModal({
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
                             id="description"
-                            label={t('Page Title')}
+                            label={t('pageTitle')}
                             onChange={formik.handleChange}
                             onBlur={handleDescriptionBlur}
                             value={formik.values.description || ''}
@@ -166,7 +178,7 @@ export function NewPageModal({
                         <TextInput
                             id="path"
                             label="Path"
-                            placeholder="e.g. /docs/[[...slug]] or /(auth)/todo-list"
+                            placeholder="e.g. docs/[[...slug]] or /(auth)/todo-list"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.path || ''}

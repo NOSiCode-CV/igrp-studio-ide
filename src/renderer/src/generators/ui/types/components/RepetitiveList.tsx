@@ -9,7 +9,7 @@ import {
     IGRPCardFooter,
     IGRPCardHeader,
 } from '@igrp/igrp-framework-react-design-system';
-import { getLabel } from '@renderer/utils/helpers';
+import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
 import TableTool from '../tools/tableTool';
@@ -22,13 +22,7 @@ export interface RepetitiveProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-export const COMPONENT_MAP: Record<string, React.ElementType> = {
-    [COMPONENT.CardFooter]: IGRPCardFooter,
-    [COMPONENT.CardContent]: IGRPCardContent,
-    [COMPONENT.CardHeader]: IGRPCardHeader,
-};
-
-const RepetitiveProps: React.FC<RepetitiveProps> = ({
+const IGRPStudioRepetitive: React.FC<RepetitiveProps> = ({
     comp,
     onDragEnd,
 }) => {
@@ -42,6 +36,13 @@ const RepetitiveProps: React.FC<RepetitiveProps> = ({
     >({});
     const { setEditingComponent } = useDroppedComponents();
     const { dynamicImport } = useStudio();
+
+
+    const COMPONENT_MAP: Record<string, React.ElementType> = {
+        [COMPONENT.CardFooter]: IGRPCardFooter,
+        [COMPONENT.CardContent]: IGRPCardContent,
+        [COMPONENT.CardHeader]: IGRPCardHeader,
+    };
 
     // Load components dynamically
     useEffect(() => {
@@ -143,4 +144,4 @@ const RepetitiveProps: React.FC<RepetitiveProps> = ({
     return <>{renderChildComp(comp)}</>;
 };
 
-export default RepetitiveProps;
+export default IGRPStudioRepetitive;

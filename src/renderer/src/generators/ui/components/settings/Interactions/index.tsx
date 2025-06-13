@@ -4,6 +4,8 @@ import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { MousePointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Action, TriggerControls } from './components/trigger-controls';
+import Rules from './components/rules';
+import { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -19,17 +21,27 @@ const Interactions = ({
     path,
     onInteranctionsChange,
 }: InteractionProps) => {
-    const { getInteractionsComponent } = useStudio();
+    const { getInteractionsComponent, getRulesComponent } =
+        useStudio();
 
     const [interactionsType, setInteractionsType] = useState({});
 
-    const { componentName, interactions, id: componentId, tag } = comp;
+    const [rulesProperties, setRulesProperties] = useState({});
+
+    const { componentName, interactions, id: componentId, tag, rules } = comp;
 
     useEffect(() => {
-        if (componentName)
+        if (componentName) {
             getInteractionsComponent(path, componentName).then((data) =>
                 setInteractionsType(data)
             );
+            getRulesComponent(path, componentName).then((data) =>
+                setRulesProperties(data)
+            );
+            /*  getDataComponent(path, componentName).then((data) =>
+                setDataProperties(data)
+            ); */
+        }
     }, [getInteractionsComponent, comp, componentName]);
 
     const handleInteractionsChange = (data: Record<string, Action>) => {
@@ -38,6 +50,20 @@ const Interactions = ({
                 interactions: { ...data },
             });
     };
+
+    const handleRulesChange = (data: RuleDefinition[]) => {
+        if (componentId)
+            onInteranctionsChange(componentId, {
+                rules: data,
+            });
+    };
+
+/*     const handleDataChange = (data: any) => {
+        if (componentId)
+            onInteranctionsChange(componentId, {
+                data,
+            });
+    }; */
 
     return (
         <div className="p-3 space-y-2">
@@ -55,6 +81,12 @@ const Interactions = ({
                     icon={<MousePointer />}
                 />
             )}
+            <Rules
+                rulesProperties={rulesProperties}
+                rules={rules}
+                componentTag={tag}
+                onRulesChange={handleRulesChange}
+            />
         </div>
     );
 };

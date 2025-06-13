@@ -99,7 +99,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
         icon?: React.ReactNode;
     }) => (
         <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500 dark:text-gray-400 flex items-center gap-0.5">
+            <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-0.5">
                 {icon}
                 {label}
             </label>
@@ -110,7 +110,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
                     onChange={(e) =>
                         onChange({ ...value, value: e.target.value })
                     }
-                    className="w-[52px] px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                    className="w-[52px] px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     placeholder="auto"
                 />
                 <select
@@ -118,7 +118,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
                     onChange={(e) =>
                         onChange({ ...value, unit: e.target.value })
                     }
-                    className="w-12 px-1 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                    className="w-12 px-1 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                 >
                     {units.map((unit) => (
                         <option key={unit} value={unit}>
@@ -135,7 +135,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
             {/* Main dimensions */}
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                    <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">
                         Dimensions
                     </h3>
                     <button
@@ -165,7 +165,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
             {/* Aspect Ratio */}
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                    <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">
                         {t('aspectRatio')}
                     </h3>
                     <button
@@ -196,7 +196,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
                             aspectRatio: e.target.value,
                         }))
                     }
-                    className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     disabled={!sizeState.aspectRatioLocked}
                 >
                     <option value="">{t('custom')}</option>
@@ -210,12 +210,12 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
 
             {/* Overflow */}
             <div className="space-y-1.5">
-                <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">
                     Overflow
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500 dark:text-gray-400">
+                        <label className="text-xs text-gray-500 dark:text-gray-400">
                             Horizontal
                         </label>
                         <select
@@ -226,7 +226,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
                                     overflowX: e.target.value,
                                 }))
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         >
                             {overflowOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -236,7 +236,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
                         </select>
                     </div>
                     <div className="space-y-0.5">
-                        <label className="text-[9px] text-gray-500 dark:text-gray-400">
+                        <label className="text-xs text-gray-500 dark:text-gray-400">
                             Vertical
                         </label>
                         <select
@@ -247,7 +247,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
                                     overflowY: e.target.value,
                                 }))
                             }
-                            className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         >
                             {overflowOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -261,7 +261,7 @@ export function SizeSection({ onChangeStyles, styles }: SectionProps) {
 
             {/* Min/Max Constraints */}
             <div className="space-y-1.5">
-                <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+                <h3 className="text-xs font-medium text-gray-700 dark:text-gray-300">
                     Constraints
                 </h3>
                 <div className="grid grid-cols-2 gap-2">

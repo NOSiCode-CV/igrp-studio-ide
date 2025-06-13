@@ -99,7 +99,7 @@ export function FilterControls({
       >
         <div className="space-y-2">
           <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
-            <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('editFilter')} {index + 1}
             </span>
             <button
@@ -111,11 +111,11 @@ export function FilterControls({
           </div>
 
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500">Type</label>
+            <label className="text-xs text-gray-500">Type</label>
             <select
               value={filter.type}
               onChange={(e) => updateFilter(index, 'type', e.target.value)}
-              className="w-full px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+              className="w-full px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
             >
               {filterTypes.map(type => (
                 <option key={type.name} value={type.name}>
@@ -126,7 +126,7 @@ export function FilterControls({
           </div>
 
           <div className="space-y-0.5">
-            <label className="text-[9px] text-gray-500">Value</label>
+            <label className="text-xs text-gray-500">Value</label>
             <div className="flex items-center gap-1">
               <input
                 type="range"
@@ -143,15 +143,15 @@ export function FilterControls({
                   max={filterType?.max}
                   value={filter.value}
                   onChange={(e) => updateFilter(index, 'value', e.target.value)}
-                  className="w-12 px-1.5 py-0.5 text-[9px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                  className="w-12 px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-[9px] text-gray-500">{filterType?.unit}</span>
+                <span className="text-xs text-gray-500">{filterType?.unit}</span>
               </div>
             </div>
           </div>
 
           <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
-            <div className="text-[9px] text-gray-500 mb-1">Preview</div>
+            <div className="text-xs text-gray-500 mb-1">Preview</div>
             <div 
               className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded"
               style={{ filter: getFilterPreview(filter) }}
@@ -165,7 +165,7 @@ export function FilterControls({
   return (
     <div className="space-y-1.5" ref={containerRef}>
       <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <Filter size={10} />
           {title}
         </h3>
@@ -189,10 +189,10 @@ export function FilterControls({
               style={{ filter: getFilterPreview(filter) }}
             />
             <div className="flex-1 min-w-0">
-              <div className="text-[9px] font-medium text-gray-700 dark:text-gray-300">
+              <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {filter.type.charAt(0).toUpperCase() + filter.type.slice(1)} Filter
               </div>
-              <div className="text-[8px] text-gray-500 dark:text-gray-400 truncate">
+              <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {getFilterPreview(filter)}
               </div>
             </div>

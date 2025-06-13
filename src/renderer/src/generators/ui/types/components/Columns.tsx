@@ -14,9 +14,12 @@ export interface ColProps {
     onDragEnd: (result: DragEndResult) => void;
 }
 
-const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
+const IGRPStudioColumns: React.FC<ColProps> = ({
+    comp,
+    onDragEnd,
+}: ColProps) => {
     const { children, properties } = comp;
-     const { t } = useTranslation();
+    const { t } = useTranslation();
 
     const { variant, className } = properties || {};
 
@@ -57,28 +60,28 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
 
             const { variant, className } = properties || {};
 
-            return Component ? (
-                <Draggable
-                    key={comp.id}
-                    item={comp}
-                    index={index}
-                    dropZone={true}
-                    className={cn(
-                        'p-0',
-                        columnVariants({ variant, className })
-                    )}
-                >
-                    <BoxWrapper
-                        comp={comp}
-                        onEdit={() => handleEditClick(comp)}
-                        group="group/comp"
-                        className="opacity-0 group-hover/comp:opacity-100"
+            return (
+                Component && (
+                    <Draggable
+                        key={comp.id}
+                        item={comp}
+                        index={index}
+                        dropZone={true}
+                        className={cn(
+                            'p-0',
+                            columnVariants({ variant, className })
+                        )}
                     >
-                        <Component comp={comp} onDragEnd={onDragEnd} />
-                    </BoxWrapper>
-                </Draggable>
-            ) : (
-                <div key={comp.id}>{t('loading')}</div>
+                        <BoxWrapper
+                            comp={comp}
+                            onEdit={() => handleEditClick(comp)}
+                            group="group/comp"
+                            className="opacity-0 group-hover/comp:opacity-100"
+                        >
+                            <Component comp={comp} onDragEnd={onDragEnd} />
+                        </BoxWrapper>
+                    </Draggable>
+                )
             );
         });
     };
@@ -90,4 +93,4 @@ const Columns: React.FC<ColProps> = ({ comp, onDragEnd }: ColProps) => {
     );
 };
 
-export default Columns;
+export default IGRPStudioColumns;

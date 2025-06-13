@@ -31,13 +31,13 @@ export function FlexControls({
         <div className="space-y-2">
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('direction')}
                     </label>
                     <select
                         value={direction}
                         onChange={(e) => onDirectionChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="row">{t('row')}</option>
                         <option value="row-reverse">{t('rowReverse')}</option>
@@ -47,13 +47,13 @@ export function FlexControls({
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('wrap')}
                     </label>
                     <select
                         value={wrap}
                         onChange={(e) => onWrapChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="nowrap">{t('noWrap')}</option>
                         <option value="wrap">{t('wrap')}</option>
@@ -64,13 +64,13 @@ export function FlexControls({
 
             <div className="grid grid-cols-2 gap-1">
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('alignItems')}
                     </label>
                     <select
                         value={alignItems}
                         onChange={(e) => onAlignItemsChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="stretch">{t('stretch')}</option>
                         <option value="flex-start">{t('start')}</option>
@@ -81,13 +81,13 @@ export function FlexControls({
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-[10px] text-gray-500 dark:text-gray-400">
-                        {t('justifyContent')}
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {'Justify Content'}
                     </label>
                     <select
                         value={justifyContent}
                         onChange={(e) => onJustifyContentChange(e.target.value)}
-                        className="w-full px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="flex-start">{t('start')}</option>
                         <option value="flex-end">{t('end')}</option>
@@ -100,7 +100,7 @@ export function FlexControls({
             </div>
 
             <div className="space-y-1">
-                <label className="text-[10px] text-gray-500 dark:text-gray-400">
+                <label className="text-xs text-gray-500 dark:text-gray-400">
                     {t('gap')}
                 </label>
                 <div className="flex items-center gap-1">
@@ -108,10 +108,10 @@ export function FlexControls({
                         type="text"
                         value={gap}
                         onChange={(e) => onGapChange(e.target.value)}
-                        className="flex-1 px-2 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500"
                         placeholder="0"
                     />
-                    <select className="w-16 px-1 py-1 text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500">
+                    <select className="w-16 px-1 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded border-0 focus:ring-2 focus:ring-blue-500">
                         <option value="px">{t('px')}</option>
                         <option value="rem">{t('rem')}</option>
                         <option value="%">{t('%')}</option>

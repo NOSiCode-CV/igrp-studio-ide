@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@renderer/lib/utils';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import { generateId } from '@renderer/utils/helpers';
+import { generateId } from '@renderer/utils';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { COMPONENT } from '../../ComponentTypes';
 import CompTools from './CompTools';
@@ -10,12 +10,14 @@ interface BoxContainerProps {
     group?: string;
     className?: string;
     comp: StructuredComponent;
+    parentComp?: StructuredComponent;
     onEdit: () => void;
     children: React.ReactElement;
 }
 
 const BoxWrapper = ({
     comp,
+    parentComp,
     children,
     group,
     className,
@@ -99,12 +101,13 @@ const BoxWrapper = ({
         <div className={cn('relative', group)} id={id}>
             <div
                 className={cn(
-                    `absolute -top-6 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
+                    `absolute -top-8 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
                     className
                 )}
             >
                 <CompTools
                     comp={comp}
+                    parentComp={parentComp}
                     handleClickDeleteComp={onClickDeleteComp}
                     handleClickBtnEdition={onClickBtnEdition}
                     handleClickStructComp={onClickStructure}

@@ -13,8 +13,8 @@ interface DependencyProps {
 }
 
 const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
-    if (!dependsOn || dependsOn.length === 0) return null;
     const { t } = useTranslation();
+    if (!dependsOn || dependsOn.length === 0) return null;
 
     const content = (
         <>
@@ -35,6 +35,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                 }
 
                 // Handle object dependencies
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 return Object.entries(dependency).map(([depId, _config]) => (
                     <Badge
                         key={`${depId}-${i}`}
