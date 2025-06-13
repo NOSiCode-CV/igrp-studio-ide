@@ -171,6 +171,11 @@ export const useFakedata = () => {
                 ]
             }
         },
+        [COMPONENT.Text]: {
+            properties: {
+                content: faker.lorem.paragraph(1)
+            }
+        },
         // Default fallback component
         Default: {
             componentName: 'UnknownComponent',

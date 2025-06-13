@@ -122,13 +122,15 @@ export function PageCard({
                         </div>
                     </div>
                     <CollapsibleContent className="flex flex-col gap-2">
-                        <Separator />
-
                         {subPages && subPages.length > 0 && (
-                            <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
-                                <ComponentIcon className="h-3 w-3" />
-                                Pages
-                            </div>
+                            <>
+                                <Separator />
+
+                                <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                    <ComponentIcon className="h-3 w-3" />
+                                    Pages
+                                </div>
+                            </>
                         )}
 
                         {/* subpages */}
@@ -157,13 +159,15 @@ export function PageCard({
                                 ))}
                             </div>
                         )}
-                        <Separator />
 
-                        {subPages && subPages.length > 0 && (
-                            <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
-                                <ComponentIcon className="h-3 w-3" />
-                                Components
-                            </div>
+                        {components && components.length > 0 && (
+                            <>
+                                <Separator />
+                                <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                    <ComponentIcon className="h-3 w-3" />
+                                    Components
+                                </div>
+                            </>
                         )}
                         {/* Subcomponents */}
                         {components && components.length > 0 && (

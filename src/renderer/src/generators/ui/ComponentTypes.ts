@@ -1,4 +1,4 @@
-import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -91,6 +91,8 @@ import IGRPStudioTabs from './types/components/Tabs';
 import IGRPStudioRepetitive from './types/components/RepetitiveList';
 import IGRPStudioMenuNavigation from './types/components/MenuNavigation';
 import IGRPStudioFormList from './types/components/FormList';
+import IGRPStudioInfoCard from './types/components/InfoCard';
+import IGRPStudioAlert from './types/components/Alert';
 
 
 // Component Categories
@@ -209,8 +211,10 @@ export const COMPONENT: Record<string, string> = {
     Paragraph: 'paragraph',
     RepetitiveList: 'repetitiveList',
     FormList: 'formList',
-    MenuNavigation: 'menuNavigation'
-
+    MenuNavigation: 'menuNavigation',
+    InfoCard: 'infoCard',
+    PdfViewer: 'pdfViewer',
+    Alert: 'alert'
 }
 
 
@@ -307,6 +311,8 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.Paragraph]: WrapText,
     [COMPONENT.RepetitiveList]: LayoutList,
     [COMPONENT.FormList]: LayoutList,
+    [COMPONENT.InfoCard]: CreditCard,
+    [COMPONENT.PdfViewer]: FileText,
 
     tableDateFilter: CalendarIcon,
     tableTextFilter: FormInput,
@@ -344,6 +350,7 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Radio]: IGRPRadioGroup,
     [COMPONENT.Icon]: IGRPIcon,
     [COMPONENT.Headline]: IGRPHeadline,
+    [COMPONENT.Text]: IGRPText,
     [COMPONENT.Switch]: IGRPSwitch,
     [COMPONENT.Search]: IGRPInputSearch,
     [COMPONENT.DatePickerRange]: IGRPDatePickerRange,
@@ -357,7 +364,7 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.RadialBarchart]: IGRPRadialBarChart,
 
     [COMPONENT.Badge]: IGRPBadge,
-
+    [COMPONENT.PdfViewer]: IGRPPdfViewer,
 
     [COMPONENT.TableInputFilter]: IGRPDataTableFilterInput,
     [COMPONENT.TableMinMaxFilter]: IGRPDataTableFilterMinMax,
@@ -386,5 +393,7 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Paragraph]: IGRPStudioParagraph,
     [COMPONENT.RepetitiveList]: IGRPStudioRepetitive,
     [COMPONENT.FormList]: IGRPStudioFormList,
-    [COMPONENT.MenuNavigation]: IGRPStudioMenuNavigation
-};
+    [COMPONENT.MenuNavigation]: IGRPStudioMenuNavigation,
+    [COMPONENT.InfoCard]: IGRPStudioInfoCard,
+    [COMPONENT.Alert]: IGRPStudioAlert,
+ };

@@ -3,6 +3,7 @@ import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
 import {
     IGRPBadge,
     IGRPButton,
+    IGRPText,
 } from '@igrp/igrp-framework-react-design-system';
 import { useFakedata } from '../hooks/useFakeData';
 import { generateAllClasses } from '../components/settings/style/utils';
@@ -13,7 +14,7 @@ export interface CardComponentProps {
     onDragEnd: (result: DragEndResult) => void;
     group?: string;
     hoverClass?: string;
-    className?: string
+    className?: string;
 }
 
 const CardComponent = ({
@@ -69,6 +70,11 @@ const CardComponent = ({
                     >
                         {componentLabel}
                     </IGRPBadge>
+                ) : componentName === COMPONENT.Text ? (
+                    //@ts-ignore
+                    <IGRPText {...args} className={cn(classes, className)}>
+                        {FAKE_COMPONENT_DATA?.properties?.content}
+                    </IGRPText>
                 ) : (
                     //@ts-ignore
                     <Component

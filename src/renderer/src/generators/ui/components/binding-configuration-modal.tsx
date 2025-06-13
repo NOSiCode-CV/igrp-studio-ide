@@ -26,6 +26,7 @@ import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
 import { capitalize } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
+import { ElementField } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface LabeledElementField {
     componentId: string;
@@ -238,22 +239,16 @@ export const BindingConfigurationModal = ({
     useEffect(() => {
         // Auto-add fields from children if not already in the list
         if (comp.children?.length) {
-            const currentFields = formik.values.fields || [];
-            const existingNames = []; /* currentFields.map(
-                (f: ElementField) => f.componentId
-            ); */
+            const currentFields: any[] = formik.values.fields || [];
 
             const { fields, componentMap: updatedMap } = extractValidFields(
-                comp.children,
-                existingNames
+                comp.children
             );
 
-            const updatedFields = fields.map((field) => ({
-                ...field,
-                ...currentFields.find(
-                    (f) => f.componentId === field.componentId
-                ),
-            }));
+            const updatedFields = updateFieldsWithSubFields(
+                fields,
+                currentFields
+            );
 
             formik.setFieldValue('fields', [...updatedFields]);
 
@@ -261,16 +256,39 @@ export const BindingConfigurationModal = ({
         }
     }, [components, comp.children]);
 
+    const updateFieldsWithSubFields = (
+        originalFields: LabeledElementField[],
+        currentFields: LabeledElementField[]
+    ): LabeledElementField[] => {
+        return originalFields.map((field) => {
+            const currentField = currentFields.find(
+                (f) => f.componentId === field.componentId
+            );
+
+            const mergedField: LabeledElementField = {
+                ...field,
+                ...currentField,
+            };
+
+            if (field.fields && currentField?.fields) {
+                mergedField.fields = updateFieldsWithSubFields(
+                    field.fields,
+                    currentField.fields
+                );
+            }
+
+            return mergedField;
+        });
+    };
+
     const extractValidFields = (
-        components: StructuredComponent[],
-        existingNames: string[] = []
+        components: StructuredComponent[]
     ): {
         fields: LabeledElementField[];
         componentMap: Map<string, StructuredComponent>;
     } => {
         const componentMap: Map<string, StructuredComponent> = new Map();
         const fields: LabeledElementField[] = [];
-        const newExistingNames = new Set(existingNames);
 
         const processComponent = (
             child: StructuredComponent,
@@ -322,25 +340,22 @@ export const BindingConfigurationModal = ({
                 child.children.forEach(tempProcess);
 
                 // Only add the repeater field if it hasn't been added yet
-                if (!newExistingNames.has(child.id)) {
-                    fields.push({
+                fields.push({
+                    ...defaultFieldType,
+                    name: child.tag,
+                    componentId: child.id,
+                    label:
+                        child.properties.label ??
+                        child.properties.headerTitle ??
+                        child.label,
+                    isList: true,
+                    type: 'object',
+                    // Add nested fields structure as options
+                    fields: nestedFields.map((field) => ({
                         ...defaultFieldType,
-                        name: child.tag,
-                        componentId: child.id,
-                        label:
-                            child.properties.label ??
-                            child.properties.headerTitle ??
-                            child.label,
-                        isList: true,
-                        type: 'object',
-                        // Add nested fields structure as options
-                        fields: nestedFields.map((field) => ({
-                            ...defaultFieldType,
-                            ...field,
-                        })),
-                    });
-                    newExistingNames.add(child.id);
-                }
+                        ...field,
+                    })),
+                });
 
                 // Add all components to the main map
                 componentMap.set(child.id, child);
@@ -352,21 +367,17 @@ export const BindingConfigurationModal = ({
             }
 
             if (shouldInclude && !parentIsRepeater) {
-                if (!newExistingNames.has(child.id)) {
-                    fields.push({
-                        ...defaultFieldType,
-                        name: child.tag,
-                        componentId: child.id,
-                        label:
-                            child.properties.label ??
-                            child.properties.headerTitle ??
-                            child.label,
-                        // Include type if available
-                        type:
-                            child.properties.dataProperties?.type || undefined,
-                    });
-                    newExistingNames.add(child.id);
-                }
+                fields.push({
+                    ...defaultFieldType,
+                    name: child.tag,
+                    componentId: child.id,
+                    label:
+                        child.properties.label ??
+                        child.properties.headerTitle ??
+                        child.label,
+                    // Include type if available
+                    type: child.properties.dataProperties?.type || undefined,
+                });
 
                 componentMap.set(child.id, child);
             }

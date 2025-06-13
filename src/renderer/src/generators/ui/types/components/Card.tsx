@@ -13,7 +13,6 @@ import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxField from '../tools/BoxFields';
 import TableTool from '../tools/tableTool';
 import { generateAllClasses } from '../../components/settings/style/utils';
 import BoxWrapper from '../tools/BoxWrapper';
@@ -95,7 +94,7 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className={cn('space-y-2', className)}
+                    className={cn('space-y-2 p-2', className)}
                 >
                     {childComponents.length === 0 ? (
                         <GenNoInfoComp

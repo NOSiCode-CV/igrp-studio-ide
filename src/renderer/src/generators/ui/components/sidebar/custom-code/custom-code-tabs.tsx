@@ -165,7 +165,7 @@ const TabsFunctions = ({
     const handleInsertFunction = (funct: CustomFunctionConfig) => {
         if (editorRef && editorRef.current) {
             let code = funct.code;
-            if (!code && funct.name) {
+            if ((funct.id || !code ) && funct.name) {
                 code = `${funct.name}();`;
             }
             editorRef.current.insertTextAtCursor(code);
