@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@renderer/lib/utils';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { generateId } from '@renderer/utils';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { COMPONENT } from '../../ComponentTypes';
 import CompTools from './CompTools';
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface BoxContainerProps {
     group?: string;

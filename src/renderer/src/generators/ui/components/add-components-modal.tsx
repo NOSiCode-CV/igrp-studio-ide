@@ -7,7 +7,11 @@ import {
     DialogDescription,
 } from '@renderer/components/ui/dialog';
 import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import {
+    Destination,
+    DragEndResult,
+    StructuredComponent,
+} from '@renderer/lib/dnd/types';
 import React, { useEffect, useState, useCallback } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
@@ -60,10 +64,13 @@ export const AddComponentModal = ({
 
     const { getAcceptedChildren } = useStudio();
 
-    const { handleAddChildToComponent, components: allComponents } =
-        useDroppedComponents();
+    const {
+        handleAddChildToComponent,
+        handleRemoveChildFromComponent,
+        components: allComponents,
+    } = useDroppedComponents();
 
-    const { generateTag } = useTagManager(allComponents);
+    const { generateTag, rebuild } = useTagManager(allComponents);
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -104,6 +111,10 @@ export const AddComponentModal = ({
         );
     };
 
+    useEffect(() => {
+        rebuild();
+    }, [rebuild]);
+
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -137,6 +148,9 @@ export const AddComponentModal = ({
                                             onEdit={onEditComponent}
                                             handleAddComponent={
                                                 handleAddComponent
+                                            }
+                                            handleRemoveChildFromComponent={
+                                                handleRemoveChildFromComponent
                                             }
                                         />
                                     ) : (
@@ -190,16 +204,23 @@ const renderAddComponents = (
     );
 };
 
-const renderCreatedComponents = (
-    components: StructuredComponent[],
-    registryComponents: ComponentRegisterConfig[],
-    onEdit: (comp: StructuredComponent, parentComponent?: string) => void,
-    handleAddComponent: (item: any, droppableId: string) => void,
-    level: number = 0, // Add a level parameter to track nesting depth
-    parentComponent?: string
-) => {
-    const { handleRemoveChildFromComponent } = useDroppedComponents();
-
+const RenderCreatedComponents = ({
+    components,
+    registryComponents,
+    onEdit,
+    handleAddComponent,
+    level = 0,
+    parentComponent,
+    handleRemoveChildFromComponent,
+}: {
+    components: StructuredComponent[];
+    registryComponents: ComponentRegisterConfig[];
+    onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
+    handleAddComponent: (item: any, droppableId: string) => void;
+    level?: number; // Add a level parameter to track nesting depth
+    parentComponent?: string;
+    handleRemoveChildFromComponent?: (destination: Destination) => void;
+}) => {
     const handleEditComponent = (
         component: StructuredComponent,
         parentComponent?: string
@@ -232,22 +253,25 @@ const renderCreatedComponents = (
     };
 
     // Recursively render child components
-    const renderChildComponents = (
-        children: StructuredComponent[],
-        level: number,
-        parentComponent: string
-    ) => {
+    const RenderChildComponents = ({
+        children,
+        level,
+        parentComponent,
+    }: {
+        children: StructuredComponent[];
+        level: number;
+        parentComponent: string;
+    }) => {
         return (
-            <>
-                {renderCreatedComponents(
-                    children,
-                    registryComponents,
-                    onEdit,
-                    handleAddComponent,
-                    level + 1,
-                    parentComponent
-                )}
-            </>
+            <RenderCreatedComponents
+                components={children}
+                registryComponents={registryComponents}
+                onEdit={onEdit}
+                handleAddComponent={handleAddComponent}
+                level={level + 1}
+                parentComponent={parentComponent}
+                handleRemoveChildFromComponent={handleRemoveChildFromComponent}
+            />
         );
     };
 
@@ -288,7 +312,7 @@ const renderCreatedComponents = (
                                         size="sm"
                                         className="text-destructive"
                                         onClick={() =>
-                                            handleRemoveChildFromComponent({
+                                            handleRemoveChildFromComponent?.({
                                                 droppableId: id,
                                                 index,
                                             })
@@ -306,11 +330,12 @@ const renderCreatedComponents = (
                             </TableCell>
                         </TableRow>
                         {component.children &&
-                            component.children.length > 0 &&
-                            renderChildComponents(
-                                component.children,
-                                level,
-                                component.componentName
+                            component.children.length > 0 && (
+                                <RenderChildComponents
+                                    children={component.children}
+                                    level={level}
+                                    parentComponent={component.componentName}
+                                />
                             )}
                     </React.Fragment>
                 );
@@ -325,11 +350,13 @@ const ComponentTable = ({
     registryComponents,
     onEdit,
     handleAddComponent,
+    handleRemoveChildFromComponent,
 }: {
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
     onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
     handleAddComponent: (item: any, droppableId: string) => void;
+    handleRemoveChildFromComponent: (destination: Destination) => void;
 }) => {
     return (
         <Table>
@@ -340,12 +367,15 @@ const ComponentTable = ({
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {renderCreatedComponents(
-                    components,
-                    registryComponents,
-                    onEdit,
-                    handleAddComponent
-                )}
+                <RenderCreatedComponents
+                    components={components}
+                    registryComponents={registryComponents}
+                    onEdit={onEdit}
+                    handleAddComponent={handleAddComponent}
+                    handleRemoveChildFromComponent={
+                        handleRemoveChildFromComponent
+                    }
+                />
             </TableBody>
         </Table>
     );

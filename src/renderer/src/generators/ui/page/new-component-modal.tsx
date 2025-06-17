@@ -30,6 +30,7 @@ import {
     FunctionArguments,
     returnTypeOptions,
 } from '../components/sidebar/custom-code/functions-settings';
+import { PageDefinition } from './list-pages';
 
 const initialValues: ComponentConfig = {
     type: 'component',
@@ -47,6 +48,7 @@ interface NewComponentModalProps {
     isOpen: boolean;
     basePath: string;
     pageOptions: any[];
+    currentComponent?: PageDefinition;
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -57,6 +59,7 @@ export function NewComponentModal({
     onClose,
     onConfirm,
     pageOptions,
+    currentComponent,
 }: NewComponentModalProps) {
     const { t } = useTranslation();
 
@@ -115,10 +118,11 @@ export function NewComponentModal({
 
     const formik = useFormik<ComponentConfig>({
         enableReinitialize: true,
-        initialValues,
+        initialValues: currentComponent?.content || initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
             actions.setSubmitting(false);
+            console.log(values)
             handleConfirm(values);
         },
     });

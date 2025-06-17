@@ -39,6 +39,7 @@ interface NewPageModalProps {
     isOpen: boolean;
     basePath: string;
     pageEditing?: PageDefinition;
+    currentComponent?: PageDefinition;
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -49,6 +50,7 @@ export function NewPageModal({
     onClose,
     onConfirm,
     pageEditing,
+    currentComponent,
 }: NewPageModalProps) {
     const { t } = useTranslation();
 
@@ -100,7 +102,7 @@ export function NewPageModal({
 
     const formik = useFormik<PageConfig>({
         enableReinitialize: true,
-        initialValues,
+        initialValues: currentComponent?.content || initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
             const newValues = pageEditing
@@ -110,6 +112,8 @@ export function NewPageModal({
                       parentName: pageEditing?.content.pageName,
                   }
                 : values;
+
+                console.log(newValues)
 
             actions.setSubmitting(false);
             handleConfirm(newValues);

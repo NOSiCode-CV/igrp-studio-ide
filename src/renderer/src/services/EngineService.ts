@@ -1,6 +1,6 @@
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 import { ENV_TYPES } from "@renderer/constants/appConstants";
-import { convertComponentsToJSONSchema } from "@renderer/utils/convertComponentsToJSONSchema";
+import { convertComponentsToJSONSchema, convertCompToInteractinsJSONSchema } from "@renderer/utils/convertComponentsToJSONSchema";
 import { capitalize, getLabel } from "@renderer/utils";
 import { FileTree, HandlerResponse } from "src/main/types";
 
@@ -60,17 +60,17 @@ export const EngineService = {
                 properties: {
                     customProperties: {
                         type: 'object',
-                        properties: component.content.args ? convertComponentsToJSONSchema(component.content.args) : undefined,
+                        properties: convertComponentsToJSONSchema(component.content.args),
                     }
                 },
-                interactions: component.interactions,
+                interactions: convertCompToInteractinsJSONSchema(component.content.args),
                 childrenTypes: [],
-                imports: component.content.pagePath ? [`import ${capitalize(component.content.name)} from '${component.content.pageName ? `./components/${component.content.name.toLowerCase()}` : `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name}`}'`] : [],
+                imports: component.content.pagePath ? [`import ${capitalize(component.content.name)} from '${component.content.pageName ? `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name.toLowerCase()}` : `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name}`}'`] : [],
                 defaultValue: false,
                 allowTypes: false,
                 group: 'appComponents',
                 customClassName: component.customClassName,
-                customComponentTag: component.content.name,
+                customComponentTag: capitalize(component.content.name),
                 variants: {},
                 propertiesMapping: {},
                 interactionsMapping: {},

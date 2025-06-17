@@ -12,6 +12,9 @@ import { BindingConfigurationModal } from '../../components/binding-configuratio
 import { Badge } from '@renderer/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { AddComponentPopover } from '../../components/add-components-popover';
+import { useTranslation } from 'react-i18next';
+import useStudio from '@renderer/hooks/use-studio';
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -28,14 +31,26 @@ const CompTools = ({
     comp,
     parentComp,
 }: ToolsProps) => {
+    const { t } = useTranslation();
     const { componentName, label, allowTypes } = comp;
+    const { componentName: parentComponentName } = parentComp || {};
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    const isGrids = [COMPONENT.Columns].includes(componentName);
+
+    const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
 
     const [currentComponent, setCurrentComponent] =
         useState<StructuredComponent | null>(null);
 
-    const isGrids = [COMPONENT.Columns].includes(componentName);
+    const { getAcceptedChildren } = useStudio();
+
+    useEffect(() => {
+        getAcceptedChildren(parentComponentName, componentName).then((data) => {
+            setComponents(data);
+        });
+    }, [parentComponentName, componentName, getAcceptedChildren]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -101,12 +116,15 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Delete</p>
+                        <p>{t('delete')}</p>
                     </TooltipContent>
                 </Tooltip>
 
-                {parentComp && (
-                    <AddComponentPopover comp={comp} parentComp={parentComp} />
+                {components.length > 0 && (
+                    <AddComponentPopover
+                        components={components}
+                        comp={comp}
+                    />
                 )}
 
                 {allowTypes && (

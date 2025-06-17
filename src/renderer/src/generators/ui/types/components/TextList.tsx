@@ -11,15 +11,13 @@ import { getLabel } from '@renderer/utils';
 import BoxWrapper from '../tools/BoxWrapper';
 import { useEffect, useState } from 'react';
 import useStudio from '@renderer/hooks/use-studio';
-import { parseArgs } from 'util';
 import {
     IGRPHeadline,
     IGRPIcon,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPColors } from '@igrp/igrp-framework-react-design-system/dist/lib/colors';
 import Droppable from '@renderer/lib/dnd/Droppable';
 
-const IGRPStudioInfoCard = ({
+const IGRPStudioTextList = ({
     comp,
     group,
     hoverClass,
@@ -41,6 +39,7 @@ const IGRPStudioInfoCard = ({
     };
 
     const handleEdit = async (component: StructuredComponent, path: string) => {
+        console.log("path ",path)
         setEditingComponent({
             path,
             component,
@@ -87,10 +86,10 @@ const IGRPStudioInfoCard = ({
         loadComponents();
     }, [dynamicImport, components]);
 
-    const renderInfoSection = (comp: StructuredComponent) => {
+    const renderTextListItem = (comp: StructuredComponent, path:string) => {
         const { children: components, componentName } = comp;
         const { className } = properties;
-        const path = `${parentComponentName}/${componentName}`;
+        const newPath = `${path}/${componentName}`;
         return (
             <Droppable
                 className={cn('flex w-full flex-col gap-2', className)}
@@ -118,7 +117,7 @@ const IGRPStudioInfoCard = ({
                                 <BoxWrapper
                                     parentComp={comp}
                                     comp={child}
-                                    onEdit={() => handleEdit(child, path)}
+                                    onEdit={() => handleEdit(child, newPath)}
                                     group="group/info-section"
                                     className="top-0 opacity-0 group-hover/info-section:opacity-100"
                                 >
@@ -134,9 +133,52 @@ const IGRPStudioInfoCard = ({
         );
     };
 
+    const renderTextList = (comp: StructuredComponent) => {
+        const { children: components, componentName } = comp;
+        const { className } = properties;
+        const path = `${parentComponentName}/${componentName}`;
+        return (
+            <Droppable
+                className={cn('flex w-full flex-col gap-2', className)}
+                onDrop={onDragEnd}
+                component={comp}
+            >
+                {components.length === 0 ? (
+                    <GenNoInfoComp
+                        type={getLabel(componentName).toUpperCase()}
+                    />
+                ) : (
+                    components.map((child, index) => {
+
+                        return (
+                            <Draggable
+                                key={child.id}
+                                item={child}
+                                index={index}
+                                mode="MOVE"
+                                dropTargetId={componentId}
+                                layout="horizontal"
+                                className={cn('p-1')}
+                            >
+                                <BoxWrapper
+                                    parentComp={comp}
+                                    comp={child}
+                                    onEdit={() => handleEdit(child, path)}
+                                    group="group/text-list-item"
+                                    className="top-0 opacity-0 group-hover/text-list-item:opacity-100"
+                                >
+                                    {renderTextListItem(child, path)}
+                                </BoxWrapper>
+                            </Draggable>
+                        );
+                    })
+                )}
+            </Droppable>
+        );
+    };
+
     return (
         <div {...properties} className={cn('space-y-3 relative  p-3')}>
-            <IGRPHeadline title={title}></IGRPHeadline>
             {components && components.length > 0 ? (
                 components.map((child: StructuredComponent, index: number) => {
                     return (
@@ -154,14 +196,14 @@ const IGRPStudioInfoCard = ({
                                 onEdit={() =>
                                     handleEdit(child, parentComponentName)
                                 }
-                                group={_group ?? `group/info-card`}
+                                group={_group ?? `group/text-list`}
                                 className={cn(
                                     'space-y-1 flex flex-col opacity-0',
                                     _hoverClass ??
-                                        'group-hover/info-card:opacity-100'
+                                        'group-hover/text-list:opacity-100'
                                 )}
                             >
-                                {renderInfoSection(child)}
+                                {renderTextList(child)}
                             </BoxWrapper>
                         </Draggable>
                     );
@@ -192,4 +234,4 @@ function IGRPInfoField({ item }: any) {
     );
 }
 
-export default IGRPStudioInfoCard;
+export default IGRPStudioTextList;

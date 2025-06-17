@@ -943,10 +943,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.211":
-  version "0.0.0-alpha.211"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.211.tgz#b447240229761d19de0906efd73582c88cfd602f"
-  integrity sha512-NtW7/kQs/TokybGgZ8Ek3S7i0uMqL2KPOFd5Al0sBtLhVuknxzbqmEMa5pqOjZkxxNxucxbfxRQ5PVBLsxBtOg==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.214":
+  version "0.0.0-alpha.214"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.214.tgz#84c1d75abdecb85956966db6afc43e2b34da4603"
+  integrity sha512-SAVM6Ui7EpNghAmNo7/Vk8C8QOU546w7CrIlg7hunq/87tNSF5g1eFw79Rl4+fdkhVpUVt2RRnv2RWx9kLTDaA==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.11"
@@ -997,10 +997,10 @@
     vaul "1.1.2"
     zod "3.25.17"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.379":
-  version "0.0.1-alpha.379"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.379.tgz#1127f6f84e657d039a2ad002df0be4ec9ad11b3b"
-  integrity sha512-Dy/WzOJCpjXkXqyMVtB6dCT1sV8XVxXtkHXDcWdEHHURf1HgW4NUKCFzC9RMJIKbwjpprTSbXaHsFAm/ZhJXqw==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.395":
+  version "0.0.1-alpha.395"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.395.tgz#88de904a684d873420ece46d59b07843bbdf45f4"
+  integrity sha512-E8PChpKCXtEKASINWBhLP41iBfann34xQL7LnET2tmifJZTpKEjBcXIv2eY+SeKCFrxETz51yE9PBnG4Soj29A==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"

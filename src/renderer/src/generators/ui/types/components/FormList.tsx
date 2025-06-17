@@ -11,6 +11,7 @@ import BoxField from '../tools/BoxFields';
 import { Button } from '@renderer/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Badge } from '@renderer/components/ui/badge';
+import BoxWrapper from '../tools/BoxWrapper';
 
 export interface RepetitiveProps {
     isDisabled?: boolean;
@@ -74,7 +75,7 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
             const path = parentComponentName;
 
             return (
-                <div className='space-y-1'>
+                <div className="space-y-1">
                     <div className="flex flex-1 justify-between">
                         <div>
                             <p className="text-sm font-medium">{label}</p>
@@ -87,7 +88,11 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
                             {badgeValue || 'Obrigatório'}
                         </Badge>
                     </div>
-                    <Droppable component={component} onDrop={onDragEnd} className='border'>
+                    <Droppable
+                        component={component}
+                        onDrop={onDragEnd}
+                        className="border"
+                    >
                         {childComponents.length === 0 ? (
                             <GenNoInfoComp
                                 type={getLabel(componentName).toUpperCase()}
@@ -107,20 +112,20 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
                                         dropTargetId={componentId}
                                         className={cn('border-none')}
                                     >
-                                        <BoxField
-                                            index={index}
+                                        <BoxWrapper
                                             parentComp={comp}
                                             comp={child}
-                                            path={path}
                                             onEdit={() =>
                                                 handleEdit(child, path)
                                             }
+                                            group="group/formlist"
+                                            className="opacity-0 group-hover/formlist:opacity-100"
                                         >
                                             <Component
                                                 comp={child}
                                                 onDragEnd={onDragEnd}
                                             />
-                                        </BoxField>
+                                        </BoxWrapper>
                                     </Draggable>
                                 );
                             })
