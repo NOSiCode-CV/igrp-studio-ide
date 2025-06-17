@@ -36,9 +36,8 @@ const MainLayout = (props: LayoutProps) => {
                 name: 'App Logic',
                 type: 'item' as const,
                 icon: BrainCircuit,
-                href: "#/app-logic",
-            }
-           
+                href: '#/app-logic',
+            },
         ],
         []
     );
