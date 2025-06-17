@@ -48,7 +48,6 @@ import {
     CustomCodeMenu,
     SidebarAppCustomCode,
 } from './custom-code/sidebar-app-custom-code';
-import { SidebarAppLogic } from './app-logic/sidebar-app-logic';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
@@ -229,8 +228,6 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup.id === 'customCode' ? (
                             <SidebarAppCustomCode searchTerm={searchQuery} />
-                        ) : activeMenuGroup.id === 'appLogic' ? (
-                            <SidebarAppLogic searchTerm={searchQuery} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible

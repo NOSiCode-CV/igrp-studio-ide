@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { IOpenProject } from './types';
 import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
 import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { Connection, FileTree, ProjectData, ToolCheck } from 'src/main/types';
+import { AppLogicEnvironment, AppLogicSettings, Connection, ConnectionTest, FileTree, ProjectData, ToolCheck } from 'src/main/types';
 import { IConnenctionRepository, IWorkspaceRepository, IBaseEngine, IDocker } from 'src/main/interfaces';
 import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
 
@@ -39,13 +39,74 @@ interface CustomMenu {
     restoreWindow: () => void,
     isMaximized: () => Promise<boolean>,
 }
+interface AppLogicAPI {
+  // Initialize
+  initialize: () => Promise<{
+    success: boolean
+    path?: string | null
+    info?: {
+      isReady: boolean
+      storeName: string
+      environmentsCount: number
+    }
+    error?: string
+  }>
 
+  // Environments
+  getEnvironments: () => Promise<AppLogicEnvironment[]>
+  addEnvironment: (environment: AppLogicEnvironment) => Promise<AppLogicEnvironment>
+  updateEnvironment: (id: string, updates: Partial<AppLogicEnvironment>) => Promise<boolean>
+  deleteEnvironment: (id: string) => Promise<boolean>
+  getEnvironment: (id: string) => Promise<AppLogicEnvironment | null>
+
+  // Stats
+  getStats: () => Promise<{
+    total: number
+    connected: number
+    disconnected: number
+    testing: number
+    error: number
+  }>
+
+  // Settings
+  getSettings: () => Promise<AppLogicSettings>
+  updateSettings: (updates: Partial<AppLogicSettings>) => Promise<boolean>
+
+  // History
+  addConnectionTest: (test: ConnectionTest) => Promise<boolean>
+  getEnvironmentHistory: (environmentId: string) => Promise<ConnectionTest[]>
+
+  // Export/Import
+  exportData: () => Promise<string>
+  importData: (jsonData: string) => Promise<{ success: boolean; error?: string }>
+
+  // Test
+  testEnvironment: (environment: AppLogicEnvironment) => Promise<{
+    isValid: boolean
+    responseTime?: number
+    error?: string
+    statusCode?: number
+  }>
+
+  // Store info
+  getStoreInfo: () => Promise<{
+    isReady: boolean
+    storeName: string
+    environmentsCount: number
+    path: string | null
+  }>
+
+  // Events
+  onEnvironmentsChanged: (callback: (environments: AppLogicEnvironment[]) => void) => () => void
+  removeAllListeners: () => void
+}
 declare global {
     interface Window {
         electron: ElectronAPI | getAppVersion | getLanguage | setLanguage | onFolderChange | watchFolder
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
         menu: CustomMenu,
-        engine: IBaseEngine
+        engine: IBaseEngine,
+        appLogicAPI: AppLogicAPI
     }
 }

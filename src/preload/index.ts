@@ -292,7 +292,47 @@ const window = {
 	restoreWindow: () => ipcRenderer.send('restore-window'),
 	isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
 }
+const appLogic = {
+	// Initialize
+		initialize: () => ipcRenderer.invoke("app-logic:initialize"),
 
+		// Environments
+		getEnvironments: () => ipcRenderer.invoke("app-logic:get-environments"),
+		addEnvironment: (environment) => ipcRenderer.invoke("app-logic:add-environment", environment),
+		updateEnvironment: (id, updates) => ipcRenderer.invoke("app-logic:update-environment", id, updates),
+		deleteEnvironment: (id) => ipcRenderer.invoke("app-logic:delete-environment", id),
+		getEnvironment: (id) => ipcRenderer.invoke("app-logic:get-environment", id),
+
+		// Stats
+		getStats: () => ipcRenderer.invoke("app-logic:get-stats"),
+
+		// Settings
+		getSettings: () => ipcRenderer.invoke("app-logic:get-settings"),
+		updateSettings: (updates) => ipcRenderer.invoke("app-logic:update-settings", updates),
+
+		// History
+		addConnectionTest: (test) => ipcRenderer.invoke("app-logic:add-connection-test", test),
+		getEnvironmentHistory: (environmentId) => ipcRenderer.invoke("app-logic:get-environment-history", environmentId),
+
+		// Export/Import
+		exportData: () => ipcRenderer.invoke("app-logic:export-data"),
+		importData: (jsonData) => ipcRenderer.invoke("app-logic:import-data", jsonData),
+
+		// Test
+		testEnvironment: (environment) => ipcRenderer.invoke("app-logic:test-environment", environment),
+
+		// Store info
+		getStoreInfo: () => ipcRenderer.invoke("app-logic:get-store-info"),
+
+		// Events
+		onEnvironmentsChanged: (callback) => {
+			const subscription = (event, environments) => callback(environments)
+			ipcRenderer.on("app-logic:environments-changed", subscription)
+			return () => ipcRenderer.removeListener("app-logic:environments-changed", subscription)
+		},
+
+		removeAllListeners: () => ipcRenderer.removeAllListeners("app-logic:environments-changed"),
+	}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -316,6 +356,8 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('engine', engine)
 		contextBridge.exposeInMainWorld('igrpStudio', repo)
 		contextBridge.exposeInMainWorld('menu', window)
+		contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
+
 	} catch (error) {
 		console.error(error)
 	}
