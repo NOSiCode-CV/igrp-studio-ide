@@ -7,7 +7,7 @@ import {
     IGRPSidebarFooter,
 } from '@renderer/layouts/components/app-sidebar-default';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
-import { Database } from 'lucide-react';
+import { BrainCircuit, Database } from 'lucide-react';
 import FooterSidebar from './components/footer-sidebar';
 import { Footer } from './components/footer';
 import { Toaster } from '@renderer/components/ui/sonner';
@@ -32,6 +32,12 @@ const MainLayout = (props: LayoutProps) => {
                 icon: Database,
                 href: '#',
             },
+            {
+                name: 'App Logic',
+                type: 'item' as const,
+                icon: BrainCircuit,
+                href: "#/app-logic",
+            }
            
         ],
         []
