@@ -52,7 +52,7 @@ const SectionTool = ({
             </Tooltip>
 
             {/* Action buttons */}
-            <div className="absolute z-10 left-0 -top-6 rounded opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
+          {/*   <div className="absolute z-10 left-0 -top-6 rounded opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
                 <div className="flex">
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -113,7 +113,7 @@ const SectionTool = ({
                         </TooltipContent>
                     </Tooltip>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

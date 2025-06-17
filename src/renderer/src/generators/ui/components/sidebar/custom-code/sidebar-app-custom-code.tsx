@@ -52,6 +52,7 @@ import useCustomCode from '../../../hooks/useCustomCode';
 import { SnnipetComponent } from './custom-code-snippet';
 import { ImportComponent } from './custom-code-imports';
 import { FunctionSettingsSidebar } from './functions-settings';
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 
 interface ResourceListProps<T> {
     title: string;
@@ -176,7 +177,8 @@ const ResourceList = <T extends { id?: string; name: string }>({
     const filteredItems = items.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+    const [isDelete, setIsDelete] = useState<boolean>(false);
+    const [currentItem, setCurrentItem] = useState<T | null>(null);
     return (
         <>
             {filteredItems.length > 0 && (
@@ -196,41 +198,34 @@ const ResourceList = <T extends { id?: string; name: string }>({
                                                         {renderItemName(item)}
                                                     </span>
                                                     <div className="absolute right-2 top-1/2 -translate-y-1/2  opacity-0 group-hover/item:opacity-100">
+                                                        {onEdit && item.id && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-6 w-6"
+                                                                onClick={() =>
+                                                                    onEdit(item)
+                                                                }
+                                                            >
+                                                                <Pencil className="h-3 w-3" />
+                                                            </Button>
+                                                        )}
                                                         {onDelete &&
                                                             item.id && (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6"
-                                                                    onClick={() =>
-                                                                        onEdit(
-                                                                            item
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Pencil className="h-3 w-3" />
-                                                                </Button>
-                                                            )}
-                                                        {onDelete &&
-                                                            item.id && (
-                                                                <IGRPAlertDialog
-                                                                    onAction={() =>
-                                                                        onDelete(
-                                                                            item
-                                                                        )
-                                                                    }
-                                                                   /*  recordId={
-                                                                        item.name
-                                                                    } */
-                                                                >
                                                                     <Button
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         className="h-6 w-6 text-destructive hover:text-destructive"
+                                                                        onClick={() =>
+                                                                           {  setCurrentItem(item);
+                                                                           setIsDelete(
+                                                                            !isDelete
+                                                                        )
+                                                                       
+                                                                        }}
                                                                     >
                                                                         <Trash2 className="h-3 w-3" />
                                                                     </Button>
-                                                                </IGRPAlertDialog>
                                                             )}
                                                     </div>
                                                 </div>
@@ -244,6 +239,12 @@ const ResourceList = <T extends { id?: string; name: string }>({
                 </>
             )}
             {editModal}
+            <AlertDialogDelete
+                isOpen={isDelete}
+                onClose={() => setIsDelete(false)}
+                onConfirm={() => currentItem && onDelete?.(currentItem)}
+                hasTrigger={false}
+            />
         </>
     );
 };

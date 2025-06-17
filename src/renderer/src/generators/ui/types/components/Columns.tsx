@@ -7,6 +7,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import { columnsVariants, columnVariants } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
 import { useTranslation } from 'react-i18next';
+import { useIsMobile } from '@renderer/hooks/use-mobile';
 
 export interface ColProps {
     isDisabled?: boolean;
@@ -19,7 +20,6 @@ const IGRPStudioColumns: React.FC<ColProps> = ({
     onDragEnd,
 }: ColProps) => {
     const { children, properties } = comp;
-    const { t } = useTranslation();
 
     const { variant, className } = properties || {};
 
@@ -30,6 +30,8 @@ const IGRPStudioColumns: React.FC<ColProps> = ({
     const { setEditingComponent } = useDroppedComponents();
 
     const { dynamicImport } = useStudio();
+
+    const isMobile = useIsMobile();
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -76,7 +78,7 @@ const IGRPStudioColumns: React.FC<ColProps> = ({
                             comp={comp}
                             onEdit={() => handleEditClick(comp)}
                             group="group/comp"
-                            className="opacity-0 group-hover/comp:opacity-100"
+                            className="-top-4 opacity-0 group-hover/comp:opacity-100"
                         >
                             <Component comp={comp} onDragEnd={onDragEnd} />
                         </BoxWrapper>
@@ -87,7 +89,13 @@ const IGRPStudioColumns: React.FC<ColProps> = ({
     };
 
     return (
-        <div className={cn('p-2', columnsVariants({ variant, className }))}>
+        <div
+            className={cn(
+                'p-2',
+                columnsVariants({ variant, className }),
+                isMobile && 'grid-cols-2 w-full'
+            )}
+        >
             {renderColumns()}
         </div>
     );

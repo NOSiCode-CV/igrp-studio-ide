@@ -4,21 +4,16 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
 import useStudio from '@renderer/hooks/use-studio';
-import { useEffect, useState } from 'react';
+import { ComponentProps, useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import SectionTool from '../tools/SectionTool';
 import { useTranslation } from 'react-i18next';
 import { newStructuredComponent } from '../../dnd/helpers';
 import { COMPONENT } from '../../ComponentTypes';
 import BoxWrapper from '../tools/BoxWrapper';
+import { CardComponentProps } from '../CardComponent';
 
-export interface SectionProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
+const IGRPStudioComponent= ({ comp, onDragEnd }: CardComponentProps) => {
     const { t } = useTranslation();
     const { children: components, id: componentId } = comp || {};
 
@@ -86,14 +81,8 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
     };
 
     return (
-        <div className="group/section relative hover:border-2 hover:border-primary rounded-lg px-1">
-            <SectionTool
-                onClickAddControl={(type) => {
-                    handleAddControl?.(type, componentId);
-                }}
-                onClickDeleteSection={handleDeleteSection}
-                onEdit={() => handleEdit(comp)}
-            />
+        <div className="group/row relative hover:border-2 hover:border-primary rounded-lg px-1">
+   
             <Droppable
                 onDrop={handleDrop}
                 component={comp}
@@ -118,15 +107,14 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
                                         parentComp={comp}
                                         comp={childComp}
                                         onEdit={() => handleEdit(childComp)}
-                                        group="group/row-section"
+                                        group="group/row-comp"
                                         className={cn(
-                                            'left-0 right-auto opacity-0 group-hover/row-section:opacity-100'
+                                            'left-0 right-auto opacity-0 group-hover/row-comp:opacity-100'
                                         )}
                                     >
                                         <Component
                                             comp={childComp}
                                             onDragEnd={onDragEnd}
-                                            isDisabled={isDisabled}
                                         />
                                     </BoxWrapper>
                                 </Draggable>
@@ -143,4 +131,4 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
     );
 };
 
-export default IGRPStudioSection;
+export default IGRPStudioComponent;

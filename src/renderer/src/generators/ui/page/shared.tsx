@@ -21,6 +21,7 @@ import { PageDefinition } from './list-pages';
 export const PageActions = ({
     page,
     onDelete,
+    onEdit,
     onAddComponents,
     openDialogNewPage,
 }: PageCardProps) => {
@@ -38,10 +39,10 @@ export const PageActions = ({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                {/* <DropdownMenuItem>Edit</DropdownMenuItem> */}
+                <DropdownMenuItem onClick={onEdit}><Edit/>{t('edit')}</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddComponents(page)}>
-                    <Edit />
-                    {isPage ? t('addComponents') : t('editComponents')}
+                    <Component />
+                    {t('addComponents')}
                 </DropdownMenuItem>
                 {isPage && (
                     <DropdownMenuItem

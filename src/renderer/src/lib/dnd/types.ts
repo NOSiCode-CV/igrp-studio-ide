@@ -100,7 +100,6 @@ export interface EditingComponentParams {
 }
 
 export interface DroppedComponentsContextType {
-  newStructure: (name: string) => StructuredComponent;
   setAllComponents: (components: StructuredLayout) => void;
 
   handleAddChildToComponent: (

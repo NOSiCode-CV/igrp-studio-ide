@@ -180,7 +180,7 @@ export const layoutMapping = {
 };
 
 export const columnsVariants = cva(
-    "flex flex-1",
+    "",
     {
         variants: {
             variant: {

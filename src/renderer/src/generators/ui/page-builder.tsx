@@ -30,11 +30,13 @@ import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
 import { EngineService } from '@renderer/services/EngineService';
-import Page from './types/components/Page';
+import Page from './types/components/MainComponent';
+import { PageDefinition } from './page/list-pages';
+import IGRPStudioMainComponent from './types/components/MainComponent';
 
 interface FormEngineProps {
     basePath: string;
-    page: any;
+    page: PageDefinition;
     activePresentation: string;
     onSave: () => void;
 }
@@ -46,6 +48,8 @@ interface FormEngineRef {
 const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
     ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath } = page;
+
+        const isPage = content?.type === 'page';
 
         const {
             handleAddChildToComponent,
@@ -68,7 +72,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { componentsRegistered, findComponentById, fetchComponents } = useStudio();
+        const { componentsRegistered, findComponentById, fetchComponents } =
+            useStudio();
 
         const { customComponents } = useCustomCode();
 
@@ -95,14 +100,17 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         }, [activePresentation]);
 
         useEffect(() => {
-
             const appComponents = fetchComponents();
 
             const registerComponents = () => {
-                EngineService.registerComponent({ customComponents, appComponents, currentPage: page.pageName });
-            }
+                EngineService.registerComponent({
+                    customComponents,
+                    appComponents,
+                    currentPage: page.pageName,
+                });
+            };
 
-            registerComponents()
+            registerComponents();
 
             window.electron.ipcRenderer.on('folder-change', registerComponents);
 
@@ -112,7 +120,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     registerComponents
                 );
             };
-
         }, [customComponents]);
 
         const handleSave = async (components: StructuredLayout) => {
@@ -137,10 +144,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     ...config,
                 };
 
-                console.log(content.type === 'page' ? pageConfig : compConfig);
+                console.log(isPage ? pageConfig : compConfig);
 
                 const { error } = await window.engine.createPage(
-                    content.type === 'page' ? pageConfig : compConfig,
+                    isPage ? pageConfig : compConfig,
                     ENV_TYPES.NEXTJS,
                     basePath
                 );
@@ -184,7 +191,11 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         useEffect(() => {
             if (loading) return;
 
-            const pageCompRegister = findComponentById(COMPONENT.PageContent);
+            const mainComponent = isPage
+                ? COMPONENT.PageContent
+                : COMPONENT.ComponentContent;
+
+            const pageCompRegister = findComponentById(mainComponent);
             const sectionCompRegister = findComponentById(COMPONENT.Section);
 
             const section = newStructuredComponent(
@@ -194,15 +205,18 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             );
 
             const pageContent = newStructuredComponent(
-                COMPONENT.PageContent,
-                [{ ...section, tag: generateTag(COMPONENT.Section) }],
+                mainComponent,
+                isPage
+                    ? [{ ...section, tag: generateTag(COMPONENT.Section) }]
+                    : [],
                 pageCompRegister
             );
+            console.log(pageContent);
             setAllComponents({
                 ...pageContent,
-                tag: generateTag(COMPONENT.PageContent),
+                tag: generateTag(mainComponent),
             });
-        }, [menuItems, loading]);
+        }, [menuItems, loading, isPage]);
 
         useEffect(() => {
             rebuild();
@@ -228,7 +242,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
                             {activePresentation === APRESENTATION.DESIGN ? (
-                                <Page page={components} onDragEnd={onDragEnd} />
+                                <IGRPStudioMainComponent component={components ?? []} onDragEnd={onDragEnd} />
                             ) : activePresentation === APRESENTATION.JSON ? (
                                 <CodeContentJson
                                     components={components}

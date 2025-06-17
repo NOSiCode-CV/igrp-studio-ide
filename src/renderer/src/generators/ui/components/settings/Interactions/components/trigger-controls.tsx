@@ -27,7 +27,6 @@ import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { PageSelectionConfig } from '../../properties';
 
 type ActionType = 'function' | 'navigate' | 'formSubmit';
 
@@ -227,7 +226,6 @@ const InteractionEditor = ({
     localInteractions,
     componentTag,
 }: InteractionEditorProps) => {
-    const [selectedPagePath, setSelectedPagePath] = useState<string>();
 
     const [actionType, setActionType] = useState<ActionType>(
         interaction.type || 'function'

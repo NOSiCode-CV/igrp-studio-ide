@@ -91,7 +91,11 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
 
     // Render table headers
     const renderTableHeaders = useCallback(
-        (compName: string, dropTargetId: string, tableColumn: StructuredComponent) => {
+        (
+            compName: string,
+            dropTargetId: string,
+            tableColumn: StructuredComponent
+        ) => {
             return columns.map((child, index) => {
                 const Component = loadedComponents[child.id];
                 const { label, properties } = child;
@@ -126,7 +130,7 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                 ) : null;
             });
         },
-        [columns, loadedComponents, componentId, comp, handleEdit]
+        [columns, loadedComponents, handleEdit, componentName]
     );
 
     // Render table rows
@@ -138,10 +142,12 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                         {child.componentName === COMPONENT.TableCheckboxCell ? (
                             <Checkbox id={child.id} checked={row[child.id]} />
                         ) : child.componentName ===
-                            COMPONENT.TableableBadgeCell ? (
-                            <Badge variant="secondary">{faker.lorem.words(1)}</Badge>
+                          COMPONENT.TableableBadgeCell ? (
+                            <Badge variant="secondary">
+                                {faker.lorem.words(1)}
+                            </Badge>
                         ) : child.componentName ===
-                            COMPONENT.TableActionListCell ? (
+                          COMPONENT.TableActionListCell ? (
                             <Button variant="secondary" size="icon">
                                 <Ellipsis />
                             </Button>

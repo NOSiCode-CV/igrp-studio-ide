@@ -19,6 +19,7 @@ export interface PageCardProps {
     components?: PageDefinition[];
     subPages?: PageDefinition[];
     onDelete: (page: any) => void;
+    onEdit: (page: any) => void;
     onAddComponents: (page: PageDefinition) => void;
     openDialogNewPage?: (page: PageDefinition) => void;
 }
@@ -27,6 +28,7 @@ export function PageCard({
     page,
     components,
     onDelete,
+    onEdit,
     onAddComponents,
     openDialogNewPage,
     subPages,
@@ -114,6 +116,7 @@ export function PageCard({
                                 </Badge>
                                 <PageActions
                                     page={page}
+                                    onEdit={() => onEdit(page)}
                                     onDelete={() => onDelete(page)}
                                     onAddComponents={onAddComponents}
                                     openDialogNewPage={openDialogNewPage}
@@ -152,6 +155,7 @@ export function PageCard({
                                         </div>
                                         <PageActions
                                             page={subpage}
+                                            onEdit={() => onEdit(subpage)}
                                             onDelete={() => onDelete(subpage)}
                                             onAddComponents={onAddComponents}
                                         />
@@ -186,6 +190,7 @@ export function PageCard({
                                         <PageActions
                                             page={subpage}
                                             onDelete={() => onDelete(subpage)}
+                                            onEdit={() => onEdit(subpage)}
                                             onAddComponents={onAddComponents}
                                         />
                                     </div>

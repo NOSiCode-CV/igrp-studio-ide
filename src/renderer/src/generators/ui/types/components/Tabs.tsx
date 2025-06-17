@@ -152,7 +152,7 @@ const IGRPStudioTabs: React.FC<TabsProps> = ({
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
-                        className="bg-card rounded-lg border border-dashed border-gray-400 w-full"
+                        className="bg-card rounded-lg border border-dashed border-gray-400 w-full space-y-2"
                     >
                         {components.length > 0 ? (
                             components.map(
