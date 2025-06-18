@@ -408,9 +408,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -950,10 +950,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.215":
-  version "0.0.0-alpha.215"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.215.tgz#418991470f0655b0c86328a3eb0e40613d1becee"
-  integrity sha512-i7na0xfgS3O2yY51ob175v/ZuAS4JR3STe+9i1V6bf1g9Zn/xvfJGkAR54bPTjkaJEeXxn5/CZb2dv1qhlBiOg==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.216":
+  version "0.0.0-alpha.216"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.216.tgz#811ab333a002ba61c9ced1fa9e8702bdd5c83ab0"
+  integrity sha512-Jo3hN3os3mP2bzQHZ5rmm+Oeytj3Fp8G16+REx091TpxO9zMDA9wFf5Z/YPcY1d5VuI56u7DYx0d0a6pEk/TGQ==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.11"
@@ -1004,10 +1004,10 @@
     vaul "1.1.2"
     zod "3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.397":
-  version "0.0.1-alpha.397"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.397.tgz#539e3fa71b430f8b36a0badc45fe79033d7beb5e"
-  integrity sha512-fkVNjEGaHay9bE1NKAhX7/b+Ra3VwoMTqlqTTl+vjetW1xelC9zka2oI3gEdcxcYA86DgpRBPjw/C22OFDQ4SQ==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.401":
+  version "0.0.1-alpha.401"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.401.tgz#1b96787af1af310e1f40935cef6e200bd32722c4"
+  integrity sha512-QiouWGZnekS0S0h1uziZoWGQqeTgLkC77j+rnxD51CU1mIkA740T2cFkpQw3VpFbk+sYpz18J43rez2btmbejQ==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"

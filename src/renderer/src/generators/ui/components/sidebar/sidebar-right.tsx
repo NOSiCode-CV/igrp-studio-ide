@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Settings, X } from 'lucide-react';
 
 import {
@@ -33,22 +32,34 @@ import useCustomCode from '../../hooks/useCustomCode';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
 import { useComponents } from '../../hooks/useComponents';
+import {
+    ChangeEvent,
+    ComponentProps,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 
-interface SidebarRightProps extends React.ComponentProps<typeof Sidebar> {
+interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
     parentComp?: StructuredComponent;
     path?: string;
 }
 
-export function SidebarRight({
+const SidebarRight = ({
     comp,
     path,
     parentComp,
     ...props
-}: SidebarRightProps) {
+}: SidebarRightProps) => {
     const { t } = useTranslation();
-    const { getPropertiesComponent, getChildPropertiesComponent, pageOptions } =
-        useStudio();
+    const {
+        getPropertiesComponent,
+        getDataComponent,
+        getChildPropertiesComponent,
+        pageOptions,
+    } = useStudio();
     const {
         currentComponent: editingComponentParams,
         handleUpdateChildComponent,
@@ -59,7 +70,7 @@ export function SidebarRight({
     const { getRefsOptions } = useComponents();
 
     // Memoized derived state
-    const currentComp = React.useMemo(
+    const currentComp = useMemo(
         () => comp || editingComponentParams?.component,
         [comp, editingComponentParams]
     );
@@ -67,38 +78,81 @@ export function SidebarRight({
     const {
         label,
         tag,
+        data,
         componentName,
-        id: componentId,
         properties = {},
         childProperties = {},
-        data,
+        id: componentId,
     } = currentComp || {};
 
     // State management
-    const [formValues, setFormValues] = React.useState<Record<string, any>>({});
-    const [propsComponent, setPropsComponent] = React.useState<
+    const [formValues, setFormValues] = useState<Record<string, any>>({});
+    const [propsComponent, setPropsComponent] = useState<Record<string, any>>(
+        {}
+    );
+
+    const [childformValues, setChildformValues] = useState<Record<string, any>>(
+        {}
+    );
+
+    const [propsComponentChild, setPropsComponentChild] = useState<
         Record<string, any>
     >({});
 
-    const [childformValues, setChildformValues] = React.useState<
-        Record<string, any>
-    >({});
+    const [currentTag, setCurrentTag] = useState<string>(tag || '');
 
-    const [propsComponentChild, setPropsComponentChild] = React.useState<
-        Record<string, any>
-    >({});
+    const [columnsOptions, setColumnsOptions] = useState<IGRPOptionsProps[]>(
+        []
+    );
 
-    const [currentTag, setCurrentTag] = React.useState<string>(tag || '');
+    useEffect(() => {
+        if (componentName) {
+            console.log(currentPath, componentName, data);
+            getDataComponent(currentPath, componentName).then((response) => {
+                // Check if each key in data exists in response
+                if (data && response) {
+                    const cleanedData = { ...data };
+                    let hasChanges = false;
 
-    const [columnsOptions, setColumnsOptions] = React.useState<
-        IGRPOptionsProps[]
-    >([]);
+                    // Iterate through each key in the current data
+                    Object.keys(data).forEach((key) => {
+                        // If the key doesn't exist in the response, remove it
+                        if (!(key in response)) {
+                            delete cleanedData[key];
+                            hasChanges = true;
+                        }
+                    });
 
-    React.useEffect(() => {
-        setCurrentTag(tag || '');
-    }, [tag]);
+                    // Iterate through each key in the response
+                    Object.keys(response).forEach((key) => {
+                        // If the key doesn't exist in the current data, add it
+                        if (!(key in data)) {
+                            cleanedData[key] = response[key];
+                            hasChanges = true;
+                        }
+                    });
 
-    React.useEffect(() => {
+                    // If we made changes, update the component with cleaned data
+                    if (hasChanges && componentId) {
+                        handleUpdateChildComponent(componentId, {
+                            ...currentComp,
+                            data: cleanedData,
+                        });
+                    }
+                }
+            });
+        }
+    }, [
+        componentName,
+        currentPath,
+        data,
+        componentId,
+        currentComp,
+        handleUpdateChildComponent,
+        getDataComponent,
+    ]);
+
+    useEffect(() => {
         const options =
             parentComp?.children
                 .filter(
@@ -116,9 +170,13 @@ export function SidebarRight({
         setColumnsOptions(options);
     }, [parentComp]);
 
+    useEffect(() => {}, []);
+
     // Load properties component
-    React.useEffect(() => {
+    useEffect(() => {
         if (!componentName) return;
+
+        setCurrentTag(tag || '');
 
         const loadProps = async () => {
             try {
@@ -130,32 +188,107 @@ export function SidebarRight({
 
                 // Função para fazer deep merge de objetos
                 const deepMerge = (target: any, source: any) => {
+                    const result = { ...target };
+
                     for (const key in source) {
-                        if (source[key] instanceof Object && key in target) {
-                            Object.assign(
-                                source[key],
-                                deepMerge(target[key], source[key])
-                            );
+                        if (
+                            source[key] instanceof Object &&
+                            key in target &&
+                            target[key] instanceof Object
+                        ) {
+                            result[key] = deepMerge(target[key], source[key]);
+                        } else {
+                            // Always use source value if it exists
+                            result[key] = source[key];
                         }
                     }
-                    Object.assign(target || {}, source);
-                    return target;
+
+                    return result;
                 };
 
-                // Initialize form values with deep merge
-                const initialValues = deepMerge(
-                    // Começa com os defaults
+                const target = // Aplica os valores padrão
                     Object.entries(data ?? {}).reduce(
                         (acc, [key, config]) => {
-                            acc[key] = config.default;
+                            if (config.type === 'object' && config.properties) {
+                                acc[key] = Object.entries(
+                                    config.properties
+                                ).reduce(
+                                    (
+                                        objAcc,
+                                        [propKey, propConfig]: [string, any]
+                                    ) => {
+                                        if (
+                                            propConfig.default !== undefined ||
+                                            propConfig.required
+                                        ) {
+                                            objAcc[propKey] =
+                                                propConfig.default;
+                                        }
+                                        return objAcc;
+                                    },
+                                    {}
+                                );
+                            } else if (config.default || config.required) {
+                                acc[key] = config.default;
+                            }
                             return acc;
                         },
                         {} as Record<string, any>
-                    ),
+                    );
 
-                    // Sobrescreve com as properties atuais
-                    properties
-                );
+                const source = // Filter properties based on schema and requirements
+                    Object.entries(properties ?? {}).reduce(
+                        (acc, [key, value]) => {
+                            const schemaConfig = data?.[key];
+
+                            // Skip if property not in schema
+                            if (!schemaConfig) {
+                                return acc;
+                            }
+
+                            // Handle nested objects
+                            if (
+                                schemaConfig.type === 'object' &&
+                                schemaConfig.properties
+                            ) {
+                                const filteredNestedProps = Object.entries(
+                                    value || {}
+                                ).reduce(
+                                    (nestedAcc, [nestedKey, nestedValue]) => {
+                                        const nestedConfig =
+                                            schemaConfig.properties[nestedKey];
+                                        // Keep if in schema and (required or not null)
+                                        if (
+                                            nestedConfig &&
+                                            (nestedConfig.required ||
+                                                nestedValue !== null)
+                                        ) {
+                                            nestedAcc[nestedKey] = nestedValue;
+                                        }
+                                        return nestedAcc;
+                                    },
+                                    {}
+                                );
+
+                                if (
+                                    Object.keys(filteredNestedProps).length > 0
+                                ) {
+                                    acc[key] = filteredNestedProps;
+                                }
+                            }
+                            // Handle non-object properties
+                            else if (schemaConfig.required || value) {
+                                // For string type, keep empty strings
+                                acc[key] = value;
+                            }
+
+                            return acc;
+                        },
+                        {} as Record<string, any>
+                    );
+
+                // Initialize form values with deep merge
+                const initialValues = deepMerge(target, source);
 
                 setFormValues(initialValues);
             } catch (error) {
@@ -164,10 +297,10 @@ export function SidebarRight({
         };
 
         loadProps();
-    }, [componentId]);
+    }, [componentId, componentName, currentPath, properties, tag]);
 
     // Load properties component
-    React.useEffect(() => {
+    useEffect(() => {
         if (!componentName) return;
 
         const loadProps = async () => {
@@ -183,7 +316,9 @@ export function SidebarRight({
                 // Initialize form values
                 const initialValues = Object.entries(data ?? {}).reduce(
                     (acc, [key, config]) => {
-                        acc[key] = childProperties[key] ?? config.default;
+                        if (config.default !== null || config.required) {
+                            acc[key] = childProperties[key] ?? config.default;
+                        }
                         return acc;
                     },
                     {} as Record<string, any>
@@ -199,17 +334,17 @@ export function SidebarRight({
     }, [componentId]);
 
     // Debounced component update
-    React.useEffect(() => {
+    useEffect(() => {
         if (!componentId) return;
         handleUpdateChildComponent(componentId, {
             ...currentComp,
-            properties: { ...properties, ...formValues },
-            childProperties: { ...childProperties, ...childformValues },
+            properties: { ...formValues },
+            childProperties: { ...childformValues },
         });
-    }, [formValues, childformValues]);
+    }, [formValues, childformValues, currentComp]);
 
     // Event handlers
-    const handleInputChange = React.useCallback(
+    const handleInputChange = useCallback(
         (
             fieldPath: string,
             value: any,
@@ -239,11 +374,11 @@ export function SidebarRight({
         []
     );
 
-    const handleClose = React.useCallback(() => {
+    const handleClose = useCallback(() => {
         clearEditingComponent();
     }, [clearEditingComponent]);
 
-    const udpateTag = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const udpateTag = (e: ChangeEvent<HTMLInputElement>) => {
         if (!componentId) return;
         handleUpdateChildComponent(componentId, {
             ...currentComp,
@@ -288,7 +423,7 @@ export function SidebarRight({
             style={
                 {
                     '--sidebar-width': '380px',
-                } as React.CSSProperties
+                } as React.CSSProperties & { '--sidebar-width': string }
             }
         >
             <SidebarHeader>
@@ -462,4 +597,6 @@ export function SidebarRight({
             </SidebarContent>
         </Sidebar>
     );
-}
+};
+
+export default SidebarRight;

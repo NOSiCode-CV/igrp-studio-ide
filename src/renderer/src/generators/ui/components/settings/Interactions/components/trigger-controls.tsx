@@ -226,7 +226,6 @@ const InteractionEditor = ({
     localInteractions,
     componentTag,
 }: InteractionEditorProps) => {
-
     const [actionType, setActionType] = useState<ActionType>(
         interaction.type || 'function'
     );
@@ -284,16 +283,17 @@ const InteractionEditor = ({
             const functionOption = functionOptions.find(
                 (option) => option.value === fnName
             );
+            if (functionOption?.metadata?.path) {
+                const namespace = `import {${fnName}} from '${functionOption?.metadata?.path}'`;
 
-            const namespace = `import {${fnName}} from '${functionOption?.metadata?.path}'`;
-
-            setImports?.((prev) => [
-                ...prev,
-                {
-                    namespace,
-                    id: getId(),
-                },
-            ]);
+                setImports?.((prev) => [
+                    ...prev,
+                    {
+                        namespace,
+                        id: getId(),
+                    },
+                ]);
+            }
         }
 
         setCurrentAction({

@@ -71,7 +71,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
             const updateComponentTree = (
                 component: StructuredComponent
             ): StructuredComponent => {
-                console.log(component);
                 // If the current component matches the destination ID, add the child
                 if (component.id === destination.droppableId) {
                     const updatedChildren = [...(component.children || [])];

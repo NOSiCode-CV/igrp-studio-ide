@@ -40,6 +40,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import {
     CodeSnippetsRegisterConfig,
     CustomFunctionConfig,
+    Import,
     State,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
@@ -212,20 +213,21 @@ const ResourceList = <T extends { id?: string; name: string }>({
                                                         )}
                                                         {onDelete &&
                                                             item.id && (
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        className="h-6 w-6 text-destructive hover:text-destructive"
-                                                                        onClick={() =>
-                                                                           {  setCurrentItem(item);
-                                                                           setIsDelete(
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 text-destructive hover:text-destructive"
+                                                                    onClick={() => {
+                                                                        setCurrentItem(
+                                                                            item
+                                                                        );
+                                                                        setIsDelete(
                                                                             !isDelete
-                                                                        )
-                                                                       
-                                                                        }}
-                                                                    >
-                                                                        <Trash2 className="h-3 w-3" />
-                                                                    </Button>
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <Trash2 className="h-3 w-3" />
+                                                                </Button>
                                                             )}
                                                     </div>
                                                 </div>
@@ -327,6 +329,7 @@ const FncComponent = ({
                 isList: false,
             },
             imports: [],
+            isAsync: false,
             ...funct,
         },
         validationSchema: functionValidationSchema,
@@ -354,6 +357,13 @@ const FncComponent = ({
             }
         },
     });
+
+    const handleChangeImport = (importObj: Import) => {
+        formik.setFieldValue('imports', [
+            ...(formik.values.imports || []),
+            importObj,
+        ]);
+    };
 
     useEffect(() => {
         if (funct) {
@@ -410,7 +420,7 @@ const FncComponent = ({
                         </DialogHeader>
 
                         <ImportComponent
-                            initialImports={funct?.imports || []}
+                            initialImports={formik.values?.imports || []}
                             onChange={(imports) =>
                                 formik.setFieldValue('imports', imports)
                             }
@@ -438,7 +448,9 @@ const FncComponent = ({
                     editorRef={editorRef}
                     side="right"
                     componentTag={''}
-                    onInsertImport={() => void 0}
+                    onInsertImport={(importObj) =>
+                        handleChangeImport(importObj)
+                    }
                 />
             </DialogContent>
         </Dialog>

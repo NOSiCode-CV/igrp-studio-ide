@@ -17,7 +17,6 @@ import { CodeContentJson, CodeContentTS } from './components/CodeContent';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { SidebarRight } from './components/sidebar/sidebar-right';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
@@ -30,9 +29,9 @@ import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
 import { EngineService } from '@renderer/services/EngineService';
-import Page from './types/components/MainComponent';
 import { PageDefinition } from './page/list-pages';
 import IGRPStudioMainComponent from './types/components/MainComponent';
+import SidebarRight from './components/sidebar/sidebar-right';
 
 interface FormEngineProps {
     basePath: string;
