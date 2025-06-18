@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Mouse, Loader2, RefreshCw, Loader2, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse, Loader2, RefreshCw} from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,

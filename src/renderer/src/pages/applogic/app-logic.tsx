@@ -193,7 +193,7 @@ export default function AppLogicPage() {
                         onOpenChange={setIsCreateDialogOpen}
                     >
                         <DialogTrigger asChild>
-                            <Button className="bg-green-600 hover:bg-green-700">
+                            <Button variant={'default'}>
                                 <Plus className="h-4 w-4 mr-2" />
                                 New Environment
                             </Button>
@@ -241,7 +241,7 @@ export default function AppLogicPage() {
                     {!searchTerm && (
                         <Button
                             onClick={() => setIsCreateDialogOpen(true)}
-                            className="bg-green-600 hover:bg-green-700"
+                            variant={'default'}
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Create Environment
