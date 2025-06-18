@@ -8,9 +8,11 @@ import {
 import { Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BindingConfigurationFilterModal } from '../../components/binding-config-filter-modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@renderer/components/ui/badge';
 import { cn } from '@renderer/lib/utils';
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import useStudio from '@renderer/hooks/use-studio';
 
 interface RowOptionsProps {
     comp: StructuredComponent;
@@ -33,8 +35,21 @@ const TableTool = ({
 
     const [isOpen, setIsOpen] = useState(false);
 
+    const { componentName } = comp;
+    const { componentName: parentComponentName } = parentComp || {};
+
     const [currentComponent, setCurrentComponent] =
         useState<StructuredComponent | null>(null);
+
+    const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
+
+    const { getAcceptedChildren } = useStudio();
+
+    useEffect(() => {
+        getAcceptedChildren(parentComponentName, componentName).then((data) => {
+            setComponents(data);
+        });
+    }, [parentComponentName, componentName, getAcceptedChildren]);
 
     return (
         <div className={cn('table-tools relative', group)}>
@@ -64,11 +79,12 @@ const TableTool = ({
                     </Tooltip>
 
                     <div className="space-x-1">
-                        <AddComponentPopover
-                            comp={comp}
-                            parentComp={parentComp}
-                        />
-
+                        {components.length > 0 && (
+                            <AddComponentPopover
+                                comp={comp}
+                                components={components}
+                            />
+                        )}
                         {tableColumns.length > 0 && (
                             <>
                                 <Tooltip>

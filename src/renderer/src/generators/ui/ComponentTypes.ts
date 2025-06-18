@@ -1,4 +1,4 @@
-import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPStatusBanner, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -72,6 +72,7 @@ import {
     CheckCircle,
     Ratio,
     Menu,
+    Dot,
 } from 'lucide-react';
 import IGRPStudioFlex from './types/components/Flex';
 import IGRPStudioGrid from './types/components/Grid';
@@ -83,7 +84,7 @@ import IGRPStudioForm from './types/components/Form';
 import IGRPStudioContainer from './types/components/Container';
 import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
-import IGRPStudioPage from './types/components/Page';
+import IGRPStudioPage from './types/components/MainComponent';
 import IGRPStudioModalDialog from './types/components/ModalDialog';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
@@ -93,6 +94,7 @@ import IGRPStudioMenuNavigation from './types/components/MenuNavigation';
 import IGRPStudioFormList from './types/components/FormList';
 import IGRPStudioInfoCard from './types/components/InfoCard';
 import IGRPStudioAlert from './types/components/Alert';
+import IGRPStudioTextList from './types/components/TextList';
 
 
 // Component Categories
@@ -108,9 +110,10 @@ export const GROUP_COMPONET: Record<string, string> = {
     typography: "Typograpgy",
     customComponents: "Custom Components",
     appComponents: 'Application Components'
-};
+} as const;
 
 export const COMPONENT: Record<string, string> = {
+    ComponentContent: 'component',
     PageContent: "page",
     Columns: "columns",
     Column: "column",
@@ -214,8 +217,10 @@ export const COMPONENT: Record<string, string> = {
     MenuNavigation: 'menuNavigation',
     InfoCard: 'infoCard',
     PdfViewer: 'pdfViewer',
-    Alert: 'alert'
-}
+    Alert: 'alert',
+    TextList: 'textList',
+    StatusBanner: "statusBanner"
+} as const;
 
 
 // Icon Mapping
@@ -288,15 +293,23 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 
     [COMPONENT.Chat]: MessageCircle,
     [COMPONENT.Search]: Search,
-
     [COMPONENT.StatsCard]: TrendingUp,
-
     [COMPONENT.Separator]: SeparatorHorizontal,
-
     [COMPONENT.ModalDialog]: CheckCircle,
     [COMPONENT.AlertDialog]: Info,
     [COMPONENT.Aspect]: Ratio,
     [COMPONENT.MenuNavigation]: Menu,
+    [COMPONENT.Alert]: Dot,
+
+    [COMPONENT.PageHeader]: Heading,
+    [COMPONENT.Fragment]: Code,
+    [COMPONENT.Paragraph]: WrapText,
+    [COMPONENT.TextList]: WrapText,
+    [COMPONENT.RepetitiveList]: LayoutList,
+    [COMPONENT.FormList]: LayoutList,
+    [COMPONENT.InfoCard]: CreditCard,
+    [COMPONENT.PdfViewer]: FileText,
+    [COMPONENT.StatusBanner]: Bell,
 
     accordion: AlignLeft,
     treeView: GitMerge,
@@ -305,14 +318,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 
     stack: Table2,
     section: RectangleHorizontal,
-
-    [COMPONENT.PageHeader]: Heading,
-    [COMPONENT.Fragment]: Code,
-    [COMPONENT.Paragraph]: WrapText,
-    [COMPONENT.RepetitiveList]: LayoutList,
-    [COMPONENT.FormList]: LayoutList,
-    [COMPONENT.InfoCard]: CreditCard,
-    [COMPONENT.PdfViewer]: FileText,
 
     tableDateFilter: CalendarIcon,
     tableTextFilter: FormInput,
@@ -326,7 +331,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableTextCell: FormInput,
     tableExpanderCell: ChevronDown,
     tableBadgeCell: Badge,
-};
+} as const;
 
 export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ColorPicker]: IGRPInputColor,
@@ -375,6 +380,7 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.StatsCard]: IGRPStatsCard,
     [COMPONENT.Separator]: IGRPSeparator,
     [COMPONENT.AlertDialog]: IGRPAlertDialog,
+    [COMPONENT.StatusBanner]: IGRPStatusBanner,
 
     [COMPONENT.Table]: IGRPStudioTable,
     [COMPONENT.Section]: IGRPStudioSection,
@@ -396,4 +402,5 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.MenuNavigation]: IGRPStudioMenuNavigation,
     [COMPONENT.InfoCard]: IGRPStudioInfoCard,
     [COMPONENT.Alert]: IGRPStudioAlert,
- };
+    [COMPONENT.TextList]: IGRPStudioTextList,
+};

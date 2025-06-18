@@ -4,7 +4,7 @@ import { useRef, useCallback } from 'react';
 export function useTagManager(componentTree: StructuredComponent | null) {
     const tagSetRef = useRef<Set<string>>(new Set());
 
-    // Função recursiva para coletar todos os IDs
+    // Função recursiva para coletar todos os TAGs
     const collectAllIds = useCallback((component: StructuredComponent): string[] => {
         const tags = [component.tag];
         component.children?.forEach(child => {

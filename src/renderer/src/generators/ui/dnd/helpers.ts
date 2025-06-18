@@ -14,7 +14,7 @@ export const getDefaultProperties = (schema: any): any => {
             properties[key] = [];
         } else if (prop.type === 'object' && prop.properties) {
             properties[key] = getDefaultProperties(prop.properties); // Recursive call
-        } else
+        } else if (prop.required || prop.default)
             properties[key] = prop.default
     }
 

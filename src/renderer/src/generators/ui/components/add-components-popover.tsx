@@ -1,45 +1,27 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { Badge } from '@renderer/components/ui/badge';
 import { useTranslation } from 'react-i18next';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import useStudio from '@renderer/hooks/use-studio';
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { useTagManager } from '../hooks/useTagManager';
+import { Badge } from '@renderer/components/ui/badge';
 
 export const AddComponentPopover = ({
     comp,
-    parentComp,
+    components,
 }: {
-    parentComp: StructuredComponent;
+    components: ComponentRegisterConfig[];
     comp: StructuredComponent;
 }) => {
+    const { t } = useTranslation();
+
     const { componentName, id: componentId, children } = comp;
-    const { componentName: parentComponentName } = parentComp;
-
-    const { getAcceptedChildren } = useStudio();
-    const { handleAddChildToComponent } = useDroppedComponents();
-    const { generateTag} = useTagManager(null);
-
-    const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
-
-    useEffect(() => {
-        getAcceptedChildren(parentComponentName, componentName).then((data) => {
-            setComponents(data);
-        });
-    }, [parentComponentName, componentName, getAcceptedChildren]);
+    const { handleAddChildToComponent, components: availableComponents } =
+        useDroppedComponents();
+    const { generateTag, rebuild } = useTagManager(availableComponents);
 
     const handleAddComponent = (item: any) => {
         const result: DragEndResult = {
@@ -54,7 +36,7 @@ export const AddComponentPopover = ({
         };
         handleDragEnd(result, {
             handleAddChildToComponent,
-            generateTag
+            generateTag,
         });
     };
 
@@ -63,57 +45,46 @@ export const AddComponentPopover = ({
 
         return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
     };
-    const { t } = useTranslation();
+
+    useEffect(() => {
+        rebuild();
+    }, [rebuild]);
 
     return (
-        <>
-            {components.length > 0 ? (
-                <Popover>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <PopoverTrigger asChild>
-                                <Badge
-                                    variant={'secondary'}
-                                    className="my-1 rounded-sm cursor-pointer"
-                                >
-                                    <span className="text-xs">Add Comp</span>
-                                </Badge>
-                            </PopoverTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('addComp')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <PopoverContent className="w-100 p-3 space-y-3">
-                        <div className="p-2 border-b">
-                            <h3 className="text-lg font-semibold">
-                            {t('addComponent')}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                            {t('selectComponent')}{' '}
-                                {componentName}
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-4 gap-2">
-                            {components.map((component) => (
-                                <button
-                                    key={component.name}
-                                    className="flex flex-col items-center justify-center rounded-md border bg-background p-2 text-xs transition-colors hover:bg-muted aspect-square"
-                                    onClick={() =>
-                                        handleAddComponent(component)
-                                    }
-                                >
-                                    <div className="mb-1">
-                                        {renderIcon(component.name)}
-                                    </div>
-                                    {component.label}
-                                </button>
-                            ))}
-                        </div>
-                    </PopoverContent>
-                </Popover>
-            ) : null}
-        </>
+        <Popover >
+            <PopoverTrigger asChild>
+                <Badge
+                    variant={'secondary'}
+                    className="my-1 rounded-sm cursor-pointer"
+                >
+                    <span className="text-xs">Add Comp</span>
+                </Badge>
+            </PopoverTrigger>
+            <PopoverContent className="w-100 p-3 space-y-3">
+                <div className="p-2 border-b">
+                    <h3 className="text-lg font-semibold">
+                        {t('addComponent')}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        {t('selectComponent')} {componentName}
+                    </p>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                    {components &&
+                        components.map((component) => (
+                            <button
+                                key={component.name}
+                                className="flex flex-col items-center justify-center rounded-md border bg-background p-2 text-xs transition-colors hover:bg-muted aspect-square"
+                                onClick={() => handleAddComponent(component)}
+                            >
+                                <div className="mb-1">
+                                    {renderIcon(component.name)}
+                                </div>
+                                {component.label}
+                            </button>
+                        ))}
+                </div>
+            </PopoverContent>
+        </Popover>
     );
 };

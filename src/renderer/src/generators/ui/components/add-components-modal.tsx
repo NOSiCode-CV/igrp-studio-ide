@@ -7,7 +7,11 @@ import {
     DialogDescription,
 } from '@renderer/components/ui/dialog';
 import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import {
+    Destination,
+    DragEndResult,
+    StructuredComponent,
+} from '@renderer/lib/dnd/types';
 import React, { useEffect, useState, useCallback } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
@@ -15,7 +19,6 @@ import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { Button } from '@renderer/components/ui/button';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
-import { SidebarRight } from './sidebar/sidebar-right';
 import {
     Table,
     TableBody,
@@ -33,6 +36,7 @@ import {
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { useTagManager } from '../hooks/useTagManager';
 import * as LucideIcons from 'lucide-react';
+import SidebarRight from './sidebar/sidebar-right';
 
 interface AddComponentProps {
     path: string;
@@ -60,10 +64,13 @@ export const AddComponentModal = ({
 
     const { getAcceptedChildren } = useStudio();
 
-    const { handleAddChildToComponent, components: allComponents } =
-        useDroppedComponents();
+    const {
+        handleAddChildToComponent,
+        handleRemoveChildFromComponent,
+        components: allComponents,
+    } = useDroppedComponents();
 
-    const { generateTag } = useTagManager(allComponents);
+    const { generateTag, rebuild } = useTagManager(allComponents);
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -104,6 +111,10 @@ export const AddComponentModal = ({
         );
     };
 
+    useEffect(() => {
+        rebuild();
+    }, [rebuild]);
+
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -138,6 +149,9 @@ export const AddComponentModal = ({
                                             handleAddComponent={
                                                 handleAddComponent
                                             }
+                                            handleRemoveChildFromComponent={
+                                                handleRemoveChildFromComponent
+                                            }
                                         />
                                     ) : (
                                         <>
@@ -145,6 +159,53 @@ export const AddComponentModal = ({
                                         </>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* Helper Section */}
+                            <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t">
+                                <p className="mb-2">
+                                    <strong>rowData</strong> is a variable
+                                    provided by the table that contains all the
+                                    data from the current row. Use it in your
+                                    click handlers to access row information.
+                                </p>
+                                <p className="mb-2">
+                                    Available data in rowData:
+                                </p>
+                                <ul className="list-disc list-inside mt-1 space-y-1">
+                                    <li>
+                                        <code>rowData.id</code> - Row identifier
+                                    </li>
+                                    <li>
+                                        <code>rowData.nome</code> - Name field
+                                    </li>
+                                    <li>
+                                        <code>rowData.status</code> - Status
+                                        field
+                                    </li>
+                                    <li>
+                                        <code>rowData.data</code> - Date field
+                                    </li>
+                                </ul>
+                                <p className="mt-2 mb-2">
+                                    Example usage in table actions:
+                                </p>
+                                <ul className="list-disc list-inside mt-1 space-y-1">
+                                    <li>
+                                        <code>handleView</code>
+                                    </li>
+                                    <li>
+                                        <code>
+                                            () =&gt;
+                                            handleView(rowData.id)
+                                        </code>
+                                    </li>
+                                    <li>
+                                        <code>
+                                            () =&gt; handleEdit(rowData)
+                                        </code>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </SidebarInset>
@@ -190,16 +251,23 @@ const renderAddComponents = (
     );
 };
 
-const renderCreatedComponents = (
-    components: StructuredComponent[],
-    registryComponents: ComponentRegisterConfig[],
-    onEdit: (comp: StructuredComponent, parentComponent?: string) => void,
-    handleAddComponent: (item: any, droppableId: string) => void,
-    level: number = 0, // Add a level parameter to track nesting depth
-    parentComponent?: string
-) => {
-    const { handleRemoveChildFromComponent } = useDroppedComponents();
-
+const RenderCreatedComponents = ({
+    components,
+    registryComponents,
+    onEdit,
+    handleAddComponent,
+    level = 0,
+    parentComponent,
+    handleRemoveChildFromComponent,
+}: {
+    components: StructuredComponent[];
+    registryComponents: ComponentRegisterConfig[];
+    onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
+    handleAddComponent: (item: any, droppableId: string) => void;
+    level?: number; // Add a level parameter to track nesting depth
+    parentComponent?: string;
+    handleRemoveChildFromComponent?: (destination: Destination) => void;
+}) => {
     const handleEditComponent = (
         component: StructuredComponent,
         parentComponent?: string
@@ -232,22 +300,25 @@ const renderCreatedComponents = (
     };
 
     // Recursively render child components
-    const renderChildComponents = (
-        children: StructuredComponent[],
-        level: number,
-        parentComponent: string
-    ) => {
+    const RenderChildComponents = ({
+        children,
+        level,
+        parentComponent,
+    }: {
+        children: StructuredComponent[];
+        level: number;
+        parentComponent: string;
+    }) => {
         return (
-            <>
-                {renderCreatedComponents(
-                    children,
-                    registryComponents,
-                    onEdit,
-                    handleAddComponent,
-                    level + 1,
-                    parentComponent
-                )}
-            </>
+            <RenderCreatedComponents
+                components={children}
+                registryComponents={registryComponents}
+                onEdit={onEdit}
+                handleAddComponent={handleAddComponent}
+                level={level + 1}
+                parentComponent={parentComponent}
+                handleRemoveChildFromComponent={handleRemoveChildFromComponent}
+            />
         );
     };
 
@@ -288,7 +359,7 @@ const renderCreatedComponents = (
                                         size="sm"
                                         className="text-destructive"
                                         onClick={() =>
-                                            handleRemoveChildFromComponent({
+                                            handleRemoveChildFromComponent?.({
                                                 droppableId: id,
                                                 index,
                                             })
@@ -306,11 +377,12 @@ const renderCreatedComponents = (
                             </TableCell>
                         </TableRow>
                         {component.children &&
-                            component.children.length > 0 &&
-                            renderChildComponents(
-                                component.children,
-                                level,
-                                component.componentName
+                            component.children.length > 0 && (
+                                <RenderChildComponents
+                                    children={component.children}
+                                    level={level}
+                                    parentComponent={component.componentName}
+                                />
                             )}
                     </React.Fragment>
                 );
@@ -325,11 +397,13 @@ const ComponentTable = ({
     registryComponents,
     onEdit,
     handleAddComponent,
+    handleRemoveChildFromComponent,
 }: {
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
     onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
     handleAddComponent: (item: any, droppableId: string) => void;
+    handleRemoveChildFromComponent: (destination: Destination) => void;
 }) => {
     return (
         <Table>
@@ -340,12 +414,15 @@ const ComponentTable = ({
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {renderCreatedComponents(
-                    components,
-                    registryComponents,
-                    onEdit,
-                    handleAddComponent
-                )}
+                <RenderCreatedComponents
+                    components={components}
+                    registryComponents={registryComponents}
+                    onEdit={onEdit}
+                    handleAddComponent={handleAddComponent}
+                    handleRemoveChildFromComponent={
+                        handleRemoveChildFromComponent
+                    }
+                />
             </TableBody>
         </Table>
     );

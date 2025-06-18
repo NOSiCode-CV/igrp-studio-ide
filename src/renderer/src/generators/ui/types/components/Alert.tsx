@@ -61,7 +61,7 @@ const IGRPStudioAlert = ({
                                         onEdit={() => handleEdit(comp)}
                                         group={_group ?? `group/row-alert`}
                                         className={cn(
-                                            'opacity-0',
+                                            'top-2 opacity-0',
                                             _hoverClass ??
                                                 'group-hover/row-alert:opacity-100'
                                         )}

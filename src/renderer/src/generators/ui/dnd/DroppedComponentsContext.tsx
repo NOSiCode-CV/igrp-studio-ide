@@ -19,7 +19,6 @@ import {
     State,
     TypeDef,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { newStructuredComponent } from './helpers';
 
 const DroppedComponentsContext = createContext<
     DroppedComponentsContextType | undefined
@@ -56,10 +55,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         setComponents(components);
     };
 
-    const newStructure = (name: string) => {
-        return newStructuredComponent(name);
-    };
-
     const handleAddChildToComponent = useCallback(
         (
             destination: Destination, // Contains droppableId (component ID) and index
@@ -70,7 +65,8 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 console.error('Invalid child component or destination');
                 return;
             }
-
+            console.log(destination);
+            console.log(childComponent);
             // Recursive function to find and update the target component
             const updateComponentTree = (
                 component: StructuredComponent
@@ -104,10 +100,10 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
             };
 
             // Update the components state
-            setComponents((prev) => ({
-                ...prev,
-                children: (prev.children || []).map(updateComponentTree),
-            }));
+            setComponents((prev) => {
+                const updatedRoot = updateComponentTree(prev);
+                return updatedRoot;
+            });
         },
         []
     );
@@ -450,7 +446,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     return (
         <DroppedComponentsContext.Provider
             value={{
-                newStructure,
                 setAllComponents,
                 handleAddChildToComponent,
                 handleRemoveChildFromComponent,

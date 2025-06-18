@@ -101,6 +101,8 @@ const getNestedValue = (obj: any, path: string) => {
         );
 };
 
+const RENDER_IGNORE = ['segments'];
+
 const RenderPropsConfig = ({
     propsComp,
     formValues,
@@ -124,7 +126,8 @@ const RenderPropsConfig = ({
         const xUiWidget = fieldConfig['x-ui-widget'];
         const xMetaLabel = fieldConfig['x-meta']?.['label'] || getLabel(key);
 
-        if (fieldConfig.type === 'object' && fieldConfig.properties) {
+        if (RENDER_IGNORE.includes(key)) return <></>;
+        else if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties;
             return (
                 <Accordion type="single" collapsible className="w-full">

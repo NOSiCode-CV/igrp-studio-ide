@@ -73,8 +73,8 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
     const [content, setContent] = useState<any>([]);
     const [components, setComponents] = useState<any>([]);
     const [page, setPage] = useState<PageDefinition>();
-    const [newPageModal, setNewPageModal] = useState<boolean>(false);
-    const [showNewComponentModal, setNewComponentModal] = useState(false);
+    const [showformPage, setFormPage] = useState<boolean>(false);
+    const [showFormComponent, setFormComponent] = useState(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -97,6 +97,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             name: page.pageName,
             id: page.id,
         };
+        console.log(pageConfig)
         await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
         isLoadingTable(true);
@@ -104,13 +105,14 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
     };
 
     const openDialogNewPage = (page?: PageDefinition) => {
-        setNewPageModal(true);
+        setFormPage(true);
         setPageEditing(page);
     };
 
     const handleNewPage = () => {
-        setNewPageModal(false);
-        setNewComponentModal(false);
+        setFormPage(false);
+        setPage(undefined);
+        setFormComponent(false);
         isLoadingTable(true);
     };
 
@@ -166,6 +168,15 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                 pagePath: page?.content?.path,
                 isPage: false,
             }));
+    };
+
+    const handleEdit = (page: PageDefinition) => {
+        if (page.isPage) {
+            setFormPage(!showformPage);
+        } else {
+            setFormComponent(!showFormComponent);
+        }
+        setPage(page);
     };
 
     const tableData: PageDefinition[] = [
@@ -272,6 +283,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             cell: ({ row }) => (
                 <PageActions
                     page={row.original}
+                    onEdit={() => void 0}
                     onDelete={() => handleDeletePage(row.original)}
                     onAddComponents={() => handleAddComponents(row.original)}
                     openDialogNewPage={openDialogNewPage}
@@ -374,7 +386,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onSelect={() =>
-                                                setNewComponentModal(true)
+                                                setFormComponent(true)
                                             }
                                         >
                                             {t('createNewComponent')}
@@ -398,12 +410,13 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                             <PageCard
                                                 key={page.name}
                                                 page={page}
-                                                onDelete={() =>
+                                                onDelete={(page) =>
                                                     handleDeletePage(page)
                                                 }
                                                 onAddComponents={
                                                     handleAddComponents
                                                 }
+                                                onEdit={handleEdit}
                                                 components={components}
                                                 subPages={subPages}
                                                 openDialogNewPage={
@@ -434,18 +447,20 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             </IGRPTabs>
             <NewPageModal
                 basePath={basePath}
-                isOpen={newPageModal}
-                onClose={() => setNewPageModal(false)}
+                isOpen={showformPage}
+                onClose={() => setFormPage(false)}
                 onConfirm={handleNewPage}
                 pageEditing={pageEditing}
+                currentComponent={page}
             />
 
             <NewComponentModal
                 basePath={basePath}
-                isOpen={showNewComponentModal}
-                onClose={() => setNewComponentModal(false)}
+                isOpen={showFormComponent}
+                onClose={() => setFormComponent(false)}
                 onConfirm={handleNewPage}
                 pageOptions={pageOptions}
+                currentComponent={page}
             />
 
             <AlertDialogDelete
