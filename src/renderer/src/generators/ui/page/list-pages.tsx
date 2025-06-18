@@ -97,6 +97,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             name: page.pageName,
             id: page.id,
         };
+        console.log(pageConfig)
         await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
         isLoadingTable(true);

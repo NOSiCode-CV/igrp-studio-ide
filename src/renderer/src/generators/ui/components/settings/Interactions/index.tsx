@@ -21,8 +21,7 @@ const Interactions = ({
     path,
     onInteranctionsChange,
 }: InteractionProps) => {
-    const { getInteractionsComponent, getRulesComponent } =
-        useStudio();
+    const { getInteractionsComponent, getRulesComponent } = useStudio();
 
     const [interactionsType, setInteractionsType] = useState({});
 
@@ -38,11 +37,8 @@ const Interactions = ({
             getRulesComponent(path, componentName).then((data) =>
                 setRulesProperties(data)
             );
-            /*  getDataComponent(path, componentName).then((data) =>
-                setDataProperties(data)
-            ); */
         }
-    }, [getInteractionsComponent, comp, componentName]);
+    }, [getInteractionsComponent, comp, componentName, path]);
 
     const handleInteractionsChange = (data: Record<string, Action>) => {
         if (componentId)
@@ -57,13 +53,6 @@ const Interactions = ({
                 rules: data,
             });
     };
-
-/*     const handleDataChange = (data: any) => {
-        if (componentId)
-            onInteranctionsChange(componentId, {
-                data,
-            });
-    }; */
 
     return (
         <div className="p-3 space-y-2">

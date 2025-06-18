@@ -34,7 +34,7 @@ export default function MultipleSelector({
     placeholder = 'Select items...',
 }: MultiSelectProps) {
     const [open, setOpen] = React.useState(false);
-    
+
     const { t } = useTranslation();
 
     const handleUnselect = (item: string) => {
@@ -42,7 +42,6 @@ export default function MultipleSelector({
     };
 
     return (
-        
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
@@ -53,11 +52,10 @@ export default function MultipleSelector({
                                 variant="secondary"
                                 className="mr-1 mb-1"
                             >
-                                {
+                                {options &&
                                     options.find(
                                         (option) => option.value === item
-                                    )?.label
-                                }
+                                    )?.label}
                                 <button
                                     className="ml-1 ring-offset-background rounded-full outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                     onKeyDown={(e) => {
@@ -89,46 +87,51 @@ export default function MultipleSelector({
                             <CommandInput placeholder={placeholder} />
                             <CommandEmpty>{t('noItemFound')}</CommandEmpty>
                             <CommandGroup>
-                                {options && options.map((option) => (
-                                    <CommandItem
-                                        key={option.value}
-                                        onSelect={() => {
-                                            onChange(
-                                                value
-                                                    ? value.includes(
-                                                          option.value
-                                                      )
-                                                        ? value.filter(
-                                                              (item) =>
-                                                                  item !==
-                                                                  option.value
+                                {options &&
+                                    options.map((option) => (
+                                        <CommandItem
+                                            key={option.value}
+                                            onSelect={() => {
+                                                onChange(
+                                                    value
+                                                        ? value.includes(
+                                                              option.value
                                                           )
-                                                        : [
-                                                              ...value,
-                                                              option.value,
-                                                          ]
-                                                    : []
-                                            );
-                                            setOpen(true);
-                                        }}
-                                    >
-                                        <div
-                                            className={cn(
-                                                `mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary`,
-                                                value &&
-                                                    value.includes(option.value)
-                                                    ? 'bg-primary text-primary-foreground'
-                                                    : 'opacity-50'
-                                            )}
+                                                            ? value.filter(
+                                                                  (item) =>
+                                                                      item !==
+                                                                      option.value
+                                                              )
+                                                            : [
+                                                                  ...value,
+                                                                  option.value,
+                                                              ]
+                                                        : []
+                                                );
+                                                setOpen(true);
+                                            }}
                                         >
-                                            {value &&
-                                                value.includes(
-                                                    option.value
-                                                ) && <X className="h-3 w-3" />}
-                                        </div>
-                                        {option.label}
-                                    </CommandItem>
-                                ))}
+                                            <div
+                                                className={cn(
+                                                    `mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary`,
+                                                    value &&
+                                                        value.includes(
+                                                            option.value
+                                                        )
+                                                        ? 'bg-primary text-primary-foreground'
+                                                        : 'opacity-50'
+                                                )}
+                                            >
+                                                {value &&
+                                                    value.includes(
+                                                        option.value
+                                                    ) && (
+                                                        <X className="h-3 w-3" />
+                                                    )}
+                                            </div>
+                                            {option.label}
+                                        </CommandItem>
+                                    ))}
                             </CommandGroup>
                         </Command>
                     </div>

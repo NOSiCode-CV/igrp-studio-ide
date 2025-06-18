@@ -7,12 +7,13 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@renderer/components/ui/button';
 import { useEffect, useState } from 'react';
 import {
-    Argument,
+    Arguments,
     Import,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import {
     CheckboxInput,
     SelectInput,
+    SwitchInput,
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +34,7 @@ import {
 import useCustomCode from '../../../hooks/useCustomCode';
 import { TabsFunctions, TabSnipptes, TabStates } from './custom-code-tabs';
 import { cn } from '@renderer/lib/utils';
+import { Switch } from '@renderer/components/ui/switch';
 
 export const returnTypeOptions = [
     { value: 'string', label: 'String' },
@@ -63,7 +65,7 @@ export const FunctionSettingsSidebar = ({
 
     const { states, snippets, functions } = useCustomCode();
 
-    const [arguments_, setArguments] = useState<Argument[]>(
+    const [arguments_, setArguments] = useState<Arguments[]>(
         formik && formik.values?.arguments ? formik.values?.arguments : []
     );
 
@@ -119,6 +121,16 @@ export const FunctionSettingsSidebar = ({
                                 isTouched={formik.touched.name}
                                 error={formik.errors.name}
                                 isRequired
+                            />
+                            <CheckboxInput
+                                label="IsAsync"
+                                id="IsAsync"
+                                value={formik.values.isAsync}
+                                onChange={(checked) => {
+                                    formik.setFieldValue('isAsync', checked);
+                                }}
+                                onBlur={formik.handleBlur}
+                                error={formik.errors.isAsync}
                             />
                             <Separator />
                             <div className="flex flex-col gap-2">
@@ -205,8 +217,8 @@ export const FunctionSettingsSidebar = ({
 };
 
 interface FunctionArgumentsProps {
-    value: Argument[];
-    onChange: (args: Argument[]) => void;
+    value: Arguments[];
+    onChange: (args: Arguments[]) => void;
     returnTypeOptions: { value: string; label: string }[];
 }
 
@@ -238,7 +250,7 @@ export const FunctionArguments = ({
         ]);
     };
 
-    const updateArgument = (id: string, updates: Partial<Argument>) => {
+    const updateArgument = (id: string, updates: Partial<Arguments>) => {
         onChange(
             arguments_.map((arg) =>
                 arg.id === id ? { ...arg, ...updates } : arg
@@ -261,7 +273,7 @@ export const FunctionArguments = ({
                                     <span className="text-gray-400 text-sm">
                                         {arg.type}
                                         {arg.isList ? '[]' : ''}
-                                        {arg.isNullable ? '?' : ''}
+                                        {arg.isOptional ? '?' : ''}
                                     </span>
                                 </div>
                             </div>
