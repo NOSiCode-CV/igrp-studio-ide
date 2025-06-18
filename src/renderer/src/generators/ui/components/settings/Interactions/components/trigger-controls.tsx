@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Mouse, Loader2, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse, Loader2, RefreshCw, Loader2, RefreshCw } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -27,15 +27,9 @@ import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { useAppLogic } from '@renderer/hooks/use-app-logic';
-import useCore from '@renderer/hooks/use-core';
-import { toast } from 'sonner';
-import { AppLogicEnvironment } from 'src/main/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@renderer/components/ui/select"
-import { Input } from '@renderer/components/ui/input';
+import { PageSelectionConfig } from '../../properties';
 
-type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';;
+type ActionType = 'function' | 'navigate' | 'formSubmit';
 
 const actionTypeOptions = [
     { value: 'function', label: 'Function' },
