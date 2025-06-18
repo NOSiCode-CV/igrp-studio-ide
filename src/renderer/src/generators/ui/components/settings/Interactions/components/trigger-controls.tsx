@@ -1066,9 +1066,9 @@ const InteractionEditor = ({
                                         </pre>
                                     </div>
 
-                                    {selectedEndpoint.params && selectedEndpoint.params.length > 0 && (
+                                    {selectedEndpoint.inputBody  && (
                                         <div>
-                                        <Label className="text-sm font-medium">Body request</Label>
+                                        <Label className="text-sm font-medium">Request body</Label>
                                         <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                             {JSON.stringify(selectedEndpoint.inputBody, null, 2)}
                                         </pre>
@@ -1081,18 +1081,18 @@ const InteractionEditor = ({
                                         (selectedEndpoint.method === "POST" ||
                                         selectedEndpoint.method === "PUT" ||
                                         selectedEndpoint.method === "PATCH") && (
-                                <div className="border rounded-md overflow-hidden">                      
-                                <div className="p-4">
-                                    <div className="space-y-3">                  
-                                    <div>
-                                        <Label className="text-sm font-medium">Request Body</Label>
-                                        <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">{requestBody}</pre>
+                                    <div className="border rounded-md overflow-hidden">                      
+                                    <div className="p-4">
+                                        <div className="space-y-3">                  
+                                        <div>
+                                            <Label className="text-sm font-medium">Request Body</Label>
+                                            <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">{requestBody}</pre>
+                                        </div>
+                                        </div>
                                     </div>
                                     </div>
-                                </div>
-                                </div>
                                 )}
-                                {requestBody && (
+                                {requestBody ? (
                                 <div className="border rounded-md overflow-hidden">                      
                                     <div className="p-4">
                                     <div className="space-y-3">                  
@@ -1103,7 +1103,16 @@ const InteractionEditor = ({
                                     </div>
                                     </div>
                                 </div>
-                                )}
+                                ):<div className="border rounded-md overflow-hidden">                      
+                                    <div className="p-4">
+                                    <div className="space-y-3">                  
+                                        <div>
+                                            <Label className="text-sm font-medium">Response Body</Label>
+                                            <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">{JSON.stringify({}, null, 2)}</pre>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>}
                             </div>
                             ) : (
                             <div className="text-center py-8 text-gray-500">

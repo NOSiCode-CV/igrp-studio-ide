@@ -35,6 +35,7 @@ import './handlers/api-handler';
 import './handlers/db-handler';
 import './handlers/workspace-handler';
 import './handlers/git-handler';
+import './handlers/app-logic-handlers';
 import './handlers/docker-handler';
 import './handlers/global-handler';
 import './helpers/fetch-request';

@@ -293,45 +293,36 @@ const window = {
 	isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
 }
 const appLogic = {
-	// Initialize
-		initialize: () => ipcRenderer.invoke("app-logic:initialize"),
 
-		// Environments
-		getEnvironments: () => ipcRenderer.invoke("app-logic:get-environments"),
-		addEnvironment: (environment) => ipcRenderer.invoke("app-logic:add-environment", environment),
-		updateEnvironment: (id, updates) => ipcRenderer.invoke("app-logic:update-environment", id, updates),
-		deleteEnvironment: (id) => ipcRenderer.invoke("app-logic:delete-environment", id),
-		getEnvironment: (id) => ipcRenderer.invoke("app-logic:get-environment", id),
+	// Environments
+	getEnvironments: () => ipcRenderer.invoke(EVENTS.APPLOGIC.FIND_ALL),
+	addEnvironment: (environment) => ipcRenderer.invoke(EVENTS.APPLOGIC.CREATE, environment),
+	updateEnvironment: (id, updates) => ipcRenderer.invoke(EVENTS.APPLOGIC.UPDATE, id, updates),
+	deleteEnvironment: (id) => ipcRenderer.invoke(EVENTS.APPLOGIC.DELETE, id),
+	getEnvironment: (id) => ipcRenderer.invoke(EVENTS.APPLOGIC.GET, id),
 
-		// Stats
-		getStats: () => ipcRenderer.invoke("app-logic:get-stats"),
+	// History
+	addConnectionTest: (test) => ipcRenderer.invoke("app-logic:add-connection-test", test),
+	getEnvironmentHistory: (environmentId) => ipcRenderer.invoke("app-logic:get-environment-history", environmentId),
 
-		// Settings
-		getSettings: () => ipcRenderer.invoke("app-logic:get-settings"),
-		updateSettings: (updates) => ipcRenderer.invoke("app-logic:update-settings", updates),
+	// Export/Import
+	exportData: () => ipcRenderer.invoke("app-logic:export-data"),
+	importData: (jsonData) => ipcRenderer.invoke("app-logic:import-data", jsonData),
 
-		// History
-		addConnectionTest: (test) => ipcRenderer.invoke("app-logic:add-connection-test", test),
-		getEnvironmentHistory: (environmentId) => ipcRenderer.invoke("app-logic:get-environment-history", environmentId),
+	// Test
+	testEnvironment: (environment) => ipcRenderer.invoke(EVENTS.APPLOGIC.TEST, environment),
 
-		// Export/Import
-		exportData: () => ipcRenderer.invoke("app-logic:export-data"),
-		importData: (jsonData) => ipcRenderer.invoke("app-logic:import-data", jsonData),
+	// Store info
+	getStoreInfo: () => ipcRenderer.invoke("app-logic:get-store-info"),
 
-		// Test
-		testEnvironment: (environment) => ipcRenderer.invoke("app-logic:test-environment", environment),
+	// Events
+	onEnvironmentsChanged: (callback) => {
+		const subscription = (event, environments) => callback(environments)
+		ipcRenderer.on(EVENTS.APPLOGIC.CHANGE, subscription)
+		return () => ipcRenderer.removeListener(EVENTS.APPLOGIC.CHANGE, subscription)
+	},
 
-		// Store info
-		getStoreInfo: () => ipcRenderer.invoke("app-logic:get-store-info"),
-
-		// Events
-		onEnvironmentsChanged: (callback) => {
-			const subscription = (event, environments) => callback(environments)
-			ipcRenderer.on("app-logic:environments-changed", subscription)
-			return () => ipcRenderer.removeListener("app-logic:environments-changed", subscription)
-		},
-
-		removeAllListeners: () => ipcRenderer.removeAllListeners("app-logic:environments-changed"),
+	removeAllListeners: () => ipcRenderer.removeAllListeners(EVENTS.APPLOGIC.CHANGE),
 	}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

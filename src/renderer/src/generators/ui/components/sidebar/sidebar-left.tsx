@@ -100,7 +100,6 @@ export function AppSidebar({
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
-        { icon: BrainCircuit, label: t('Applogic'), id: 'appLogic' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         { icon: Badge, label: t('settings'), id: 'settings' },

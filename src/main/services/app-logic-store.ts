@@ -1,77 +1,67 @@
+import { IGRPStudioSettings } from "../helpers/igrp-studio-settings";
 import { AppLogicEnvironment, AppLogicSettings, ConnectionTest } from "../types"
 
-let store: any = null;
 export const AppLogicStore = {
-  async initialize() {    
-    const Store = (await import("electron-store")).default
-    store = new Store({
-      name: "igrp-app-logic",
-      clearInvalidConfig: true,
-      defaults: {
-        environments: [],
-        settings: {
-          autoTest: false,
-          testInterval: 30,
-          maxHistoryEntries: 100,
-          defaultTimeout: 10000,
-          retryAttempts: 1,
-          notifications: true,
-          autoBackup: false,
-          backupInterval: 24,
-        },
-        history: {},
-      },
-    })
+
+  async ensureStore() {
+    return await IGRPStudioSettings.getStore();
   },
 
-  // Environments
-  getEnvironments(): AppLogicEnvironment[] {
-    return store?.get("environments", []) || []
+   async getEnvironments(): Promise<AppLogicEnvironment[]> {
+    const store = await this.ensureStore();
+    return store?.get("AppLogicEnvironments", []) || [];
   },
 
-  getEnvironment(id: string): AppLogicEnvironment | null {
-    return this.getEnvironments().find((env) => env.id === id) || null
+ async getEnvironment(id: string): Promise<AppLogicEnvironment | null> {
+    const envs = await this.getEnvironments();
+    return envs.find((env) => env.id === id) || null;
   },
 
-  setEnvironments(envs: AppLogicEnvironment[]) {
-    store?.set("environments", envs)
+  async setEnvironments(envs: AppLogicEnvironment[]) {
+    const store = await this.ensureStore();
+    store?.set("AppLogicEnvironments", envs)
   },
 
-    addEnvironment(env: AppLogicEnvironment) {
+  async addEnvironment(env: AppLogicEnvironment) {
+    const store = await this.ensureStore();
     const environments = this.getEnvironments()
-    store?.set("environments", [...environments, env])
-    return env // ✅ adicione esta linha
+    store?.set("AppLogicEnvironments", [...await environments, env])
+    console.log(store)
+    return env
+  },
+    // Search functionality
+  async searchEnvironments(searchTerm: string): Promise<AppLogicEnvironment[]> {
+    const environments = this.getEnvironments()
+    const term = searchTerm.toLowerCase()
+    return (await environments).filter(
+      (env) =>
+        env.name.toLowerCase().includes(term) ||
+        env.description?.toLowerCase().includes(term) ||
+        env.url.toLowerCase().includes(term),
+    )
   },
 
-
-  updateEnvironment(id: string, updates: Partial<AppLogicEnvironment>) {
-    const updated = this.getEnvironments().map((env) =>
+  async updateEnvironment(id: string, updates: Partial<AppLogicEnvironment>) {
+    const store = await this.ensureStore();
+    const updated = (await this.getEnvironments()).map((env) =>
       env.id === id ? { ...env, ...updates, lastModified: new Date().toISOString() } : env
     )
-    store?.set("environments", updated)
+    store?.set("AppLogicEnvironments", updated)
   },
 
-  deleteEnvironment(id: string) {
-    const environments = this.getEnvironments().filter((env) => env.id !== id)
-    store?.set("environments", environments)
+  async deleteEnvironment(id: string) {
+    const store = await this.ensureStore();
+    const environments = (await this.getEnvironments()).filter((env) => env.id !== id)
+    store?.set("AppLogicEnvironments", environments)
     const history = store?.get("history", {})
     delete history[id]
     store?.set("history", history)
   },
 
-  // Settings
-  getSettings(): AppLogicSettings {
-    return store?.get("settings") || {}
-  },
-
-  updateSettings(updates: Partial<AppLogicSettings>) {
-    const current = this.getSettings()
-    store?.set("settings", { ...current, ...updates })
-  },
-
   // History
-  addConnectionTest(envId: string, test: Omit<ConnectionTest, "id" | "environmentId">) {
-    const history = store?.get("history", {}) || {}
+  async addConnectionTest(envId: string, test: Omit<ConnectionTest, "id" | "environmentId">) {
+    const store = await this.ensureStore();
+    const history = store?.get("AppLogicHistory", {}) || {}
     const list = history[envId] || []
 
     const fullTest: ConnectionTest = {
@@ -79,23 +69,21 @@ export const AppLogicStore = {
       environmentId: envId,
       ...test,
     }
-
-    list.unshift(fullTest)
-
-    const max = this.getSettings().maxHistoryEntries || 50
-    if (list.length > max) list.splice(max)
+    list.unshift(fullTest)  
 
     history[envId] = list
-    store?.set("history", history)
+    store?.set("AppLogicHistory", history)
   },
 
-  getEnvironmentHistory(envId: string): ConnectionTest[] {
-    const history = store?.get("history", {}) || {}
+  async getEnvironmentHistory(envId: string): Promise<ConnectionTest[]> {
+    const store = await this.ensureStore();
+    const history = store?.get("AppLogicHistory", {}) || {}
     return history[envId] || []
   },
 
   // Outros
-  getStorePath(): string | null {
+  async getStorePath(): Promise<string | null> {
+    const store = await this.ensureStore();
     try {
       return (store as any)?.path || null
     } catch {
@@ -103,42 +91,32 @@ export const AppLogicStore = {
     }
   },
 
-  isReady() {
+  async isReady() {
+    const store = await this.ensureStore();
     return store !== null
-  },
-    // Statistics
-  getEnvironmentStats() {    
-    const environments = this.getEnvironments()
-    return {
-      total: environments.length,
-      connected: environments.filter((e) => e.status === "connected").length,
-      disconnected: environments.filter((e) => e.status === "disconnected").length,
-      testing: environments.filter((e) => e.status === "testing").length,
-      error: environments.filter((e) => e.status === "error").length,
-    }
-  },
+  }, 
 
-    // Backup
-  createBackup() {
+  // Backup
+  async createBackup() {
+    const store = await this.ensureStore();
     return {
       version: "1.0.0",
       timestamp: new Date().toISOString(),
       environments: this.getEnvironments(),
-      settings: this.getSettings(),
-      history: store!.get("history", {}),
+      history: store!.get("AppLogicHistory", {}),
     }
   },
 
-  restoreBackup(backup: any) {
-    if (backup.environments) store!.set("environments", backup.environments)
-    if (backup.settings) this.updateSettings(backup.settings)
-    if (backup.history) store!.set("history", backup.history)
+  async restoreBackup(backup: any) {
+    const store = await this.ensureStore();
+    if (backup.environments) store!.set("AppLogicEnvironments", backup.environments)
+    if (backup.history) store!.set("AppLogicHistory", backup.history)
   },
 
-  getStoreInfo() {
+  async getStoreInfo() {
     return {
       isReady: this.isReady(),
-      count: this.getEnvironments().length,
+      count: (await this.getEnvironments()).length,
     }
   },
 }

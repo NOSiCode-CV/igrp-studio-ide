@@ -40,37 +40,13 @@ interface CustomMenu {
     isMaximized: () => Promise<boolean>,
 }
 interface AppLogicAPI {
-  // Initialize
-  initialize: () => Promise<{
-    success: boolean
-    path?: string | null
-    info?: {
-      isReady: boolean
-      storeName: string
-      environmentsCount: number
-    }
-    error?: string
-  }>
-
+  
   // Environments
   getEnvironments: () => Promise<AppLogicEnvironment[]>
   addEnvironment: (environment: AppLogicEnvironment) => Promise<AppLogicEnvironment>
   updateEnvironment: (id: string, updates: Partial<AppLogicEnvironment>) => Promise<boolean>
   deleteEnvironment: (id: string) => Promise<boolean>
-  getEnvironment: (id: string) => Promise<AppLogicEnvironment | null>
-
-  // Stats
-  getStats: () => Promise<{
-    total: number
-    connected: number
-    disconnected: number
-    testing: number
-    error: number
-  }>
-
-  // Settings
-  getSettings: () => Promise<AppLogicSettings>
-  updateSettings: (updates: Partial<AppLogicSettings>) => Promise<boolean>
+  getEnvironment: (id: string) => Promise<AppLogicEnvironment | null> 
 
   // History
   addConnectionTest: (test: ConnectionTest) => Promise<boolean>
