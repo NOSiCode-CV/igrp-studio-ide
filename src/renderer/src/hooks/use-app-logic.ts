@@ -26,7 +26,6 @@ export function useAppLogic() {
         setLoading(true)
         setError(null)
 
-        await AppLogicIPCClient.initialize()
         const storedEnvironments = await AppLogicIPCClient.getEnvironments()
         setEnvironments(storedEnvironments)
         setIsInitialized(true)
@@ -143,59 +142,52 @@ export function useAppLogic() {
     },
     [isInitialized],
   )
-
-  // Test environment
+  
+ // Test environment
   const testEnvironment = useCallback(
     async (id: string) => {
-      if (!isInitialized) {
-        toast.error("Storage not initialized")
+      if (!isInitialized || !window.appLogicAPI) {
+        toast.error("App Logic not initialized")
         return false
       }
 
       try {
-        const environment = await AppLogicIPCClient.getEnvironment(id)
+        const environment = await window.appLogicAPI.getEnvironment(id)
         if (!environment) {
           toast.error("Environment not found")
           return false
         }
 
         await updateEnvironment(id, { status: "testing" })
-        const startTime = Date.now()
-        const { result, error } = await fetchData(environment.url, {
-          method: "GET",
-          headers: {
-            "API-KEY": environment.apiKey,
-            "Content-Type": "application/json",
-          },
-        })
-        const responseTime = Date.now() - startTime        //const result = await AppLogicIPCClient.testEnvironment(environment)
+        const result = await window.appLogicAPI.testEnvironment(environment)
+        console.log(result)
         const test: ConnectionTest = {
           id: `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           environmentId: id,
-          success: result || error,
+          success: result.isValid,
           timestamp: new Date().toISOString(),
-          responseTime: responseTime,
-          error: error,
-          statusCode: result || error,
+          responseTime: result.responseTime,
+          error: result.error,
+          statusCode: result.statusCode,
           endpoint: "/",
           method: "GET",
         }
 
-        await AppLogicIPCClient.addConnectionTest(test)
+        await window.appLogicAPI.addConnectionTest(test)
 
-        const newStatus = result ? "connected" : "error"
+        const newStatus = result.isValid ? "connected" : "error"
         await updateEnvironment(id, {
           status: newStatus,
           lastTested: new Date().toISOString(),
         })
 
-        if (result) {
-          toast.success(`Environment tested successfully (${responseTime}ms)`)
+        if (result.isValid) {
+          toast.success(`Environment tested successfully (${result.responseTime}ms)`)
         } else {
-          toast.error(`Environment test failed: ${error}`)
+          toast.error(`Environment test failed: ${result.error}`)
         }
 
-        return result || error
+        return result.isValid
       } catch (err) {
         console.error("Error testing environment:", err)
         await updateEnvironment(id, { status: "error" })
@@ -205,20 +197,6 @@ export function useAppLogic() {
     },
     [isInitialized, updateEnvironment],
   )
-
-  // Get stats
-  const getStats = useCallback(async () => {
-    if (!isInitialized) {
-      return { total: 0, connected: 0, disconnected: 0, testing: 0, error: 0, lastUpdated: new Date().toISOString() }
-    }
-
-    try {
-      const stats = await AppLogicIPCClient.getStats()
-      return { ...stats, lastUpdated: new Date().toISOString() }
-    } catch (error) {
-      return { total: 0, connected: 0, disconnected: 0, testing: 0, error: 0, lastUpdated: new Date().toISOString() }
-    }
-  }, [isInitialized])
 
   // Search environments
   const searchEnvironments = useCallback(
@@ -235,7 +213,7 @@ export function useAppLogic() {
     },
     [environments],
   )
-
+  
   // Export
   const exportEnvironments = useCallback(async () => {
     if (!isInitialized) {
@@ -270,7 +248,6 @@ export function useAppLogic() {
     updateEnvironment,
     deleteEnvironment,
     testEnvironment,
-    getStats,
     searchEnvironments,
     exportEnvironments,
     getEnvironmentHistory: (id: string) => AppLogicIPCClient.getEnvironmentHistory(id),

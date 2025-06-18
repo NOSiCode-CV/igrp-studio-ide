@@ -8,7 +8,7 @@ import { Input } from "@renderer/components/ui/input"
 import { Label } from "@renderer/components/ui/label"
 import { Textarea } from "@renderer/components/ui/textarea"
 import { EnvironmentValidator } from "../validation"
-import type { AppLogicEnvironment } from "../types"
+import type { AppLogicEnvironment } from 'src/main/types';
 
 interface EnvironmentFormProps {
   environment?: Partial<AppLogicEnvironment>
@@ -67,7 +67,7 @@ export function EnvironmentForm({ environment, onSubmit, onCancel, loading }: En
               type="url"
               value={formData.url}
               onChange={(e) => setFormData((prev) => ({ ...prev, url: e.target.value }))}
-              placeholder="https://api.example.com"
+              placeholder="https://api.applogic.com"
               required
             />
           </div>
