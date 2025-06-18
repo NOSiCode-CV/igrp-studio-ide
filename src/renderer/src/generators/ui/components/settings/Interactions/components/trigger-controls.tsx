@@ -28,8 +28,15 @@ import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { PageSelectionConfig } from '../../properties';
+import { Input } from '@renderer/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
+import useCore from '@renderer/hooks/use-core';
+import { toast } from 'sonner';
+import { AppLogicEnvironment } from 'src/main/types';
+import { useAppLogic } from '@renderer/hooks/use-app-logic';
 
-type ActionType = 'function' | 'navigate' | 'formSubmit';
+type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';;
 
 const actionTypeOptions = [
     { value: 'function', label: 'Function' },
