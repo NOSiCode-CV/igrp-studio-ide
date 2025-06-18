@@ -14,6 +14,7 @@ const PageBuilderApi = lazy(() => import('@renderer/generators/api'));
 const ProjectSettings = lazy(() => import('@renderer/pages/project/project-settings'));
 const Connections = lazy(() => import('@renderer/pages/connections'));
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'));
+const AppLogicPage = lazy(() => import('@renderer/pages/applogic/app-logic'));
 
 const allRoutes = [
     {
@@ -41,6 +42,10 @@ const othersRoutes = [
     {
         path: ROUTES.PAHT_IDE_INITIAL_SCREEN,
         component: <IDEInitialScreen />,
+    },
+    {
+        path: ROUTES.PATH_IDE_APP_LOGIC,
+        component: <AppLogicPage />,
     },
 ];
 
