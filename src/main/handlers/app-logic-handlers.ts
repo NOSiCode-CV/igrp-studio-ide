@@ -85,25 +85,6 @@ ipcMain.handle(EVENTS.APPLOGIC.SEARCH, (event, searchTerm: string) => {
 })
 
 
-// History
-ipcMain.handle("app-logic:add-connection-test", (event, test: ConnectionTest) => {
-    try {
-        AppLogicStore.addConnectionTest(test.environmentId, {
-            success: test.success,
-            timestamp: test.timestamp,
-            responseTime: test.responseTime,
-            error: test.error,
-            statusCode: test.statusCode,
-            endpoint: test.endpoint,
-            method: test.method,
-        })
-        return true
-    } catch (error) {
-        console.error("Error adding connection test:", error)
-        throw error
-    }
-})
-
 ipcMain.handle("app-logic:get-environment-history", (event, environmentId: string) => {
     try {
         return AppLogicStore.getEnvironmentHistory(environmentId)
