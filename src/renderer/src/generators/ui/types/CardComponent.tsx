@@ -37,7 +37,7 @@ const CardComponent = ({
         className,
         content,
         ...args
-    } = properties;
+    } = properties || {};
 
     const componentLabel = properties?.label || componentName;
 
