@@ -173,7 +173,6 @@ export function useAppLogic() {
           method: "GET",
         }
 
-        await window.appLogicAPI.addConnectionTest(test)
 
         const newStatus = result.isValid ? "connected" : "error"
         await updateEnvironment(id, {

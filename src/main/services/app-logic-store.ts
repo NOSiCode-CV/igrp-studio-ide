@@ -58,24 +58,7 @@ export const AppLogicStore = {
     store?.set("history", history)
   },
 
-  // History
-  async addConnectionTest(envId: string, test: Omit<ConnectionTest, "id" | "environmentId">) {
-    const store = await this.ensureStore();
-    const history = store?.get("AppLogicHistory", {}) || {}
-    const list = history[envId] || []
-
-    const fullTest: ConnectionTest = {
-      id: `test_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      environmentId: envId,
-      ...test,
-    }
-    list.unshift(fullTest)  
-
-    history[envId] = list
-    store?.set("AppLogicHistory", history)
-  },
-
-  async getEnvironmentHistory(envId: string): Promise<ConnectionTest[]> {
+   async getEnvironmentHistory(envId: string): Promise<ConnectionTest[]> {
     const store = await this.ensureStore();
     const history = store?.get("AppLogicHistory", {}) || {}
     return history[envId] || []
