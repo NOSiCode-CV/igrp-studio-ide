@@ -457,7 +457,7 @@ const SidebarRight = ({
                     <>
                         <div className="space-y-2 p-2">
                             <Label htmlFor={'tab'}>
-                                {`${label} - ${componentId}`}
+                                {`${label || componentName} - ${componentId}`}
                             </Label>
                             <Input
                                 id="tag"
