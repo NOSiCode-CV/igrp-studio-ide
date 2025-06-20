@@ -45,12 +45,7 @@ export const returnTypeOptions = [
     { value: 'void', label: 'Void' },
     { value: 'any', label: 'Any' },
 ];
-interface FunctionParameter {
-    id: string;
-    name: string;
-    type: string;
-    isOptional: boolean;
-}
+
 interface FunctionSettingsSidebarProps
     extends React.ComponentProps<typeof Sidebar> {
     formik?: any;
@@ -252,8 +247,6 @@ export const FunctionArguments = ({
                 isFunction: false,
                 isState: false,
                 functionParameters: [],
-                stateParameterType: 'boolean',
-                stateParameterName: 'value',
             },
         ]);
     };
@@ -267,11 +260,15 @@ export const FunctionArguments = ({
     };
 
     const addFunctionParameter = (argumentId: string) => {
-        const newParameter: FunctionParameter = {
+        const newParameter: Arguments = {
             id: Date.now().toString(),
             name: '',
             type: 'string',
             isOptional: false,
+            isList: false,
+            isInterface: false,
+            isFunction: false,
+            isState: false,
         };
 
         updateArgument(argumentId, {
@@ -290,7 +287,7 @@ export const FunctionArguments = ({
         const argument = arguments_.find((arg) => arg.id === argumentId);
         if (argument) {
             updateArgument(argumentId, {
-                functionParameters: argument.functionParameters.filter(
+                functionParameters: (argument.functionParameters || []).filter(
                     (param) => param.id !== parameterId
                 ),
             });
@@ -300,12 +297,12 @@ export const FunctionArguments = ({
     const updateFunctionParameter = (
         argumentId: string,
         parameterId: string,
-        updates: Partial<FunctionParameter>
+        updates: Partial<Arguments>
     ) => {
         const argument = arguments_.find((arg) => arg.id === argumentId);
         if (argument) {
             updateArgument(argumentId, {
-                functionParameters: argument.functionParameters.map((param) =>
+                functionParameters: (argument.functionParameters || []).map((param) =>
                     param.id === parameterId ? { ...param, ...updates } : param
                 ),
             });
@@ -410,7 +407,7 @@ export const FunctionArguments = ({
                                                     label="isFunction"
                                                 />
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                            {/* <div className="flex items-center space-x-2">
                                                 <CheckboxInput
                                                     id={`isState-${arg.id}`}
                                                     value={arg.isState}
@@ -422,7 +419,7 @@ export const FunctionArguments = ({
                                                     }
                                                     label="isState"
                                                 />
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
 
@@ -452,8 +449,7 @@ export const FunctionArguments = ({
                                                     </Button>
                                                 </div>
 
-                                                {arg.functionParameters.length >
-                                                    0 &&
+                                                {arg?.functionParameters &&
                                                     arg.functionParameters.map(
                                                         (param, paramIndex) => (
                                                             <div
@@ -496,7 +492,7 @@ export const FunctionArguments = ({
                                                                                 arg.id,
                                                                                 param.id,
                                                                                 {
-                                                                                    type: value,
+                                                                                    type: value as string,
                                                                                 }
                                                                             )
                                                                         }
@@ -548,19 +544,21 @@ export const FunctionArguments = ({
                                                         )
                                                     )}
 
-                                                {arg.functionParameters
-                                                    .length === 0 && (
-                                                    <p className="text-sm text-gray-500 text-center py-4">
-                                                        No parameters defined.
-                                                        Click "Add Parameter" to
-                                                        add function parameters.
-                                                    </p>
-                                                )}
+                                                {arg.functionParameters &&
+                                                    arg.functionParameters
+                                                        .length === 0 && (
+                                                        <p className="text-sm text-gray-500 text-center py-4">
+                                                            No parameters
+                                                            defined. Click "Add
+                                                            Parameter" to add
+                                                            function parameters.
+                                                        </p>
+                                                    )}
                                             </div>
                                         </div>
                                     )}
 
-                                    {arg.isState && (
+                                    {/*    {arg.isState && (
                                         <div className="mt-6 p-4 border rounded-lg bg-white">
                                             <div className="flex items-center justify-between mb-4">
                                                 <h4 className="font-medium">
@@ -618,7 +616,7 @@ export const FunctionArguments = ({
                                                 void
                                             </div>
                                         </div>
-                                    )}
+                                    )} */}
 
                                     <div className="flex flex-1 justify-end">
                                         <Button

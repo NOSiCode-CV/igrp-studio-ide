@@ -62,7 +62,7 @@ const CompTools = ({
         <TooltipProvider>
             <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
                 <div className="flex align-middle items-center">
-                    <span className="text-xs">{label}</span>
+                    <span className="text-xs">{label || componentName}</span>
                 </div>
 
                 <Tooltip>
@@ -121,10 +121,7 @@ const CompTools = ({
                 </Tooltip>
 
                 {components.length > 0 && (
-                    <AddComponentPopover
-                        components={components}
-                        comp={comp}
-                    />
+                    <AddComponentPopover components={components} comp={comp} />
                 )}
 
                 {allowTypes && (

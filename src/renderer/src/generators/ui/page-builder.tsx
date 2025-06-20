@@ -67,6 +67,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             setAllFunctions,
             setAllComponents,
             setAllStates,
+            setAllArguments,
         } = useDroppedComponents();
 
         const { showErrorToast, showSuccessToast } = useToast();
@@ -172,6 +173,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
                     const data = await window.api.getJsonContent(pagePath);
 
+                    setAllArguments(data.args);
+
                     if (data.components) {
                         setLoading(true);
                         setAllComponents(data.components);
@@ -241,7 +244,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
                             {activePresentation === APRESENTATION.DESIGN ? (
-                                <IGRPStudioMainComponent component={components ?? []} onDragEnd={onDragEnd} />
+                                <IGRPStudioMainComponent
+                                    component={components ?? []}
+                                    onDragEnd={onDragEnd}
+                                />
                             ) : activePresentation === APRESENTATION.JSON ? (
                                 <CodeContentJson
                                     components={components}

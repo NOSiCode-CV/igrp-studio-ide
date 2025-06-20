@@ -15,7 +15,7 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import {
-    Argument,
+    Arguments,
     ComponentConfig,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
@@ -73,7 +73,7 @@ export function NewComponentModal({
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const [arguments_, setArguments] = useState<Argument[]>([]);
+    const [arguments_, setArguments] = useState<Arguments[]>([]);
 
     useEffect(() => {
         formik.resetForm();
@@ -124,7 +124,7 @@ export function NewComponentModal({
 
     const formik = useFormik<ComponentConfig>({
         enableReinitialize: true,
-        initialValues: currentComponent?.content || initialValues,
+        initialValues: { ...initialValues, ...currentComponent?.content },
         validationSchema,
         onSubmit: (values, actions) => {
             actions.setSubmitting(false);
@@ -241,19 +241,21 @@ export function NewComponentModal({
 
                                                     paramStr += ': ';
 
-                                                    if (arg.isState) {
+                                                    /*  if (arg.isState) {
                                                         // Handle state setter
                                                         paramStr += `(${arg.stateParameterType}: ${arg.stateParameterName}) => void`;
-                                                    } else if (arg.isFunction) {
+                                                    } else  */
+                                                    if (arg.isFunction) {
                                                         // Handle regular function
                                                         const params =
+                                                            arg?.functionParameters &&
                                                             arg.functionParameters
                                                                 .map(
                                                                     (p) =>
                                                                         `${p.name}${p.isOptional ? '?' : ''}: ${p.type}`
                                                                 )
                                                                 .join(', ');
-                                                        paramStr += `(${params}) => ${arg.returnType}`;
+                                                        paramStr += `(${params}) => ${arg.type}`;
                                                     } else {
                                                         // Handle regular parameter
                                                         paramStr += arg.type;

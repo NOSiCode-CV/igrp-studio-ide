@@ -102,7 +102,7 @@ export function NewPageModal({
 
     const formik = useFormik<PageConfig>({
         enableReinitialize: true,
-        initialValues: currentComponent?.content || initialValues,
+        initialValues: { ...initialValues, ...currentComponent?.content },
         validationSchema,
         onSubmit: (values, actions) => {
             const newValues = pageEditing
@@ -113,7 +113,7 @@ export function NewPageModal({
                   }
                 : values;
 
-                console.log(newValues)
+            console.log(newValues);
 
             actions.setSubmitting(false);
             handleConfirm(newValues);

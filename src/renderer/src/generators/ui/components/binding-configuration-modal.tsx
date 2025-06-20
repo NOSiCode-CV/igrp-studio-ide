@@ -184,7 +184,7 @@ export const BindingConfigurationModal = ({
                     state: {
                         ...comp.data?.defaultValues.state,
                         name: comp.data?.defaultValues.state?.name ?? '',
-                        defaultValue: undefined, //`init${capitalize(values.name)}`,
+                        defaultValue: `init${capitalize(values.name)}`,
                         type: comp.data?.defaultValues.state?.type ?? '',
                         id: comp.data?.defaultValues.state?.id ?? '',
                     },
