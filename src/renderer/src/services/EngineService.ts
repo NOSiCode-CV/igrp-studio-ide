@@ -65,7 +65,7 @@ export const EngineService = {
                 },
                 interactions: convertCompToInteractinsJSONSchema(component.content.args),
                 childrenTypes: [],
-                imports: component.content.pagePath ? [`import ${capitalize(component.content.name)} from '${component.content.pageName ? `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name.toLowerCase()}` : `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name}`}'`] : [],
+                imports: [`import ${capitalize(component.content.name)} from '${component.content.pageName ? `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name.toLowerCase()}` : `@/components/${component.content.name}`}'`], 
                 defaultValue: false,
                 allowTypes: false,
                 group: 'appComponents',

@@ -156,7 +156,7 @@ export const BindingConfigurationModal = ({
         onSubmit: (values, actions) => {
             actions.setSubmitting(false);
 
-            if (!validate()) return;
+            if (!validate() || !componentId) return;
 
             const updatedComponent = {
                 ...values,
@@ -169,50 +169,52 @@ export const BindingConfigurationModal = ({
                 ),
             };
 
+            console.log(updatedComponent)
+
             createOrUpdateType({
                 ...updatedComponent,
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 
-            if (componentId) {
-                //TODO For revisions
-                let defaultValues: any = undefined;
-                if (comp.componentName === COMPONENT.Form) {
-                    defaultValues = {
-                        ...comp.data?.defaultValues,
-                        state: {
-                            ...comp.data?.defaultValues.state,
-                            name: comp.data?.defaultValues.state?.name ?? '',
-                            defaultValue: `init${capitalize(values.name)}`,
-                            type: comp.data?.defaultValues.state?.type ?? '',
-                            id: comp.data?.defaultValues.state?.id ?? '',
-                        },
-                    };
+            //TODO For revisions
+            let defaultValues: any = undefined;
+            if (comp.componentName === COMPONENT.Form) {
+                defaultValues = {
+                    ...comp.data?.defaultValues,
+                    state: {
+                        ...comp.data?.defaultValues.state,
+                        name: comp.data?.defaultValues.state?.name ?? '',
+                        defaultValue: undefined, //`init${capitalize(values.name)}`,
+                        type: comp.data?.defaultValues.state?.type ?? '',
+                        id: comp.data?.defaultValues.state?.id ?? '',
+                    },
+                };
 
-                    handleUpdateChildComponent(componentId, {
-                        ...comp,
-                        dataType: values.name,
-                        data: {
-                            ...comp.data,
-                            defaultValues,
-                        },
-                    });
-                } else
-                    handleUpdateChildComponent(componentId, {
-                        ...comp,
-                        dataType: values.name,
-                    });
-
-                values.fields.forEach(({ componentId: id, name }) => {
-                    const component = componentMap.get(id);
-                    if (component) {
-                        handleUpdateChildComponent(id, {
-                            ...component,
-                            tag: name,
-                        });
-                    }
+                handleUpdateChildComponent(componentId, {
+                    ...comp,
+                    dataType: values.name,
+                    data: {
+                        ...comp.data,
+                        defaultValues,
+                    },
+                });
+            } else {
+                console.log(comp);
+                handleUpdateChildComponent(componentId, {
+                    ...comp,
+                    dataType: values.name,
                 });
             }
+
+            values.fields.forEach(({ componentId: id, name }) => {
+                const component = componentMap.get(id);
+                if (component) {
+                    handleUpdateChildComponent(id, {
+                        ...component,
+                        tag: name,
+                    });
+                }
+            });
 
             setOpen(false);
         },

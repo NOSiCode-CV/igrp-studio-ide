@@ -37,6 +37,9 @@ import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { useTagManager } from '../hooks/useTagManager';
 import * as LucideIcons from 'lucide-react';
 import SidebarRight from './sidebar/sidebar-right';
+import { cn } from '@renderer/lib/utils';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import Droppable from '@renderer/lib/dnd/Droppable';
 
 interface AddComponentProps {
     path: string;
@@ -67,6 +70,7 @@ export const AddComponentModal = ({
     const {
         handleAddChildToComponent,
         handleRemoveChildFromComponent,
+        handleReorderChildInComponent,
         components: allComponents,
     } = useDroppedComponents();
 
@@ -99,6 +103,16 @@ export const AddComponentModal = ({
             });
         },
         [children.length, generateTag, handleAddChildToComponent]
+    );
+
+    const handleOrderComponent = useCallback(
+        (result: DragEndResult) => {
+            handleDragEnd(result, {
+                handleReorderChildInComponent,
+                generateTag,
+            });
+        },
+        [generateTag, handleReorderChildInComponent]
     );
 
     const onEditComponent = (
@@ -143,9 +157,13 @@ export const AddComponentModal = ({
                                 <div>
                                     {children.length > 0 ? (
                                         <ComponentTable
+                                            parentComp={comp}
                                             components={children}
                                             registryComponents={components}
                                             onEdit={onEditComponent}
+                                            onOrderComponent={
+                                                handleOrderComponent
+                                            }
                                             handleAddComponent={
                                                 handleAddComponent
                                             }
@@ -162,7 +180,7 @@ export const AddComponentModal = ({
                             </div>
 
                             {/* Helper Section */}
-                            <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t">
+                            <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t mt-6">
                                 <p className="mb-2">
                                     <strong>rowData</strong> is a variable
                                     provided by the table that contains all the
@@ -196,8 +214,7 @@ export const AddComponentModal = ({
                                     </li>
                                     <li>
                                         <code>
-                                            () =&gt;
-                                            handleView(rowData.id)
+                                            () =&gt; handleView(rowData.id)
                                         </code>
                                     </li>
                                     <li>
@@ -252,6 +269,7 @@ const renderAddComponents = (
 };
 
 const RenderCreatedComponents = ({
+    parentComp,
     components,
     registryComponents,
     onEdit,
@@ -259,7 +277,9 @@ const RenderCreatedComponents = ({
     level = 0,
     parentComponent,
     handleRemoveChildFromComponent,
+    onOrderComponent,
 }: {
+    parentComp: StructuredComponent;
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
     onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
@@ -267,6 +287,7 @@ const RenderCreatedComponents = ({
     level?: number; // Add a level parameter to track nesting depth
     parentComponent?: string;
     handleRemoveChildFromComponent?: (destination: Destination) => void;
+    onOrderComponent: (result: DragEndResult) => void;
 }) => {
     const handleEditComponent = (
         component: StructuredComponent,
@@ -301,16 +322,19 @@ const RenderCreatedComponents = ({
 
     // Recursively render child components
     const RenderChildComponents = ({
+        parentComp,
         children,
         level,
         parentComponent,
     }: {
+        parentComp: StructuredComponent;
         children: StructuredComponent[];
         level: number;
         parentComponent: string;
     }) => {
         return (
             <RenderCreatedComponents
+                parentComp={parentComp}
                 components={children}
                 registryComponents={registryComponents}
                 onEdit={onEdit}
@@ -318,12 +342,17 @@ const RenderCreatedComponents = ({
                 level={level + 1}
                 parentComponent={parentComponent}
                 handleRemoveChildFromComponent={handleRemoveChildFromComponent}
+                onOrderComponent={onOrderComponent}
             />
         );
     };
 
     return (
-        <>
+        <Droppable
+            component={parentComp}
+            onDrop={onOrderComponent}
+            className="w-full bg-none"
+        >
             {components.map((component, index) => {
                 const { properties, label, id } = component;
                 return (
@@ -333,17 +362,31 @@ const RenderCreatedComponents = ({
                                 className="font-medium"
                                 style={{ paddingLeft: `${level * 20}px` }}
                             >
-                                <div className="flex items-center gap-2">
-                                    {renderIcon(
-                                        properties?.iconProperties?.iconName
+                                <Draggable
+                                    item={component}
+                                    index={index}
+                                    mode="MOVE"
+                                    layout="vertical"
+                                    dropTargetId={parentComp?.id}
+                                    className={cn(
+                                        'border-none flex flex-1 items-center space-x-2'
                                     )}
-                                    <span>{`${label} (${properties.labelTrigger})`}</span>
-                                </div>
+                                >
+                                    <button className="me-1" disabled>
+                                        <LucideIcons.GripVertical className="h-4 w-4 text-muted-foreground" />
+                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {renderIcon(
+                                            properties?.iconProperties?.iconName
+                                        )}
+                                        <span>{`${label} (${properties.labelTrigger})`}</span>
+                                    </div>
+                                </Draggable>
                             </TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
                                     <Button
-                                        variant="outline"
+                                        variant="ghost"
                                         size="sm"
                                         onClick={() =>
                                             handleEditComponent(
@@ -352,7 +395,8 @@ const RenderCreatedComponents = ({
                                             )
                                         }
                                     >
-                                        Edit
+                                        <LucideIcons.Edit />
+                                        <span className="sr-only">Edit</span>
                                     </Button>
                                     <Button
                                         variant="ghost"
@@ -365,7 +409,8 @@ const RenderCreatedComponents = ({
                                             })
                                         }
                                     >
-                                        Delete
+                                        <LucideIcons.Trash />
+                                        <span className="sr-only">Delete</span>
                                     </Button>
                                     {canAcceptChildren(component) &&
                                         renderAddComponents(
@@ -379,6 +424,7 @@ const RenderCreatedComponents = ({
                         {component.children &&
                             component.children.length > 0 && (
                                 <RenderChildComponents
+                                    parentComp={component}
                                     children={component.children}
                                     level={level}
                                     parentComponent={component.componentName}
@@ -387,21 +433,25 @@ const RenderCreatedComponents = ({
                     </React.Fragment>
                 );
             })}
-        </>
+        </Droppable>
     );
 };
 
 // Main component that renders the table with a single header
 const ComponentTable = ({
+    parentComp,
     components,
     registryComponents,
     onEdit,
     handleAddComponent,
     handleRemoveChildFromComponent,
+    onOrderComponent,
 }: {
+    parentComp: StructuredComponent;
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
     onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
+    onOrderComponent: (result: DragEndResult) => void;
     handleAddComponent: (item: any, droppableId: string) => void;
     handleRemoveChildFromComponent: (destination: Destination) => void;
 }) => {
@@ -415,6 +465,7 @@ const ComponentTable = ({
             </TableHeader>
             <TableBody>
                 <RenderCreatedComponents
+                    parentComp={parentComp}
                     components={components}
                     registryComponents={registryComponents}
                     onEdit={onEdit}
@@ -422,6 +473,7 @@ const ComponentTable = ({
                     handleRemoveChildFromComponent={
                         handleRemoveChildFromComponent
                     }
+                    onOrderComponent={onOrderComponent}
                 />
             </TableBody>
         </Table>
