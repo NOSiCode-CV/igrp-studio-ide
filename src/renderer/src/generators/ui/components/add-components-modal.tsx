@@ -20,14 +20,6 @@ import { Button } from '@renderer/components/ui/button';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -299,7 +291,7 @@ const RenderCreatedComponents = ({
     // Render the icon for a component
     const renderIcon = (iconName: string) => {
         const IconComponent = LucideIcons[iconName] ?? ICON_MAP[iconName];
-        return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
+        return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
     };
 
     // Check if the component can accept children
@@ -357,8 +349,8 @@ const RenderCreatedComponents = ({
                 const { properties, label, id } = component;
                 return (
                     <React.Fragment key={index}>
-                        <TableRow>
-                            <TableCell
+                        <div className="grid grid-cols-[1fr_auto] px-3 py-1 border-b last:border-b-0 hover:bg-muted/50">
+                            <div
                                 className="font-medium"
                                 style={{ paddingLeft: `${level * 20}px` }}
                             >
@@ -369,58 +361,56 @@ const RenderCreatedComponents = ({
                                     layout="vertical"
                                     dropTargetId={parentComp?.id}
                                     className={cn(
-                                        'border-none flex flex-1 items-center space-x-2'
+                                        'border-none flex flex-1 items-center space-x-3'
                                     )}
                                 >
-                                    <button className="me-1" disabled>
+                                    <button disabled>
                                         <LucideIcons.GripVertical className="h-4 w-4 text-muted-foreground" />
                                     </button>
                                     <div className="flex items-center gap-2">
                                         {renderIcon(
                                             properties?.iconProperties?.iconName
                                         )}
-                                        <span>{`${label} (${properties.labelTrigger})`}</span>
+                                        <span className='text-sm'>{`${label} (${properties.labelTrigger})`}</span>
                                     </div>
                                 </Draggable>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                            handleEditComponent(
-                                                component,
-                                                parentComponent
-                                            )
-                                        }
-                                    >
-                                        <LucideIcons.Edit />
-                                        <span className="sr-only">Edit</span>
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-destructive"
-                                        onClick={() =>
-                                            handleRemoveChildFromComponent?.({
-                                                droppableId: id,
-                                                index,
-                                            })
-                                        }
-                                    >
-                                        <LucideIcons.Trash />
-                                        <span className="sr-only">Delete</span>
-                                    </Button>
-                                    {canAcceptChildren(component) &&
-                                        renderAddComponents(
-                                            getAcceptedChildren(component),
-                                            id,
-                                            handleAddComponent
-                                        )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        handleEditComponent(
+                                            component,
+                                            parentComponent
+                                        )
+                                    }
+                                >
+                                    <LucideIcons.Edit />
+                                    <span className="sr-only">Edit</span>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive"
+                                    onClick={() =>
+                                        handleRemoveChildFromComponent?.({
+                                            droppableId: id,
+                                            index,
+                                        })
+                                    }
+                                >
+                                    <LucideIcons.Trash />
+                                    <span className="sr-only">Delete</span>
+                                </Button>
+                                {canAcceptChildren(component) &&
+                                    renderAddComponents(
+                                        getAcceptedChildren(component),
+                                        id,
+                                        handleAddComponent
+                                    )}
+                            </div>
+                        </div>
                         {component.children &&
                             component.children.length > 0 && (
                                 <RenderChildComponents
@@ -456,14 +446,16 @@ const ComponentTable = ({
     handleRemoveChildFromComponent: (destination: Destination) => void;
 }) => {
     return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className="border rounded-lg overflow-hidden">
+            {/* Table Header */}
+            <div className="bg-muted/50 border-b">
+                <div className="grid grid-cols-[1fr_auto] gap-4 p-3 mx-6">
+                    <div className="font-medium text-sm">Label</div>
+                    <div className="font-medium text-sm">Actions</div>
+                </div>
+            </div>
+            {/* Table Body */}
+            <div>
                 <RenderCreatedComponents
                     parentComp={parentComp}
                     components={components}
@@ -475,7 +467,7 @@ const ComponentTable = ({
                     }
                     onOrderComponent={onOrderComponent}
                 />
-            </TableBody>
-        </Table>
+            </div>
+        </div>
     );
 };
