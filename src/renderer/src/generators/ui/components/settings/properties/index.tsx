@@ -188,17 +188,35 @@ const RenderPropsConfig = ({
             );
         } else if (key === 'href' || xUiWidget === 'uri') {
             return (
-                <SlugBindingConfig
-                    key={key}
-                    label={xMetaLabel}
-                    value={value}
-                    fieldPath={fieldPath}
-                    parentKey={parentKey}
-                    pageOptions={pageOptions}
-                    onInputChange={onInputChange}
-                    columnsOptions={columnsOptions}
-                    segments={formValues['segments']}
-                />
+                <>
+                    <Label
+                        htmlFor={key}
+                        className="flex justify-between items-center"
+                    >
+                        <span>{xMetaLabel}</span>
+                        <FieldActions
+                            field={key}
+                            statesOptions={statesOptions}
+                            argumentsOptions={argumentsOptions}
+                            value={value}
+                            tag={tag}
+                            type={type}
+                            onSelectState={onSelectState}
+                            dataProperties={dataProperties}
+                        />
+                    </Label>
+                    <SlugBindingConfig
+                        key={key}
+                        label={xMetaLabel}
+                        value={value}
+                        fieldPath={fieldPath}
+                        parentKey={parentKey}
+                        pageOptions={pageOptions}
+                        onInputChange={onInputChange}
+                        columnsOptions={columnsOptions}
+                        segments={formValues['segments']}
+                    />
+                </>
             );
         } else if (xUiWidget === 'ref') {
             return (
@@ -451,7 +469,7 @@ const FieldActions = ({
                             placeholder="Select State"
                         />
                     </div>
-                    {argumentsOptions && argumentsOptions.length && (
+                    {argumentsOptions.length > 0 ? (
                         <>
                             <Separator />
                             <div className="space-y-2">
@@ -476,6 +494,8 @@ const FieldActions = ({
                                 />
                             </div>
                         </>
+                    ) : (
+                        <></>
                     )}
                     <div className="flex justify-end">
                         <Button
@@ -608,7 +628,6 @@ const SlugBindingConfig = ({
     value,
     fieldPath,
     key,
-    label,
     parentKey,
     segments,
     pageOptions,
@@ -638,11 +657,10 @@ const SlugBindingConfig = ({
 
         setLinkType(defaultType);
         setSelectedPagePath(value);
-    }, [value]);
+    }, [pageOptions, value]);
 
     return (
         <>
-            <Label htmlFor={key}>{label}</Label>
             <IGRPRadioGroup
                 id={parentKey ? `${parentKey}.${key}` : key}
                 name={key}

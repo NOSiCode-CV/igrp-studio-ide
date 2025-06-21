@@ -176,6 +176,11 @@ export const useFakedata = () => {
                 content: faker.lorem.paragraph(1)
             }
         },
+        [COMPONENT.PdfViewer]: {
+            properties: {
+                fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+            }
+        },
         // Default fallback component
         Default: {
             componentName: 'UnknownComponent',

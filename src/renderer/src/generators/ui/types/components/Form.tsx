@@ -1,46 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, {  } from 'react';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { formVariants } from '../../utils/layout-mapping';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import BoxWrapper from '../tools/BoxWrapper';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface FormComponentProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioForm: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const { id: componentId, properties, children } = comp;
     const { className, variant } = properties || {};
 
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
-
-    const { dynamicImport } = useStudio();
-
     const { setEditingComponent } = useDroppedComponents();
-
-    useEffect(() => {
-        const loadComponents = async () => {
-            const components: { [key: string]: React.ComponentType<any> } = {};
-
-            for (const field of children) {
-                const component = await dynamicImport(field.componentName);
-                components[field.id] = component;
-            }
-
-            setLoadedComponents(components);
-        };
-
-        loadComponents();
-    }, [children, dynamicImport]);
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -53,7 +26,6 @@ const IGRPStudioForm: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
         const fields =
             children.length > 0 ? (
                 children.map((comp: StructuredComponent, index: number) => {
-                    const Component = loadedComponents[comp.id];
                     return (
                         <Draggable
                             key={comp.id}
@@ -63,19 +35,14 @@ const IGRPStudioForm: React.FC<FormComponentProps> = ({ comp, onDragEnd }) => {
                             className="p-1"
                             mode="MOVE"
                         >
-                            {Component && (
-                                <BoxWrapper
-                                    comp={comp}
-                                    onEdit={() => handleEditClick(comp)}
-                                    group="group/comp-form"
-                                    className="opacity-0 group-hover/comp-form:opacity-100"
-                                >
-                                    <Component
-                                        comp={comp}
-                                        onDragEnd={onDragEnd}
-                                    />
-                                </BoxWrapper>
-                            )}
+                            <BoxWrapper
+                                comp={comp}
+                                onEdit={() => handleEditClick(comp)}
+                                group="group/comp-form"
+                                className="opacity-0 group-hover/comp-form:opacity-100"
+                            >
+                                <CardComponent comp={comp} onDragEnd={onDragEnd} />
+                            </BoxWrapper>
                         </Draggable>
                     );
                 })

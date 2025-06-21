@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxWrapper from '../tools/BoxWrapper';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
@@ -14,17 +13,12 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { Button } from '@renderer/components/ui/button';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface TabsProps {
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioTabs: React.FC<TabsProps> = ({
+const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
-}: TabsProps) => {
+}: CardComponentProps) => {
     const {
         children: components,
         componentName: parentComponentName,
@@ -32,15 +26,9 @@ const IGRPStudioTabs: React.FC<TabsProps> = ({
         id: componentId,
     } = comp;
 
-    const { variant, className } = properties || {};
-
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
+    const { className } = properties || {};
 
     const { setEditingComponent } = useDroppedComponents();
-
-    const { dynamicImport } = useStudio();
 
     const handleEditClick = (
         component: StructuredComponent,
@@ -52,91 +40,46 @@ const IGRPStudioTabs: React.FC<TabsProps> = ({
         });
     };
 
-    // Load components dynamically
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: Record<string, React.ComponentType<any>> = {};
-
-            // Recursive function to load a component and all its children
-            const loadComponentAndChildren = async (
-                component: StructuredComponent
-            ) => {
-                try {
-                    // Load the current component
-                    const loadedComp = await dynamicImport(
-                        component.componentName
-                    );
-                    comps[component.id] = loadedComp;
-
-                    // Load all children recursively
-                    if (component.children && component.children.length > 0) {
-                        await Promise.all(
-                            component.children.map(loadComponentAndChildren)
-                        );
-                    }
-                } catch (error) {
-                    console.error(
-                        `Failed to load component ${component.componentName}:`,
-                        error
-                    );
-                }
-            };
-
-            // Load all root components, filters, and columns in parallel
-            await Promise.all([...components.map(loadComponentAndChildren)]);
-
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [dynamicImport, components]);
-
     const renderTriggers = () => {
         return components.map((child: StructuredComponent, index: number) => {
-            const Component = loadedComponents[child.id];
             const { properties, componentName } = child;
 
             const { className, label } = properties || {};
 
             return (
-                Component && (
-                    <Draggable
-                        key={child.id}
-                        item={child}
-                        index={index}
-                        dropTargetId={componentId}
-                        dropZone={true}
-                        className={cn('p-0 bg-muted/0', className)}
-                        mode="MOVE"
-                        layout="horizontal"
+                <Draggable
+                    key={child.id}
+                    item={child}
+                    index={index}
+                    dropTargetId={componentId}
+                    dropZone={true}
+                    className={cn('p-0 bg-muted/0', className)}
+                    mode="MOVE"
+                    layout="horizontal"
+                >
+                    <TabsTrigger
+                        value={child.id}
+                        key={index}
+                        className="w-full"
+                        asChild
                     >
-                        <TabsTrigger
-                            value={child.id}
-                            key={index}
-                            className="w-full"
-                            asChild
-                        >
-                            <div>
-                                <BoxWrapper
-                                    comp={child}
-                                    onEdit={() =>
-                                        handleEditClick(
-                                            child,
-                                            parentComponentName
-                                        )
-                                    }
-                                    group="group/tabitem-trigger"
-                                    className={cn(
-                                        'opacity-0 group-hover/tabitem-trigger:opacity-100',
-                                        'data-[state=active]:opacity-100'
-                                    )}
-                                >
-                                    <span>{label || componentName}</span>
-                                </BoxWrapper>
-                            </div>
-                        </TabsTrigger>
-                    </Draggable>
-                )
+                        <div>
+                            <BoxWrapper
+                                comp={child}
+                                onEdit={() =>
+                                    handleEditClick(child, parentComponentName)
+                                }
+                                group="group/tabitem-trigger"
+                                className={cn(
+                                    'opacity-0 group-hover/tabitem-trigger:opacity-100',
+                                    'data-[state=active]:opacity-100'
+                                )}
+                            >
+                                <span>{label || componentName}</span>
+                            </BoxWrapper>
+                        </div>
+                    </TabsTrigger>
+                </Draggable>
             );
         });
     };
@@ -160,12 +103,9 @@ const IGRPStudioTabs: React.FC<TabsProps> = ({
                                     childTab: StructuredComponent,
                                     index: number
                                 ) => {
-                                    const Component =
-                                        loadedComponents[childTab.id];
-
                                     const { id: componentId } = comp;
 
-                                    return Component ? (
+                                    return (
                                         <Draggable
                                             key={childTab.id}
                                             item={childTab}
@@ -187,13 +127,13 @@ const IGRPStudioTabs: React.FC<TabsProps> = ({
                                                     'left-0 right-auto opacity-0 group-hover/tab-content:opacity-100'
                                                 )}
                                             >
-                                                <Component
+                                                <CardComponent
                                                     comp={childTab}
                                                     onDragEnd={onDragEnd}
                                                 />
                                             </BoxWrapper>
                                         </Draggable>
-                                    ) : null;
+                                    );
                                 }
                             )
                         ) : (

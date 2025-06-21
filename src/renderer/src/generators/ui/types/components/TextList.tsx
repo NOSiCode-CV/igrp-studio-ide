@@ -1,20 +1,14 @@
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxContainer from '../tools/BoxWrapper';
 import { CardComponentProps } from '../CardComponent';
 import { COMPONENT } from '../../ComponentTypes';
 import { getHoverClasses } from '../../utils/tailwindGroups';
 import { getLabel } from '@renderer/utils';
 import BoxWrapper from '../tools/BoxWrapper';
-import { useEffect, useState } from 'react';
-import useStudio from '@renderer/hooks/use-studio';
-import {
-    IGRPHeadline,
-    IGRPIcon,
-} from '@igrp/igrp-framework-react-design-system';
+import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import Droppable from '@renderer/lib/dnd/Droppable';
 
 const IGRPStudioTextList = ({
@@ -30,16 +24,10 @@ const IGRPStudioTextList = ({
         properties,
     } = comp || {};
 
-    const { title } = properties;
-
     const { setEditingComponent } = useDroppedComponents();
 
-    const handleDrop = (item: DragEndResult) => {
-        onDragEnd(item);
-    };
-
     const handleEdit = async (component: StructuredComponent, path: string) => {
-        console.log("path ",path)
+        console.log('path ', path);
         setEditingComponent({
             path,
             component,
@@ -53,40 +41,7 @@ const IGRPStudioTextList = ({
         componentName: COMPONENT.Container,
     });
 
-    const [loadedComponents, setLoadedComponents] = useState<
-        Record<string, React.ComponentType<any>>
-    >({});
-    const { dynamicImport } = useStudio();
-
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: Record<string, React.ComponentType<any>> = {};
-
-            // Load all child components in parallel
-            const loadPromises = components.flatMap((child) =>
-                child.children.map(async (grandChild) => {
-                    try {
-                        const component = await dynamicImport(
-                            grandChild.componentName
-                        );
-                        comps[grandChild.id] = component;
-                    } catch (error) {
-                        console.error(
-                            `Failed to load component ${grandChild.componentName}:`,
-                            error
-                        );
-                    }
-                })
-            );
-
-            await Promise.all(loadPromises);
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [dynamicImport, components]);
-
-    const renderTextListItem = (comp: StructuredComponent, path:string) => {
+    const renderTextListItem = (comp: StructuredComponent, path: string) => {
         const { children: components, componentName } = comp;
         const { className } = properties;
         const newPath = `${path}/${componentName}`;
@@ -149,7 +104,6 @@ const IGRPStudioTextList = ({
                     />
                 ) : (
                     components.map((child, index) => {
-
                         return (
                             <Draggable
                                 key={child.id}

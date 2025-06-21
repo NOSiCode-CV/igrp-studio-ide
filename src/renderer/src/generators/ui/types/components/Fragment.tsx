@@ -3,45 +3,17 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
-import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxContainer from '../tools/BoxWrapper';
-import { useTranslation } from 'react-i18next';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface ContainerProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-    onAddControl?: (type: string, componentId: string) => void;
-}
-
-const IGRPStudioFragment = ({ isDisabled, comp, onDragEnd }: ContainerProps) => {
-    const { t } = useTranslation();
+const IGRPStudioFragment = ({
+    comp,
+    onDragEnd,
+}: CardComponentProps) => {
     const { children: components, id: componentId } = comp || {};
 
     const { setEditingComponent } = useDroppedComponents();
-
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
-
-    const { dynamicImport } = useStudio();
-
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
-            for (const comp of components) {
-                const component = await dynamicImport(comp.componentName);
-                comps[comp.id] = component;
-            }
-
-            setLoadedComponents(comps);
-        };
-
-        if (components) loadComponents();
-    }, [components, dynamicImport]);
 
     const handleDrop = (item: DragEndResult) => {
         onDragEnd(item);
@@ -60,21 +32,17 @@ const IGRPStudioFragment = ({ isDisabled, comp, onDragEnd }: ContainerProps) => 
             component={comp}
             className={cn(
                 'space-y-1 group/row relative hover:border-1 hover:border-primary rounded-lg p-1',
-                isDisabled && 'border-none hover:border-destructive'
             )}
         >
             {components && components.length > 0 ? (
                 components.map((comp: StructuredComponent, index: number) => {
-                    const Component = loadedComponents[comp.id];
-
-                    return Component ? (
+                    return (
                         <Draggable
                             key={comp.id}
                             item={comp}
                             index={index}
                             dropTargetId={componentId}
                             mode="MOVE"
-                            isDisabled={isDisabled}
                         >
                             <BoxContainer
                                 comp={comp}
@@ -82,19 +50,14 @@ const IGRPStudioFragment = ({ isDisabled, comp, onDragEnd }: ContainerProps) => 
                                 group="group/row-container"
                                 className={cn(
                                     'left-0 right-auto opacity-0',
-                                    !isDisabled &&
-                                        'group-hover/row-container:opacity-100'
                                 )}
                             >
-                                <Component
+                                <CardComponent
                                     comp={comp}
                                     onDragEnd={onDragEnd}
-                                    isDisabled={isDisabled}
                                 />
                             </BoxContainer>
                         </Draggable>
-                    ) : (
-                        <div key={comp.id}>{t('loading')}</div>
                     );
                 })
             ) : (
