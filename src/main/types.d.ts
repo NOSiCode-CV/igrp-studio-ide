@@ -243,6 +243,9 @@ export type ToolCheck = {
     version?: string;
     error?: string;
     link: string;
+    category: 'frontend' | 'backend' | 'development';
+    description?: string;
+    required: boolean;
 };
 export interface AppLogicEnvironment {
   id: string

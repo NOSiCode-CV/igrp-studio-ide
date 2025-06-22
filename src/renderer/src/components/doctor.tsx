@@ -2,9 +2,23 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog';
 import { ToolCheck } from 'src/main/types';
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
-import { Save, Stethoscope } from 'lucide-react';
-import { Table, TableBody, TableHeader } from './ui/table';
-import { Button } from './ui/button';
+import { Stethoscope, CheckCircle, XCircle, AlertTriangle, Download, Globe, Settings, Wrench } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Badge } from './ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { ScrollArea } from './ui/scroll-area';
+
+interface CategorySummary {
+    category: 'frontend' | 'backend' | 'development';
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    tools: ToolCheck[];
+    totalTools: number;
+    successfulTools: number;
+    requiredTools: number;
+    successfulRequiredTools: number;
+}
 
 export default function Doctor({
     open,
@@ -14,7 +28,6 @@ export default function Doctor({
     setOpen: (prompt: boolean) => void;
 }) {
     const [results, setResults] = useState<ToolCheck[] | null>(null);
-    const [savedPath, setSavedPath] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -28,108 +41,195 @@ export default function Doctor({
         }
     }, [open]);
 
-    const saveReport = async () => {
-        if (!results) return;
-        const filePath = await window.api.saveDoctorReport(results);
-        setSavedPath(filePath);
+    const allGood = results && results.every((tool) => tool.success);
+
+    const getCategorySummary = (category: 'frontend' | 'backend' | 'development'): CategorySummary => {
+        const categoryTools = results?.filter(tool => tool.category === category) || [];
+        const requiredTools = categoryTools.filter(tool => tool.required);
+        const successfulRequiredTools = requiredTools.filter(tool => tool.success);
+
+        return {
+            category,
+            title: category === 'frontend' ? 'Frontend Development' : 
+                   category === 'backend' ? 'Backend Development' : 'Development Infrastructure',
+            description: category === 'frontend' ? 'Tools for React, Next.js, and modern web development' :
+                        category === 'backend' ? 'Tools for Java, Spring Boot, and .NET development' :
+                        'Essential development tools and infrastructure',
+            icon: category === 'frontend' ? <Globe className="h-6 w-6" /> : 
+                  category === 'backend' ? <Settings className="h-6 w-6" /> : 
+                  <Wrench className="h-6 w-6" />,
+            tools: categoryTools,
+            totalTools: categoryTools.length,
+            successfulTools: categoryTools.filter(tool => tool.success).length,
+            requiredTools: requiredTools.length,
+            successfulRequiredTools: successfulRequiredTools.length,
+        };
     };
 
-    const allGood = results && results.every((tool) => tool.success);
+    const getCategoryStatus = (summary: CategorySummary) => {
+        if (summary.successfulRequiredTools === summary.requiredTools && summary.requiredTools > 0) {
+            return { status: 'success', icon: <CheckCircle className="h-4 w-4 text-green-600" />, text: 'All required tools ready' };
+        } else if (summary.successfulRequiredTools > 0) {
+            return { status: 'partial', icon: <AlertTriangle className="h-4 w-4 text-yellow-600" />, text: 'Some required tools missing' };
+        } else {
+            return { status: 'error', icon: <XCircle className="h-4 w-4 text-red-600" />, text: 'Required tools missing' };
+        }
+    };
+
+    const categories: ('frontend' | 'backend' | 'development')[] = ['frontend', 'backend', 'development'];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[600px] max-w-4xl max-h-[80vh]">
                 <DialogHeader>
-                    <DialogTitle className="flex gap-2 items-center">
-                        <Stethoscope />
-                        <span>Stethoscope</span>
+                    <DialogTitle className="flex gap-2 items-center text-xl">
+                        <Stethoscope className="h-6 w-6" />
+                        <span>System Health Check</span>
                     </DialogTitle>
-                    <DialogDescription />
+                    <DialogDescription>
+                        Comprehensive check of your development environment tools
+                    </DialogDescription>
                 </DialogHeader>
 
-                {loading ? (
-                    <p className="text-gray-600 text-sm">🌀 Running system checks...</p>
-                ) : (
-                    <>
-                        {allGood ? (
-                            <p className="text-green-600 font-medium mb-4">
-                                ✅ All systems are healthy!
-                            </p>
-                        ) : (
-                            <p className="text-red-600 font-medium mb-4">
-                                ⚠️ Some tools are missing or not working correctly.
-                            </p>
-                        )}
-
-                        <Table className="w-full border border-gray-200 text-sm">
-                            <TableHeader>
-                                <tr className="bg-gray-100 text-left">
-                                    <th className="p-2">Tool</th>
-                                    <th className="p-2">Status</th>
-                                    <th className="p-2">Version / Error</th>
-                                    <th className="p-2">Action</th>
-                                </tr>
-                            </TableHeader>
-                            <TableBody>
-                                {results?.map((tool, index) => (
-                                    <tr key={index} className="border-t">
-                                        <td className="p-2">{tool.name}</td>
-                                        <td className="p-2">
-                                            <span
-                                                className={
-                                                    tool.success
-                                                        ? 'text-green-600'
-                                                        : 'text-red-600'
-                                                }
-                                            >
-                                                {tool.success
-                                                    ? '✅ OK'
-                                                    : '❌ Missing'}
-                                            </span>
-                                        </td>
-                                        <td className="p-2 text-xs">
-                                            {tool.success ? (
-                                                tool.version
-                                            ) : (
-                                                <span title={tool.error}>
-                                                    {tool.error?.split('\n')[0]}
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="p-2">
-                                            {!tool.success && tool.link && (
-                                                <a
-                                                    href={tool.link}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="text-blue-600 underline"
-                                                >
-                                                    Download
-                                                </a>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </TableBody>
-                        </Table>
-
-                        <div className="mt-6 flex items-center gap-4">
-                            <Button
-                                onClick={saveReport}
-                                variant={'outline'}
-                                size={'sm'}
-                            >
-                                <Save className="mr-2 h-4 w-4" />
-                                <span>Save Report</span>
-                            </Button>
-                            {savedPath && (
-                                <span className="text-gray-600 text-sm">
-                                    Saved at: {savedPath}
-                                </span>
-                            )}
+                
+                    {loading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="flex items-center gap-2 text-gray-600">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                <span>Running system checks...</span>
+                            </div>
                         </div>
-                    </>
-                )}
+                    ) : (
+                        <ScrollArea className="h-[60vh] pr-4">
+                            {/* Overall Status */}
+                            <div className="mb-6">
+                                {allGood ? (
+                                    <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                        <CheckCircle className="h-5 w-5 text-green-600" />
+                                        <span className="text-green-800 font-medium">✅ All systems are healthy!</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                                        <span className="text-yellow-800 font-medium">⚠️ Some tools are missing or not working correctly.</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Category Cards */}
+                            <div className="space-y-6">
+                                {categories.map((category) => {
+                                    const summary = getCategorySummary(category);
+                                    const status = getCategoryStatus(summary);
+
+                                    if (summary.totalTools === 0) return null;
+
+                                    return (
+                                        <Card key={category}>
+                                            <CardHeader className="pb-3">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-muted-foreground">
+                                                            {summary.icon}
+                                                        </div>
+                                                        <div>
+                                                            <CardTitle className="text-lg">{summary.title}</CardTitle>
+                                                            <p className="text-sm text-muted-foreground">{summary.description}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        {status.icon}
+                                                        <Badge 
+                                                            variant={status.status === 'success' ? 'default' : 
+                                                                    status.status === 'partial' ? 'secondary' : 'destructive'}
+                                                            className="text-xs"
+                                                        >
+                                                            {summary.successfulRequiredTools}/{summary.requiredTools} required
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className="pt-0">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow>
+                                                            <TableHead className="w-[35%]">Tool</TableHead>
+                                                            <TableHead className="w-[15%]">Status</TableHead>
+                                                            <TableHead className="w-[30%]">Version / Error</TableHead>
+                                                            <TableHead className="w-[20%]">Action</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {summary.tools.map((tool, index) => (
+                                                            <TableRow key={index}>
+                                                                <TableCell className="py-3">
+                                                                    <div>
+                                                                        <div className="font-medium">{tool.name}</div>
+                                                                        {tool.description && (
+                                                                            <div className="text-xs text-muted-foreground mt-1">{tool.description}</div>
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="py-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        {tool.success ? (
+                                                                            <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                                                        ) : (
+                                                                            <XCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                                                                        )}
+                                                                        <span className={tool.success ? 'text-green-600' : 'text-red-600'}>{tool.success ? 'OK' : tool.required ? 'Required' : 'Optional'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="py-3 text-xs">
+                                                                    {tool.success ? (
+                                                                        <code className="bg-muted px-1 py-0.5 rounded text-xs">
+                                                                            {tool.version}
+                                                                        </code>
+                                                                    ) : (
+                                                                        <span title={tool.error} className="text-red-600 text-xs">
+                                                                            {tool.error?.split('\n')[0]}
+                                                                        </span>
+                                                                    )}
+                                                                </TableCell>
+                                                                <TableCell className="py-3">
+                                                                    {!tool.success && tool.link && (
+                                                                        <a
+                                                                            href={tool.link}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                                                        >
+                                                                            <Download className="h-3 w-3" />
+                                                                            Download
+                                                                        </a>
+                                                                    )}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Summary Footer */}
+                            {results && (
+                                <div className="mt-6 pt-4 border-t">
+                                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                        <span>
+                                            Total tools checked: {results.length} • 
+                                            Successful: {results.filter(t => t.success).length} • 
+                                            Required missing: {results.filter(t => t.required && !t.success).length}
+                                        </span>
+                                        <span>Last checked: {new Date().toLocaleTimeString()}</span>
+                                    </div>
+                                </div>
+                            )}
+                       </ScrollArea>
+                    )}
+                
             </DialogContent>
         </Dialog>
     );
