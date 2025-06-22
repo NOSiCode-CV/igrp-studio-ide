@@ -4,7 +4,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { PageCardProps } from './page-card';
+import { PageCardProps } from './page-card-view';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -17,9 +17,9 @@ import {
     Trash,
     Copy,
 } from 'lucide-react';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 
-export const PageActions = ({
+export const PageActionMenu = ({
     page,
     onDelete,
     onEdit,
@@ -70,7 +70,7 @@ export const PageActions = ({
     );
 };
 
-export const IconPage = ({
+export const PageTypeIcon = ({
     page,
     compCount,
     isOpen,

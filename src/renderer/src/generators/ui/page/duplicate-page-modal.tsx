@@ -20,9 +20,9 @@ import { getId } from '@renderer/utils';
 import { FocusEvent } from 'react';
 import { TextInput } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 
-interface DuplicateModalProps {
+interface DuplicatePageModalProps {
     isOpen: boolean;
     basePath: string;
     pageToDuplicate?: PageDefinition;
@@ -47,13 +47,13 @@ const deepCopy = (obj: any): any => {
     return obj;
 };
 
-export function DuplicateModal({
+export function DuplicatePageModal({
     isOpen,
     basePath,
     onClose,
     onConfirm,
     pageToDuplicate,
-}: DuplicateModalProps) {
+}: DuplicatePageModalProps) {
   
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
@@ -63,8 +63,6 @@ export function DuplicateModal({
 
     // Create a deep copy of the original content
     const originalContent = deepCopy(pageToDuplicate?.content || {});
-
-    console.log(originalContent)
 
     const initialValues = {
         // Copy any other properties that might exist

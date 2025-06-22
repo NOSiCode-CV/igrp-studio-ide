@@ -1,8 +1,8 @@
-// page-card.tsx
+// page-card-view.tsx
 import { Card, CardContent } from '@renderer/components/ui/card';
 import { Button } from '@renderer/components/ui/button';
 import { ChevronRight, ComponentIcon } from 'lucide-react';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 import { Badge } from '@renderer/components/ui/badge';
 import {
     Collapsible,
@@ -12,7 +12,7 @@ import {
 import { Separator } from '@renderer/components/ui/separator';
 import { useState } from 'react';
 import { cn } from '@renderer/lib/utils';
-import { IconPage, PageActions } from './shared';
+import { PageTypeIcon, PageActionMenu } from './page-actions';
 
 export interface PageCardProps {
     page: PageDefinition;
@@ -25,7 +25,7 @@ export interface PageCardProps {
     onDuplicate?: (page: PageDefinition) => void;
 }
 
-export function PageCard({
+export function PageCardView({
     page,
     components,
     onDelete,
@@ -71,7 +71,7 @@ export function PageCard({
                             )}
                             <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <div className="flex items-center gap-1">
-                                    <IconPage
+                                    <PageTypeIcon
                                         isOpen={isOpen}
                                         compCount={
                                             components ? components.length : 0
@@ -116,7 +116,7 @@ export function PageCard({
                                 >
                                     {page.type === 'page' ? 'P' : 'C'}
                                 </Badge>
-                                <PageActions
+                                <PageActionMenu
                                     page={page}
                                     onEdit={() => onEdit(page)}
                                     onDelete={() => onDelete(page)}
@@ -156,7 +156,7 @@ export function PageCard({
                                                 [{subpage.content?.path}]
                                             </span>
                                         </div>
-                                        <PageActions
+                                        <PageActionMenu
                                             page={subpage}
                                             onEdit={() => onEdit(subpage)}
                                             onDelete={() => onDelete(subpage)}
@@ -191,7 +191,7 @@ export function PageCard({
                                                     subpage.pageName}
                                             </span>
                                         </div>
-                                        <PageActions
+                                        <PageActionMenu
                                             page={subpage}
                                             onDelete={() => onDelete(subpage)}
                                             onEdit={() => onEdit(subpage)}

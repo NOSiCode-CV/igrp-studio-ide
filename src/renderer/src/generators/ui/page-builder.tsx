@@ -29,7 +29,7 @@ import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
 import { EngineService } from '@renderer/services/EngineService';
-import { PageDefinition } from './page/list-pages';
+import { PageDefinition } from './page/page-manager';
 import IGRPStudioMainComponent from './types/components/MainComponent';
 import SidebarRight from './components/sidebar/sidebar-right';
 

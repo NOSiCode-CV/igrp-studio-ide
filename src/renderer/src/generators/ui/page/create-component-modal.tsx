@@ -29,7 +29,7 @@ import {
     FunctionArguments,
     returnTypeOptions,
 } from '../components/sidebar/custom-code/functions-settings';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 import {
     Card,
     CardContent,
@@ -49,7 +49,7 @@ const initialValues: ComponentConfig = {
     args: [],
 };
 
-interface NewComponentModalProps {
+interface CreateComponentModalProps {
     isOpen: boolean;
     basePath: string;
     pageOptions: any[];
@@ -58,14 +58,14 @@ interface NewComponentModalProps {
     onConfirm: () => void;
 }
 
-export function NewComponentModal({
+export function CreateComponentModal({
     isOpen,
     basePath,
     onClose,
     onConfirm,
     pageOptions,
     currentComponent,
-}: NewComponentModalProps) {
+}: CreateComponentModalProps) {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();

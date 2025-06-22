@@ -4,16 +4,11 @@ import { useDispatch } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
-import {
-    ChevronDown,
-    ChevronRight,
-    LayoutGrid,
-    Plus,
-    TableIcon,
-} from 'lucide-react';
-import { PageCard } from './page-card';
-import { NewPageModal } from './new-page-modal';
-import { DuplicateModal } from './duplicate-modal';
+import { LayoutGrid, Plus, TableIcon } from 'lucide-react';
+import { PageCardView } from './page-card-view';
+import { CreatePageModal } from './create-page-modal';
+import { DuplicatePageModal } from './duplicate-page-modal';
+import { PageTable } from './page-table';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { FileTree } from 'src/main/types';
@@ -23,7 +18,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { NewComponentModal } from './new-component-modal';
+import { CreateComponentModal } from './create-component-modal';
 import {
     IGRPTabs,
     IGRPTabsContent,
@@ -31,7 +26,6 @@ import {
     IGRPTabsTrigger,
 } from '@renderer/components/tabs';
 import ProjectSettings from '@renderer/pages/project/project-settings';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 import {
     ToggleGroup,
     ToggleGroupItem,
@@ -40,12 +34,7 @@ import { EmptyList } from '@renderer/components/empty-list';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import useStudio from '@renderer/hooks/use-studio';
-import { Badge } from '@renderer/components/ui/badge';
-import { IconPage, PageActions } from './shared';
-import {
-    IGRPDataTable,
-    IGRPPageHeader,
-} from '@igrp/igrp-framework-react-design-system';
+import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 
 export interface PageDefinition {
     id: string;
@@ -65,7 +54,7 @@ interface PageBuilderContentProps {
     onPageClick?: (pageFile: PageDefinition) => void;
 }
 
-const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
+const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
 
@@ -76,7 +65,8 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
     const [page, setPage] = useState<PageDefinition>();
     const [showformPage, setFormPage] = useState<boolean>(false);
     const [showFormComponent, setFormComponent] = useState(false);
-    const [showDuplicateModal, setShowDuplicateModal] = useState<boolean>(false);
+    const [showDuplicateModal, setShowDuplicateModal] =
+        useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -105,7 +95,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             name: page.pageName,
             id: page.id,
         };
-        console.log(pageConfig)
+        console.log(pageConfig);
         await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
         isLoadingTable(true);
@@ -218,106 +208,6 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
             path: content?.path,
         }));
 
-    const columns: ColumnDef<any>[] = [
-        {
-            accessorKey: 'description',
-            header: 'Name',
-            cell: ({ row }) => (
-                <div className="flex items-center gap-2">
-                    <IconPage
-                        isOpen={false}
-                        compCount={components ? components.length : 0}
-                        page={row.original}
-                    />
-                    <span>
-                        {row.original.description || row.original.pageName}
-                    </span>
-                </div>
-            ),
-        },
-        {
-            accessorKey: 'pagePath',
-            header: 'Path',
-            cell: ({ row }) => (
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                    {row.original.pagePath || '-'}
-                </code>
-            ),
-        },
-        {
-            accessorKey: 'type',
-            header: 'Type',
-            cell: ({ row }) => (
-                <Badge
-                    variant={row.original.isPage ? 'default' : 'secondary'}
-                    className="text-xs"
-                >
-                    {row.original.type}
-                </Badge>
-            ),
-        },
-        {
-            accessorKey: 'type',
-            header: 'Subpages/Components',
-            cell: ({ row }) => {
-                const components = getPageComponent(row.original.pageName);
-                return (
-                    <div className="flex gap-2">
-                        {components && components.length > 0 ? (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => console.log()}
-                                className="h-6 px-2 text-xs flex items-center gap-1"
-                            >
-                                <span>Components</span>
-                                <Badge variant="outline" className="text-xs">
-                                    {components.length}
-                                </Badge>
-                                {row.original.isComponentsExpanded ? (
-                                    <ChevronDown className="h-3 w-3" />
-                                ) : (
-                                    <ChevronRight className="h-3 w-3" />
-                                )}
-                            </Button>
-                        ) : (
-                            <>-</>
-                        )}
-                    </div>
-                );
-            },
-        },
-        {
-            accessorKey: 'actions',
-            header: 'Actions',
-            cell: ({ row }) => (
-                <PageActions
-                    page={row.original}
-                    onEdit={() => void 0}
-                    onDelete={() => handleDeletePage(row.original)}
-                    onAddComponents={() => handleAddComponents(row.original)}
-                    openDialogNewPage={openDialogNewPage}
-                    onDuplicate={handleDuplicate}
-                />
-            ),
-        },
-        {
-            header: 'Children',
-            cell: ({ row }) => {
-                return row.getCanExpand() ? (
-                    <button
-                        onClick={row.getToggleExpandedHandler()}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        {row.getIsExpanded() ? '👇' : '👉'}
-                    </button>
-                ) : (
-                    ''
-                );
-            },
-        },
-    ];
-
     const tableCountText = `${filteredPages.length} ${
         filteredPages.length === 1 ? 'page' : 'pages'
     } • ${filteredComponents.length} ${filteredComponents.length === 1 ? 'component' : 'components'}`;
@@ -367,19 +257,20 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                         setViewMode(value as 'table' | 'card')
                                     }
                                 >
-                                    <ToggleGroupItem
-                                        value="table"
-                                        aria-label="Table view"
-                                        className="h-8 w-8"
-                                    >
-                                        <TableIcon className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
+                                    {' '}
                                     <ToggleGroupItem
                                         value="card"
                                         aria-label="Card view"
                                         className="h-8 w-8"
                                     >
                                         <LayoutGrid className="h-3.5 w-3.5" />
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem
+                                        value="table"
+                                        aria-label="Table view"
+                                        className="h-8 w-8"
+                                    >
+                                        <TableIcon className="h-3.5 w-3.5" />
                                     </ToggleGroupItem>
                                 </ToggleGroup>
                                 <DropdownMenu>
@@ -418,7 +309,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                             page.pageName
                                         );
                                         return (
-                                            <PageCard
+                                            <PageCardView
                                                 key={page.name}
                                                 page={page}
                                                 onDelete={(page) =>
@@ -445,7 +336,16 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                 />
                             )
                         ) : (
-                            <IGRPDataTable columns={columns} data={tableData} />
+                            <PageTable
+                                tableData={tableData}
+                                components={components}
+                                getPageComponent={getPageComponent}
+                                getSubPages={getSubPages}
+                                handleDeletePage={handleDeletePage}
+                                handleAddComponents={handleAddComponents}
+                                openDialogNewPage={openDialogNewPage}
+                                handleDuplicate={handleDuplicate}
+                            />
                         )}
                     </>
                 </IGRPTabsContent>
@@ -457,7 +357,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                     />
                 </IGRPTabsContent>
             </IGRPTabs>
-            <NewPageModal
+            <CreatePageModal
                 basePath={basePath}
                 isOpen={showformPage}
                 onClose={() => setFormPage(false)}
@@ -466,7 +366,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                 currentComponent={page}
             />
 
-            <NewComponentModal
+            <CreateComponentModal
                 basePath={basePath}
                 isOpen={showFormComponent}
                 onClose={() => setFormComponent(false)}
@@ -475,7 +375,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                 currentComponent={page}
             />
 
-            <DuplicateModal
+            <DuplicatePageModal
                 basePath={basePath}
                 isOpen={showDuplicateModal}
                 onClose={() => setShowDuplicateModal(false)}
@@ -494,4 +394,4 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
     );
 };
 
-export default MainPageBuilder;
+export default PageManager;

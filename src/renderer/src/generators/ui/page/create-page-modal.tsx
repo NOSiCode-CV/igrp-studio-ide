@@ -20,7 +20,7 @@ import {
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -35,7 +35,7 @@ const initialValues: PageConfig = {
     parentName: undefined,
 };
 
-interface NewPageModalProps {
+interface CreatePageModalProps {
     isOpen: boolean;
     basePath: string;
     pageEditing?: PageDefinition;
@@ -44,14 +44,14 @@ interface NewPageModalProps {
     onConfirm: () => void;
 }
 
-export function NewPageModal({
+export function CreatePageModal({
     isOpen,
     basePath,
     onClose,
     onConfirm,
     pageEditing,
     currentComponent,
-}: NewPageModalProps) {
+}: CreatePageModalProps) {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
