@@ -15,6 +15,7 @@ import {
     FolderOpen,
     MoreHorizontal,
     Trash,
+    Copy,
 } from 'lucide-react';
 import { PageDefinition } from './list-pages';
 
@@ -24,6 +25,7 @@ export const PageActions = ({
     onEdit,
     onAddComponents,
     openDialogNewPage,
+    onDuplicate,
 }: PageCardProps) => {
     const { t } = useTranslation();
     const { isPage } = page;
@@ -40,6 +42,10 @@ export const PageActions = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEdit}><Edit/>{t('edit')}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate?.(page)}>
+                    <Copy />
+                    {t('duplicate')}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddComponents(page)}>
                     <Component />
                     {t('addComponents')}

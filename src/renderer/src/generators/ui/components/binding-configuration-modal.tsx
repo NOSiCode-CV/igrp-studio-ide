@@ -26,7 +26,6 @@ import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
 import { capitalize } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
-import { ElementField } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface LabeledElementField {
     componentId: string;
@@ -133,6 +132,14 @@ export const BindingConfigurationModal = ({
               ]
             : []),
         { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
+        {
+            key: 'group',
+            name: '',
+            type: 'group',
+            items: [
+                { key: 'validation', name: '', type: 'popoverFormValidation', options: [] },
+            ],
+        },
     ];
 
     const validate = () => {
@@ -169,7 +176,7 @@ export const BindingConfigurationModal = ({
                 ),
             };
 
-            console.log(updatedComponent)
+            console.log(updatedComponent);
 
             createOrUpdateType({
                 ...updatedComponent,

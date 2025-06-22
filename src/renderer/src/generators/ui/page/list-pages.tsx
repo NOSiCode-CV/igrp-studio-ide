@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { PageCard } from './page-card';
 import { NewPageModal } from './new-page-modal';
+import { DuplicateModal } from './duplicate-modal';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { FileTree } from 'src/main/types';
@@ -75,11 +76,13 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
     const [page, setPage] = useState<PageDefinition>();
     const [showformPage, setFormPage] = useState<boolean>(false);
     const [showFormComponent, setFormComponent] = useState(false);
+    const [showDuplicateModal, setShowDuplicateModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
     const [pageEditing, setPageEditing] = useState<PageDefinition>();
+    const [pageToDuplicate, setPageToDuplicate] = useState<PageDefinition>();
 
     const handleAddComponents = (page: PageDefinition) => {
         onPageClick?.(page);
@@ -88,6 +91,11 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
     const handleDeletePage = (page: PageDefinition) => {
         setDeleteModal(true);
         setPage(page);
+    };
+
+    const handleDuplicate = (page: PageDefinition) => {
+        setPageToDuplicate(page);
+        setShowDuplicateModal(true);
     };
 
     const confirmDeletion = async () => {
@@ -113,6 +121,8 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
         setFormPage(false);
         setPage(undefined);
         setFormComponent(false);
+        setShowDuplicateModal(false);
+        setPageToDuplicate(undefined);
         isLoadingTable(true);
     };
 
@@ -287,6 +297,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                     onDelete={() => handleDeletePage(row.original)}
                     onAddComponents={() => handleAddComponents(row.original)}
                     openDialogNewPage={openDialogNewPage}
+                    onDuplicate={handleDuplicate}
                 />
             ),
         },
@@ -417,6 +428,7 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                                                     handleAddComponents
                                                 }
                                                 onEdit={handleEdit}
+                                                onDuplicate={handleDuplicate}
                                                 components={components}
                                                 subPages={subPages}
                                                 openDialogNewPage={
@@ -461,6 +473,14 @@ const MainPageBuilder = ({ onPageClick }: PageBuilderContentProps) => {
                 onConfirm={handleNewPage}
                 pageOptions={pageOptions}
                 currentComponent={page}
+            />
+
+            <DuplicateModal
+                basePath={basePath}
+                isOpen={showDuplicateModal}
+                onClose={() => setShowDuplicateModal(false)}
+                onConfirm={handleNewPage}
+                pageToDuplicate={pageToDuplicate}
             />
 
             <AlertDialogDelete

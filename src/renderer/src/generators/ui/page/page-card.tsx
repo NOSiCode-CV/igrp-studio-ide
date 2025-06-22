@@ -22,6 +22,7 @@ export interface PageCardProps {
     onEdit: (page: any) => void;
     onAddComponents: (page: PageDefinition) => void;
     openDialogNewPage?: (page: PageDefinition) => void;
+    onDuplicate?: (page: PageDefinition) => void;
 }
 
 export function PageCard({
@@ -32,6 +33,7 @@ export function PageCard({
     onAddComponents,
     openDialogNewPage,
     subPages,
+    onDuplicate,
 }: PageCardProps) {
     const { isPage, description, pageName, pagePath } = page;
     const [isOpen, setIsOpen] = useState(false);
@@ -120,6 +122,7 @@ export function PageCard({
                                     onDelete={() => onDelete(page)}
                                     onAddComponents={onAddComponents}
                                     openDialogNewPage={openDialogNewPage}
+                                    onDuplicate={onDuplicate}
                                 />
                             </div>
                         </div>
@@ -158,6 +161,7 @@ export function PageCard({
                                             onEdit={() => onEdit(subpage)}
                                             onDelete={() => onDelete(subpage)}
                                             onAddComponents={onAddComponents}
+                                            onDuplicate={onDuplicate}
                                         />
                                     </div>
                                 ))}
@@ -192,6 +196,7 @@ export function PageCard({
                                             onDelete={() => onDelete(subpage)}
                                             onEdit={() => onEdit(subpage)}
                                             onAddComponents={onAddComponents}
+                                            onDuplicate={onDuplicate}
                                         />
                                     </div>
                                 ))}
