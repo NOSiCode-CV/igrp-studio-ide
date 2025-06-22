@@ -64,6 +64,8 @@ export function DuplicateModal({
     // Create a deep copy of the original content
     const originalContent = deepCopy(pageToDuplicate?.content || {});
 
+    console.log(originalContent)
+
     const initialValues = {
         // Copy any other properties that might exist
         ...originalContent,
@@ -73,10 +75,10 @@ export function DuplicateModal({
         name: originalContent?.pageName
             ? `${originalContent.pageName}Copy`
             : '',
-        path: originalContent?.content?.path
-            ? `${originalContent.content.path}-copy`
+        path: originalContent?.path
+            ? `${originalContent.path}-copy`
             : '',
-        pagePath: originalContent?.content?.pagePath || '',
+        pagePath: originalContent?.pagePath || '',
         pageName: originalContent?.pageName
             ? `${originalContent.pageName}Copy`
             : '',

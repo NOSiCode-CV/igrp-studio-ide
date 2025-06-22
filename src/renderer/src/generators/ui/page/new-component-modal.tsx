@@ -1,5 +1,4 @@
 import { Button } from '@renderer/components/ui/button';
-import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
