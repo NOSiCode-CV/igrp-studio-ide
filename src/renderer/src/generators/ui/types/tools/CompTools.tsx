@@ -22,6 +22,7 @@ interface ToolsProps {
     handleClickStructComp: (layout: string) => void;
     comp: StructuredComponent;
     parentComp?: StructuredComponent;
+    path?: string;
 }
 
 const CompTools = ({
@@ -30,6 +31,7 @@ const CompTools = ({
     handleClickStructComp,
     comp,
     parentComp,
+    path,
 }: ToolsProps) => {
     const { t } = useTranslation();
     const { componentName, label, allowTypes } = comp;
@@ -47,10 +49,13 @@ const CompTools = ({
     const { getAcceptedChildren } = useStudio();
 
     useEffect(() => {
-        getAcceptedChildren(parentComponentName, componentName).then((data) => {
-            setComponents(data);
-        });
-    }, [parentComponentName, componentName, getAcceptedChildren]);
+        getAcceptedChildren(path || parentComponentName, componentName).then(
+            (data) => {
+                console.log(path,data, componentName)
+                setComponents(data);
+            }
+        );
+    }, [parentComponentName, componentName, getAcceptedChildren, path]);
 
     useEffect(() => {
         if (!isOpen) {

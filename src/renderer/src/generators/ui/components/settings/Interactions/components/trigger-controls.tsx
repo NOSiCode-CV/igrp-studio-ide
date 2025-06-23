@@ -251,7 +251,7 @@ const InteractionEditor = ({
 
     const interactions = interactionsType[interactionKey];
 
-    const { properties } = interactions;
+    const { properties } = interactions || {};
 
     const hasfnNameOption = properties?.function?.properties.fnName.visible;
 

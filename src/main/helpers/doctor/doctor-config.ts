@@ -68,14 +68,14 @@ export const toolConfig: ToolConfig[] = [
     category: 'backend',
     description: 'Java build and dependency management tool',
   },
-  {
+  /* {
     name: '.NET SDK',
     command: 'dotnet',
     link: 'https://dotnet.microsoft.com/download',
     required: false,
     category: 'backend',
     description: '.NET development framework',
-  },
+  }, */
 
   // Development Infrastructure Tools
   {

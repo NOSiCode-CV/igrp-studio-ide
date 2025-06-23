@@ -1,4 +1,4 @@
-import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPStatusBanner, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPModalDialogDescription, IGRPModalDialogHeader, IGRPModalDialogTitle, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPStatusBanner, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -85,7 +85,7 @@ import IGRPStudioContainer from './types/components/Container';
 import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/MainComponent';
-import IGRPStudioModalDialog from './types/components/ModalDialog';
+import { IGRPStudioDialogDescription, IGRPSTudioDialogFooter, IGRPSTudioDialogHeader, IGRPSTudioDialogTitle, IGRPStudioDialogTrigger, IGRPStudioModalDialog } from './types/components/ModalDialog';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
 import IGRPStudioTabs from './types/components/Tabs';
@@ -208,6 +208,13 @@ export const COMPONENT: Record<string, string> = {
     Separator: "separator",
 
     ModalDialog: 'modalDialog',
+    ModalDialogTitle: "modalDialogTitle",
+    ModalDialogTrigger: "modalDialogTrigger",
+    ModalDialogHeader: 'modalDialogHeader',
+    ModalDialogDescription: "modalDialogDescription",
+    ModalDialogContent: "modalDialogContent",
+    ModalDialogFooter: "modalDialogFooter",
+
     AlertDialog: 'alertDialog',
     Aspect: 'aspect',
     Fragment: 'fragment',
@@ -220,6 +227,7 @@ export const COMPONENT: Record<string, string> = {
     Alert: 'alert',
     TextList: 'textList',
     StatusBanner: "statusBanner"
+
 } as const;
 
 
@@ -394,7 +402,6 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Card]: IGRPStudioCard,
     [COMPONENT.Flex]: IGRPStudioFlex,
     [COMPONENT.Grid]: IGRPStudioGrid,
-    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
     [COMPONENT.Tabs]: IGRPStudioTabs,
     [COMPONENT.Paragraph]: IGRPStudioParagraph,
     [COMPONENT.RepetitiveList]: IGRPStudioRepetitive,
@@ -403,4 +410,11 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.InfoCard]: IGRPStudioInfoCard,
     [COMPONENT.Alert]: IGRPStudioAlert,
     [COMPONENT.TextList]: IGRPStudioTextList,
+
+    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
+    [COMPONENT.ModalDialogTigger]: IGRPStudioDialogTrigger,
+    [COMPONENT.ModalDialogTitle]: IGRPSTudioDialogTitle,
+    [COMPONENT.ModalDialogHeader]: IGRPSTudioDialogHeader,
+    [COMPONENT.ModalDialogDescription]: IGRPStudioDialogDescription,
+    [COMPONENT.ModalDialogFooter]: IGRPSTudioDialogFooter
 };
