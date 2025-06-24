@@ -39,7 +39,7 @@ const CardComponent = ({
         ...args
     } = properties || {};
 
-    const componentLabel = properties?.label || componentName;
+    const componentLabel = content || properties?.label || componentName;
 
     const Icon = ICON_MAP[componentName];
 

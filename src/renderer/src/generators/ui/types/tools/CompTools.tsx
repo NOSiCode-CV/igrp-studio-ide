@@ -64,7 +64,7 @@ const CompTools = ({
 
     return (
         <TooltipProvider>
-            <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
+            <div className="flex justify-end shadow-lg align-middle py-0.5 space-x-0.5 z-50">
                 <div className="flex align-middle items-center">
                     <span className="text-xs">{label || componentName}</span>
                 </div>
@@ -76,7 +76,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Move</p>
+                        <p>{t('move')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -87,7 +87,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Clone</p>
+                        <p>{t('clone')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -106,7 +106,7 @@ const CompTools = ({
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Edit</p>
+                        <p>{t('edit')}</p>
                     </TooltipContent>
                 </Tooltip>
 
@@ -134,7 +134,7 @@ const CompTools = ({
                             <TooltipTrigger asChild>
                                 <Badge
                                     variant={'secondary'}
-                                    className="my-1 rounded-sm cursor-pointer ml-2"
+                                    className="rounded-sm cursor-pointer h-6"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setCurrentComponent(comp);

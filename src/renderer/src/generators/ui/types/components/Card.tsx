@@ -2,12 +2,6 @@ import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { COMPONENT } from '../../ComponentTypes';
-import {
-    IGRPCardContent,
-    IGRPCardFooter,
-    IGRPCardHeader,
-} from '@igrp/igrp-framework-react-design-system';
 import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
@@ -21,12 +15,6 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const { children: components, componentName: parentComponentName } = comp;
 
     const { setEditingComponent } = useDroppedComponents();
-
-    const COMPONENT_MAP: Record<string, React.ElementType> = {
-        [COMPONENT.CardFooter]: IGRPCardFooter,
-        [COMPONENT.CardContent]: IGRPCardContent,
-        [COMPONENT.CardHeader]: IGRPCardHeader,
-    };
 
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
@@ -52,7 +40,7 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className={cn('space-y-2 p-2', className)}
+                    className={cn('space-y-3', className)}
                 >
                     {childComponents.length === 0 ? (
                         <GenNoInfoComp
@@ -68,7 +56,7 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                     mode="MOVE"
                                     dropTargetId={componentId}
                                     layout="horizontal"
-                                    className={cn('p-1', childClassName)}
+                                    className={cn(childClassName)}
                                 >
                                     <BoxWrapper
                                         parentComp={comp}
@@ -95,25 +83,19 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     return (
         <div className="w-full flex flex-col gap-3">
             {components.map((child, index) => {
-                const { componentName, properties, style, childProperties } =
-                    child;
-                const { className, commonProperties, ...args } =
-                    properties || {};
+                const { properties, style, childProperties } = child;
+                const { className, ...args } = properties || {};
 
                 const { className: childClassName } = childProperties || {};
 
-                const Component = COMPONENT_MAP[componentName];
-
                 const classes = generateAllClasses(style);
-
-                if (!Component) return null;
 
                 return (
                     <div
                         key={index}
                         {...args}
                         className={cn(
-                            'bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table'
+                            'bg-card rounded-lg border border-dashed border-gray-400 p-2'
                         )}
                     >
                         <TableTool

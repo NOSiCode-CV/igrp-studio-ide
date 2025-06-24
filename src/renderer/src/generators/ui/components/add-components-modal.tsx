@@ -67,6 +67,7 @@ export const AddComponentModal = ({
     } = useDroppedComponents();
 
     const { generateTag, rebuild } = useTagManager(allComponents);
+    const { findComponentById } = useStudio();
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -91,20 +92,24 @@ export const AddComponentModal = ({
 
             handleDragEnd(result, {
                 handleAddChildToComponent,
+                handleReorderChildInComponent,
                 generateTag,
+                findComponentById,
             });
         },
-        [children.length, generateTag, handleAddChildToComponent]
+        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
     );
 
     const handleOrderComponent = useCallback(
         (result: DragEndResult) => {
             handleDragEnd(result, {
+                handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
+                findComponentById,
             });
         },
-        [generateTag, handleReorderChildInComponent]
+        [generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
     );
 
     const onEditComponent = (

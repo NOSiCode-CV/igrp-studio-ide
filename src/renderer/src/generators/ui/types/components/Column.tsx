@@ -40,7 +40,7 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
                         comp={child}
                         group="group/column"
                         onEdit={() => handleEditClick(child)}
-                        className="top-0 opacity-0 group-hover/column:opacity-100"
+                        className="opacity-0 group-hover/column:opacity-100"
                     >
                         <CardComponent comp={child} onDragEnd={onDragEnd} />
                     </BoxWrapper>
@@ -51,7 +51,7 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
 
     return (
         <Droppable component={comp} onDrop={onDragEnd}>
-            <div className={cn(`w-full flex flex-col p-0 gap-3`)}>
+            <div className={cn(`w-full flex flex-col gap-3 space-y-3`)}>
                 {renderComponents()}
             </div>
         </Droppable>

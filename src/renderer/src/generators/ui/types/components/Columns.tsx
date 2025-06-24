@@ -40,15 +40,14 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
                     index={index}
                     dropZone={true}
                     className={cn(
-                        'p-0',
                         columnVariants({ variant, className })
                     )}
                 >
                     <BoxWrapper
                         comp={comp}
                         onEdit={() => handleEditClick(comp)}
-                        group="group/comp"
-                        className="-top-4 opacity-0 group-hover/comp:opacity-100"
+                        group="group/comp-columns"
+                        className="opacity-0 group-hover/comp-columns:opacity-100"
                     >
                         <CardComponent comp={comp} onDragEnd={onDragEnd} />
                     </BoxWrapper>
@@ -62,7 +61,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
             className={cn(
                 'p-2',
                 columnsVariants({ variant, className }),
-                isMobile && 'grid-cols-2 w-full'
+                isMobile && 'grid-cols-2 w-full space-y-3'
             )}
         >
             {renderColumns()}
