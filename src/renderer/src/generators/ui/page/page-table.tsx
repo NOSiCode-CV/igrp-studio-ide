@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import { Badge } from '@renderer/components/ui/badge';
@@ -70,15 +70,15 @@ export const PageTable = ({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {tableData.map((page) => {
+                    {tableData.map((page, index) => {
                         const pageComponents = getPageComponent(page.pageName);
                         const pageSubPages = getSubPages(page.pageName);
                         const hasChildren = canExpand(page);
                         const expanded = isExpanded(page.pageName);
 
                         return (
-                            <>
-                                <TableRow key={page.id}>
+                            <React.Fragment key={index}>
+                                <TableRow >
                                     <TableCell>
                                         {hasChildren && (
                                             <Button
@@ -237,7 +237,7 @@ export const PageTable = ({
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                            </>
+                            </React.Fragment>
                         );
                     })}
                 </TableBody>

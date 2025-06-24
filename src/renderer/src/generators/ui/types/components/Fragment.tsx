@@ -6,11 +6,9 @@ import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxContainer from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import BoxWrapper from '../tools/BoxWrapper';
 
-const IGRPStudioFragment = ({
-    comp,
-    onDragEnd,
-}: CardComponentProps) => {
+const IGRPStudioFragment = ({ comp, onDragEnd }: CardComponentProps) => {
     const { children: components, id: componentId } = comp || {};
 
     const { setEditingComponent } = useDroppedComponents();
@@ -30,33 +28,29 @@ const IGRPStudioFragment = ({
         <Droppable
             onDrop={handleDrop}
             component={comp}
-            className={cn(
-                'space-y-1 group/row relative hover:border-1 hover:border-primary rounded-lg p-1',
-            )}
         >
             {components && components.length > 0 ? (
-                components.map((comp: StructuredComponent, index: number) => {
+                components.map((child: StructuredComponent, index: number) => {
                     return (
                         <Draggable
-                            key={comp.id}
-                            item={comp}
+                            key={child.id}
+                            item={child}
                             index={index}
                             dropTargetId={componentId}
                             mode="MOVE"
                         >
-                            <BoxContainer
-                                comp={comp}
-                                onEdit={() => handleEdit(comp)}
-                                group="group/row-container"
-                                className={cn(
-                                    'left-0 right-auto opacity-0',
-                                )}
+                            <BoxWrapper
+                                comp={child}
+                                parentComp={comp}
+                                onEdit={() => handleEdit(child)}
+                                group="group/comp-frag"
+                                className="-top-4 pacity-0 group-hover/comp-frag:opacity-100"
                             >
                                 <CardComponent
-                                    comp={comp}
+                                    comp={child}
                                     onDragEnd={onDragEnd}
                                 />
-                            </BoxContainer>
+                            </BoxWrapper>
                         </Draggable>
                     );
                 })

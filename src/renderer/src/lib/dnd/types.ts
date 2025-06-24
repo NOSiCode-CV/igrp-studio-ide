@@ -93,6 +93,7 @@ export interface Source {
     [key: string]: any;
   };
   childrenTypes?: ComponentRegisterConfig[]
+  defaultChildren?: { name: string }[]
   interactions: {
     [key: string]: any;
   }

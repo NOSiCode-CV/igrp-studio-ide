@@ -53,8 +53,7 @@ const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
                                     index={index}
                                     mode="MOVE"
                                     dropTargetId={componentId}
-                                    layout="horizontal"
-                                    className={cn('p-1 py-6 space-y-3')}
+                                    className="py-4"
                                 >
                                     <BoxWrapper
                                         parentComp={component}
@@ -80,7 +79,7 @@ const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
     );
 
     return (
-        <div className="flex flex-col gap-3 space-y-3 py-3">
+        <div className="flex flex-col gap-2">
             {components.map((child, index) => {
                 const { componentName } = child;
                 const path = `${parentComponentName}/${componentName}`;
@@ -88,7 +87,7 @@ const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
                     <div
                         key={index}
                         className={cn(
-                            'bg-card rounded-lg border border-dashed border-gray-400 py-3'
+                            'bg-card rounded-lg border border-dashed border-gray-400'
                         )}
                     >
                         <BoxWrapper
@@ -142,7 +141,6 @@ const IGRPSTudioDialogHeader: React.FC<CardComponentProps> = ({
                         index={index}
                         mode="MOVE"
                         dropTargetId={componentId}
-                        layout="horizontal"
                         className={cn('p-1')}
                     >
                         <BoxWrapper

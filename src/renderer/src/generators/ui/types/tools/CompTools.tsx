@@ -51,7 +51,6 @@ const CompTools = ({
     useEffect(() => {
         getAcceptedChildren(path || parentComponentName, componentName).then(
             (data) => {
-                console.log(path,data, componentName)
                 setComponents(data);
             }
         );

@@ -186,9 +186,9 @@ const RenderPropsConfig = ({
                     }}
                 />
             );
-        } else if (key === 'href' || xUiWidget === 'uri') {
+        } else if ( xUiWidget === 'uri') {
             return (
-                <>
+                <div className='group space-y-3'>
                     <Label
                         htmlFor={key}
                         className="flex justify-between items-center"
@@ -216,8 +216,9 @@ const RenderPropsConfig = ({
                         columnsOptions={columnsOptions}
                         segments={formValues['segments']}
                     />
-                </>
+                </div>
             );
+        //references
         } else if (xUiWidget === 'ref') {
             return (
                 <div className="space-y-2">
