@@ -9,6 +9,7 @@ interface DragEndHandlers {
     generateTag: (name: string) => string;
     addState?: (state: State) => void;
     findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
+    showErrorToast: (message: string) => void;
 }
 
 export const handleDragEnd = async (
@@ -16,9 +17,23 @@ export const handleDragEnd = async (
     handlers: DragEndHandlers
 ): Promise<void> => {
 
+    /**
+     * Validation: For each component that is dropped/moved, we must verify if the destination.{droppableId} 
+     * component has acceptChildren[].name. If it does, we check if the component being dropped is one of the accepted ones.
+     * If not, we don't allow the drop. If acceptChildren is null/empty, we allow it.
+     */
+
     const { draggableId, source, destination, mode, type }: DragEndResult = result;
 
     if (!destination) {
+        return;
+    }
+
+    // Validate if the destination component accepts the dropped component
+    const isDropAllowed = await validateDropPermission(draggableId, destination, handlers);
+    
+    if (!isDropAllowed) {
+        handlers.showErrorToast(`Drop not allowed: Component '${draggableId}' cannot be dropped into '${destination.droppableId}'`);
         return;
     }
 
@@ -28,6 +43,65 @@ export const handleDragEnd = async (
         await handleDropComponent(draggableId, source, destination, type, handlers);
     }
 }
+
+/**
+ * Validates if a component can be dropped into a destination based on acceptChildren configuration
+ */
+const validateDropPermission = async (
+    draggableId: string,
+    destination: Destination,
+    handlers: DragEndHandlers
+): Promise<boolean> => {
+    console.log(`[validateDropPermission] Starting validation for drop:`, {
+        draggableId,
+        destinationIndex: destination.index,
+        destinationDroppableName: destination.droppableName
+    });
+
+    try {
+        // Find the destination component by its droppableName
+        console.log(`[validateDropPermission] Looking up destination component: ${destination.droppableName}`);
+        const destinationComponent = await handlers.findComponentById(destination.droppableName);
+        
+        if (!destinationComponent) {
+            console.log(`[validateDropPermission] Destination component not found, allowing drop (fallback behavior)`);
+            return true;
+        }
+
+        console.log(`[validateDropPermission] Destination component found:`, {
+            name: destinationComponent.name,
+            label: destinationComponent.label,
+            acceptedChildrenCount: destinationComponent.acceptedChildren?.length || 0
+        });
+
+        // If acceptChildren is null, undefined, or empty array, allow the drop
+        if (!destinationComponent.acceptedChildren || destinationComponent.acceptedChildren.length === 0) {
+            console.log(`[validateDropPermission] No acceptChildren configured, allowing drop`);
+            return true;
+        }
+
+        console.log(`[validateDropPermission] Checking if '${draggableId}' is in acceptedChildren:`, 
+            destinationComponent.acceptedChildren.map(child => child.name));
+
+        // Check if the dropped component is in the acceptedChildren list
+        const isAccepted = destinationComponent.acceptedChildren.some(
+            (acceptedChild) => acceptedChild.name === draggableId
+        );
+
+        console.log(`[validateDropPermission] Validation result: ${isAccepted ? 'ALLOWED' : 'DENIED'}`);
+        
+        if (!isAccepted) {
+            console.log(`[validateDropPermission] Component '${draggableId}' is not in the accepted children list for '${destinationComponent.name}'`);
+        }
+
+        return isAccepted;
+    } catch (error) {
+        console.error('[validateDropPermission] Error during validation:', error);
+        console.log(`[validateDropPermission] Allowing drop due to error (fail-safe behavior)`);
+        // In case of error, allow the drop (fail-safe behavior)
+        return true;
+    }
+};
 
 const handleDropComponent = async (
     draggableId: string,

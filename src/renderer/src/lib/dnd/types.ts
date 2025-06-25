@@ -82,7 +82,7 @@ export interface StructuredComponent {
 export type StructuredLayout = StructuredComponent
 
 export interface Destination {
-  droppableId: string, index: number
+  droppableId: string, index: number, droppableName: string
 }
 
 export interface Source {

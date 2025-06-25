@@ -137,18 +137,28 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         };
 
-        const onDragEnd = useCallback(async (result: DragEndResult) => {
-            const droppedComponentsMethods = {
+        const onDragEnd = useCallback(
+            async (result: DragEndResult) => {
+                const droppedComponentsMethods = {
+                    removeRow,
+                    handleAddChildToComponent,
+                    handleReorderChildInComponent,
+                    generateTag,
+                    findComponentById,
+                    showErrorToast,
+                };
+
+                console.log('dropZone', result);
+                await handleDragEnd(result, droppedComponentsMethods);
+            },
+            [
                 removeRow,
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
                 findComponentById,
-            };
-
-            console.log('dropZone', result);
-            await handleDragEnd(result, droppedComponentsMethods);
-        }, [removeRow, handleAddChildToComponent, handleReorderChildInComponent, generateTag, findComponentById]);
+            ]
+        );
 
         useEffect(() => {
             clearEditingComponent();
