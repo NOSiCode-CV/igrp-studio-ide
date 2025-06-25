@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Mouse } from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse} from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -27,13 +27,15 @@ import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { AppLogicAction } from './app-logic/app-logic-action';
 
-type ActionType = 'function' | 'navigate' | 'formSubmit';
+type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';;
 
 const actionTypeOptions = [
     { value: 'function', label: 'Function' },
     { value: 'navigate', label: 'Navigation' },
     { value: 'formSubmit', label: 'Form Submit' },
+    /* { value: 'applogic', label: 'App Logic' }, */
 ];
 
 interface NavigationAction {
@@ -249,7 +251,7 @@ const InteractionEditor = ({
 
     const interactions = interactionsType[interactionKey];
 
-    const { properties } = interactions;
+    const { properties } = interactions || {};
 
     const hasfnNameOption = properties?.function?.properties.fnName.visible;
 
@@ -544,7 +546,8 @@ const InteractionEditor = ({
                         />
                     </div>
                 );
-
+            case "applogic":
+                    return <AppLogicAction currentAction={currentAction} setCurrentAction={setCurrentAction} />
             default:
                 return null;
         }
@@ -613,3 +616,4 @@ const InteractionEditor = ({
         </Dialog>
     );
 };
+

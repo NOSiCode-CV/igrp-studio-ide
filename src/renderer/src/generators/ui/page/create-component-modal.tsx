@@ -1,5 +1,4 @@
 import { Button } from '@renderer/components/ui/button';
-import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
@@ -15,7 +14,7 @@ import {
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import {
-    Argument,
+    Arguments,
     ComponentConfig,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
@@ -30,7 +29,13 @@ import {
     FunctionArguments,
     returnTypeOptions,
 } from '../components/sidebar/custom-code/functions-settings';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from '@renderer/components/ui/card';
 
 const initialValues: ComponentConfig = {
     type: 'component',
@@ -44,7 +49,7 @@ const initialValues: ComponentConfig = {
     args: [],
 };
 
-interface NewComponentModalProps {
+interface CreateComponentModalProps {
     isOpen: boolean;
     basePath: string;
     pageOptions: any[];
@@ -53,21 +58,53 @@ interface NewComponentModalProps {
     onConfirm: () => void;
 }
 
-export function NewComponentModal({
+export function CreateComponentModal({
     isOpen,
     basePath,
     onClose,
     onConfirm,
     pageOptions,
     currentComponent,
-}: NewComponentModalProps) {
+}: CreateComponentModalProps) {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const [arguments_, setArguments] = useState<Argument[]>([]);
+    const [arguments_, setArguments] = useState<Arguments[]>([]);
+    const [formInitialValues, setFormInitialValues] = useState<ComponentConfig>(initialValues);
+
+    useEffect(() => {
+        const loadCurrentData = async () => {
+            if (currentComponent?.path) {
+                try {
+                    const currentData = await window.api.getJsonContent(currentComponent.path);
+                    console.log('Current component data loaded:', currentData);
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentData,
+                    });
+                } catch (error) {
+                    console.warn('Failed to load current component data:', error);
+                    // Fallback to currentComponent.content if API call fails
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentComponent.content,
+                    });
+                }
+            } else if (currentComponent?.content) {
+                setFormInitialValues({
+                    ...initialValues,
+                    ...currentComponent.content,
+                });
+            } else {
+                setFormInitialValues(initialValues);
+            }
+        };
+
+        loadCurrentData();
+    }, [currentComponent, isOpen]);
 
     useEffect(() => {
         formik.resetForm();
@@ -118,11 +155,11 @@ export function NewComponentModal({
 
     const formik = useFormik<ComponentConfig>({
         enableReinitialize: true,
-        initialValues: currentComponent?.content || initialValues,
+        initialValues: formInitialValues,
         validationSchema,
         onSubmit: (values, actions) => {
             actions.setSubmitting(false);
-            console.log(values)
+            console.log(values);
             handleConfirm(values);
         },
     });
@@ -156,7 +193,7 @@ export function NewComponentModal({
                     }}
                 >
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-4 py-4">
+                        <div className="flex flex-col space-y-3">
                             <TextInput
                                 id="description"
                                 label={t('componentTitle')}
@@ -168,19 +205,15 @@ export function NewComponentModal({
                                 placeholder="Todo Item"
                                 isRequired
                             />
-                            <div className="grid grid-cols-1 items-center gap-3">
-                                <Label htmlFor="componentName">
-                                    {t('componentName')}
-                                </Label>
-                                <Input
-                                    id="name"
-                                    className="col-span-3"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.name || ''}
-                                    placeholder="TodoItem"
-                                />
-                            </div>
+                            <TextInput
+                                id="name"
+                                label={t('componentName')}
+                                className="col-span-3"
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                value={formik.values.name || ''}
+                                placeholder="TodoItem"
+                            />
                             <div className="grid grid-cols-1 items-center gap-3">
                                 <Label htmlFor="Associar">{t('pages')}</Label>
                                 <IGRPCombobox
@@ -217,6 +250,61 @@ export function NewComponentModal({
                                     selectedIcon={formik.values.icon || ''}
                                 />
                             </div>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>
+                                        Generated Component Signature
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
+                                        <code>
+                                            {`export default function  myComponent(`}
+                                            {(formik.values.args || [])
+                                                .map((arg, index) => {
+                                                    let paramStr =
+                                                        arg.name ||
+                                                        `param${index + 1}`;
+
+                                                    if (arg.isOptional)
+                                                        paramStr += '?';
+
+                                                    paramStr += ': ';
+
+                                                    /*  if (arg.isState) {
+                                                        // Handle state setter
+                                                        paramStr += `(${arg.stateParameterType}: ${arg.stateParameterName}) => void`;
+                                                    } else  */
+                                                    if (arg.isFunction) {
+                                                        // Handle regular function
+                                                        const params =
+                                                            arg?.functionParameters &&
+                                                            arg.functionParameters
+                                                                .map(
+                                                                    (p) =>
+                                                                        `${p.name}${p.isOptional ? '?' : ''}: ${p.type}`
+                                                                )
+                                                                .join(', ');
+                                                        paramStr += `(${params}) => ${arg.type}`;
+                                                    } else {
+                                                        // Handle regular parameter
+                                                        paramStr += arg.type;
+                                                    }
+
+                                                    if (arg.isList)
+                                                        paramStr += '[]';
+
+                                                    return paramStr;
+                                                })
+                                                .join(', ')}
+                                            {`) {
+  // Component implementation
+}`}
+                                        </code>
+                                    </pre>
+                                </CardContent>
+                            </Card>
                         </div>
                         <div className="col-span-1 py-4">
                             <div className="flex flex-row space-x-3 w-full h-full">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { getLabel } from '@renderer/utils';
 import Droppable from '@renderer/lib/dnd/Droppable';
@@ -15,16 +15,12 @@ import {
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { Badge } from '@renderer/components/ui/badge';
+import { CardComponentProps } from '../CardComponent';
 
-export interface TabsProps {
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioMenuNavigation: React.FC<TabsProps> = ({
+const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
-}: TabsProps) => {
+}: CardComponentProps) => {
     const [activeSection, setActiveSection] = useState('basic');
 
     const {
@@ -92,7 +88,11 @@ const IGRPStudioMenuNavigation: React.FC<TabsProps> = ({
                             )}
                         >
                             <div className="flex items-center gap-2">
-                                {Icon ? <Icon className="h-4 w-4" /> : <ArrowRight />}
+                                {Icon ? (
+                                    <Icon className="h-4 w-4" />
+                                ) : (
+                                    <ArrowRight />
+                                )}
                                 <span>{title || label}</span>
                             </div>
                             <ChevronRight

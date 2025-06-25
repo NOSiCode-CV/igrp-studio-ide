@@ -3,23 +3,16 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
-import { useEffect, useState } from 'react';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import SectionTool from '../tools/SectionTool';
 import { useTranslation } from 'react-i18next';
 import { newStructuredComponent } from '../../dnd/helpers';
 import { COMPONENT } from '../../ComponentTypes';
 import BoxWrapper from '../tools/BoxWrapper';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface SectionProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
-    const { t } = useTranslation();
+const IGRPStudioSection = ({ comp, onDragEnd }: CardComponentProps) => {
+    useTranslation();
     const { children: components, id: componentId } = comp || {};
 
     const {
@@ -28,12 +21,6 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
         setAllComponents,
         components: allComponents,
     } = useDroppedComponents();
-
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
-
-    const { dynamicImport } = useStudio();
 
     const handleAddControl = (type: string, componentId: string) => {
         const newRow = newStructuredComponent(COMPONENT.Section);
@@ -54,21 +41,6 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
             });
         }
     };
-
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
-            for (const comp of components) {
-                const component = await dynamicImport(comp.componentName);
-                comps[comp.id] = component;
-            }
-
-            setLoadedComponents(comps);
-        };
-
-        if (components) loadComponents();
-    }, [components, dynamicImport]);
 
     const handleDrop = (item: DragEndResult) => {
         onDragEnd(item);
@@ -97,16 +69,12 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
             <Droppable
                 onDrop={handleDrop}
                 component={comp}
-                className={cn(
-                    'hover:border-none space-y-1',
-                )}
+                className={cn('hover:border-none space-y-1')}
             >
                 {components && components.length > 0 ? (
                     components.map(
                         (childComp: StructuredComponent, index: number) => {
-                            const Component = loadedComponents[childComp.id];
-
-                            return Component ? (
+                            return (
                                 <Draggable
                                     key={childComp.id}
                                     item={childComp}
@@ -123,15 +91,12 @@ const IGRPStudioSection = ({ isDisabled, comp, onDragEnd }: SectionProps) => {
                                             'left-0 right-auto opacity-0 group-hover/row-section:opacity-100'
                                         )}
                                     >
-                                        <Component
+                                        <CardComponent
                                             comp={childComp}
                                             onDragEnd={onDragEnd}
-                                            isDisabled={isDisabled}
                                         />
                                     </BoxWrapper>
                                 </Draggable>
-                            ) : (
-                                <div key={childComp.id}>{t('loading')}</div>
                             );
                         }
                     )

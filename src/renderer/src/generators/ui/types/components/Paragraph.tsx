@@ -1,17 +1,9 @@
-import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
-import Droppable from '@renderer/lib/dnd/Droppable';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxWrapper from '../tools/BoxWrapper';
+import { CardComponentProps } from '../CardComponent';
 
-export interface PageHeaderProps {
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-    isDisabled?: boolean;
-}
 
-const IGRPStudioParagraph = ({ comp, onDragEnd }: PageHeaderProps) => {
+const IGRPStudioParagraph = ({ comp }: CardComponentProps) => {
     const { id: componentId, properties, componentName } = comp;
     const { content, className } = properties;
 

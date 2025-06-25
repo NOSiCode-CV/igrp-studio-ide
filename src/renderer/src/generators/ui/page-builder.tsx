@@ -18,7 +18,6 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
-import { handleDragEnd } from './dnd/DraggableItemManager';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { APRESENTATION, ENV_TYPES } from '@renderer/constants/appConstants';
 import { useDispatch } from 'react-redux';
@@ -29,9 +28,10 @@ import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
 import { EngineService } from '@renderer/services/EngineService';
-import { PageDefinition } from './page/list-pages';
+import { PageDefinition } from './page/page-manager';
 import IGRPStudioMainComponent from './types/components/MainComponent';
 import SidebarRight from './components/sidebar/sidebar-right';
+import { handleDragEnd } from './dnd/DraggableItemManager';
 
 interface FormEngineProps {
     basePath: string;
@@ -54,7 +54,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             handleAddChildToComponent,
             handleReorderChildInComponent,
             removeRow,
-            setEditingComponent,
             clearEditingComponent,
             currentComponent,
             types,
@@ -67,6 +66,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             setAllFunctions,
             setAllComponents,
             setAllStates,
+            setAllArguments,
         } = useDroppedComponents();
 
         const { showErrorToast, showSuccessToast } = useToast();
@@ -93,34 +93,6 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         useImperativeHandle(ref, () => ({
             handleSave: internalHandleSave,
         }));
-
-        useEffect(() => {
-            clearEditingComponent();
-        }, [activePresentation]);
-
-        useEffect(() => {
-            const appComponents = fetchComponents();
-
-            const registerComponents = () => {
-                EngineService.registerComponent({
-                    customComponents,
-                    appComponents,
-                    currentPage: page.pageName,
-                });
-            };
-
-            registerComponents();
-
-            window.electron.ipcRenderer.on('folder-change', registerComponents);
-
-            return () => {
-                window.electron.ipcRenderer.removeListener(
-                    'folder-change',
-                    registerComponents
-                );
-            };
-        }, [customComponents]);
-
         const handleSave = async (components: StructuredLayout) => {
             try {
                 if (basePath === undefined) return;
@@ -165,12 +137,64 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         };
 
+        const onDragEnd = useCallback(
+            async (result: DragEndResult) => {
+                const droppedComponentsMethods = {
+                    removeRow,
+                    handleAddChildToComponent,
+                    handleReorderChildInComponent,
+                    generateTag,
+                    findComponentById,
+                    showErrorToast,
+                };
+
+                console.log('dropZone', result);
+                await handleDragEnd(result, droppedComponentsMethods);
+            },
+            [
+                removeRow,
+                handleAddChildToComponent,
+                handleReorderChildInComponent,
+                generateTag,
+                findComponentById,
+            ]
+        );
+
+        useEffect(() => {
+            clearEditingComponent();
+        }, [activePresentation]);
+
+        useEffect(() => {
+            const appComponents = fetchComponents();
+
+            const registerComponents = () => {
+                EngineService.registerComponent({
+                    customComponents,
+                    appComponents,
+                    currentPage: page.pageName,
+                });
+            };
+
+            registerComponents();
+
+            window.electron.ipcRenderer.on('folder-change', registerComponents);
+
+            return () => {
+                window.electron.ipcRenderer.removeListener(
+                    'folder-change',
+                    registerComponents
+                );
+            };
+        }, [customComponents]);
+
         useEffect(() => {
             const getJsonData = async () => {
                 try {
                     if (pagePath === undefined) return;
 
                     const data = await window.api.getJsonContent(pagePath);
+
+                    setAllArguments(data.args);
 
                     if (data.components) {
                         setLoading(true);
@@ -194,45 +218,38 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 ? COMPONENT.PageContent
                 : COMPONENT.ComponentContent;
 
-            const pageCompRegister = findComponentById(mainComponent);
-            const sectionCompRegister = findComponentById(COMPONENT.Section);
+            const initializeComponents = async () => {
+                const pageCompRegister = await findComponentById(mainComponent);
+                const sectionCompRegister = await findComponentById(
+                    COMPONENT.Section
+                );
 
-            const section = newStructuredComponent(
-                COMPONENT.Section,
-                [],
-                sectionCompRegister
-            );
+                const section = newStructuredComponent(
+                    COMPONENT.Section,
+                    [],
+                    sectionCompRegister
+                );
 
-            const pageContent = newStructuredComponent(
-                mainComponent,
-                isPage
-                    ? [{ ...section, tag: generateTag(COMPONENT.Section) }]
-                    : [],
-                pageCompRegister
-            );
-            console.log(pageContent);
-            setAllComponents({
-                ...pageContent,
-                tag: generateTag(mainComponent),
-            });
+                const pageContent = newStructuredComponent(
+                    mainComponent,
+                    isPage
+                        ? [{ ...section, tag: generateTag(COMPONENT.Section) }]
+                        : [],
+                    pageCompRegister
+                );
+
+                setAllComponents({
+                    ...pageContent,
+                    tag: generateTag(mainComponent),
+                });
+            };
+
+            initializeComponents();
         }, [menuItems, loading, isPage]);
 
         useEffect(() => {
             rebuild();
         }, [components, rebuild]);
-
-        const droppedComponentsMethods = {
-            setEditingComponent,
-            removeRow,
-            handleAddChildToComponent,
-            handleReorderChildInComponent,
-            generateTag,
-        };
-
-        const onDragEnd = useCallback((result: DragEndResult) => {
-            console.log('dropZone', result);
-            handleDragEnd(result, droppedComponentsMethods);
-        }, []);
 
         return (
             <div className="flex flex-1 overflow-hidden">
@@ -241,7 +258,10 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
                             {activePresentation === APRESENTATION.DESIGN ? (
-                                <IGRPStudioMainComponent component={components ?? []} onDragEnd={onDragEnd} />
+                                <IGRPStudioMainComponent
+                                    component={components ?? []}
+                                    onDragEnd={onDragEnd}
+                                />
                             ) : activePresentation === APRESENTATION.JSON ? (
                                 <CodeContentJson
                                     components={components}

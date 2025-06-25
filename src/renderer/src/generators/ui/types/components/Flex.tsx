@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
@@ -9,8 +8,8 @@ import BoxWrapper from '../tools/BoxWrapper';
 import { flexVariants } from '../../utils/layout-mapping';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { COMPONENT } from '../../ComponentTypes';
-import { nanoid } from '@reduxjs/toolkit';
 import { getHoverClasses } from '../../utils/tailwindGroups';
+import CardComponent from '../CardComponent';
 
 export interface FlexProps {
     comp: StructuredComponent;
@@ -29,13 +28,7 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
 
     const { variant, className } = properties || {};
 
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
-
     const { setEditingComponent } = useDroppedComponents();
-
-    const { dynamicImport } = useStudio();
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -43,21 +36,6 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
             component,
         });
     };
-
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
-            for (const comp of children) {
-                const component = await dynamicImport(comp.componentName);
-                comps[comp.id] = component;
-            }
-
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [children, dynamicImport]);
 
     //RESET Hover if parent is diff current component
     const { group: _group, hoverClass: _hoverClass } = getHoverClasses({
@@ -70,12 +48,10 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
         const fields =
             children.length > 0 ? (
                 children.map((comp: StructuredComponent, index: number) => {
-                    const Component = loadedComponents[comp.id];
-
-                    return Component ? (
+                    return (
                         <Draggable
                             key={comp.id}
-                            item={comp.id}
+                            item={comp}
                             layout="horizontal"
                             index={index}
                             dropTargetId={componentId}
@@ -92,7 +68,7 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
                                         'group-hover/comp-flex:opacity-100'
                                 )}
                             >
-                                <Component
+                                <CardComponent
                                     comp={comp}
                                     onDragEnd={onDragEnd}
                                     group={`group/comp-flex-child`}
@@ -100,8 +76,6 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
                                 />
                             </BoxWrapper>
                         </Draggable>
-                    ) : (
-                        <div key={comp.id}>Loading...</div>
                     );
                 })
             ) : (

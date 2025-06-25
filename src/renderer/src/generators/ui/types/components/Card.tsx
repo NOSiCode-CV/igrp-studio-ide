@@ -1,14 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { COMPONENT } from '../../ComponentTypes';
-import {
-    IGRPCardContent,
-    IGRPCardFooter,
-    IGRPCardHeader,
-} from '@igrp/igrp-framework-react-design-system';
 import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
@@ -16,59 +9,12 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import TableTool from '../tools/tableTool';
 import { generateAllClasses } from '../../components/settings/style/utils';
 import BoxWrapper from '../tools/BoxWrapper';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface CardProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
+const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
+    const { children: components, componentName: parentComponentName } = comp;
 
-const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
-    const {
-        children: components,
-        id: componentId,
-        componentName: parentComponentName,
-    } = comp;
-    const [loadedComponents, setLoadedComponents] = useState<
-        Record<string, React.ComponentType<any>>
-    >({});
     const { setEditingComponent } = useDroppedComponents();
-    const { dynamicImport } = useStudio();
-
-    const COMPONENT_MAP: Record<string, React.ElementType> = {
-        [COMPONENT.CardFooter]: IGRPCardFooter,
-        [COMPONENT.CardContent]: IGRPCardContent,
-        [COMPONENT.CardHeader]: IGRPCardHeader,
-    };
-
-    // Load components dynamically
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: Record<string, React.ComponentType<any>> = {};
-
-            // Load all child components in parallel
-            const loadPromises = components.flatMap((child) =>
-                child.children.map(async (grandChild) => {
-                    try {
-                        const component = await dynamicImport(
-                            grandChild.componentName
-                        );
-                        comps[grandChild.id] = component;
-                    } catch (error) {
-                        console.error(
-                            `Failed to load component ${grandChild.componentName}:`,
-                            error
-                        );
-                    }
-                })
-            );
-
-            await Promise.all(loadPromises);
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [dynamicImport, components]);
 
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
@@ -94,7 +40,7 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className={cn('space-y-2 p-2', className)}
+                    className={cn('space-y-3', className)}
                 >
                     {childComponents.length === 0 ? (
                         <GenNoInfoComp
@@ -102,9 +48,6 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                         />
                     ) : (
                         childComponents.map((child, index) => {
-                            const Component = loadedComponents[child.id];
-                            if (!Component) return null;
-
                             return (
                                 <Draggable
                                     key={child.id}
@@ -113,18 +56,16 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                                     mode="MOVE"
                                     dropTargetId={componentId}
                                     layout="horizontal"
-                                    className={cn('p-1', childClassName)}
+                                    className={cn(childClassName)}
                                 >
                                     <BoxWrapper
-                                        //index={index}
                                         parentComp={comp}
                                         comp={child}
-                                        // path={path}
                                         onEdit={() => handleEdit(child, path)}
                                         group="group/card-content-item"
                                         className="opacity-0 group-hover/card-content-item:opacity-100"
                                     >
-                                        <Component
+                                        <CardComponent
                                             comp={child}
                                             onDragEnd={onDragEnd}
                                         />
@@ -136,31 +77,25 @@ const IGRPStudioCard: React.FC<CardProps> = ({ comp, onDragEnd }) => {
                 </Droppable>
             );
         },
-        [handleEdit, loadedComponents, onDragEnd, parentComponentName, comp]
+        [handleEdit, onDragEnd, parentComponentName, comp]
     );
 
     return (
         <div className="w-full flex flex-col gap-3">
             {components.map((child, index) => {
-                const { componentName, properties, style, childProperties } =
-                    child;
-                const { className, commonProperties, ...args } =
-                    properties || {};
+                const { properties, style, childProperties } = child;
+                const { className, ...args } = properties || {};
 
                 const { className: childClassName } = childProperties || {};
 
-                const Component = COMPONENT_MAP[componentName];
-
                 const classes = generateAllClasses(style);
-
-                if (!Component) return null;
 
                 return (
                     <div
                         key={index}
                         {...args}
                         className={cn(
-                            'bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table'
+                            'bg-card rounded-lg border border-dashed border-gray-400 p-2'
                         )}
                     >
                         <TableTool

@@ -4,7 +4,6 @@ import { BaseEngine } from '../interfaces';
 import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
 import { ensureDirectoryExists } from '../helpers';
-import path from 'path';
 
 
 export class NextjsEngine implements BaseEngine {

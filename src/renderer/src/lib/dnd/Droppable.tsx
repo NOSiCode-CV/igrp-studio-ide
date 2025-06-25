@@ -1,11 +1,11 @@
 import { useDragDrop } from './drag-drop-context';
 
 import { useEffect, useState, type DragEvent } from 'react';
-import { LayoutMode, StructuredComponent } from './types';
+import { DragEndResult, LayoutMode, StructuredComponent } from './types';
 import { cn } from '../utils';
 
 interface DroppableProps {
-    onDrop: (result: any) => void;
+    onDrop: (result: any) => DragEndResult;
     component: StructuredComponent;
     layout?: string;
     children: React.ReactNode;
@@ -19,7 +19,7 @@ const Droppable = ({
     children,
     className,
 }: DroppableProps) => {
-    const { id: componentId } = component || {};
+    const { id: componentId, componentName } = component || {};
 
     const [targetHovered, setTargetHovered] = useState<string>('');
 
@@ -39,7 +39,7 @@ const Droppable = ({
 
     const handleDropItem = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        const droppedItem = handleDrop(e, componentId);
+        const droppedItem = handleDrop(e, componentId, componentName);
         onDrop(droppedItem);
     };
 

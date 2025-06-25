@@ -15,7 +15,7 @@ interface DragDropContextType {
     // Event handlers
     onDragEnd: () => void;
     onDragStart: (item: any) => void;
-    handleDrop: (e: DragEvent<HTMLDivElement>, targetId?: string) => void;
+    handleDrop: (e: DragEvent<HTMLDivElement>, targetId?: string, targetName?: string) => void;
     handleDragOver: (
         e: DragEvent<HTMLDivElement>,
         id?: string,
@@ -59,7 +59,7 @@ export const DragProvider = ({ children }) => {
     };
 
     // Handle drop - core functionality
-    const handleDrop = (e: DragEvent<HTMLDivElement>, targetId?: string) => {
+    const handleDrop = (e: DragEvent<HTMLDivElement>, targetId?: string, targetName?: string) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -106,6 +106,7 @@ export const DragProvider = ({ children }) => {
             position,
             destination: {
                 droppableId: targetId,
+                droppableName: targetName,
                 index: mode === 'MOVE' ? moveIndex : insertIndex,
             },
             type,

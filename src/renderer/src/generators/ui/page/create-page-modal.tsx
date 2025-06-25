@@ -14,13 +14,13 @@ import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
 import { Button } from '@renderer/components/ui/button';
-import { FocusEvent } from 'react';
+import { FocusEvent, useEffect, useState } from 'react';
 import {
     CheckboxInput,
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -35,7 +35,7 @@ const initialValues: PageConfig = {
     parentName: undefined,
 };
 
-interface NewPageModalProps {
+interface CreatePageModalProps {
     isOpen: boolean;
     basePath: string;
     pageEditing?: PageDefinition;
@@ -44,19 +44,51 @@ interface NewPageModalProps {
     onConfirm: () => void;
 }
 
-export function NewPageModal({
+export function CreatePageModal({
     isOpen,
     basePath,
     onClose,
     onConfirm,
     pageEditing,
     currentComponent,
-}: NewPageModalProps) {
+}: CreatePageModalProps) {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
 
     const { showErrorToast, showSuccessToast } = useToast();
+
+    const [formInitialValues, setFormInitialValues] = useState<PageConfig>(initialValues);
+
+    useEffect(() => {
+        const loadCurrentData = async () => {
+            if (currentComponent?.path) {
+                try {
+                    const currentData = await window.api.getJsonContent(currentComponent.path);
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentData,
+                    });
+                } catch (error) {
+                    console.warn('Failed to load current data:', error);
+                    // Fallback to currentComponent.content if API call fails
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentComponent.content,
+                    });
+                }
+            } else if (currentComponent?.content) {
+                setFormInitialValues({
+                    ...initialValues,
+                    ...currentComponent.content,
+                });
+            } else {
+                setFormInitialValues(initialValues);
+            }
+        };
+
+        loadCurrentData();
+    }, [currentComponent, isOpen]);
 
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
@@ -102,9 +134,10 @@ export function NewPageModal({
 
     const formik = useFormik<PageConfig>({
         enableReinitialize: true,
-        initialValues: currentComponent?.content || initialValues,
+        initialValues: formInitialValues,
         validationSchema,
-        onSubmit: (values, actions) => {
+        onSubmit: async (values, actions) => {
+
             const newValues = pageEditing
                 ? {
                       ...values,
@@ -113,7 +146,7 @@ export function NewPageModal({
                   }
                 : values;
 
-                console.log(newValues)
+            console.log(newValues);
 
             actions.setSubmitting(false);
             handleConfirm(newValues);

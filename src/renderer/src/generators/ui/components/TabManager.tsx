@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import FormEngine from '../page-builder';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
-import MainPageBuilder from '../page/list-pages';
+import PageManager from '../page/page-manager';
 import { Separator } from '@renderer/components/ui/separator';
 import NavigationBar from './NavigationBar';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
@@ -100,7 +100,7 @@ export default function TabManager({ basePath }: ContentProps) {
                         <SidebarInset>
                             <ContainerScrollArea>
                                 <div className="flex flex-1 flex-col gap-4 p-4">
-                                    <MainPageBuilder
+                                    <PageManager
                                         onPageClick={handleClickOpenGerador}
                                     />
                                 </div>

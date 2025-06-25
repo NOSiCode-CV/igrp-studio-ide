@@ -62,7 +62,9 @@ const TableTool = ({
             >
                 <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
                     <div className="flex align-middle items-center">
-                        <span className="text-xs">{comp.label}</span>
+                        <span className="text-xs">
+                            {comp.label || comp.componentName}
+                        </span>
                     </div>
                     <Tooltip>
                         <TooltipTrigger asChild>

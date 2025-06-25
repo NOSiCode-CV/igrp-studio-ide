@@ -33,22 +33,6 @@ const useStudio = () => {
         return componentsFolder?.children ?? [];
     }, [files]);
 
-    // Dynamically import a component by name
-    const dynamicImport = useCallback(async (_componentName: string) => {
-
-        const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
-
-        return fallbackModule.default;
-        /*   try {
-              const module = await import(`../generators/ui/types/components/${componentName}`);
-              return module.default;
-          } catch (error) {
-              const fallbackModule = await import(`@renderer/generators/ui/types/CardComponent`);
-              // console.warn('Failed to load component:', error);
-              return fallbackModule.default;
-          } */
-    }, []);
-
     // Get component data from a JSON file
     const getComponentData = useCallback(async (componentName: string) => {
         try {
@@ -175,13 +159,13 @@ const useStudio = () => {
     }, [findComponent]);
 
 
-    const findComponentById = (id: string): ComponentRegisterConfig | undefined => {
-        return componentsRegistered.find(component => component.name === id);
+    const findComponentById = async (componentName: string): Promise<ComponentRegisterConfig | undefined> => {
+        return componentsRegistered.find(component => component.name === componentName);
     };
 
     useEffect(() => {
         getRegistryComponent();
-    }, []);
+    }, [getRegistryComponent]);
 
     useEffect(() => {
         const pages = files.find((page) => page.name === 'pages')
@@ -212,8 +196,7 @@ const useStudio = () => {
         getRulesComponent,
         getComponentData,
         getPageData,
-        fetchComponents,
-        dynamicImport,
+        fetchComponents
     };
 };
 

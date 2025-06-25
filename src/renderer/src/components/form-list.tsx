@@ -28,6 +28,48 @@ import { PopoverDto } from '../generators/api/pages/dto/popover-dto';
 import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
 import { Label } from './ui/label';
+import { FormValidationPopover } from '../generators/ui/components/form-validation-popover';
+
+// Component registry for popover types
+const POPOVER_COMPONENTS = {
+    popoverController: PopoverController,
+    popoverModel: PopoverModel,
+    popoverDto: PopoverDto,
+    popoverFormValidation: FormValidationPopover,
+    popoverRelation: RelationPopover,
+} as const;
+
+// Props mapping for each popover type
+const POPOVER_PROPS_MAPPING = {
+    popoverController: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+        row,
+        changeValue: (element: string, value: any) => changeValue(element, index, value),
+        options: itemOptions || [],
+    }),
+    popoverModel: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+        index,
+        row,
+        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
+        options: itemOptions || [],
+    }),
+    popoverDto: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+        index,
+        row,
+        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
+        collectionTypes: itemOptions || [],
+    }),
+    popoverFormValidation: (row: any, index: number, changeValue: any) => ({
+        index,
+        field: row,
+        fieldType: row.type || 'string',
+        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
+    }),
+    popoverRelation: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+        field: row,
+        changeValue: (element: string, value: any) => changeValue(element, index, value),
+        options: itemOptions || [],
+    }),
+} as const; 
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
     data,
@@ -205,15 +247,18 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         );
     };
 
+    // Optimized grouped items renderer using component registry
     const renderGroupedItems = ({ items, row, index, index2 }: any) => {
         return (
             <div className="flex gap-2 align-center">
                 {items.map((item, itemIndex) => {
                     const itemValue = row[item.key] || '';
                     const itemOptions = item.options || [];
-                    return (
-                        <div key={itemIndex} className="flex items-center">
-                            {item.type === 'select' && (
+                    
+                    // Handle select component
+                    if (item.type === 'select') {
+                        return (
+                            <div key={itemIndex} className="flex items-center">
                                 <IGRPCombobox
                                     placeholder={`Select ${item.name}`}
                                     options={itemOptions || []}
@@ -227,8 +272,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     }
                                     className="w-auto h-8"
                                 />
-                            )}
-                            {item.type === 'checkbox' && (
+                            </div>
+                        );
+                    }
+                    
+                    // Handle checkbox component
+                    if (item.type === 'checkbox') {
+                        return (
+                            <div key={itemIndex} className="flex items-center">
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -255,58 +306,36 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
-                            )}
-                            {item.type === 'popoverController' && (
-                                <PopoverController
-                                    key={itemIndex}
-                                    row={row}
-                                    changeValue={(element, value) =>
-                                        changeValue(element, index, value)
-                                    }
-                                    options={itemOptions || []}
-                                />
-                            )}
-                            {item.type === 'popoverModel' && (
-                                <PopoverModel
-                                    key={itemIndex}
-                                    index={index}
-                                    row={row}
-                                    changeValue={(element, position, value) =>
-                                        changeValue(element, position, value)
-                                    }
-                                    options={itemOptions || []}
-                                />
-                            )}
-                            {item.type === 'popoverDto' && (
-                                <PopoverDto
-                                    key={itemIndex}
-                                    index={index}
-                                    row={row}
-                                    changeValue={(element, position, value) =>
-                                        changeValue(element, position, value)
-                                    }
-                                    collectionTypes={itemOptions || []}
-                                />
-                            )}
-                            {item.type === 'popoverRelation' &&
-                                row['type'] === 'relation' && (
-                                    <RelationPopover
-                                        key={itemIndex}
-                                        field={row}
-                                        changeValue={(element, value) =>
-                                            changeValue(element, index, value)
-                                        }
-                                        options={itemOptions || []}
-                                    />
-                                )}
-                        </div>
-                    );
+                            </div>
+                        );
+                    }
+                    
+                    // Handle popover components using registry
+                    if (POPOVER_COMPONENTS[item.type]) {
+                        const PopoverComponent = POPOVER_COMPONENTS[item.type];
+                        const propsMapping = POPOVER_PROPS_MAPPING[item.type];
+                        
+                        // Special case for popoverRelation
+                        if (item.type === 'popoverRelation' && row['type'] !== 'relation') {
+                            return null;
+                        }
+                        
+                        const props = propsMapping(row, index, changeValue, itemOptions);
+                        
+                        return (
+                            <div key={itemIndex} className="flex items-center">
+                                <PopoverComponent {...props} />
+                            </div>
+                        );
+                    }
+                    
+                    return null;
                 })}
             </div>
         );
     };
 
-    // Renderização de campos específicos
+    // Optimized field renderer using component registry
     const renderField = (
         row,
         index,
@@ -318,125 +347,110 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         readonly,
         onChangeValue
     ) => {
-        switch (type) {
-            case 'text':
-            case 'number':
-                return (
-                    <Input
-                        className={cn(
-                            'h-8 text-sm',
-                            errors?.[index]?.[key] && touched?.[index]?.[key]
-                                ? 'border-destructive'
-                                : ''
-                        )}
-                        type={type}
-                        value={row?.[key] || ''}
-                        onChange={(ev) =>
-                            onChangeValue(key, index, ev.target.value)
-                        }
-                        readOnly={readonly}
-                    />
-                );
-            case 'label':
-                return (
-                    <Label htmlFor={`${key}_${index}`}>
-                        {row?.[key] || ''}
-                    </Label>
-                );
-            case 'select':
-                return (
-                    <IGRPCombobox
-                        key={`${index}-${key}`}
-                        placeholder={`Select ${key}`}
-                        options={dynamicOptions[`${index}-${key}`] || options}
-                        value={selectValue}
-                        onChange={(selectedOption) =>
-                            handleDependentChange(key, index, selectedOption)
-                        }
-                        className="w-full h-8"
-                    />
-                );
-            case 'multiSelect':
-                return (
-                    <MultipleSelector
-                        placeholder={`Select ${name}`}
-                        options={dynamicOptions[`${index}-${key}`] || options}
-                        value={selectMultiValues}
-                        onChange={(selectedOption) => {
-                            onChangeValue(key, index, selectedOption);
-                        }}
-                    />
-                );
-            case 'checkbox':
-                return (
-                    <Checkbox
-                        id={`${key}_${index}`}
-                        onCheckedChange={(checked) =>
-                            onChangeValue(key, index, checked)
-                        }
-                        checked={row?.[key] || false}
-                    />
-                );
-            case 'popover':
-                return (
-                    <PopoverController
-                        key={index}
-                        row={row}
-                        changeValue={(element, value) =>
-                            onChangeValue(element, index, value)
-                        }
-                        options={options || []}
-                    />
-                );
-            case 'popoverModel':
-                return (
-                    <PopoverModel
-                        key={index}
-                        index={index}
-                        row={row}
-                        changeValue={(element, position, value) =>
-                            onChangeValue(element, position, value)
-                        }
-                        options={options}
-                    />
-                );
-            case 'popoverDto':
-                return (
-                    <PopoverDto
-                        key={index}
-                        index={index}
-                        row={row}
-                        changeValue={(element, position, value) =>
-                            onChangeValue(element, position, value)
-                        }
-                        collectionTypes={options}
-                    />
-                );
-            case 'popoverRelation':
-                return (
-                    <RelationPopover
-                        key={index}
-                        field={row}
-                        changeValue={(element, value) =>
-                            changeValue(element, index, value)
-                        }
-                        options={options || []}
-                    />
-                );
-            case 'typeSelectorDropdown':
-                return (
-                    <TypeSelectorDropdown
-                        type={row?.[key] || ''}
-                        onTypeChange={(dataType: any) =>
-                            onChangeValue(key, index, dataType)
-                        }
-                        schemaTypes={options}
-                        variant={'outline'}
-                    />
-                );
-            default:
-                return null;
+        // Handle input types (text, number)
+        if (type === 'text' || type === 'number') {
+            return (
+                <Input
+                    className={cn(
+                        'h-8 text-sm',
+                        errors?.[index]?.[key] && touched?.[index]?.[key]
+                            ? 'border-destructive'
+                            : ''
+                    )}
+                    type={type}
+                    value={row?.[key] || ''}
+                    onChange={(ev) =>
+                        onChangeValue(key, index, ev.target.value)
+                    }
+                    readOnly={readonly}
+                />
+            );
         }
+        
+        // Handle label type
+        if (type === 'label') {
+            return (
+                <Label htmlFor={`${key}_${index}`}>
+                    {row?.[key] || ''}
+                </Label>
+            );
+        }
+        
+        // Handle select type
+        if (type === 'select') {
+            return (
+                <IGRPCombobox
+                    key={`${index}-${key}`}
+                    placeholder={`Select ${key}`}
+                    options={dynamicOptions[`${index}-${key}`] || options}
+                    value={selectValue}
+                    onChange={(selectedOption) =>
+                        handleDependentChange(key, index, selectedOption)
+                    }
+                    className="w-full h-8"
+                />
+            );
+        }
+        
+        // Handle multiSelect type
+        if (type === 'multiSelect') {
+            return (
+                <MultipleSelector
+                    placeholder={`Select ${name}`}
+                    options={dynamicOptions[`${index}-${key}`] || options}
+                    value={selectMultiValues}
+                    onChange={(selectedOption) => {
+                        onChangeValue(key, index, selectedOption);
+                    }}
+                />
+            );
+        }
+        
+        // Handle checkbox type
+        if (type === 'checkbox') {
+            return (
+                <Checkbox
+                    id={`${key}_${index}`}
+                    onCheckedChange={(checked) =>
+                        onChangeValue(key, index, checked)
+                    }
+                    checked={row?.[key] || false}
+                />
+            );
+        }
+        
+        // Handle popover types using registry
+        if (POPOVER_COMPONENTS[type]) {
+            const PopoverComponent = POPOVER_COMPONENTS[type];
+            const propsMapping = POPOVER_PROPS_MAPPING[type];
+            
+            // Special case for popoverRelation
+            if (type === 'popoverRelation' && row['type'] !== 'relation') {
+                return null;
+            }
+            
+            const props = propsMapping(row, index, changeValue, options);
+            
+            return <PopoverComponent {...props} />;
+        }
+        
+        // Handle typeSelectorDropdown
+        if (type === 'typeSelectorDropdown') {
+            return (
+                <TypeSelectorDropdown
+                    key={`${index}-${key}`}
+                    type={row?.[key] || ''}
+                    onTypeChange={(dataType: any) =>
+                        onChangeValue(key, index, dataType)
+                    }
+                    schemaTypes={options || []}
+                    variant={'outline'}
+                />
+            );
+        }
+        
+        // Default case - return null or a fallback component
+        return null;
     };
 
     // Renderização das linhas da tabela

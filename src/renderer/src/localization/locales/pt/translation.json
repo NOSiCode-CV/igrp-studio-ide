@@ -786,9 +786,35 @@
   "pageTitle": "Título da Página",
   "searchRepositories": "Procurar Repositórios",
   "componentAssociation": "Você pode associar este componente a uma das páginas disponíveis neste combobox. A página associada será incluída no mesmo path da página atual, dentro da pasta 'components'.",
-  "componentTitle": "Título do Componente"
-
-
-
-
+  "componentTitle": "Título do Componente",
+  "validation": "Validação",
+  "openValidationSettings": "Abrir configurações de validação",
+  "setValidationsForFormField": "Definir validações para campo do formulário",
+  "basicValidations": "Validações Básicas",
+  "typeSpecificValidations": "Validações Específicas por Tipo",
+  "generatedZodSchema": "Schema Zod Gerado",
+  "copyToClipboard": "Copiar para Área de Transferência",
+  "validationPreview": "Pré-visualização de Validação",
+  "activeValidations": "Validações Ativas",
+  "noValidationsSet": "Nenhuma validação definida",
+  "enterValue": "Digite um valor",
+  "min": "Mín",
+  "max": "Máx",
+  "negative": "Negativo",
+  "int": "Inteiro",
+  "finite": "Finito",
+  "url": "URL",
+  "uuid": "UUID",
+  "startsWith": "Começa Com",
+  "endsWith": "Termina Com",
+  "includes": "Inclui",
+  "minDate": "Data Mínima",
+  "maxDate": "Data Máxima",
+  "optional": "Opcional",
+  "createSubNewPage": "Criar SubPágina",
+  "areRequired": "São Obrigatórios",
+  "duplicate": "Duplicar",
+  "duplicating": "Duplicando...",
+  "duplicateItem": "Duplicar {{type}} '{{name}}'",
+  "duplicateItemDescription": "Criar uma cópia deste {{type}} com um novo nome e caminho."
 }

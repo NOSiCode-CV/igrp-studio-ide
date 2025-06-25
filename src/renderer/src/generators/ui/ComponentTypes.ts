@@ -73,6 +73,7 @@ import {
     Ratio,
     Menu,
     Dot,
+    Text as TextIcon,
 } from 'lucide-react';
 import IGRPStudioFlex from './types/components/Flex';
 import IGRPStudioGrid from './types/components/Grid';
@@ -85,7 +86,7 @@ import IGRPStudioContainer from './types/components/Container';
 import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/MainComponent';
-import IGRPStudioModalDialog from './types/components/ModalDialog';
+import { IGRPStudioDialogDescription, IGRPSTudioDialogFooter, IGRPSTudioDialogHeader, IGRPSTudioDialogTitle, IGRPStudioDialogTrigger, IGRPStudioModalDialog } from './types/components/ModalDialog';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
 import IGRPStudioTabs from './types/components/Tabs';
@@ -107,7 +108,7 @@ export const GROUP_COMPONET: Record<string, string> = {
     layout: "Layout",
     widget: "Widgets",
     advanced: "Advanced",
-    typography: "Typograpgy",
+    typography: "Typography",
     customComponents: "Custom Components",
     appComponents: 'Application Components'
 } as const;
@@ -208,6 +209,13 @@ export const COMPONENT: Record<string, string> = {
     Separator: "separator",
 
     ModalDialog: 'modalDialog',
+    ModalDialogTitle: "modalDialogTitle",
+    ModalDialogTrigger: "modalDialogTrigger",
+    ModalDialogHeader: 'modalDialogHeader',
+    ModalDialogDescription: "modalDialogDescription",
+    ModalDialogContent: "modalDialogContent",
+    ModalDialogFooter: "modalDialogFooter",
+
     AlertDialog: 'alertDialog',
     Aspect: 'aspect',
     Fragment: 'fragment',
@@ -219,7 +227,9 @@ export const COMPONENT: Record<string, string> = {
     PdfViewer: 'pdfViewer',
     Alert: 'alert',
     TextList: 'textList',
-    StatusBanner: "statusBanner"
+    StatusBanner: "statusBanner",
+    Span: "span"
+
 } as const;
 
 
@@ -311,26 +321,28 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.PdfViewer]: FileText,
     [COMPONENT.StatusBanner]: Bell,
 
-    accordion: AlignLeft,
-    treeView: GitMerge,
+    [COMPONENT.Span]: TextIcon,
+    [COMPONENT.Section]: RectangleHorizontal,
 
-    notifications: BellIcon,
+    [COMPONENT.Accordion]: AlignLeft,
+    [COMPONENT.TreeView]: GitMerge,
 
-    stack: Table2,
-    section: RectangleHorizontal,
+    [COMPONENT.Notifications]: BellIcon,
 
-    tableDateFilter: CalendarIcon,
-    tableTextFilter: FormInput,
-    tableNumberFilter: Sliders,
-    tableCheckboxFilter: CheckSquare,
-    tableSelectFilter: List,
-    tableActionListCell: ButtonIcon,
-    tableAmountCell: DollarSign,
-    tableCheckboxCell: CheckSquare,
-    tableDateCell: CalendarIcon,
-    tableTextCell: FormInput,
-    tableExpanderCell: ChevronDown,
-    tableBadgeCell: Badge,
+    [COMPONENT.Stack]: Table2,
+
+    [COMPONENT.TableDateFilter]: CalendarIcon,
+    [COMPONENT.TableTextFilter]: FormInput,
+    [COMPONENT.TableNumberFilter]: Sliders,
+    [COMPONENT.TableCheckboxFilter]: CheckSquare,
+    [COMPONENT.TableSelectFilter]: List,
+    [COMPONENT.TableActionListCell]: ButtonIcon,
+    [COMPONENT.TableAmountCell]: DollarSign,
+    [COMPONENT.TableCheckboxCell]: CheckSquare,
+    [COMPONENT.TableDateCell]: CalendarIcon,
+    [COMPONENT.TableTextCell]: FormInput,
+    [COMPONENT.TableExpanderCell]: ChevronDown,
+    [COMPONENT.TableBadgeCell]: Badge,
 } as const;
 
 export const COMPONENT_MAP: Record<string, any> = {
@@ -394,7 +406,6 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Card]: IGRPStudioCard,
     [COMPONENT.Flex]: IGRPStudioFlex,
     [COMPONENT.Grid]: IGRPStudioGrid,
-    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
     [COMPONENT.Tabs]: IGRPStudioTabs,
     [COMPONENT.Paragraph]: IGRPStudioParagraph,
     [COMPONENT.RepetitiveList]: IGRPStudioRepetitive,
@@ -403,4 +414,11 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.InfoCard]: IGRPStudioInfoCard,
     [COMPONENT.Alert]: IGRPStudioAlert,
     [COMPONENT.TextList]: IGRPStudioTextList,
+
+    [COMPONENT.ModalDialog]: IGRPStudioModalDialog,
+    [COMPONENT.ModalDialogTigger]: IGRPStudioDialogTrigger,
+    [COMPONENT.ModalDialogTitle]: IGRPSTudioDialogTitle,
+    [COMPONENT.ModalDialogHeader]: IGRPSTudioDialogHeader,
+    [COMPONENT.ModalDialogDescription]: IGRPStudioDialogDescription,
+    [COMPONENT.ModalDialogFooter]: IGRPSTudioDialogFooter
 };

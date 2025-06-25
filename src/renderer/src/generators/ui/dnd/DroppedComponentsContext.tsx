@@ -14,6 +14,7 @@ import {
     StructuredLayout,
 } from '@renderer/lib/dnd/types';
 import {
+    Arguments,
     CustomFunctionConfig,
     Import,
     State,
@@ -48,6 +49,10 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
     const [imports, setImports] = useState<Import[]>([]);
 
+    const [componentArguments, setComponentArguments] = useState<Arguments[]>(
+        []
+    );
+
     const [currentComponent, setCurrentComponent] =
         useState<EditingComponentParams | null>(null);
 
@@ -65,8 +70,6 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 console.error('Invalid child component or destination');
                 return;
             }
-            console.log(destination);
-            console.log(childComponent);
             // Recursive function to find and update the target component
             const updateComponentTree = (
                 component: StructuredComponent
@@ -443,6 +446,10 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
         setImports(Array.isArray(imports) ? imports : []); // Ensure array
     };
 
+    const setAllArguments = (args: Arguments[]) => {
+        setComponentArguments(Array.isArray(args) ? args : []);
+    };
+
     return (
         <DroppedComponentsContext.Provider
             value={{
@@ -483,6 +490,9 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 functions,
                 states,
                 imports,
+
+                setAllArguments,
+                componentArguments
             }}
         >
             {children}

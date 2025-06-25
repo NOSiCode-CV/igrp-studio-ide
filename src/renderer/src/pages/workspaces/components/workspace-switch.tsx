@@ -29,6 +29,8 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@renderer/routes/routeConstants';
 
 export function WorkspaceSwitcher({
     defaultWorkspace,
@@ -37,6 +39,7 @@ export function WorkspaceSwitcher({
     defaultWorkspace: IWorkspace;
     onWorkspaceChange: (workspace: IWorkspace) => void;
 }) {
+    const navigate = useNavigate();
     const [workspaces, setWorkspaces] = React.useState<IWorkspace[]>([]);
     const [pinnedWorkspaces, setPinnedWorkspaces] = React.useState<
         IWorkspace[]
@@ -65,6 +68,12 @@ export function WorkspaceSwitcher({
         );
 
         setPinnedWorkspaces(pinned);
+    };
+
+    const handleChangeWorkspace = (workspace: IWorkspace) => {
+        console.log(workspace);
+        onWorkspaceChange(workspace);
+        navigate(ROUTES.HOME);
     };
 
     React.useEffect(() => {
@@ -137,7 +146,7 @@ export function WorkspaceSwitcher({
                                     <DropdownMenuItem
                                         key={index}
                                         onSelect={() =>
-                                            onWorkspaceChange(workspace)
+                                            handleChangeWorkspace(workspace)
                                         }
                                         className={cn(
                                             workspace.name ===
@@ -165,7 +174,7 @@ export function WorkspaceSwitcher({
                                         <Plus className="size-4" />
                                     </div>
                                     <div className="font-medium text-muted-foreground">
-                                    {t('addWorkspace')}
+                                        {t('addWorkspace')}
                                     </div>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -184,7 +193,9 @@ export function WorkspaceSwitcher({
                                             ? t('bgMuted')
                                             : ''
                                     }
-                                    onClick={() => onWorkspaceChange(workspace)}
+                                    onClick={() =>
+                                        handleChangeWorkspace(workspace)
+                                    }
                                 >
                                     <div className="flex items-center justify-between pl-9 cursor-pointer">
                                         <div className="flex items-center gap-2">
@@ -213,7 +224,7 @@ export function WorkspaceSwitcher({
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 {workspace.pinned
-                                                    ? t('unpinWorkspace') 
+                                                    ? t('unpinWorkspace')
                                                     : t('pinWorkspace')}
                                             </TooltipContent>
                                         </Tooltip>

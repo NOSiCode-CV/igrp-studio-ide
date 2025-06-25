@@ -32,11 +32,26 @@ import { StateComponent } from '../../sidebar/custom-code/custom-code-state';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getDynamicSegments, RouteSegment } from './route-parser';
 import { Badge } from '@renderer/components/ui/badge';
+import { Separator } from '@renderer/components/ui/separator';
+import { DataValue } from '@renderer/lib/dnd/types';
+import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 
 interface Segment {
     name: string;
     tag: string;
     value?: string;
+}
+
+interface Data {
+    state?: State;
+    value?: DataValue;
+}
+
+interface DataProperties {
+    [key: string]: {
+        state?: State;
+        value?: DataValue;
+    };
 }
 
 interface SettingsProps {
@@ -48,14 +63,14 @@ interface SettingsProps {
     dataProperties:
         | {
               [key: string]: {
-                  state: State;
+                  state?: State;
+                  value?: DataValue;
               };
           }
         | undefined;
     tag: string;
-    refsOptions: Option[];
     onInputChange: (fieldPath: string, value: any) => void;
-    onSelectState: (field: string, value: State | undefined) => void;
+    onSelectState: (field: string, state?: State, value?: DataValue) => void;
 }
 
 interface PageSelectionConfigProps {
@@ -113,8 +128,12 @@ const RenderPropsConfig = ({
     dataProperties,
     onInputChange,
     onSelectState,
-    refsOptions,
 }: SettingsProps) => {
+    const { getRefsOptions, getArqumentsOptions } = useComponents();
+
+    const refsOptions = getRefsOptions();
+    const argumentsOptions = getArqumentsOptions();
+
     const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const type = enumValues ? 'enum' : typeDefault;
@@ -167,20 +186,39 @@ const RenderPropsConfig = ({
                     }}
                 />
             );
-        } else if (key === 'href' || xUiWidget === 'uri') {
+        } else if (xUiWidget === 'uri') {
             return (
-                <SlugBindingConfig
-                    key={key}
-                    label={Label}
-                    value={value}
-                    fieldPath={fieldPath}
-                    parentKey={parentKey}
-                    pageOptions={pageOptions}
-                    onInputChange={onInputChange}
-                    columnsOptions={columnsOptions}
-                    segments={formValues['segments']}
-                />
+                <div className="group space-y-3">
+                    <Label
+                        htmlFor={key}
+                        className="flex justify-between items-center"
+                    >
+                        <span>{xMetaLabel}</span>
+                        <FieldActions
+                            field={key}
+                            statesOptions={statesOptions}
+                            argumentsOptions={argumentsOptions}
+                            value={value}
+                            tag={tag}
+                            type={type}
+                            onSelectState={onSelectState}
+                            dataProperties={dataProperties}
+                        />
+                    </Label>
+                    <SlugBindingConfig
+                        key={key}
+                        label={xMetaLabel}
+                        value={value}
+                        fieldPath={fieldPath}
+                        parentKey={parentKey}
+                        pageOptions={pageOptions}
+                        onInputChange={onInputChange}
+                        columnsOptions={columnsOptions}
+                        segments={formValues['segments']}
+                    />
+                </div>
             );
+            //references
         } else if (xUiWidget === 'ref') {
             return (
                 <div className="space-y-2">
@@ -222,6 +260,7 @@ const RenderPropsConfig = ({
                         <FieldActions
                             field={key}
                             statesOptions={statesOptions}
+                            argumentsOptions={argumentsOptions}
                             value={value}
                             tag={tag}
                             type={type}
@@ -244,6 +283,7 @@ const RenderPropsConfig = ({
                                         type={type}
                                         onSelectState={onSelectState}
                                         dataProperties={dataProperties}
+                                        argumentsOptions={argumentsOptions}
                                     />
 
                                     <Switch
@@ -350,22 +390,24 @@ const FieldActions = ({
     type,
     dataProperties,
     onSelectState,
+    argumentsOptions,
 }: {
     field: string;
     value: string;
     tag: string;
     type: string;
     statesOptions: Option[];
-    dataProperties:
-        | {
-              [key: string]: {
-                  state: State;
-              };
-          }
-        | undefined;
-    onSelectState: (field: string, value: State | undefined) => void;
+    argumentsOptions: Option[];
+    dataProperties?: DataProperties;
+    onSelectState: (
+        field: string,
+        state: State | undefined,
+        value: DataValue | undefined
+    ) => void;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
+    const [selected, setSelected] = useState<Data>({});
+    const [inputValue, setInputValue] = useState<string>('');
 
     const state: State = {
         id: '',
@@ -375,7 +417,13 @@ const FieldActions = ({
         defaultValue: value,
     };
 
-    const stateSaved = dataProperties?.[field];
+    const stateSaved =
+        selected.state || selected.value ? selected : dataProperties?.[field];
+
+    // Update input value when stateSaved changes
+    useEffect(() => {
+        setInputValue(stateSaved?.value?.code || '');
+    }, [stateSaved?.value?.code]);
 
     return (
         <>
@@ -388,7 +436,8 @@ const FieldActions = ({
                     >
                         {stateSaved && (
                             <div className="bg-muted rounded-sm p-0.5">
-                                {stateSaved.state?.name}
+                                {stateSaved.state?.name ||
+                                    stateSaved.value?.code}
                             </div>
                         )}
                         <MoreVertical className="w-3 h-3" />
@@ -400,29 +449,85 @@ const FieldActions = ({
                         dynamic value.
                     </p>
                     <div className="space-y-2">
-                        <Label>State</Label>
                         <IGRPCombobox
+                            label="State"
                             value={stateSaved?.state?.name || ''}
-                            onChange={(selectedState) =>
-                                onSelectState(
-                                    field,
-                                    selectedState
-                                        ? {
-                                              id: '',
-                                              name: selectedState as string,
-                                              type: '',
-                                              imports: [],
-                                              defaultValue: undefined,
-                                              generate: false,
-                                          }
-                                        : undefined
-                                )
-                            }
+                            onChange={(selectedState) => {
+                                const result = selectedState
+                                    ? {
+                                          id: '',
+                                          name: selectedState as string,
+                                          type: '',
+                                          imports: [],
+                                          defaultValue: undefined,
+                                          generate: false,
+                                      }
+                                    : undefined;
+
+                                onSelectState(field, result, undefined);
+
+                                setSelected({
+                                    state: result,
+                                });
+                            }}
                             options={statesOptions}
                             className="w-full"
                             placeholder="Select State"
                         />
                     </div>
+                    {argumentsOptions.length > 0 ? (
+                        <>
+                            <Separator />
+                            <div className="space-y-2">
+                                <IGRPCombobox
+                                    label="Page Arguments"
+                                    value={stateSaved?.value?.code || ''}
+                                    onChange={(selectedArgs) => {
+                                        const result = selectedArgs
+                                            ? {
+                                                  id: '',
+                                                  code: selectedArgs as string,
+                                              }
+                                            : undefined;
+                                        onSelectState(field, undefined, result);
+                                        setSelected({
+                                            value: result,
+                                        });
+                                    }}
+                                    options={argumentsOptions}
+                                    className="w-full"
+                                    placeholder="Select Page arguments"
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <></>
+                    )}
+                    <>
+                        <Separator />
+                        <div className="space-y-2">
+                            <Label>Variable Name</Label>
+                            <Input
+                                id={`${field}-variable-name`}
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => {
+                                    const newValue = e.target.value;
+                                    setInputValue(newValue);
+                                    const result = newValue
+                                        ? {
+                                              id: '',
+                                              code: newValue,
+                                          }
+                                        : undefined;
+                                    onSelectState(field, undefined, result);
+                                    setSelected({
+                                        value: result,
+                                    });
+                                }}
+                            />
+                        </div>
+                    </>
                     <div className="flex justify-end">
                         <Button
                             variant={'secondary'}
@@ -554,7 +659,6 @@ const SlugBindingConfig = ({
     value,
     fieldPath,
     key,
-    label,
     parentKey,
     segments,
     pageOptions,
@@ -565,7 +669,7 @@ const SlugBindingConfig = ({
     fieldPath: string;
     key: string;
     parentKey?: string;
-    label: any;
+    label: string;
     columnsOptions: IGRPOptionsProps[];
     pageOptions: Option;
     segments: Segment[];
@@ -584,11 +688,10 @@ const SlugBindingConfig = ({
 
         setLinkType(defaultType);
         setSelectedPagePath(value);
-    }, [value]);
+    }, [pageOptions, value]);
 
     return (
         <>
-            <Label htmlFor={key}>{label}</Label>
             <IGRPRadioGroup
                 id={parentKey ? `${parentKey}.${key}` : key}
                 name={key}

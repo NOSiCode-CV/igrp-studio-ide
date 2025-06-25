@@ -16,9 +16,3 @@ ipcMain.handle('theme:set', async (_event, theme: string) => {
 ipcMain.handle('run-doctor-checks', async (): Promise<ToolCheck[]> => {
     return DoctorService.run()
 });
-
-ipcMain.handle('save-doctor-report', async (_event, results) => {
-    const filePath = path.join(__dirname, `doctor-report-${Date.now()}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
-    return filePath;
-});
