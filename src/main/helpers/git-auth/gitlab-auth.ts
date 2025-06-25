@@ -3,8 +3,8 @@ import { GitStore } from '../../services/git-store';
 import { GitLabService } from '../../services/gitlab-service';
 
 const gitlabConfig = {
-  clientId: import.meta.env.VITE_GITLAB_CLIENT_ID,
-  clientSecret: import.meta.env.VITE_GITLAB_CLIENT_SECRET,
+  clientId: process.env.VITE_GITLAB_CLIENT_ID || "",
+  clientSecret: process.env.VITE_GITLAB_CLIENT_SECRET || "",
   scopes: ['api', 'read_user', 'read_repository'],
   authUrl: 'https://git.nosi.cv/oauth/authorize',
   tokenUrl: 'https://git.nosi.cv/oauth/token',

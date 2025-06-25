@@ -285,7 +285,7 @@ const repo = {
 	}
 }
 
-const window = {
+const windowControls = {
 	minimizeWindow: () => ipcRenderer.send('minimize-window'),
 	maximizeWindow: () => ipcRenderer.send('maximize-window'),
 	closeWindow: () => ipcRenderer.send('close-window'),
@@ -317,7 +317,7 @@ const appLogic = {
 
 	// Events
 	onEnvironmentsChanged: (callback) => {
-		const subscription = (event, environments) => callback(environments)
+		const subscription = (_event, environments) => callback(environments)
 		ipcRenderer.on(EVENTS.APPLOGIC.CHANGE, subscription)
 		return () => ipcRenderer.removeListener(EVENTS.APPLOGIC.CHANGE, subscription)
 	},
@@ -346,7 +346,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)
 		contextBridge.exposeInMainWorld('igrpStudio', repo)
-		contextBridge.exposeInMainWorld('menu', window)
+		contextBridge.exposeInMainWorld('menu', windowControls)
 		contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
 
 	} catch (error) {
@@ -355,4 +355,19 @@ if (process.contextIsolated) {
 } else {
 	window.electron = electronAPI
 	window.api = api
+	window.engine = engine
+	window.igrpStudio = repo
+	window.menu = windowControls
+	window.appLogicAPI = appLogic
+}
+
+declare global {
+  interface Window {
+    electron?: typeof electronAPI;
+    api?: typeof api;
+    engine?: typeof engine;
+    igrpStudio?: typeof repo;
+    menu?: typeof windowControls;
+    appLogicAPI?: typeof appLogic;
+  }
 }

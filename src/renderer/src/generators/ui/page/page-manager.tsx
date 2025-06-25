@@ -121,7 +121,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             dispatch(onGetPages(basePath));
             isLoadingTable(false);
         }
-    }, [loadingTable]);
+    }, [loadingTable, basePath]);
 
     useEffect(() => {
         if (files) {

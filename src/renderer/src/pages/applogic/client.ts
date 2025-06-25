@@ -1,5 +1,4 @@
-import useCore from '@renderer/hooks/use-core';
-import type { AppLogicEnvironment, ConnectionTest, AppLogicSettings } from 'src/main/types';
+import type { AppLogicEnvironment, ConnectionTest } from 'src/main/types';
 
 // Verificar se estamos em ambiente Electron
 const isElectron = () => {
@@ -15,6 +14,7 @@ export class AppLogicIPCClient {
       return await window.appLogicAPI.getEnvironments()
     } catch (error) {
       console.error("Error getting environments via IPC:", error)
+      throw error
     }
   }
 
@@ -23,6 +23,7 @@ export class AppLogicIPCClient {
       return await window.appLogicAPI.addEnvironment(environment)
     } catch (error) {
       console.error("Error adding environment via IPC:", error)
+      throw error
     }
   }
 
@@ -33,6 +34,7 @@ export class AppLogicIPCClient {
       return
     } catch (error) {
       console.error("Error updating environment via IPC:", error)
+      throw error
     }
   }
 
@@ -42,13 +44,14 @@ export class AppLogicIPCClient {
       return
     } catch (error) {
       console.error("Error deleting environment via IPC:", error)
+      throw error
     }
   }
 
   static async getEnvironment(id: string): Promise<AppLogicEnvironment | null> {
     const environments = await this.getEnvironments()
     return environments.find((env) => env.id === id) || null
-  } 
+  }
 
   // History
   static async addConnectionTest(test: ConnectionTest): Promise<void> {
@@ -58,6 +61,7 @@ export class AppLogicIPCClient {
       return
     } catch (error) {
       console.error("Error adding connection test via IPC:", error)
+      throw error
     }
   }
 
@@ -66,18 +70,18 @@ export class AppLogicIPCClient {
       return await window.appLogicAPI.getEnvironmentHistory(environmentId)
     } catch (error) {
       console.error("Error getting environment history via IPC:", error)
+      throw error
     }
   }
 
   // Test environment
   static async testEnvironment(environment: AppLogicEnvironment) {
 
-    const { fetchData } = useCore();
-
     try {
       return await window.appLogicAPI.testEnvironment(environment)
     } catch (error) {
       console.error("Error testing environment via IPC:", error)
+      throw error
     }
 
 
@@ -121,6 +125,7 @@ export class AppLogicIPCClient {
       return await window.appLogicAPI.exportData()
     } catch (error) {
       console.error("Error exporting data via IPC:", error)
+      throw error
     }
 
   }
@@ -134,6 +139,7 @@ export class AppLogicIPCClient {
       return
     } catch (error) {
       console.error("Error importing data via IPC:", error)
+      throw error
     }
 
   }
@@ -144,6 +150,7 @@ export class AppLogicIPCClient {
       return window.appLogicAPI.onEnvironmentsChanged(callback)
     } catch (error) {
       console.error("Error setting up environment change listener:", error)
+      throw error
     }
 
   }

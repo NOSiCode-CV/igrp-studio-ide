@@ -67,7 +67,7 @@ const SidebarRight = ({
     } = useDroppedComponents();
 
     const { statesOptions } = useCustomCode();
-   
+
     // Memoized derived state
     const currentComp = useMemo(
         () => comp || editingComponentParams?.component,
@@ -167,6 +167,31 @@ const SidebarRight = ({
                 }) ?? [];
         setColumnsOptions(options);
     }, [parentComp]);
+
+    // Helper function to check if a key is referenced in properties (including nested objects)
+    const isKeyReferencedInProperties = useCallback(
+        (key: string, propertiesObj: Record<string, any>): boolean => {
+            for (const [propKey, propValue] of Object.entries(propertiesObj)) {
+                // Check if the property key matches the data key
+                if (propKey === key) {
+                    return true;
+                }
+
+                // If property value is an object, recursively check its keys
+                if (
+                    propValue &&
+                    typeof propValue === 'object' &&
+                    !Array.isArray(propValue)
+                ) {
+                    if (isKeyReferencedInProperties(key, propValue)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        []
+    );
 
     // Load properties component
     useEffect(() => {
@@ -287,6 +312,33 @@ const SidebarRight = ({
                 const initialValues = deepMerge(target, source);
 
                 setFormValues(initialValues);
+
+                if (data && currentComp?.data) {
+                    // Check if any data keys are referenced in the schema properties
+                    const cleanedData = { ...currentComp.data };
+                    let hasChanges = false;
+
+                    Object.keys(currentComp.data).forEach((key) => {
+                        const isReferencedInProps = isKeyReferencedInProperties(
+                            key,
+                            data || {}
+                        );
+
+                        // Only delete if not referenced in schema properties
+                        if (!isReferencedInProps) {
+                            delete cleanedData[key];
+                            hasChanges = true;
+                        }
+                    });
+
+                    // If we made changes, update the component with cleaned data
+                    if (hasChanges && componentId) {
+                        handleUpdateChildComponent(componentId, {
+                            ...currentComp,
+                            data: cleanedData,
+                        });
+                    }
+                }
             } catch (error) {
                 console.error('Error loading properties component:', error);
             }

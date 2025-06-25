@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
+import { useRef } from 'react';
+import { Trash2 } from 'lucide-react';
 import { BackgroundEditor } from './BackgroundEditor';
 import { getBackgroundStyles } from './utils';
 import type { BackgroundStyle } from '../effects/types';
@@ -18,7 +18,6 @@ interface BackgroundListItemProps {
 export function BackgroundListItem({
     background,
     index,
-    isEditing,
     onEdit,
     onRemove,
     onChange,

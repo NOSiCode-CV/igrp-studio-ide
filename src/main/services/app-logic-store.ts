@@ -1,5 +1,5 @@
 import { IGRPStudioSettings } from "../helpers/igrp-studio-settings";
-import { AppLogicEnvironment, AppLogicSettings, ConnectionTest } from "../types"
+import { AppLogicEnvironment, ConnectionTest } from "../types"
 
 export const AppLogicStore = {
 

@@ -45,9 +45,11 @@ export function ConnectionForm({
         const { success, message } = await window.igrpStudio.connection.connectToDatabase(
             values
         );
-        if (success) {
+        if (success && message) {
             showSuccessToast(message);
-        } else showErrorToast(message);
+        } else if (message) {
+            showErrorToast(message);
+        }
     };
 
     const validationSchema = Yup.object({

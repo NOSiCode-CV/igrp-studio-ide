@@ -1,10 +1,5 @@
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
-import { COMPONENT, COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
-import {
-    IGRPBadge,
-    IGRPButton,
-    IGRPText,
-} from '@igrp/igrp-framework-react-design-system';
+import { COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
 import { useFakedata } from '../hooks/useFakeData';
 import { generateAllClasses } from '../components/settings/style/utils';
 import { cn } from '@renderer/lib/utils';

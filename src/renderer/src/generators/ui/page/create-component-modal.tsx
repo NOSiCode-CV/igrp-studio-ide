@@ -73,6 +73,38 @@ export function CreateComponentModal({
     const { showErrorToast, showSuccessToast } = useToast();
 
     const [arguments_, setArguments] = useState<Arguments[]>([]);
+    const [formInitialValues, setFormInitialValues] = useState<ComponentConfig>(initialValues);
+
+    useEffect(() => {
+        const loadCurrentData = async () => {
+            if (currentComponent?.path) {
+                try {
+                    const currentData = await window.api.getJsonContent(currentComponent.path);
+                    console.log('Current component data loaded:', currentData);
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentData,
+                    });
+                } catch (error) {
+                    console.warn('Failed to load current component data:', error);
+                    // Fallback to currentComponent.content if API call fails
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentComponent.content,
+                    });
+                }
+            } else if (currentComponent?.content) {
+                setFormInitialValues({
+                    ...initialValues,
+                    ...currentComponent.content,
+                });
+            } else {
+                setFormInitialValues(initialValues);
+            }
+        };
+
+        loadCurrentData();
+    }, [currentComponent, isOpen]);
 
     useEffect(() => {
         formik.resetForm();
@@ -123,7 +155,7 @@ export function CreateComponentModal({
 
     const formik = useFormik<ComponentConfig>({
         enableReinitialize: true,
-        initialValues: { ...initialValues, ...currentComponent?.content },
+        initialValues: formInitialValues,
         validationSchema,
         onSubmit: (values, actions) => {
             actions.setSubmitting(false);

@@ -41,30 +41,30 @@ const POPOVER_COMPONENTS = {
 
 // Props mapping for each popover type
 const POPOVER_PROPS_MAPPING = {
-    popoverController: (item: any, row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverController: (row: any, index: number, changeValue: any, itemOptions: any) => ({
         row,
         changeValue: (element: string, value: any) => changeValue(element, index, value),
         options: itemOptions || [],
     }),
-    popoverModel: (item: any, row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverModel: (row: any, index: number, changeValue: any, itemOptions: any) => ({
         index,
         row,
         changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
         options: itemOptions || [],
     }),
-    popoverDto: (item: any, row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverDto: (row: any, index: number, changeValue: any, itemOptions: any) => ({
         index,
         row,
         changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
         collectionTypes: itemOptions || [],
     }),
-    popoverFormValidation: (item: any, row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverFormValidation: (row: any, index: number, changeValue: any) => ({
         index,
         field: row,
         fieldType: row.type || 'string',
         changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
     }),
-    popoverRelation: (item: any, row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverRelation: (row: any, index: number, changeValue: any, itemOptions: any) => ({
         field: row,
         changeValue: (element: string, value: any) => changeValue(element, index, value),
         options: itemOptions || [],
@@ -320,7 +320,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             return null;
                         }
                         
-                        const props = propsMapping(item, row, index, changeValue, itemOptions);
+                        const props = propsMapping(row, index, changeValue, itemOptions);
                         
                         return (
                             <div key={itemIndex} className="flex items-center">
@@ -429,7 +429,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 return null;
             }
             
-            const props = propsMapping({ key }, row, index, changeValue, options);
+            const props = propsMapping(row, index, changeValue, options);
             
             return <PopoverComponent {...props} />;
         }

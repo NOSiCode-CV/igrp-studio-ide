@@ -1,4 +1,3 @@
-import { Environments } from '@gitbeaker/node';
 
 let store: any = null;
 

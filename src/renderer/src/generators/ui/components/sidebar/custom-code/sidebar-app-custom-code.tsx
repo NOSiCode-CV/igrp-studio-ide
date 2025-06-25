@@ -44,7 +44,6 @@ import {
     State,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { IGRPAlertDialog } from '@igrp/igrp-framework-react-design-system';
 import * as Yup from 'yup';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import { Label } from '@renderer/components/ui/label';

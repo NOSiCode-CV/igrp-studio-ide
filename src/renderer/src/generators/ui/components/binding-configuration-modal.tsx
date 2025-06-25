@@ -31,7 +31,7 @@ interface LabeledElementField {
     componentId: string;
     name: string;
     type: string;
-    validation?: string;
+    validation?: any;
     defaultValue?: string;
     required: boolean;
     label: string;
@@ -137,7 +137,12 @@ export const BindingConfigurationModal = ({
             name: '',
             type: 'group',
             items: [
-                { key: 'validation', name: '', type: 'popoverFormValidation', options: [] },
+                {
+                    key: 'validation',
+                    name: '',
+                    type: 'popoverFormValidation',
+                    options: [],
+                },
             ],
         },
     ];
@@ -175,8 +180,6 @@ export const BindingConfigurationModal = ({
                     }
                 ),
             };
-
-            console.log(updatedComponent);
 
             createOrUpdateType({
                 ...updatedComponent,

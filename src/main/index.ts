@@ -217,7 +217,7 @@ app.whenReady().then(async () => {
     await initializeAllServices();
 
     ipcMain.on('github-oauth', async () => {
-        const isDev = import.meta.env.VITE_NODE_ENV === 'development';
+        const isDev = process.env.VITE_NODE_ENV === 'development';
         try {
             currentAuthProvider = 'github'; // Add this line
             await githubAuth.setupOAuth(mainWindow, isDev);
@@ -229,7 +229,7 @@ app.whenReady().then(async () => {
 
     // GitLab handler
     ipcMain.on('gitlab-oauth', async () => {
-        const isDev = import.meta.env.VITE_NODE_ENV === 'development';
+        const isDev = process.env.VITE_NODE_ENV === 'development';
         try {
             currentAuthProvider = 'gitlab'; // Add this line
             await gitlabAuth.setupOAuth(mainWindow, isDev);

@@ -8,7 +8,6 @@ import { COMPONENT } from '../../ComponentTypes';
 import { getHoverClasses } from '../../utils/tailwindGroups';
 import { getLabel } from '@renderer/utils';
 import BoxWrapper from '../tools/BoxWrapper';
-import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import Droppable from '@renderer/lib/dnd/Droppable';
 
 const IGRPStudioTextList = ({
@@ -174,24 +173,5 @@ const IGRPStudioTextList = ({
         </div>
     );
 };
-
-function IGRPInfoField({ item }: any) {
-    return (
-        <div className={cn('flex flex-col space-y-0.5')}>
-            <span className="text-sm font-medium">{item.label}</span>
-            <div className="flex items-center gap-2">
-                {item.icon && (
-                    <div className="flex items-center gap-2">
-                        <IGRPIcon
-                            iconName={item.icon}
-                            className={item.iconClassName}
-                        />
-                    </div>
-                )}
-                <span>{item.text}</span>
-            </div>
-        </div>
-    );
-}
 
 export default IGRPStudioTextList;

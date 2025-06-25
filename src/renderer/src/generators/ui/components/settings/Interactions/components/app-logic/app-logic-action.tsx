@@ -20,7 +20,6 @@ import {
 import { Loader2, RefreshCw, Copy } from 'lucide-react';
 import { useAppLogic } from '@renderer/hooks/use-app-logic';
 import useToast from '@renderer/hooks/useToast';
-import { AppLogicEnvironment } from 'src/main/types';
 import useCore from '@renderer/hooks/use-core';
 
 interface AppLogicNode {
@@ -83,7 +82,6 @@ export function AppLogicAction({
     const { fetchData } = useCore();
     const { showErrorToast, showSuccessToast } = useToast();
 
-
     const [selectedEnvironmentId, setSelectedEnvironmentId] = useState(
         currentAction.applogic?.environmentId || ''
     );
@@ -101,9 +99,9 @@ export function AppLogicAction({
     const [customHeaders, setCustomHeaders] = useState<Record<string, string>>(
         currentAction.applogic?.headers || {}
     );
-    const [rawApplications, setRawApplications] = useState<
+    /*  const [rawApplications, setRawApplications] = useState<
         AppLogicApplication[]
-    >([]);
+    >([]); */
     const [processedApplications, setProcessedApplications] = useState<
         ProcessedApplication[]
     >([]);
@@ -153,8 +151,8 @@ export function AppLogicAction({
             }
 
             const applications: AppLogicApplication[] = await result;
-            setRawApplications(applications);
-
+            /*             setRawApplications(applications);
+             */
             const processed = processApplicationsByTag(applications);
             setProcessedApplications(processed);
 
@@ -163,7 +161,7 @@ export function AppLogicAction({
             );
         } catch (error) {
             console.error('Error fetching environment applications:', error);
-            showErrorToast (
+            showErrorToast(
                 `Failed to fetch applications: ${error instanceof Error ? error.message : 'Unknown error'}`
             );
         } finally {
@@ -187,7 +185,7 @@ export function AppLogicAction({
             const allEndpoints: ProcessedEndpoint[] = [];
 
             apps.forEach((app) => {
-                app.nodes.forEach((node, index) => {
+                app.nodes.forEach((node) => {
                     const resourceIdSuffix = `${Math.random().toString(36).substring(2, 8)}`;
 
                     allEndpoints.push({
@@ -217,8 +215,8 @@ export function AppLogicAction({
         setSelectedEnvironmentId(environmentId);
         setSelectedApplicationTag('');
         setSelectedEndpointId('');
-        setRawApplications([]);
-        setProcessedApplications([]);
+        /*         setRawApplications([]);
+         */ setProcessedApplications([]);
 
         setCurrentAction({
             ...currentAction,
@@ -296,9 +294,9 @@ export function AppLogicAction({
         }
     };
 
-    const getSelectedEnvironment = (): AppLogicEnvironment | undefined => {
+   /*  const getSelectedEnvironment = (): AppLogicEnvironment | undefined => {
         return environments.find((env) => env.id === selectedEnvironmentId);
-    };
+    }; */
 
     const getSelectedApplication = (): ProcessedApplication | undefined => {
         return processedApplications.find(
@@ -353,7 +351,7 @@ export function AppLogicAction({
         const body = selectedEndpoint.inputBody;
         const headers = {
             'Content-Type': 'application/json',
-            'accept': 'application/json',
+            accept: 'application/json',
             'API-KEY': selectedEnvironment.apiKey,
             ...customHeaders,
         };
@@ -705,7 +703,7 @@ export function AppLogicAction({
                                                     {
                                                         'Content-Type':
                                                             'application/json',
-                                                            'accept': 'application/json',
+                                                        accept: 'application/json',
                                                         'X-API-Key': '...',
                                                         ...customHeaders,
                                                     },
@@ -793,7 +791,6 @@ export function AppLogicAction({
                                     <Label className="text-sm font-medium">
                                         cURL Command
                                     </Label>
-                                    
                                 </div>
                                 <pre className="bg-gray-900 text-green-400 p-3 rounded-md text-xs mt-1 overflow-x-auto relative group">
                                     {generateCurlCommand()}
