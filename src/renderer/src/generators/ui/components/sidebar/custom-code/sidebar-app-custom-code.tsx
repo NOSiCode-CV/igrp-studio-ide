@@ -125,7 +125,7 @@ const SidebarAppCustomCode = ({ searchTerm }: { searchTerm: string }) => {
                                 <StateComponent
                                     open={openState}
                                     setOpen={setOpenState}
-                                    state={currentState}
+                                    state={currentState || undefined}
                                 />
                             )
                         }

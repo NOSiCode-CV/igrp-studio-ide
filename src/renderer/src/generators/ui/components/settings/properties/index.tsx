@@ -35,7 +35,6 @@ import { Badge } from '@renderer/components/ui/badge';
 import { Separator } from '@renderer/components/ui/separator';
 import { DataValue } from '@renderer/lib/dnd/types';
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
-import { TextInput } from '@renderer/generators/api/components/inputs-form';
 
 interface Segment {
     name: string;
