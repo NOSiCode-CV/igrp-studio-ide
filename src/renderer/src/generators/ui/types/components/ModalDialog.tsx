@@ -185,48 +185,52 @@ const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({
     const { children: childComponents, componentName, id: componentId } = comp;
 
     return (
-        <div className="space-y-3">
-            {childComponents.map((child, index) => {
-                const { properties } = child;
-                const { content } = properties;
+        <Droppable
+            component={comp}
+            onDrop={onDragEnd}
+            className={cn('p-2 space-y-3')}
+        >
+            {childComponents.length === 0 ? (
+                <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
+            ) : (
+                childComponents.map((child, index) => {
+                    const { properties } = child;
+                    const { content } = properties;
 
-                return (
-                    <Draggable
-                        key={child.id}
-                        item={child}
-                        index={index}
-                        mode="MOVE"
-                        dropTargetId={componentId}
-                        layout="horizontal"
-                        className={cn('p-1')}
-                    >
-                        <BoxWrapper
-                            parentComp={comp}
-                            comp={child}
-                            onEdit={() =>
-                                handleEdit(
-                                    child,
-                                    `${COMPONENT.ModalDialog}/${COMPONENT.ModalDialogContent}/${componentName}`
-                                )
-                            }
-                            group="group/card-dialog-footer"
-                            className="top-0 opacity-0 group-hover/card-dialog-footer:opacity-100"
+                    return (
+                        <Draggable
+                            key={child.id}
+                            item={child}
+                            index={index}
+                            mode="MOVE"
+                            dropTargetId={componentId}
+                            layout="horizontal"
+                            className={cn('p-1')}
                         >
-                            <>
-                                {content ? (
-                                    content
-                                ) : (
+                            <BoxWrapper
+                                parentComp={comp}
+                                comp={child}
+                                onEdit={() =>
+                                    handleEdit(
+                                        child,
+                                        `${COMPONENT.ModalDialog}/${COMPONENT.ModalDialogContent}/${componentName}`
+                                    )
+                                }
+                                group="group/card-dialog-footer"
+                                className="top-0 opacity-0 group-hover/card-dialog-footer:opacity-100"
+                            >
+                                <>
                                     <CardComponent
                                         comp={child}
                                         onDragEnd={onDragEnd}
                                     />
-                                )}
-                            </>
-                        </BoxWrapper>
-                    </Draggable>
-                );
-            })}
-        </div>
+                                </>
+                            </BoxWrapper>
+                        </Draggable>
+                    );
+                })
+            )}
+        </Droppable>
     );
 };
 

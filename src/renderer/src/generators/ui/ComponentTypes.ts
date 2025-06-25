@@ -73,6 +73,7 @@ import {
     Ratio,
     Menu,
     Dot,
+    Text as TextIcon,
 } from 'lucide-react';
 import IGRPStudioFlex from './types/components/Flex';
 import IGRPStudioGrid from './types/components/Grid';
@@ -226,7 +227,8 @@ export const COMPONENT: Record<string, string> = {
     PdfViewer: 'pdfViewer',
     Alert: 'alert',
     TextList: 'textList',
-    StatusBanner: "statusBanner"
+    StatusBanner: "statusBanner",
+    Span: "span"
 
 } as const;
 
@@ -319,27 +321,28 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.PdfViewer]: FileText,
     [COMPONENT.StatusBanner]: Bell,
 
+    [COMPONENT.Span]: TextIcon,
+    [COMPONENT.Section]: RectangleHorizontal,
 
-    accordion: AlignLeft,
-    treeView: GitMerge,
+    [COMPONENT.Accordion]: AlignLeft,
+    [COMPONENT.TreeView]: GitMerge,
 
-    notifications: BellIcon,
+    [COMPONENT.Notifications]: BellIcon,
 
-    stack: Table2,
-    section: RectangleHorizontal,
+    [COMPONENT.Stack]: Table2,
 
-    tableDateFilter: CalendarIcon,
-    tableTextFilter: FormInput,
-    tableNumberFilter: Sliders,
-    tableCheckboxFilter: CheckSquare,
-    tableSelectFilter: List,
-    tableActionListCell: ButtonIcon,
-    tableAmountCell: DollarSign,
-    tableCheckboxCell: CheckSquare,
-    tableDateCell: CalendarIcon,
-    tableTextCell: FormInput,
-    tableExpanderCell: ChevronDown,
-    tableBadgeCell: Badge,
+    [COMPONENT.TableDateFilter]: CalendarIcon,
+    [COMPONENT.TableTextFilter]: FormInput,
+    [COMPONENT.TableNumberFilter]: Sliders,
+    [COMPONENT.TableCheckboxFilter]: CheckSquare,
+    [COMPONENT.TableSelectFilter]: List,
+    [COMPONENT.TableActionListCell]: ButtonIcon,
+    [COMPONENT.TableAmountCell]: DollarSign,
+    [COMPONENT.TableCheckboxCell]: CheckSquare,
+    [COMPONENT.TableDateCell]: CalendarIcon,
+    [COMPONENT.TableTextCell]: FormInput,
+    [COMPONENT.TableExpanderCell]: ChevronDown,
+    [COMPONENT.TableBadgeCell]: Badge,
 } as const;
 
 export const COMPONENT_MAP: Record<string, any> = {

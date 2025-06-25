@@ -54,7 +54,7 @@ const IGRPStudioGrid: React.FC<CardComponentProps> = ({
             });
 
         const emptySlots =
-            variant && variant.replace('cols', 0) - children.length;
+            variant && variant?.default?.replace('cols', 0) - children.length;
         const emptySlotComponents = Array.from(
             { length: emptySlots },
             (_, index) => (
