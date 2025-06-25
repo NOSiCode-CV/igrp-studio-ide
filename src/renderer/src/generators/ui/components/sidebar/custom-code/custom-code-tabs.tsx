@@ -6,7 +6,7 @@ import {
 import { EmptyList } from '@renderer/components/empty-list';
 import { Button } from '@renderer/components/ui/button';
 import { getId } from '@renderer/utils';
-import { FunctionSquare } from 'lucide-react';
+import { FunctionSquare, Type } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface TabStatesProps {
@@ -29,6 +29,13 @@ interface TabSnippetsProps {
     componentTag: string;
     editorRef?: React.RefObject<any>;
     globalFilter?: string;
+}
+
+interface TabTypesProps {
+    types: any[];
+    editorRef?: React.RefObject<any>;
+    globalFilter?: string;
+    onInsertImport?: (importObj: Import) => void;
 }
 
 function capitalizeFirstLetter(string: string) {
@@ -258,4 +265,71 @@ const TabsFunctions = ({
     );
 };
 
-export { TabStates, TabSnipptes, TabsFunctions };
+const TabTypes = ({ types, editorRef, globalFilter,onInsertImport }: TabTypesProps) => {
+    const filteredTypes = useMemo(() => {
+        if (!globalFilter) return types;
+        return types.filter(type => 
+            (type.name?.toLowerCase() || '').includes(globalFilter.toLowerCase()) ||
+            (type.type?.toLowerCase() || '').includes(globalFilter.toLowerCase())
+        );
+    }, [types, globalFilter]);
+
+    const handleInsertType = (type: any) => {
+        if (editorRef && editorRef.current) {
+            editorRef.current.insertTextAtCursor(type.name);
+
+            if (type.path)
+                onInsertImport?.({
+                    namespace: `import {${type.name}} from '${type.path}'`,
+                    id: getId(),
+                });
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+                {filteredTypes.length > 0 ? (
+                    filteredTypes.map((type, index) => (
+                        <div
+                            key={index}
+                            className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
+                        >
+                            <div className="flex flex-col">
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-medium">
+                                        {type.name}
+                                    </span>
+                                    <span className="text-gray-400 text-sm">
+                                        {type.type}
+                                    </span>
+                                </div>
+                                {type.description && (
+                                    <p className="text-sm text-muted-foreground">
+                                        {type.description}
+                                    </p>
+                                )}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size={'sm'}
+                                onClick={() => handleInsertType(type)}
+                            >
+                                Insert Type
+                            </Button>
+                        </div>
+                    ))
+                ) : (
+                    <EmptyList
+                        icon={<Type />}
+                        title={globalFilter ? "No matching types" : "No Types"}
+                        description={globalFilter ? "Try adjusting your search terms" : "Create your first custom type to add functionality to your page!"}
+                        className="py-12"
+                    />
+                )}
+            </div>
+        </div>
+    );
+};
+
+export { TabStates, TabSnipptes, TabsFunctions, TabTypes };

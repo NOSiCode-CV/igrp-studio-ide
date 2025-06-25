@@ -31,7 +31,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import useCustomCode from '../../../hooks/useCustomCode';
-import { TabsFunctions, TabSnipptes, TabStates } from './custom-code-tabs';
+import { TabsFunctions, TabSnipptes, TabStates, TabTypes } from './custom-code-tabs';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';
@@ -63,7 +63,7 @@ export const FunctionSettingsSidebar = ({
     ...props
 }: FunctionSettingsSidebarProps) => {
     const { t } = useTranslation();
-    const { states, snippets, functions } = useCustomCode();
+    const { states, snippets, functions, types } = useCustomCode();
     const { filterValue, setFilterValue, clearFilter } = useGlobalTabFilter();
     const [activeTab, setActiveTab] = useState<string>('states');
 
@@ -107,8 +107,8 @@ export const FunctionSettingsSidebar = ({
                 <Tabs defaultValue={formik ? 'props' : 'states'} onValueChange={setActiveTab}>
                     <TabsList
                         className={cn(
-                            'grid w-full grid-cols-4',
-                            !formik ? 'grid-cols-3' : ''
+                            'grid w-full grid-cols-5',
+                            !formik ? 'grid-cols-4' : ''
                         )}
                     >
                         {formik && (
@@ -117,6 +117,7 @@ export const FunctionSettingsSidebar = ({
                         <TabsTrigger value="states">States</TabsTrigger>
                         <TabsTrigger value="functions">Functions</TabsTrigger>
                         <TabsTrigger value="snippets">Snippets</TabsTrigger>
+                        <TabsTrigger value="types">Types</TabsTrigger>
                     </TabsList>
                     {formik && (
                         <TabsContent value="props" className="space-y-4">
@@ -223,6 +224,14 @@ export const FunctionSettingsSidebar = ({
                             currentFunction={formik?.values}
                             onInsertImport={onInsertImport}
                             globalFilter={filterValue}
+                        />
+                    </TabsContent>
+                    <TabsContent value="types" className="space-y-4">
+                        <TabTypes
+                            types={types}
+                            editorRef={editorRef}
+                            globalFilter={filterValue}
+                            onInsertImport={onInsertImport}
                         />
                     </TabsContent>
                 </Tabs>
