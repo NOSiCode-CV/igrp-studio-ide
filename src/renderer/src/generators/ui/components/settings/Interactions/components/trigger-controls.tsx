@@ -35,7 +35,7 @@ const actionTypeOptions = [
     { value: 'function', label: 'Function' },
     { value: 'navigate', label: 'Navigation' },
     { value: 'formSubmit', label: 'Form Submit' },
-    { value: 'applogic', label: 'App Logic' },
+    /* { value: 'applogic', label: 'App Logic' }, */
 ];
 
 interface NavigationAction {

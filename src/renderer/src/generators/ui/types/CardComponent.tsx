@@ -30,7 +30,6 @@ const CardComponent = ({
     const {
         commonProperties,
         iconProperties,
-        dataproperties,
         dataProperties,
         error,
         errorMessage,
@@ -52,41 +51,18 @@ const CardComponent = ({
     return (
         <>
             {Component ? (
-                componentName === COMPONENT.Button ? (
-                    //@ts-ignore
-                    <IGRPButton
-                        {...args}
-                        {...iconProperties}
-                        className={cn(classes, className)}
-                    >
-                        {content}
-                    </IGRPButton>
-                ) : componentName === COMPONENT.Badge ? (
-                    //@ts-ignore
-                    <IGRPBadge
-                        {...args}
-                        {...iconProperties}
-                        className={cn(classes, className)}
-                    >
-                        {componentLabel}
-                    </IGRPBadge>
-                ) : componentName === COMPONENT.Text ? (
-                    //@ts-ignore
-                    <IGRPText {...args} className={cn(classes, className)}>
-                        {FAKE_COMPONENT_DATA?.properties?.content}
-                    </IGRPText>
-                ) : (
-                    //@ts-ignore
-                    <Component
-                        {...args}
-                        {...FAKE_COMPONENT_DATA?.properties}
-                        className={cn(classes, className)}
-                        comp={comp}
-                        onDragEnd={onDragEnd}
-                        hoverClass={hoverClass}
-                        group={group}
-                    />
-                )
+                //@ts-ignore
+                <Component
+                    {...args}
+                    {...FAKE_COMPONENT_DATA?.properties}
+                    className={cn(classes, className)}
+                    comp={comp}
+                    onDragEnd={onDragEnd}
+                    hoverClass={hoverClass}
+                    group={group}
+                >
+                    {content || FAKE_COMPONENT_DATA?.properties?.content}
+                </Component>
             ) : (
                 <div className="rounded-lg shadow-xs border p-4 bg-card">
                     <div className="flex items-center gap-3 flex-wrap md:flex-nowrap justify-center">

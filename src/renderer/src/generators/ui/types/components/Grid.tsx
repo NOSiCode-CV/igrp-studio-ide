@@ -43,9 +43,9 @@ const IGRPStudioGrid: React.FC<CardComponentProps> = ({
                     >
                         <BoxWrapper
                             comp={comp}
-                            group="group/column-grid"
                             onEdit={() => handleEditClick(comp)}
-                            className="opacity-0 group-hover/column-grid:opacity-100  -top-4"
+                            group="group/comp-grid"
+                            className="opacity-0 group-hover/comp-grid:opacity-100 -top-4"
                         >
                             <CardComponent comp={comp} onDragEnd={onDragEnd} />
                         </BoxWrapper>
