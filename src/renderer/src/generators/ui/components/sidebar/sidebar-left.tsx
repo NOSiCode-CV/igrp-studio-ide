@@ -16,7 +16,6 @@ import {
 import { cn } from '@renderer/lib/utils';
 import {
     Badge,
-    BrainCircuit,
     ChevronRight,
     FileText,
     FolderTree,
@@ -48,7 +47,6 @@ import {
     CustomCodeMenu,
     SidebarAppCustomCode,
 } from './custom-code/sidebar-app-custom-code';
-import { SidebarAppLogic } from './app-logic/sidebar-app-logic';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
@@ -101,7 +99,6 @@ export function AppSidebar({
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
-        { icon: BrainCircuit, label: t('Applogic'), id: 'appLogic' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         { icon: Badge, label: t('settings'), id: 'settings' },
@@ -229,8 +226,6 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup.id === 'customCode' ? (
                             <SidebarAppCustomCode searchTerm={searchQuery} />
-                        ) : activeMenuGroup.id === 'appLogic' ? (
-                            <SidebarAppLogic searchTerm={searchQuery} />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible

@@ -4,7 +4,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { PageCardProps } from './page-card';
+import { PageCardProps } from './page-card-view';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {
@@ -15,15 +15,17 @@ import {
     FolderOpen,
     MoreHorizontal,
     Trash,
+    Copy,
 } from 'lucide-react';
-import { PageDefinition } from './list-pages';
+import { PageDefinition } from './page-manager';
 
-export const PageActions = ({
+export const PageActionMenu = ({
     page,
     onDelete,
     onEdit,
     onAddComponents,
     openDialogNewPage,
+    onDuplicate,
 }: PageCardProps) => {
     const { t } = useTranslation();
     const { isPage } = page;
@@ -40,6 +42,10 @@ export const PageActions = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEdit}><Edit/>{t('edit')}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate?.(page)}>
+                    <Copy />
+                    {t('duplicate')}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddComponents(page)}>
                     <Component />
                     {t('addComponents')}
@@ -64,7 +70,7 @@ export const PageActions = ({
     );
 };
 
-export const IconPage = ({
+export const PageTypeIcon = ({
     page,
     compCount,
     isOpen,

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import yaml from 'js-yaml';
 import useToast from '@renderer/hooks/useToast';
-import { DockerComposeConfig, DockerComposeService, IWorkspace, ServiceInfo } from 'src/main/types';
+import { DockerComposeConfig, IWorkspace, ServiceInfo } from 'src/main/types';
 import { IDocker } from 'src/main/interfaces';
 
 export function useDocker({ workspace, changeStatus = false }: { workspace: IWorkspace, changeStatus?: boolean }) {
@@ -58,7 +58,7 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
             timeout?: number,
             dropVolume?: boolean
         }
-    ): Promise<DockerComposeService[] | boolean | void> => {
+    ): Promise<ServiceInfo[] | boolean | void> => {
 
         const { services, timeout, dropVolume } = options || {}
 

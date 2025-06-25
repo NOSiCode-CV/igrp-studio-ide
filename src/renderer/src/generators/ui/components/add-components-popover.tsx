@@ -1,6 +1,10 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
-import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@renderer/components/ui/popover';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
@@ -8,6 +12,7 @@ import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { useTagManager } from '../hooks/useTagManager';
 import { Badge } from '@renderer/components/ui/badge';
+import useStudio from '@renderer/hooks/use-studio';
 
 export const AddComponentPopover = ({
     comp,
@@ -19,9 +24,13 @@ export const AddComponentPopover = ({
     const { t } = useTranslation();
 
     const { componentName, id: componentId, children } = comp;
-    const { handleAddChildToComponent, components: availableComponents } =
-        useDroppedComponents();
+    const {
+        handleAddChildToComponent,
+        handleReorderChildInComponent,
+        components: availableComponents,
+    } = useDroppedComponents();
     const { generateTag, rebuild } = useTagManager(availableComponents);
+    const { findComponentById } = useStudio();
 
     const handleAddComponent = (item: any) => {
         const result: DragEndResult = {
@@ -36,7 +45,9 @@ export const AddComponentPopover = ({
         };
         handleDragEnd(result, {
             handleAddChildToComponent,
+            handleReorderChildInComponent,
             generateTag,
+            findComponentById,
         });
     };
 
@@ -51,11 +62,11 @@ export const AddComponentPopover = ({
     }, [rebuild]);
 
     return (
-        <Popover >
+        <Popover>
             <PopoverTrigger asChild>
                 <Badge
                     variant={'secondary'}
-                    className="my-1 rounded-sm cursor-pointer"
+                    className="rounded-sm cursor-pointer h-6"
                 >
                     <span className="text-xs">Add Comp</span>
                 </Badge>

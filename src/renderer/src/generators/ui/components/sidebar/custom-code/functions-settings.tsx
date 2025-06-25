@@ -13,7 +13,6 @@ import {
 import {
     CheckboxInput,
     SelectInput,
-    SwitchInput,
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { useTranslation } from 'react-i18next';
@@ -32,9 +31,11 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import useCustomCode from '../../../hooks/useCustomCode';
-import { TabsFunctions, TabSnipptes, TabStates } from './custom-code-tabs';
+import { TabsFunctions, TabSnipptes, TabStates, TabTypes } from './custom-code-tabs';
 import { cn } from '@renderer/lib/utils';
-import { Switch } from '@renderer/components/ui/switch';
+import { Checkbox } from '@renderer/components/ui/checkbox';
+import { Input } from '@renderer/components/ui/input';
+import { GlobalTabFilter, useGlobalTabFilter } from './global-tab-filter';
 
 export const returnTypeOptions = [
     { value: 'string', label: 'String' },
@@ -62,8 +63,9 @@ export const FunctionSettingsSidebar = ({
     ...props
 }: FunctionSettingsSidebarProps) => {
     const { t } = useTranslation();
-
-    const { states, snippets, functions } = useCustomCode();
+    const { states, snippets, functions, types } = useCustomCode();
+    const { filterValue, setFilterValue, clearFilter } = useGlobalTabFilter();
+    const [activeTab, setActiveTab] = useState<string>('states');
 
     const [arguments_, setArguments] = useState<Arguments[]>(
         formik && formik.values?.arguments ? formik.values?.arguments : []
@@ -95,11 +97,18 @@ export const FunctionSettingsSidebar = ({
                 </div>
             </SidebarHeader>
             <SidebarContent className="gap-4 p-2">
-                <Tabs defaultValue={formik ? 'props' : 'states'}>
+                <GlobalTabFilter
+                    value={filterValue}
+                    onChange={setFilterValue}
+                    onClear={clearFilter}
+                    activeTab={activeTab}
+                />
+                
+                <Tabs defaultValue={formik ? 'props' : 'states'} onValueChange={setActiveTab}>
                     <TabsList
                         className={cn(
-                            'grid w-full grid-cols-4',
-                            !formik ? 'grid-cols-3' : ''
+                            'grid w-full grid-cols-5',
+                            !formik ? 'grid-cols-4' : ''
                         )}
                     >
                         {formik && (
@@ -108,6 +117,7 @@ export const FunctionSettingsSidebar = ({
                         <TabsTrigger value="states">States</TabsTrigger>
                         <TabsTrigger value="functions">Functions</TabsTrigger>
                         <TabsTrigger value="snippets">Snippets</TabsTrigger>
+                        <TabsTrigger value="types">Types</TabsTrigger>
                     </TabsList>
                     {formik && (
                         <TabsContent value="props" className="space-y-4">
@@ -193,13 +203,18 @@ export const FunctionSettingsSidebar = ({
                         </TabsContent>
                     )}
                     <TabsContent value="states" className="space-y-4">
-                        <TabStates states={states} editorRef={editorRef} />
+                        <TabStates 
+                            states={states} 
+                            editorRef={editorRef} 
+                            globalFilter={filterValue}
+                        />
                     </TabsContent>
                     <TabsContent value="snippets" className="space-y-4">
                         <TabSnipptes
                             snippets={snippets}
                             editorRef={editorRef}
                             componentTag={componentTag}
+                            globalFilter={filterValue}
                         />
                     </TabsContent>
                     <TabsContent value="functions" className="space-y-4">
@@ -207,6 +222,15 @@ export const FunctionSettingsSidebar = ({
                             functions={functions}
                             editorRef={editorRef}
                             currentFunction={formik?.values}
+                            onInsertImport={onInsertImport}
+                            globalFilter={filterValue}
+                        />
+                    </TabsContent>
+                    <TabsContent value="types" className="space-y-4">
+                        <TabTypes
+                            types={types}
+                            editorRef={editorRef}
+                            globalFilter={filterValue}
                             onInsertImport={onInsertImport}
                         />
                     </TabsContent>
@@ -246,6 +270,7 @@ export const FunctionArguments = ({
                 isInterface: false,
                 isFunction: false,
                 isState: false,
+                functionParameters: [],
             },
         ]);
     };
@@ -256,6 +281,56 @@ export const FunctionArguments = ({
                 arg.id === id ? { ...arg, ...updates } : arg
             )
         );
+    };
+
+    const addFunctionParameter = (argumentId: string) => {
+        const newParameter: Arguments = {
+            id: Date.now().toString(),
+            name: '',
+            type: 'string',
+            isOptional: false,
+            isList: false,
+            isInterface: false,
+            isFunction: false,
+            isState: false,
+        };
+
+        updateArgument(argumentId, {
+            functionParameters: [
+                ...(arguments_.find((arg) => arg.id === argumentId)
+                    ?.functionParameters || []),
+                newParameter,
+            ],
+        });
+    };
+
+    const removeFunctionParameter = (
+        argumentId: string,
+        parameterId: string
+    ) => {
+        const argument = arguments_.find((arg) => arg.id === argumentId);
+        if (argument) {
+            updateArgument(argumentId, {
+                functionParameters: (argument.functionParameters || []).filter(
+                    (param) => param.id !== parameterId
+                ),
+            });
+        }
+    };
+
+    const updateFunctionParameter = (
+        argumentId: string,
+        parameterId: string,
+        updates: Partial<Arguments>
+    ) => {
+        const argument = arguments_.find((arg) => arg.id === argumentId);
+        if (argument) {
+            updateArgument(argumentId, {
+                functionParameters: (argument.functionParameters || []).map((param) =>
+                    param.id === parameterId ? { ...param, ...updates } : param
+                ),
+            });
+        }
     };
 
     return (
@@ -278,7 +353,7 @@ export const FunctionArguments = ({
                                 </div>
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent>
+                        <AccordionContent className="border rounded-lg bg-gray-50 space-y-4 p-3">
                             <div className="p-1 space-y-3">
                                 <TextInput
                                     id={`argName-${arg.id}`}
@@ -356,7 +431,7 @@ export const FunctionArguments = ({
                                                     label="isFunction"
                                                 />
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                            {/* <div className="flex items-center space-x-2">
                                                 <CheckboxInput
                                                     id={`isState-${arg.id}`}
                                                     value={arg.isState}
@@ -368,12 +443,210 @@ export const FunctionArguments = ({
                                                     }
                                                     label="isState"
                                                 />
+                                            </div> */}
+                                        </div>
+                                    </div>
+
+                                    {arg.isFunction && (
+                                        <div className="mt-6 p-4 border rounded-lg bg-white">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h4 className="font-medium">
+                                                    Function Configuration
+                                                </h4>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between">
+                                                    <Label>Parameters</Label>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            addFunctionParameter(
+                                                                arg.id
+                                                            )
+                                                        }
+                                                    >
+                                                        <Plus className="h-4 w-4 mr-1" />
+                                                        Add Parameter
+                                                    </Button>
+                                                </div>
+
+                                                {arg?.functionParameters &&
+                                                    arg.functionParameters.map(
+                                                        (param, paramIndex) => (
+                                                            <div
+                                                                key={param.id}
+                                                                className="flex items-center gap-2 p-3 border rounded bg-gray-50"
+                                                            >
+                                                                <div className="flex-1">
+                                                                    <Input
+                                                                        placeholder={`Parameter ${paramIndex + 1} name`}
+                                                                        value={
+                                                                            param.name
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            updateFunctionParameter(
+                                                                                arg.id,
+                                                                                param.id,
+                                                                                {
+                                                                                    name: e
+                                                                                        .target
+                                                                                        .value,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <SelectInput
+                                                                        label=""
+                                                                        name="type"
+                                                                        id={`funcParamName-${arg.id}`}
+                                                                        value={
+                                                                            param.type
+                                                                        }
+                                                                        onChange={(
+                                                                            value
+                                                                        ) =>
+                                                                            updateFunctionParameter(
+                                                                                arg.id,
+                                                                                param.id,
+                                                                                {
+                                                                                    type: value as string,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        options={
+                                                                            returnTypeOptions
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                                <div className="flex items-center space-x-2">
+                                                                    <Checkbox
+                                                                        id={`paramOptional-${param.id}`}
+                                                                        checked={
+                                                                            param.isOptional
+                                                                        }
+                                                                        onCheckedChange={(
+                                                                            checked
+                                                                        ) =>
+                                                                            updateFunctionParameter(
+                                                                                arg.id,
+                                                                                param.id,
+                                                                                {
+                                                                                    isOptional:
+                                                                                        checked as boolean,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <Label
+                                                                        htmlFor={`paramOptional-${param.id}`}
+                                                                        className="text-sm"
+                                                                    >
+                                                                        Optional
+                                                                    </Label>
+                                                                </div>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        removeFunctionParameter(
+                                                                            arg.id,
+                                                                            param.id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                                                </Button>
+                                                            </div>
+                                                        )
+                                                    )}
+
+                                                {arg.functionParameters &&
+                                                    arg.functionParameters
+                                                        .length === 0 && (
+                                                        <p className="text-sm text-gray-500 text-center py-4">
+                                                            No parameters
+                                                            defined. Click "Add
+                                                            Parameter" to add
+                                                            function parameters.
+                                                        </p>
+                                                    )}
                                             </div>
                                         </div>
+                                    )}
+
+                                    {/*    {arg.isState && (
+                                        <div className="mt-6 p-4 border rounded-lg bg-white">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h4 className="font-medium">
+                                                    State Setter Configuration
+                                                </h4>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <SelectInput
+                                                        label="Parameter Type"
+                                                        id={`stateParamType-${arg.id}`}
+                                                        onChange={(value) =>
+                                                            updateArgument(
+                                                                arg.id,
+                                                                {
+                                                                    stateParameterType:
+                                                                        value,
+                                                                }
+                                                            )
+                                                        }
+                                                        options={
+                                                            returnTypeOptions
+                                                        }
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <TextInput
+                                                        label="Parameter Name"
+                                                        id={`stateParamName-${arg.id}`}
+                                                        value={
+                                                            arg.stateParameterName
+                                                        }
+                                                        onChange={(e) =>
+                                                            updateArgument(
+                                                                arg.id,
+                                                                {
+                                                                    stateParameterName:
+                                                                        e.target
+                                                                            .value,
+                                                                }
+                                                            )
+                                                        }
+                                                        placeholder="Parameter name"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-3 p-3 bg-gray-50 rounded text-sm">
+                                                <strong>Preview:</strong>{' '}
+                                                {arg.name || 'stateSetter'}: (
+                                                {arg.stateParameterType}:{' '}
+                                                {arg.stateParameterName}) =&gt;
+                                                void
+                                            </div>
+                                        </div>
+                                    )} */}
+
+                                    <div className="flex flex-1 justify-end">
                                         <Button
                                             variant={'ghost'}
                                             size={'icon'}
-                                            className="text-destructive text-sm"
+                                            className="text-destructive text-sm text-right"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 removeArgument(arg.id);

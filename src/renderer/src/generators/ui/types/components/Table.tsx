@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import {
     Table,
@@ -24,22 +23,14 @@ import { Badge } from '@renderer/components/ui/badge';
 import { useFakedata } from '../../hooks/useFakeData';
 import { faker } from '@faker-js/faker';
 import Droppable from '@renderer/lib/dnd/Droppable';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface TableProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
-    const { children: components, id: componentId, componentName } = comp;
+const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
+    const { children: components, componentName } = comp;
     const [columns, setColumns] = useState<StructuredComponent[]>([]);
     const [filters, setFilters] = useState<StructuredComponent[]>([]);
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
+
     const { setEditingComponent } = useDroppedComponents();
-    const { dynamicImport } = useStudio();
     const { getDataTableFake } = useFakedata();
 
     // Extract table columns and filters from components
@@ -54,39 +45,12 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
         setFilters(tableFilter?.children || []);
     }, [components]);
 
-    // Load components dynamically
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
-            const loadComponent = async (comp: StructuredComponent) => {
-                try {
-                    const component = await dynamicImport(comp.componentName);
-                    comps[comp.id] = component;
-                } catch (error) {
-                    console.error(
-                        `Failed to load component ${comp.componentName}:`,
-                        error
-                    );
-                }
-            };
-
-            await Promise.all([
-                ...columns.map(loadComponent),
-                ...filters.map(loadComponent),
-            ]);
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [columns, filters, dynamicImport]);
-
     // Handle edit click
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
             setEditingComponent({ path, component });
         },
-        [comp, setEditingComponent]
+        [setEditingComponent]
     );
 
     // Render table headers
@@ -97,14 +61,13 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
             tableColumn: StructuredComponent
         ) => {
             return columns.map((child, index) => {
-                const Component = loadedComponents[child.id];
                 const { label, properties } = child;
                 const { headerTitle } = properties || {};
 
                 // Construct the path for tracking origin
                 const path = `${componentName}/${compName}`;
 
-                return Component ? (
+                return (
                     <TableHead key={child.id}>
                         <Draggable
                             item={child}
@@ -127,10 +90,10 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                             </BoxField>
                         </Draggable>
                     </TableHead>
-                ) : null;
+                );
             });
         },
-        [columns, loadedComponents, handleEdit, componentName]
+        [columns, handleEdit, componentName]
     );
 
     // Render table rows
@@ -158,7 +121,7 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                 ))}
             </TableRow>
         ));
-    }, [columns]);
+    }, [columns, getDataTableFake]);
 
     // Render table filters
     const renderTableFilters = useCallback(
@@ -169,12 +132,10 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
             return (
                 <div className="flex flex-1">
                     {filters.map((child, index) => {
-                        const Component = loadedComponents[child.id];
-
                         // Construct the path for tracking origin
                         const path = `${componentName}/${compName}`;
 
-                        return Component ? (
+                        return (
                             <Draggable
                                 key={child.id}
                                 item={child}
@@ -193,19 +154,19 @@ const IGRPStudioTable: React.FC<TableProps> = ({ comp, onDragEnd }) => {
                                     group="group/table-filter"
                                     className="opacity-0 group-hover/table-filter:opacity-100"
                                 >
-                                    <Component
+                                    <CardComponent
                                         comp={child}
                                         onDragEnd={onDragEnd}
                                         className="min-w-32"
                                     />
                                 </BoxField>
                             </Draggable>
-                        ) : null;
+                        );
                     })}
                 </div>
             );
         },
-        [filters, loadedComponents, componentId, comp, handleEdit]
+        [filters, componentName, comp, onDragEnd, handleEdit]
     );
 
     // Separate TableFilter and TableColumn components

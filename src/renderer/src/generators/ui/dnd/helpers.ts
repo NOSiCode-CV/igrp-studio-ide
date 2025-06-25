@@ -1,6 +1,6 @@
 import { StructuredComponent } from "@renderer/lib/dnd/types";
 import { generateId } from "@renderer/utils";
-import { ComponentRegisterConfig, State } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
 
 // Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
 export const getDefaultProperties = (schema: any): any => {
@@ -56,7 +56,7 @@ export const getRequiredDataSchema = (schema: any): any => {
         Object.entries(schema[index].properties).forEach(([key, property]: [string, any]) => {
 
             // Se for o objeto state que queremos validar
-            if (key === 'state' && property.type === 'object') {
+            if (key === 'state' && property.type === 'object' && property.required) {
                 if (isState(property.properties))
                     tempResult[key] = {
                         id: property.properties?.id?.default ?? "",
@@ -67,25 +67,11 @@ export const getRequiredDataSchema = (schema: any): any => {
                         generate: property.properties?.generate?.default ?? true
                     };
                 else tempResult[key] = undefined
-            }
-            // Para outras propriedades, mantemos a estrutura básica
-            /*   else {
-                  tempResult[key] = property.default !== undefined ? property.default : null;
-  
-                  // Se for um objeto (não-state), pegamos seus defaults
-                  if (property.type === 'object' && property.properties) {
-                      tempResult[key] = {};
-                      Object.entries(property.properties).forEach(([subKey, subProp]: [string, any]) => {
-                          tempResult[key][subKey] = subProp.default !== undefined ? subProp.default : null;
-                      });
-                  }
-                  // Se for array, pegamos o padrão do item
-                  else if (property.type === 'array' && property.items) {
-                      tempResult[key] = property.items.default !== undefined ? property.items.default : [];
-                  }
-              } */
 
-            result[index] = tempResult;
+                result[index] = tempResult;
+
+            }
+
         });
     }
 

@@ -1,32 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import useStudio from '@renderer/hooks/use-studio';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import BoxWrapper from '../tools/BoxWrapper';
-import { useTranslation } from 'react-i18next';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface ColProps {
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioColumn: React.FC<ColProps> = ({
+const IGRPStudioColumn: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
-}: ColProps) => {
+}: CardComponentProps) => {
     const { children, id: componentId } = comp;
-    const { t } = useTranslation();
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
 
     const { setEditingComponent } = useDroppedComponents();
-
-    const { dynamicImport } = useStudio();
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -35,54 +23,35 @@ const IGRPStudioColumn: React.FC<ColProps> = ({
         });
     };
 
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
-            for (const comp of children) {
-                const component = await dynamicImport(comp.componentName);
-                comps[comp.id] = component;
-            }
-
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [children, dynamicImport]);
-
     const renderComponents = () => {
         if (children.length === 0) return <EmptySlotComponent />;
 
         return children.map((child: StructuredComponent, index: number) => {
-            const Component = loadedComponents[child.id];
-
             return (
-                Component && (
-                    <Draggable
-                        key={child.id}
-                        item={child}
-                        index={index}
-                        dropTargetId={componentId}
-                        mode="MOVE"
+                <Draggable
+                    key={child.id}
+                    item={child}
+                    index={index}
+                    dropTargetId={componentId}
+                    mode="MOVE"
+                >
+                    <BoxWrapper
+                        parentComp={comp}
+                        comp={child}
+                        group="group/column"
+                        onEdit={() => handleEditClick(child)}
+                        className="opacity-0 group-hover/column:opacity-100"
                     >
-                        <BoxWrapper
-                            parentComp={comp}
-                            comp={child}
-                            group="group/column"
-                            onEdit={() => handleEditClick(child)}
-                            className="top-0 opacity-0 group-hover/column:opacity-100"
-                        >
-                            <Component comp={child} onDragEnd={onDragEnd} />
-                        </BoxWrapper>
-                    </Draggable>
-                )
+                        <CardComponent comp={child} onDragEnd={onDragEnd} />
+                    </BoxWrapper>
+                </Draggable>
             );
         });
     };
 
     return (
         <Droppable component={comp} onDrop={onDragEnd}>
-            <div className={cn(`w-full flex flex-col p-0 gap-3`)}>
+            <div className={cn(`w-full flex flex-col gap-3 space-y-3`)}>
                 {renderComponents()}
             </div>
         </Droppable>

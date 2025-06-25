@@ -1,3 +1,4 @@
+
 let store: any = null;
 
 export const IGRPStudioSettings = {
@@ -10,6 +11,13 @@ export const IGRPStudioSettings = {
         activeTheme: 'default',
       },
     });
+  },
+
+  async getStore() {
+    if (!store) {
+      await this.initialize();
+    }
+    return store;
   },
 
   setActiveTheme(theme: string) {

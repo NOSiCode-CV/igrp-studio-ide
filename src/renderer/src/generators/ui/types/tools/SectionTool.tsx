@@ -1,5 +1,5 @@
 import { Button } from '@renderer/components/ui/button';
-import { Copy, Move, Plus, Trash, Settings } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
@@ -15,8 +15,6 @@ interface RowOptionsProps {
 
 const SectionTool = ({
     onClickAddControl,
-    onClickDeleteSection,
-    onEdit,
 }: RowOptionsProps) => {
     const { t } = useTranslation();
     return (

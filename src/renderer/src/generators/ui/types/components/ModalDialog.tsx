@@ -1,63 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxField from '../tools/BoxFields';
 import { cn } from '@renderer/lib/utils';
+import BoxWrapper from '../tools/BoxWrapper';
+import CardComponent, { CardComponentProps } from '../CardComponent';
+import { IGRPButton } from '@igrp/igrp-framework-react-design-system';
+import { COMPONENT } from '../../ComponentTypes';
 
-export interface ModalDialogProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
+const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
 }) => {
-    const {
-        children: components,
-        id: componentId,
-        componentName: parentComponentName,
-        properties,
-    } = comp;
-    const { title, description } = properties;
-    const [loadedComponents, setLoadedComponents] = useState<
-        Record<string, React.ComponentType<any>>
-    >({});
+    const { children: components, componentName: parentComponentName } = comp;
+
     const { setEditingComponent } = useDroppedComponents();
-    const { dynamicImport } = useStudio();
-
-    // Load components dynamically
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: Record<string, React.ComponentType<any>> = {};
-
-            // Load all child components in parallel
-            const loadPromises = components.map(async (grandChild) => {
-                try {
-                    const component = await dynamicImport(
-                        grandChild.componentName
-                    );
-                    comps[grandChild.id] = component;
-                } catch (error) {
-                    console.error(
-                        `Failed to load component ${grandChild.componentName}:`,
-                        error
-                    );
-                }
-            });
-
-            await Promise.all(loadPromises);
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [dynamicImport, components]);
 
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
@@ -66,26 +26,176 @@ const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
         [setEditingComponent]
     );
 
+    const renderChildComp = useCallback(
+        (component: StructuredComponent, path: string) => {
+            const {
+                children: childComponents,
+                componentName,
+                id: componentId,
+            } = component;
+
+            return (
+                <Droppable
+                    component={component}
+                    onDrop={onDragEnd}
+                    className={cn('p-2 space-y-3')}
+                >
+                    {childComponents.length === 0 ? (
+                        <GenNoInfoComp
+                            type={getLabel(componentName).toUpperCase()}
+                        />
+                    ) : (
+                        childComponents.map((child, index) => {
+                            return (
+                                <Draggable
+                                    key={child.id}
+                                    item={child}
+                                    index={index}
+                                    mode="MOVE"
+                                    dropTargetId={componentId}
+                                    className="py-4"
+                                >
+                                    <BoxWrapper
+                                        parentComp={component}
+                                        comp={child}
+                                        path={path}
+                                        onEdit={() => handleEdit(child, path)}
+                                        group="group/dialog-item"
+                                        className="opacity-0 group-hover/dialog-item:opacity-100"
+                                    >
+                                        <CardComponent
+                                            comp={child}
+                                            onDragEnd={onDragEnd}
+                                        />
+                                    </BoxWrapper>
+                                </Draggable>
+                            );
+                        })
+                    )}
+                </Droppable>
+            );
+        },
+        [handleEdit, onDragEnd]
+    );
+
     return (
-        <Droppable component={comp} onDrop={onDragEnd} className="space-y-2">
-            <div className={cn('flex flex-col gap-2 text-center sm:text-left')}>
-                <p className={cn('text-lg leading-none font-semibold')}>
-                    {title}
-                </p>
+        <div className="flex flex-col gap-2">
+            {components.map((child, index) => {
+                const { componentName } = child;
+                const path = `${parentComponentName}/${componentName}`;
+                return (
+                    <div
+                        key={index}
+                        className={cn(
+                            'bg-card rounded-lg border border-dashed border-gray-400'
+                        )}
+                    >
+                        <BoxWrapper
+                            key={index}
+                            parentComp={comp}
+                            comp={child}
+                            onEdit={() =>
+                                handleEdit(child, parentComponentName)
+                            }
+                            group="group/dialog"
+                            className="opacity-0 group-hover/dialog:opacity-100"
+                        >
+                            {renderChildComp(child, path)}
+                        </BoxWrapper>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
-                <p className={cn('ttext-muted-foreground text-sm')}>
-                    {description}
-                </p>
-            </div>
+// Add small components for dialog parts
 
-            {components.length === 0 ? (
-                <GenNoInfoComp
-                    type={getLabel(parentComponentName).toUpperCase()}
-                />
+const IGRPSTudioDialogHeader: React.FC<CardComponentProps> = ({
+    comp,
+    onDragEnd,
+}) => {
+    const { setEditingComponent } = useDroppedComponents();
+
+    const handleEdit = useCallback(
+        (component: StructuredComponent, path: string) => {
+            setEditingComponent({ path, component });
+        },
+        [setEditingComponent]
+    );
+
+    const { children: childComponents, componentName, id: componentId } = comp;
+
+    return (
+        <div className="space-y-3">
+            {childComponents.map((child, index) => {
+                const { properties } = child;
+                const { content } = properties;
+
+                const path = `${COMPONENT.ModalDialog}/${COMPONENT.ModalDialogContent}/${componentName}`;
+
+                return (
+                    <Draggable
+                        key={child.id}
+                        item={child}
+                        index={index}
+                        mode="MOVE"
+                        dropTargetId={componentId}
+                        className={cn('p-1')}
+                    >
+                        <BoxWrapper
+                            parentComp={comp}
+                            comp={child}
+                            path={`${COMPONENT.ModalDialog}/${COMPONENT.ModalDialogContent}`}
+                            onEdit={() => handleEdit(child, path)}
+                            group="group/card-dialog-header"
+                            className="top-0 opacity-0 group-hover/card-dialog-header:opacity-100"
+                        >
+                            <>
+                                {content ? (
+                                    content
+                                ) : (
+                                    <CardComponent
+                                        comp={child}
+                                        onDragEnd={onDragEnd}
+                                    />
+                                )}
+                            </>
+                        </BoxWrapper>
+                    </Draggable>
+                );
+            })}
+        </div>
+    );
+};
+
+const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({
+    comp,
+    onDragEnd,
+}) => {
+    const { setEditingComponent } = useDroppedComponents();
+
+    const handleEdit = useCallback(
+        (component: StructuredComponent, path: string) => {
+            setEditingComponent({ path, component });
+        },
+        [setEditingComponent]
+    );
+
+    const { children: childComponents, componentName, id: componentId } = comp;
+
+    return (
+        <Droppable
+            component={comp}
+            onDrop={onDragEnd}
+            className={cn('p-2 space-y-3')}
+        >
+            {childComponents.length === 0 ? (
+                <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
             ) : (
-                components.map((child, index) => {
-                    const Component = loadedComponents[child.id];
-                    if (!Component) return null;
+                childComponents.map((child, index) => {
+                    const { properties } = child;
+                    const { content } = properties;
 
                     return (
                         <Draggable
@@ -94,21 +204,28 @@ const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
                             index={index}
                             mode="MOVE"
                             dropTargetId={componentId}
-                            className="p-1"
+                            layout="horizontal"
+                            className={cn('p-1')}
                         >
-                            <BoxField
-                                index={index}
+                            <BoxWrapper
                                 parentComp={comp}
                                 comp={child}
-                                path={parentComponentName}
                                 onEdit={() =>
-                                    handleEdit(child, parentComponentName)
+                                    handleEdit(
+                                        child,
+                                        `${COMPONENT.ModalDialog}/${COMPONENT.ModalDialogContent}/${componentName}`
+                                    )
                                 }
-                                group="group/dialog"
-                                className="opacity-0 group-hover/dialog:opacity-100"
+                                group="group/card-dialog-footer"
+                                className="top-0 opacity-0 group-hover/card-dialog-footer:opacity-100"
                             >
-                                <Component comp={child} onDragEnd={onDragEnd} />
-                            </BoxField>
+                                <>
+                                    <CardComponent
+                                        comp={child}
+                                        onDragEnd={onDragEnd}
+                                    />
+                                </>
+                            </BoxWrapper>
                         </Draggable>
                     );
                 })
@@ -117,4 +234,34 @@ const IGRPStudioModalDialog: React.FC<ModalDialogProps> = ({
     );
 };
 
-export default IGRPStudioModalDialog;
+const IGRPSTudioDialogTitle: React.FC<{ children: React.ReactNode }> = ({
+    children,
+}) => <h2 className="text-lg font-bold">{children}</h2>;
+
+const IGRPStudioDialogDescription: React.FC<{ children: React.ReactNode }> = ({
+    children,
+}) => <p className="text-sm text-gray-500">{children}</p>;
+
+const IGRPStudioDialogContent: React.FC<{ children: React.ReactNode }> = ({
+    children,
+}) => <div className="py-2">{children}</div>;
+
+const IGRPStudioDialogTrigger: React.FC<CardComponentProps> = ({ comp }) => {
+    const { properties } = comp;
+    const { content, ...args } = properties;
+    return (
+        <div className="py-2">
+            <IGRPButton {...args}>{content}</IGRPButton>
+        </div>
+    );
+};
+
+export {
+    IGRPSTudioDialogHeader,
+    IGRPSTudioDialogFooter,
+    IGRPStudioModalDialog,
+    IGRPSTudioDialogTitle,
+    IGRPStudioDialogDescription,
+    IGRPStudioDialogContent,
+    IGRPStudioDialogTrigger,
+};

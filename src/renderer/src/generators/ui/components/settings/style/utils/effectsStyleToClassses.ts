@@ -1,4 +1,3 @@
-
 import type { EffectsStyle } from "../types";
 
 export function effectsToSyleClasses(effects: EffectsStyle): string {
@@ -71,7 +70,7 @@ export function effectsToSyleClasses(effects: EffectsStyle): string {
     if (transitions.length > 0) {
         const props = transitions.map(t => t.property).join(',');
         const duration = transitions[0]?.duration || '150ms';
-        const timing = transitions[0]?.timingFunction || 'ease-in-out';
+        const timing = transitions[0]?.timing || 'ease-in-out';
         const delay = transitions[0]?.delay || '0ms';
 
         classes.push(

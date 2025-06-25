@@ -285,14 +285,45 @@ const repo = {
 	}
 }
 
-const window = {
+const windowControls = {
 	minimizeWindow: () => ipcRenderer.send('minimize-window'),
 	maximizeWindow: () => ipcRenderer.send('maximize-window'),
 	closeWindow: () => ipcRenderer.send('close-window'),
 	restoreWindow: () => ipcRenderer.send('restore-window'),
 	isMaximized: async () => await ipcRenderer.invoke('is-window-maximized')
 }
+const appLogic = {
 
+	// Environments
+	getEnvironments: () => ipcRenderer.invoke(EVENTS.APPLOGIC.FIND_ALL),
+	addEnvironment: (environment) => ipcRenderer.invoke(EVENTS.APPLOGIC.CREATE, environment),
+	updateEnvironment: (id, updates) => ipcRenderer.invoke(EVENTS.APPLOGIC.UPDATE, id, updates),
+	deleteEnvironment: (id) => ipcRenderer.invoke(EVENTS.APPLOGIC.DELETE, id),
+	getEnvironment: (id) => ipcRenderer.invoke(EVENTS.APPLOGIC.GET, id),
+
+	// History
+	addConnectionTest: (test) => ipcRenderer.invoke("app-logic:add-connection-test", test),
+	getEnvironmentHistory: (environmentId) => ipcRenderer.invoke("app-logic:get-environment-history", environmentId),
+
+	// Export/Import
+	exportData: () => ipcRenderer.invoke("app-logic:export-data"),
+	importData: (jsonData) => ipcRenderer.invoke("app-logic:import-data", jsonData),
+
+	// Test
+	testEnvironment: (environment) => ipcRenderer.invoke(EVENTS.APPLOGIC.TEST, environment),
+
+	// Store info
+	getStoreInfo: () => ipcRenderer.invoke("app-logic:get-store-info"),
+
+	// Events
+	onEnvironmentsChanged: (callback) => {
+		const subscription = (_event, environments) => callback(environments)
+		ipcRenderer.on(EVENTS.APPLOGIC.CHANGE, subscription)
+		return () => ipcRenderer.removeListener(EVENTS.APPLOGIC.CHANGE, subscription)
+	},
+
+	removeAllListeners: () => ipcRenderer.removeAllListeners(EVENTS.APPLOGIC.CHANGE),
+	}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -315,11 +346,28 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('api', api)
 		contextBridge.exposeInMainWorld('engine', engine)
 		contextBridge.exposeInMainWorld('igrpStudio', repo)
-		contextBridge.exposeInMainWorld('menu', window)
+		contextBridge.exposeInMainWorld('menu', windowControls)
+		contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
+
 	} catch (error) {
 		console.error(error)
 	}
 } else {
 	window.electron = electronAPI
 	window.api = api
+	window.engine = engine
+	window.igrpStudio = repo
+	window.menu = windowControls
+	window.appLogicAPI = appLogic
+}
+
+declare global {
+  interface Window {
+    electron?: typeof electronAPI;
+    api?: typeof api;
+    engine?: typeof engine;
+    igrpStudio?: typeof repo;
+    menu?: typeof windowControls;
+    appLogicAPI?: typeof appLogic;
+  }
 }

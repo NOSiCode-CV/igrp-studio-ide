@@ -58,6 +58,18 @@ export const EVENTS = {
             RESTORE: 'repository:backup:restore'
         }
     },
+    APPLOGIC:{
+        CREATE: 'app-logic:add-environment',
+        REATE: 'repository:service:create',
+        UPDATE: 'app-logic:update-environment',
+        DELETE: 'app-logic:delete-environment',
+        GET: 'app-logic:get-environment',
+        FIND_ALL: 'app-logic:get-environments',
+        SEARCH: 'app-logic:search-environments',
+        CHANGE: 'app-logic:environments-changed',
+        TEST: 'app-logic:test-environment'
+
+    },
     ERROR: 'error',
     LOG: 'log'
 };

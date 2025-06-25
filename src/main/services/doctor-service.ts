@@ -4,7 +4,7 @@ import { ToolCheck } from "../types";
 
 export const DoctorService = {
 
-    async run(_projectPath?: string): Promise<ToolCheck[]> {
+    async run(): Promise<ToolCheck[]> {
         const results: ToolCheck[] = [];
 
         for (const tool of toolConfig) {
@@ -35,6 +35,9 @@ export const DoctorService = {
                 version: parsedVersion,
                 error: success ? undefined : result.error,
                 link: tool.link,
+                category: tool.category,
+                description: tool.description,
+                required: tool.required,
             });
         }
 

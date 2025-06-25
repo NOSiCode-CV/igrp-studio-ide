@@ -26,6 +26,8 @@ export default defineConfig({
       alias: {
         '@renderer': resolve('src/renderer/src'),
         path: 'path-browserify',
+        'next/link': resolve(__dirname, 'src/renderer/src/__mocks__/nextLink.js'),
+        'next/image': resolve(__dirname, 'src/renderer/src/__mocks__/nextImage.js'),
       },
     },
     define: {
@@ -33,7 +35,7 @@ export default defineConfig({
     },
     plugins: [react()],
     optimizeDeps: {
-      exclude: ['monaco-editor']
+      exclude: ['monaco-editor', 'next/link', 'next/image']
     },
     css: {
       postcss: './postcss.config.mjs',
@@ -41,6 +43,7 @@ export default defineConfig({
     build: {
       outDir: 'out/renderer',
       rollupOptions: {
+        external: ['next/link', 'next/image'],
         output: {
           manualChunks: {
             'monaco-editor': ['monaco-editor']

@@ -22,7 +22,7 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import useStudio from '@renderer/hooks/use-studio';
-import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { DataValue, StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
 import Interactions from '../settings/Interactions';
 import { StyleTab } from '../settings/style';
@@ -31,7 +31,7 @@ import { Input } from '@renderer/components/ui/input';
 import useCustomCode from '../../hooks/useCustomCode';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
-import { useComponents } from '../../hooks/useComponents';
+
 import {
     ChangeEvent,
     ComponentProps,
@@ -67,13 +67,13 @@ const SidebarRight = ({
     } = useDroppedComponents();
 
     const { statesOptions } = useCustomCode();
-    const { getRefsOptions } = useComponents();
 
     // Memoized derived state
     const currentComp = useMemo(
         () => comp || editingComponentParams?.component,
         [comp, editingComponentParams]
     );
+
     const currentPath = path || editingComponentParams?.path || '';
     const {
         label,
@@ -106,42 +106,40 @@ const SidebarRight = ({
     );
 
     useEffect(() => {
-        if (componentName) {
-            console.log(currentPath, componentName, data);
-            getDataComponent(currentPath, componentName).then((response) => {
-                // Check if each key in data exists in response
-                if (data && response) {
-                    const cleanedData = { ...data };
-                    let hasChanges = false;
+        if (!componentName) return;
+        getDataComponent(currentPath, componentName).then((response) => {
+            // Check if each key in data exists in response
+            if (data && response) {
+                const cleanedData = { ...data };
+                let hasChanges = false;
 
-                    // Iterate through each key in the current data
-                    Object.keys(data).forEach((key) => {
-                        // If the key doesn't exist in the response, remove it
-                        if (!(key in response)) {
-                            delete cleanedData[key];
-                            hasChanges = true;
-                        }
-                    });
-
-                    // Iterate through each key in the response
-                    Object.keys(response).forEach((key) => {
-                        // If the key doesn't exist in the current data, add it
-                        if (!(key in data)) {
-                            cleanedData[key] = response[key];
-                            hasChanges = true;
-                        }
-                    });
-
-                    // If we made changes, update the component with cleaned data
-                    if (hasChanges && componentId) {
-                        handleUpdateChildComponent(componentId, {
-                            ...currentComp,
-                            data: cleanedData,
-                        });
+                // Iterate through each key in the current data
+                Object.keys(data).forEach((key) => {
+                    // If the key doesn't exist in the response, remove it
+                    if (!(key in response)) {
+                        delete cleanedData[key];
+                        hasChanges = true;
                     }
+                });
+
+                // Iterate through each key in the response
+                Object.keys(response).forEach((key) => {
+                    // If the key doesn't exist in the current data, add it
+                    if (!(key in data)) {
+                        cleanedData[key] = response[key];
+                        hasChanges = true;
+                    }
+                });
+
+                // If we made changes, update the component with cleaned data
+                if (hasChanges && componentId) {
+                    handleUpdateChildComponent(componentId, {
+                        ...currentComp,
+                        data: cleanedData,
+                    });
                 }
-            });
-        }
+            }
+        });
     }, [
         componentName,
         currentPath,
@@ -170,7 +168,30 @@ const SidebarRight = ({
         setColumnsOptions(options);
     }, [parentComp]);
 
-    useEffect(() => {}, []);
+    // Helper function to check if a key is referenced in properties (including nested objects)
+    const isKeyReferencedInProperties = useCallback(
+        (key: string, propertiesObj: Record<string, any>): boolean => {
+            for (const [propKey, propValue] of Object.entries(propertiesObj)) {
+                // Check if the property key matches the data key
+                if (propKey === key) {
+                    return true;
+                }
+
+                // If property value is an object, recursively check its keys
+                if (
+                    propValue &&
+                    typeof propValue === 'object' &&
+                    !Array.isArray(propValue)
+                ) {
+                    if (isKeyReferencedInProperties(key, propValue)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        []
+    );
 
     // Load properties component
     useEffect(() => {
@@ -291,6 +312,33 @@ const SidebarRight = ({
                 const initialValues = deepMerge(target, source);
 
                 setFormValues(initialValues);
+
+                if (data && currentComp?.data) {
+                    // Check if any data keys are referenced in the schema properties
+                    const cleanedData = { ...currentComp.data };
+                    let hasChanges = false;
+
+                    Object.keys(currentComp.data).forEach((key) => {
+                        const isReferencedInProps = isKeyReferencedInProperties(
+                            key,
+                            data || {}
+                        );
+
+                        // Only delete if not referenced in schema properties
+                        if (!isReferencedInProps) {
+                            delete cleanedData[key];
+                            hasChanges = true;
+                        }
+                    });
+
+                    // If we made changes, update the component with cleaned data
+                    if (hasChanges && componentId) {
+                        handleUpdateChildComponent(componentId, {
+                            ...currentComp,
+                            data: cleanedData,
+                        });
+                    }
+                }
             } catch (error) {
                 console.error('Error loading properties component:', error);
             }
@@ -393,20 +441,28 @@ const SidebarRight = ({
     const udpateDataProperties = ({
         field,
         state,
+        value,
     }: {
         field: string;
-        state: State | undefined;
+        state?: State;
+        value?: DataValue;
     }) => {
         if (!componentId) return;
 
         const updatedData = { ...data };
 
+        delete updatedData[field];
+
         if (state) {
             updatedData[field] = {
-                state: state,
+                state,
             };
-        } else {
-            delete updatedData[field];
+        }
+
+        if (value) {
+            updatedData[field] = {
+                value,
+            };
         }
 
         handleUpdateChildComponent(componentId, {
@@ -457,7 +513,7 @@ const SidebarRight = ({
                     <>
                         <div className="space-y-2 p-2">
                             <Label htmlFor={'tab'}>
-                                {`${label} - ${componentId}`}
+                                {`${label || componentName} - ${componentId}`}
                             </Label>
                             <Input
                                 id="tag"
@@ -498,11 +554,10 @@ const SidebarRight = ({
                                                     columnsOptions={
                                                         columnsOptions
                                                     }
-                                                    refsOptions={getRefsOptions()}
                                                     tag={currentTag}
                                                     onInputChange={(
                                                         fieldPath: string,
-                                                        value: any
+                                                        value: string | boolean
                                                     ) => {
                                                         handleInputChange(
                                                             fieldPath,
@@ -512,11 +567,17 @@ const SidebarRight = ({
                                                     }}
                                                     onSelectState={(
                                                         field: string,
-                                                        state: State | undefined
+                                                        state:
+                                                            | State
+                                                            | undefined,
+                                                        value:
+                                                            | DataValue
+                                                            | undefined
                                                     ) =>
                                                         udpateDataProperties({
                                                             field,
                                                             state,
+                                                            value,
                                                         })
                                                     }
                                                 />
@@ -543,11 +604,10 @@ const SidebarRight = ({
                                                     columnsOptions={
                                                         columnsOptions
                                                     }
-                                                    refsOptions={getRefsOptions()}
                                                     tag={currentTag}
                                                     onInputChange={(
                                                         fieldPath: string,
-                                                        value: any
+                                                        value: string | boolean
                                                     ) =>
                                                         handleInputChange(
                                                             fieldPath,
@@ -557,11 +617,17 @@ const SidebarRight = ({
                                                     }
                                                     onSelectState={(
                                                         field: string,
-                                                        state: State | undefined
+                                                        state:
+                                                            | State
+                                                            | undefined,
+                                                        value:
+                                                            | DataValue
+                                                            | undefined
                                                     ) =>
                                                         udpateDataProperties({
                                                             field,
                                                             state,
+                                                            value,
                                                         })
                                                     }
                                                 />

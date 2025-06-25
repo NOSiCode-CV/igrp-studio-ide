@@ -26,13 +26,12 @@ import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
 import { capitalize } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
-import { ElementField } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface LabeledElementField {
     componentId: string;
     name: string;
     type: string;
-    validation?: string;
+    validation?: any;
     defaultValue?: string;
     required: boolean;
     label: string;
@@ -133,6 +132,19 @@ export const BindingConfigurationModal = ({
               ]
             : []),
         { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
+        {
+            key: 'group',
+            name: '',
+            type: 'group',
+            items: [
+                {
+                    key: 'validation',
+                    name: '',
+                    type: 'popoverFormValidation',
+                    options: [],
+                },
+            ],
+        },
     ];
 
     const validate = () => {
@@ -156,7 +168,7 @@ export const BindingConfigurationModal = ({
         onSubmit: (values, actions) => {
             actions.setSubmitting(false);
 
-            if (!validate()) return;
+            if (!validate() || !componentId) return;
 
             const updatedComponent = {
                 ...values,
@@ -174,45 +186,45 @@ export const BindingConfigurationModal = ({
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 
-            if (componentId) {
-                //TODO For revisions
-                let defaultValues: any = undefined;
-                if (comp.componentName === COMPONENT.Form) {
-                    defaultValues = {
-                        ...comp.data?.defaultValues,
-                        state: {
-                            ...comp.data?.defaultValues.state,
-                            name: comp.data?.defaultValues.state?.name ?? '',
-                            defaultValue: `init${capitalize(values.name)}`,
-                            type: comp.data?.defaultValues.state?.type ?? '',
-                            id: comp.data?.defaultValues.state?.id ?? '',
-                        },
-                    };
+            //TODO For revisions
+            let defaultValues: any = undefined;
+            if (comp.componentName === COMPONENT.Form) {
+                defaultValues = {
+                    ...comp.data?.defaultValues,
+                    state: {
+                        ...comp.data?.defaultValues.state,
+                        name: comp.data?.defaultValues.state?.name ?? '',
+                        defaultValue: `init${capitalize(values.name)}`,
+                        type: comp.data?.defaultValues.state?.type ?? '',
+                        id: comp.data?.defaultValues.state?.id ?? '',
+                    },
+                };
 
-                    handleUpdateChildComponent(componentId, {
-                        ...comp,
-                        dataType: values.name,
-                        data: {
-                            ...comp.data,
-                            defaultValues,
-                        },
-                    });
-                } else
-                    handleUpdateChildComponent(componentId, {
-                        ...comp,
-                        dataType: values.name,
-                    });
-
-                values.fields.forEach(({ componentId: id, name }) => {
-                    const component = componentMap.get(id);
-                    if (component) {
-                        handleUpdateChildComponent(id, {
-                            ...component,
-                            tag: name,
-                        });
-                    }
+                handleUpdateChildComponent(componentId, {
+                    ...comp,
+                    dataType: values.name,
+                    data: {
+                        ...comp.data,
+                        defaultValues,
+                    },
+                });
+            } else {
+                console.log(comp);
+                handleUpdateChildComponent(componentId, {
+                    ...comp,
+                    dataType: values.name,
                 });
             }
+
+            values.fields.forEach(({ componentId: id, name }) => {
+                const component = componentMap.get(id);
+                if (component) {
+                    handleUpdateChildComponent(id, {
+                        ...component,
+                        tag: name,
+                    });
+                }
+            });
 
             setOpen(false);
         },

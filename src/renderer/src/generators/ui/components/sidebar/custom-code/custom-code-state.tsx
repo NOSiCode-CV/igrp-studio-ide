@@ -21,26 +21,19 @@ import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import { ImportComponent } from './custom-code-imports';
-
-const returnTypeOptions = [
-    { value: 'string', label: 'String' },
-    { value: 'number', label: 'Number' },
-    { value: 'boolean', label: 'Boolean' },
-    { value: 'object', label: 'Object' },
-    { value: 'array', label: 'Array' },
-    { value: 'void', label: 'Void' },
-    { value: 'any', label: 'Any' },
-];
+import useCustomCode from '@renderer/generators/ui/hooks/useCustomCode';
+import { getId } from '@renderer/utils';
 
 interface StateComponentProps {
     open: boolean;
     setOpen: (open: boolean) => void;
-    state?: any;
+    state?: State;
 }
 
 const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
     const { addState, updateState } = useDroppedComponents();
     const { t } = useTranslation();
+    const { typesOptions } = useCustomCode();
 
     const stateValidationSchema = Yup.object().shape({
         name: Yup.string()
@@ -89,6 +82,21 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
         },
     });
 
+    const handleTypeChange = (value: string) => {
+        formik.setFieldValue('type', value);
+        const selectedType = typesOptions.find((type) => type.value === value);
+        if (selectedType && selectedType.metadata) {
+            const namespace = `import {${selectedType.metadata.name}} from '${selectedType.metadata?.path}'`;
+            formik.setFieldValue('imports', [
+                ...(formik.values.imports || []),
+                {
+                    namespace,
+                    id: getId(),
+                },
+            ]);
+        }
+    };
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
@@ -126,10 +134,8 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                         label={t('Type')}
                         id="type"
                         value={formik.values.type}
-                        onChange={(value) =>
-                            formik.setFieldValue('type', value)
-                        }
-                        options={returnTypeOptions}
+                        onChange={(value) => handleTypeChange(value as string)}
+                        options={typesOptions}
                     />
 
                     <TextInput

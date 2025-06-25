@@ -1,27 +1,22 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/use-studio';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { getLabel } from '@renderer/utils';
 import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxField from '../tools/BoxFields';
 import { Button } from '@renderer/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Badge } from '@renderer/components/ui/badge';
 import BoxWrapper from '../tools/BoxWrapper';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface RepetitiveProps {
-    isDisabled?: boolean;
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-}
-
-const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioFormList: React.FC<CardComponentProps> = ({
+    comp,
+    onDragEnd,
+}) => {
     const {
-        children: components,
         id: componentId,
         componentName: parentComponentName,
         properties,
@@ -29,38 +24,7 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
 
     const { addButtonLabel, badgeValue, label, description } = properties || {};
 
-    const [loadedComponents, setLoadedComponents] = useState<
-        Record<string, React.ComponentType<any>>
-    >({});
     const { setEditingComponent } = useDroppedComponents();
-    const { dynamicImport } = useStudio();
-
-    // Load components dynamically
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: Record<string, React.ComponentType<any>> = {};
-
-            // Load all child components in parallel
-            const loadPromises = components.map(async (grandChild) => {
-                try {
-                    const component = await dynamicImport(
-                        grandChild.componentName
-                    );
-                    comps[grandChild.id] = component;
-                } catch (error) {
-                    console.error(
-                        `Failed to load component ${grandChild.componentName}:`,
-                        error
-                    );
-                }
-            });
-
-            await Promise.all(loadPromises);
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [dynamicImport, components]);
 
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
@@ -85,7 +49,7 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
                             variant="outline"
                             className="font-normal text-xs"
                         >
-                            {badgeValue || 'Obrigatório'}
+                            {badgeValue || 'nobadge'}
                         </Badge>
                     </div>
                     <Droppable
@@ -99,9 +63,6 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
                             />
                         ) : (
                             childComponents.map((child, index) => {
-                                const Component = loadedComponents[child.id];
-                                if (!Component) return null;
-
                                 return (
                                     <Draggable
                                         key={child.id}
@@ -121,7 +82,7 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
                                             group="group/formlist"
                                             className="opacity-0 group-hover/formlist:opacity-100"
                                         >
-                                            <Component
+                                            <CardComponent
                                                 comp={child}
                                                 onDragEnd={onDragEnd}
                                             />
@@ -145,13 +106,15 @@ const IGRPStudioFormList: React.FC<RepetitiveProps> = ({ comp, onDragEnd }) => {
             );
         },
         [
+            parentComponentName,
+            label,
+            description,
+            badgeValue,
+            onDragEnd,
             addButtonLabel,
             componentId,
-            handleEdit,
-            loadedComponents,
-            onDragEnd,
-            parentComponentName,
             comp,
+            handleEdit,
         ]
     );
 

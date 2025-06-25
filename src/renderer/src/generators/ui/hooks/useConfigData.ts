@@ -33,6 +33,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
                 properties: component.properties,
                 interactions: component.interactions,
                 childrenTypes: component.childrenTypes,
+                defaultChildren: component.defaultChildren,
                 allowTypes: component.allowTypes,
                 data: component.data,
             }))

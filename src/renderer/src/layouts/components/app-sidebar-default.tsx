@@ -88,16 +88,20 @@ const IGRPSidebarContent = React.forwardRef<
     );
 
     return (
-        <SidebarContent ref={ref} {...props} className={cn('gap-0 py-3', className)}>
+        <SidebarContent
+            ref={ref}
+            {...props}
+            className={cn('gap-0 py-3', className)}
+        >
             <ScrollArea className="h-[calc(100svh-var(--header-height-two))]">
                 <div className="flex flex-col h-full px-3">
                     {searchActive && (
                         <div className="group-data-[collapsible=icon]:hidden">
                             <SearchInput
                                 value={searchTerm}
-                                placeholder='Search'
+                                placeholder="Search"
                                 onChange={(value) => setSearchTerm(value)}
-                                className='lg:w-auto'
+                                className="lg:w-auto"
                             />
                         </div>
                     )}
@@ -160,7 +164,7 @@ const renderMenu = (menus: SidebarProps[], size: 'lg' | 'sm' | null) => {
                         <SidebarMenuItem>
                             <SidebarMenuButton tooltip={item.name}>
                                 {item.icon && <item.icon />}
-                                <span>{item.name}</span>
+                                <a href={item.href ?? '#'}>{item.name}</a>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>

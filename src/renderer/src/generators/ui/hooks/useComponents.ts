@@ -8,7 +8,7 @@ import { COMPONENT } from "../ComponentTypes";
 
 export const useComponents = () => {
 
-    const { components } = useDroppedComponents();
+    const { components, componentArguments } = useDroppedComponents();
 
     const extractAllStates = useCallback((): State[] => {
         const states: State[] = [];
@@ -146,11 +146,20 @@ export const useComponents = () => {
         return options;
     }, [extractAllComponentsWithRefs]);
 
+    const getArqumentsOptions = useCallback((): Array<{ value: string; label: string }> => {
+        return componentArguments.map((arg) => ({
+            value: arg.name,
+            label: arg.name,
+        }));
+    }, [componentArguments])
+
     return {
         extractAllStates,
         extractAllComponentsWithRefs,
         extractAllComponents,
         getFormOptions,
-        getRefsOptions
+        getRefsOptions,
+        componentArguments,
+        getArqumentsOptions
     };
 }

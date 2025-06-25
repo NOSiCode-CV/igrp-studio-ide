@@ -24,7 +24,7 @@ export const GitLabService = {
     try {
       gitlab = new Gitlab({
         oauthToken: token,
-        host: import.meta.env.VITE_GITLAB_HOST
+        host: process.env.VITE_GITLAB_HOST
       });
 
       GitStore.setToken('gitlab', token);

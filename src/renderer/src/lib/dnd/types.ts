@@ -1,4 +1,4 @@
-import { ComponentRegisterConfig, CustomFunctionConfig, Import, RegisterState, RuleDefinition, State, TypeDef } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
+import { Arguments, ComponentRegisterConfig, CustomFunctionConfig, Import, RegisterState, RuleDefinition, State, TypeDef } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types"
 import { StyleComponent } from "@renderer/generators/ui/components/settings/style/types"
 
 export type LayoutMode = "vertical" | "horizontal"
@@ -41,6 +41,11 @@ export interface ComponentConfig {
   [key: string]: any
 }
 
+export interface DataValue {
+  code: string;
+  id: string;
+}
+
 export interface StructuredComponent {
   id: string
   componentName: string
@@ -66,17 +71,18 @@ export interface StructuredComponent {
   children: StructuredComponent[],
   data?: {
     [key: string]: {
-      state: State
+      state?: State,
+      value?: DataValue
     };
   };
-  rules?:RuleDefinition[];
+  rules?: RuleDefinition[];
   style?: StyleComponent
 }
 
 export type StructuredLayout = StructuredComponent
 
 export interface Destination {
-  droppableId: string, index: number
+  droppableId: string, index: number, droppableName: string
 }
 
 export interface Source {
@@ -87,6 +93,7 @@ export interface Source {
     [key: string]: any;
   };
   childrenTypes?: ComponentRegisterConfig[]
+  defaultChildren?: { name: string }[]
   interactions: {
     [key: string]: any;
   }
@@ -160,4 +167,7 @@ export interface DroppedComponentsContextType {
   removeImport: (id: string) => void;
   setAllImports: (newImports: Import[]) => void;
 
+  //
+  setAllArguments: (args: Arguments[]) => void;
+  componentArguments: Arguments[]
 }

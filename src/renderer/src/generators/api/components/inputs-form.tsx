@@ -2,7 +2,13 @@ import { LabelRequired } from '@renderer/components/label-required';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@renderer/components/ui/select';
 import { Switch } from '@renderer/components/ui/switch';
 import { cn } from '@renderer/lib/utils';
 
@@ -109,7 +115,7 @@ export const SelectInput = ({
                 ))}
             </SelectContent>
         </Select>
-       {/*  <IGRPCombobox
+        {/*  <IGRPCombobox
             options={options}
             value={value as string}
             onChange={(e) => {
@@ -138,12 +144,12 @@ export const CheckboxInput = ({
     error,
 }: CheckboxProps) => (
     <div className="flex flex-1 gap-2">
+        <Checkbox checked={value} onCheckedChange={onChange} />
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
             <Label htmlFor={id}>{label}</Label>
         )}
-        <Checkbox checked={value} onCheckedChange={onChange} />
         {error && isTouched && (
             <p className="text-xs text-destructive">{error}</p>
         )}

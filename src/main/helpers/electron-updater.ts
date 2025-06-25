@@ -25,7 +25,7 @@ export default class AppUpdater {
         autoUpdater.setFeedURL({
             provider: "s3",
             bucket: "igrp-studio",
-            endpoint: import.meta.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
+            endpoint: process.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
             path: `${process.platform}/${process.arch}`,
             channel: "latest"
         });

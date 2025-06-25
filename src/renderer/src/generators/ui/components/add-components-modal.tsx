@@ -20,14 +20,6 @@ import { Button } from '@renderer/components/ui/button';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -37,6 +29,9 @@ import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { useTagManager } from '../hooks/useTagManager';
 import * as LucideIcons from 'lucide-react';
 import SidebarRight from './sidebar/sidebar-right';
+import { cn } from '@renderer/lib/utils';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import Droppable from '@renderer/lib/dnd/Droppable';
 
 interface AddComponentProps {
     path: string;
@@ -67,10 +62,12 @@ export const AddComponentModal = ({
     const {
         handleAddChildToComponent,
         handleRemoveChildFromComponent,
+        handleReorderChildInComponent,
         components: allComponents,
     } = useDroppedComponents();
 
     const { generateTag, rebuild } = useTagManager(allComponents);
+    const { findComponentById } = useStudio();
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -95,10 +92,24 @@ export const AddComponentModal = ({
 
             handleDragEnd(result, {
                 handleAddChildToComponent,
+                handleReorderChildInComponent,
                 generateTag,
+                findComponentById,
             });
         },
-        [children.length, generateTag, handleAddChildToComponent]
+        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
+    );
+
+    const handleOrderComponent = useCallback(
+        (result: DragEndResult) => {
+            handleDragEnd(result, {
+                handleAddChildToComponent,
+                handleReorderChildInComponent,
+                generateTag,
+                findComponentById,
+            });
+        },
+        [generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
     );
 
     const onEditComponent = (
@@ -143,9 +154,13 @@ export const AddComponentModal = ({
                                 <div>
                                     {children.length > 0 ? (
                                         <ComponentTable
+                                            parentComp={comp}
                                             components={children}
                                             registryComponents={components}
                                             onEdit={onEditComponent}
+                                            onOrderComponent={
+                                                handleOrderComponent
+                                            }
                                             handleAddComponent={
                                                 handleAddComponent
                                             }
@@ -162,7 +177,7 @@ export const AddComponentModal = ({
                             </div>
 
                             {/* Helper Section */}
-                            <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t">
+                            <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t mt-6">
                                 <p className="mb-2">
                                     <strong>rowData</strong> is a variable
                                     provided by the table that contains all the
@@ -196,8 +211,7 @@ export const AddComponentModal = ({
                                     </li>
                                     <li>
                                         <code>
-                                            () =&gt;
-                                            handleView(rowData.id)
+                                            () =&gt; handleView(rowData.id)
                                         </code>
                                     </li>
                                     <li>
@@ -252,6 +266,7 @@ const renderAddComponents = (
 };
 
 const RenderCreatedComponents = ({
+    parentComp,
     components,
     registryComponents,
     onEdit,
@@ -259,7 +274,9 @@ const RenderCreatedComponents = ({
     level = 0,
     parentComponent,
     handleRemoveChildFromComponent,
+    onOrderComponent,
 }: {
+    parentComp: StructuredComponent;
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
     onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
@@ -267,6 +284,7 @@ const RenderCreatedComponents = ({
     level?: number; // Add a level parameter to track nesting depth
     parentComponent?: string;
     handleRemoveChildFromComponent?: (destination: Destination) => void;
+    onOrderComponent: (result: DragEndResult) => void;
 }) => {
     const handleEditComponent = (
         component: StructuredComponent,
@@ -278,7 +296,7 @@ const RenderCreatedComponents = ({
     // Render the icon for a component
     const renderIcon = (iconName: string) => {
         const IconComponent = LucideIcons[iconName] ?? ICON_MAP[iconName];
-        return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
+        return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
     };
 
     // Check if the component can accept children
@@ -301,16 +319,19 @@ const RenderCreatedComponents = ({
 
     // Recursively render child components
     const RenderChildComponents = ({
+        parentComp,
         children,
         level,
         parentComponent,
     }: {
+        parentComp: StructuredComponent;
         children: StructuredComponent[];
         level: number;
         parentComponent: string;
     }) => {
         return (
             <RenderCreatedComponents
+                parentComp={parentComp}
                 components={children}
                 registryComponents={registryComponents}
                 onEdit={onEdit}
@@ -318,67 +339,87 @@ const RenderCreatedComponents = ({
                 level={level + 1}
                 parentComponent={parentComponent}
                 handleRemoveChildFromComponent={handleRemoveChildFromComponent}
+                onOrderComponent={onOrderComponent}
             />
         );
     };
 
     return (
-        <>
+        <Droppable
+            component={parentComp}
+            onDrop={onOrderComponent}
+            className="w-full bg-none"
+        >
             {components.map((component, index) => {
                 const { properties, label, id } = component;
                 return (
                     <React.Fragment key={index}>
-                        <TableRow>
-                            <TableCell
+                        <div className="grid grid-cols-[1fr_auto] px-3 py-1 border-b last:border-b-0 hover:bg-muted/50">
+                            <div
                                 className="font-medium"
                                 style={{ paddingLeft: `${level * 20}px` }}
                             >
-                                <div className="flex items-center gap-2">
-                                    {renderIcon(
-                                        properties?.iconProperties?.iconName
+                                <Draggable
+                                    item={component}
+                                    index={index}
+                                    mode="MOVE"
+                                    layout="vertical"
+                                    dropTargetId={parentComp?.id}
+                                    className={cn(
+                                        'border-none flex flex-1 items-center space-x-3'
                                     )}
-                                    <span>{`${label} (${properties.labelTrigger})`}</span>
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            handleEditComponent(
-                                                component,
-                                                parentComponent
-                                            )
-                                        }
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-destructive"
-                                        onClick={() =>
-                                            handleRemoveChildFromComponent?.({
-                                                droppableId: id,
-                                                index,
-                                            })
-                                        }
-                                    >
-                                        Delete
-                                    </Button>
-                                    {canAcceptChildren(component) &&
-                                        renderAddComponents(
-                                            getAcceptedChildren(component),
-                                            id,
-                                            handleAddComponent
+                                >
+                                    <button disabled>
+                                        <LucideIcons.GripVertical className="h-4 w-4 text-muted-foreground" />
+                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {renderIcon(
+                                            properties?.iconProperties?.iconName
                                         )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                                        <span className='text-sm'>{`${label} (${properties.labelTrigger})`}</span>
+                                    </div>
+                                </Draggable>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        handleEditComponent(
+                                            component,
+                                            parentComponent
+                                        )
+                                    }
+                                >
+                                    <LucideIcons.Edit />
+                                    <span className="sr-only">Edit</span>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive"
+                                    onClick={() =>
+                                        handleRemoveChildFromComponent?.({
+                                            droppableId: id,
+                                            index,
+                                        })
+                                    }
+                                >
+                                    <LucideIcons.Trash />
+                                    <span className="sr-only">Delete</span>
+                                </Button>
+                                {canAcceptChildren(component) &&
+                                    renderAddComponents(
+                                        getAcceptedChildren(component),
+                                        id,
+                                        handleAddComponent
+                                    )}
+                            </div>
+                        </div>
                         {component.children &&
                             component.children.length > 0 && (
                                 <RenderChildComponents
+                                    parentComp={component}
                                     children={component.children}
                                     level={level}
                                     parentComponent={component.componentName}
@@ -387,34 +428,41 @@ const RenderCreatedComponents = ({
                     </React.Fragment>
                 );
             })}
-        </>
+        </Droppable>
     );
 };
 
 // Main component that renders the table with a single header
 const ComponentTable = ({
+    parentComp,
     components,
     registryComponents,
     onEdit,
     handleAddComponent,
     handleRemoveChildFromComponent,
+    onOrderComponent,
 }: {
+    parentComp: StructuredComponent;
     components: StructuredComponent[];
     registryComponents: ComponentRegisterConfig[];
     onEdit: (comp: StructuredComponent, parentComponent?: string) => void;
+    onOrderComponent: (result: DragEndResult) => void;
     handleAddComponent: (item: any, droppableId: string) => void;
     handleRemoveChildFromComponent: (destination: Destination) => void;
 }) => {
     return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className="border rounded-lg overflow-hidden">
+            {/* Table Header */}
+            <div className="bg-muted/50 border-b">
+                <div className="grid grid-cols-[1fr_auto] gap-4 p-3 mx-6">
+                    <div className="font-medium text-sm">Label</div>
+                    <div className="font-medium text-sm">Actions</div>
+                </div>
+            </div>
+            {/* Table Body */}
+            <div>
                 <RenderCreatedComponents
+                    parentComp={parentComp}
                     components={components}
                     registryComponents={registryComponents}
                     onEdit={onEdit}
@@ -422,8 +470,9 @@ const ComponentTable = ({
                     handleRemoveChildFromComponent={
                         handleRemoveChildFromComponent
                     }
+                    onOrderComponent={onOrderComponent}
                 />
-            </TableBody>
-        </Table>
+            </div>
+        </div>
     );
 };

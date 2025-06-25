@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import useStudio from '@renderer/hooks/use-studio';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { cn } from '@renderer/lib/utils';
@@ -8,6 +7,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import GenNoInfoField from '../../components/GenNoInfoField';
+import CardComponent from '../CardComponent';
 
 export interface PageHeaderProps {
     comp: StructuredComponent;
@@ -29,12 +29,6 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
         StructuredComponent[]
     >([]);
 
-    const [loadedComponents, setLoadedComponents] = useState<{
-        [key: string]: React.ComponentType<any>;
-    }>({});
-
-    const { dynamicImport } = useStudio();
-
     const { setEditingComponent } = useDroppedComponents();
 
     useEffect(() => {
@@ -51,28 +45,12 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
         });
     };
 
-    useEffect(() => {
-        const loadComponents = async () => {
-            const comps: { [key: string]: React.ComponentType<any> } = {};
-
-            for (const comp of buttonComponents) {
-                const component = await dynamicImport(comp.componentName);
-                comps[comp.id] = component;
-            }
-
-            setLoadedComponents(comps);
-        };
-
-        loadComponents();
-    }, [buttonComponents, dynamicImport]);
-
     const renderButtons = () => {
         return buttonComponents.length === 0 ? (
             <GenNoInfoField />
         ) : (
             buttonComponents.map(
                 (button: StructuredComponent, index: number) => {
-                    const Component = loadedComponents[button.id];
                     return (
                         <Draggable
                             key={button.id}
@@ -82,19 +60,17 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
                             layout="horizontal"
                             className="p-1"
                         >
-                            {Component && (
-                                <BoxField
+                            <BoxField
+                                comp={button}
+                                parentComp={comp}
+                                onEdit={() => handleEditClick(button)}
+                                index={index}
+                            >
+                                <CardComponent
                                     comp={button}
-                                    parentComp={comp}
-                                    onEdit={() => handleEditClick(button)}
-                                    index={index}
-                                >
-                                    <Component
-                                        comp={button}
-                                        onDragEnd={onDragEnd}
-                                    />
-                                </BoxField>
-                            )}
+                                    onDragEnd={onDragEnd}
+                                />
+                            </BoxField>
                         </Draggable>
                     );
                 }
