@@ -186,6 +186,7 @@ const useStudio = () => {
         config,
         componentsRegistered,
         pageOptions,
+        findComponent,
         findComponentById,
         getAcceptedChildren,
         getPropertiesComponent,

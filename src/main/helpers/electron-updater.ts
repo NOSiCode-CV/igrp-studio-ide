@@ -42,11 +42,11 @@ export default class AppUpdater {
         autoUpdater.autoInstallOnAppQuit = false; // ❌ NÃO instala ao sair
 
         // ✅ Force updates in development mode
-        if (!app.isPackaged) {
+       /*  if (!app.isPackaged) {
             this.sendStatusToWindow("⚠️ App is not packaged! Forcing update check in development mode...")
             autoUpdater.checkForUpdatesAndNotify()
             return
-        }
+        } */
 
         autoUpdater.checkForUpdatesAndNotify()
 

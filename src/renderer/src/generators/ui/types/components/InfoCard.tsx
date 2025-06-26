@@ -1,4 +1,4 @@
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
+ import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
@@ -54,6 +54,7 @@ const IGRPStudioInfoCard = ({
                 className={cn('flex w-full flex-col gap-2', className)}
                 onDrop={onDragEnd}
                 component={comp}
+                path={parentComponentName}
             >
                 {components.length === 0 ? (
                     <GenNoInfoComp

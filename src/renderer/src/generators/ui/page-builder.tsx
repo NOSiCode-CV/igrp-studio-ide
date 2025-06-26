@@ -71,7 +71,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { componentsRegistered, findComponentById, fetchComponents } =
+        const { componentsRegistered, findComponentById, fetchComponents, findComponent } =
             useStudio();
 
         const { customComponents } = useCustomCode();
@@ -144,7 +144,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     handleAddChildToComponent,
                     handleReorderChildInComponent,
                     generateTag,
-                    findComponentById,
+                    findComponent,
                     showErrorToast,
                 };
 
@@ -156,7 +156,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponentById,
+                showErrorToast,
+                findComponent
             ]
         );
 

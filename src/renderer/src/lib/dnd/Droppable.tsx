@@ -1,16 +1,17 @@
 import { useDragDrop } from './drag-drop-context';
 
 import { useEffect, useState, type DragEvent } from 'react';
-import { DragEndResult, LayoutMode, StructuredComponent } from './types';
+import { LayoutMode, StructuredComponent } from './types';
 import { cn } from '../utils';
 
 interface DroppableProps {
-    onDrop: (result: any) => DragEndResult;
+    onDrop: (result: any) => void;
     component: StructuredComponent;
     layout?: string;
     children: React.ReactNode;
     className?: string;
     accept?: string[];
+    path?: string;
 }
 
 const Droppable = ({
@@ -18,6 +19,7 @@ const Droppable = ({
     component,
     children,
     className,
+    path,
 }: DroppableProps) => {
     const { id: componentId, componentName } = component || {};
 
@@ -39,8 +41,15 @@ const Droppable = ({
 
     const handleDropItem = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        const droppedItem = handleDrop(e, componentId, componentName);
-        onDrop(droppedItem);
+        const droppedItem = handleDrop(e, componentId);
+        onDrop({
+            ...droppedItem,
+            destination: {
+                ...droppedItem.destination,
+                droppableName: componentName,
+                droppablePath: path,
+            },
+        });
     };
 
     const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
@@ -76,9 +85,9 @@ const Droppable = ({
             className={cn(
                 'p-3 min-h-12 rounded-lg bg-card', //border border-dashed border-gray-400 hover:border
                 draggingItem &&
-                (activeDropZone?.dropTargetId === componentId ||
-                    targetHovered === componentId) &&
-                'bg-primary/35',
+                    (activeDropZone?.dropTargetId === componentId ||
+                        targetHovered === componentId) &&
+                    'bg-primary/35',
                 className
             )}
         >
