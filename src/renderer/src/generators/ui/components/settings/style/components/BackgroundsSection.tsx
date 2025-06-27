@@ -5,7 +5,7 @@ import type { BackgroundStyle } from './effects/types';
 import { SectionProps } from '../types';
 
 
-export function BackgroundsSection({ onChangeStyles, styles }: SectionProps) {
+export function BackgroundsSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
   const [backgrounds, setBackgrounds] = useState<BackgroundStyle[]>(
     styles.backgrounds || [{
       type: 'color',

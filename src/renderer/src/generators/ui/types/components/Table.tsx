@@ -190,6 +190,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
                         component={tableComp}
                         onDrop={onDragEnd}
+                        path={componentName}
                     >
                         <TableTool
                             parentComp={comp}
@@ -206,13 +207,14 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
 
             {/* Render TableColumn next */}
             {tableColumns.map((tableComp, index) => {
-                const { componentName, id } = tableComp;
+                const { componentName: compName, id } = tableComp;
                 return (
                     <Droppable
                         key={index}
                         className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
                         component={tableComp}
                         onDrop={onDragEnd}
+                        path={componentName}
                     >
                         <TableTool
                             parentComp={comp}
@@ -223,7 +225,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         />
                         {columns.length === 0 ? (
                             <GenNoInfoComp
-                                type={getLabel(componentName).toUpperCase()}
+                                type={getLabel(compName).toUpperCase()}
                             />
                         ) : (
                             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -231,7 +233,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                     <TableHeader>
                                         <TableRow>
                                             {renderTableHeaders(
-                                                componentName,
+                                                compName,
                                                 id,
                                                 tableComp
                                             )}

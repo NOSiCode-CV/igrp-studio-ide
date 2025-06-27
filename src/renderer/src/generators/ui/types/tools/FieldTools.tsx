@@ -36,7 +36,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                 setComponents(data);
             }
         );
-    }, [parentComponentName, componentName, getAcceptedChildren]);
+    }, [parentComponentName, componentName, getAcceptedChildren, path]);
 
     const onClickDeleteField = () => {
         handleRemoveChildFromComponent({ droppableId: id, index });
@@ -57,11 +57,11 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
 
     return (
         <TooltipProvider>
-            <div className="shadow-lg flex justify-end p-0 space-x-0">
+            <div className="shadow-lg flex justify-end p-0 space-x-0 py-0.5 px-1">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded">
-                            <Move className="h-4" />
+                            <Move className="h-3.5" />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -74,7 +74,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Clone"
                         >
-                            <Copy className="h-4" />
+                            <Copy className="h-3.5" />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -92,7 +92,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                                 onEdit();
                             }}
                         >
-                            <Settings className="h-4" />
+                            <Settings className="h-3.5" />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -107,7 +107,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                             title="Delete"
                             onClick={onClickDeleteField}
                         >
-                            <Trash className="h-4" />
+                            <Trash className="h-3.5" />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -119,7 +119,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         <TooltipTrigger asChild>
                             <Badge
                                 variant={'secondary'}
-                                className="rounded-sm cursor-pointer mt-0.5"
+                                className="rounded-sm cursor-pointer h-6"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setCurrentComponent(comp);

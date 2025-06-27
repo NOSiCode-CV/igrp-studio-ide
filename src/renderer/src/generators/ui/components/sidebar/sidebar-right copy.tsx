@@ -1,4 +1,4 @@
-import { RotateCcw, Settings, X } from 'lucide-react';
+import { Settings, X, RotateCcw } from 'lucide-react';
 
 import {
     Sidebar,
@@ -31,6 +31,7 @@ import { Input } from '@renderer/components/ui/input';
 import useCustomCode from '../../hooks/useCustomCode';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
+import Loader from '@renderer/components/loader';
 
 import {
     ChangeEvent,
@@ -40,7 +41,6 @@ import {
     useMemo,
     useState,
 } from 'react';
-import Loader from '@renderer/components/loader';
 
 interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -80,14 +80,14 @@ const SidebarRight = ({
         label,
         data,
         componentName,
+        properties = {},
         childProperties = {},
         id: componentId,
     } = currentComp || {};
 
     // State management
-    const [tempEditingComponent, setTempEditingComponent] =
-        useState<StructuredComponent | null>(null);
     const [formValues, setFormValues] = useState<Record<string, any>>({});
+
     const [propsComponent, setPropsComponent] = useState<Record<string, any>>(
         {}
     );
@@ -106,6 +106,11 @@ const SidebarRight = ({
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    // Temporary data for editing - improved with ref to track initialization
+    const [tempEditingComponent, setTempEditingComponent] =
+        useState<StructuredComponent | null>(null);
+
+    // Initialize tempEditingComponent when currentComp changes
     useEffect(() => {
         setTempEditingComponent(currentComp as StructuredComponent);
     }, [currentComp]);
@@ -114,7 +119,7 @@ const SidebarRight = ({
         if (!componentName) return;
         getDataComponent(currentPath, componentName).then((response) => {
             // Check if each key in data exists in response
-            if (data && response) {
+            if (data && response && currentComp) {
                 const cleanedData = { ...data };
                 let hasChanges = false;
 
@@ -138,7 +143,8 @@ const SidebarRight = ({
 
                 // If we made changes, update the component with cleaned data
                 if (hasChanges && componentId) {
-                    handleUpdateChildComponent(componentId, {
+                    setTempEditingComponent({
+                        ...currentComp,
                         data: cleanedData,
                     });
                 }
@@ -149,8 +155,8 @@ const SidebarRight = ({
         currentPath,
         data,
         componentId,
-        currentComp,
         getDataComponent,
+        currentComp,
     ]);
 
     useEffect(() => {
@@ -198,8 +204,7 @@ const SidebarRight = ({
 
     // Load properties component
     useEffect(() => {
-        if (!componentId || !componentName) return;
-
+        if (!componentName) return;
         const loadProps = async () => {
             try {
                 setIsLoading(true);
@@ -260,9 +265,7 @@ const SidebarRight = ({
                     );
 
                 const source = // Filter properties based on schema and requirements
-                    Object.entries(
-                        tempEditingComponent?.properties ?? {}
-                    ).reduce(
+                    Object.entries(currentComp?.properties ?? {}).reduce(
                         (acc, [key, value]) => {
                             const schemaConfig = data?.[key];
 
@@ -315,18 +318,17 @@ const SidebarRight = ({
                 // Initialize form values with deep merge
                 const initialValues = deepMerge(target, source);
 
-                setFormValues(initialValues);
-
-                handleUpdateChildComponent(componentId, {
-                    properties: initialValues,
+                setTempEditingComponent({
+                    ...currentComp,
+                    ...initialValues,
                 });
 
-                if (data && tempEditingComponent?.data) {
+                if (data && currentComp?.data) {
                     // Check if any data keys are referenced in the schema properties
-                    const cleanedData = { ...tempEditingComponent.data };
+                    const cleanedData = { ...currentComp.data };
                     let hasChanges = false;
 
-                    Object.keys(tempEditingComponent.data).forEach((key) => {
+                    Object.keys(currentComp.data).forEach((key) => {
                         const isReferencedInProps = isKeyReferencedInProperties(
                             key,
                             data || {}
@@ -340,8 +342,9 @@ const SidebarRight = ({
                     });
 
                     // If we made changes, update the component with cleaned data
-                    if (hasChanges) {
-                        handleUpdateChildComponent(componentId, {
+                    if (hasChanges && componentId && currentComp) {
+                        setTempEditingComponent({
+                            ...currentComp,
                             data: cleanedData,
                         });
                     }
@@ -358,7 +361,9 @@ const SidebarRight = ({
         componentId,
         componentName,
         currentPath,
-        tempEditingComponent,
+        currentComp,
+        isKeyReferencedInProperties,
+        getPropertiesComponent,
     ]);
 
     // Load properties component
@@ -367,6 +372,7 @@ const SidebarRight = ({
 
         const loadProps = async () => {
             try {
+                setIsLoading(true);
                 const data = await getChildPropertiesComponent(
                     currentPath,
                     componentName
@@ -389,32 +395,13 @@ const SidebarRight = ({
                 setChildformValues(initialValues);
             } catch (error) {
                 console.error('Error loading properties component:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         loadProps();
-    }, [
-        childProperties,
-        componentId,
-        componentName,
-        currentPath,
-        getChildPropertiesComponent,
-    ]);
-
-    // Debounced component update
-    useEffect(() => {
-        if (!componentId) return;
-        handleUpdateChildComponent(componentId, {
-            properties: { ...formValues },
-        });
-    }, [formValues, componentId]);
-
-    useEffect(() => {
-        if (!componentId) return;
-        handleUpdateChildComponent(componentId, {
-            childProperties: { ...childformValues },
-        });
-    }, [childformValues, componentId]);
+    }, [componentId]);
 
     // Event handlers
     const handleInputChange = useCallback(
@@ -447,32 +434,33 @@ const SidebarRight = ({
         []
     );
 
+    // Function to save temp data to component
+    /*     const saveTempData = useCallback(() => {
+        if (!componentId) return;
+
+        handleUpdateChildComponent(componentId, {
+            ...tempEditingComponent,
+        });
+    }, [componentId, tempEditingComponent, handleUpdateChildComponent]); */
+
     // Function to reset temp data to original component data
     const resetTempData = useCallback(() => {
-        if (!componentId) return;
-        handleUpdateChildComponent(componentId, {
-            ...currentComp,
-        });
-    }, [currentComp, componentId, handleUpdateChildComponent]);
-
-    const handleClose = useCallback(() => {
-        clearEditingComponent();
-    }, [clearEditingComponent]);
+        if (currentComp) {
+            setTempEditingComponent(currentComp as StructuredComponent);
+        } else {
+            setTempEditingComponent(null);
+        }
+    }, [currentComp]);
 
     const udpateTag = (e: ChangeEvent<HTMLInputElement>) => {
-        if (!componentId) return;
+        if (!componentId || !tempEditingComponent) return;
 
-        handleUpdateChildComponent(componentId, {
+        const updatedComponent = {
+            ...tempEditingComponent,
             tag: e.target.value,
-        });
+        } as StructuredComponent;
 
-        setTempEditingComponent(
-            (prev) =>
-                ({
-                    ...prev,
-                    tag: e.target.value,
-                }) as StructuredComponent
-        );
+        setTempEditingComponent(updatedComponent);
     };
 
     const udpateDataProperties = ({
@@ -484,35 +472,86 @@ const SidebarRight = ({
         state?: State;
         value?: DataValue;
     }) => {
-        if (!componentId) return;
+        if (!componentId || !tempEditingComponent) return;
 
-        const updatedData = { ...data };
+        // Update temporary data only
+        const updatedTempData = { ...tempEditingComponent.data };
 
-        delete updatedData[field];
-
+        // Update or add by key
         if (state) {
-            updatedData[field] = {
+            updatedTempData[field] = {
+                ...updatedTempData[field], // Keep existing value if any
                 state,
             };
         }
 
         if (value) {
-            updatedData[field] = {
+            updatedTempData[field] = {
+                ...updatedTempData[field], // Keep existing state if any
                 value,
             };
         }
 
-        handleUpdateChildComponent(componentId, {
-            data: updatedData,
-        });
+        // Update temp data state only - don't update component yet
+        const updatedComponent = {
+            ...tempEditingComponent,
+            data: updatedTempData,
+        } as StructuredComponent;
 
-        setTempEditingComponent(
-            (prev) =>
-                ({
-                    ...prev,
-                    data: updatedData,
-                }) as StructuredComponent
-        );
+        setTempEditingComponent(updatedComponent);
+    };
+
+    // Debounced component update
+    useEffect(() => {
+        if (!componentId || !tempEditingComponent) {
+            return;
+        }
+        
+        handleUpdateChildComponent(componentId, {
+            ...tempEditingComponent,
+        });
+    }, [
+        tempEditingComponent,
+        componentId,
+        handleUpdateChildComponent,
+    ]);
+
+
+    useEffect(() => {
+        if (!componentId || !tempEditingComponent || !formValues) {
+            return;
+        }
+        
+        handleUpdateChildComponent(componentId, {
+            ...tempEditingComponent,
+            properties: { ...formValues }
+        });
+    }, [
+        formValues,
+        tempEditingComponent,
+        componentId,
+        handleUpdateChildComponent,
+    ]);
+
+    useEffect(() => {
+        if (!componentId || !tempEditingComponent || !childformValues) {
+            return;
+        }
+        
+        handleUpdateChildComponent(componentId, {
+            ...tempEditingComponent,
+            childProperties: { ...childformValues },
+        });
+    }, [
+        childformValues,
+        tempEditingComponent,
+        componentId,
+        handleUpdateChildComponent,
+    ]);
+
+    const handleClose = () => {
+        setTempEditingComponent(null);
+        clearEditingComponent();
     };
 
     return (
@@ -538,20 +577,30 @@ const SidebarRight = ({
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        {!comp && (
+                        {!comp && currentComp && (
                             <>
                                 <Button
                                     variant="outline"
-                                    size="icon"
+                                    size="sm"
                                     onClick={resetTempData}
                                     title="Reset changes"
                                 >
                                     <RotateCcw className="h-4 w-4" />
                                 </Button>
-                                <Button variant={'ghost'} onClick={handleClose}>
-                                    <X />
-                                </Button>
+                                {/* <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={saveTempData}
+                                    title="Save changes"
+                                >
+                                    <Save className="h-4 w-4" />
+                                </Button> */}
                             </>
+                        )}
+                        {!comp && (
+                            <Button variant={'ghost'} onClick={handleClose}>
+                                <X />
+                            </Button>
                         )}
                     </div>
                 </div>
@@ -575,7 +624,7 @@ const SidebarRight = ({
                             </Label>
                             <Input
                                 id="tag"
-                                value={tempEditingComponent?.tag}
+                                value={tempEditingComponent.tag}
                                 onChange={udpateTag}
                             />
                         </div>
@@ -615,8 +664,7 @@ const SidebarRight = ({
                                                         columnsOptions
                                                     }
                                                     tag={
-                                                        tempEditingComponent?.tag ||
-                                                        ''
+                                                        tempEditingComponent.tag
                                                     }
                                                     onInputChange={(
                                                         fieldPath: string,
@@ -649,7 +697,7 @@ const SidebarRight = ({
                                     </AccordionItem>
                                     {Object.keys(propsComponentChild).length >
                                         0 && (
-                                        <AccordionItem value="item-1">
+                                        <AccordionItem value="item-2">
                                             <AccordionTrigger>
                                                 {t('Child Properties')}
                                             </AccordionTrigger>
@@ -670,8 +718,7 @@ const SidebarRight = ({
                                                         columnsOptions
                                                     }
                                                     tag={
-                                                        tempEditingComponent?.tag ||
-                                                        ''
+                                                        tempEditingComponent.tag
                                                     }
                                                     onInputChange={(
                                                         fieldPath: string,

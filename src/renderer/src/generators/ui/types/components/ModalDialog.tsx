@@ -236,11 +236,15 @@ const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({
 
 const IGRPSTudioDialogTitle: React.FC<{ children: React.ReactNode }> = ({
     children,
-}) => <h2 className="text-lg font-bold">{children}</h2>;
+}) => <h2 className="text-lg font-bold">{children || 'no title provided'}</h2>;
 
 const IGRPStudioDialogDescription: React.FC<{ children: React.ReactNode }> = ({
     children,
-}) => <p className="text-sm text-gray-500">{children}</p>;
+}) => (
+    <p className="text-sm text-gray-500">
+        {children || 'no title description'}
+    </p>
+);
 
 const IGRPStudioDialogContent: React.FC<{ children: React.ReactNode }> = ({
     children,

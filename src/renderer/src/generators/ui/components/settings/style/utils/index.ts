@@ -7,6 +7,7 @@ import { positionStyleToClasses } from "./positionStyleToClasses";
 import { sizeStyleToClasses } from "./sizeStyleToClasses";
 import { spacingToClasses } from "./spacingToClasses";
 import { typographyStyleToClasses } from "./typographyStyleToClasses";
+import { customPropertiesToClasses } from "./customPropertiesToClasses";
 
 export const generateAllClasses = (style: StyleComponent | undefined) => {
     if (!style) return '';
@@ -45,6 +46,9 @@ export const generateAllClasses = (style: StyleComponent | undefined) => {
         classes.push(effectsToSyleClasses(style.effects));
     }
 
+    if (style.customProperties) {
+        classes.push(customPropertiesToClasses(style.customProperties));
+    }
 
     return classes.filter(Boolean).join(' ');
 };

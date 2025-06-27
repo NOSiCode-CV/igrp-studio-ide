@@ -30,7 +30,7 @@ export const AddComponentPopover = ({
         components: availableComponents,
     } = useDroppedComponents();
     const { generateTag, rebuild } = useTagManager(availableComponents);
-    const { findComponentById } = useStudio();
+    const { findComponent } = useStudio();
 
     const handleAddComponent = (item: any) => {
         const result: DragEndResult = {
@@ -47,7 +47,7 @@ export const AddComponentPopover = ({
             handleAddChildToComponent,
             handleReorderChildInComponent,
             generateTag,
-            findComponentById,
+            findComponent,
         });
     };
 

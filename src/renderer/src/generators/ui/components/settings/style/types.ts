@@ -134,6 +134,15 @@ export interface EffectsStyle {
     transitions: TransitionValue[];
 }
 
+export interface CustomProperty {
+    name: string;
+    value: string;
+}
+
+export interface CustomPropertiesStyle {
+    properties: CustomProperty[];
+}
+
 export interface StyleComponent {
     layout?: LayoutStyle;
     spacing?: SpacingSytle;
@@ -143,9 +152,11 @@ export interface StyleComponent {
     position?: PositionStyle;
     backgrounds?: BackgroundStyle[]
     effects?: EffectsStyle
+    customProperties?: CustomPropertiesStyle;
 }
 
 export interface SectionProps {
     onChangeStyles: (styles: StyleComponent) => void;
     styles: StyleComponent;
+    resetStyles: (sectionKey: keyof StyleComponent) => void;
 }
