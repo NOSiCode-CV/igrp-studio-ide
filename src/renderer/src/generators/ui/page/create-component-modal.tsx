@@ -227,18 +227,14 @@ export function CreateComponentModal({
                                         const selected = pageOptions.find(
                                             (opt) => opt.value === selectedValue
                                         );
-                                        formik.setFieldValue(
-                                            'pagePath',
-                                            selected?.path || undefined
-                                        );
-                                        formik.setFieldValue(
-                                            'pageName',
-                                            selected?.value || undefined
-                                        );
-                                        formik.setFieldValue(
-                                            'scope',
-                                            selectedValue ? 'page' : 'app'
-                                        );
+                                        
+                                        // Update all fields at once to avoid double-click issue
+                                        formik.setValues({
+                                            ...formik.values,
+                                            pagePath: selected?.path || undefined,
+                                            pageName: selected?.value || undefined,
+                                            scope: selectedValue ? 'page' : 'app',
+                                        });
                                     }}
                                 />
                             </div>

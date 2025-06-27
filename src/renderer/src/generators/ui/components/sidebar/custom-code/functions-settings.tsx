@@ -45,6 +45,7 @@ export const returnTypeOptions = [
     { value: 'array', label: 'Array' },
     { value: 'void', label: 'Void' },
     { value: 'any', label: 'Any' },
+    { value: 'z.infer<any>', label: 'Form ZodType' },
 ];
 
 interface FunctionSettingsSidebarProps

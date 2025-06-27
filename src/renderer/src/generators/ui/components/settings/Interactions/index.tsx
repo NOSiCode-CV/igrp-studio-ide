@@ -62,7 +62,7 @@ const Interactions = ({
                 interactionsType={interactionsType}
                 componentTag={tag}
             />
-            {interactions.length === 0 && (
+            {Object.keys(interactions || {}).length === 0 && (
                 <EmptyList
                     title="Element Trigger"
                     description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."

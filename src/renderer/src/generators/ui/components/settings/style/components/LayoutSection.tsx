@@ -12,7 +12,7 @@ import { GridControls } from './GridControls';
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
 import { LayoutStyle, SectionProps } from '../types';
 
-export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
+export function LayoutSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const [layoutStyle, setLayoutStyle] = React.useState<LayoutStyle>(
         styles.layout || {

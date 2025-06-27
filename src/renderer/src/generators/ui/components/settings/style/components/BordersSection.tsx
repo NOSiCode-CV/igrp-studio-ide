@@ -3,7 +3,7 @@ import { Square, RefreshCw } from 'lucide-react';
 import { BorderRadius, BordersStyle, BorderValue, SectionProps } from '../types';
 
 
-export function BordersSection({ onChangeStyles, styles }: SectionProps) {
+export function BordersSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
   const [bordersStyle, setBordersStyle] = useState<BordersStyle>(
     styles.borders || {
       borders: {

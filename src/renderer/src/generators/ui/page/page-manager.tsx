@@ -171,7 +171,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     };
 
     const handleEdit = (page: PageDefinition) => {
-        if (page.isPage) {
+        if (page.type === 'page') {
             setFormPage(!showformPage);
         } else {
             setFormComponent(!showFormComponent);
@@ -257,7 +257,6 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                         setViewMode(value as 'table' | 'card')
                                     }
                                 >
-                                    {' '}
                                     <ToggleGroupItem
                                         value="card"
                                         aria-label="Card view"

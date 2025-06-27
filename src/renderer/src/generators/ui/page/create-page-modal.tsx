@@ -28,7 +28,7 @@ const initialValues: PageConfig = {
     path: '',
     description: undefined,
     forceDynamic: false,
-    id: '',
+    id: getId(),
     types: [],
     states: [],
     functions: [],
@@ -58,13 +58,16 @@ export function CreatePageModal({
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const [formInitialValues, setFormInitialValues] = useState<PageConfig>(initialValues);
+    const [formInitialValues, setFormInitialValues] =
+        useState<PageConfig>(initialValues);
 
     useEffect(() => {
         const loadCurrentData = async () => {
             if (currentComponent?.path) {
                 try {
-                    const currentData = await window.api.getJsonContent(currentComponent.path);
+                    const currentData = await window.api.getJsonContent(
+                        currentComponent.path
+                    );
                     setFormInitialValues({
                         ...initialValues,
                         ...currentData,
@@ -93,7 +96,7 @@ export function CreatePageModal({
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
             const { error } = await window.engine.createPage(
-                { ...pageConfig, id: getId() },
+                { ...pageConfig },
                 ENV_TYPES.NEXTJS,
                 basePath
             );
@@ -137,7 +140,6 @@ export function CreatePageModal({
         initialValues: formInitialValues,
         validationSchema,
         onSubmit: async (values, actions) => {
-
             const newValues = pageEditing
                 ? {
                       ...values,

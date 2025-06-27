@@ -9,6 +9,7 @@ import {
     Settings2,
     Variable,
     SquareIcon,
+    RotateCcw,
 } from 'lucide-react';
 import { LayoutSection } from './components/LayoutSection';
 import { SpacingSection } from './components/SpacingSection';
@@ -28,6 +29,7 @@ import {
     AccordionTrigger,
 } from '@renderer/components/ui/accordion';
 import { generateAllClasses } from './utils';
+import { Button } from '@renderer/components/ui/button';
 
 interface StyleSection {
     id: string;
@@ -37,6 +39,7 @@ interface StyleSection {
     component: React.ComponentType<{
         onChangeStyles: (styles: StyleComponent) => void;
         styles: StyleComponent;
+        resetStyles: (sectionKey: keyof StyleComponent) => void;
     }>;
 }
 
@@ -64,6 +67,14 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                 ...styles,
             };
             return merged;
+        });
+    };
+
+    const resetStyles = (sectionKey: keyof StyleComponent) => {
+        setStyleState((prev) => {
+            const newState = { ...prev };
+            delete newState[sectionKey];
+            return newState;
         });
     };
 
@@ -140,6 +151,19 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
         },
     ];
 
+    // Map section IDs to StyleComponent keys
+    const sectionKeyMap: Record<string, keyof StyleComponent> = {
+        layout: 'layout',
+        spacing: 'spacing',
+        size: 'size',
+        typography: 'typography',
+        backgrounds: 'backgrounds',
+        borders: 'borders',
+        position: 'position',
+        effects: 'effects',
+        'custom-properties': 'customProperties',
+    };
+
     const classes = generateAllClasses(style);
 
     return (
@@ -147,11 +171,34 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
             <Accordion type="single" collapsible className="w-full">
                 {sections.map((section) => (
                     <AccordionItem key={section.id} value={section.id}>
-                        <AccordionTrigger>{section.title}</AccordionTrigger>
+                        <AccordionTrigger className="group">
+                            <div className="flex align-middle items-center gap-2">
+                                {section.icon}
+                                {section.title}
+                                <Button
+                                    asChild
+                                    variant={'ghost'}
+                                    size={'sm'}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const sectionKey =
+                                            sectionKeyMap[section.id];
+                                        if (sectionKey) {
+                                            resetStyles(sectionKey);
+                                        }
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-5"
+                                    title={`Reset ${section.title} styles`}
+                                >
+                                    <RotateCcw className='h-4'/>
+                                </Button>
+                            </div>
+                        </AccordionTrigger>
                         <AccordionContent>
                             <section.component
                                 onChangeStyles={onChangeStyles}
                                 styles={styleState}
+                                resetStyles={resetStyles}
                             />
                         </AccordionContent>
                     </AccordionItem>
