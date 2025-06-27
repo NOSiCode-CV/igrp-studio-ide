@@ -60,7 +60,7 @@ const TableTool = ({
                     className
                 )}
             >
-                <div className="flex justify-end shadow-lg align-middle p-0 space-x-0 z-50">
+                <div className="flex justify-end shadow-lg align-middle space-x-1 z-50 py-0.5 ">
                     <div className="flex align-middle items-center">
                         <span className="text-xs">
                             {comp.label || comp.componentName}
@@ -72,7 +72,7 @@ const TableTool = ({
                                 className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
                                 onClick={onEdit}
                             >
-                                <Settings className="h-4" />
+                                <Settings className="h-3.5" />
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -93,7 +93,7 @@ const TableTool = ({
                                     <TooltipTrigger asChild>
                                         <Badge
                                             variant={'secondary'}
-                                            className="rounded-sm cursor-pointer my-0.5"
+                                            className="rounded-sm cursor-pointer h-6"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setCurrentComponent(comp);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VisibilityControls } from './effects/VisibilityControls';
 import { InteractionControls } from './effects/InteractionControls';
 import { BoxShadowControls } from './effects/BoxShadowControls';
@@ -33,10 +33,15 @@ const DEFAULT_EFFECTS: EffectsStyle = {
   transitions: [],
 };
 
-export function EffectsSection({ styles, onChangeStyles }: SectionProps) {
+export function EffectsSection({ styles, onChangeStyles, resetStyles }: SectionProps) {
   const [effects, setEffects] = useState<EffectsStyle>(
     styles.effects || DEFAULT_EFFECTS
   );
+
+  // Sync local state with external style changes
+  useEffect(() => {
+    setEffects(styles.effects || DEFAULT_EFFECTS);
+  }, [styles.effects]);
 
   const updateEffect = <K extends keyof EffectsStyle>(key: K, value: EffectsStyle[K]) => {
     const updated = { ...effects, [key]: value };

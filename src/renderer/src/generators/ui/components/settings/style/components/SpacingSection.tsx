@@ -24,7 +24,7 @@ const initialState: SpacingSytle = {
     },
 };
 
-export function SpacingSection({ onChangeStyles, styles }: SectionProps) {
+export function SpacingSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
     const [spacing, setSpacing] = useState<SpacingSytle>(
         styles.spacing || initialState
     );

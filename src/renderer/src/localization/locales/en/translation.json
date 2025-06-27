@@ -818,5 +818,6 @@
   "duplicate": "Duplicate",
   "duplicating": "Duplicating...",
   "duplicateItem": "Duplicate {{type}} '{{name}}'",
-  "duplicateItemDescription": "Create a copy of this {{type}} with a new name and path."
+  "duplicateItemDescription": "Create a copy of this {{type}} with a new name and path.",
+  "customProperties": "Custom Properties"
 }
