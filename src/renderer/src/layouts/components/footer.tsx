@@ -55,7 +55,7 @@ export function Footer() {
         window.electron.ipcRenderer.on('message-update', handleLog);
 
         return () => {
-            window.electron.ipcRenderer.removeListener(
+            window.electron.ipcRenderer.on(
                 'message-update',
                 handleLog
             );
@@ -90,13 +90,13 @@ export function Footer() {
             }
         };
         if (appVersion) handleCheckUpdate();
-    }, [appVersion]);
+    }, [appVersion, t]);
 
     return (
         <TooltipProvider>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
                 <div className="flex items-center space-x-3">
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground whitespace-nowrap flex-none">
                         {`${import.meta.env.VITE_APP_TITLE}`} &copy;{' '}
                         {new Date().getFullYear()}
                     </span>
@@ -107,7 +107,7 @@ export function Footer() {
                         ) : (
                             <span className="flex items-center space-x-1 text-amber-600">
                                 <AlertCircle className="h-4 w-4" />
-                                <span className="truncate">{log}</span>
+                                <span className="truncate max-w-[calc(100vw_-_500px)]">{log}</span>
                             </span>
                         )}
                     </span>
