@@ -819,5 +819,22 @@
   "duplicating": "Duplicating...",
   "duplicateItem": "Duplicate {{type}} '{{name}}'",
   "duplicateItemDescription": "Create a copy of this {{type}} with a new name and path.",
-  "customProperties": "Custom Properties"
+  "customProperties": "Custom Properties",
+  "custom_gitlab_name": "Custom GitLab Name",
+  "custom_gitlab_name_placeholder": "Enter custom GitLab name",
+  "gitlab_base_url": "GitLab Base URL",
+  "client_id": "Client ID",
+  "client_secret": "Client Secret",
+  "save_configuration": "Save Configuration",
+  "activate": "Activate",
+  "active": "Active",
+  "add_gitlab": "Add GitLab",
+  "edit_gitlab_config": "Edit GitLab Configuration",
+  "add_gitlab_config": "Add GitLab Configuration",
+  "configSaved": "Configuration saved successfully",
+  "configSaveError": "Failed to save configuration",
+  "providerActivated": "Provider activated successfully",
+  "providerDeleted": "Provider deleted successfully",
+  "providerDeleteError": "Failed to delete provider",
+  "needs_configuration": "Needs Configuration"
 }

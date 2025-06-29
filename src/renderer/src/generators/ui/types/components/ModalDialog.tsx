@@ -194,9 +194,6 @@ const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({
                 <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
             ) : (
                 childComponents.map((child, index) => {
-                    const { properties } = child;
-                    const { content } = properties;
-
                     return (
                         <Draggable
                             key={child.id}

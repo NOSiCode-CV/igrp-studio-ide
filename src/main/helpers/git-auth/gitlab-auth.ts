@@ -2,12 +2,17 @@ import { GitAuth } from './git-auth';
 import { GitStore } from '../../services/git-store';
 import { GitLabService } from '../../services/gitlab-service';
 
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
 const gitlabConfig = {
   clientId: process.env.VITE_GITLAB_CLIENT_ID || "",
   clientSecret: process.env.VITE_GITLAB_CLIENT_SECRET || "",
   scopes: ['api', 'read_user', 'read_repository'],
-  authUrl: 'https://git.nosi.cv/oauth/authorize',
-  tokenUrl: 'https://git.nosi.cv/oauth/token',
+  authUrl: `${process.env.VITE_GITLAB_BASE_URL || 'https://git.nosi.cv'}/oauth/authorize`,
+  tokenUrl: `${process.env.VITE_GITLAB_BASE_URL || 'https://git.nosi.cv'}/oauth/token`,
   provider: 'gitlab' as const
 };
 
