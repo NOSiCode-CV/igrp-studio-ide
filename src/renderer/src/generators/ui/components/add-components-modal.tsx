@@ -67,7 +67,7 @@ export const AddComponentModal = ({
     } = useDroppedComponents();
 
     const { generateTag, rebuild } = useTagManager(allComponents);
-    const { findComponentById } = useStudio();
+    const { findComponent } = useStudio();
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -94,7 +94,7 @@ export const AddComponentModal = ({
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponentById,
+                findComponent,
             });
         },
         [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
@@ -106,7 +106,7 @@ export const AddComponentModal = ({
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponentById,
+                findComponent,
             });
         },
         [generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]

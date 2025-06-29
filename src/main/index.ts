@@ -230,6 +230,7 @@ app.whenReady().then(async () => {
     // GitLab handler
     ipcMain.on('gitlab-oauth', async () => {
         const isDev = process.env.VITE_NODE_ENV === 'development';
+        console.log("isDev", isDev)
         try {
             currentAuthProvider = 'gitlab'; // Add this line
             await gitlabAuth.setupOAuth(mainWindow, isDev);

@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron"
+import { BrowserWindow } from "electron"
 import { autoUpdater } from "electron-updater"
 import log from "electron-log"
 
@@ -42,11 +42,11 @@ export default class AppUpdater {
         autoUpdater.autoInstallOnAppQuit = false; // ❌ NÃO instala ao sair
 
         // ✅ Force updates in development mode
-       /*  if (!app.isPackaged) {
-            this.sendStatusToWindow("⚠️ App is not packaged! Forcing update check in development mode...")
-            autoUpdater.checkForUpdatesAndNotify()
-            return
-        } */
+        /*  if (!app.isPackaged) {
+             this.sendStatusToWindow("⚠️ App is not packaged! Forcing update check in development mode...")
+             autoUpdater.checkForUpdatesAndNotify()
+             return
+         } */
 
         autoUpdater.checkForUpdatesAndNotify()
 
