@@ -41,6 +41,7 @@ import {
     useState,
 } from 'react';
 import Loader from '@renderer/components/loader';
+import { getRequiredDataSchema } from '../../dnd/helpers';
 
 interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -113,28 +114,32 @@ const SidebarRight = ({
     useEffect(() => {
         if (!componentName) return;
         getDataComponent(currentPath, componentName).then((response) => {
+            const requiredDataSchema = getRequiredDataSchema(response);
+
             // Check if each key in data exists in response
-            if (data && response) {
+            if (data && requiredDataSchema) {
                 const cleanedData = { ...data };
                 let hasChanges = false;
 
                 // Iterate through each key in the current data
                 Object.keys(data).forEach((key) => {
                     // If the key doesn't exist in the response, remove it
-                    if (!(key in response)) {
+                    if (!(key in requiredDataSchema)) {
                         delete cleanedData[key];
                         hasChanges = true;
                     }
                 });
 
                 // Iterate through each key in the response
-                Object.keys(response).forEach((key) => {
+                Object.keys(requiredDataSchema).forEach((key) => {
                     // If the key doesn't exist in the current data, add it
                     if (!(key in data)) {
-                        cleanedData[key] = response[key];
+                        cleanedData[key] = requiredDataSchema[key];
                         hasChanges = true;
                     }
                 });
+
+                console.log('cleanedData', cleanedData);
 
                 // If we made changes, update the component with cleaned data
                 if (hasChanges && componentId) {
@@ -323,7 +328,7 @@ const SidebarRight = ({
 
                 if (data && tempEditingComponent?.data) {
                     // Check if any data keys are referenced in the schema properties
-                    const cleanedData = { ...tempEditingComponent.data };
+                  /* const cleanedData = { ...tempEditingComponent.data };
                     let hasChanges = false;
 
                     Object.keys(tempEditingComponent.data).forEach((key) => {
@@ -344,7 +349,7 @@ const SidebarRight = ({
                         handleUpdateChildComponent(componentId, {
                             data: cleanedData,
                         });
-                    }
+                    }  */
                 }
             } catch (error) {
                 console.error('Error loading properties component:', error);
@@ -354,12 +359,7 @@ const SidebarRight = ({
         };
 
         loadProps();
-    }, [
-        componentId,
-        componentName,
-        currentPath,
-        tempEditingComponent,
-    ]);
+    }, [componentId, componentName, currentPath, tempEditingComponent]);
 
     // Load properties component
     useEffect(() => {

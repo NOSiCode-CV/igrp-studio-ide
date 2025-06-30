@@ -233,8 +233,6 @@ export function ConnectedAccountsSettings() {
         getGitlabConfig();
     }, []);
 
-    console.log('gitLabProviders', activeProviderId);
-
     return (
         <div>
             <div className="pb-4">

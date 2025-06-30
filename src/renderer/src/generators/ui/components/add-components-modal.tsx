@@ -97,7 +97,7 @@ export const AddComponentModal = ({
                 findComponent,
             });
         },
-        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
+        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent]
     );
 
     const handleOrderComponent = useCallback(
@@ -109,7 +109,7 @@ export const AddComponentModal = ({
                 findComponent,
             });
         },
-        [generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponentById]
+        [generateTag, handleAddChildToComponent, handleReorderChildInComponent]
     );
 
     const onEditComponent = (
