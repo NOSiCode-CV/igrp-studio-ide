@@ -1,43 +1,25 @@
 import { Button } from '@renderer/components/ui/button';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
-import { Github, Gitlab, Plus } from 'lucide-react';
+import { Github, Gitlab, Plus, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useEffect, useState } from 'react';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import { nanoid } from '@reduxjs/toolkit';
-
-interface GitProviderConfig {
-    id: string;
-    name: string;
-    baseUrl: string;
-    clientId: string;
-    clientSecret: string;
-    active: boolean;
-    isDefault?: boolean;
-}
-
-const DEFAULT_PROVIDERS: GitProviderConfig[] = [
-    /*  {
-        id: 'gitlab_nosi',
-        name: 'GitLab NOSi',
-        baseUrl: import.meta.env.VITE_GITLAB_BASE_URL,
-        clientId: import.meta.env.VITE_GITLAB_CLIENT_ID,
-        clientSecret: import.meta.env.VITE_GITLAB_CLIENT_SECRET,
-        active: false,
-        isDefault: true,
-    }, */
-];
+import { GitLabProvider } from '@renderer/redux/git/reducer';
 
 // Componente para o formulário de configuração GitLab
 function GitLabConfigForm({
     config,
     onSave,
+    onCancel,
 }: {
-    config: GitProviderConfig;
-    onSave: (config: GitProviderConfig) => void;
+    config: GitLabProvider;
+    onSave: (config: GitLabProvider) => void;
+    onCancel: () => void;
 }) {
+    const { t } = useTranslation();
     const [name, setName] = useState(config.name);
     const [baseUrl, setBaseUrl] = useState(config.baseUrl);
     const [clientId, setClientId] = useState(config.clientId);
@@ -57,17 +39,17 @@ function GitLabConfigForm({
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <Label>Custom GitLab Name</Label>
+                <Label>{t('custom_gitlab_name')}</Label>
                 <Input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Custom GitLab Name"
+                    placeholder={t('custom_gitlab_name_placeholder')}
                     className="input"
                 />
             </div>
             <div className="space-y-2">
-                <Label>GitLab Base URL</Label>
+                <Label>{t('gitlab_base_url')}</Label>
                 <Input
                     type="text"
                     value={baseUrl}
@@ -77,7 +59,7 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>Client ID</Label>
+                <Label>{t('client_id')}</Label>
                 <Input
                     type="text"
                     value={clientId}
@@ -86,7 +68,7 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>Client Secret</Label>
+                <Label>{t('client_secret')}</Label>
                 <Input
                     type="password"
                     value={clientSecret}
@@ -94,7 +76,12 @@ function GitLabConfigForm({
                     className="input"
                 />
             </div>
-            <Button onClick={handleSave}>Save Configuration</Button>
+            <div className="flex space-x-2">
+                <Button onClick={handleSave}>{t('save_configuration')}</Button>
+                <Button variant="outline" onClick={onCancel}>
+                    {t('cancel')}
+                </Button>
+            </div>
         </div>
     );
 }
@@ -103,10 +90,27 @@ interface AccountProps {
     name: string;
     icon: ReactNode;
     connected: boolean;
+    isActive: boolean;
     action?: () => void;
+    onActivate?: () => void;
+    onDelete?: () => void;
+    onEdit?: () => void;
+    isDefault?: boolean;
+    isConfigured?: boolean;
 }
 
-function Account({ name, icon, connected, action }: AccountProps) {
+function Account({
+    name,
+    icon,
+    connected,
+    isActive,
+    action,
+    onActivate,
+    onDelete,
+    onEdit,
+    isDefault,
+    isConfigured,
+}: AccountProps) {
     const { t } = useTranslation();
 
     const handleClick = () => {
@@ -114,59 +118,120 @@ function Account({ name, icon, connected, action }: AccountProps) {
     };
 
     return (
-        <>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                    {icon}
-                    <span>{t(name)}</span>
-                </div>
-
-                <div className="space-x-2">
-                    <Button
-                        variant={connected ? 'outline' : 'default'}
-                        onClick={handleClick}
-                    >
-                        {connected ? t('disconnect') : t('connect')}
-                    </Button>
+        <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center space-x-3">
+                {icon}
+                <div>
+                    <span className="font-medium">{t(name)}</span>
+                    {isDefault && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                            ({t('default')})
+                        </span>
+                    )}
+                    {isActive && (
+                        <span className="ml-2 text-xs text-green-600 font-medium">
+                            ({t('active')})
+                        </span>
+                    )}
+                    {isDefault && !isConfigured && (
+                        <span className="ml-2 text-xs text-orange-600 font-medium">
+                            ({t('needs_configuration')})
+                        </span>
+                    )}
                 </div>
             </div>
-        </>
+
+            <div className="flex items-center space-x-2">
+                {!isActive && connected && (
+                    <Button variant="outline" size="sm" onClick={onActivate}>
+                        {t('activate')}
+                    </Button>
+                )}
+
+                {!isDefault && onEdit && (
+                    <Button variant="outline" size="sm" onClick={onEdit}>
+                        <Settings size={16} />
+                    </Button>
+                )}
+
+                {!isDefault && onDelete && (
+                    <Button variant="outline" size="sm" onClick={onDelete}>
+                        <Trash2 size={16} />
+                    </Button>
+                )}
+
+                <Button
+                    variant={connected ? 'outline' : 'default'}
+                    onClick={handleClick}
+                    disabled={isDefault && !isConfigured}
+                >
+                    {connected ? t('disconnect') : t('connect')}
+                </Button>
+            </div>
+        </div>
     );
 }
 
 export function ConnectedAccountsSettings() {
     const { t } = useTranslation();
     const {
+        getGitlabConfig,
+        gitLabProviders,
+        activeProviderId,
+        activeProvider,
         loginGithub,
         loginGitLab,
-        userGitHub,
-        userGitLab,
         logoutGithub,
         logoutGitLab,
         saveGitlabConfig,
-        getGitlabConfig,
+        setActiveProvider,
+        handleRemoveGitLabProvider,
     } = useGithubAuth();
 
-    const { showSuccessToast } = useToast();
+    const { showSuccessToast, showErrorToast } = useToast();
 
     const [isGitLabConfigVisible, setIsGitLabConfigVisible] = useState(false);
+    const [editingProvider, setEditingProvider] =
+        useState<GitLabProvider | null>(null);
 
-    const [providers, setProviders] = useState<GitProviderConfig[]>([
-        ...DEFAULT_PROVIDERS,
-    ]);
-
-    const handleGitLabConfigSave = async (config: GitProviderConfig) => {
+    const handleGitLabConfigSave = async (config: GitLabProvider) => {
         const response = await saveGitlabConfig(config);
-        console.log(response);
-        showSuccessToast(t('configSaved'));
+        if (response.success) {
+            showSuccessToast(t('configSaved'));
+            setIsGitLabConfigVisible(false);
+            setEditingProvider(null);
+        } else {
+            showErrorToast(t('configSaveError'));
+        }
     };
 
+    const handleActivateProvider = (providerId: string) => {
+        setActiveProvider(providerId);
+        showSuccessToast(t('providerActivated'));
+    };
+
+    const handleDeleteProvider = async (providerId: string) => {
+        const response = await handleRemoveGitLabProvider(providerId);
+        if (response.success) {
+            showSuccessToast(t('providerDeleted'));
+        } else {
+            showErrorToast(t('providerDeleteError'));
+        }
+    };
+
+    const handleEditProvider = (provider: GitLabProvider) => {
+        setEditingProvider(provider);
+        setIsGitLabConfigVisible(true);
+    };
+
+    const isGithubConnected =
+        activeProviderId === 'github' && !!activeProvider?.user;
+    const isGitLabConnected =
+        activeProviderId !== 'github' && !!activeProvider?.user;
+
     useEffect(() => {
-        getGitlabConfig().then((config) => {
-            setProviders(config || []);
-            console.log(config);
-        });
-    }, [getGitlabConfig]);
+        getGitlabConfig();
+    }, []);
 
     return (
         <div>
@@ -178,57 +243,81 @@ export function ConnectedAccountsSettings() {
                     {t('connected_accounts_description')}
                 </p>
             </div>
+
             <div className="space-y-4">
+                {/* GitHub Account */}
                 <Account
                     name="github"
                     icon={<Github size={20} />}
-                    connected={userGitHub}
-                    action={userGitHub ? logoutGithub : loginGithub}
+                    connected={isGithubConnected}
+                    isActive={activeProviderId === 'github'}
+                    action={isGithubConnected ? logoutGithub : loginGithub}
+                    onActivate={() => handleActivateProvider('github')}
                 />
 
-                <Account
-                    name={'GitLab NOSi'}
-                    icon={<Gitlab size={20} />}
-                    connected={userGitLab}
-                    action={userGitLab ? logoutGitLab : loginGitLab}
-                />
-
-                {providers.map((provider, index) => (
+                {/* GitLab Providers */}
+                {gitLabProviders.map((provider) => (
                     <Account
-                        key={index}
+                        key={provider.id}
                         name={provider.name}
                         icon={<Gitlab size={20} />}
-                        connected={userGitLab}
-                        action={userGitLab ? logoutGitLab : loginGitLab}
+                        connected={
+                            activeProviderId === provider.id && !!provider.user
+                        }
+                        isActive={activeProviderId === provider.id}
+                        isDefault={provider.isDefault}
+                        isConfigured={provider.isConfigured}
+                        action={
+                            activeProviderId === provider.id && provider.user
+                                ? () => logoutGitLab(provider.id)
+                                : () => loginGitLab(provider.id)
+                        }
+                        onActivate={() => handleActivateProvider(provider.id)}
+                        onEdit={() => handleEditProvider(provider)}
+                        onDelete={() => handleDeleteProvider(provider.id)}
                     />
                 ))}
 
-                {/* Formulário de configuração GitLab */}
+                {/* GitLab Configuration Form */}
                 {isGitLabConfigVisible && (
-                    <div className="mt-4 p-4 border rounded bg-gray-100">
+                    <div className="mt-4 p-4 border rounded bg-gray-50">
+                        <h3 className="text-md font-medium mb-4">
+                            {editingProvider
+                                ? t('edit_gitlab_config')
+                                : t('add_gitlab_config')}
+                        </h3>
                         <GitLabConfigForm
-                            config={{
-                                id: nanoid(),
-                                name: '',
-                                baseUrl: '',
-                                clientId: '',
-                                clientSecret: '',
-                                active: false,
-                                isDefault: false,
+                            config={
+                                editingProvider || {
+                                    id: nanoid(),
+                                    name: '',
+                                    baseUrl: '',
+                                    clientId: '',
+                                    clientSecret: '',
+                                    active: false,
+                                    isDefault: false,
+                                }
+                            }
+                            onSave={handleGitLabConfigSave}
+                            onCancel={() => {
+                                setIsGitLabConfigVisible(false);
+                                setEditingProvider(null);
                             }}
-                            onSave={(config) => handleGitLabConfigSave(config)}
                         />
                     </div>
                 )}
 
-                <div className="pt-2 hidden">
+                {/* Add GitLab Button */}
+                <div className="pt-2">
                     <Button
                         variant="outline"
-                        onClick={() =>
-                            setIsGitLabConfigVisible(!isGitLabConfigVisible)
-                        }
+                        onClick={() => {
+                            setEditingProvider(null);
+                            setIsGitLabConfigVisible(!isGitLabConfigVisible);
+                        }}
                     >
-                        <Plus /> Adicionar GitLab
+                        <Plus size={16} className="mr-2" />
+                        {t('add_gitlab')}
                     </Button>
                 </div>
             </div>
