@@ -14,7 +14,7 @@ import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
 import { Button } from '@renderer/components/ui/button';
-import { FocusEvent } from 'react';
+import { FocusEvent, useEffect, useState } from 'react';
 import {
     CheckboxInput,
     TextInput,
@@ -28,7 +28,7 @@ const initialValues: PageConfig = {
     path: '',
     description: undefined,
     forceDynamic: false,
-    id: '',
+    id: getId(),
     types: [],
     states: [],
     functions: [],
@@ -58,10 +58,45 @@ export function CreatePageModal({
 
     const { showErrorToast, showSuccessToast } = useToast();
 
+    const [formInitialValues, setFormInitialValues] =
+        useState<PageConfig>(initialValues);
+
+    useEffect(() => {
+        const loadCurrentData = async () => {
+            if (currentComponent?.path) {
+                try {
+                    const currentData = await window.api.getJsonContent(
+                        currentComponent.path
+                    );
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentData,
+                    });
+                } catch (error) {
+                    console.warn('Failed to load current data:', error);
+                    // Fallback to currentComponent.content if API call fails
+                    setFormInitialValues({
+                        ...initialValues,
+                        ...currentComponent.content,
+                    });
+                }
+            } else if (currentComponent?.content) {
+                setFormInitialValues({
+                    ...initialValues,
+                    ...currentComponent.content,
+                });
+            } else {
+                setFormInitialValues(initialValues);
+            }
+        };
+
+        loadCurrentData();
+    }, [currentComponent, isOpen]);
+
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
             const { error } = await window.engine.createPage(
-                { ...pageConfig, id: getId() },
+                { ...pageConfig },
                 ENV_TYPES.NEXTJS,
                 basePath
             );
@@ -102,9 +137,9 @@ export function CreatePageModal({
 
     const formik = useFormik<PageConfig>({
         enableReinitialize: true,
-        initialValues: { ...initialValues, ...currentComponent?.content },
+        initialValues: formInitialValues,
         validationSchema,
-        onSubmit: (values, actions) => {
+        onSubmit: async (values, actions) => {
             const newValues = pageEditing
                 ? {
                       ...values,

@@ -24,14 +24,15 @@ import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import useCustomCode from '../hooks/useCustomCode';
 import useToast from '@renderer/hooks/useToast';
-import { capitalize } from '@renderer/utils';
+import { capitalize, getId } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
+import useStudio from '@renderer/hooks/use-studio';
 
 interface LabeledElementField {
     componentId: string;
     name: string;
     type: string;
-    validation?: string;
+    validation?: any;
     defaultValue?: string;
     required: boolean;
     label: string;
@@ -78,6 +79,7 @@ export const BindingConfigurationModal = ({
     const { t } = useTranslation();
     const { types, typesOptions } = useCustomCode();
     const { showErrorToast } = useToast();
+    const { getDataComponent } = useStudio();
 
     const [fieldsTypeOptions, setFieldsTypeOptions] = useState([]);
     const [selectedType, setSelectedType] = useState<string>('');
@@ -101,6 +103,8 @@ export const BindingConfigurationModal = ({
     const [newBinding, setNewBinding] = useState<boolean>(
         compType?.path === '' || compType?.path === undefined
     );
+
+    const [formDefaultData, setFormDefaultData] = useState<any>(null);
 
     const columns = [
         { key: 'label', name: t('label'), type: 'label' },
@@ -137,7 +141,12 @@ export const BindingConfigurationModal = ({
             name: '',
             type: 'group',
             items: [
-                { key: 'validation', name: '', type: 'popoverFormValidation', options: [] },
+                {
+                    key: 'validation',
+                    name: '',
+                    type: 'popoverFormValidation',
+                    options: [],
+                },
             ],
         },
     ];
@@ -160,7 +169,7 @@ export const BindingConfigurationModal = ({
             fields: [],
             ...compType,
         },
-        onSubmit: (values, actions) => {
+        onSubmit: async (values, actions) => {
             actions.setSubmitting(false);
 
             if (!validate() || !componentId) return;
@@ -176,39 +185,52 @@ export const BindingConfigurationModal = ({
                 ),
             };
 
-            console.log(updatedComponent);
-
             createOrUpdateType({
                 ...updatedComponent,
                 path: !newBinding && typeFilePath ? typeFilePath : '',
             });
 
-            //TODO For revisions
-            let defaultValues: any = undefined;
+            //TODO For revisions]
             if (comp.componentName === COMPONENT.Form) {
-                defaultValues = {
-                    ...comp.data?.defaultValues,
+                //TODOREVISAR
+                const data = formDefaultData;
+                const newState = {
                     state: {
-                        ...comp.data?.defaultValues.state,
-                        name: comp.data?.defaultValues.state?.name ?? '',
+                        id: getId(),
+                        type:
+                            (data &&
+                                'defaultValues' in data &&
+                                data.defaultValues?.properties?.type
+                                    ?.default) ??
+                            'any',
+                        name: `${
+                            values.name ??
+                            (data &&
+                                'defaultValues' in data &&
+                                data.defaultValues?.properties?.name
+                                    ?.default) ??
+                            ''
+                        }Data`,
                         defaultValue: `init${capitalize(values.name)}`,
-                        type: comp.data?.defaultValues.state?.type ?? '',
-                        id: comp.data?.defaultValues.state?.id ?? '',
+                        imports:
+                            (data &&
+                                'defaultValues' in data &&
+                                data.defaultValues?.properties?.imports
+                                    ?.default) ??
+                            [],
+                        generate: true,
                     },
                 };
 
                 handleUpdateChildComponent(componentId, {
-                    ...comp,
                     dataType: values.name,
                     data: {
                         ...comp.data,
-                        defaultValues,
+                        defaultValues: newState,
                     },
                 });
             } else {
-                console.log(comp);
                 handleUpdateChildComponent(componentId, {
-                    ...comp,
                     dataType: values.name,
                 });
             }
@@ -217,7 +239,6 @@ export const BindingConfigurationModal = ({
                 const component = componentMap.get(id);
                 if (component) {
                     handleUpdateChildComponent(id, {
-                        ...component,
                         tag: name,
                     });
                 }
@@ -435,6 +456,12 @@ export const BindingConfigurationModal = ({
             );
         }
     };
+
+    useEffect(() => {
+        if (open && comp.componentName === COMPONENT.Form) {
+            getDataComponent('', comp.componentName).then(setFormDefaultData);
+        }
+    }, [open, comp.componentName, getDataComponent]);
 
     return (
         <>

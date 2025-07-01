@@ -5,7 +5,6 @@ import { toast } from "sonner"
 import { AppLogicIPCClient } from "@renderer/pages/applogic/client"
 import { EnvironmentValidator } from "@renderer/pages/applogic/validation"
 import type { AppLogicEnvironment, ConnectionTest } from "src/main/types"
-import useCore from "./use-core"
 
 export function useAppLogic() {
   const [environments, setEnvironments] = useState<AppLogicEnvironment[]>([])
@@ -14,7 +13,6 @@ export function useAppLogic() {
   const [isInitialized, setIsInitialized] = useState(false)
   const initRef = useRef(false)
   const unsubscribeRef = useRef<(() => void) | null>(null)
-  const { fetchData } = useCore();
 
   // Initialize
   useEffect(() => {
@@ -172,6 +170,8 @@ export function useAppLogic() {
           endpoint: "/",
           method: "GET",
         }
+
+        console.log(test)
 
 
         const newStatus = result.isValid ? "connected" : "error"

@@ -1,6 +1,11 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import type { DragEvent } from 'react';
-import { StructuredComponent, DropZone, LayoutMode } from './types';
+import {
+    StructuredComponent,
+    DropZone,
+    LayoutMode,
+    DragEndResult,
+} from './types';
 
 interface DragDropContextType {
     // State
@@ -15,7 +20,10 @@ interface DragDropContextType {
     // Event handlers
     onDragEnd: () => void;
     onDragStart: (item: any) => void;
-    handleDrop: (e: DragEvent<HTMLDivElement>, targetId?: string) => void;
+    handleDrop: (
+        e: DragEvent<HTMLDivElement>,
+        targetId?: string
+    ) => DragEndResult;
     handleDragOver: (
         e: DragEvent<HTMLDivElement>,
         id?: string,
@@ -82,7 +90,7 @@ export const DragProvider = ({ children }) => {
             (layoutMode === 'vertical' ? 'bottom' : 'right');
 
         const targetIndex = activeDropZone?.cellIndex || 0;
-        
+
         const insertIndex =
             position === 'bottom' || position === 'right'
                 ? targetIndex + 1

@@ -1,11 +1,14 @@
-/// <reference types="vite/client" />
 import { GitAuth } from './git-auth';
 import { GitStore } from '../../services/git-store';
 import { GitHubService } from '../../services/github-service';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const githubConfig = {
-  clientId: import.meta.env.VITE_GITHUB_CLIENT_ID,
-  clientSecret: import.meta.env.VITE_GITHUB_CLIENT_SECRET,
+  clientId: process.env.VITE_GITHUB_CLIENT_ID || "",
+  clientSecret: process.env.VITE_GITHUB_CLIENT_SECRET || "",
   scopes: ['repo', 'read:user', 'read:org'],
   authUrl: 'https://github.com/login/oauth/authorize',
   tokenUrl: 'https://github.com/login/oauth/access_token',

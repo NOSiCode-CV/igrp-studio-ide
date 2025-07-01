@@ -12,7 +12,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
 }: CardComponentProps) => {
-    const { children, properties } = comp;
+    const { children, properties, componentName } = comp;
 
     const { variant, className } = properties || {};
 
@@ -22,7 +22,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
-            path: '',
+            path: componentName,
             component,
         });
     };
@@ -45,6 +45,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
                 >
                     <BoxWrapper
                         comp={comp}
+                        parentComp={comp}
                         onEdit={() => handleEditClick(comp)}
                         group="group/comp-columns"
                         className="opacity-0 group-hover/comp-columns:opacity-100"

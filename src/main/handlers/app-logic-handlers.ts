@@ -3,11 +3,7 @@ import { AppLogicStore } from "../services/app-logic-store"
 import { EVENTS } from '../constants/events'
 import type {
     AppLogicEnvironment,
-    AppLogicSettings,
-    ConnectionTest,
-    AppLogicRequest,
 } from "../types"
-import { url } from "inspector"
 
 // Environment management
 ipcMain.handle(EVENTS.APPLOGIC.FIND_ALL, () => {
@@ -19,7 +15,7 @@ ipcMain.handle(EVENTS.APPLOGIC.FIND_ALL, () => {
     }
 })
 
-ipcMain.handle(EVENTS.APPLOGIC.CREATE, (event, environment: AppLogicEnvironment) => {
+ipcMain.handle(EVENTS.APPLOGIC.CREATE, (__, environment: AppLogicEnvironment) => {
     try {
         const result = AppLogicStore.addEnvironment(environment)
         // Notify all windows about the change
@@ -34,7 +30,7 @@ ipcMain.handle(EVENTS.APPLOGIC.CREATE, (event, environment: AppLogicEnvironment)
     }
 })
 
-ipcMain.handle(EVENTS.APPLOGIC.UPDATE, (event, id: string, updates: Partial<AppLogicEnvironment>) => {
+ipcMain.handle(EVENTS.APPLOGIC.UPDATE, (__, id: string, updates: Partial<AppLogicEnvironment>) => {
     try {
         AppLogicStore.updateEnvironment(id, updates)
 
@@ -50,7 +46,7 @@ ipcMain.handle(EVENTS.APPLOGIC.UPDATE, (event, id: string, updates: Partial<AppL
     }
 })
 
-ipcMain.handle(EVENTS.APPLOGIC.DELETE, (event, id: string) => {
+ipcMain.handle(EVENTS.APPLOGIC.DELETE, (__, id: string) => {
     try {
         AppLogicStore.deleteEnvironment(id)
 
@@ -66,7 +62,7 @@ ipcMain.handle(EVENTS.APPLOGIC.DELETE, (event, id: string) => {
     }
 })
 
-ipcMain.handle(EVENTS.APPLOGIC.GET, (event, id: string) => {
+ipcMain.handle(EVENTS.APPLOGIC.GET, (__, id: string) => {
     try {
         return AppLogicStore.getEnvironment(id)
     } catch (error) {
@@ -75,7 +71,7 @@ ipcMain.handle(EVENTS.APPLOGIC.GET, (event, id: string) => {
     }
 })
 
-ipcMain.handle(EVENTS.APPLOGIC.SEARCH, (event, searchTerm: string) => {
+ipcMain.handle(EVENTS.APPLOGIC.SEARCH, (__, searchTerm: string) => {
     try {
         return AppLogicStore.searchEnvironments(searchTerm)
     } catch (error) {
@@ -85,7 +81,7 @@ ipcMain.handle(EVENTS.APPLOGIC.SEARCH, (event, searchTerm: string) => {
 })
 
 
-ipcMain.handle("app-logic:get-environment-history", (event, environmentId: string) => {
+ipcMain.handle("app-logic:get-environment-history", (__, environmentId: string) => {
     try {
         return AppLogicStore.getEnvironmentHistory(environmentId)
     } catch (error) {
@@ -94,7 +90,7 @@ ipcMain.handle("app-logic:get-environment-history", (event, environmentId: strin
     }
 })
 
-ipcMain.handle("app-logic:clear-environment-history", (event, environmentId: string) => {
+ipcMain.handle("app-logic:clear-environment-history", (__, _environmentId: string) => {
     try {
         //AppLogicStore.clearEnvironmentHistory(environmentId)
         return true
@@ -105,7 +101,7 @@ ipcMain.handle("app-logic:clear-environment-history", (event, environmentId: str
 })
 
 // Requests
-ipcMain.handle("app-logic:add-request", (event, request: AppLogicRequest) => {
+ipcMain.handle("app-logic:add-request", (_event) => {
     try {
         //AppLogicStore.addRequest(request)
         return true
@@ -115,9 +111,10 @@ ipcMain.handle("app-logic:add-request", (event, request: AppLogicRequest) => {
     }
 })
 
-ipcMain.handle("app-logic:get-requests", (event, environmentId?: string) => {
+ipcMain.handle("app-logic:get-requests", (_) => {
     try {
         //return AppLogicStore.getRequests(environmentId)
+        return null
     } catch (error) {
         console.error("Error getting requests:", error)
         return []
@@ -134,7 +131,7 @@ ipcMain.handle("app-logic:create-backup", () => {
     }
 })
 
-ipcMain.handle("app-logic:restore-backup", (event, backup: any) => {
+ipcMain.handle("app-logic:restore-backup", (__, backup: any) => {
     try {
         AppLogicStore.restoreBackup(backup)
 
@@ -160,7 +157,7 @@ ipcMain.handle("app-logic:export-data", () => {
     }
 })
 
-ipcMain.handle("app-logic:import-data", (event, jsonData: string) => {
+ipcMain.handle("app-logic:import-data", (__, jsonData: string) => {
     try {
         const backup = JSON.parse(jsonData)
         AppLogicStore.restoreBackup(backup)
@@ -201,7 +198,7 @@ ipcMain.handle("app-logic:get-store-info", () => {
 })
 
 // HTTP Client operations
-ipcMain.handle(EVENTS.APPLOGIC.TEST, async (event, environment: AppLogicEnvironment) => {
+ipcMain.handle(EVENTS.APPLOGIC.TEST, async (_, environment: AppLogicEnvironment) => {
     const startTime = Date.now()
 
     try {
@@ -241,7 +238,7 @@ ipcMain.handle(EVENTS.APPLOGIC.TEST, async (event, environment: AppLogicEnvironm
 
 ipcMain.handle(
     "app-logic:make-request",
-    async (event, environment: AppLogicEnvironment, endpoint: string, options: any = {}) => {
+    async (_, environment: AppLogicEnvironment, endpoint: string, options: any = {}) => {
         const url = `${environment.url}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`
         const method = options.method || "GET"
         const timeout = options.timeout || 10000
@@ -300,8 +297,7 @@ ipcMain.handle(
                 success: response.ok,
             }
         } catch (error) {
-            const responseTime = Date.now() - startTime
-
+           
             if (error instanceof Error && error.name === "AbortError") {
                 throw new Error(`Request timeout after ${timeout}ms`)
             }

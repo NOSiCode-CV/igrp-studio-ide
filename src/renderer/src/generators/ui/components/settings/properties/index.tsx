@@ -186,9 +186,9 @@ const RenderPropsConfig = ({
                     }}
                 />
             );
-        } else if ( xUiWidget === 'uri') {
+        } else if (xUiWidget === 'uri') {
             return (
-                <div className='group space-y-3'>
+                <div className="group space-y-3">
                     <Label
                         htmlFor={key}
                         className="flex justify-between items-center"
@@ -218,7 +218,7 @@ const RenderPropsConfig = ({
                     />
                 </div>
             );
-        //references
+            //references
         } else if (xUiWidget === 'ref') {
             return (
                 <div className="space-y-2">
@@ -406,8 +406,8 @@ const FieldActions = ({
     ) => void;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
-
     const [selected, setSelected] = useState<Data>({});
+    const [inputValue, setInputValue] = useState<string>('');
 
     const state: State = {
         id: '',
@@ -419,6 +419,11 @@ const FieldActions = ({
 
     const stateSaved =
         selected.state || selected.value ? selected : dataProperties?.[field];
+
+    // Update input value when stateSaved changes
+    useEffect(() => {
+        setInputValue(stateSaved?.value?.code || '');
+    }, [stateSaved?.value?.code]);
 
     return (
         <>
@@ -498,6 +503,31 @@ const FieldActions = ({
                     ) : (
                         <></>
                     )}
+                    <>
+                        <Separator />
+                        <div className="space-y-2">
+                            <Label>Variable Name</Label>
+                            <Input
+                                id={`${field}-variable-name`}
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => {
+                                    const newValue = e.target.value;
+                                    setInputValue(newValue);
+                                    const result = newValue
+                                        ? {
+                                              id: '',
+                                              code: newValue,
+                                          }
+                                        : undefined;
+                                    onSelectState(field, undefined, result);
+                                    setSelected({
+                                        value: result,
+                                    });
+                                }}
+                            />
+                        </div>
+                    </>
                     <div className="flex justify-end">
                         <Button
                             variant={'secondary'}

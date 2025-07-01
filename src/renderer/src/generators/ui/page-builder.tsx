@@ -32,6 +32,7 @@ import { PageDefinition } from './page/page-manager';
 import IGRPStudioMainComponent from './types/components/MainComponent';
 import SidebarRight from './components/sidebar/sidebar-right';
 import { handleDragEnd } from './dnd/DraggableItemManager';
+import Loader from '@renderer/components/loader';
 
 interface FormEngineProps {
     basePath: string;
@@ -71,8 +72,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         const { showErrorToast, showSuccessToast } = useToast();
 
-        const { componentsRegistered, findComponentById, fetchComponents } =
-            useStudio();
+        const {
+            componentsRegistered,
+            findComponentById,
+            fetchComponents,
+            findComponent,
+        } = useStudio();
 
         const { customComponents } = useCustomCode();
 
@@ -83,6 +88,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         const { rebuild, generateTag } = useTagManager(components);
 
         const [loading, setLoading] = useState<boolean>(false);
+
+        const [isLoading, setIsLoading] = useState<boolean>(false);
 
         // Internal handleSave function in FormEngine
         const internalHandleSave = () => {
@@ -137,18 +144,35 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             }
         };
 
-        const onDragEnd = useCallback(async (result: DragEndResult) => {
-            const droppedComponentsMethods = {
+        const onDragEnd = useCallback(
+            async (result: DragEndResult) => {
+                const droppedComponentsMethods = {
+                    removeRow,
+                    handleAddChildToComponent,
+                    handleReorderChildInComponent,
+                    generateTag,
+                    findComponent: async (
+                        path: string,
+                        componentName: string
+                    ) => {
+                        const result = await findComponent(path, componentName);
+                        return result || undefined;
+                    },
+                    showErrorToast,
+                };
+
+                console.log('dropZone', result);
+                await handleDragEnd(result, droppedComponentsMethods);
+            },
+            [
                 removeRow,
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponentById,
-            };
-
-            console.log('dropZone', result);
-            await handleDragEnd(result, droppedComponentsMethods);
-        }, [removeRow, handleAddChildToComponent, handleReorderChildInComponent, generateTag, findComponentById]);
+                showErrorToast,
+                findComponent,
+            ]
+        );
 
         useEffect(() => {
             clearEditingComponent();
@@ -182,6 +206,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 try {
                     if (pagePath === undefined) return;
 
+                    setIsLoading(true);
+
                     const data = await window.api.getJsonContent(pagePath);
 
                     setAllArguments(data.args);
@@ -196,6 +222,8 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
+                } finally {
+                    setIsLoading(false);
                 }
             };
             getJsonData();
@@ -248,10 +276,14 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
                             {activePresentation === APRESENTATION.DESIGN ? (
-                                <IGRPStudioMainComponent
-                                    component={components ?? []}
-                                    onDragEnd={onDragEnd}
-                                />
+                                isLoading ? (
+                                    <Loader />
+                                ) : (
+                                    <IGRPStudioMainComponent
+                                        component={components ?? []}
+                                        onDragEnd={onDragEnd}
+                                    />
+                                )
                             ) : activePresentation === APRESENTATION.JSON ? (
                                 <CodeContentJson
                                     components={components}

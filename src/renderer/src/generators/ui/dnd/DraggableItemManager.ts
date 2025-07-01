@@ -8,7 +8,8 @@ interface DragEndHandlers {
     handleReorderChildInComponent: (draggableId: string, source: Source, destination: Destination) => void;
     generateTag: (name: string) => string;
     addState?: (state: State) => void;
-    findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
+    findComponent: (path: string, componentName: string) => Promise<ComponentRegisterConfig | undefined>;
+    showErrorToast: (message: string) => void;
 }
 
 export const handleDragEnd = async (
@@ -16,9 +17,23 @@ export const handleDragEnd = async (
     handlers: DragEndHandlers
 ): Promise<void> => {
 
+    /**
+     * Validation: For each component that is dropped/moved, we must verify if the destination.{droppableId} 
+     * component has acceptChildren[].name. If it does, we check if the component being dropped is one of the accepted ones.
+     * If not, we don't allow the drop. If acceptChildren is null/empty, we allow it.
+     */
+
     const { draggableId, source, destination, mode, type }: DragEndResult = result;
 
     if (!destination) {
+        return;
+    }
+
+    // Validate if the destination component accepts the dropped component
+    const isDropAllowed = await validateDropPermission(source.componentName || draggableId, destination, handlers);
+
+    if (!isDropAllowed) {
+        handlers.showErrorToast(`Drop not allowed: Component '${source.componentName || draggableId}' cannot be dropped into '${destination.droppableName || destination.droppableId}'`);
         return;
     }
 
@@ -28,6 +43,45 @@ export const handleDragEnd = async (
         await handleDropComponent(draggableId, source, destination, type, handlers);
     }
 }
+
+/**
+ * Validates if a component can be dropped into a destination based on acceptChildren configuration
+ */
+const validateDropPermission = async (
+    draggableId: string,
+    destination: Destination,
+    handlers: DragEndHandlers
+): Promise<boolean> => {
+    try {
+        // Find the destination component by its droppableName
+        
+        // Add null checks for the destination properties
+        if (!destination.droppablePath || !destination.droppableName) {
+            return true;
+        }
+        
+        const destinationComponent = await handlers.findComponent(destination.droppablePath, destination.droppablePath);
+
+        if (!destinationComponent) {
+            return true;
+        }
+
+        // If acceptChildren is null, undefined, or empty array, allow the drop
+        if (!destinationComponent.acceptedChildren || destinationComponent.acceptedChildren.length === 0) {
+            return true;
+        }
+
+        // Check if the dropped component is in the acceptedChildren list
+        const isAccepted = destinationComponent.acceptedChildren.some(
+            (acceptedChild) => acceptedChild.name === draggableId
+        );
+
+        return isAccepted;
+    } catch (error) {
+        // In case of error, allow the drop (fail-safe behavior)
+        return true;
+    }
+};
 
 const handleDropComponent = async (
     draggableId: string,
@@ -75,7 +129,7 @@ const handleDropComponent = async (
     if (defaultChildren) {
         for (const child of defaultChildren) {
             if (childrenTypes && !childrenTypes.some(childType => childType.name === child.name)) {
-                const register = await handlers.findComponentById(child.name)
+                const register = await handlers.findComponent('', child.name)
                 if (register) {
                     const childComponent = await createStructuredComponentRecursive(register, handlers.generateTag, handlers);
                     component.children?.push(childComponent);
@@ -111,7 +165,7 @@ async function createStructuredComponentRecursive(child: ComponentRegisterConfig
     if (defaultChildren) {
         for (const defaultChild of defaultChildren) {
             if (childrenTypes && !childrenTypes.some(childType => childType.name === defaultChild.name)) {
-                const register = await handlers.findComponentById(defaultChild.name)
+                const register = await handlers.findComponent('', defaultChild.name)
                 if (register) {
                     const defaultChildComponent = await createStructuredComponentRecursive(register, generateTag, handlers);
                     children.push(defaultChildComponent);

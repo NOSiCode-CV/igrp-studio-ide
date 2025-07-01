@@ -15,7 +15,7 @@ interface GitService {
   initialize: (token: string) => void;
 }
 
-const DEV_PORT = import.meta.env.VITE_DEV_PORT || 4000;
+const DEV_PORT = process.env.VITE_DEV_PORT || 4000;
 
 export class GitAuth {
   private config: GitProviderConfig;
@@ -32,7 +32,7 @@ export class GitAuth {
     const scopes = this.config.scopes.join(' ');
     const redirectUri = isDev
       ? `http://localhost:${DEV_PORT}/oauth/callback`
-      : import.meta.env.VITE_GIT_REDIRECT_URI;
+      : process.env.VITE_GIT_REDIRECT_URI;
 
     return `${this.config.authUrl}?client_id=${this.config.clientId}&redirect_uri=${redirectUri}` +
       `${this.config.provider === 'gitlab' ? '&response_type=code' : ''}&scope=${scopes}`;
@@ -116,7 +116,7 @@ export class GitAuth {
   private async exchangeCodeForToken(code: string, isDev: boolean) {
     const redirectUri = isDev
       ? `http://localhost:${DEV_PORT}/oauth/callback`
-      : import.meta.env.VITE_GIT_REDIRECT_URI;
+      : process.env.VITE_GIT_REDIRECT_URI;
 
     const body: any = {
       client_id: this.config.clientId,

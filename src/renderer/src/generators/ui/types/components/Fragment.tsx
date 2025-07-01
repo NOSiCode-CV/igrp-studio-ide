@@ -2,9 +2,7 @@ import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
-import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxContainer from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 import BoxWrapper from '../tools/BoxWrapper';
 

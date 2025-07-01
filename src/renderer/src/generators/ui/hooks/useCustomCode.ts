@@ -11,6 +11,16 @@ export interface Option {
     metadata?: any
 }
 
+const defaultTypes = [
+    { value: 'string', label: 'String' },
+    { value: 'number', label: 'Number' },
+    { value: 'boolean', label: 'Boolean' },
+    { value: 'object', label: 'Object' },
+    { value: 'array', label: 'Array' },
+    { value: 'void', label: 'Void' },
+    { value: 'any', label: 'Any' },
+];
+
 interface CustomCodeHook {
     functions: CustomFunctionConfig[];
     states: State[];
@@ -57,10 +67,13 @@ const useCustomCode = (): CustomCodeHook => {
     }, [functions]);
 
     const typesOptions = useMemo<Option[]>(() => {
-        return types.map((type) => ({
+        const dynamicTypeOptions = types.map((type) => ({
             label: type.name,
             value: type.name,
+            metadata: type
         }));
+
+        return [...defaultTypes, ...dynamicTypeOptions];
     }, [types]);
 
     const statesOptions = useMemo<Option[]>(() => {
@@ -68,7 +81,7 @@ const useCustomCode = (): CustomCodeHook => {
             label: type.name,
             value: type.name,
         }));
-    }, [types]);
+    }, [states]);
 
     // Fetch code snippets and metadata
     useEffect(() => {

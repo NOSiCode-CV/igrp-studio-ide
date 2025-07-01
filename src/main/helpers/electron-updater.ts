@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron"
+import { BrowserWindow } from "electron"
 import { autoUpdater } from "electron-updater"
 import log from "electron-log"
 
@@ -25,7 +25,7 @@ export default class AppUpdater {
         autoUpdater.setFeedURL({
             provider: "s3",
             bucket: "igrp-studio",
-            endpoint: import.meta.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
+            endpoint: process.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
             path: `${process.platform}/${process.arch}`,
             channel: "latest"
         });
@@ -42,11 +42,11 @@ export default class AppUpdater {
         autoUpdater.autoInstallOnAppQuit = false; // ❌ NÃO instala ao sair
 
         // ✅ Force updates in development mode
-        if (!app.isPackaged) {
-            this.sendStatusToWindow("⚠️ App is not packaged! Forcing update check in development mode...")
-            autoUpdater.checkForUpdatesAndNotify()
-            return
-        }
+        /*  if (!app.isPackaged) {
+             this.sendStatusToWindow("⚠️ App is not packaged! Forcing update check in development mode...")
+             autoUpdater.checkForUpdatesAndNotify()
+             return
+         } */
 
         autoUpdater.checkForUpdatesAndNotify()
 

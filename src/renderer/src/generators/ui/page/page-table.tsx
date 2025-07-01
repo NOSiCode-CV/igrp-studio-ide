@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import { Badge } from '@renderer/components/ui/badge';
 import { ChevronDown, ChevronRight, FileText, Component } from 'lucide-react';
@@ -35,7 +34,6 @@ export const PageTable = ({
     openDialogNewPage,
     handleDuplicate,
 }: PageTableProps) => {
-    const { t } = useTranslation();
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
     const toggleRowExpansion = (pageName: string) => {

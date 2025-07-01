@@ -16,7 +16,6 @@ import {
 import { cn } from '@renderer/lib/utils';
 import {
     Badge,
-    BrainCircuit,
     ChevronRight,
     FileText,
     FolderTree,

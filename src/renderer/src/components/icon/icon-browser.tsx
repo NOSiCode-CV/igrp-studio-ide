@@ -14,7 +14,6 @@ import {
 import { useDebounce } from 'use-debounce';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
-import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
 
 interface IconBrowserProps {
@@ -90,7 +89,7 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-[435px]">
+                <PopoverContent className="w-[435px] z-[60]">
                     <IGRPInputSearch
                         placeholder="Type to search icon ..."
                         value={search}
@@ -98,19 +97,17 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                             setSearch(e.target.value);
                         }}
                     />
-                    <ScrollArea>
-                        <Grid
-                            ref={gridRef}
-                            columnCount={columnCount}
-                            columnWidth={50}
-                            height={300}
-                            rowCount={rowCount}
-                            rowHeight={50}
-                            width={columnCount * 50 + 20}
-                        >
-                            {Cell}
-                        </Grid>
-                    </ScrollArea>
+                    <Grid
+                        ref={gridRef}
+                        columnCount={columnCount}
+                        columnWidth={50}
+                        height={300}
+                        rowCount={rowCount}
+                        rowHeight={50}
+                        width={columnCount * 50 + 20}
+                    >
+                        {Cell}
+                    </Grid>
                 </PopoverContent>
             </Popover>
         </TooltipProvider>

@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Mouse, Loader2, RefreshCw} from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse} from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -35,7 +35,7 @@ const actionTypeOptions = [
     { value: 'function', label: 'Function' },
     { value: 'navigate', label: 'Navigation' },
     { value: 'formSubmit', label: 'Form Submit' },
-    { value: 'applogic', label: 'App Logic' },
+    /* { value: 'applogic', label: 'App Logic' }, */
 ];
 
 interface NavigationAction {

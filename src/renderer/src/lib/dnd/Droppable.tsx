@@ -11,6 +11,7 @@ interface DroppableProps {
     children: React.ReactNode;
     className?: string;
     accept?: string[];
+    path?: string;
 }
 
 const Droppable = ({
@@ -18,8 +19,9 @@ const Droppable = ({
     component,
     children,
     className,
+    path,
 }: DroppableProps) => {
-    const { id: componentId } = component || {};
+    const { id: componentId, componentName } = component || {};
 
     const [targetHovered, setTargetHovered] = useState<string>('');
 
@@ -40,7 +42,14 @@ const Droppable = ({
     const handleDropItem = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         const droppedItem = handleDrop(e, componentId);
-        onDrop(droppedItem);
+        onDrop({
+            ...droppedItem,
+            destination: {
+                ...droppedItem.destination,
+                droppableName: componentName,
+                droppablePath: path,
+            },
+        });
     };
 
     const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
@@ -76,9 +85,9 @@ const Droppable = ({
             className={cn(
                 'p-3 min-h-12 rounded-lg bg-card', //border border-dashed border-gray-400 hover:border
                 draggingItem &&
-                (activeDropZone?.dropTargetId === componentId ||
-                    targetHovered === componentId) &&
-                'bg-primary/35',
+                    (activeDropZone?.dropTargetId === componentId ||
+                        targetHovered === componentId) &&
+                    'bg-primary/35',
                 className
             )}
         >

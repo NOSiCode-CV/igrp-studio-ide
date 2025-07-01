@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import {
     Card,
@@ -25,20 +25,16 @@ import {
 import {
     Plus,
     MoreHorizontal,
-    Settings,
     Trash2,
     Edit,
     Globe,
     Server,
     Search,
-    Grid3X3,
-    List,
     TestTube,
     Copy,
     Eye,
     EyeOff,
     Download,
-    Upload,
     Loader2,
     CheckCircle,
     XCircle,
@@ -56,7 +52,6 @@ export default function AppLogicPage() {
         environments,
         loading,
         error,
-        isInitialized,
         createEnvironment,
         updateEnvironment,
         deleteEnvironment,
@@ -73,14 +68,6 @@ export default function AppLogicPage() {
     const [testingEnvironments, setTestingEnvironments] = useState<Set<string>>(
         new Set()
     );
-    const [stats, setStats] = useState({
-        total: 0,
-        connected: 0,
-        disconnected: 0,
-        testing: 0,
-        error: 0,
-    });
-
     const filteredEnvironments = searchTerm
         ? searchEnvironments(searchTerm)
         : environments;    

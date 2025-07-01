@@ -3,7 +3,7 @@ import { ArrowRight, ArrowDown, Lock, Unlock, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SectionProps, SizeSytle, SizeValue } from '../types';
 
-export function SizeSection({ onChangeStyles, styles }: SectionProps) {
+export function SizeSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
     const { t } = useTranslation();
     const [sizeState, setSizeState] = useState<SizeSytle>(
         styles.size || {

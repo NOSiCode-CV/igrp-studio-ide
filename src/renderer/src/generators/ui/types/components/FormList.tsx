@@ -49,7 +49,7 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
                             variant="outline"
                             className="font-normal text-xs"
                         >
-                            {badgeValue || 'Obrigatório'}
+                            {badgeValue || 'nobadge'}
                         </Badge>
                     </div>
                     <Droppable

@@ -97,8 +97,7 @@ export const useWorkspace = () => {
 
         try {
             const { result, error } = await window.igrpStudio.workspace.createWorkspace({
-                ...workspaceData,
-                createdAt: new Date().toISOString()
+                ...workspaceData
             });
 
             if (error) {

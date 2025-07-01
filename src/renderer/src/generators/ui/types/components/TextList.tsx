@@ -3,12 +3,11 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import { CardComponentProps } from '../CardComponent';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 import { COMPONENT } from '../../ComponentTypes';
 import { getHoverClasses } from '../../utils/tailwindGroups';
 import { getLabel } from '@renderer/utils';
 import BoxWrapper from '../tools/BoxWrapper';
-import { IGRPIcon } from '@igrp/igrp-framework-react-design-system';
 import Droppable from '@renderer/lib/dnd/Droppable';
 
 const IGRPStudioTextList = ({
@@ -58,6 +57,7 @@ const IGRPStudioTextList = ({
                 ) : (
                     components.map((child, index) => {
                         const { properties } = child;
+                        const { content } = properties;
 
                         return (
                             <Draggable
@@ -73,12 +73,17 @@ const IGRPStudioTextList = ({
                                     parentComp={comp}
                                     comp={child}
                                     onEdit={() => handleEdit(child, newPath)}
-                                    group="group/info-section"
-                                    className="top-0 opacity-0 group-hover/info-section:opacity-100"
+                                    group="group/item-content"
+                                    className="top-0 opacity-0 group-hover/item-content:opacity-100"
                                 >
-                                    <IGRPInfoField
-                                        item={properties}
-                                    ></IGRPInfoField>
+                                    {content ? (
+                                        <>content</>
+                                    ) : (
+                                        <CardComponent
+                                            comp={child}
+                                            onDragEnd={onDragEnd}
+                                        />
+                                    )}
                                 </BoxWrapper>
                             </Draggable>
                         );
@@ -168,24 +173,5 @@ const IGRPStudioTextList = ({
         </div>
     );
 };
-
-function IGRPInfoField({ item }: any) {
-    return (
-        <div className={cn('flex flex-col space-y-0.5')}>
-            <span className="text-sm font-medium">{item.label}</span>
-            <div className="flex items-center gap-2">
-                {item.icon && (
-                    <div className="flex items-center gap-2">
-                        <IGRPIcon
-                            iconName={item.icon}
-                            className={item.iconClassName}
-                        />
-                    </div>
-                )}
-                <span>{item.text}</span>
-            </div>
-        </div>
-    );
-}
 
 export default IGRPStudioTextList;
