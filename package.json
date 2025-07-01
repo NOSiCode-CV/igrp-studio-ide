@@ -32,7 +32,7 @@
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.216",
 		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.417",
-		"@igrp/igrp-studio-springboot-engine": "0.0.1-alpha.85",
+		"@igrp/igrp-studio-springboot-engine": "0.0.2-alpha.8",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^22.0.0",
 		"@radix-ui/react-accordion": "^1.2.11",
