@@ -1,4 +1,5 @@
 import {
+    Arguments,
     CustomFunctionConfig,
     Import,
     State,
@@ -14,6 +15,7 @@ interface TabStatesProps {
     editorRef?: React.RefObject<any>;
     onSelectState?: (state: State) => void;
     globalFilter?: string;
+    pageArguments?: Arguments[];
 }
 
 interface TabFunctionsProps {
@@ -42,14 +44,35 @@ function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TabStates = ({ states, editorRef, onSelectState, globalFilter }: TabStatesProps) => {
+const TabStates = ({
+    states,
+    editorRef,
+    onSelectState,
+    globalFilter,
+    pageArguments,
+}: TabStatesProps) => {
+
+    const allStates = useMemo(() => {
+        const pageArgsAsStates: State[] = (pageArguments || []).map((arg) => ({
+            ...arg,
+            defaultValue: '',
+            imports: [],
+        }));
+        return [...states, ...pageArgsAsStates];
+    }, [states, pageArguments]);
+
     const filteredStates = useMemo(() => {
-        if (!globalFilter) return states;
-        return states.filter(state => 
-            (state.name?.toLowerCase() || '').includes(globalFilter.toLowerCase()) ||
-            (state.type?.toLowerCase() || '').includes(globalFilter.toLowerCase())
+        if (!globalFilter) return allStates;
+        return allStates.filter(
+            (state) =>
+                (state.name?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                ) ||
+                (state.type?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                )
         );
-    }, [states, globalFilter]);
+    }, [allStates, globalFilter]);
 
     const handleInsertState = (state: State) => {
         if (editorRef && editorRef.current) {
@@ -71,7 +94,9 @@ const TabStates = ({ states, editorRef, onSelectState, globalFilter }: TabStates
     return (
         <div className="space-y-4">
             <p className="text-muted-foreground text-xs">
-                Use <strong>Name</strong> to insert the state name, or <strong>Set</strong> to insert the setter function with its default value.
+                Use <strong>Name</strong> to insert the state name, or{' '}
+                <strong>Set</strong> to insert the setter function with its
+                default value.
             </p>
 
             <div className="flex flex-col gap-2">
@@ -82,12 +107,14 @@ const TabStates = ({ states, editorRef, onSelectState, globalFilter }: TabStates
                             className="flex justify-between items-center w-full border p-2 rounded-sm hover:bg-accent hover:text-accent-foreground"
                         >
                             <div className="flex flex-col space-x-2">
-                                <span className="font-medium truncate max-w-[150px]">{state.name}</span>
+                                <span className="font-medium truncate max-w-[150px]">
+                                    {state.name}
+                                </span>
                                 <span className="text-muted-foreground text-sm">
                                     {state.type}
                                 </span>
                             </div>
-                            <div className='space-x-2 flex flex-1 justify-end'>
+                            <div className="space-x-2 flex flex-1 justify-end">
                                 <Button
                                     size={'sm'}
                                     variant="outline"
@@ -97,23 +124,33 @@ const TabStates = ({ states, editorRef, onSelectState, globalFilter }: TabStates
                                 >
                                     Name
                                 </Button>
-                                <Button
-                                    size={'sm'}
-                                    variant="outline"
-                                    onClick={() => {
-                                        handleInsertStateSet(state);
-                                    }}
-                                >
-                                    Set
-                                </Button>
+                                {!pageArguments?.some(
+                                    (arg) => arg.id === state.id
+                                ) && (
+                                    <Button
+                                        size={'sm'}
+                                        variant="outline"
+                                        onClick={() => {
+                                            handleInsertStateSet(state);
+                                        }}
+                                    >
+                                        Set
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     ))
                 ) : (
                     <EmptyList
                         icon={<FunctionSquare />}
-                        title={globalFilter ? "No matching states" : "No States"}
-                        description={globalFilter ? "Try adjusting your search terms" : "Create your first custom state to add functionality to your page!"}
+                        title={
+                            globalFilter ? 'No matching states' : 'No States'
+                        }
+                        description={
+                            globalFilter
+                                ? 'Try adjusting your search terms'
+                                : 'Create your first custom state to add functionality to your page!'
+                        }
                         className="py-12"
                     />
                 )}
@@ -130,10 +167,17 @@ const TabSnipptes = ({
 }: TabSnippetsProps) => {
     const filteredSnippets = useMemo(() => {
         if (!globalFilter) return snippets;
-        return snippets.filter(snippet => 
-            (snippet.title?.toLowerCase() || '').includes(globalFilter.toLowerCase()) ||
-            (snippet.type?.toLowerCase() || '').includes(globalFilter.toLowerCase()) ||
-            (snippet.description?.toLowerCase() || '').includes(globalFilter.toLowerCase())
+        return snippets.filter(
+            (snippet) =>
+                (snippet.title?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                ) ||
+                (snippet.type?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                ) ||
+                (snippet.description?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                )
         );
     }, [snippets, globalFilter]);
 
@@ -179,8 +223,16 @@ const TabSnipptes = ({
                 ) : (
                     <EmptyList
                         icon={<FunctionSquare />}
-                        title={globalFilter ? "No matching snippets" : "No Snippets"}
-                        description={globalFilter ? "Try adjusting your search terms" : "Create your first custom Snnippt to add functionality to your page!"}
+                        title={
+                            globalFilter
+                                ? 'No matching snippets'
+                                : 'No Snippets'
+                        }
+                        description={
+                            globalFilter
+                                ? 'Try adjusting your search terms'
+                                : 'Create your first custom Snnippt to add functionality to your page!'
+                        }
                         className="py-12"
                     />
                 )}
@@ -202,9 +254,14 @@ const TabsFunctions = ({
             : functions;
 
         if (globalFilter) {
-            filtered = filtered.filter(funct => 
-                (funct.name?.toLowerCase() || '').includes(globalFilter.toLowerCase()) ||
-                (funct.returnValue?.type?.toLowerCase() || '').includes(globalFilter.toLowerCase())
+            filtered = filtered.filter(
+                (funct) =>
+                    (funct.name?.toLowerCase() || '').includes(
+                        globalFilter.toLowerCase()
+                    ) ||
+                    (funct.returnValue?.type?.toLowerCase() || '').includes(
+                        globalFilter.toLowerCase()
+                    )
             );
         }
 
@@ -214,7 +271,7 @@ const TabsFunctions = ({
     const handleInsertFunction = (funct: CustomFunctionConfig) => {
         if (editorRef && editorRef.current) {
             let code = funct.code;
-            if ((funct.id || !code ) && funct.name) {
+            if ((funct.id || !code) && funct.name) {
                 code = `${funct.name}();`;
             }
             editorRef.current.insertTextAtCursor(code);
@@ -236,7 +293,9 @@ const TabsFunctions = ({
                             className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
                         >
                             <div className="flex items-center space-x-2">
-                                <span className="font-medium">{funct.name}</span>
+                                <span className="font-medium">
+                                    {funct.name}
+                                </span>
                                 <span className="text-gray-400 text-sm">
                                     {funct.returnValue?.type}
                                 </span>
@@ -255,8 +314,16 @@ const TabsFunctions = ({
                 ) : (
                     <EmptyList
                         icon={<FunctionSquare />}
-                        title={globalFilter ? "No matching functions" : "No Functions"}
-                        description={globalFilter ? "Try adjusting your search terms" : "Create your first custom functions to add functionality to your page!"}
+                        title={
+                            globalFilter
+                                ? 'No matching functions'
+                                : 'No Functions'
+                        }
+                        description={
+                            globalFilter
+                                ? 'Try adjusting your search terms'
+                                : 'Create your first custom functions to add functionality to your page!'
+                        }
                         className="py-12"
                     />
                 )}
@@ -265,12 +332,22 @@ const TabsFunctions = ({
     );
 };
 
-const TabTypes = ({ types, editorRef, globalFilter,onInsertImport }: TabTypesProps) => {
+const TabTypes = ({
+    types,
+    editorRef,
+    globalFilter,
+    onInsertImport,
+}: TabTypesProps) => {
     const filteredTypes = useMemo(() => {
         if (!globalFilter) return types;
-        return types.filter(type => 
-            (type.name?.toLowerCase() || '').includes(globalFilter.toLowerCase()) ||
-            (type.type?.toLowerCase() || '').includes(globalFilter.toLowerCase())
+        return types.filter(
+            (type) =>
+                (type.name?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                ) ||
+                (type.type?.toLowerCase() || '').includes(
+                    globalFilter.toLowerCase()
+                )
         );
     }, [types, globalFilter]);
 
@@ -322,8 +399,12 @@ const TabTypes = ({ types, editorRef, globalFilter,onInsertImport }: TabTypesPro
                 ) : (
                     <EmptyList
                         icon={<Type />}
-                        title={globalFilter ? "No matching types" : "No Types"}
-                        description={globalFilter ? "Try adjusting your search terms" : "Create your first custom type to add functionality to your page!"}
+                        title={globalFilter ? 'No matching types' : 'No Types'}
+                        description={
+                            globalFilter
+                                ? 'Try adjusting your search terms'
+                                : 'Create your first custom type to add functionality to your page!'
+                        }
                         className="py-12"
                     />
                 )}

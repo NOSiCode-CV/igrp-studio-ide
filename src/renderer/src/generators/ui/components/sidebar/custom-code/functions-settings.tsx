@@ -31,11 +31,17 @@ import {
     TabsTrigger,
 } from '@renderer/components/ui/tabs';
 import useCustomCode from '../../../hooks/useCustomCode';
-import { TabsFunctions, TabSnipptes, TabStates, TabTypes } from './custom-code-tabs';
+import {
+    TabsFunctions,
+    TabSnipptes,
+    TabStates,
+    TabTypes,
+} from './custom-code-tabs';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';
 import { GlobalTabFilter, useGlobalTabFilter } from './global-tab-filter';
+import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 
 export const returnTypeOptions = [
     { value: 'string', label: 'String' },
@@ -66,6 +72,8 @@ export const FunctionSettingsSidebar = ({
     const { t } = useTranslation();
     const { states, snippets, functions, types } = useCustomCode();
     const { filterValue, setFilterValue, clearFilter } = useGlobalTabFilter();
+    const { componentArguments } = useComponents();
+
     const [activeTab, setActiveTab] = useState<string>('states');
 
     const [arguments_, setArguments] = useState<Arguments[]>(
@@ -104,8 +112,11 @@ export const FunctionSettingsSidebar = ({
                     onClear={clearFilter}
                     activeTab={activeTab}
                 />
-                
-                <Tabs defaultValue={formik ? 'props' : 'states'} onValueChange={setActiveTab}>
+
+                <Tabs
+                    defaultValue={formik ? 'props' : 'states'}
+                    onValueChange={setActiveTab}
+                >
                     <TabsList
                         className={cn(
                             'grid w-full grid-cols-5',
@@ -204,9 +215,10 @@ export const FunctionSettingsSidebar = ({
                         </TabsContent>
                     )}
                     <TabsContent value="states" className="space-y-4">
-                        <TabStates 
-                            states={states} 
-                            editorRef={editorRef} 
+                        <TabStates
+                            states={states}
+                            pageArguments={componentArguments}
+                            editorRef={editorRef}
                             globalFilter={filterValue}
                         />
                     </TabsContent>
@@ -327,8 +339,11 @@ export const FunctionArguments = ({
         const argument = arguments_.find((arg) => arg.id === argumentId);
         if (argument) {
             updateArgument(argumentId, {
-                functionParameters: (argument.functionParameters || []).map((param) =>
-                    param.id === parameterId ? { ...param, ...updates } : param
+                functionParameters: (argument.functionParameters || []).map(
+                    (param) =>
+                        param.id === parameterId
+                            ? { ...param, ...updates }
+                            : param
                 ),
             });
         }

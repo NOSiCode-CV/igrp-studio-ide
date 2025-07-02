@@ -69,20 +69,20 @@ const Draggable = ({
                 dropZone &&
                     'relative border border-dashed  hover:border-primary/50 rounded-lg bg-card transition-all p-2',
                 draggedId === componentId && dropZone
-                    ? 'opacity-25 border-primary'
+                    ? 'opacity-25 border-primary bg-primary/35'
                     : 'border-border',
                 isDisabled && 'hover:border-destructive',
                 className
             )}
             id={`drag-${componentId}`}
         >
-            {dropZone && (
+           {/*  {dropZone && (
                 <DropZone
                     layoutMode={layout}
                     activeDropZone={activeDropZone}
                     componentId={componentId}
                 />
-            )}
+            )} */}
             {children}
         </div>
     );

@@ -100,8 +100,9 @@ const useCustomCode = (): CustomCodeHook => {
                 setMetadataStates(metadataStates || []);
 
                 setSnippets(snippetsResponse.result?.codes || []);
+                console.log('result', result);
                 if (result) {
-                    setMetadataFunctions(result.functions || []);
+                    setMetadataFunctions([...(result.functions || []), ...(result.actions || [])]);
                     setTypes(result.types || [])
                     setCustomComponents(result.components || [])
                 }

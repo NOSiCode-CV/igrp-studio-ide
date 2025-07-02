@@ -320,7 +320,10 @@ const RenderPropsConfig = ({
                                     name={key}
                                     value={value}
                                     onChange={(e) =>
-                                        onInputChange(fieldPath, e.target.value)
+                                        onInputChange(
+                                            fieldPath,
+                                            (e.target as HTMLInputElement).value
+                                        )
                                     }
                                 />
                             );
@@ -332,7 +335,10 @@ const RenderPropsConfig = ({
                                     name={key}
                                     value={value}
                                     onChange={(e) =>
-                                        onInputChange(fieldPath, e.target.value)
+                                        onInputChange(
+                                            fieldPath,
+                                            (e.target as HTMLInputElement).value
+                                        )
                                     }
                                 />
                             );

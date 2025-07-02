@@ -1,11 +1,10 @@
 import React from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
-import { cn } from '@renderer/lib/utils';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import { gridVariants } from '../../utils/layout-mapping';
+import { useResponsiveClasses } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
@@ -72,6 +71,13 @@ const IGRPStudioGrid: React.FC<CardComponentProps> = ({
         );
     };
 
+    // Gera as classes responsivas usando o hook personalizado
+    const { classes: finalClasses } = useResponsiveClasses(
+        variant,
+        'grid',
+        className
+    );
+
     return (
         <Droppable
             component={comp}
@@ -79,9 +85,7 @@ const IGRPStudioGrid: React.FC<CardComponentProps> = ({
             layout="horizontal"
             className="px-1 py-1.5"
         >
-            <div className={cn(gridVariants({ variant, className }))}>
-                {renderChild()}
-            </div>
+            <div className={finalClasses}>{renderChild()}</div>
         </Droppable>
     );
 };
