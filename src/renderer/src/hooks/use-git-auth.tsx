@@ -30,8 +30,6 @@ const useGitAuth = () => {
         activeProviderId,
     } = useSelector((state: RootState) => state.git);
 
-    console.log('activeProviderId', activeProviderId);
-
     // Get the currently active provider
     const activeProvider =
         activeProviderId === 'github'

@@ -15,6 +15,7 @@ const IGRPStudioContainer = ({
     group,
     hoverClass,
     onDragEnd,
+    className,
 }: CardComponentProps) => {
     const { children: components, id: componentId } = comp || {};
 
@@ -42,7 +43,7 @@ const IGRPStudioContainer = ({
         <Droppable
             onDrop={handleDrop}
             component={comp}
-            className={cn('space-y-3 relative  p-3')}
+            className={cn('space-y-3 relative  p-3', className)}
         >
             {components && components.length > 0 ? (
                 components.map((comp: StructuredComponent, index: number) => {

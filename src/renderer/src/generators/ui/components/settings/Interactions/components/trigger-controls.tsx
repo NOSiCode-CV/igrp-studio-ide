@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Mouse} from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,7 +29,7 @@ import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppLogicAction } from './app-logic/app-logic-action';
 
-type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';;
+type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';
 
 const actionTypeOptions = [
     { value: 'function', label: 'Function' },
@@ -158,46 +158,50 @@ export function TriggerControls({
             </div>
 
             <div className="space-y-1">
-                {Object.entries(localInteractions).map(
-                    ([key, interaction], index) => {
-                        return (
-                            <div
-                                key={index}
-                                className="group flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
-                            >
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        {interactionsType[key]?.label || key}
+                {localInteractions &&
+                    Object.entries(localInteractions).map(
+                        ([key, interaction], index) => {
+                            return (
+                                <div
+                                    key={index}
+                                    className="group flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
+                                >
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            {interactionsType[key]?.label ||
+                                                key}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            variant={'ghost'}
+                                            size={'icon'}
+                                            onClick={() => {
+                                                setOpen(true);
+                                                setInteraction(interaction);
+                                                setInteractionKey(key);
+                                            }}
+                                            className="w-6 h-6"
+                                        >
+                                            <Edit2 size={4} />
+                                        </Button>
+                                        <Button
+                                            variant={'ghost'}
+                                            size={'sm'}
+                                            onClick={() =>
+                                                removeInteraction(key)
+                                            }
+                                        >
+                                            <Trash2
+                                                size={4}
+                                                className="text-destructive"
+                                            />
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        variant={'ghost'}
-                                        size={'icon'}
-                                        onClick={() => {
-                                            setOpen(true);
-                                            setInteraction(interaction);
-                                            setInteractionKey(key);
-                                        }}
-                                        className="w-6 h-6"
-                                    >
-                                        <Edit2 size={4} />
-                                    </Button>
-                                    <Button
-                                        variant={'ghost'}
-                                        size={'sm'}
-                                        onClick={() => removeInteraction(key)}
-                                    >
-                                        <Trash2
-                                            size={4}
-                                            className="text-destructive"
-                                        />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    }
-                )}
+                            );
+                        }
+                    )}
             </div>
 
             {open && interaction && interactionKey && (
@@ -546,8 +550,13 @@ const InteractionEditor = ({
                         />
                     </div>
                 );
-            case "applogic":
-                    return <AppLogicAction currentAction={currentAction} setCurrentAction={setCurrentAction} />
+            case 'applogic':
+                return (
+                    <AppLogicAction
+                        currentAction={currentAction}
+                        setCurrentAction={setCurrentAction}
+                    />
+                );
             default:
                 return null;
         }
@@ -616,4 +625,3 @@ const InteractionEditor = ({
         </Dialog>
     );
 };
-

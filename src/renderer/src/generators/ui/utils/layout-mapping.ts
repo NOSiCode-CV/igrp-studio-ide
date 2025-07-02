@@ -264,3 +264,112 @@ export const flexVariants = cva(
         },
     }
 )
+
+/**
+ * Função para gerar classes responsivas baseadas nos variants
+ * @param variantObj - Objeto com breakpoints e valores (ex: { default: "cols1", md: "cols2", lg: "cols4" })
+ * @returns String com classes CSS responsivas
+ * 
+ * @example
+ * ```javascript
+ * // Para grid columns
+ * const variant = {
+ *   "default": "cols1",    // grid-cols-1
+ *   "md": "cols2",         // md:grid-cols-2
+ *   "lg": "cols4"          // lg:grid-cols-4
+ * };
+ * 
+ * const classes = generateResponsiveClasses(variant);
+ * // Resultado: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+ * 
+ * // Para column spans
+ * const spanVariant = {
+ *   "default": "span1",    // col-span-1
+ *   "md": "span2",         // md:col-span-2
+ *   "lg": "span4"          // lg:col-span-4
+ * };
+ * 
+ * const spanClasses = generateResponsiveClasses(spanVariant);
+ * // Resultado: "col-span-1 md:col-span-2 lg:col-span-4"
+ * ```
+ */
+export const generateResponsiveClasses = (variantObj: any) => {
+    if (!variantObj || typeof variantObj !== 'object') {
+        return '';
+    }
+
+    const breakpoints = {
+        default: '',
+        sm: 'sm:',
+        md: 'md:',
+        lg: 'lg:',
+        xl: 'xl:',
+        '2xl': '2xl:'
+    };
+
+    const classes: string[] = [];
+
+    Object.entries(variantObj).forEach(([breakpoint, value]) => {
+        if (value && typeof value === 'string') {
+            const prefix = breakpoints[breakpoint as keyof typeof breakpoints] || '';
+            
+            // Mapeia diferentes tipos de valores para classes CSS
+            let gridClass = value;
+            if (value.startsWith('cols')) {
+                gridClass = value.replace('cols', 'grid-cols-');
+            } else if (value.startsWith('rows')) {
+                gridClass = value.replace('rows', 'grid-rows-');
+            } else if (value.startsWith('span')) {
+                gridClass = value.replace('span', 'col-span-');
+            } else if (value.startsWith('gap-')) {
+                gridClass = value; // Mantém gap como está
+            } else if (value.startsWith('place-')) {
+                gridClass = value; // Mantém place como está
+            } else if (value.includes('grid-cols-') || value.includes('grid-rows-') || value.includes('col-span-')) {
+                gridClass = value; // Já está no formato correto
+            }
+            
+            classes.push(`${prefix}${gridClass}`);
+        }
+    });
+
+    // Adiciona gap padrão se não especificado (apenas para grid, não para span)
+    if (classes.length > 0 && 
+        !classes.some(cls => cls.includes('gap-')) && 
+        !classes.some(cls => cls.includes('col-span-'))) {
+        classes.push('gap-4');
+    }
+
+    return classes.join(' ');
+};
+
+/**
+ * Hook personalizado para facilitar o uso da função generateResponsiveClasses
+ * @param variant - Objeto com breakpoints e valores
+ * @param baseClass - Classe base (padrão: 'grid')
+ * @param additionalClasses - Classes adicionais opcionais
+ * @returns Objeto com classes finais, classes responsivas e variant
+ * 
+ * @example
+ * ```javascript
+ * // Para grid
+ * const variant = { default: "cols1", lg: "cols4" };
+ * const { classes } = useResponsiveClasses(variant, 'grid', 'my-custom-class');
+ * // classes = "grid grid-cols-1 lg:grid-cols-4 gap-4 my-custom-class"
+ * 
+ * // Para column spans
+ * const spanVariant = { default: "span1", lg: "span4" };
+ * const { classes } = useResponsiveClasses(spanVariant, 'span', 'my-custom-class');
+ * // classes = "span col-span-1 lg:col-span-4 my-custom-class"
+ * ```
+ */
+export const useResponsiveClasses = (variant: any, baseClass: string = 'grid', additionalClasses?: string) => {
+    const responsiveClasses = generateResponsiveClasses(variant);
+    const finalClasses = [baseClass, responsiveClasses, additionalClasses].filter(Boolean).join(' ');
+    
+    return {
+        classes: finalClasses,
+        responsiveClasses,
+        variant
+    };
+};
