@@ -6,10 +6,10 @@ import {
     CardTitle,
 } from '@renderer/components/ui/card';
 import { ProjectData } from 'src/main/types';
-import { projectIcons } from '@renderer/constants/appConstants';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@renderer/lib/utils';
+import { FrameworkIcon } from '@renderer/components/framework-icon';
 
 interface PageProps {
     basePath?: string;
@@ -95,15 +95,12 @@ export default function ProjectSettings({
                         <SettingsRow
                             label="icon"
                             value={
-                                <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
-                                    <img
-                                        src={projectIcons[framework]}
-                                        alt={`${project.framework} logo`}
-                                        width={16}
-                                        height={16}
-                                        className="h-68 w-8"
-                                    />
-                                </div>
+                                <FrameworkIcon
+                                    framework={framework as any}
+                                    size={16}
+                                    className="h-12 w-12 rounded-lg bg-muted p-2"
+                                    alt={`${project.framework} logo`}
+                                />
                             }
                             onEdit={() =>
                                 console.log(t('edit', { context: 'icon' }))

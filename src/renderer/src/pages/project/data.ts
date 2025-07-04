@@ -78,4 +78,13 @@ export const backendFrameworks = [
         views: '2.3K',
         availableSupport: false
     },
+    {
+        id: 'go',
+        name: 'Go',
+        description: 'Go Programming Language',
+        icon: '/placeholder.svg?height=40&width=40',
+        stars: '72K',
+        views: '2.3K',
+        availableSupport: false
+    }
 ];

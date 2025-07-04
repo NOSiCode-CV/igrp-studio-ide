@@ -166,7 +166,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 ...page,
                 pageName: page?.content?.pageName,
                 pagePath: page?.content?.path,
-                isPage: false,
+                isPage: true,
             }));
     };
 

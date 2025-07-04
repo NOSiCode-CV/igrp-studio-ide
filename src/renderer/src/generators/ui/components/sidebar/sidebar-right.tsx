@@ -42,6 +42,7 @@ import {
 } from 'react';
 import Loader from '@renderer/components/loader';
 import { getRequiredDataSchema } from '../../dnd/helpers';
+import { useComponents } from '../../hooks/useComponents';
 
 interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -69,6 +70,9 @@ const SidebarRight = ({
     } = useDroppedComponents();
 
     const { statesOptions } = useCustomCode();
+    const { getArqumentsOptions, getRefsOptions } = useComponents();
+    const argumentsOptions = getArqumentsOptions();
+    const refsOptions = getRefsOptions();
 
     // Memoized derived state
     const currentComp = useMemo(
@@ -103,9 +107,9 @@ const SidebarRight = ({
         Record<string, any>
     >({});
 
-    const [columnsOptions, setColumnsOptions] = useState<IGRPOptionsProps[]>(
-        []
-    );
+    const [columnsOptions, setColumnsOptions] = useState<
+        (IGRPOptionsProps & { type?: 'variable' | 'column' })[]
+    >([]);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -147,9 +151,21 @@ const SidebarRight = ({
                     return {
                         value: column.tag,
                         label: column.properties.headerTitle,
+                        type: 'column' as const,
                     };
                 }) ?? [];
-        setColumnsOptions(options);
+
+        // Join all data sources with type indicators
+        const combinedDataOptions = [
+            ...argumentsOptions.map((option) => ({
+                ...option,
+                type: 'variable' as const,
+                label: `${option.label} (Variable)`,
+            })),
+            ...options,
+        ];
+
+        setColumnsOptions(combinedDataOptions);
     }, [parentComp]);
 
     // Load properties component and delete data not in the schema
@@ -184,11 +200,24 @@ const SidebarRight = ({
                     }
                 });
 
+                // Remove keys with empty object values
+                Object.keys(cleanedData).forEach((key) => {
+                    if (
+                        cleanedData[key] &&
+                        typeof cleanedData[key] === 'object' &&
+                        !Array.isArray(cleanedData[key]) &&
+                        Object.keys(cleanedData[key]).length === 0
+                    ) {
+                        delete cleanedData[key];
+                        hasChanges = true;
+                    }
+                });
+
                 setTempEditingComponent(
                     (prev) =>
                         ({
-                            ...prev,
                             ...currentComp,
+                            ...prev,
                             data: cleanedData,
                         }) as StructuredComponent
                 );
@@ -308,16 +337,18 @@ const SidebarRight = ({
                 // Initialize form values with deep merge
                 const initialValues = deepMerge(target, source);
 
+                console.log(initialValues);
+
                 setTempEditingComponent(
                     (prev) =>
                         ({
-                            ...prev,
                             ...currentComp,
+                            ...prev,
                             properties: initialValues,
                         }) as StructuredComponent
                 );
 
-                //TODO review this, when the data is not in the schema, it is not updated
+                //TODO review this, when properties key
                 if (data && tempEditingComponent?.data) {
                     // Check if any data keys are referenced in the schema properties
                     /* const cleanedData = { ...tempEditingComponent.data };
@@ -700,6 +731,7 @@ const SidebarRight = ({
                                     onInteranctionsChange={
                                         handleUpdateChildComponent
                                     }
+                                    columnsOptions={columnsOptions}
                                 />
                             </TabsContent>
                         </Tabs>

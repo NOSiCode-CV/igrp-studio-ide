@@ -100,7 +100,7 @@ const useCustomCode = (): CustomCodeHook => {
                 setMetadataStates(metadataStates || []);
 
                 setSnippets(snippetsResponse.result?.codes || []);
-                console.log('result', result);
+                //TODO review this, when the data is not in the schema, it is not updated
                 if (result) {
                     setMetadataFunctions([...(result.functions || []), ...(result.actions || [])]);
                     setTypes(result.types || [])

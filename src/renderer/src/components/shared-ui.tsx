@@ -1,8 +1,8 @@
 import { ProjectData } from 'src/main/types';
-import { projectIcons } from '@renderer/constants/appConstants';
 import { LucideIcon, Search } from 'lucide-react';
 import { Input } from './ui/input';
 import * as LucideIcons from 'lucide-react';
+import { FrameworkIcon } from './framework-icon';
 
 interface HeadlineProps {
     icon?: LucideIcon; // Optional icon
@@ -33,17 +33,14 @@ function ProjectIcon({ project }: { project: ProjectData }) {
                 className="rounded-full"
             />
         </div>
-    ) : projectIcons[project.framework] ? (
-        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-            {' '}
-            <img
-                src={projectIcons[project.framework]}
-                alt={`${project.framework} logo`}
-                width={20}
-                height={20}
-            />
-        </div>
-    ) : null;
+    ) : (
+        <FrameworkIcon
+            framework={project.framework as any}
+            size={20}
+            className="h-8 w-8 rounded-lg bg-muted p-1"
+            alt={`${project.framework} logo`}
+        />
+    );
 }
 
 function SearchInput({

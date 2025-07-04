@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { projectIcons } from '@renderer/constants/appConstants';
+import { FrameworkIcon } from '@/renderer/src/components/framework-icon';
 import DashboardOverview from '../components/dashboard-overview';
 import { useTranslation } from 'react-i18next';
 
@@ -124,17 +124,12 @@ const Overview = () => {
                         <>
                             <div className="space-x-3 flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shadow-lg">
-                                        <img
-                                            src={
-                                                projectIcons[project.framework]
-                                            }
-                                            alt={`${project.framework} logo`}
-                                            width={16}
-                                            height={16}
-                                            className="h-68 w-8"
-                                        />
-                                    </div>
+                                                                    <FrameworkIcon
+                                    framework={project.framework as any}
+                                    size={16}
+                                    className="w-10 h-10 bg-muted rounded-lg shadow-lg p-2"
+                                    alt={`${project.framework} logo`}
+                                />
                                     <div>
                                         <h1 className="text-2xl font-semibold">
                                         {t('projectDetails')}

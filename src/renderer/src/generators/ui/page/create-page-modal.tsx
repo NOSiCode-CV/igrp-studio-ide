@@ -21,6 +21,7 @@ import {
 } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
 import { PageDefinition } from './page-manager';
+import { getDynamicSegments } from '@renderer/generators/ui/components/settings/properties/route-parser';
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -33,7 +34,8 @@ const initialValues: PageConfig = {
     states: [],
     functions: [],
     parentName: undefined,
-};
+    args: [],
+} as any;
 
 interface CreatePageModalProps {
     isOpen: boolean;
@@ -95,6 +97,24 @@ export function CreatePageModal({
 
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
+            // Auto-generate args based on path
+            const dynamicSegments = getDynamicSegments(pageConfig.path);
+            if (dynamicSegments.length > 0) {
+                const generatedArgs = dynamicSegments.map((segment) => ({
+                    id: getId(),
+                    type: 'string', // Default type for dynamic segments
+                    name: segment.name,
+                    isList: false,
+                    isOptional: segment.type === 'optional-catch-all',
+                    isInterface: false,
+                    isFunction: false,
+                    isState: false,
+                }));
+
+                // Add args to pageConfig (we'll need to extend the interface)
+                (pageConfig as any).args = generatedArgs;
+            }
+
             const { error } = await window.engine.createPage(
                 { ...pageConfig },
                 ENV_TYPES.NEXTJS,
@@ -175,6 +195,46 @@ export function CreatePageModal({
         formik.setFieldValue('pageName', generatedPath);
     };
 
+    // Auto-generate args when path changes
+    useEffect(() => {
+        const path = formik.values.path;
+        if (path) {
+            const dynamicSegments = getDynamicSegments(path);
+            if (dynamicSegments.length > 0) {
+                const generatedArgs = dynamicSegments.map((segment) => ({
+                    id: getId(),
+                    type: 'string', // Default type for dynamic segments
+                    name: segment.name,
+                    isList: false,
+                    isOptional: segment.type === 'optional-catch-all',
+                    isInterface: false,
+                    isFunction: false,
+                    isState: false,
+                }));
+
+                // Only update if args are different from current ones
+                const currentArgNames =
+                    (formik.values as any).args?.map((a: any) => a.name) || [];
+                const newArgNames = generatedArgs.map((a) => a.name);
+
+                if (
+                    JSON.stringify(currentArgNames.sort()) !==
+                    JSON.stringify(newArgNames.sort())
+                ) {
+                    formik.setFieldValue('args', generatedArgs);
+                }
+            } else {
+                // Clear args if no dynamic segments found
+                if (
+                    (formik.values as any).args &&
+                    (formik.values as any).args.length > 0
+                ) {
+                    formik.setFieldValue('args', []);
+                }
+            }
+        }
+    }, [formik.values.path]);
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
@@ -225,6 +285,36 @@ export function CreatePageModal({
                             error={formik.errors.path}
                             isRequired
                         />
+
+                        {/* Show generated dynamic args */}
+                        {(formik.values as any).args &&
+                            (formik.values as any).args.length > 0 && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-foreground">
+                                        Dynamic Arguments (Auto-generated)
+                                    </label>
+                                    <div className="flex flex-wrap gap-2 p-3 bg-muted rounded-lg">
+                                        {(formik.values as any).args.map(
+                                            (arg: any, index: number) => (
+                                                <div
+                                                    key={index}
+                                                    className="px-2 py-1 bg-primary/10 text-primary text-xs rounded border"
+                                                >
+                                                    {arg.name} ({arg.type}){' '}
+                                                    {arg.isOptional
+                                                        ? '(optional)'
+                                                        : ''}
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        These arguments will be automatically
+                                        generated based on the dynamic segments
+                                        in your path.
+                                    </p>
+                                </div>
+                            )}
 
                         <CheckboxInput
                             id="forceDynamic"
