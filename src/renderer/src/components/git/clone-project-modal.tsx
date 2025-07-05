@@ -40,6 +40,7 @@ export function CloneProjectModal({
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
+    const [isCloning, setIsCloning] = useState(false);
 
     const { showErrorToast, showSuccessToast } = useToast();
 
@@ -61,9 +62,27 @@ export function CloneProjectModal({
         setUsername('');
         setPassword('');
         setToken('');
+        setIsCloning(false);
     };
 
     const handleCloneProject = async (): Promise<void> => {
+        // Validate required fields
+        if (!projectUrl.trim()) {
+            showErrorToast(t('repositoryUrlRequired'));
+            return;
+        }
+
+        // Validate authentication fields based on type
+        if (authType === 'basic' && (!username.trim() || !password.trim())) {
+            showErrorToast(t('usernameAndPasswordRequired'));
+            return;
+        }
+
+        if (authType === 'token' && !token.trim()) {
+            showErrorToast(t('tokenRequired'));
+            return;
+        }
+
         const extractProjectPath = (projectUrl: string): string => {
             const match = projectUrl.match(/\/([^\/]+)\.git$/);
             return match ? match[1] : '';
@@ -71,19 +90,27 @@ export function CloneProjectModal({
 
         const projectPath = `/projects/${extractProjectPath(projectUrl)}`;
 
-        try {
+        // Prepare authentication data
+        const auth = {
+            type: authType,
+            ...(authType === 'basic' && { username, password }),
+            ...(authType === 'token' && { token }),
+        };
 
+        setIsCloning(true);
+        try {
             await window.electron.ipcRenderer.invoke(
                 'clone-repository',
                 projectUrl,
-                `${workspace.path}${projectPath}`
+                `${workspace.path}${projectPath}`,
+                auth
             );
-
         } catch (error) {
             console.error(t('errorCloningRepository'), error);
             showErrorToast(error);
+        } finally {
+            setIsCloning(false);
         }
-
     };
 
     useEffect(() => {
@@ -297,9 +324,13 @@ export function CloneProjectModal({
                                     </Tabs>
                                 </div>
                             </div>
-                            <Button onClick={handleCloneProject} className="w-full">
+                            <Button 
+                                onClick={handleCloneProject} 
+                                className="w-full"
+                                disabled={isCloning}
+                            >
                                 <GitFork className="w-4 h-4 mr-2" />
-                                {t('cloneProject')}
+                                {isCloning ? t('cloningProject') : t('cloneProject')}
                             </Button>
                         </TabsContent>
                         <TabsContent
