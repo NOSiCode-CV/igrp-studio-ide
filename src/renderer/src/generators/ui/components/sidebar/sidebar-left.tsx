@@ -109,7 +109,7 @@ export function AppSidebar({
         <Sidebar
             collapsible="icon"
             className={cn(
-                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!',
+                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]! group-data-[side=left]:border-r-0',
                 props.className
             )}
             {...props}

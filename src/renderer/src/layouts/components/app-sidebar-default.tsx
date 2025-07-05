@@ -68,8 +68,11 @@ const IGRPSidebar = ({
 }: IGRPSidebarProps) => {
     return (
         <Sidebar
-            className={cn('bg-card dark:bg-gray-900', 'border-r border-border')}
             collapsible={collapsible}
+            className={cn(
+                props.className,
+                'group-data-[side=left]:border-r-none'
+            )}
             {...props}
         >
             {children}

@@ -86,8 +86,6 @@ export default function TabManager({ basePath }: ContentProps) {
                 )}
             </TabsNavigation>
 
-            <Separator />
-
             {tabs.map((tab) => (
                 <div
                     key={tab.id}
