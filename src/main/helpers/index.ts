@@ -87,9 +87,11 @@ export async function getJsonContent(filePath: string): Promise<any> {
 
 export async function getFileContent(filePath: string): Promise<any> {
     try {
-        return fs.readFileSync(filePath, 'utf-8');
+        // Normalize the file path to handle spaces and special characters
+        const normalizedPath = path.resolve(filePath);
+        return fs.readFileSync(normalizedPath, 'utf-8');
     } catch (err) {
-        console.error('Error reading JSON file:', err);
+        console.error('Error reading file:', err);
         return null;
     }
 }
@@ -183,7 +185,9 @@ export const readDirectory = (dirPath: string): FileTree[] => {
 
 export async function readProjectFile(filePath: string): Promise<any> {
     try {
-        return fs.readFileSync(filePath, 'utf-8');
+        // Normalize the file path to handle spaces and special characters
+        const normalizedPath = path.resolve(filePath);
+        return fs.readFileSync(normalizedPath, 'utf-8');
     } catch (err) {
         console.error('Error reading file:', err);
         return null;

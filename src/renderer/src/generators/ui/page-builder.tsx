@@ -3,64 +3,73 @@ import {
     useCallback,
     useEffect,
     useImperativeHandle,
+    useMemo,
     useState,
 } from 'react';
 
 import { useConfigdata } from './hooks/useConfigData';
-import {
-    ComponentConfig,
-    PageConfig,
-} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useToast from '@renderer/hooks/useToast';
 import { CodeContentJson, CodeContentTS } from './components/CodeContent';
 
-import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
-import { DragEndResult, StructuredLayout } from '@renderer/lib/dnd/types';
+import { DragEndResult } from '@renderer/lib/dnd/types';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
-import { APRESENTATION, ENV_TYPES } from '@renderer/constants/appConstants';
-import { useDispatch } from 'react-redux';
+import { APRESENTATION } from '@renderer/constants/appConstants';
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
 import { useTagManager } from './hooks/useTagManager';
-import { COMPONENT } from './ComponentTypes';
-import { newStructuredComponent } from './dnd/helpers';
 import useStudio from '@renderer/hooks/use-studio';
 import useCustomCode from './hooks/useCustomCode';
-import { EngineService } from '@renderer/services/EngineService';
+
 import { PageDefinition } from './page/page-manager';
 import IGRPStudioMainComponent from './types/components/MainComponent';
 import SidebarRight from './components/sidebar/sidebar-right';
 import { handleDragEnd } from './dnd/DraggableItemManager';
 import Loader from '@renderer/components/loader';
 
-interface FormEngineProps {
+// Custom hooks for better organization
+import { useDebug } from './hooks/useDebug';
+import { useComponentRegistration } from './hooks/useComponentRegistration';
+import { useComponentInitialization } from './hooks/useComponentInitialization';
+import { usePageSave } from './hooks/usePageSave';
+
+interface PageBuilderProps {
     basePath: string;
     page: PageDefinition;
     activePresentation: string;
     onSave: () => void;
 }
 
-interface FormEngineRef {
+interface PageBuilderRef {
     handleSave: () => void;
 }
 
-const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
+// Improved error handling types
+interface SaveError {
+    message: string;
+    code?: string;
+    details?: any;
+}
+
+const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
     ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath } = page;
-
         const isPage = content?.type === 'page';
 
+        // Debug hook to track renders
+        useDebug('FormEngine', [
+            basePath,
+            pagePath,
+            activePresentation,
+            isPage,
+        ]);
+
+        // Custom hooks for better separation of concerns
         const {
-            handleAddChildToComponent,
-            handleReorderChildInComponent,
-            removeRow,
-            clearEditingComponent,
-            currentComponent,
+            components,
             types,
             functions,
             states,
-            components,
             imports,
             setAllImports,
             setAllTypes,
@@ -68,9 +77,12 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             setAllComponents,
             setAllStates,
             setAllArguments,
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
+            removeRow,
+            clearEditingComponent,
+            currentComponent,
         } = useDroppedComponents();
-
-        const { showErrorToast, showSuccessToast } = useToast();
 
         const {
             componentsRegistered,
@@ -80,70 +92,38 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         } = useStudio();
 
         const { customComponents } = useCustomCode();
-
         const { menuItems } = useConfigdata(componentsRegistered);
-
-        const dispatch: any = useDispatch();
-
         const { rebuild, generateTag } = useTagManager(components);
 
+        // Temporary: Back to original implementation to identify the issue
         const [loading, setLoading] = useState<boolean>(false);
-
         const [isLoading, setIsLoading] = useState<boolean>(false);
 
-        // Internal handleSave function in FormEngine
-        const internalHandleSave = () => {
-            handleSave(components);
-        };
+        const { showErrorToast } = useToast();
+
+        const { handleSave } = usePageSave({
+            basePath,
+            content,
+            id,
+            components,
+            functions,
+            types,
+            states,
+            imports,
+            isPage,
+            page,
+        });
 
         // Expose handleSave to parent via ref
-        useImperativeHandle(ref, () => ({
-            handleSave: internalHandleSave,
-        }));
-        const handleSave = async (components: StructuredLayout) => {
-            try {
-                if (basePath === undefined) return;
+        useImperativeHandle(
+            ref,
+            () => ({
+                handleSave: () => handleSave(components),
+            }),
+            [handleSave, components]
+        );
 
-                const config: any = {
-                    ...content,
-                    id,
-                    components,
-                    functions,
-                    types,
-                    states,
-                    imports,
-                };
-
-                const pageConfig: PageConfig = {
-                    ...config,
-                };
-
-                const compConfig: ComponentConfig = {
-                    ...config,
-                };
-
-                console.log(isPage ? pageConfig : compConfig);
-
-                const { error } = await window.engine.createPage(
-                    isPage ? pageConfig : compConfig,
-                    ENV_TYPES.NEXTJS,
-                    basePath
-                );
-
-                if (error) {
-                    console.log(error);
-                    showErrorToast(error);
-                    return;
-                }
-
-                showSuccessToast('Components added successfully');
-
-                dispatch(onSetChangeStatus(true));
-            } catch (error) {
-                showErrorToast(error);
-            }
-        };
-
+        // Memoized drag end handler
         const onDragEnd = useCallback(
             async (result: DragEndResult) => {
                 const droppedComponentsMethods = {
@@ -161,7 +141,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                     showErrorToast,
                 };
 
-                console.log('dropZone', result);
+                console.log('Drag end result:', result);
                 await handleDragEnd(result, droppedComponentsMethods);
             },
             [
@@ -174,32 +154,24 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
             ]
         );
 
+        // Effects for component lifecycle management
         useEffect(() => {
             clearEditingComponent();
         }, [activePresentation]);
 
-        useEffect(() => {
-            const appComponents = fetchComponents();
+        useComponentRegistration({
+            customComponents,
+            fetchComponents,
+            page,
+        });
 
-            const registerComponents = () => {
-                EngineService.registerComponent({
-                    customComponents,
-                    appComponents,
-                    currentPage: page.pageName,
-                });
-            };
-
-            registerComponents();
-
-            window.electron.ipcRenderer.on('folder-change', registerComponents);
-
-            return () => {
-                window.electron.ipcRenderer.removeListener(
-                    'folder-change',
-                    registerComponents
-                );
-            };
-        }, [customComponents]);
+        const { initializeComponents } = useComponentInitialization({
+            isPage,
+            menuItems,
+            findComponentById,
+            generateTag,
+            setAllComponents,
+        });
 
         useEffect(() => {
             const getJsonData = async () => {
@@ -231,43 +203,58 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
 
         useEffect(() => {
             if (loading) return;
-
-            const mainComponent = isPage
-                ? COMPONENT.PageContent
-                : COMPONENT.ComponentContent;
-
-            const initializeComponents = async () => {
-                const pageCompRegister = await findComponentById(mainComponent);
-                const sectionCompRegister = await findComponentById(
-                    COMPONENT.Section
-                );
-
-                const section = newStructuredComponent(
-                    COMPONENT.Section,
-                    [],
-                    sectionCompRegister
-                );
-
-                const pageContent = newStructuredComponent(
-                    mainComponent,
-                    isPage
-                        ? [{ ...section, tag: generateTag(COMPONENT.Section) }]
-                        : [],
-                    pageCompRegister
-                );
-
-                setAllComponents({
-                    ...pageContent,
-                    tag: generateTag(mainComponent),
-                });
-            };
-
             initializeComponents();
-        }, [menuItems, loading, isPage]);
+        }, [menuItems, loading, isPage, initializeComponents]);
 
         useEffect(() => {
             rebuild();
         }, [components, rebuild]);
+
+        // Memoized render content for better performance
+        const renderContent = useMemo(() => {
+            if (activePresentation === APRESENTATION.DESIGN) {
+                return isLoading ? (
+                    <Loader />
+                ) : (
+                    <IGRPStudioMainComponent
+                        component={components ?? []}
+                        onDragEnd={onDragEnd}
+                    />
+                );
+            } else if (activePresentation === APRESENTATION.JSON) {
+                return (
+                    <CodeContentJson
+                        components={components}
+                        pagePath={pagePath}
+                    />
+                );
+            } else if (activePresentation === APRESENTATION.CODE) {
+                // Ensure pagePath is properly formatted and handle spaces
+                const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
+                const tsFilePath = cleanPagePath
+                    ? `${basePath}/src/app/[locale]/(igrp)/(generated)/${cleanPagePath}/page.tsx`
+                    : `${basePath}/src/app/[locale]/(igrp)/(generated)/page.tsx`;
+
+                return <CodeContentTS pagePath={tsFilePath} />;
+            } else {
+                return isLoading ? (
+                    <Loader />
+                ) : (
+                    <IGRPStudioMainComponent
+                        component={components ?? []}
+                        onDragEnd={onDragEnd}
+                    />
+                );
+            }
+        }, [
+            activePresentation,
+            isLoading,
+            components,
+            onDragEnd,
+            pagePath,
+            basePath,
+            page,
+        ]);
 
         return (
             <div className="flex flex-1 overflow-hidden">
@@ -275,25 +262,7 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
                 <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
-                            {activePresentation === APRESENTATION.DESIGN ? (
-                                isLoading ? (
-                                    <Loader />
-                                ) : (
-                                    <IGRPStudioMainComponent
-                                        component={components ?? []}
-                                        onDragEnd={onDragEnd}
-                                    />
-                                )
-                            ) : activePresentation === APRESENTATION.JSON ? (
-                                <CodeContentJson
-                                    components={components}
-                                    pagePath={pagePath}
-                                />
-                            ) : (
-                                <CodeContentTS
-                                    pagePath={`${basePath}/src/app/(generated)/${page.pagePath}/page.tsx`}
-                                />
-                            )}
+                            {renderContent}
                         </ContainerScrollArea>
                     </div>
                 </SidebarInset>
@@ -302,4 +271,5 @@ const FormEngine = forwardRef<FormEngineRef, FormEngineProps>(
         );
     }
 );
-export default FormEngine;
+
+export default PageBuilder;

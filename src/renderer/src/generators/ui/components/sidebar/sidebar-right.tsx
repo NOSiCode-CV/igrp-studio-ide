@@ -70,9 +70,8 @@ const SidebarRight = ({
     } = useDroppedComponents();
 
     const { statesOptions } = useCustomCode();
-    const { getArqumentsOptions, getRefsOptions } = useComponents();
+    const { getArqumentsOptions } = useComponents();
     const argumentsOptions = getArqumentsOptions();
-    const refsOptions = getRefsOptions();
 
     // Memoized derived state
     const currentComp = useMemo(
@@ -108,7 +107,7 @@ const SidebarRight = ({
     >({});
 
     const [columnsOptions, setColumnsOptions] = useState<
-        (IGRPOptionsProps & { type?: 'variable' | 'column' })[]
+        (IGRPOptionsProps & { type?: 'column' | 'pageParam' })[]
     >([]);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -159,7 +158,7 @@ const SidebarRight = ({
         const combinedDataOptions = [
             ...argumentsOptions.map((option) => ({
                 ...option,
-                type: 'variable' as const,
+                type: 'pageParam' as const,
                 label: `${option.label} (Variable)`,
             })),
             ...options,
@@ -283,6 +282,8 @@ const SidebarRight = ({
                         {} as Record<string, any>
                     );
 
+                console.log(currentComp?.properties)
+
                 const source = // Filter properties based on schema and requirements
                     Object.entries(currentComp?.properties ?? {}).reduce(
                         (acc, [key, value]) => {
@@ -304,11 +305,11 @@ const SidebarRight = ({
                                     (nestedAcc, [nestedKey, nestedValue]) => {
                                         const nestedConfig =
                                             schemaConfig.properties[nestedKey];
-                                        // Keep if in schema and (required or not null)
+                                        // Keep if in schema and (required or value exists, including null)
                                         if (
                                             nestedConfig &&
                                             (nestedConfig.required ||
-                                                nestedValue !== null)
+                                                nestedValue !== undefined)
                                         ) {
                                             nestedAcc[nestedKey] = nestedValue;
                                         }
@@ -324,8 +325,8 @@ const SidebarRight = ({
                                 }
                             }
                             // Handle non-object properties
-                            else if (schemaConfig.required || value) {
-                                // For string type, keep empty strings
+                            else if (schemaConfig.required || value !== undefined) {
+                                // Keep the value if it exists in current properties (including null)
                                 acc[key] = value;
                             }
 
@@ -333,6 +334,7 @@ const SidebarRight = ({
                         },
                         {} as Record<string, any>
                     );
+                console.log(source, target);
 
                 // Initialize form values with deep merge
                 const initialValues = deepMerge(target, source);
