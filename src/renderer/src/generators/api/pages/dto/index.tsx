@@ -34,8 +34,8 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
 
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value];
-        const data = formik?.values?.[value];
-        const errors = formik?.errors?.[value];
+        const data = (formik?.values as any)?.[value];
+        const errors = (formik?.errors as any)?.[value];
         const dValues = initialValues.attributes[0];
 
         if (columns && data) {
@@ -118,15 +118,15 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 options={
                                     dtos && dtos.length > 0
                                         ? dtos.map(
-                                              ({ label, module, value }) => ({
+                                              ({ label, module, value }: { label: string, module: string, value: string }) => ({
                                                   label: `${label} (${module})`,
                                                   value: `${value}-${module}`,
                                               })
                                           )
                                         : []
                                 }
-                                onChange={(option) =>
-                                    handleChangeExtends(option as string)
+                                onChange={(option: string | boolean) =>
+                                    typeof option === 'string' && handleChangeExtends(option)
                                 }
                                 onBlur={formik.handleBlur}
                                 error={formik.errors.extends}
@@ -138,7 +138,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 </Label>
                                 <Checkbox
                                     id="enableCustonValidation"
-                                    onCheckedChange={(checked) =>
+                                    onCheckedChange={(checked: boolean) =>
                                         formik.setFieldValue(
                                             'enableCustonValidation',
                                             checked

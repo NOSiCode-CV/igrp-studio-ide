@@ -104,8 +104,8 @@ export class ComponentErrorBoundary extends React.Component<
     // Example: Sentry, LogRocket, etc.
     try {
       // Example analytics call
-      if (window.analytics) {
-        window.analytics.track('error_boundary_caught', {
+      if ((window as any).analytics) {
+        (window as any).analytics.track('error_boundary_caught', {
           error: error.message,
           stack: error.stack,
           componentStack: errorInfo.componentStack,
@@ -164,8 +164,8 @@ export const useErrorHandler = () => {
     console.error('Error caught by useErrorHandler:', error, context);
     
     // Report error to analytics
-    if (window.analytics) {
-      window.analytics.track('error_occurred', {
+    if ((window as any).analytics) {
+      (window as any).analytics.track('error_occurred', {
         message: error.message,
         stack: error.stack,
         context,

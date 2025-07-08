@@ -33,7 +33,7 @@ const DEFAULT_EFFECTS: EffectsStyle = {
   transitions: [],
 };
 
-export function EffectsSection({ styles, onChangeStyles, resetStyles }: SectionProps) {
+export function EffectsSection({ styles, onChangeStyles }: SectionProps) {
   const [effects, setEffects] = useState<EffectsStyle>(
     styles.effects || DEFAULT_EFFECTS
   );

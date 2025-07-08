@@ -98,9 +98,9 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
         const data = await getJsonData(currentItem?.path);
         const actionName = oldActionName || values.actionName;
 
-        const validPathVariables = values.pathVariables?.filter((item) => item.type && item.name);
-        const validRequestParams = values.requestParams?.filter((item) => item.type && item.name);
-        const validHeaders = values.headers?.filter((item) => item.type && item.header);
+        const validPathVariables = values.pathVariables?.filter((item: any) => item.type && item.name);
+        const validRequestParams = values.requestParams?.filter((item: any) => item.type && item.name);
+        const validHeaders = values.headers?.filter((item: any) => item.type && item.header);
 
         const newAction = {
             ...values,
@@ -111,10 +111,10 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
 
         const existingActions = data?.actions || [];
         const isActionExisting = existingActions.some(
-            (dataAction) => dataAction.actionName === oldActionName
+            (dataAction: any) => dataAction.actionName === oldActionName
         );
 
-        const mergedActions = existingActions.map((dataAction) =>
+        const mergedActions = existingActions.map((dataAction: any) =>
             dataAction.actionName === actionName ? newAction : dataAction
         );
 
@@ -134,7 +134,7 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
     };
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 formik.handleSubmit();
@@ -184,7 +184,7 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
                 if (error) return showErrorToast(error);
             } else {
                 const updatedActions = values.actions.filter(
-                    (dataAction) => dataAction.actionName !== formik.values.actionName
+                    (dataAction: any) => dataAction.actionName !== formik.values.actionName
                 );
                 const updatedValues = { ...values, actions: updatedActions };
                 const { error } = await window.engine.createController(updatedValues, ENV_TYPES.SPRING, basePath);
@@ -200,7 +200,7 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
     };
 
     const typesData = formatMethods(
-        (selectors.find((selector) => 'MYME_TYPES' in selector) as { MYME_TYPES: string[] } | undefined)?.MYME_TYPES || []
+        (selectors.find((selector: any) => 'MYME_TYPES' in selector) as { MYME_TYPES: string[] } | undefined)?.MYME_TYPES || []
     );
 
     const collectionType = formatMethods(
@@ -208,7 +208,7 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
     );
 
     useEffect(() => {
-        setEnumTypes(enums.map((enumItem) => ({ label: enumItem.name, value: enumItem.name })));
+        setEnumTypes(enums.map((enumItem: any) => ({ label: enumItem.name, value: enumItem.name })));
     }, [enums]);
 
     const schemaTypes = useSchemaTypes(selectors, dto, enums);

@@ -30,24 +30,24 @@ export const PATTERNS = {
 };
 
 
-export enum OPTION_TYPE {
-    MODELS = "models",
-    MODEL = "model",
-    CONTROLLERS = "controllers",
-    CONTROLLER = "controller",
-    DATA_OBJECTS = "dto",
-    ACTION = 'action',
-    MODAL = 'modal',
-    RESPONSES = 'responses',
-    RESPONSE = 'response',
-    ENUM = 'enum',
-    DELETE = 'delete',
-    ERDDiagram = "ERDDiagram",
-    FILE_THREE = "filethree",
-    PERMISSIONS = "permissions"
-};
+export const OPTION_TYPE = {
+    MODELS: "models",
+    MODEL: "model",
+    CONTROLLERS: "controllers",
+    CONTROLLER: "controller",
+    DATA_OBJECTS: "dto",
+    ACTION: 'action',
+    MODAL: 'modal',
+    RESPONSES: 'responses',
+    RESPONSE: 'response',
+    ENUM: 'enum',
+    DELETE: 'delete',
+    ERDDiagram: "ERDDiagram",
+    FILE_THREE: "filethree",
+    PERMISSIONS: "permissions"
+} as const;
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree' | 'permissions';
+export type OptionType = typeof OPTION_TYPE[keyof typeof OPTION_TYPE];
 
 // Framework icons are now handled by the FrameworkIcon component
 // This export is kept for backward compatibility

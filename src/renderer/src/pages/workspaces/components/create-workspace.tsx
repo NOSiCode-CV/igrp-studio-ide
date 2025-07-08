@@ -83,7 +83,7 @@ const CreateWorkspace = ({
 
     const handleSelectDirectory = async () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
-        window.electron.ipcRenderer.on('file-content', (_e, result) => {
+        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
             if (!result.canceled) {
                 setDirectoryPath(result.filePaths[0]);
             }

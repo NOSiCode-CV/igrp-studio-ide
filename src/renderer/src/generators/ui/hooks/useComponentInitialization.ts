@@ -22,10 +22,6 @@ export const useComponentInitialization = ({
     setAllComponents,
 }: ComponentInitializationProps): UseComponentInitializationReturn => {
     const initializeComponents = useCallback(async () => {
-        console.log('[Debug] useComponentInitialization: Starting initialization', {
-            menuItemsLength: menuItems.length,
-            isPage
-        });
 
         if (!menuItems.length) {
             console.log('[Debug] useComponentInitialization: No menu items, skipping');
@@ -37,8 +33,6 @@ export const useComponentInitialization = ({
                 ? COMPONENT.PageContent
                 : COMPONENT.ComponentContent;
 
-            console.log('[Debug] useComponentInitialization: Finding components', { mainComponent });
-
             const pageCompRegister = await findComponentById(mainComponent);
             const sectionCompRegister = await findComponentById(COMPONENT.Section);
 
@@ -46,8 +40,6 @@ export const useComponentInitialization = ({
                 console.warn(`Component ${mainComponent} not found`);
                 return;
             }
-
-            console.log('[Debug] useComponentInitialization: Creating structured components');
 
             const section = newStructuredComponent(
                 COMPONENT.Section,
@@ -68,11 +60,10 @@ export const useComponentInitialization = ({
                 tag: generateTag(mainComponent),
             });
 
-            console.log('[Debug] useComponentInitialization: Components initialized successfully');
         } catch (error) {
             console.error('Error initializing components:', error);
         }
-    }, [isPage, menuItems, findComponentById, generateTag, setAllComponents]);
+    }, [isPage, menuItems]);
 
     return {
         initializeComponents,

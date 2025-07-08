@@ -90,7 +90,7 @@ const Overview = () => {
             file.children.forEach((child: any) => {
                 const { name, children } = child;
                 if (name in newStats) {
-                    newStats[name] += children?.length || 0;
+                    newStats[name as keyof typeof newStats] += children?.length || 0;
                 }
             });
         });

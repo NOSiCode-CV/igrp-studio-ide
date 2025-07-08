@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react';
 export interface TabItem {
     id: string;
     title: string;
-    open: OptionType;
+    open: OptionType | 'none';
     item?: any;
 }
 

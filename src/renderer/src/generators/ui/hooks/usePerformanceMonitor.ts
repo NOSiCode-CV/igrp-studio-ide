@@ -56,8 +56,8 @@ export const usePerformanceMonitor = (config: PerformanceConfig): UsePerformance
     });
 
     // Send to analytics if available
-    if (window.analytics) {
-      window.analytics.track('component_performance', {
+    if ((window as any).analytics) {
+      (window as any).analytics.track('component_performance', {
         component: config.componentName,
         renderTime,
         memoryUsage: metrics.memoryUsage,

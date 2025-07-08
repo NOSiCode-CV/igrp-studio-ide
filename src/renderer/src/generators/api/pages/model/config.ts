@@ -99,25 +99,25 @@ export const getTablesColumns = ({
 	enums,
 	currentItem,
 	t
-}): { [value: string]: IColumnsTabelProps[] } => {
+}: { selectors: any, attributes: any, revision: any, models: any, enums: any, currentItem: any, t: any }): { [value: string]: IColumnsTabelProps[] } => {
 
 	const { module } = currentItem || {}
 
 	const modelsOptions = (models || [])
-		.filter((model) => model.content?.name !== name)
-		.map((model) => ({
+		.filter((model: any) => model.content?.name !== name)
+		.map((model: any) => ({
 			value: model.content?.name || model.name,
 			label: model.content?.name || model.name,
 			module: model.content?.module
 		}));
 
-	const columns = attributes.map((attribute) => ({
+	const columns = attributes.map((attribute: any) => ({
 		value: attribute.name,
 		label: attribute.name
 	}))
 
 	const dataTypes = (
-		selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+		selectors.find((selector: any) => 'ATTRIBUTE_TYPES' in selector) as
 		| {
 			ATTRIBUTE_TYPES: string[]
 		}
@@ -126,7 +126,7 @@ export const getTablesColumns = ({
 
 	const generateTypes = formatMethods(
 		(
-			selectors.find((selector) => 'GENERATION_TYPES' in selector) as
+			selectors.find((selector: any) => 'GENERATION_TYPES' in selector) as
 			| { GENERATION_TYPES: string[] }
 			| undefined
 		)?.GENERATION_TYPES || [])
@@ -175,9 +175,9 @@ export const getTablesColumns = ({
 export const getValuesToSubmit = (values: any, module: string) => {
 
 	const uniqueConstraints =
-		values.uniqueConstraints?.filter((rel) => rel.name !== '') || [];
+		values.uniqueConstraints?.filter((rel: any) => rel.name !== '') || [];
 
-	const indexes = values.indexes?.filter((idx) => idx.name !== '') || [];
+	const indexes = values.indexes?.filter((idx: any) => idx.name !== '') || [];
 
 	const attributes = values.attributes.map(({ ...field }) => ({
 		...field,
@@ -186,8 +186,8 @@ export const getValuesToSubmit = (values: any, module: string) => {
 	}));
 
 	const primaryKey = values.attributes
-		.filter((attribute) => attribute.primaryKey === true)
-		.map(({ name, type }) => ({
+		.filter((attribute: any) => attribute.primaryKey === true)
+		.map(({ name, type }: { name: string, type: string }) => ({
 			name,
 			type,
 		}));
@@ -195,7 +195,7 @@ export const getValuesToSubmit = (values: any, module: string) => {
 	const hasListPk = primaryKey.length > 1;
 
 	const filteredAttributes = hasListPk
-		? attributes.filter((attribute) => attribute.primaryKey !== true)
+		? attributes.filter((attribute: any) => attribute.primaryKey !== true)
 		: attributes;
 
 	const newValues: ModelConfig = {

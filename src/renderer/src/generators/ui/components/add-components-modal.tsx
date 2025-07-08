@@ -32,6 +32,7 @@ import SidebarRight from './sidebar/sidebar-right';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
+import useToast from '@renderer/hooks/useToast';
 
 interface AddComponentProps {
     path: string;
@@ -68,6 +69,7 @@ export const AddComponentModal = ({
 
     const { generateTag, rebuild } = useTagManager(allComponents);
     const { findComponent } = useStudio();
+    const { showErrorToast } = useToast();
 
     // Fetch and filter components on mount
     useEffect(() => {
@@ -94,10 +96,14 @@ export const AddComponentModal = ({
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponent,
+                findComponent: async (path: string, componentName: string) => {
+                    const result = await findComponent(path, componentName);
+                    return result || undefined;
+                },
+                showErrorToast,
             });
         },
-        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent]
+        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponent, showErrorToast]
     );
 
     const handleOrderComponent = useCallback(
@@ -106,10 +112,14 @@ export const AddComponentModal = ({
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponent,
+                findComponent: async (path: string, componentName: string) => {
+                    const result = await findComponent(path, componentName);
+                    return result || undefined;
+                },
+                showErrorToast,
             });
         },
-        [generateTag, handleAddChildToComponent, handleReorderChildInComponent]
+        [generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponent, showErrorToast]
     );
 
     const onEditComponent = (
@@ -295,8 +305,16 @@ const RenderCreatedComponents = ({
 
     // Render the icon for a component
     const renderIcon = (iconName: string) => {
-        const IconComponent = LucideIcons[iconName] ?? ICON_MAP[iconName];
-        return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+        try {
+            const IconComponent = LucideIcons[iconName as keyof typeof LucideIcons] ?? ICON_MAP[iconName];
+            if (IconComponent && typeof IconComponent === 'function') {
+                // Check if it's a React component by trying to render it
+                return React.createElement(IconComponent as React.ComponentType<any>, { className: "h-4 w-4" });
+            }
+        } catch (error) {
+            console.warn(`Failed to render icon: ${iconName}`, error);
+        }
+        return null;
     };
 
     // Check if the component can accept children

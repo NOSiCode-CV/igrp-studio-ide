@@ -179,7 +179,7 @@ const SidebarRight = ({
             // Check if each key in data exists in response
             if (data && requiredDataSchema) {
                 const cleanedData = { ...data };
-                let hasChanges = false;
+                //let hasChanges = false;
 
                 // Iterate through each key in the current data
                 /*   Object.keys(data).forEach((key) => {
@@ -195,7 +195,7 @@ const SidebarRight = ({
                     // If the key doesn't exist in the current data, add it
                     if (!(key in data)) {
                         cleanedData[key] = requiredDataSchema[key];
-                        hasChanges = true;
+                       // hasChanges = true;
                     }
                 });
 
@@ -208,7 +208,7 @@ const SidebarRight = ({
                         Object.keys(cleanedData[key]).length === 0
                     ) {
                         delete cleanedData[key];
-                        hasChanges = true;
+                       // hasChanges = true;
                     }
                 });
 
@@ -272,7 +272,7 @@ const SidebarRight = ({
                                         }
                                         return objAcc;
                                     },
-                                    {}
+                                    {} as Record<string, any>
                                 );
                             } else if (config.default || config.required) {
                                 acc[key] = config.default;
@@ -281,13 +281,10 @@ const SidebarRight = ({
                         },
                         {} as Record<string, any>
                     );
-
-                console.log(currentComp?.properties)
-
                 const source = // Filter properties based on schema and requirements
                     Object.entries(currentComp?.properties ?? {}).reduce(
                         (acc, [key, value]) => {
-                            const schemaConfig = data?.[key];
+                            const schemaConfig = (data as Record<string, any>)?.[key];
 
                             // Skip if property not in schema
                             if (!schemaConfig) {
@@ -315,7 +312,7 @@ const SidebarRight = ({
                                         }
                                         return nestedAcc;
                                     },
-                                    {}
+                                    {} as Record<string, any>
                                 );
 
                                 if (
@@ -325,7 +322,10 @@ const SidebarRight = ({
                                 }
                             }
                             // Handle non-object properties
-                            else if (schemaConfig.required || value !== undefined) {
+                            else if (
+                                schemaConfig.required ||
+                                value !== undefined
+                            ) {
                                 // Keep the value if it exists in current properties (including null)
                                 acc[key] = value;
                             }
@@ -334,12 +334,9 @@ const SidebarRight = ({
                         },
                         {} as Record<string, any>
                     );
-                console.log(source, target);
 
                 // Initialize form values with deep merge
                 const initialValues = deepMerge(target, source);
-
-                console.log(initialValues);
 
                 setTempEditingComponent(
                     (prev) =>

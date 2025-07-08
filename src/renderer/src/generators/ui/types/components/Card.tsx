@@ -14,7 +14,6 @@ import CardComponent, { CardComponentProps } from '../CardComponent';
 const IGRPStudioCard: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
-    className,
 }) => {
     const { children: components, componentName: parentComponentName } = comp;
 

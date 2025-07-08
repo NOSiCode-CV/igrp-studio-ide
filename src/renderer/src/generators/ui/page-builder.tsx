@@ -44,13 +44,6 @@ interface PageBuilderRef {
     handleSave: () => void;
 }
 
-// Improved error handling types
-interface SaveError {
-    message: string;
-    code?: string;
-    details?: any;
-}
-
 const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
     ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath } = page;
@@ -96,7 +89,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         const { rebuild, generateTag } = useTagManager(components);
 
         // Temporary: Back to original implementation to identify the issue
-        const [loading, setLoading] = useState<boolean>(false);
         const [isLoading, setIsLoading] = useState<boolean>(false);
 
         const { showErrorToast } = useToast();
@@ -180,17 +172,18 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
 
                     setIsLoading(true);
 
-                    const data = await window.api.getJsonContent(pagePath);
+                    const data = await window.api?.getJsonContent(pagePath);
 
                     setAllArguments(data.args);
 
                     if (data.components) {
-                        setLoading(true);
                         setAllComponents(data.components);
                         setAllTypes(data.types);
                         setAllFunctions(data.functions);
                         setAllStates(data.states);
                         setAllImports(data.imports);
+                    } else {
+                        initializeComponents();
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
@@ -200,11 +193,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             };
             getJsonData();
         }, [pagePath, page]);
-
-        useEffect(() => {
-            if (loading) return;
-            initializeComponents();
-        }, [menuItems, loading, isPage, initializeComponents]);
 
         useEffect(() => {
             rebuild();

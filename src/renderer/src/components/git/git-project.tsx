@@ -44,7 +44,7 @@ export default function GitProject() {
     useEffect(() => {
         window.electron.ipcRenderer.on(
             'clone-progress',
-            async (_event, data) => {
+            async (_event: any, data: any) => {
                 if (data.status === 'success' || data.status === 'error') {
                     setCloningRepoId(null);
                 }
@@ -103,11 +103,11 @@ export default function GitProject() {
 
         window.electron.ipcRenderer.on(
             'request-project-name',
-            (_event, { defaultName }) => {
+            (_event: any, { defaultName }: { defaultName: string }) => {
                 setNameDialog({
                     isOpen: true,
                     defaultName,
-                    onConfirm: async (name) => {
+                    onConfirm: async (name: string) => {
                         window.electron.ipcRenderer.send(
                             'project-name-response',
                             name

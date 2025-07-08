@@ -96,7 +96,7 @@ const toMap = (items: any) => {
 export const toMapPages = (items: any) => {
     return (
         items &&
-        items.map(({ label, metadata }) => ({
+        items.map(({ label, metadata }: { label: string; metadata: any }) => ({
             value: metadata.path,
             label,
         }))

@@ -226,9 +226,9 @@ export function ConnectedAccountsSettings() {
 
     const isGithubConnected =
         activeProviderId === 'github' && !!activeProvider?.user;
-    const isGitLabConnected =
+   /*  const isGitLabConnected =
         activeProviderId !== 'github' && !!activeProvider?.user;
-
+ */
     useEffect(() => {
         getGitlabConfig();
     }, []);

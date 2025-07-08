@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { ComponentConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { StructuredLayout } from '@renderer/lib/dnd/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
@@ -33,7 +32,6 @@ export const usePageSave = ({
     basePath,
     content,
     id,
-    components,
     functions,
     types,
     states,
@@ -60,7 +58,7 @@ export const usePageSave = ({
                 imports,
             };
 
-            const pageConfig: PageConfig = {
+           /*  const pageConfig: PageConfig = {
                 ...config,
                 type: 'page',
                 path: page.pagePath,
@@ -71,17 +69,15 @@ export const usePageSave = ({
                 type: 'component',
                 name: page.name,
                 scope: 'app',
-            };
+            }; */
 
-            console.log('Saving configuration:', isPage ? pageConfig : compConfig, basePath);
+            console.log('Saving configuration:', config);
 
             const { error } = await window.engine.createPage(
-                isPage ? pageConfig : compConfig,
+                config,
                 ENV_TYPES.NEXTJS,
                 basePath
             );
-
-            console.log('Error:', error, basePath);
 
             if (error) {
                 const saveError: SaveError = {

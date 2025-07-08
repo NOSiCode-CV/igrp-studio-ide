@@ -42,6 +42,7 @@ const POPOVER_COMPONENTS = {
 // Props mapping for each popover type
 const POPOVER_PROPS_MAPPING = {
     popoverController: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+        index,
         row,
         changeValue: (element: string, value: any) => changeValue(element, index, value),
         options: itemOptions || [],
@@ -84,7 +85,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     btnLabels,
 }) => {
     const [formData, setFormData] = useState(data || []);
-    const [dynamicOptions, setDynamicOptions] = useState({});
+    const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>({});
 
     // Atualiza o formData quando os dados mudam
     useEffect(() => {
@@ -92,7 +93,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }, [data]);
 
     // Atualiza campos dependentes
-    const updateDependentFields = (key, index, selectedValue) => {
+    const updateDependentFields = (key: string, index: number, selectedValue: any) => {
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
             const updatedOptions = dependentColumn.getOptions(selectedValue);
@@ -138,7 +139,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }, [formData, columns]);
 
     // Função para atualizar as opções de um campo baseado em outro
-    const handleDependentChange = (key, index, selectedValue) => {
+    const handleDependentChange = (key: string, index: number, selectedValue: any) => {
         changeValue(key, index, selectedValue);
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
@@ -251,7 +252,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     const renderGroupedItems = ({ items, row, index, index2 }: any) => {
         return (
             <div className="flex gap-2 align-center">
-                {items.map((item, itemIndex) => {
+                {items.map((item: any, itemIndex: number) => {
                     const itemValue = row[item.key] || '';
                     const itemOptions = item.options || [];
                     
@@ -311,9 +312,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     }
                     
                     // Handle popover components using registry
-                    if (POPOVER_COMPONENTS[item.type]) {
-                        const PopoverComponent = POPOVER_COMPONENTS[item.type];
-                        const propsMapping = POPOVER_PROPS_MAPPING[item.type];
+                    if (POPOVER_COMPONENTS[item.type as keyof typeof POPOVER_COMPONENTS]) {
+                        const PopoverComponent = POPOVER_COMPONENTS[item.type as keyof typeof POPOVER_COMPONENTS];
+                        const propsMapping = POPOVER_PROPS_MAPPING[item.type as keyof typeof POPOVER_PROPS_MAPPING];
                         
                         // Special case for popoverRelation
                         if (item.type === 'popoverRelation' && row['type'] !== 'relation') {
@@ -324,7 +325,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         
                         return (
                             <div key={itemIndex} className="flex items-center">
-                                <PopoverComponent {...props} />
+                                <PopoverComponent {...(props as any)} />
                             </div>
                         );
                     }
@@ -337,15 +338,15 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 
     // Optimized field renderer using component registry
     const renderField = (
-        row,
-        index,
-        key,
-        type,
-        options,
-        selectValue,
-        selectMultiValues,
-        readonly,
-        onChangeValue
+        row: any,
+        index: number,
+        key: string,
+        type: string,
+        options: any,
+        selectValue: any,
+        selectMultiValues: any,
+        readonly: boolean,
+        onChangeValue: (key: string, index: number, value: any) => void
     ) => {
         // Handle input types (text, number)
         if (type === 'text' || type === 'number') {
@@ -420,9 +421,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         }
         
         // Handle popover types using registry
-        if (POPOVER_COMPONENTS[type]) {
-            const PopoverComponent = POPOVER_COMPONENTS[type];
-            const propsMapping = POPOVER_PROPS_MAPPING[type];
+        if (type in POPOVER_COMPONENTS) {
+            const PopoverComponent = POPOVER_COMPONENTS[type as keyof typeof POPOVER_COMPONENTS];
+            const propsMapping = POPOVER_PROPS_MAPPING[type as keyof typeof POPOVER_PROPS_MAPPING];
             
             // Special case for popoverRelation
             if (type === 'popoverRelation' && row['type'] !== 'relation') {
@@ -431,7 +432,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
             
             const props = propsMapping(row, index, changeValue, options);
             
-            return <PopoverComponent {...props} />;
+            return <PopoverComponent {...(props as any)} />;
         }
         
         // Handle typeSelectorDropdown
@@ -454,7 +455,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     };
 
     // Renderização das linhas da tabela
-    const renderTableRow = (rowId, index, row, className, onChangeValue) => {
+    const renderTableRow = (rowId: string, index: number, row: any, className: string, onChangeValue: (key: string, index: number, value: any) => void) => {
         return (
             <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
                 {(provided: any) => (
@@ -473,7 +474,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           dynamicOptions?.[`${index}-${key}`] ||
                                           options
                                       )?.filter(
-                                          (d) =>
+                                          (d: any) =>
                                               row[key] && d.value === row[key]
                                       )[0]?.value
                                     : '';
@@ -481,10 +482,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     'multiSelect',
                                 ].includes(type)
                                     ? options
-                                          ?.filter((d) =>
+                                          ?.filter((d: any) =>
                                               row[key]?.includes(d.value)
                                           )
-                                          .map((d) => d.value)
+                                          .map((d: any) => d.value)
                                     : [];
                                 return (
                                     <TableCell
@@ -517,7 +518,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                       options,
                                                       selectValue,
                                                       selectMultiValues,
-                                                      readonly,
+                                                      readonly || false,
                                                       onChangeValue
                                                   )}
                                         </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
 
-export const EditorLayout = ({ currentItem }) => {
+export const EditorLayout = ({ currentItem }: { currentItem: any }) => {
     const { t } = useTranslation();
     const [data, setData] = useState<any>(null);
     const [filePath, setFilePath] = useState<string>('');

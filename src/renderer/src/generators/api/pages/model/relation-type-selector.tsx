@@ -100,7 +100,7 @@ export function RelationTypeSelector({
                                                     'text-muted-foreground bg-secondary/10 border border-secondary shadow-lg'
                                             )}
                                         >
-                                            {relationTypeIcons[type]}
+                                            {relationTypeIcons[type as keyof typeof relationTypeIcons]}
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>

@@ -116,7 +116,7 @@ export function CloneProjectModal({
     useEffect(() => {
         window.electron.ipcRenderer.on(
             'clone-progress',
-            async (_event, data) => {
+            async (_event: any, data: any) => {
                 if (data.status === 'success') {
 
                     resetForm();

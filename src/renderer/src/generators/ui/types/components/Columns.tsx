@@ -4,13 +4,10 @@ import { cn } from '@renderer/lib/utils';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import {
-    columnsVariants,
-    columnVariants,
     useResponsiveClasses,
     generateResponsiveClasses,
 } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
-import { useIsMobile } from '@renderer/hooks/use-mobile';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
 const IGRPStudioColumns: React.FC<CardComponentProps> = ({
@@ -22,8 +19,6 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
     const { variant, className } = properties || {};
 
     const { setEditingComponent } = useDroppedComponents();
-
-    const isMobile = useIsMobile();
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({

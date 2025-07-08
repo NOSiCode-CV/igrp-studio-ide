@@ -48,7 +48,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
         }
     };
 
-    const handleChangeCode = (value) => {
+    const handleChangeCode = (value: string) => {
         setStatusCode(value);
         if (name === '') setName(getStatusLabel(value));
     };
@@ -72,7 +72,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             <IGRPCombobox
                                 options={httpStatusCodes}
                                 value={statusCode}
-                                onChange={(value) => handleChangeCode(value)}
+                                onChange={(selected: string | string[]) => handleChangeCode(selected as string)}
                                 className="w-full"
                                 placeholder={t('httpStatusCodePlaceholder')}
                             />
