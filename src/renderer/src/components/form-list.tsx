@@ -41,36 +41,63 @@ const POPOVER_COMPONENTS = {
 
 // Props mapping for each popover type
 const POPOVER_PROPS_MAPPING = {
-    popoverController: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverController: (
+        row: any,
+        index: number,
+        changeValue: any,
+        itemOptions: any
+    ) => ({
         index,
         row,
-        changeValue: (element: string, value: any) => changeValue(element, index, value),
+        changeValue: (element: string, value: any) =>
+            changeValue(element, index, value),
         options: itemOptions || [],
     }),
-    popoverModel: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverModel: (
+        row: any,
+        index: number,
+        changeValue: any,
+        itemOptions: any
+    ) => ({
         index,
         row,
-        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
+        changeValue: (element: string, position: number, value: any) =>
+            changeValue(element, position, value),
         options: itemOptions || [],
     }),
-    popoverDto: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverDto: (
+        row: any,
+        index: number,
+        changeValue: any,
+        itemOptions: any
+    ) => ({
         index,
         row,
-        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
+        changeValue: (element: string, position: number, value: any) =>
+            changeValue(element, position, value),
         collectionTypes: itemOptions || [],
     }),
     popoverFormValidation: (row: any, index: number, changeValue: any) => ({
         index,
         field: row,
         fieldType: row.type || 'string',
-        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
+        changeValue: (element: string, position: number, value: any) => {
+            changeValue(element, position, value);
+        },
     }),
-    popoverRelation: (row: any, index: number, changeValue: any, itemOptions: any) => ({
+    popoverRelation: (
+        row: any,
+        index: number,
+        changeValue: any,
+        itemOptions: any
+    ) => ({
         field: row,
-        changeValue: (element: string, value: any) => changeValue(element, index, value),
+        changeValue: (element: string, value: any) => {
+            changeValue(element, index, value);
+        },
         options: itemOptions || [],
     }),
-} as const; 
+} as const;
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
     data,
@@ -85,7 +112,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     btnLabels,
 }) => {
     const [formData, setFormData] = useState(data || []);
-    const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>({});
+    const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>(
+        {}
+    );
 
     // Atualiza o formData quando os dados mudam
     useEffect(() => {
@@ -93,7 +122,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }, [data]);
 
     // Atualiza campos dependentes
-    const updateDependentFields = (key: string, index: number, selectedValue: any) => {
+    const updateDependentFields = (
+        key: string,
+        index: number,
+        selectedValue: any
+    ) => {
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
             const updatedOptions = dependentColumn.getOptions(selectedValue);
@@ -139,7 +172,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }, [formData, columns]);
 
     // Função para atualizar as opções de um campo baseado em outro
-    const handleDependentChange = (key: string, index: number, selectedValue: any) => {
+    const handleDependentChange = (
+        key: string,
+        index: number,
+        selectedValue: any
+    ) => {
         changeValue(key, index, selectedValue);
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
@@ -255,7 +292,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 {items.map((item: any, itemIndex: number) => {
                     const itemValue = row[item.key] || '';
                     const itemOptions = item.options || [];
-                    
+
                     // Handle select component
                     if (item.type === 'select') {
                         return (
@@ -276,7 +313,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             </div>
                         );
                     }
-                    
+
                     // Handle checkbox component
                     if (item.type === 'checkbox') {
                         return (
@@ -310,26 +347,44 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             </div>
                         );
                     }
-                    
+
                     // Handle popover components using registry
-                    if (POPOVER_COMPONENTS[item.type as keyof typeof POPOVER_COMPONENTS]) {
-                        const PopoverComponent = POPOVER_COMPONENTS[item.type as keyof typeof POPOVER_COMPONENTS];
-                        const propsMapping = POPOVER_PROPS_MAPPING[item.type as keyof typeof POPOVER_PROPS_MAPPING];
-                        
+                    if (
+                        POPOVER_COMPONENTS[
+                            item.type as keyof typeof POPOVER_COMPONENTS
+                        ]
+                    ) {
+                        const PopoverComponent =
+                            POPOVER_COMPONENTS[
+                                item.type as keyof typeof POPOVER_COMPONENTS
+                            ];
+                        const propsMapping =
+                            POPOVER_PROPS_MAPPING[
+                                item.type as keyof typeof POPOVER_PROPS_MAPPING
+                            ];
+
                         // Special case for popoverRelation
-                        if (item.type === 'popoverRelation' && row['type'] !== 'relation') {
+                        if (
+                            item.type === 'popoverRelation' &&
+                            row['type'] !== 'relation'
+                        ) {
                             return null;
                         }
-                        
-                        const props = propsMapping(row, index, changeValue, itemOptions);
-                        
+
+                        const props = propsMapping(
+                            row,
+                            index,
+                            changeValue,
+                            itemOptions
+                        );
+
                         return (
                             <div key={itemIndex} className="flex items-center">
                                 <PopoverComponent {...(props as any)} />
                             </div>
                         );
                     }
-                    
+
                     return null;
                 })}
             </div>
@@ -367,16 +422,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 />
             );
         }
-        
+
         // Handle label type
         if (type === 'label') {
             return (
-                <Label htmlFor={`${key}_${index}`}>
-                    {row?.[key] || ''}
-                </Label>
+                <Label htmlFor={`${key}_${index}`}>{row?.[key] || ''}</Label>
             );
         }
-        
+
         // Handle select type
         if (type === 'select') {
             return (
@@ -392,7 +445,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 />
             );
         }
-        
+
         // Handle multiSelect type
         if (type === 'multiSelect') {
             return (
@@ -406,7 +459,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 />
             );
         }
-        
+
         // Handle checkbox type
         if (type === 'checkbox') {
             return (
@@ -419,22 +472,26 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 />
             );
         }
-        
+
         // Handle popover types using registry
         if (type in POPOVER_COMPONENTS) {
-            const PopoverComponent = POPOVER_COMPONENTS[type as keyof typeof POPOVER_COMPONENTS];
-            const propsMapping = POPOVER_PROPS_MAPPING[type as keyof typeof POPOVER_PROPS_MAPPING];
-            
+            const PopoverComponent =
+                POPOVER_COMPONENTS[type as keyof typeof POPOVER_COMPONENTS];
+            const propsMapping =
+                POPOVER_PROPS_MAPPING[
+                    type as keyof typeof POPOVER_PROPS_MAPPING
+                ];
+
             // Special case for popoverRelation
             if (type === 'popoverRelation' && row['type'] !== 'relation') {
                 return null;
             }
-            
+
             const props = propsMapping(row, index, changeValue, options);
-            
+
             return <PopoverComponent {...(props as any)} />;
         }
-        
+
         // Handle typeSelectorDropdown
         if (type === 'typeSelectorDropdown') {
             return (
@@ -449,13 +506,19 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 />
             );
         }
-        
+
         // Default case - return null or a fallback component
         return null;
     };
 
     // Renderização das linhas da tabela
-    const renderTableRow = (rowId: string, index: number, row: any, className: string, onChangeValue: (key: string, index: number, value: any) => void) => {
+    const renderTableRow = (
+        rowId: string,
+        index: number,
+        row: any,
+        className: string,
+        onChangeValue: (key: string, index: number, value: any) => void
+    ) => {
         return (
             <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
                 {(provided: any) => (
@@ -562,7 +625,6 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 value
             );
         } else changeValue(key, index, value);
-
     };
 
     // Renderização do componente completo
@@ -582,8 +644,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     const rowId =
                                         row.id || `row-${name}-${index}`;
                                     const isDataArray =
-                                        row.fields &&
-                                        row.fields.length > 0;
+                                        row.fields && row.fields.length > 0;
 
                                     return (
                                         <React.Fragment key={rowId}>

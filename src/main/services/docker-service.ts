@@ -207,7 +207,7 @@ export class DockerService {
             }
         } catch (error: any) {
             console.error('Error getting status:', error);
-            throw new Error(`Failed to get service status: ${error.message}`);
+            return [];
         }
     }
 
