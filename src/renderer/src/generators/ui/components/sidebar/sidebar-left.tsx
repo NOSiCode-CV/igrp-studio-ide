@@ -37,8 +37,7 @@ import {
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
 import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area';
-import Draggable from '@renderer/lib/dnd/Draggable';
-import useStudio from '@renderer/hooks/use-studio';
+import Draggable from '@renderer/lib/dnd/Draggable';     
 import NavigatorSidebar from './sidebar-navigator';
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
 //import SidebarAppComponents from './sidebar-app-components';

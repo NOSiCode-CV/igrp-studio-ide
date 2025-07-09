@@ -73,7 +73,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             findComponentById,
             fetchComponents,
             findComponent,
-            loadRegistryComponent,
         } = useStudio();
 
         const { customComponents } = useCustomCode();

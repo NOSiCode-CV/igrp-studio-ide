@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback  } from 'react';
 import { COMPONENT } from '../ComponentTypes';
 import { newStructuredComponent } from '../dnd/helpers';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
