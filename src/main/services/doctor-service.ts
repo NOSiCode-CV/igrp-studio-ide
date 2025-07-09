@@ -10,7 +10,7 @@ export const DoctorService = {
         for (const tool of toolConfig) {
             const result = await checkCommand(tool.command);
 
-            let parsedVersion = result.version ? parseVersion(result.version) : undefined;
+            const parsedVersion = result.version ? parseVersion(result.version) : undefined;
             let success = !result.error;
 
             // Version range validation
