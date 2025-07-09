@@ -2,7 +2,7 @@ import { PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup'
 
 
-export function useDtoValidation({ t }) {
+export function useDtoValidation({ t }: { t: any }) {
     return Yup.object({
         name: Yup.string().required('Name is required')
             .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))

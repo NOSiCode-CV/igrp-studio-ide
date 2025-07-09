@@ -119,7 +119,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
     }, [data]);
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 handleSave();
@@ -183,7 +183,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                         ? modelData.relationReference
                         : [];
 
-                    const existingIndex = existingRefs.findIndex(existingRef =>
+                    const existingIndex = existingRefs.findIndex((existingRef: any) =>
                         existingRef.fieldName === relationReference.fieldName &&
                         existingRef.mappedBy === relationReference.mappedBy
                     );

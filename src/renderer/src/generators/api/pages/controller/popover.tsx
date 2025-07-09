@@ -47,9 +47,9 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
         setIsBoolean(row?.['type'] === 'boolean');
     }, [row]);
 
-    const handleChangeEditor = (_value) => {};
+    const handleChangeEditor = (_value: any) => {};
 
-    const changeConst = (key, value) => {
+    const changeConst = (key: string, value: boolean) => {
         setIsConst(key === 'const' && value);
         setIsEnum(key === 'enum' && value);
     };
@@ -90,7 +90,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         </p>
                         <div className="flex flex-1 gap-2">
                             {['isRequired', 'nullable', 'deprecated'].map(
-                                (field) => (
+                                (field: string) => (
                                     <div
                                         key={`${field}`}
                                         className="flex flex-1 items-center gap-4"
@@ -112,7 +112,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         <Separator orientation="horizontal" />
                         {!isBoolean && (
                             <div className="flex flex-1 gap-2">
-                                {['enum', 'const'].map((field) => (
+                                {['enum', 'const'].map((field: string) => (
                                     <div
                                         key={`${field}`}
                                         className="flex items-center gap-4"

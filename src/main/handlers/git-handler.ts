@@ -70,9 +70,9 @@ ipcMain.handle('gitlab-repositories', async (event) => {
 ipcMain.handle('check-git-remotes', async (_event, { projects, githubRepos }) => {
     return GitService.checkGitRemotes(projects, githubRepos);
 });
-ipcMain.handle('clone-repository', async (event, repoUrl, basePath) => {
+ipcMain.handle('clone-repository', async (event, repoUrl, basePath, auth) => {
     const mainWindow = BrowserWindow.fromWebContents(event.sender);
-    return GitService.cloneRepository(repoUrl, basePath, mainWindow as BrowserWindow);
+    return GitService.cloneRepository(repoUrl, basePath, mainWindow as BrowserWindow, auth);
 });
 ipcMain.handle('list-branches', async (_event, projectPath) => {
     return GitService.listBranches(projectPath);

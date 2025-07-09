@@ -55,7 +55,7 @@ const MainLayout = (props: LayoutProps) => {
                     <Header />
 
                     <div className="flex flex-1 overflow-hidden">
-                        <IGRPSidebar className="!top-(--header-height)  h-[calc(100svh-var(--header-height-two))]">
+                        <IGRPSidebar className="!top-(--header-height)  h-[calc(100svh-var(--header-height-two))] group-data-[side=left]:border-r-0">
                             <IGRPSidebarContent items={[...navData]}>
                                 {workspace && (
                                     <WorkspaceSwitcher

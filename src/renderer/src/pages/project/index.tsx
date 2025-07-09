@@ -177,7 +177,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const handleOpenDirectory = () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
-        window.electron.ipcRenderer.on('file-content', (_e, result) => {
+        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
             if (!result.canceled) {
                 formik.setFieldValue('path', result.filePaths[0]);
             }
@@ -211,17 +211,17 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }, []);
 
     React.useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
                 event.preventDefault();
                 setOpen(true);
             }
         };
 
-        document.addEventListener(t('keydown'), handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            document.removeEventListener(t('keydown'), handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
 

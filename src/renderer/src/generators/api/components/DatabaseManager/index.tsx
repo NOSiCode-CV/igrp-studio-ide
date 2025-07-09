@@ -89,7 +89,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                     // Map the attributes
                     const attributes = structure
                         .filter(() => true)
-                        .map((column) => {
+                        .map((column: any) => {
                             const relation = column.foreign_key_table
                                 ? {
                                       type: 'ManyToOne',
@@ -109,7 +109,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                                 name: column.name || '',
                                 type: relation
                                     ? 'relation'
-                                    : typeMapping[column.data_type] || 'string', // Map types
+                                    : typeMapping[column.data_type as keyof typeof typeMapping] || 'string', // Map types
                                 length: column.max_length || null,
                                 defaultValue: !column.is_primary_key
                                     ? column.default_value
@@ -126,11 +126,11 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
 
                     // Add referenced foreign_key_table to selectedRows dynamically if not present
                     for (const column of structure.filter(
-                        (col) => col.foreign_key_table
+                        (col: any) => col.foreign_key_table
                     )) {
                         const foreignKeyTable = column.foreign_key_table;
-                        if (!selectedRows[foreignKeyTable]) {
-                            selectedRows[foreignKeyTable] = true; // Add to the list
+                        if (!selectedRows.has(foreignKeyTable)) {
+                            selectedRows.add(foreignKeyTable); // Add to the list
                             await processTable(foreignKeyTable);
                         }
                     }
@@ -174,7 +174,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
         }
 
         if (errorMessages.length > 0) {
-            errorMessages.forEach((errMsg) => {
+            errorMessages.forEach((errMsg: string) => {
                 showErrorToast(errMsg);
             });
         } else {

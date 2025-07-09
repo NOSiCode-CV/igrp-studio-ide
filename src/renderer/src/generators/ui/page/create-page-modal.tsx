@@ -29,7 +29,7 @@ const initialValues: PageConfig = {
     path: '',
     description: undefined,
     forceDynamic: false,
-    id: getId(),
+    id: '',
     types: [],
     states: [],
     functions: [],
@@ -167,6 +167,8 @@ export function CreatePageModal({
                       parentName: pageEditing?.content.pageName,
                   }
                 : values;
+
+            newValues.id = newValues.id || getId();
 
             console.log(newValues);
 

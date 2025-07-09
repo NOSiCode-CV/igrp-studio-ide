@@ -66,7 +66,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         );
     };
 
-    const updateFormik = (content) => {
+    const updateFormik = (content: any) => {
         const contentType = Object.keys(content)[0];
 
         const schema = content?.[contentType]?.['schema'];
@@ -99,8 +99,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     }, [bodyType]);
 
     const onChangeBody = (element: string, position: number, value: string) => {
-        setData((prev) =>
-            prev.map((row, index) =>
+        setData((prev: any) =>
+            prev.map((row: any, index: number) =>
                 index === position ? { ...row, [element]: value } : row
             )
         );
@@ -156,7 +156,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
 
         const transformedData = {
             type: 'object',
-            properties: data.reduce((acc, row) => {
+            properties: data.reduce((acc: any, row: any) => {
                 const { name, ...rest } = row;
                 acc[name] = {
                     ...rest,
@@ -196,8 +196,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 <IGRPCombobox
                     options={collectionTypes}
                     value={collectionType}
-                    onChange={(collectionType) =>
-                        setCollectionType(collectionType as string)
+                    onChange={(selected: string | string[]) =>
+                        setCollectionType(selected as string)
                     }
                     className="w-full h-9"
                     placeholder={t('selectCollectionType')}
@@ -290,8 +290,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                             <IGRPCombobox
                                 value={bodyType}
                                 placeholder={t('selectContentType')}
-                                onChange={(value) =>
-                                    setBodyType(value as TbodyType)
+                                onChange={(selected: string | string[]) =>
+                                    setBodyType(selected as TbodyType)
                                 }
                                 options={contentTypes}
                             />

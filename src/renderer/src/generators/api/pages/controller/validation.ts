@@ -2,7 +2,7 @@ import { PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup'
 
 
-const methodConditions = (method, schema, requiredMethods, errorMessage) => {
+const methodConditions = (method: any, schema: any, requiredMethods: any, errorMessage: any) => {
     const methodValue = Array.isArray(method) ? method[0] : method;
     return requiredMethods.includes(methodValue)
         ? schema.required(errorMessage)
@@ -28,7 +28,7 @@ const conditionalValidation = Yup.object().shape({
     return true; // If both are valid or both are not present, return true
 });
 
-export function useActionValidation({ t }) {
+export function useActionValidation({ t }: { t: any }) {
     return Yup.object().shape({
         actionName: Yup.string().required('Action Name is required')
             .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
@@ -38,7 +38,7 @@ export function useActionValidation({ t }) {
 
 }
 
-export function useControllerValidation({ t }) {
+export function useControllerValidation({ t }: { t: any }) {
     return Yup.object({
         //name: Yup.string().required('Name is required')
         //    .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))

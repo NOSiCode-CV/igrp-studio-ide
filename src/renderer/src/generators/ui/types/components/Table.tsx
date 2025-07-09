@@ -208,6 +208,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
             {/* Render TableColumn next */}
             {tableColumns.map((tableComp, index) => {
                 const { componentName: compName, id } = tableComp;
+               // const path = `${componentName}/${compName}`;
                 return (
                     <Droppable
                         key={index}

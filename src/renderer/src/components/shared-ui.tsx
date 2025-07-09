@@ -111,7 +111,7 @@ function SubHeadline({
 
 function getIcon(iconName: string) {
     console.log(iconName);
-    return LucideIcons[iconName] || undefined;
+    return LucideIcons[iconName as keyof typeof LucideIcons] || undefined;
 }
 
 export { ProjectIcon, Headline, SearchInput, SubHeadline, getIcon };

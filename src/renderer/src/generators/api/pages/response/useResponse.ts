@@ -82,7 +82,7 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
     };
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 handleSave();

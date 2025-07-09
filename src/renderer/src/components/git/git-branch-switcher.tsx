@@ -95,7 +95,7 @@ export function BranchSwitcher({
             );
             dispatch(setBranches(branchList));
 
-            const activeBranch = branchList.find((branch) => branch.isActive);
+            const activeBranch = branchList.find((branch: any) => branch.isActive);
             if (activeBranch) {
                 dispatch(setActiveBranch(activeBranch.name));
             }

@@ -369,7 +369,7 @@ export const FunctionArguments = ({
                                 </div>
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className="border rounded-lg bg-gray-50 space-y-4 p-3">
+                        <AccordionContent className="border rounded-lg  space-y-4 p-3">
                             <div className="p-1 space-y-3">
                                 <TextInput
                                     id={`argName-${arg.id}`}

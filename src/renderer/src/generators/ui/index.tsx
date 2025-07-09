@@ -4,6 +4,8 @@ import { ROUTES } from '@renderer/routes/routeConstants';
 import { TabProvider } from '@renderer/components/navigation/TabContext';
 import TabManager from './components/TabManager';
 import { EngineService } from '@renderer/services/EngineService';
+import { ComponentsProvider } from './contexts/ComponentsContext';
+import { ComponentsLoader } from './components/ComponentsLoader';
 
 interface PageBuilderProps {
     basePath?: string;
@@ -22,7 +24,10 @@ const Index = ({ basePath }: PageBuilderProps) => {
 
     return (
         <TabProvider>
-            {basePath && <TabManager basePath={basePath} />}
+            <ComponentsProvider>
+                <ComponentsLoader />
+                {basePath && <TabManager basePath={basePath} />}
+            </ComponentsProvider>
         </TabProvider>
     );
 };

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { FrameworkIcon } from '@/renderer/src/components/framework-icon';
 import DashboardOverview from '../components/dashboard-overview';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +35,7 @@ import Dependency from '@renderer/pages/workspaces/components/dependency';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
 import { GitContributors } from '@renderer/components/git/git-contributors';
+import { FrameworkIcon } from '@renderer/components/framework-icon';
 
 const Overview = () => {
     const { t } = useTranslation();
@@ -90,7 +90,7 @@ const Overview = () => {
             file.children.forEach((child: any) => {
                 const { name, children } = child;
                 if (name in newStats) {
-                    newStats[name] += children?.length || 0;
+                    newStats[name as keyof typeof newStats] += children?.length || 0;
                 }
             });
         });
@@ -113,10 +113,10 @@ const Overview = () => {
             <Tabs defaultValue="overview" className="compact-tabs">
                 <TabsList className="mb-3">
                     <TabsTrigger value="overview" className="text-xs">
-                    {t('overview')}
+                        {t('overview')}
                     </TabsTrigger>
                     <TabsTrigger value="settings" className="text-xs">
-                    {t('settings')}
+                        {t('settings')}
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="mt-0 space-y-4">
@@ -124,15 +124,15 @@ const Overview = () => {
                         <>
                             <div className="space-x-3 flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
-                                                                    <FrameworkIcon
-                                    framework={project.framework as any}
-                                    size={16}
-                                    className="w-10 h-10 bg-muted rounded-lg shadow-lg p-2"
-                                    alt={`${project.framework} logo`}
-                                />
+                                    <FrameworkIcon
+                                        framework={project.framework as any}
+                                        size={16}
+                                        className="w-10 h-10 bg-muted rounded-lg shadow-lg p-2"
+                                        alt={`${project.framework} logo`}
+                                    />
                                     <div>
                                         <h1 className="text-2xl font-semibold">
-                                        {t('projectDetails')}
+                                            {t('projectDetails')}
                                         </h1>
                                     </div>
                                 </div>
@@ -142,7 +142,7 @@ const Overview = () => {
                                 <div className="p-5 rounded-lg border">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-base font-medium">
-                                        {t('projectInfo')}
+                                            {t('projectInfo')}
                                         </h3>
                                         <Package className="text-blue-400 w-5 h-5" />
                                     </div>
@@ -150,7 +150,7 @@ const Overview = () => {
                                         <div className="space-y-4">
                                             <div>
                                                 <p className="text-muted-foreground text-xs mb-1">
-                                                {t('name')}
+                                                    {t('name')}
                                                 </p>
                                                 <p className="truncate">
                                                     {project.config?.name}
@@ -158,7 +158,7 @@ const Overview = () => {
                                             </div>
                                             <div>
                                                 <div className="text-muted-foreground">
-                                                {t('type')}
+                                                    {t('type')}
                                                 </div>
                                                 <div className="text-sm font-medium capitalize">
                                                     {project.type}
@@ -166,7 +166,7 @@ const Overview = () => {
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground text-xs mb-1">
-                                                {t('version')}
+                                                    {t('version')}
                                                 </p>
                                                 <p className="">1.0.0</p>
                                             </div>
@@ -177,14 +177,14 @@ const Overview = () => {
                                 <div className="p-6 rounded-lg border space-y-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-base font-medium">
-                                        {t('technicalStack')}
+                                            {t('technicalStack')}
                                         </h3>
                                         <Server className="text-purple-400 w-5 h-5" />
                                     </div>
                                     <div className="space-y-4">
                                         <div>
                                             <p className="text-muted-foreground text-xs mb-1">
-                                            {t('framework')}
+                                                {t('framework')}
                                             </p>
                                             <p className="">
                                                 {project.framework}
@@ -192,7 +192,7 @@ const Overview = () => {
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground   text-xs mb-1">
-                                            {t('version')}
+                                                {t('version')}
                                             </p>
                                             <p className="">
                                                 {
@@ -211,7 +211,7 @@ const Overview = () => {
                                 <div className="p-6 rounded-lg border space-y-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-base font-medium">
-                                        {t('development')}
+                                            {t('development')}
                                         </h3>
                                         <GitBranchIcon className="text-green-400 w-5 h-5" />
                                     </div>
@@ -219,7 +219,7 @@ const Overview = () => {
                                         {isGitEnabled && (
                                             <div>
                                                 <p className="text-muted-foreground text-xs mb-1">
-                                                {t('repository')}
+                                                    {t('repository')}
                                                 </p>
                                                 <p className="">
                                                     {activeBranch}
@@ -229,7 +229,7 @@ const Overview = () => {
                                         {repositoryUrl && (
                                             <div>
                                                 <div className="text-muted-foreground text-xs">
-                                                {t('repository')}
+                                                    {t('repository')}
                                                 </div>
                                                 <div className="text-sm font-medium truncate">
                                                     <a
@@ -261,17 +261,17 @@ const Overview = () => {
                     <Card>
                         <CardHeader className="compact-card-header">
                             <CardTitle className="text-sm">
-                            {t('projectSettings')}
+                                {t('projectSettings')}
                             </CardTitle>
                             <CardDescription className="text-xs">
-                            {t('configureProjectSettings')}
+                                {t('configureProjectSettings')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="compact-card-content space-y-3">
                             {projectId && (
                                 <div className="space-y-2">
                                     <Label htmlFor="project-id">
-                                    {t('projectId')}
+                                        {t('projectId')}
                                     </Label>
                                     <div className="flex space-x-2">
                                         <Input
@@ -296,7 +296,7 @@ const Overview = () => {
                                         </Button>
                                     </div>
                                     <p className="text-[10px] text-muted-foreground mt-1">
-                                    {t('projectIdDescription')}
+                                        {t('projectIdDescription')}
                                     </p>
                                 </div>
                             )}
@@ -308,7 +308,7 @@ const Overview = () => {
                             />
                             <div className="pt-2">
                                 <Button onClick={handleSave}>
-                                {t('saveSettings')}
+                                    {t('saveSettings')}
                                 </Button>
                             </div>
                         </CardContent>

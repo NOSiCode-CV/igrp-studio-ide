@@ -88,7 +88,7 @@ export const DropdownSidebarMenuButton: React.FC<
     };
 
     const isDeleteAction = menuItem.dropdownMenus.some(
-        (menu) => menu.actionType === OPTION_TYPE.DELETE
+        (menu: any) => menu.actionType === OPTION_TYPE.DELETE
     );
 
     return (

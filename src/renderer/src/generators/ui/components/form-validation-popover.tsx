@@ -92,7 +92,7 @@ export function FormValidationPopover({
         const stringValidations = ['minLength', 'maxLength', 'regex', 'email', 'url', 'uuid', 'startsWith', 'endsWith', 'includes'];
         const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite'];
         const dateValidations = ['minDate', 'maxDate'];
-        const booleanValidations = [];
+        const booleanValidations: string[] = [];
 
         let validations = [...baseValidations];
 

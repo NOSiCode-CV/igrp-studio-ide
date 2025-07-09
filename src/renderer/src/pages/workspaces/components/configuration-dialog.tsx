@@ -40,7 +40,6 @@ import {
     networkTypes,
     serviceTypes,
 } from '../services';
-import { extractDefaults } from '@renderer/utils';
 import {
     Dependency,
     Environment,
@@ -50,6 +49,7 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { HandlerResponse, ProjectData } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
+import { getDefaultProperties } from '@renderer/generators/ui/dnd/helpers';
 
 interface ConfigurationDialogProps {
     service?: any;
@@ -106,20 +106,20 @@ export function ConfigurationDialog({
         const { result } = await getTemplatesService();
 
         const convertedTemplates =
-            result.services?.map((service) => {
+            result.services?.map((service: any) => {
                 const { properties, name, label } = service;
 
-                const serviveData: any = extractDefaults(properties);
+                const serviveData: any = getDefaultProperties(properties);
 
                 // Convert ports array to the string format "internal:external"
                 const ports =
                     serviveData.ports.map(
-                        (port) => `${port.external}:${port.internal}`
+                        (port: any) => `${port.external}:${port.internal}`
                     ) || [];
 
                 // Convert environments array to {name, value} format
                 const environments =
-                    serviveData?.environments?.map((env) => ({
+                    serviveData?.environments?.map((env: any) => ({
                         key: env.key,
                         value: env.value,
                     })) || [];
@@ -127,20 +127,20 @@ export function ConfigurationDialog({
                 // Convert volumes array to "source:target" format
                 const volumes =
                     serviveData.volumes?.map(
-                        (vol) => `${vol.name}:${vol.path}:${vol.driver}`
+                        (vol: any) => `${vol.name}:${vol.path}:${vol.driver}`
                     ) || [];
 
                 // Convert dependsOn to depends_on array
                 const dependsOn =
-                    serviveData.dependsOn?.map((dep) => dep.service) || [];
+                    serviveData.dependsOn?.map((dep: any) => dep.service) || [];
 
                 // Convert labels array
                 const type =
-                    serviveData.labels?.find((l) => l.key === 'type')?.value ||
-                    '';
+                    serviveData.labels?.find((l: any) => l.key === 'type')
+                        ?.value || '';
 
                 const labels =
-                    serviveData?.labels?.map((env) => ({
+                    serviveData?.labels?.map((env: any) => ({
                         key: env.key,
                         value: env.value,
                     })) || [];
@@ -441,11 +441,15 @@ export function ConfigurationDialog({
                 >
                     <TabsList className="grid grid-cols-4 mb-4 w-full">
                         <TabsTrigger value="basic">{t('basic')}</TabsTrigger>
-                        <TabsTrigger value="config">{t('configuration')}</TabsTrigger>
-                        <TabsTrigger value="dependencies">
-                        {t('dependencies')}
+                        <TabsTrigger value="config">
+                            {t('configuration')}
                         </TabsTrigger>
-                        <TabsTrigger value="network">{t('network')}</TabsTrigger>
+                        <TabsTrigger value="dependencies">
+                            {t('dependencies')}
+                        </TabsTrigger>
+                        <TabsTrigger value="network">
+                            {t('network')}
+                        </TabsTrigger>
                     </TabsList>
 
                     <ScrollArea className="flex-1 pr-4 max-h-[60vh] overflow-auto">
@@ -474,13 +478,15 @@ export function ConfigurationDialog({
                                             className="w-1/2"
                                         />
                                         <p className="text-xs text-muted-foreground">
-                                        {t('selectTemplate')}
+                                            {t('selectTemplate')}
                                         </p>
                                     </div>
                                 )}
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">{t('serviceName')}</Label>
+                                    <Label htmlFor="name">
+                                        {t('serviceName')}
+                                    </Label>
                                     <Input
                                         id="name"
                                         value={name}
@@ -494,7 +500,7 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <Label htmlFor="description">
-                                    {t('description')}
+                                        {t('description')}
                                     </Label>
                                     <Textarea
                                         id="description"
@@ -502,7 +508,9 @@ export function ConfigurationDialog({
                                         onChange={(e) =>
                                             setDescription(e.target.value)
                                         }
-                                        placeholder={t('describeServicePlaceholder')}
+                                        placeholder={t(
+                                            'describeServicePlaceholder'
+                                        )}
                                         className="h-20 resize-none"
                                     />
                                 </div>
@@ -510,7 +518,7 @@ export function ConfigurationDialog({
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="image">
-                                        {t('dockerImage')}
+                                            {t('dockerImage')}
                                         </Label>
                                         <Input
                                             id="image"
@@ -525,7 +533,7 @@ export function ConfigurationDialog({
 
                                     <div className="space-y-2">
                                         <Label htmlFor="type">
-                                        {t('serviceType')}
+                                            {t('serviceType')}
                                         </Label>
                                         <IGRPCombobox
                                             value={type}
@@ -560,27 +568,34 @@ export function ConfigurationDialog({
                                     <div className="border rounded-md p-3 space-y-2">
                                         {ports.length > 0 ? (
                                             <div className="flex flex-wrap gap-2">
-                                                {ports.map((port, index) => (
-                                                    <Badge
-                                                        key={index}
-                                                        variant="secondary"
-                                                        className="px-2 py-1 flex items-center gap-1"
-                                                    >
-                                                        <span className="font-mono">
-                                                            {port}
-                                                        </span>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-4 w-4 p-0 ml-1"
-                                                            onClick={() =>
-                                                                removePort(port)
-                                                            }
+                                                {ports.map(
+                                                    (
+                                                        port: any,
+                                                        index: number
+                                                    ) => (
+                                                        <Badge
+                                                            key={index}
+                                                            variant="secondary"
+                                                            className="px-2 py-1 flex items-center gap-1"
                                                         >
-                                                            <X className="h-3 w-3" />
-                                                        </Button>
-                                                    </Badge>
-                                                ))}
+                                                            <span className="font-mono">
+                                                                {port}
+                                                            </span>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-4 w-4 p-0 ml-1"
+                                                                onClick={() =>
+                                                                    removePort(
+                                                                        port
+                                                                    )
+                                                                }
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
+                                                        </Badge>
+                                                    )
+                                                )}
                                             </div>
                                         ) : (
                                             <p className="text-xs text-muted-foreground text-center py-2">
@@ -608,14 +623,16 @@ export function ConfigurationDialog({
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                        {t('portsFormat')}
+                                            {t('portsFormat')}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>{t('environmentVariables')}</Label>
+                                        <Label>
+                                            {t('environmentVariables')}
+                                        </Label>
                                         <Badge
                                             variant="outline"
                                             className="text-xs"
@@ -771,7 +788,7 @@ export function ConfigurationDialog({
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                        {t('volumesFormat')}
+                                            {t('volumesFormat')}
                                         </p>
                                     </div>
                                 </div>
@@ -782,9 +799,11 @@ export function ConfigurationDialog({
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <Label>{t('describeServicePlaceholder')}</Label>
+                                    <Label>
+                                        {t('describeServicePlaceholder')}
+                                    </Label>
                                     <p className="text-xs text-muted-foreground">
-                                    {t('connectedService')}
+                                        {t('connectedService')}
                                     </p>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -843,7 +862,7 @@ export function ConfigurationDialog({
                                 <div className="space-y-2">
                                     <Label>{t('projectDependencies')}</Label>
                                     <p className="text-xs text-muted-foreground">
-                                    {t('selectProjects')}
+                                        {t('selectProjects')}
                                     </p>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -904,7 +923,11 @@ export function ConfigurationDialog({
                                         onValueChange={setNetworkType}
                                     >
                                         <SelectTrigger className="h-8">
-                                            <SelectValue placeholder={t('selectNetworkType')} />
+                                            <SelectValue
+                                                placeholder={t(
+                                                    'selectNetworkType'
+                                                )}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {networkTypes.map((network) => (
@@ -918,7 +941,7 @@ export function ConfigurationDialog({
                                         </SelectContent>
                                     </Select>
                                     <p className="text-xs text-muted-foreground">
-                                    {t('networkDescription')}
+                                        {t('networkDescription')}
                                     </p>
                                 </div>
 
@@ -932,14 +955,14 @@ export function ConfigurationDialog({
                                             }
                                         />
                                         <Label htmlFor="custom-network">
-                                        {t('useCustomNetwork')}
+                                            {t('useCustomNetwork')}
                                         </Label>
                                     </div>
 
                                     {useCustomNetwork && (
                                         <div className="pl-6 space-y-2">
                                             <Label htmlFor="network-name">
-                                            {t('networkName')}
+                                                {t('networkName')}
                                             </Label>
                                             <Input
                                                 id="network-name"
@@ -949,11 +972,13 @@ export function ConfigurationDialog({
                                                         e.target.value
                                                     )
                                                 }
-                                                placeholder={t('exampleNetwork')}
+                                                placeholder={t(
+                                                    'exampleNetwork'
+                                                )}
                                                 className="h-8"
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                            {t('customNetworkName')}
+                                                {t('customNetworkName')}
                                             </p>
                                         </div>
                                     )}
@@ -971,7 +996,7 @@ export function ConfigurationDialog({
                         onClick={handleSave}
                         disabled={isSubmitting || !name}
                     >
-                        {isSubmitting ?  t('saving') : t('saveService')}
+                        {isSubmitting ? t('saving') : t('saveService')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

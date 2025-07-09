@@ -40,7 +40,7 @@ export function ConnectionForm({
     const { t } = useTranslation()
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const handleTestConnection = async (e, values) => {
+    const handleTestConnection = async (e: React.FormEvent<HTMLFormElement>, values: any) => {
         e.preventDefault();
         const { success, message } = await window.igrpStudio.connection.connectToDatabase(
             values
@@ -127,10 +127,10 @@ export function ConnectionForm({
                                     <IGRPCombobox
                                         options={databaseTypes}
                                         value={values.databaseType}
-                                        onChange={(value) => {
+                                        onChange={(selected: string | string[]) => {
                                             setFieldValue(
                                                 t('databaseType'),
-                                                value
+                                                selected as string
                                             );
                                         }}
                                         className="w-full"
@@ -253,7 +253,7 @@ export function ConnectionForm({
                             variant="link"
                             className="link text-igrp"
                             type="button"
-                            onClick={(e) => handleTestConnection(e, values)}
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleTestConnection(e as any, values)}
                         >
                             {t('testConnection')}
                         </Button>
