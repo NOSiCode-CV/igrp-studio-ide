@@ -28,7 +28,6 @@ import { handleDragEnd } from './dnd/DraggableItemManager';
 import Loader from '@renderer/components/loader';
 
 // Custom hooks for better organization
-import { useDebug } from './hooks/useDebug';
 import { useComponentRegistration } from './hooks/useComponentRegistration';
 import { useComponentInitialization } from './hooks/useComponentInitialization';
 import { usePageSave } from './hooks/usePageSave';
@@ -48,14 +47,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
     ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath } = page;
         const isPage = content?.type === 'page';
-
-        // Debug hook to track renders
-        useDebug('FormEngine', [
-            basePath,
-            pagePath,
-            activePresentation,
-            isPage,
-        ]);
 
         // Custom hooks for better separation of concerns
         const {
@@ -82,12 +73,12 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             findComponentById,
             fetchComponents,
             findComponent,
+            loadRegistryComponent,
         } = useStudio();
 
         const { customComponents } = useCustomCode();
         const { menuItems } = useConfigdata(componentsRegistered);
         const { rebuild, generateTag } = useTagManager(components);
-
         // Temporary: Back to original implementation to identify the issue
         const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -146,6 +137,8 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             ]
         );
 
+
+
         // Effects for component lifecycle management
         useEffect(() => {
             clearEditingComponent();
@@ -182,8 +175,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                         setAllFunctions(data.functions);
                         setAllStates(data.states);
                         setAllImports(data.imports);
-                    } else {
-                        initializeComponents();
                     }
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
@@ -193,6 +184,12 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             };
             getJsonData();
         }, [pagePath, page]);
+
+        useEffect(() => {
+            if (componentsRegistered.length > 0 && !components.componentName) {
+                initializeComponents();
+            }
+        }, [componentsRegistered]);
 
         useEffect(() => {
             rebuild();

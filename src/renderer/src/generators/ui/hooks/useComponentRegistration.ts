@@ -26,7 +26,7 @@ export const useComponentRegistration = ({
             currentPage: page.pageName,
         });
 
-    }, [customComponents, fetchComponents, page.pageName]);
+    }, [customComponents, page.pageName]);
 
     useEffect(() => {
         // Only register if we have components to register

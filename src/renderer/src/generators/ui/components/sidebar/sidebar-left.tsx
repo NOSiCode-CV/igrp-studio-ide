@@ -59,7 +59,7 @@ export function AppSidebar({
     basePath,
     ...props
 }: AppSidebarProps) {
-    const { getRegistryComponent } = useStudio();
+    /* const { getRegistryComponent } = useStudio(); */
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
 
@@ -75,9 +75,9 @@ export function AppSidebar({
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    useEffect(() => {
+   /*  useEffect(() => {
         getRegistryComponent();
-    }, []);
+    }, []); */
 
     useEffect(() => {
         setFilteredData(filterSubItems(initialData, searchQuery));

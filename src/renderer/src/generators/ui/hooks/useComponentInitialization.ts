@@ -1,11 +1,12 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { COMPONENT } from '../ComponentTypes';
 import { newStructuredComponent } from '../dnd/helpers';
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface ComponentInitializationProps {
     isPage: boolean;
     menuItems: any[];
-    findComponentById: (id: string) => Promise<any>;
+    findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
     generateTag: (base: string) => string;
     setAllComponents: (components: any) => void;
 }
@@ -16,18 +17,12 @@ interface UseComponentInitializationReturn {
 
 export const useComponentInitialization = ({
     isPage,
-    menuItems,
     findComponentById,
     generateTag,
     setAllComponents,
 }: ComponentInitializationProps): UseComponentInitializationReturn => {
+
     const initializeComponents = useCallback(async () => {
-
-        if (!menuItems.length) {
-            console.log('[Debug] useComponentInitialization: No menu items, skipping');
-            return;
-        }
-
         try {
             const mainComponent = isPage
                 ? COMPONENT.PageContent
@@ -63,7 +58,7 @@ export const useComponentInitialization = ({
         } catch (error) {
             console.error('Error initializing components:', error);
         }
-    }, [isPage, menuItems]);
+    }, [isPage]);
 
     return {
         initializeComponents,
