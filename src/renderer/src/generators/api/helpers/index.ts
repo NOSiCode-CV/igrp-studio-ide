@@ -78,7 +78,7 @@ export const handleChangeValueObject = (
 	value: string
 ) => {
 
-	const isObject = typeof result === 'object' && element !== 'relation' && !Array.isArray(result)
+	const isObject = typeof result === 'object' && element !== 'relation' && !Array.isArray(result) && result.value
 
 	const typeValue = isObject ? result.value : result;
 	const typeModule = isObject ? result.module : '';

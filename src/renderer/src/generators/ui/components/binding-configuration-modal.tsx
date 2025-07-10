@@ -27,12 +27,13 @@ import useToast from '@renderer/hooks/useToast';
 import { capitalize, getId } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/use-studio';
+import { FieldValidation } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface LabeledElementField {
     componentId: string;
     name: string;
     type: string;
-    validation?: any;
+    validation?: FieldValidation;
     defaultValue?: string;
     required: boolean;
     label: string;
@@ -159,6 +160,7 @@ export const BindingConfigurationModal = ({
         }
         return true;
     };
+
 
     const formik = useFormik({
         enableReinitialize: true,
