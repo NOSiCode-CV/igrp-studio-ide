@@ -91,17 +91,17 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
 
         const targetIndex = activeDropZone?.cellIndex || 0;
 
-        /*  const insertIndex =
-            position === 'bottom' || position === 'right'
-                ? targetIndex + 1
-                : targetIndex;
-
-        const moveIndex =
+        /*const moveIndex =
             (position === 'top' || position === 'left') && targetIndex > 1
                 ? targetIndex - 1
                 : targetIndex; */
 
-        const newIndex = position === 'right' ? targetIndex + 1 : targetIndex;
+        const newIndex =
+            activeDropZone?.position === 'right'
+                ? targetIndex + 1
+                : position === 'bottom'
+                  ? targetIndex + 1
+                  : targetIndex;
 
         setDraggedId(null);
         setActiveDropZone(null);
