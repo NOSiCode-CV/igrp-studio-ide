@@ -5,3 +5,6 @@ out
 *.log*
 
 .env.local
+/tsconfig.web.tsbuildinfo
+# IDE specific
+.idea/
