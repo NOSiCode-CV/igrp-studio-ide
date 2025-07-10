@@ -1,4 +1,3 @@
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
@@ -14,6 +13,7 @@ const IGRPStudioAlert = ({
     comp,
     group,
     hoverClass,
+    className,
     onDragEnd,
 }: CardComponentProps) => {
     const { children: components, id: componentId, properties } = comp || {};
@@ -42,10 +42,11 @@ const IGRPStudioAlert = ({
         <Droppable
             onDrop={handleDrop}
             component={comp}
-            className={cn('space-y-3 relative  p-3')}
+            className={cn(className)}
         >
             <IGRPAlert {...properties}>
-                {components && components.length > 0 ? (
+                {components &&
+                    components.length > 0 &&
                     components.map(
                         (comp: StructuredComponent, index: number) => {
                             return (
@@ -76,10 +77,7 @@ const IGRPStudioAlert = ({
                                 </Draggable>
                             );
                         }
-                    )
-                ) : (
-                    <GenNoInfoComp />
-                )}
+                    )}
             </IGRPAlert>
         </Droppable>
     );

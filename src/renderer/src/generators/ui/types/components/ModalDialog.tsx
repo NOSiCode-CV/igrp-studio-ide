@@ -2,8 +2,6 @@ import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { getLabel } from '@renderer/utils';
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { cn } from '@renderer/lib/utils';
 import BoxWrapper from '../tools/BoxWrapper';
@@ -28,11 +26,7 @@ const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
 
     const renderChildComp = useCallback(
         (component: StructuredComponent, path: string) => {
-            const {
-                children: childComponents,
-                componentName,
-                id: componentId,
-            } = component;
+            const { children: childComponents, id: componentId } = component;
 
             return (
                 <Droppable
@@ -40,11 +34,7 @@ const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
                     onDrop={onDragEnd}
                     className={cn('p-2 space-y-3')}
                 >
-                    {childComponents.length === 0 ? (
-                        <GenNoInfoComp
-                            type={getLabel(componentName).toUpperCase()}
-                        />
-                    ) : (
+                    {childComponents.length > 0 &&
                         childComponents.map((child, index) => {
                             return (
                                 <Draggable
@@ -70,8 +60,7 @@ const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
                                     </BoxWrapper>
                                 </Draggable>
                             );
-                        })
-                    )}
+                        })}
                 </Droppable>
             );
         },
@@ -190,9 +179,7 @@ const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({
             onDrop={onDragEnd}
             className={cn('p-2 space-y-3')}
         >
-            {childComponents.length === 0 ? (
-                <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
-            ) : (
+            {childComponents.length > 0 &&
                 childComponents.map((child, index) => {
                     return (
                         <Draggable
@@ -225,8 +212,7 @@ const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({
                             </BoxWrapper>
                         </Draggable>
                     );
-                })
-            )}
+                })}
         </Droppable>
     );
 };

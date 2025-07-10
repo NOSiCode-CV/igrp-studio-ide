@@ -10,10 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { getLabel } from '@renderer/utils';
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { COMPONENT } from '../../ComponentTypes';
 import { Button } from '@renderer/components/ui/button';
 import { Ellipsis } from 'lucide-react';
@@ -126,9 +124,6 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     // Render table filters
     const renderTableFilters = useCallback(
         (compName: string, dropTargetId: string) => {
-            if (filters.length === 0)
-                return <GenNoInfoComp type="TABLE FILTERS" />;
-
             return (
                 <div className="flex flex-1">
                     {filters.map((child, index) => {
@@ -179,19 +174,13 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     );
 
     return (
-        <div className="w-full flex flex-col gap-3">
+        <div className="w-full flex flex-col space-y-3 pt-2">
             {/* Render TableFilter first */}
             {tableFilters.map((tableComp, index) => {
                 const { componentName: compName, id } = tableComp;
 
                 return (
-                    <Droppable
-                        key={index}
-                        className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
-                        component={tableComp}
-                        onDrop={onDragEnd}
-                        path={componentName}
-                    >
+                    <>
                         <TableTool
                             parentComp={comp}
                             comp={tableComp}
@@ -200,23 +189,24 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             group="group/table-filter"
                             className="opacity-0 group-hover/table-filter:opacity-100"
                         />
-                        {renderTableFilters(compName, id)}
-                    </Droppable>
+                        <Droppable
+                            key={index}
+                            className="bg-card rounded-lg border border-dashed border-gray-400 group/table"
+                            component={tableComp}
+                            onDrop={onDragEnd}
+                            path={componentName}
+                        >
+                            {renderTableFilters(compName, id)}
+                        </Droppable>
+                    </>
                 );
             })}
 
             {/* Render TableColumn next */}
             {tableColumns.map((tableComp, index) => {
                 const { componentName: compName, id } = tableComp;
-               // const path = `${componentName}/${compName}`;
                 return (
-                    <Droppable
-                        key={index}
-                        className="bg-card rounded-lg border border-dashed border-gray-400 p-2 group/table"
-                        component={tableComp}
-                        onDrop={onDragEnd}
-                        path={componentName}
-                    >
+                    <>
                         <TableTool
                             parentComp={comp}
                             comp={tableComp}
@@ -224,27 +214,31 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             group="group/table-column"
                             className="opacity-0 group-hover/table-column:opacity-100"
                         />
-                        {columns.length === 0 ? (
-                            <GenNoInfoComp
-                                type={getLabel(compName).toUpperCase()}
-                            />
-                        ) : (
-                            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                                <Table className="w-full text-sm text-left rtl:text-right table-fixed">
-                                    <TableHeader>
-                                        <TableRow>
-                                            {renderTableHeaders(
-                                                compName,
-                                                id,
-                                                tableComp
-                                            )}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>{renderTableRows}</TableBody>
-                                </Table>
-                            </div>
-                        )}
-                    </Droppable>
+                        <Droppable
+                            key={index}
+                            className="bg-card rounded-lg border border-dashed border-gray-400 group/table"
+                            component={tableComp}
+                            onDrop={onDragEnd}
+                            path={componentName}
+                        >
+                            {columns.length > 0 && (
+                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                    <Table className="w-full text-sm text-left rtl:text-right table-fixed">
+                                        <TableHeader>
+                                            <TableRow>
+                                                {renderTableHeaders(
+                                                    compName,
+                                                    id,
+                                                    tableComp
+                                                )}
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>{renderTableRows}</TableBody>
+                                    </Table>
+                                </div>
+                            )}
+                        </Droppable>
+                    </>
                 );
             })}
         </div>

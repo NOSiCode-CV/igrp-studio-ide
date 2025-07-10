@@ -1,4 +1,3 @@
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
@@ -11,7 +10,7 @@ import { COMPONENT } from '../../ComponentTypes';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
-const IGRPStudioSection = ({ comp, onDragEnd }: CardComponentProps) => {
+const IGRPStudioSection = ({ comp, onDragEnd, className }: CardComponentProps) => {
     useTranslation();
     const { children: components, id: componentId } = comp || {};
 
@@ -69,9 +68,9 @@ const IGRPStudioSection = ({ comp, onDragEnd }: CardComponentProps) => {
             <Droppable
                 onDrop={handleDrop}
                 component={comp}
-                className={cn('hover:border-none space-y-1')}
+                className={className}
             >
-                {components && components.length > 0 ? (
+                {components.length > 0 &&
                     components.map(
                         (childComp: StructuredComponent, index: number) => {
                             return (
@@ -99,10 +98,7 @@ const IGRPStudioSection = ({ comp, onDragEnd }: CardComponentProps) => {
                                 </Draggable>
                             );
                         }
-                    )
-                ) : (
-                    <GenNoInfoComp />
-                )}
+                    )}
             </Droppable>
         </div>
     );

@@ -84,16 +84,9 @@ const IGRPStudioFlex: React.FC<CardComponentProps> = ({
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className="p-2"
+            className={cn(flexVariants({ variant, className }))}
         >
-            <div
-                className={cn(
-                    flexVariants({ variant, className }),
-                    'space-y-2'
-                )}
-            >
-                {renderColumns()}
-            </div>
+            {renderColumns()}
         </Droppable>
     );
 };

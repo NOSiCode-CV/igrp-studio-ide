@@ -7,6 +7,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import { useResponsiveClasses } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import { cn } from '@renderer/lib/utils';
 
 const IGRPStudioGrid: React.FC<CardComponentProps> = ({
     comp,
@@ -83,9 +84,9 @@ const IGRPStudioGrid: React.FC<CardComponentProps> = ({
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className="px-1 py-1.5"
+            className={cn(finalClasses)}
         >
-            <div className={finalClasses}>{renderChild()}</div>
+            {renderChild()}
         </Droppable>
     );
 };
