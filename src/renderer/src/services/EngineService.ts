@@ -17,7 +17,7 @@ export const EngineService = {
         return await window.engine.getCodeSnippets(ENV_TYPES.NEXTJS);
     },
 
-    async registerComponent({ customComponents, appComponents, currentPage }: { customComponents: any, appComponents: FileTree[], currentPage: string }): Promise<void> {
+    async registerComponent({ customComponents, appComponents, currentPage, loadRegistryComponent }: { customComponents: any, appComponents: FileTree[], currentPage: string, loadRegistryComponent: () => void }): Promise<void> {
 
         const components: ComponentRegisterConfig[] = customComponents.map((component: any) => ({
             name: component.name,
@@ -54,7 +54,7 @@ export const EngineService = {
             defaultChildren: []
         }));
 
-        const _components: ComponentRegisterConfig[] = appComponents.filter((component) => component.content.scope === 'app' || ((component.content.type === 'page' && component.content.pageName === currentPage) || component.content.name !== currentPage))
+        const _components: ComponentRegisterConfig[] = appComponents.filter((component) => component.content.scope === 'app' || ((component.content.scope === 'page' && component.content.pageName === currentPage) || component.content.name !== currentPage))
             .map((component: any) => ({
                 name: capitalize(component.content.name),
                 label: component.content.description || getLabel(component.content.name),
@@ -96,5 +96,7 @@ export const EngineService = {
         const { result, error } = await window.engine.registerComponent(ENV_TYPES.NEXTJS, { components: componentsToRegister });
         if (error)
             console.log(result, error)
+        else
+            loadRegistryComponent();
     }
 };

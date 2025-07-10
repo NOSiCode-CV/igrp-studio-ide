@@ -281,14 +281,20 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem
-                                            onSelect={() => openDialogNewPage()}
+                                            onSelect={() => {
+                                                openDialogNewPage();
+                                                setPage(undefined);
+                                                setPageEditing(undefined);
+                                            }}
                                         >
                                             {t('createNewPage')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
-                                            onSelect={() =>
-                                                setFormComponent(true)
-                                            }
+                                            onSelect={() => {
+                                                setFormComponent(true);
+                                                setPage(undefined);
+                                                setPageEditing(undefined);
+                                            }}
                                         >
                                             {t('createNewComponent')}
                                         </DropdownMenuItem>

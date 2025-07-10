@@ -1,4 +1,4 @@
-import { useCallback  } from 'react';
+import { useCallback } from 'react';
 import { COMPONENT } from '../ComponentTypes';
 import { newStructuredComponent } from '../dnd/helpers';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
@@ -30,6 +30,8 @@ export const useComponentInitialization = ({
 
             const pageCompRegister = await findComponentById(mainComponent);
             const sectionCompRegister = await findComponentById(COMPONENT.Section);
+            const fragmetCompRegister = await findComponentById(COMPONENT.Fragment);
+
 
             if (!pageCompRegister) {
                 console.warn(`Component ${mainComponent} not found`);
@@ -42,11 +44,17 @@ export const useComponentInitialization = ({
                 sectionCompRegister
             );
 
+            const fragment = newStructuredComponent(
+                COMPONENT.Fragment,
+                [],
+                fragmetCompRegister
+            );
+
             const pageContent = newStructuredComponent(
                 mainComponent,
                 isPage
-                    ? [{ ...section, tag: generateTag(COMPONENT.Section) }]
-                    : [],
+                    ? [{ ...section, tag: generateTag(COMPONENT.Section) },]
+                    : [{ ...fragment, tag: generateTag(COMPONENT.Fragment) }],
                 pageCompRegister
             );
 

@@ -2,8 +2,6 @@ import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { getLabel } from '@renderer/utils';
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import TableTool from '../tools/tableTool';
@@ -34,7 +32,6 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({
         ) => {
             const {
                 children: childComponents,
-                componentName,
                 id: componentId,
             } = component;
             const path = parentComponentName;
@@ -43,13 +40,9 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className={cn('space-y-3', className)}
+                    className={cn( className)}
                 >
-                    {childComponents.length === 0 ? (
-                        <GenNoInfoComp
-                            type={getLabel(componentName).toUpperCase()}
-                        />
-                    ) : (
+                    {childComponents.length > 0 &&
                         childComponents.map((child, index) => {
                             return (
                                 <Draggable
@@ -75,8 +68,7 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({
                                     </BoxWrapper>
                                 </Draggable>
                             );
-                        })
-                    )}
+                        })}
                 </Droppable>
             );
         },

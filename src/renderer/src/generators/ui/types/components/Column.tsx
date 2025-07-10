@@ -60,15 +60,8 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
     );
 
     return (
-        <Droppable component={comp} onDrop={onDragEnd} >
-            <div
-                className={cn(
-                    `w-full flex flex-col gap-3 space-y-3`,
-                    finalClasses
-                )}
-            >
-                {renderComponents()}
-            </div>
+        <Droppable component={comp} onDrop={onDragEnd} className={cn(finalClasses)}>
+             {renderComponents()}
         </Droppable>
     );
 };
