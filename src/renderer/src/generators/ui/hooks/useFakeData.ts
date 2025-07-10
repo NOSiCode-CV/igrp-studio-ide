@@ -36,7 +36,7 @@ export const useFakedata = () => {
                 ],
                 areas: [{ dataKey: "desktop", name: "Desktop", color: "#3b82f6", type: "step" }],
                 categoryKey: "mes",
-                valueFormatter: (value) => `${value}`,
+                valueFormatter: (value: number) => `${value}`,
                 footer: { description: "January - June 2024" }
             }
         },
@@ -54,23 +54,44 @@ export const useFakedata = () => {
                 ],
                 bars: [{ dataKey: "satisfacao", name: "Satisfação", color: "#f97316" }],
                 categoryKey: "produto",
-                valueFormatter: (value) => `★ ${value.toFixed(1)}`,
+                valueFormatter: (value: number) => `★ ${value.toFixed(1)}`,
             }
         },
         [COMPONENT.RadialBarchart]: {
             componentName: COMPONENT.RadialBarchart,
             properties: {
+                title: 'Completion Status',
+                description: 'Project Milestones',
                 data: [
-                    { browser: "Chrome", visitors: 275 },
-                    { browser: "Safari", visitors: 200 },
-                    { browser: "Firefox", visitors: 187 },
-                    { browser: "Edge", visitors: 173 },
-                    { browser: "Other", visitors: 90 },
+                    { task: 'Research', progress: 85 },
+                    { task: 'Design', progress: 65 },
+                    { task: 'Development', progress: 45 },
+                    { task: 'Testing', progress: 20 },
+                    { task: 'Deployment', progress: 10 },
                 ],
-                bars: [{
-                    dataKey: "visitors",
-                }],
-                nameKey: "browser",
+                bars: [
+                    {
+                        dataKey: 'progress',
+                        showLabels: true,
+                        labelPosition: 'insideStart',
+                        labelType: 'name',
+                    },
+                ],
+                nameKey: 'task',
+                size: 'lg',
+                startAngle: 90,
+                endAngle: -270,
+                innerRadius: 20,
+                outerRadius: 160,
+                barSize: 20,
+                showBackground: true,
+                footer: {
+                    description: 'Project status as of June 2024',
+                },
+                centerText: {
+                    show: true,
+                    value: 100,
+                }
             }
         },
         [COMPONENT.HorizontalBarchart]: {
@@ -254,7 +275,7 @@ export const useFakedata = () => {
     const getDataTableFake = useCallback((columns: any) => {
         return Array.from({ length: 4 }).map(() => {
             const rowData: { [key: string]: any } = {};
-            columns.forEach((child) => {
+            columns.forEach((child: any) => {
                 const type = getComponentType(child.componentName);
                 rowData[child.id] = generateFakeDataForField(type);
             });

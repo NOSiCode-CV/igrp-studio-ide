@@ -3,7 +3,7 @@ import { Move, RefreshCw, Lock, Unlock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PositionStyle, PositionType, PositionValue, SectionProps, Side } from '../types';
 
-export function PositionSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
+export function PositionSection({ onChangeStyles, styles }: SectionProps) {
     const { t } = useTranslation();
     const [positionStyle, setPositionStyle] = useState<PositionStyle>(
         styles.position || {

@@ -78,7 +78,7 @@ const TabsNavigation = ({
     };
 
     return (
-        <nav className="flex justify-between pr-5 bg-background">
+        <nav className="flex justify-between pr-5 bg-sidebar">
             <div className="flex flex-1 w-[100px]">
                 <ScrollArea ref={scrollAreaRef}>
                     <div className="flex items-center whitespace-nowrap">

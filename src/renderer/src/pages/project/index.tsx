@@ -31,19 +31,19 @@ import { NextConfig } from './components/configurations/next-config';
 import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import { projectIcons } from '@renderer/constants/appConstants';
 import {
     backendFrameworks,
     frontendFrameworks,
     STEPS,
     THEME_COLORS,
 } from './data';
-import { ProjectData } from 'src/main/types';
+import { FrameworkType, ProjectData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
 import { LabelRequired } from '@renderer/components/label-required';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { FrameworkIcon } from '@renderer/components/framework-icon';
 
 interface ConfigComponentProps {
     data: any; // Replace `any` with a specific type if possible (e.g., `ProjectData`)
@@ -177,7 +177,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const handleOpenDirectory = () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
-        window.electron.ipcRenderer.on('file-content', (_e, result) => {
+        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
             if (!result.canceled) {
                 formik.setFieldValue('path', result.filePaths[0]);
             }
@@ -211,17 +211,17 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }, []);
 
     React.useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
                 event.preventDefault();
                 setOpen(true);
             }
         };
 
-        document.addEventListener(t('keydown'), handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            document.removeEventListener(t('keydown'), handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
 
@@ -382,7 +382,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 onValueChange={(value) => handleChangeFramework(value)}
                 className="grid gap-4 mt-2"
             >
-                {frameworks.map((fw) => (
+                {frameworks.map((fw) => {
+                    console.log('Framework data:', fw);
+                    return (
                     <div
                         key={fw.id}
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
@@ -401,12 +403,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             htmlFor={fw.id}
                             className="flex items-center gap-4 cursor-pointer"
                         >
-                            <img
-                                src={projectIcons[fw.id]}
-                                alt={fw.name}
-                                width={40}
-                                height={40}
+                            <FrameworkIcon
+                                framework={fw.id as FrameworkType}
+                                size={40}
                                 className="rounded-lg"
+                                alt={fw.name}
                             />
                             <div className="flex-1">
                                 <div className="flex items-center justify-between">
@@ -425,7 +426,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             </div>
                         </Label>
                     </div>
-                ))}
+                );
+                })}
             </RadioGroup>
             {formik.touched.framework && formik.errors.framework && (
                 <p className="text-xs text-destructive">

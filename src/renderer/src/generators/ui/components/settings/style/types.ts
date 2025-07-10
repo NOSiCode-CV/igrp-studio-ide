@@ -158,5 +158,4 @@ export interface StyleComponent {
 export interface SectionProps {
     onChangeStyles: (styles: StyleComponent) => void;
     styles: StyleComponent;
-    resetStyles: (sectionKey: keyof StyleComponent) => void;
 }

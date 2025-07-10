@@ -9,7 +9,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
     const menuItems = useMemo(() => {
         if (!components || components.length === 0) return [];
 
-        const groupedComponents = components.reduce((acc, component) => {
+        const groupedComponents = components.reduce((acc: any, component: ComponentRegisterConfig) => {
             const group = component.group || 'Others';
             if (!acc[group]) {
                 acc[group] = [];
@@ -20,7 +20,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
 
         console.log(groupedComponents)
 
-        return Object.keys(groupedComponents).map((group) => ({
+        return Object.keys(groupedComponents).map((group: string) => ({
             id: group,
             label: GROUP_COMPONET[group] || group,
             type: 'group',

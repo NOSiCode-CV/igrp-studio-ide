@@ -116,7 +116,7 @@ function GitConnectionMenu() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={logoutGitLab}
+                                        onClick={() => logoutGitLab()}
                                     >
                                         <LogOut className="h-3 w-3" />
                                     </Button>
@@ -129,7 +129,7 @@ function GitConnectionMenu() {
                     ) : (
                         <div
                             className="flex items-center cursor-pointer"
-                            onClick={loginGitLab}
+                            onClick={() => loginGitLab()}
                         >
                             <GitlabIcon className="mr-2 h-4 w-4" />
                             <span>{t('connectGitLab')}</span>

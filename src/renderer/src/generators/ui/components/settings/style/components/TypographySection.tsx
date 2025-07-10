@@ -3,7 +3,7 @@ import { Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, RefreshCw } fro
 import { useTranslation } from 'react-i18next';
 import { SectionProps, TypographyStyle, TypographyValue } from '../types';
 
-export function TypographySection({ onChangeStyles, styles, resetStyles }: SectionProps) {
+export function TypographySection({ onChangeStyles, styles }: SectionProps) {
   const [typographyStyle, setTypographyStyle] = useState<TypographyStyle>(
     styles.typography || {
       fontSize: { value: '16', unit: 'px' },

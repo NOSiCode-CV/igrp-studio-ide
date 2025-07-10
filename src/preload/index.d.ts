@@ -1,10 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { IOpenProject } from './types';
-import { BaseApiConfig, PageConfig } from 'nextjs-engine/dist/interfaces/types';
-import { ControllerConfig, DTOBaseConfig, DTOConfig, ModelConfig, ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { AppLogicEnvironment, AppLogicSettings, Connection, ConnectionTest, FileTree, ProjectData, ToolCheck } from 'src/main/types';
-import { IConnenctionRepository, IWorkspaceRepository, IBaseEngine, IDocker } from 'src/main/interfaces';
-import { Component } from '@igrp/igrp-studio-nextjs-engine/dist/components';
+import { AppLogicEnvironment, ConnectionTest, FileTree, ToolCheck, IOpenProject, HandlerResponse } from '../main/types';
+import { IConnenctionRepository, IWorkspaceRepository, IBaseEngine, IDocker } from '../main/interfaces';
+import { IDEDetails } from '../main/helpers/ideDetection';
 
 interface CustomAPI {
 
@@ -78,7 +75,16 @@ interface AppLogicAPI {
 }
 declare global {
     interface Window {
-        electron: ElectronAPI | getAppVersion | getLanguage | setLanguage | onFolderChange | watchFolder
+        electron: ElectronAPI & {
+            getAppVersion: () => Promise<string>;
+            getLanguage: () => Promise<string>;
+            setLanguage: (lang: string) => Promise<void>;
+            checkForUpdates: () => Promise<any>;
+            downloadUpdate: () => Promise<any>;
+            installUpdate: () => Promise<any>;
+            watchFolder: (folderPath: string) => Promise<any>;
+            onFolderChange: (callback: (event: any) => void) => void;
+        };
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
         menu: CustomMenu,

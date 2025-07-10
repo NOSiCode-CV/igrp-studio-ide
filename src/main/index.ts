@@ -304,17 +304,12 @@ ipcMain.handle(
     async (
         _event: IpcMainInvokeEvent,
         filePath: string
-    ): Promise<FileTree[] | { error: string }> => {
+    ): Promise<string | null> => {
         try {
             return await readProjectFile(filePath);
         } catch (error) {
             console.error('Error reading file:', error);
-            return {
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : 'Failed to read file',
-            };
+            return null;
         }
     }
 );

@@ -53,7 +53,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                     index={index}
                     dropTargetId={componentId}
                     dropZone={true}
-                    className={cn('p-0 bg-muted/0', className)}
+                    className={cn('p-0 bg-muted/0 min-w-36', className)}
                     mode="MOVE"
                     layout="horizontal"
                 >

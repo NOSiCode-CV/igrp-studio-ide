@@ -42,7 +42,7 @@ const DragDropContext = createContext<DragDropContextType | undefined>(
     undefined
 );
 
-export const DragProvider = ({ children }) => {
+export const DragProvider = ({ children }: { children: React.ReactNode }) => {
     const [layoutMode, setLayoutMode] = useState<LayoutMode>('vertical');
     const [components, setComponents] = useState<StructuredComponent[]>([]);
     const [draggingItem, setDraggingItem] = useState(null);
@@ -50,7 +50,7 @@ export const DragProvider = ({ children }) => {
     const [activeDropZone, setActiveDropZone] = useState<DropZone | null>(null);
 
     // Start dragging
-    const onDragStart = useCallback((item) => {
+    const onDragStart = useCallback((item: any) => {
         setDraggingItem(item);
     }, []);
 
@@ -91,7 +91,7 @@ export const DragProvider = ({ children }) => {
 
         const targetIndex = activeDropZone?.cellIndex || 0;
 
-        const insertIndex =
+        /*  const insertIndex =
             position === 'bottom' || position === 'right'
                 ? targetIndex + 1
                 : targetIndex;
@@ -99,7 +99,9 @@ export const DragProvider = ({ children }) => {
         const moveIndex =
             (position === 'top' || position === 'left') && targetIndex > 1
                 ? targetIndex - 1
-                : targetIndex;
+                : targetIndex; */
+
+        const newIndex = position === 'right' ? targetIndex + 1 : targetIndex;
 
         setDraggedId(null);
         setActiveDropZone(null);
@@ -113,8 +115,8 @@ export const DragProvider = ({ children }) => {
             draggableId: droppedItem.id,
             position,
             destination: {
-                droppableId: targetId,
-                index: mode === 'MOVE' ? moveIndex : insertIndex,
+                droppableId: targetId || '',
+                index: newIndex, // mode === 'MOVE' ? moveIndex : targetIndex,
             },
             type,
             mode,

@@ -1,6 +1,5 @@
 import { Database, Activity, FileText, Circle, LucideIcon, Zap, TextQuote, FileKey } from 'lucide-react'
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants';
-import { v4 as uuidv4 } from 'uuid';
 import i18next from 'i18next';
 import { enUS, pt } from 'date-fns/locale';
 
@@ -11,20 +10,20 @@ export function capitalize(str: string): string {
 export function filterItems(navData: any, searchQuery: string) {
 	return searchQuery
 		? navData
-			.map((item) => {
+			.map((item: any) => {
 				const matches =
 					item.isHeader || item.label.toLowerCase().includes(searchQuery.toLowerCase())
 
 				return matches ? { ...item } : null
 			})
-			.filter((item) => item !== null)
+			.filter((item: any) => item !== null)
 		: navData
 }
 
 export function filterSubItems(navData: any, searchQuery: string) {
 	if (!searchQuery) return navData
 	return navData
-		.map((item) => {
+		.map((item: any) => {
 			const filteredSubItems = item?.subItems
 				? item.subItems.filter((subItem: any) =>
 					subItem.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -40,12 +39,12 @@ export function filterSubItems(navData: any, searchQuery: string) {
 
 			return null
 		})
-		.filter((item) => item !== null)
+		.filter((item: any) => item !== null)
 }
 
 export function generateRowId() {
 	// Generate a random string with 8 characters
-	const randomStr = Math.random().toString(36).substr(2, 8)
+	const randomStr = Math.random().toString(36).substring(2, 8)
 	return `row-${randomStr}`
 }
 
@@ -54,7 +53,7 @@ export function getId() {
 }
 
 export function getUUID() {
-	return uuidv4()
+	return crypto.randomUUID()
 }
 
 export function generateId(componentName: string) {
@@ -64,11 +63,11 @@ export function generateId(componentName: string) {
 }
 
 export function findComponentItem(menus: Array<any>, idFind: string) {
-	return menus.flatMap((menu) => menu.subItems || []).find((sub) => sub.id === idFind) || null
+	return menus.flatMap((menu: any) => menu.subItems || []).find((sub: any) => sub.id === idFind) || null
 }
 
 export const getBadgeColor = (method: string): string | undefined => {
-	return httpMethods.find((item) => item.value === method)?.color;
+	return httpMethods.find((item: any) => item.value === method)?.color;
 };
 
 
@@ -137,24 +136,3 @@ export const getLocale = () => {
 			return enUS;
 	}
 };
-
-export function extractDefaults(schema) {
-	const result = {};
-	for (const key in schema) {
-		const field = schema[key];
-
-		if ("default" in field) {
-			result[key] = field.default;
-		} else if (field.type === "object" && field.properties) {
-			result[key] = extractDefaults(field.properties);
-		} else if (field.type === "array") {
-			if (field.default) {
-				result[key] = field.default;
-			} else if (field.items && field.items.properties) {
-				// create a dummy item with default values
-				result[key] = [extractDefaults(field.items.properties)];
-			}
-		}
-	}
-	return result;
-}

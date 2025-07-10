@@ -25,6 +25,7 @@ export const handleDragEnd = async (
 
     const { draggableId, source, destination, mode, type }: DragEndResult = result;
 
+
     if (!destination) {
         return;
     }
@@ -52,15 +53,14 @@ const validateDropPermission = async (
     destination: Destination,
     handlers: DragEndHandlers
 ): Promise<boolean> => {
+
     try {
-        // Find the destination component by its droppableName
-        
         // Add null checks for the destination properties
         if (!destination.droppablePath || !destination.droppableName) {
             return true;
         }
-        
-        const destinationComponent = await handlers.findComponent(destination.droppablePath, destination.droppablePath);
+
+        const destinationComponent = await handlers.findComponent(destination.droppablePath, destination.droppableName);
 
         if (!destinationComponent) {
             return true;
@@ -94,11 +94,8 @@ const handleDropComponent = async (
     const { label, properties, childrenTypes, interactions: interactionsProperties, allowTypes, data: dataProperties, defaultChildren } = source
 
     const componentId = generateId(draggableId);
-
     const tag = handlers.generateTag(draggableId);
-
     const data = getRequiredDataSchema(dataProperties);
-
     const interactions = getDefaultInteractions(interactionsProperties);
 
     // Create the component object
@@ -115,7 +112,7 @@ const handleDropComponent = async (
         properties: getDefaultProperties(properties),
     };
 
-    if (childrenTypes) {
+        if (childrenTypes) {
         const childPromises = childrenTypes
             .filter((child) => child.defaultValue)
             .map(async (child: ComponentRegisterConfig) => {
@@ -133,12 +130,11 @@ const handleDropComponent = async (
                 if (register) {
                     const childComponent = await createStructuredComponentRecursive(register, handlers.generateTag, handlers);
                     component.children?.push(childComponent);
-                }
+                } 
             }
         }
     }
 
-    // Add the component to the row
     handlers.handleAddChildToComponent(destination, component);
 
 };
@@ -185,6 +181,7 @@ async function createStructuredComponentRecursive(child: ComponentRegisterConfig
         data,
         properties: getDefaultProperties(properties),
     };
+    
     return childComponent;
 }
 

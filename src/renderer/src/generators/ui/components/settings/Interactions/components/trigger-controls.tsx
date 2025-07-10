@@ -16,10 +16,16 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { Label } from '@renderer/components/ui/label';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCombobox,
+    IGRPOptionsProps,
+} from '@igrp/igrp-framework-react-design-system';
 import useCustomCode from '../../../../hooks/useCustomCode';
 import { ImportComponent } from '../../../sidebar/custom-code/custom-code-imports';
-import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    Import,
+    Segment,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { FunctionSettingsSidebar } from '../../../sidebar/custom-code/functions-settings';
 import { getId } from '@renderer/utils';
@@ -28,6 +34,7 @@ import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppLogicAction } from './app-logic/app-logic-action';
+import { PageSelectionConfig } from '../../properties';
 
 type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';
 
@@ -42,6 +49,7 @@ interface NavigationAction {
     name: string;
     path: string;
     params?: Record<string, string>;
+    segments?: Segment[];
 }
 
 interface FormSubmitAction {
@@ -69,6 +77,7 @@ interface TriggerControlsProps {
     interactionsType: any;
     componentTag: string;
     onInteractionsChange: (interactions: Record<string, Action>) => void;
+    columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
 }
 
 interface InteractionEditorProps {
@@ -81,6 +90,7 @@ interface InteractionEditorProps {
     setLocalInteractions: (interactions: Record<string, Action>) => void;
     localInteractions: Record<string, Action>;
     componentTag: string;
+    columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
 }
 
 export function TriggerControls({
@@ -88,6 +98,7 @@ export function TriggerControls({
     interactionsType,
     componentTag,
     onInteractionsChange,
+    columnsOptions = [],
 }: TriggerControlsProps) {
     const [localInteractions, setLocalInteractions] = useState<
         Record<string, Action>
@@ -215,6 +226,7 @@ export function TriggerControls({
                     setLocalInteractions={setLocalInteractions}
                     localInteractions={localInteractions}
                     componentTag={componentTag}
+                    columnsOptions={columnsOptions}
                 />
             )}
         </div>
@@ -231,11 +243,15 @@ const InteractionEditor = ({
     setLocalInteractions,
     localInteractions,
     componentTag,
+    columnsOptions = [],
 }: InteractionEditorProps) => {
     const [actionType, setActionType] = useState<ActionType>(
         interaction.type || 'function'
     );
     const [currentAction, setCurrentAction] = useState<Action>(interaction);
+    const [selectedPagePath, setSelectedPagePath] = useState<string>(
+        currentAction?.navigate?.path || ''
+    );
 
     const { pageOptions: availablePages } = useStudio();
     const { getFormOptions } = useComponents();
@@ -437,9 +453,9 @@ const InteractionEditor = ({
             case 'navigate':
                 return (
                     <div className="space-y-4">
-                        <IGRPCombobox
-                            label="Target Page"
-                            placeholder="Select page"
+                        <PageSelectionConfig
+                            columnsOptions={columnsOptions}
+                            segments={currentAction.navigate?.segments || []}
                             value={
                                 currentAction.navigate?.name
                                     ? currentAction.navigate.name.replace(
@@ -448,34 +464,6 @@ const InteractionEditor = ({
                                       )
                                     : ''
                             }
-                            onChange={(id) => {
-                                const page = availablePages.find(
-                                    (p) => p.value === id
-                                );
-                                if (page) {
-                                    setCurrentAction({
-                                        ...currentAction,
-                                        navigate: {
-                                            path: page.metadata.path,
-                                            name: `goTo${id}`,
-                                        },
-                                    });
-                                }
-                            }}
-                            options={availablePages}
-                        />
-
-                        {/* TODO: Fix this */}
-                        {/* <PageSelectionConfig
-                            value={
-                                currentAction.navigate?.name
-                                    ? currentAction.navigate.name.replace(
-                                          'goTo',
-                                          ''
-                                      )
-                                    : ''
-                            }
-                            fieldPath="navigate.name"
                             key="navigate"
                             selectedPagePath={selectedPagePath}
                             onPageChange={(value) => {
@@ -483,19 +471,30 @@ const InteractionEditor = ({
                                     (p) => p.value === value
                                 );
 
-                                setSelectedPagePath(value);
                                 if (page) {
                                     setCurrentAction({
                                         ...currentAction,
                                         navigate: {
                                             path: page.metadata.path,
                                             name: `goTo${value}`,
+                                            segments: page.metadata.segments,
                                         },
                                     });
                                 }
+
+                                setSelectedPagePath(value);
                             }}
                             pageOptions={availablePages}
-                        /> */}
+                            onInputChange={(fieldPath, value) => {
+                                setCurrentAction({
+                                    ...currentAction,
+                                    navigate: {
+                                        ...currentAction.navigate!,
+                                        [fieldPath]: value,
+                                    },
+                                });
+                            }}
+                        />
 
                         <div className="space-y-2">
                             <Label>Navigation Parameters</Label>

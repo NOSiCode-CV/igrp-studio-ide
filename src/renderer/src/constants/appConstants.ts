@@ -30,33 +30,36 @@ export const PATTERNS = {
 };
 
 
-export enum OPTION_TYPE {
-    MODELS = "models",
-    MODEL = "model",
-    CONTROLLERS = "controllers",
-    CONTROLLER = "controller",
-    DATA_OBJECTS = "dto",
-    ACTION = 'action',
-    MODAL = 'modal',
-    RESPONSES = 'responses',
-    RESPONSE = 'response',
-    ENUM = 'enum',
-    DELETE = 'delete',
-    ERDDiagram = "ERDDiagram",
-    FILE_THREE = "filethree",
-    PERMISSIONS = "permissions"
-};
+export const OPTION_TYPE = {
+    MODELS: "models",
+    MODEL: "model",
+    CONTROLLERS: "controllers",
+    CONTROLLER: "controller",
+    DATA_OBJECTS: "dto",
+    ACTION: 'action',
+    MODAL: 'modal',
+    RESPONSES: 'responses',
+    RESPONSE: 'response',
+    ENUM: 'enum',
+    DELETE: 'delete',
+    ERDDiagram: "ERDDiagram",
+    FILE_THREE: "filethree",
+    PERMISSIONS: "permissions"
+} as const;
 
-export type OptionType = 'model' | 'controller' | 'dto' | 'action' | 'responses' | 'none' | 'ERDDiagram' | 'enum' | 'filethree' | 'permissions';
+export type OptionType = typeof OPTION_TYPE[keyof typeof OPTION_TYPE];
 
+// Framework icons are now handled by the FrameworkIcon component
+// This export is kept for backward compatibility
 export const projectIcons = {
-    nextjs: 'https://www.svgrepo.com/show/354113/nextjs-icon.svg',
-    springboot: 'https://www.svgrepo.com/show/354380/spring-icon.svg',
-    dotnet: 'https://www.svgrepo.com/show/376369/dotnet.svg',
-    vuejs: 'https://www.svgrepo.com/show/354528/vue.svg',
-    angular: 'https://www.svgrepo.com/show/353396/angular-icon.svg',
-    laravel: 'https://www.svgrepo.com/show/353985/laravel.svg',
-    django: 'https://www.svgrepo.com/show/353657/django-icon.svg',
+    nextjs: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg',
+    springboot: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
+    dotnet: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg',
+    vuejs: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg',
+    angular: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg',
+    laravel: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-plain.svg',
+    django: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg',
+    go: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
 }
 
 export const PAGE_DEFAULT = 'Overview'

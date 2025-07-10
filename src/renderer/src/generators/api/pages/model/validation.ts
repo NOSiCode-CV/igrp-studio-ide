@@ -1,7 +1,7 @@
 import { PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup'
 
-export function useModelValidation({t}) {
+export function useModelValidation({t}: {t: any}) {
     const validationSchema = Yup.object({
         name: Yup.string().required('Name is required')
             .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))

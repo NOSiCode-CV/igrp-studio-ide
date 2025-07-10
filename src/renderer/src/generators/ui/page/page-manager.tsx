@@ -166,7 +166,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 ...page,
                 pageName: page?.content?.pageName,
                 pagePath: page?.content?.path,
-                isPage: false,
+                isPage: true,
             }));
     };
 
@@ -299,7 +299,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
 
                         {viewMode === 'card' ? (
                             tableData.length > 0 ? (
-                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start">
                                     {tableData.map((page) => {
                                         const components = getPageComponent(
                                             page.pageName

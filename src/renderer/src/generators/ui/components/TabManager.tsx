@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import FormEngine from '../page-builder';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import PageManager from '../page/page-manager';
-import { Separator } from '@renderer/components/ui/separator';
 import NavigationBar from './NavigationBar';
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { cn } from '@renderer/lib/utils';
@@ -85,8 +84,6 @@ export default function TabManager({ basePath }: ContentProps) {
                     />
                 )}
             </TabsNavigation>
-
-            <Separator />
 
             {tabs.map((tab) => (
                 <div

@@ -42,6 +42,7 @@ import {
 } from 'react';
 import Loader from '@renderer/components/loader';
 import { getRequiredDataSchema } from '../../dnd/helpers';
+import { useComponents } from '../../hooks/useComponents';
 
 interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -69,6 +70,8 @@ const SidebarRight = ({
     } = useDroppedComponents();
 
     const { statesOptions } = useCustomCode();
+    const { getArqumentsOptions } = useComponents();
+    const argumentsOptions = getArqumentsOptions();
 
     // Memoized derived state
     const currentComp = useMemo(
@@ -103,9 +106,9 @@ const SidebarRight = ({
         Record<string, any>
     >({});
 
-    const [columnsOptions, setColumnsOptions] = useState<IGRPOptionsProps[]>(
-        []
-    );
+    const [columnsOptions, setColumnsOptions] = useState<
+        (IGRPOptionsProps & { type?: 'column' | 'pageParam' })[]
+    >([]);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -147,9 +150,21 @@ const SidebarRight = ({
                     return {
                         value: column.tag,
                         label: column.properties.headerTitle,
+                        type: 'column' as const,
                     };
                 }) ?? [];
-        setColumnsOptions(options);
+
+        // Join all data sources with type indicators
+        const combinedDataOptions = [
+            ...argumentsOptions.map((option) => ({
+                ...option,
+                type: 'pageParam' as const,
+                label: `${option.label} (Variable)`,
+            })),
+            ...options,
+        ];
+
+        setColumnsOptions(combinedDataOptions);
     }, [parentComp]);
 
     // Load properties component and delete data not in the schema
@@ -164,7 +179,7 @@ const SidebarRight = ({
             // Check if each key in data exists in response
             if (data && requiredDataSchema) {
                 const cleanedData = { ...data };
-                let hasChanges = false;
+                //let hasChanges = false;
 
                 // Iterate through each key in the current data
                 /*   Object.keys(data).forEach((key) => {
@@ -180,15 +195,28 @@ const SidebarRight = ({
                     // If the key doesn't exist in the current data, add it
                     if (!(key in data)) {
                         cleanedData[key] = requiredDataSchema[key];
-                        hasChanges = true;
+                       // hasChanges = true;
+                    }
+                });
+
+                // Remove keys with empty object values
+                Object.keys(cleanedData).forEach((key) => {
+                    if (
+                        cleanedData[key] &&
+                        typeof cleanedData[key] === 'object' &&
+                        !Array.isArray(cleanedData[key]) &&
+                        Object.keys(cleanedData[key]).length === 0
+                    ) {
+                        delete cleanedData[key];
+                       // hasChanges = true;
                     }
                 });
 
                 setTempEditingComponent(
                     (prev) =>
                         ({
-                            ...prev,
                             ...currentComp,
+                            ...prev,
                             data: cleanedData,
                         }) as StructuredComponent
                 );
@@ -244,7 +272,7 @@ const SidebarRight = ({
                                         }
                                         return objAcc;
                                     },
-                                    {}
+                                    {} as Record<string, any>
                                 );
                             } else if (config.default || config.required) {
                                 acc[key] = config.default;
@@ -253,11 +281,10 @@ const SidebarRight = ({
                         },
                         {} as Record<string, any>
                     );
-
                 const source = // Filter properties based on schema and requirements
                     Object.entries(currentComp?.properties ?? {}).reduce(
                         (acc, [key, value]) => {
-                            const schemaConfig = data?.[key];
+                            const schemaConfig = (data as Record<string, any>)?.[key];
 
                             // Skip if property not in schema
                             if (!schemaConfig) {
@@ -275,17 +302,17 @@ const SidebarRight = ({
                                     (nestedAcc, [nestedKey, nestedValue]) => {
                                         const nestedConfig =
                                             schemaConfig.properties[nestedKey];
-                                        // Keep if in schema and (required or not null)
+                                        // Keep if in schema and (required or value exists, including null)
                                         if (
                                             nestedConfig &&
                                             (nestedConfig.required ||
-                                                nestedValue !== null)
+                                                nestedValue !== undefined)
                                         ) {
                                             nestedAcc[nestedKey] = nestedValue;
                                         }
                                         return nestedAcc;
                                     },
-                                    {}
+                                    {} as Record<string, any>
                                 );
 
                                 if (
@@ -295,8 +322,11 @@ const SidebarRight = ({
                                 }
                             }
                             // Handle non-object properties
-                            else if (schemaConfig.required || value) {
-                                // For string type, keep empty strings
+                            else if (
+                                schemaConfig.required ||
+                                value !== undefined
+                            ) {
+                                // Keep the value if it exists in current properties (including null)
                                 acc[key] = value;
                             }
 
@@ -311,13 +341,13 @@ const SidebarRight = ({
                 setTempEditingComponent(
                     (prev) =>
                         ({
-                            ...prev,
                             ...currentComp,
+                            ...prev,
                             properties: initialValues,
                         }) as StructuredComponent
                 );
 
-                //TODO review this, when the data is not in the schema, it is not updated
+                //TODO review this, when properties key
                 if (data && tempEditingComponent?.data) {
                     // Check if any data keys are referenced in the schema properties
                     /* const cleanedData = { ...tempEditingComponent.data };
@@ -700,6 +730,7 @@ const SidebarRight = ({
                                     onInteranctionsChange={
                                         handleUpdateChildComponent
                                     }
+                                    columnsOptions={columnsOptions}
                                 />
                             </TabsContent>
                         </Tabs>

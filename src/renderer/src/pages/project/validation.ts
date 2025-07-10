@@ -1,7 +1,7 @@
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup';
 
-export function useProjectValidation({ t, step }) {
+export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
     const validationSchema = Yup.object().shape({
         name: Yup.string().required(
             t('fieldRequired', { name: t('projectName') })

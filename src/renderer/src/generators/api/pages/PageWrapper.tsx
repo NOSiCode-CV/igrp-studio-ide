@@ -13,7 +13,6 @@ import { EnumLayout } from './enum';
 import { EditorLayout } from './EditorLayout';
 import { FileTree, ProjectData } from 'src/main/types';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
-import { PermissionsLayout } from './permissions';
 import { ControllerLayout } from './controller';
 
 interface PageBuilderState {
@@ -21,11 +20,12 @@ interface PageBuilderState {
     currentItem: any;
     filesThree: FileTree[];
     config: ProjectData;
+    responses: any[];
 }
 
 interface NewProps {
     onOpenNew: (tab: TabItem) => void;
-    open: OptionType;
+    open: OptionType | 'none';
     tab: TabItem;
 }
 
@@ -37,13 +37,12 @@ const componentMap = {
     [OPTION_TYPE.DATA_OBJECTS]: DtoLayout,
     [OPTION_TYPE.RESPONSE]: ResponseLayout,
     [OPTION_TYPE.ENUM]: EnumLayout,
-    [OPTION_TYPE.PERMISSIONS]: PermissionsLayout,
     [OPTION_TYPE.ERDDiagram]: ERDLayout,
 };
 
 const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
     const [selectors, setSelectors] = useState<any[]>([]);
-    const [option, setOption] = useState<OptionType>(open);
+    const [option, setOption] = useState<OptionType | 'none'>(open);
     const [module, setModule] = useState<string>('shared');
 
     const { t } = useTranslation();
@@ -69,7 +68,7 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
                 );
                 setSelectors(allSelectors);
             } catch (error) {
-                console.error(t("failedFetchSelectors"), error);
+                console.error(t('failedFetchSelectors'), error);
             }
         };
 
@@ -82,11 +81,10 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
         if (tab.item) setModule(tab.item.module || module);
     }, [tab]);
 
-    const handleOptionClick = (opt: OptionType) => {
+    const handleOptionClick = (opt: OptionType | 'none') => {
         setOption(opt);
         onOpenNew({
             ...tab,
-            title: t(`new${opt.charAt(0).toUpperCase() + opt.slice(1)}`),
             open: opt,
         });
     };
@@ -95,18 +93,27 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
         handleCloseTab(tab.id);
     };
 
-    const Component = componentMap[option];
+    const Component =
+        option !== 'none'
+            ? componentMap[option as keyof typeof componentMap]
+            : null;
+
+    if (option === 'none') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4 bg-background">
+                <div className="w-full max-w-4xl space-y-8">
+                    <EmptyPage
+                        onClick={(option: string) =>
+                            handleOptionClick(option as OptionType)
+                        }
+                    />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>
-            {option === 'none' && (
-                <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4 bg-background">
-                    <div className="w-full max-w-4xl space-y-8">
-                        <EmptyPage onClick={handleOptionClick} />
-                    </div>
-                </div>
-            )}
-
             {Component && (
                 <Component
                     selectors={selectors}

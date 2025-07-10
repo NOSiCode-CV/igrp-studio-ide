@@ -37,8 +37,7 @@ import {
     CollapsibleTrigger,
 } from '@renderer/components/ui/collapsible';
 import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area';
-import Draggable from '@renderer/lib/dnd/Draggable';
-import useStudio from '@renderer/hooks/use-studio';
+import Draggable from '@renderer/lib/dnd/Draggable';     
 import NavigatorSidebar from './sidebar-navigator';
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
 //import SidebarAppComponents from './sidebar-app-components';
@@ -59,7 +58,7 @@ export function AppSidebar({
     basePath,
     ...props
 }: AppSidebarProps) {
-    const { getRegistryComponent } = useStudio();
+    /* const { getRegistryComponent } = useStudio(); */
     const { setOpen } = useSidebar();
     const { t } = useTranslation();
 
@@ -75,9 +74,9 @@ export function AppSidebar({
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    useEffect(() => {
+   /*  useEffect(() => {
         getRegistryComponent();
-    }, []);
+    }, []); */
 
     useEffect(() => {
         setFilteredData(filterSubItems(initialData, searchQuery));
@@ -109,7 +108,7 @@ export function AppSidebar({
         <Sidebar
             collapsible="icon"
             className={cn(
-                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!',
+                'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]! group-data-[side=left]:border-r-0',
                 props.className
             )}
             {...props}

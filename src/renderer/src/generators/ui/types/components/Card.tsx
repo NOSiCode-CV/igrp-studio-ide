@@ -11,7 +11,10 @@ import { generateAllClasses } from '../../components/settings/style/utils';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
-const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
+const IGRPStudioCard: React.FC<CardComponentProps> = ({
+    comp,
+    onDragEnd,
+}) => {
     const { children: components, componentName: parentComponentName } = comp;
 
     const { setEditingComponent } = useDroppedComponents();
@@ -105,11 +108,11 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                 handleEdit(child, parentComponentName)
                             }
                             group="group/card-comp"
-                            className="opacity-0 group-hover/card-comp:opacity-100"
+                            className="-top-4 popacity-0 group-hover/card-comp:opacity-100"
                         />
                         {renderChildComp(
                             child,
-                            `${classes}, ${className}`,
+                            cn(`${classes}, ${className}`),
                             childClassName
                         )}
                     </div>

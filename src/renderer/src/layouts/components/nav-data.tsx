@@ -16,7 +16,7 @@ import {
 
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
 import { getBadgeColor, getIcon } from '@renderer/utils';
-import { OPTION_TYPE } from '@renderer/constants/appConstants';
+import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { FileTree, MenuItem } from 'src/main/types';
 
@@ -30,7 +30,7 @@ const SerializationConfigModal = lazy(
 
 export interface DropdownItem {
     label: string;
-    actionType: OPTION_TYPE;
+    actionType: OptionType;
     icon?: LucideIcon;
     componentName?: React.ReactNode;
 }
@@ -142,24 +142,24 @@ const useNavdata = (filesThree: FileTree[]) => {
     );
 
     const getDropdownMenus = useCallback(
-        (category: string) => {
+        (category: OptionType) => {
             const menuMap = {
                 [OPTION_TYPE.MODELS]: dropdownConfigs.schemas,
                 [OPTION_TYPE.DATA_OBJECTS]: dropdownConfigs.dto,
             };
-            return menuMap[category] || [];
+            return menuMap[category as keyof typeof menuMap] || [];
         },
         [dropdownConfigs]
     );
 
     const getDropdownSubMenus = useCallback(
-        (category: string) => {
+        (category: OptionType) => {
             const menuMap = {
                 [OPTION_TYPE.CONTROLLERS]: dropdownConfigs.subMenus,
                 [OPTION_TYPE.CONTROLLER]: dropdownConfigs.subMenus,
                 [OPTION_TYPE.MODEL]: dropdownConfigs.modelMenus,
             };
-            return menuMap[category] || dropdownConfigs.defaultMenus;
+            return menuMap[category as keyof typeof menuMap] || dropdownConfigs.defaultMenus;
         },
         [dropdownConfigs]
     );
@@ -185,7 +185,7 @@ const useNavdata = (filesThree: FileTree[]) => {
             const { actions, type, id } = content;
 
             if (type === OPTION_TYPE.CONTROLLER && actions) {
-                return actions.map((action) => ({
+                return actions.map((action: any) => ({
                     id,
                     label: action.actionName,
                     path,
@@ -205,7 +205,7 @@ const useNavdata = (filesThree: FileTree[]) => {
     const menuItems = useMemo(() => {
         return filesThree
             .filter((folder) => !IGNORED_PATHS.has(folder.name))
-            .map((folder) => {
+            .map((folder: any) => {
                 const isShared = folder.name === 'shared';
 
                 const dropdownMenus = isShared
@@ -230,10 +230,10 @@ const useNavdata = (filesThree: FileTree[]) => {
                 };
 
                 if (folder.children) {
-                    folder.children.forEach((child) => {
+                    folder.children.forEach((child: any) => {
                         if (
                             !Object.values(OPTION_TYPE).includes(
-                                child.name as OPTION_TYPE
+                                child.name as OptionType
                             )
                         ) {
                             return;
@@ -251,7 +251,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                             };
 
                             if (child.children) {
-                                child.children.forEach((file) => {
+                                child.children.forEach((file: any) => {
                                     if (!file.isDirectory) {
                                         const dropdownMenus =
                                             getDropdownSubMenus(

@@ -51,7 +51,7 @@ export const TabList = [
 export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [value: string]: IColumnsTabelProps[] } => {
     const headersTypes = formatMethods(
         (
-            selectors.find((selector) => 'HTTP_HEADER_TYPES' in selector) as
+            selectors.find((selector: any) => 'HTTP_HEADER_TYPES' in selector) as
             | { HTTP_HEADER_TYPES: string[] }
             | undefined
         )?.HTTP_HEADER_TYPES || []
@@ -59,7 +59,7 @@ export const getTablesColumns = (selectors: any, enumTypes: any, t: any): { [val
 
     const paramsTypesData = formatMethods(
         (
-            selectors.find((selector) => 'REQUEST_PARAMS' in selector) as
+            selectors.find((selector: any) => 'REQUEST_PARAMS' in selector) as
             | { REQUEST_PARAMS: string[] }
             | undefined
         )?.REQUEST_PARAMS || []

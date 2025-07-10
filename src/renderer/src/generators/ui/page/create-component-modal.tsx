@@ -114,6 +114,7 @@ export function CreateComponentModal({
         pageConfig: ComponentConfig
     ): Promise<void> => {
         try {
+
             const { error } = await window.engine.createPage(
                 { ...pageConfig, id: getId() },
                 ENV_TYPES.NEXTJS,

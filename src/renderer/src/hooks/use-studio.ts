@@ -1,9 +1,9 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { FileTree, ProjectData } from 'src/main/types';
+import { useComponentsContext } from '../generators/ui/contexts/ComponentsContext';
 
 interface RootState {
     PageBuilder: {
@@ -23,7 +23,8 @@ const selectProperties = createSelector(selectState, (studio) => ({
 const useStudio = () => {
     const { files, basePath, config } = useSelector(selectProperties);
 
-    const [componentsRegistered, setComponentsRegistered] = useState<ComponentRegisterConfig[]>([]);
+    // Use shared context for components
+    const { componentsRegistered, loadRegistryComponent } = useComponentsContext();
 
     const [pageOptions, setPageOptions] = useState<any[]>([]);
 
@@ -36,7 +37,7 @@ const useStudio = () => {
     // Get component data from a JSON file
     const getComponentData = useCallback(async (componentName: string) => {
         try {
-            const data = await window.api.getJsonContent(
+            const data = await window.api?.getJsonContent(
                 `${basePath}/.igrpstudio/components/${componentName}.json`
             );
             return data;
@@ -66,36 +67,27 @@ const useStudio = () => {
         }
     }, [files]);
 
-    // Get all registered components
-    const getRegistryComponent = useCallback(async () => {
-        return await window.engine.getComponent(ENV_TYPES.NEXTJS).then((res) => {
-            setComponentsRegistered(res.result?.components ?? []);
-            return res.result?.components ?? [];
-        })
-    }, []);
+
 
     // Helper function to find a component by name or within a parent's acceptedChildren
     const findComponent = useCallback(
         async (path: string | undefined, componentName: string) => {
             if (!componentName) return null;
 
-            const { result, error } = await window.engine.getComponent(ENV_TYPES.NEXTJS);
-
-            if (error) {
-                console.error('Failed to load JSON content:', error);
+            // Use the already loaded componentsRegistered instead of making a new API call
+            if (componentsRegistered.length === 0) {
+                console.warn('[Debug] useStudio: No components registered yet. Call loadRegistryComponent() first.');
                 return null;
             }
-
             // If no path is provided, search for the component directly by name
-
-            let component: ComponentRegisterConfig | null = result?.components.find((comp: ComponentRegisterConfig) => comp.name === componentName) || null;
+            let component: ComponentRegisterConfig | null = componentsRegistered.find((comp: ComponentRegisterConfig) => comp.name === componentName) || null;
 
             if (path && !component) {
                 // Split the path into parts (e.g., "table/tableColumns/tableTextCell" => ["table", "tableColumns", "tableTextCell"])
                 const pathParts = path.split('/');
 
                 // Start searching from the root level
-                let currentComponents = result.components;
+                let currentComponents = componentsRegistered;
 
                 for (let i = 0; i < pathParts.length; i++) {
                     const currentPathPart = pathParts[i];
@@ -105,6 +97,7 @@ const useStudio = () => {
 
                     if (!parentComponent) {
                         // If the parent component or its children are not found, stop searching
+                        console.warn(`[Debug] useStudio: Parent component "${currentPathPart}" not found in path "${path}"`);
                         return null;
                     }
 
@@ -117,9 +110,10 @@ const useStudio = () => {
                     }
                 }
             }
+
             return component;
         },
-        []
+        [componentsRegistered]
     );
 
     // Get accepted children for a component
@@ -164,10 +158,6 @@ const useStudio = () => {
     };
 
     useEffect(() => {
-        getRegistryComponent();
-    }, [getRegistryComponent]);
-
-    useEffect(() => {
         const pages = files.find((page) => page.name === 'pages')
         const options = pages?.children?.filter((page) => page?.content?.pageName).map((page) => {
             const { content } = page
@@ -192,12 +182,12 @@ const useStudio = () => {
         getPropertiesComponent,
         getDataComponent,
         getChildPropertiesComponent,
-        getRegistryComponent,
         getInteractionsComponent,
         getRulesComponent,
         getComponentData,
         getPageData,
-        fetchComponents
+        fetchComponents,
+        loadRegistryComponent
     };
 };
 

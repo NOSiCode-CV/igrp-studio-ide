@@ -1,7 +1,7 @@
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import * as Yup from 'yup'
 
-export function useResponseValidation({ t }) {
+export function useResponseValidation({ t }: { t: any }) {
     const validationSchema = Yup.object({
         statusCode: Yup.string()
             .required(t('httpStatusCodeRequired'))

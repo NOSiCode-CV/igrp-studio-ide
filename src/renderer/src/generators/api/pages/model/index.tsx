@@ -59,7 +59,7 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                 touched={touched}
                 addRow={() => addNewRow(formik, value, defaultValues[value])}
                 removeRow={(position) => removeRow(formik, value, position)}
-                btnLabels={btnLabels[value]}
+                btnLabels={btnLabels[value as keyof typeof btnLabels]}
                 name={value}
             />
         );

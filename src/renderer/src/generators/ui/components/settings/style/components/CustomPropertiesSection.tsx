@@ -3,7 +3,7 @@ import { Variable, Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SectionProps, CustomProperty } from '../types';
 
-export function CustomPropertiesSection({ onChangeStyles, styles, resetStyles }: SectionProps) {
+export function CustomPropertiesSection({ onChangeStyles, styles }: SectionProps) {
   const [properties, setProperties] = useState<CustomProperty[]>(
     styles.customProperties?.properties || []
   );
@@ -29,7 +29,6 @@ export function CustomPropertiesSection({ onChangeStyles, styles, resetStyles }:
 
   const resetProperties = () => {
     setProperties([]);
-    resetStyles('customProperties');
   };
 
   // Update local state when styles change externally
