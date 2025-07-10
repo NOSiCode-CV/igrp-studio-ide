@@ -363,11 +363,12 @@ if (process.contextIsolated) {
 
 declare global {
   interface Window {
-    electron?: typeof electronAPI;
-    api?: typeof api;
-    engine?: typeof engine;
-    igrpStudio?: typeof repo;
-    menu?: typeof windowControls;
-    appLogicAPI?: typeof appLogic;
+    electron: typeof electronAPI;
+    api: typeof api;
+    engine: typeof engine;
+    igrpStudio: typeof repo;
+    menu: typeof windowControls;
+    appLogicAPI: typeof appLogic;
   }
 }
+
