@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { EngineService } from '@renderer/services/EngineService';
 import { PageDefinition } from '../page/page-manager';
+import { useComponentsContext } from '../contexts/ComponentsContext';
 
 interface ComponentRegistrationProps {
     customComponents: any[];
@@ -17,6 +18,10 @@ export const useComponentRegistration = ({
     fetchComponents,
     page,
 }: ComponentRegistrationProps): UseComponentRegistrationReturn => {
+
+    // Use shared context for components
+    const { loadRegistryComponent } = useComponentsContext();
+
     const registerComponents = useCallback(() => {
         const appComponents = fetchComponents();
 
@@ -24,15 +29,16 @@ export const useComponentRegistration = ({
             customComponents,
             appComponents,
             currentPage: page.pageName,
+            loadRegistryComponent
         });
 
-    }, [customComponents, page.pageName]);
+        
+
+    }, [customComponents, page]);
 
     useEffect(() => {
         // Only register if we have components to register
-        if (customComponents.length > 0) {
-            registerComponents();
-        }
+        registerComponents();
 
         window.electron.ipcRenderer.on('folder-change', registerComponents);
 
@@ -42,7 +48,7 @@ export const useComponentRegistration = ({
                 registerComponents
             );
         };
-    }, [registerComponents, customComponents.length]);
+    }, [registerComponents, customComponents]);
 
     return {
         registerComponents,

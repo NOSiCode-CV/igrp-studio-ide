@@ -6,7 +6,6 @@ import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
-import GenNoInfoField from '../../components/GenNoInfoField';
 import CardComponent from '../CardComponent';
 
 export interface PageHeaderProps {
@@ -46,49 +45,45 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     };
 
     const renderButtons = () => {
-        return buttonComponents.length === 0 ? (
-            <GenNoInfoField />
-        ) : (
-            buttonComponents.map(
-                (button: StructuredComponent, index: number) => {
-                    return (
-                        <Draggable
-                            key={button.id}
-                            item={button}
+        return buttonComponents.map(
+            (button: StructuredComponent, index: number) => {
+                return (
+                    <Draggable
+                        key={button.id}
+                        item={button}
+                        index={index}
+                        dropTargetId={componentId}
+                        layout="horizontal"
+                        className="p-1"
+                    >
+                        <BoxField
+                            comp={button}
+                            parentComp={comp}
+                            onEdit={() => handleEditClick(button)}
                             index={index}
-                            dropTargetId={componentId}
-                            layout="horizontal"
-                            className="p-1"
                         >
-                            <BoxField
+                            <CardComponent
                                 comp={button}
-                                parentComp={comp}
-                                onEdit={() => handleEditClick(button)}
-                                index={index}
-                            >
-                                <CardComponent
-                                    comp={button}
-                                    onDragEnd={onDragEnd}
-                                />
-                            </BoxField>
-                        </Draggable>
-                    );
-                }
-            )
+                                onDragEnd={onDragEnd}
+                            />
+                        </BoxField>
+                    </Draggable>
+                );
+            }
         );
     };
 
     return (
-        <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
-            <IGRPPageHeader
-                {...properties}
-                title={title || label || componentName}
+        <IGRPPageHeader {...properties} title={title || label || componentName}>
+            <Droppable
+                component={comp}
+                onDrop={onDragEnd}
+                layout="horizontal"
+                className={cn('flex flex-1 justify-end gap-3')}
             >
-                <div className={cn('flex flex-1 justify-end gap-3')}>
-                    {renderButtons()}
-                </div>
-            </IGRPPageHeader>
-        </Droppable>
+                {renderButtons()}
+            </Droppable>
+        </IGRPPageHeader>
     );
 };
 

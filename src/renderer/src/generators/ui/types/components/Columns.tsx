@@ -9,6 +9,7 @@ import {
 } from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 
 const IGRPStudioColumns: React.FC<CardComponentProps> = ({
     comp,
@@ -66,7 +67,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
         className
     );
 
-    return <div className={cn('p-2', finalClasses)}>{renderColumns()}</div>;
+    return <div className={cn('p-2', children.length > 0 && finalClasses)}>{children.length > 0 ? renderColumns() : <GenNoInfoComp type='COLUMNS'/>}</div>;
 };
 
 export default IGRPStudioColumns;

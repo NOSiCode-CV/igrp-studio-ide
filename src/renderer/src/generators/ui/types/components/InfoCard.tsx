@@ -1,4 +1,3 @@
- import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { cn } from '@renderer/lib/utils';
@@ -6,7 +5,6 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import { CardComponentProps } from '../CardComponent';
 import { COMPONENT } from '../../ComponentTypes';
 import { getHoverClasses } from '../../utils/tailwindGroups';
-import { getLabel } from '@renderer/utils';
 import BoxWrapper from '../tools/BoxWrapper';
 import {
     IGRPHeadline,
@@ -56,11 +54,7 @@ const IGRPStudioInfoCard = ({
                 component={comp}
                 path={parentComponentName}
             >
-                {components.length === 0 ? (
-                    <GenNoInfoComp
-                        type={getLabel(componentName).toUpperCase()}
-                    />
-                ) : (
+                {components.length > 0 &&
                     components.map((child, index) => {
                         const { properties } = child;
 
@@ -87,8 +81,7 @@ const IGRPStudioInfoCard = ({
                                 </BoxWrapper>
                             </Draggable>
                         );
-                    })
-                )}
+                    })}
             </Droppable>
         );
     };
@@ -96,7 +89,8 @@ const IGRPStudioInfoCard = ({
     return (
         <div {...properties} className={cn('space-y-3 relative  p-3')}>
             <IGRPHeadline title={title}></IGRPHeadline>
-            {components && components.length > 0 ? (
+            {components &&
+                components.length > 0 &&
                 components.map((child: StructuredComponent, index: number) => {
                     return (
                         <Draggable
@@ -124,10 +118,7 @@ const IGRPStudioInfoCard = ({
                             </BoxWrapper>
                         </Draggable>
                     );
-                })
-            ) : (
-                <GenNoInfoComp type="SECTIONS" />
-            )}
+                })}
         </div>
     );
 };

@@ -4,8 +4,6 @@ import { cn } from '@renderer/lib/utils';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxWrapper from '../tools/BoxWrapper';
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
-import { getLabel } from '@renderer/utils';
 import {
     Tabs,
     TabsContent,
@@ -86,18 +84,16 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
 
     const renderContent = () => {
         return components.map((child: StructuredComponent, index: number) => {
-            const { children: components, componentName, properties } = child;
-
-            const { label } = properties || {};
+            const { children: components } = child;
 
             return (
                 <TabsContent value={child.id} key={index} asChild>
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
-                        className="bg-card rounded-lg border border-dashed border-gray-400 w-full space-y-2"
+                        className="rounded-lg border border-dashed"
                     >
-                        {components.length > 0 ? (
+                        {components.length > 0 &&
                             components.map(
                                 (
                                     childTab: StructuredComponent,
@@ -135,10 +131,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                                         </Draggable>
                                     );
                                 }
-                            )
-                        ) : (
-                            <GenNoInfoComp type={label || componentName} />
-                        )}
+                            )}
                     </Droppable>
                 </TabsContent>
             );
@@ -151,15 +144,11 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
             onDrop={onDragEnd}
             component={comp}
         >
-            {components.length > 0 ? (
+            {components.length > 0 && (
                 <Tabs defaultValue={components[0].id}>
                     <TabsList>{renderTriggers()}</TabsList>
                     {renderContent()}
                 </Tabs>
-            ) : (
-                <GenNoInfoComp
-                    type={getLabel(parentComponentName).toUpperCase()}
-                />
             )}
         </Droppable>
     );

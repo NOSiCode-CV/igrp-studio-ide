@@ -136,8 +136,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             ]
         );
 
-
-
         // Effects for component lifecycle management
         useEffect(() => {
             clearEditingComponent();
