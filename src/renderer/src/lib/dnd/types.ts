@@ -9,6 +9,7 @@ export interface DropZone {
   position: DropPosition
   dropTargetId?: string
   cellIndex?: number
+  countItems: number
 }
 
 export interface SidebarItem {

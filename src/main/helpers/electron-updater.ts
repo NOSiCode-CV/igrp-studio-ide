@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron"
+import { app, BrowserWindow } from "electron"
 import { autoUpdater } from "electron-updater"
 import log from "electron-log"
 
@@ -48,7 +48,8 @@ export default class AppUpdater {
              return
          } */
 
-        autoUpdater.checkForUpdatesAndNotify()
+        if (app.isPackaged)
+            autoUpdater.checkForUpdatesAndNotify()
 
         autoUpdater.on("checking-for-update", () => {
             this.sendStatusToWindow("🔍 Checking for updates...")
