@@ -60,6 +60,13 @@ const engine = {
 			return handleError(error)
 		}
 	},
+	duplicate: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.DUPLICATE_ELEMENT, config, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 	createResponse: async (response: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.SPRING.CREATE_RESPONSE, response, engineType, basePath)

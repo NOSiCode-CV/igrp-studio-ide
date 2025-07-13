@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
     Box,
     Cable,
+    Copy,
     DatabaseZap,
     FileJson2,
     Layers,
@@ -53,11 +54,6 @@ const createMenuItems = (t: any) => ({
         actionType: OPTION_TYPE.RESPONSE,
         icon: getIcon(OPTION_TYPE.RESPONSE),
     },
-    newPermission: {
-        label: t('newPermission'),
-        actionType: OPTION_TYPE.PERMISSIONS,
-        icon: getIcon(OPTION_TYPE.PERMISSIONS),
-    },
     newControllers: {
         label: t('newControllers'),
         actionType: OPTION_TYPE.ACTION,
@@ -95,6 +91,11 @@ const createMenuItems = (t: any) => ({
         actionType: OPTION_TYPE.DATA_OBJECTS,
         icon: MoveRight,
     },
+    duplicate: {
+        label: t('duplicate'),
+        actionType: OPTION_TYPE.DUPLICATE,
+        icon: Copy,
+    },
 });
 
 const useNavdata = (filesThree: FileTree[]) => {
@@ -121,10 +122,9 @@ const useNavdata = (filesThree: FileTree[]) => {
                 menuItemsConfig.newDto,
                 menuItemsConfig.importJsonSchemaFiles,
             ],
-            subMenus: [menuItemsConfig.newAction, menuItemsConfig.delete],
-            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.delete],
-            defaultMenus: [menuItemsConfig.delete],
-            sharedExtension: [menuItemsConfig.newPermission],
+            subMenus: [menuItemsConfig.newAction, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            defaultMenus: [menuItemsConfig.duplicate, menuItemsConfig.delete],
             controllersExtension: [menuItemsConfig.newControllers],
         }),
         [menuItemsConfig]
@@ -203,7 +203,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                 const dropdownMenus = isShared
                     ? [
                           ...dropdownConfigs.baseDropdownMenus,
-                          ...dropdownConfigs.sharedExtension,
                       ]
                     : [
                           ...dropdownConfigs.controllersExtension,
@@ -254,7 +253,9 @@ const useNavdata = (filesThree: FileTree[]) => {
                                             id:
                                                 file.content?.type ===
                                                 OPTION_TYPE.CONTROLLER
-                                                    ? `${file.content?.id}-CONTROLLER`
+                                                    ? file.content?.id?.endsWith('-CONTROLLER')
+                                                        ? file.content?.id
+                                                        : `${file.content?.id}-CONTROLLER`
                                                     : file.content?.id,
                                             label:
                                                 file.content?.name || file.name,

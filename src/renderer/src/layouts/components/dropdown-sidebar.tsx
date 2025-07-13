@@ -87,13 +87,43 @@ export const DropdownSidebarMenuButton: React.FC<
         setItem(item);
         if (item.actionType === OPTION_TYPE.DELETE) {
             setIsOpenDelete(true);
+        } else if (item.actionType === OPTION_TYPE.DUPLICATE) {
+            handleDuplicate(item);
         } else if (item.modalType) {
-            console.log(item);
             setModalType(item.modalType);
             setModalProps(item || {});
             setIsOpen(true);
         } else if (item.dropdownclick) {
             item.dropdownclick(item);
+        }
+    };
+
+    const handleDuplicate = async (item: any) => {
+        if (!item || !basePath) return;
+
+        try {
+            const config = {
+                name: item.label,
+                type: item.type,
+                module: item.module,
+                content: item.content,
+            };
+
+            const { error } = await window.engine.duplicate(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
+
+            if (error) {
+                showErrorToast(error);
+            } else {
+                showSuccessToast(t('duplicatedSuccess', { name: item.label }));
+                createGitCommit(basePath, `Duplicate ${item.label}`);
+                dispatch(onSetChangeStatus(true));
+            }
+        } catch (error) {
+            showErrorToast(t('duplicateError', { name: item.label }));
         }
     };
 

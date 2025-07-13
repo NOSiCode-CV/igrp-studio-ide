@@ -38,10 +38,11 @@ export const OPTION_TYPE = {
     DATA_OBJECTS: "dto",
     ACTION: 'action',
     MODAL: 'modal',
-    RESPONSES: 'responses',
+    RESPONSES: "responses",
     RESPONSE: 'response',
     ENUM: 'enum',
     DELETE: 'delete',
+    DUPLICATE: 'duplicate',
     ERDDiagram: "ERDDiagram",
     FILE_THREE: "filethree",
     PERMISSIONS: "permissions"

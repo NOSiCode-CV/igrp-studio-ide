@@ -823,6 +823,8 @@
   "duplicating": "Duplicating...",
   "duplicateItem": "Duplicate {{type}} '{{name}}'",
   "duplicateItemDescription": "Create a copy of this {{type}} with a new name and path.",
+  "duplicatedSuccess": "{{name}} duplicated successfully",
+  "duplicateError": "Failed to duplicate {{name}}",
   "customProperties": "Custom Properties",
   "custom_gitlab_name": "Custom GitLab Name",
   "custom_gitlab_name_placeholder": "Enter custom GitLab name",
