@@ -30,7 +30,7 @@ const MainLayout = (props: LayoutProps) => {
                 name: 'Database',
                 type: 'item' as const,
                 icon: Database,
-                href: '#',
+                href: '#/connections',
             },
             /*  {
                 name: 'App Logic',

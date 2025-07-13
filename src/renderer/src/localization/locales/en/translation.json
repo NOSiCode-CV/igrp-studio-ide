@@ -840,5 +840,20 @@
   "providerActivated": "Provider activated successfully",
   "providerDeleted": "Provider deleted successfully",
   "providerDeleteError": "Failed to delete provider",
-  "needs_configuration": "Needs Configuration"
+  "needs_configuration": "Needs Configuration",
+  "SSHHostRequired": "SSH host is required",
+  "SSHPortRequired": "SSH port is required",
+  "SSHUsernameRequired": "SSH username is required",
+  "SSHPasswordRequired": "SSH password is required",
+  "databaseConnection": "Database Connection",
+  "sshHost": "SSH Host",
+  "sshPort": "SSH Port",
+  "sshUsername": "SSH Username",
+  "sshPassword": "SSH Password",
+  "databaseHost": "Database Host",
+  "databasePort": "Database Port",
+  "databaseUsername": "Database Username",
+  "databasePassword": "Database Password",
+  "edit_connection": "Edit Connection",
+  "edit_connection_description": "Modify the details of your database connection"
 }

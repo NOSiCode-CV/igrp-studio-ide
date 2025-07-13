@@ -838,5 +838,20 @@
   "providerActivated": "Provedor ativado com sucesso",
   "providerDeleted": "Provedor excluído com sucesso",
   "providerDeleteError": "Falha ao excluir provedor",
-  "needs_configuration": "Precisa de Configuração"
+  "needs_configuration": "Precisa de Configuração",
+  "SSHHostRequired": "O host SSH é obrigatório",
+  "SSHPortRequired": "A porta SSH é obrigatória",
+  "SSHUsernameRequired": "O nome de usuário SSH é obrigatório",
+  "SSHPasswordRequired": "A senha SSH é obrigatória",
+  "databaseConnection": "Conexão de Banco de Dados",
+  "sshHost": "Host SSH",
+  "sshPort": "Porta SSH",
+  "sshUsername": "Nome de Usuário SSH",
+  "sshPassword": "Senha SSH",
+  "databaseHost": "Host do Banco de Dados",
+  "databasePort": "Porta do Banco de Dados",
+  "databaseUsername": "Nome de Usuário do Banco de Dados",
+  "databasePassword": "Senha do Banco de Dados",
+  "edit_connection": "Editar Conexão",
+  "edit_connection_description": "Modificar os detalhes da sua conexão de banco de dados"
 }

@@ -10,13 +10,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
+
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
@@ -27,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import { useGit } from '@renderer/hooks/use-git';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { LabelRequired } from '@renderer/components/label-required';
+import { SelectInput } from './inputs-form';
 
 interface SerializationConfigModalProps {
     isOpen?: boolean;
@@ -62,7 +57,7 @@ export default function SerializationConfigModal({
         setConfig((prev) => ({
             ...prev,
             module,
-            type: type === 'models' ? 'model' : type
+            type: type === 'models' ? 'model' : type,
         }));
     }, [item]);
 
@@ -90,7 +85,7 @@ export default function SerializationConfigModal({
             .join('\n')
             .replace(/\s+/g, ' ') // Substitui múltiplos espaços e quebras de linha por um único espaço
             .trim();
-    }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,7 +94,7 @@ export default function SerializationConfigModal({
 
         const values = {
             ...config,
-            [contentType]:  cleanSQL(content) ,
+            [contentType]: cleanSQL(content),
         };
 
         const { error } = await window.engine.serializeElement(
@@ -141,6 +136,13 @@ export default function SerializationConfigModal({
         }
     };
 
+    const options = [
+        { value: 'json', label: t('json') },
+        { value: 'sql', label: t('sql') },
+        { value: 'xml', label: t('xml') },
+        { value: 'ddl', label: t('ddl') },
+    ];
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent
@@ -170,26 +172,17 @@ export default function SerializationConfigModal({
                             />
                         </div>
                         <div className="items-center space-y-2">
-                            <LabelRequired>{t('contentType')}</LabelRequired>
-                            <Select
-                                onValueChange={(value) =>
-                                    handleSelectChange(value)
+                            <SelectInput
+                                id="contentType"
+                                name="contentType"
+                                label={t('contentType')}
+                                isRequired
+                                onChange={(value) =>
+                                    handleSelectChange(value as string)
                                 }
                                 value={contentType}
-                                required
-                            >
-                                <SelectTrigger>
-                                    <SelectValue
-                                        placeholder={t('selectContentType')}
-                                    />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="json">{t('json')}</SelectItem>
-                                    <SelectItem value="sql">{t('sql')}</SelectItem>
-                                    <SelectItem value="xml">{t('xml')}</SelectItem>
-                                    <SelectItem value="ddl">{t('ddl')}</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                options={options}
+                            />
                         </div>
                     </div>
                     <MonacoEditor

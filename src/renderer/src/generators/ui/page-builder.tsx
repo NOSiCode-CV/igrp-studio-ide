@@ -213,9 +213,19 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             } else if (activePresentation === APRESENTATION.CODE) {
                 // Ensure pagePath is properly formatted and handle spaces
                 const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
-                const tsFilePath = cleanPagePath
-                    ? `${basePath}/src/app/[locale]/(igrp)/(generated)/${cleanPagePath}/page.tsx`
-                    : `${basePath}/src/app/[locale]/(igrp)/(generated)/page.tsx`;
+                let tsFilePath = null;
+
+                if (isPage)
+                    tsFilePath = cleanPagePath
+                        ? `${basePath}/src/app/[locale]/(igrp)/(generated)/${cleanPagePath}/page.tsx`
+                        : `${basePath}/src/app/[locale]/(igrp)/(generated)/page.tsx`;
+                else {
+                    const withScopePage = content.scope === 'page';
+                    if (withScopePage)
+                        tsFilePath = `${basePath}/src/app/[locale]/(igrp)/(generated)/${content.pagePath}/components/${content.name.toLowerCase()}.tsx`;
+                    else
+                        tsFilePath = `${basePath}/src/components/${content.name.toLowerCase()}.tsx`;
+                }
 
                 return <CodeContentTS pagePath={tsFilePath} />;
             } else {

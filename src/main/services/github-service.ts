@@ -1,18 +1,19 @@
 import { BrowserWindow } from 'electron';
 import { GitStore } from './git-store';
+import { isOnline } from '../helpers/network-utils';
 
 let octokit: any = null;
 
 export const GitHubService = {
-  
+
   async initializeServices() {
     try {
       const token = GitStore.getToken('github');
-      
+
       if (token) {
         await this.initialize(token);
         return true;
-      } 
+      }
     } catch (error) {
       console.error('Failed to initialize GitHub service:', error);
     }
@@ -21,6 +22,8 @@ export const GitHubService = {
 
   async initialize(token: string) {
     try {
+      const online = await isOnline();
+      if (!online) return false
       const { Octokit } = await import('@octokit/rest');
       octokit = new Octokit({ auth: token });
       await octokit.users.getAuthenticated();
@@ -33,7 +36,8 @@ export const GitHubService = {
   },
 
   async getUserInfo() {
-    const { data } = await octokit.users.getAuthenticated();
+    if (!octokit) return null
+    const { data } = await octokit?.users?.getAuthenticated();
     return data;
   },
 
@@ -42,7 +46,13 @@ export const GitHubService = {
       const igrpRepos: any = [];
       const batchSize = 10;
 
-      const { data: repos } = await octokit.repos.listForAuthenticatedUser({
+      if (!octokit) return []
+
+      const online = await isOnline();
+      if (!online) throw new Error('ERR_INTERNET_DISCONNECTED');
+
+
+      const { data: repos } = await octokit.repos?.listForAuthenticatedUser({
         sort: 'updated',
         per_page: 100,
         page: 1,
@@ -51,7 +61,7 @@ export const GitHubService = {
 
       for (let i = 0; i < repos.length; i += batchSize) {
         const batch = repos.slice(i, i + batchSize);
-        
+
         const promises = batch.map(async (repo) => {
           try {
             await octokit.repos.getContent({

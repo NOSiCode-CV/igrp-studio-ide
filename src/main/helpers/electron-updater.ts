@@ -64,7 +64,8 @@ export default class AppUpdater {
         })
 
         autoUpdater.on("error", (error) => {
-            this.sendStatusToWindow(`❌ Update error: ${error}`)
+            console.log(error)
+            this.sendStatusToWindow(`❌ Update error`)
         })
 
         autoUpdater.on("download-progress", (progressObj) => {
