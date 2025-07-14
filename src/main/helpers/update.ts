@@ -1,6 +1,6 @@
 import { app, autoUpdater, dialog, MessageBoxOptions } from "electron"
 
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 
 
 export function updateApp() {

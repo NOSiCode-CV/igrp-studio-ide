@@ -2,7 +2,7 @@ import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import path, { join } from 'path';
 import { IOpenProject, Handler, ProjectData, FileTree } from '../types';
 import { promisify } from 'util';
-const fs = require("fs");
+import fs from 'fs';
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
     const result = await dialog.showOpenDialog({
@@ -118,7 +118,7 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
         // Lê o conteúdo do diretório .igrpstudio
         const files = fs.readdirSync(basePath);
 
-        const IGNORED_PATHS = ['baseApi.json', 'permissions.json', '.DS_store'];
+        const IGNORED_PATHS = ['baseApi.json', 'permissions.json', '.DS_store','.gitkeep'];
 
         // Mapeia os arquivos/pastas
         return files
