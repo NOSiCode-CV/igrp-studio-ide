@@ -37,6 +37,10 @@ export const GitHubService = {
 
   async getUserInfo() {
     if (!octokit) return null
+
+    const online = await isOnline();
+    if (!online) throw new Error('ERR_INTERNET_DISCONNECTED');
+
     const { data } = await octokit?.users?.getAuthenticated();
     return data;
   },

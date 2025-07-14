@@ -115,12 +115,13 @@ const useCustomCode = (): CustomCodeHook => {
         };
         fetchData();
 
-        window.electron.ipcRenderer.on('folder-change', fetchData);
+        const handleFolderChange = () => fetchData();
+        window.electron.ipcRenderer.on('folder-change', handleFolderChange);
 
         return () => {
             window.electron.ipcRenderer.removeListener(
                 'folder-change',
-                fetchData
+                handleFolderChange
             );
         };
     }, [basePath]);

@@ -366,6 +366,7 @@ const repo = {
             options: { services: string[]; timeout?: number }
         ) => ipcRenderer.invoke('docker-restart', projectPath, options),
         check: () => ipcRenderer.invoke('docker-check'),
+        daemonStatus: () => ipcRenderer.invoke('docker-daemon-status'),
     },
 };
 

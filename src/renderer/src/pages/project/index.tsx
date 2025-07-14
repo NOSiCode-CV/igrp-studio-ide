@@ -177,11 +177,14 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const handleOpenDirectory = () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
-        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
-            if (!result.canceled) {
-                formik.setFieldValue('path', result.filePaths[0]);
+        window.electron.ipcRenderer.on(
+            'file-content',
+            (_e: any, result: any) => {
+                if (!result.canceled) {
+                    formik.setFieldValue('path', result.filePaths[0]);
+                }
             }
-        });
+        );
     };
 
     const handleChangeType = (value: string) => {
@@ -383,50 +386,49 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 className="grid gap-4 mt-2"
             >
                 {frameworks.map((fw) => {
-                    console.log('Framework data:', fw);
                     return (
-                    <div
-                        key={fw.id}
-                        className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.framework === fw.id
-                                ? 'border-primary'
-                                : ''
-                        } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
-                    >
-                        <RadioGroupItem
-                            value={fw.id}
-                            id={fw.id}
-                            className="sr-only"
-                            disabled={!fw.availableSupport}
-                        />
-                        <Label
-                            htmlFor={fw.id}
-                            className="flex items-center gap-4 cursor-pointer"
+                        <div
+                            key={fw.id}
+                            className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
+                                formik.values.framework === fw.id
+                                    ? 'border-primary'
+                                    : ''
+                            } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
                         >
-                            <FrameworkIcon
-                                framework={fw.id as FrameworkType}
-                                size={40}
-                                className="rounded-lg"
-                                alt={fw.name}
+                            <RadioGroupItem
+                                value={fw.id}
+                                id={fw.id}
+                                className="sr-only"
+                                disabled={!fw.availableSupport}
                             />
-                            <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                    <span className="font-medium">
-                                        {fw.name}
-                                    </span>
+                            <Label
+                                htmlFor={fw.id}
+                                className="flex items-center gap-4 cursor-pointer"
+                            >
+                                <FrameworkIcon
+                                    framework={fw.id as FrameworkType}
+                                    size={40}
+                                    className="rounded-lg"
+                                    alt={fw.name}
+                                />
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-medium">
+                                            {fw.name}
+                                        </span>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        {fw.description}
+                                    </div>
+                                    {!fw.availableSupport && (
+                                        <span className="ml-auto text-xs text-muted-foreground">
+                                            {t('comingSoon')}
+                                        </span>
+                                    )}
                                 </div>
-                                <div className="text-sm text-muted-foreground">
-                                    {fw.description}
-                                </div>
-                                {!fw.availableSupport && (
-                                    <span className="ml-auto text-xs text-muted-foreground">
-                                        {t('comingSoon')}
-                                    </span>
-                                )}
-                            </div>
-                        </Label>
-                    </div>
-                );
+                            </Label>
+                        </div>
+                    );
                 })}
             </RadioGroup>
             {formik.touched.framework && formik.errors.framework && (

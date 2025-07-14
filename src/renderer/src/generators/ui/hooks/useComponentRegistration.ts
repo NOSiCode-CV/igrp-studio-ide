@@ -32,8 +32,6 @@ export const useComponentRegistration = ({
             loadRegistryComponent
         });
 
-        
-
     }, [customComponents, page]);
 
     useEffect(() => {
