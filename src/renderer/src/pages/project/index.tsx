@@ -117,17 +117,112 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }, []);
 
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Handles file upload for project icons.
+     * Instead of storing base64 data in JSON (which can be very large for big files),
+     * this function saves the file to disk and stores only the relative path.
+     *
+     * Benefits:
+     * - Reduces JSON file size significantly
+     * - Better performance for large files
+     * - Easier to manage and backup
+     * - Supports larger file sizes
+     */
+    const handleFileUpload = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64String = e.target?.result as string;
-            formik.setFieldValue('icon', base64String);
-            setPreviewUrl(base64String);
-        };
-        reader.readAsDataURL(file);
+        try {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+
+            // Check file size (limit to 5MB for icons)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                alert(
+                    'File size too large. Please select an image smaller than 5MB.'
+                );
+                return;
+            }
+
+            // Validate project name exists
+            if (!formik.values.name || formik.values.name.trim() === '') {
+                alert('Please enter a project name before uploading an icon.');
+                return;
+            }
+
+            // Create a unique filename
+            const fileExtension = file.name.split('.').pop() || 'png';
+            const fileName = `icon_${Date.now()}.${fileExtension}`;
+
+            // Save file to centralized icons directory
+            const iconsPath = `${workspace.path}/icons`;
+            const filePath = `${iconsPath}/${fileName}`;
+
+            // Use electron API to save file
+            const result = await window.api.saveProjectIcon({
+                filePath,
+                fileData: await file.arrayBuffer(),
+                assetsPath: iconsPath,
+            });
+
+            if (result.success) {
+                // Store the relative path instead of base64
+                const relativePath = `icons/${fileName}`;
+                formik.setFieldValue('icon', relativePath);
+                // Preview will be updated by useEffect when icon changes
+            } else {
+                console.error('Failed to save icon file:', result.error);
+                alert('Failed to save icon file. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            alert('Error uploading file. Please try again.');
+        }
+    };
+
+    /**
+     * Converts an icon path to a displayable URL.
+     * Handles different path formats:
+     * - Relative paths (icons/filename.ext) -> fetches file securely via IPC
+     * - Legacy assets paths -> fetches file securely via IPC
+     * - Base64 data URLs -> returns as is (for backward compatibility)
+     */
+    const getIconPreviewUrl = async (
+        iconPath: string
+    ): Promise<string | null> => {
+        if (!iconPath) return null;
+
+        // If it's a base64 string (for backward compatibility), return as is
+        if (iconPath.startsWith('data:')) {
+            return iconPath;
+        }
+
+        // If it's a relative path, fetch the file securely
+        if (iconPath.startsWith('icons/') || iconPath.startsWith('assets/')) {
+            try {
+                const result = await window.api.getIconFile(
+                    iconPath,
+                    workspace.path
+                );
+                if (result.success) {
+                    return result.data;
+                } else {
+                    console.warn('Failed to load icon file:', result.error);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error loading icon file:', error);
+                return null;
+            }
+        }
+
+        return null;
     };
 
     const isFrontend = formik.values.type === 'frontend';
@@ -234,6 +329,20 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             `${workspace.path}/projects/${formik.values?.config?.name ?? formik.values.name}`
         );
     }, [workspace, formik.values.name, formik.values?.config]);
+
+    // Update preview when icon changes
+    React.useEffect(() => {
+        const updatePreview = async () => {
+            if (formik.values.icon) {
+                const previewUrl = await getIconPreviewUrl(formik.values.icon);
+                setPreviewUrl(previewUrl);
+            } else {
+                setPreviewUrl(null);
+            }
+        };
+
+        updatePreview();
+    }, [formik.values.icon, workspace.path, formik.values.name]);
 
     const renderStep1 = () => (
         <div className="space-y-4">
