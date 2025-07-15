@@ -39,64 +39,78 @@ const POPOVER_COMPONENTS = {
     popoverRelation: RelationPopover,
 } as const;
 
+interface GroupField {
+    groupName: string;
+    groupIndex: number;
+}
+
+interface PopoverProps {
+    row: any;
+    index: number;
+    onChangeValue: any;
+    itemOptions: any;
+    group?: GroupField;
+}
+
+interface ChangeFnProps {
+    key: string;
+    index: number;
+    value: any;
+    group?: GroupField;
+}
+
 // Props mapping for each popover type
 const POPOVER_PROPS_MAPPING = {
-    popoverController: (
-        row: any,
-        index: number,
-        changeValue: any,
-        itemOptions: any
-    ) => ({
-        index,
-        row,
-        changeValue: (element: string, value: any) =>
-            changeValue(element, index, value),
-        options: itemOptions || [],
-    }),
-    popoverModel: (
-        row: any,
-        index: number,
-        changeValue: any,
-        itemOptions: any
-    ) => ({
-        index,
-        row,
-        changeValue: (element: string, position: number, value: any) =>
-            changeValue(element, position, value),
-        options: itemOptions || [],
-    }),
-    popoverDto: (
-        row: any,
-        index: number,
-        changeValue: any,
-        itemOptions: any
-    ) => ({
-        index,
-        row,
-        changeValue: (element: string, position: number, value: any) =>
-            changeValue(element, position, value),
-        collectionTypes: itemOptions || [],
-    }),
-    popoverFormValidation: (row: any, index: number, changeValue: any) => ({
-        index,
-        field: row,
-        fieldType: row.type || 'string',
-        changeValue: (element: string, position: number, value: any) => {
-            changeValue(element, position, value);
-        },
-    }),
-    popoverRelation: (
-        row: any,
-        index: number,
-        changeValue: any,
-        itemOptions: any
-    ) => ({
-        field: row,
-        changeValue: (element: string, value: any) => {
-            changeValue(element, index, value);
-        },
-        options: itemOptions || [],
-    }),
+    popoverController: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            index,
+            row,
+            changeValue: (element: string, value: any) =>
+                onChangeValue({ key: element, index, value, group }),
+            options: itemOptions || [],
+        };
+    },
+    popoverModel: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            index,
+            row,
+            changeValue: (element: string, position: number, value: any) =>
+                onChangeValue({ key: element, index: position, value, group }),
+            options: itemOptions || [],
+        };
+    },
+    popoverDto: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            index,
+            row,
+            changeValue: (element: string, position: number, value: any) =>
+                onChangeValue({ key: element, index: position, value, group }),
+            collectionTypes: itemOptions || [],
+        };
+    },
+    popoverFormValidation: (props: PopoverProps) => {
+        const { row, index, onChangeValue, group } = props;
+        return {
+            index,
+            field: row,
+            fieldType: row.type || 'string',
+            changeValue: (element: string, position: number, value: any) =>
+                onChangeValue({ key: element, index: position, value, group }),
+        };
+    },
+    popoverRelation: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            field: row,
+            changeValue: (element: string, value: any) => {
+                onChangeValue({ key: element, index, value, group });
+            },
+            options: itemOptions || [],
+        };
+    },
 } as const;
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
@@ -286,12 +300,21 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     };
 
     // Optimized grouped items renderer using component registry
-    const renderGroupedItems = ({ items, row, index, index2 }: any) => {
+    const renderGroupedItems = ({
+        items,
+        row,
+        index,
+        index2,
+        group,
+        onChangeValue,
+    }: any) => {
         return (
             <div className="flex gap-2 align-center">
                 {items.map((item: any, itemIndex: number) => {
-                    const itemValue = row[item.key] || '';
+                    const itemValue = row?.[item.key] || '';
                     const itemOptions = item.options || [];
+
+                    if (!row) return null;
 
                     // Handle select component
                     if (item.type === 'select') {
@@ -302,7 +325,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     options={itemOptions || []}
                                     value={itemValue}
                                     onChange={(selectedOption) =>
-                                        changeValue(
+                                        onChangeValue(
                                             item.key,
                                             index,
                                             selectedOption
@@ -327,7 +350,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                     onCheckedChange={(
                                                         checked
                                                     ) =>
-                                                        changeValue(
+                                                        onChangeValue(
                                                             item.key,
                                                             index,
                                                             checked
@@ -370,13 +393,13 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         ) {
                             return null;
                         }
-
-                        const props = propsMapping(
+                        const props = propsMapping({
                             row,
                             index,
-                            changeValue,
-                            itemOptions
-                        );
+                            onChangeValue,
+                            itemOptions,
+                            group,
+                        });
 
                         return (
                             <div key={itemIndex} className="flex items-center">
@@ -401,7 +424,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         selectValue: any,
         selectMultiValues: any,
         readonly: boolean,
-        onChangeValue: (key: string, index: number, value: any) => void
+        onChangeValue: (props: ChangeFnProps) => void,
+        group?: GroupField
     ) => {
         // Handle input types (text, number)
         if (type === 'text' || type === 'number') {
@@ -416,7 +440,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     type={type}
                     value={row?.[key] || ''}
                     onChange={(ev) =>
-                        onChangeValue(key, index, ev.target.value)
+                        onChangeValue({
+                            key,
+                            index,
+                            value: ev.target.value,
+                            group,
+                        })
                     }
                     readOnly={readonly}
                 />
@@ -454,7 +483,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     options={dynamicOptions[`${index}-${key}`] || options}
                     value={selectMultiValues}
                     onChange={(selectedOption) => {
-                        onChangeValue(key, index, selectedOption);
+                        onChangeValue({
+                            key,
+                            index,
+                            value: selectedOption,
+                            group,
+                        });
                     }}
                 />
             );
@@ -466,7 +500,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 <Checkbox
                     id={`${key}_${index}`}
                     onCheckedChange={(checked) =>
-                        onChangeValue(key, index, checked)
+                        onChangeValue({
+                            key,
+                            index,
+                            value: checked,
+                            group,
+                        })
                     }
                     checked={row?.[key] || false}
                 />
@@ -487,7 +526,13 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 return null;
             }
 
-            const props = propsMapping(row, index, changeValue, options);
+            const props = propsMapping({
+                row,
+                index,
+                onChangeValue,
+                itemOptions: options,
+                group,
+            });
 
             return <PopoverComponent {...(props as any)} />;
         }
@@ -499,7 +544,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     key={`${index}-${key}`}
                     type={row?.[key] || ''}
                     onTypeChange={(dataType: any) =>
-                        onChangeValue(key, index, dataType)
+                        onChangeValue({
+                            key,
+                            index,
+                            value: dataType,
+                            group,
+                        })
                     }
                     schemaTypes={options || []}
                     variant={'outline'}
@@ -517,7 +567,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         index: number,
         row: any,
         className: string,
-        onChangeValue: (key: string, index: number, value: any) => void
+        onChangeValue: (props: ChangeFnProps) => void,
+        group?: GroupField
     ) => {
         return (
             <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
@@ -572,6 +623,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                       row,
                                                       index,
                                                       index2,
+                                                      group,
+                                                      onChangeValue,
                                                   })
                                                 : renderField(
                                                       row,
@@ -582,7 +635,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                       selectValue,
                                                       selectMultiValues,
                                                       readonly || false,
-                                                      onChangeValue
+                                                      onChangeValue,
+                                                      group
                                                   )}
                                         </div>
                                     </TableCell>
@@ -610,18 +664,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         );
     };
 
-    const onChangeValue = (
-        row: any,
-        rowIndex: number,
-        key: string,
-        index: number,
-        value: any
-    ) => {
+    const onChangeValue = (props: ChangeFnProps) => {
+        const { key, index, value, group } = props;
         //Chick if row is a subitems
         //TODO: Refatorar para usar o findFieldPath para pegar o path do campo
-        if (row) {
+
+        if (group) {
             formik.setFieldValue(
-                `${name}[${rowIndex}].fields[${index}].${key}`,
+                `${name}[${group.groupIndex}].${group.groupName}[${index}].${key}`,
                 value
             );
         } else changeValue(key, index, value);
@@ -653,41 +703,36 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 index,
                                                 row,
                                                 '',
-                                                (
-                                                    key: string,
-                                                    index: number,
-                                                    value: any
-                                                ) => {
-                                                    onChangeValue(
-                                                        '',
-                                                        0,
-                                                        key,
-                                                        index,
-                                                        value
-                                                    );
+                                                (props: ChangeFnProps) => {
+                                                    onChangeValue(props);
                                                 }
                                             )}
                                             {isDataArray &&
                                                 row?.fields.map(
                                                     (col: any, ii: number) =>
                                                         renderTableRow(
-                                                            col.id ||
-                                                                `col-${index}-${ii}`,
+                                                            `col-${index}-${ii}`,
                                                             ii,
                                                             col,
                                                             'pl-10',
                                                             (
-                                                                key: string,
-                                                                _index: number,
-                                                                value: any
+                                                                props: ChangeFnProps
                                                             ) => {
-                                                                onChangeValue(
-                                                                    row,
+                                                                onChangeValue({
+                                                                    ...props,
+                                                                    group: {
+                                                                        groupName:
+                                                                            'fields',
+                                                                        groupIndex:
+                                                                            index,
+                                                                    },
+                                                                });
+                                                            },
+                                                            {
+                                                                groupName:
+                                                                    'fields',
+                                                                groupIndex:
                                                                     index,
-                                                                    key,
-                                                                    ii,
-                                                                    value
-                                                                );
                                                             }
                                                         )
                                                 )}
