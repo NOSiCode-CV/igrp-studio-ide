@@ -24,7 +24,7 @@ export function ConnectionManager({ title }: { title?: string }) {
         databaseType: '',
         connectionType: 'general',
         host: '',
-        port: null,
+        port: undefined,
         user: '',
         password: '',
         database: '',
@@ -51,7 +51,7 @@ export function ConnectionManager({ title }: { title?: string }) {
             databaseType: '',
             connectionType: 'general',
             host: '',
-            port: null,
+            port: undefined,
             user: '',
             password: '',
             database: '',
@@ -62,8 +62,8 @@ export function ConnectionManager({ title }: { title?: string }) {
     const handleEditConnection = async (values: Connection) => {
         await window.igrpStudio.connection.save(values);
 
-        setConnections((prev) => 
-            prev.map((conn) => 
+        setConnections((prev) =>
+            prev.map((conn) =>
                 conn.name === editingConnection?.name ? { ...values } : conn
             )
         );

@@ -1,4 +1,4 @@
-const { app } = require('electron');
+import { app } from 'electron';
 
 export function buildTaskbar() {
     app.setUserTasks([

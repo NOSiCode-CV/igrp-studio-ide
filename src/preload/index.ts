@@ -6,7 +6,7 @@ import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 
-const backend = require('i18next-electron-fs-backend')
+import { preloadBindings } from 'i18next-electron-fs-backend';
 
 const handleError = (error: unknown): HandlerResponse => ({
 	error: (error as Error).message || 'An unknown error occurred'
@@ -39,7 +39,7 @@ const api = {
 
 	fetchData: (endpoint: string, headers: object) => ipcRenderer.invoke('fetch-data', endpoint, headers),
 
-	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process),
+	i18nextElectronBackend: preloadBindings(ipcRenderer, process),
 
 	runDoctorChecks: (): Promise<ToolCheck[]> => ipcRenderer.invoke('run-doctor-checks'),
 	saveDoctorReport: (results) => ipcRenderer.invoke('save-doctor-report', results),
@@ -462,4 +462,3 @@ declare global {
     appLogicAPI: typeof appLogic;
   }
 }
-
