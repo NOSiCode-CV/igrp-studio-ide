@@ -857,5 +857,6 @@
   "databaseUsername": "Database Username",
   "databasePassword": "Database Password",
   "edit_connection": "Edit Connection",
-  "edit_connection_description": "Modify the details of your database connection"
+  "edit_connection_description": "Modify the details of your database connection",
+  "template": "Template"
 }

@@ -249,10 +249,10 @@ const InteractionEditor = ({
         interaction.type || 'function'
     );
     const [currentAction, setCurrentAction] = useState<Action>(interaction);
-    const [selectedPagePath, setSelectedPagePath] = useState<string>(
+    /* const [selectedPagePath, setSelectedPagePath] = useState<string>(
         currentAction?.navigate?.path || ''
     );
-
+ */
     const { pageOptions: availablePages } = useStudio();
     const { getFormOptions } = useComponents();
     const availableForms = getFormOptions();
@@ -451,21 +451,14 @@ const InteractionEditor = ({
                 );
 
             case 'navigate':
+                console.log('currentAction', currentAction);
                 return (
                     <div className="space-y-4">
                         <PageSelectionConfig
                             columnsOptions={columnsOptions}
                             segments={currentAction.navigate?.segments || []}
-                            value={
-                                currentAction.navigate?.name
-                                    ? currentAction.navigate.name.replace(
-                                          'goTo',
-                                          ''
-                                      )
-                                    : ''
-                            }
+                            value={currentAction.navigate?.path || ''}
                             key="navigate"
-                            selectedPagePath={selectedPagePath}
                             onPageChange={(value) => {
                                 const page = availablePages.find(
                                     (p) => p.value === value
@@ -475,14 +468,12 @@ const InteractionEditor = ({
                                     setCurrentAction({
                                         ...currentAction,
                                         navigate: {
-                                            path: page.metadata.path,
-                                            name: `goTo${value}`,
+                                            path: value,
+                                            name: `goTo${page.metadata.pageName}`,
                                             segments: page.metadata.segments,
                                         },
                                     });
                                 }
-
-                                setSelectedPagePath(value);
                             }}
                             pageOptions={availablePages}
                             onInputChange={(fieldPath, value) => {

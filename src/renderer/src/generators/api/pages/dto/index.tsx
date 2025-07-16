@@ -74,6 +74,8 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
             module: option.split('-')[1],
         });
 
+    console.log(formik.values);
+
     return (
         <form onSubmit={formik.handleSubmit}>
             <NavigationBar
@@ -101,7 +103,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 isRequired
                             />
                             <SelectInput
-                                label={'template'}
+                                label={t('template')}
                                 id="template"
                                 options={TemplateOptions}
                                 value={formik.values.template}

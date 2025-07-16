@@ -960,10 +960,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.219":
-  version "0.0.0-alpha.219"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.219.tgz#c1e854666eecf5f268ffa8feb6170817dd898adb"
-  integrity sha512-oW/6YJqeRr7e9LKF19jOuIv40WctmGtmAfvCKQIe7qLd/HKVe7T9zteu4dd20ZabqNHZ3THbq4CbmodcQ76UBw==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.220":
+  version "0.0.0-alpha.220"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.220.tgz#2a55f0416c2c5b82cefffc11e0cc88589d43eda6"
+  integrity sha512-1fyVSobEuDZowAhXHpFgrgBiPYcTJHgHUwmorqGMNIlbAN3d5f9fomM1ysJeZ+vcEuh6yjzg3Uk9E0I7vHKvww==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.11"
@@ -1000,24 +1000,24 @@
     date-fns "4.1.0"
     embla-carousel-react "8.6.0"
     input-otp "1.4.2"
-    lucide-react "0.518.0"
+    lucide-react "0.525.0"
     next-themes "0.4.6"
-    react-day-picker "9.7.0"
+    react-day-picker "9.8.0"
     react-dropzone "14.3.8"
     react-hook-form "7.58.0"
     react-phone-number-input "3.4.12"
     react-resizable-panels "3.0.3"
     recharts "2.15.3"
-    sonner "2.0.5"
+    sonner "2.0.6"
     tailwind-merge "3.3.1"
-    tailwindcss "4.1.10"
+    tailwindcss "4.1.11"
     vaul "1.1.2"
     zod "3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.441":
-  version "0.0.1-alpha.441"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.441.tgz#d39ad56330d17e1e38ad8f05b2dbe42048db4350"
-  integrity sha512-EyOgtlU/uNAt/yrI8FDQ5bSst+o8CS7EKBxP9iKd/KnFPQkVvt7WLgnZcmaM318kVfLDV9jPS6DZiNK4HzQHnw==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.443":
+  version "0.0.1-alpha.443"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.443.tgz#c30a6ec8a9f0ecad3fed1ec46d822d6fd6108ccb"
+  integrity sha512-i9qfuFTm7DhtYX6A8v5Hd9XeWAhsqWU3S2igNdza8HK3Cr2MeunmG1rltkK4a9TqdMQyLdvLE5ind5a9ho6gSA==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1039,19 +1039,19 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.0.1-alpha.85":
-  version "0.0.1-alpha.85"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.1-alpha.85.tgz#1563fa0de6db6690489522a128380dfc2ec45e49"
-  integrity sha512-PQQQSxOBE3WpRUTkhFbG++aexV/hQO9QW/VRpC1taYy0T1CQ9wrq9A/UfyFCCTCvfkiPG6ErcRHgLv7iRauDwQ==
+"@igrp/igrp-studio-springboot-engine@0.0.2-alpha.9":
+  version "0.0.2-alpha.9"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.0.2-alpha.9.tgz#61d91ffa359999c9a460c0324ff38c59e9180d7f"
+  integrity sha512-yK/R29rLnMygXUtZaeEPUwdP49o1OFRS/b9dsnLlkGiWhfsWu5jHUKloO8asopbMRo7z0XOA6X35Q54pE1/cKg==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
     ajv-formats "^3.0.1"
-    axios "^1.9.0"
-    fast-xml-parser "^5.2.3"
+    axios "^1.10.0"
+    fast-xml-parser "^5.2.5"
     fs-extra "^11.3.0"
-    pluralize "^8.0.0"
-    sass "^1.88.0"
+    inflection "^3.0.2"
+    sass "^1.89.2"
     source-map-loader "^5.0.0"
     ts-loader "^9.5.2"
 
@@ -3638,7 +3638,7 @@ aws-ssl-profiles@^1.1.1:
   resolved "https://registry.yarnpkg.com/aws-ssl-profiles/-/aws-ssl-profiles-1.1.2.tgz#157dd77e9f19b1d123678e93f120e6f193022641"
   integrity sha512-NZKeq9AfyQvEeNlN0zSYAaWrmBffJh3IELMZfRpJVWgrpEbtEpnjvzqBPf+mxoI287JohRDoa+/nsfqqiZmF6g==
 
-axios@^1.10.0, axios@^1.9.0:
+axios@^1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.10.0.tgz#af320aee8632eaf2a400b6a1979fa75856f38d54"
   integrity sha512-/1xYAC4MP/HEG+3duIhFr4ZQXR4sQXOIe+o6sdqzeykGLx6Upp/1p8MHqhINOvGeP7xyNHe7tsiJByc4SSVUxw==
@@ -5432,7 +5432,7 @@ fast-uri@^3.0.1:
   resolved "https://registry.yarnpkg.com/fast-uri/-/fast-uri-3.0.6.tgz#88f130b77cfaea2378d56bf970dea21257a68748"
   integrity sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==
 
-fast-xml-parser@^5.2.3:
+fast-xml-parser@^5.2.5:
   version "5.2.5"
   resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-5.2.5.tgz#4809fdfb1310494e341098c25cb1341a01a9144a"
   integrity sha512-pfX9uG9Ki0yekDHx2SiuRIyFdyAr1kMIMitPvb0YBo8SUfKvia7w7FIyd/l6av85pFYRhZscS75MwMnbvY+hcQ==
@@ -6161,6 +6161,11 @@ infer-owner@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/infer-owner/-/infer-owner-1.0.4.tgz#c4cefcaa8e51051c2a40ba2ce8a3d27295af9467"
   integrity sha512-IClj+Xz94+d7irH5qRyfJonOdfTzuDaifE6ZPWfx0N0+/ATZCbuTPq2prFl526urkQd90WyUKIh1DfBQ2hMz9A==
+
+inflection@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/inflection/-/inflection-3.0.2.tgz#2f591c3dad053e3fac65a03bf6431b675d829601"
+  integrity sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==
 
 inflight@^1.0.4:
   version "1.0.6"
@@ -7364,12 +7369,7 @@ lru.min@^1.0.0:
   resolved "https://registry.yarnpkg.com/lru.min/-/lru.min-1.1.2.tgz#01ce1d72cc50c7faf8bd1f809ebf05d4331021eb"
   integrity sha512-Nv9KddBcQSlQopmBHXSsZVY5xsdlZkdH/Iey0BlcBYggMd4two7cZnKOK9vmy3nY0O5RGH99z1PCeTpPqszUYg==
 
-lucide-react@0.518.0:
-  version "0.518.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.518.0.tgz#8cd9207fbbab39a64a6aa59af1e15fa934b81688"
-  integrity sha512-kFg34uQqnVl/7HwAiigxPSpj//43VIVHQbMygQPtS1yT4btMXHCWUipHcgcXHD2pm1Z2nUBA/M+Vnh/YmWXQUw==
-
-lucide-react@^0.525.0:
+lucide-react@0.525.0, lucide-react@^0.525.0:
   version "0.525.0"
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.525.0.tgz#5f7bcecd65e4f9b2b5b6b5d295e3376df032d5e3"
   integrity sha512-Tm1txJ2OkymCGkvwoHt33Y2JpN5xucVq1slHcgE6Lk0WjDfjgKWor5CdVER8U6DvcfMwh4M8XxmpTiyzfmfDYQ==
@@ -8212,11 +8212,6 @@ plist@3.1.0, plist@^3.0.4, plist@^3.0.5, plist@^3.1.0:
     base64-js "^1.5.1"
     xmlbuilder "^15.1.1"
 
-pluralize@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-8.0.0.tgz#1a6fa16a38d12a1901e0320fa017051c539ce3b1"
-  integrity sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==
-
 possible-typed-array-names@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/possible-typed-array-names/-/possible-typed-array-names-1.1.0.tgz#93e3582bc0e5426586d9d07b79ee40fc841de4ae"
@@ -8441,15 +8436,6 @@ raw-body@^3.0.0:
     http-errors "2.0.0"
     iconv-lite "0.6.3"
     unpipe "1.0.0"
-
-react-day-picker@9.7.0:
-  version "9.7.0"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.7.0.tgz#8d8d90c0539a31be5b01fa3613d9341c05513485"
-  integrity sha512-urlK4C9XJZVpQ81tmVgd2O7lZ0VQldZeHzNejbwLWZSkzHH498KnArT0EHNfKBOWwKc935iMLGZdxXPRISzUxQ==
-  dependencies:
-    "@date-fns/tz" "1.2.0"
-    date-fns "4.1.0"
-    date-fns-jalali "4.1.0-0"
 
 react-day-picker@9.8.0:
   version "9.8.0"
@@ -9000,7 +8986,7 @@ sanitize-filename@^1.6.3:
   dependencies:
     truncate-utf8-bytes "^1.0.0"
 
-sass@^1.77.8, sass@^1.88.0:
+sass@^1.77.8, sass@^1.89.2:
   version "1.89.2"
   resolved "https://registry.yarnpkg.com/sass/-/sass-1.89.2.tgz#a771716aeae774e2b529f72c0ff2dfd46c9de10e"
   integrity sha512-xCmtksBKd/jdJ9Bt9p7nPKiuqrlBMBuuGkQlkhZjjQk3Ty48lv93k5Dq6OPkKt4XwxDJ7tvlfrTa1MPA9bf+QA==
@@ -9243,12 +9229,7 @@ socks@^2.6.2:
     ip-address "^9.0.5"
     smart-buffer "^4.2.0"
 
-sonner@2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/sonner/-/sonner-2.0.5.tgz#ffb70a6ffe3207c4302cffd3ee46a25242953477"
-  integrity sha512-YwbHQO6cSso3HBXlbCkgrgzDNIhws14r4MO87Ofy+cV2X7ES4pOoAK3+veSmVTvqNx1BWUxlhPmZzP00Crk2aQ==
-
-sonner@^2.0.6:
+sonner@2.0.6, sonner@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/sonner/-/sonner-2.0.6.tgz#623b73faec55229d63ec35226d42021f2119bfa7"
   integrity sha512-yHFhk8T/DK3YxjFQXIrcHT1rGEeTLliVzWbO0xN8GberVun2RiBnxAjXAYpZrqwEVHBG9asI/Li8TAAhN9m59Q==
@@ -9598,11 +9579,6 @@ tailwindcss-animate@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/tailwindcss-animate/-/tailwindcss-animate-1.0.7.tgz#318b692c4c42676cc9e67b19b78775742388bef4"
   integrity sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==
-
-tailwindcss@4.1.10:
-  version "4.1.10"
-  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.10.tgz#515741b0a79316d1971d182f7fbc435b68679373"
-  integrity sha512-P3nr6WkvKV/ONsTzj6Gb57sWPMX29EPNPopo7+FcpkQaNsrNpZ1pv8QmrYI2RqEKD7mlGqLnGovlcYnBK0IqUA==
 
 tailwindcss@4.1.11, tailwindcss@^4.1.11:
   version "4.1.11"

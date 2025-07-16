@@ -4,6 +4,7 @@ import useStudio from "@renderer/hooks/use-studio";
 import { EngineService } from "@renderer/services/EngineService";
 import { useMemo, useState, useEffect } from "react";
 import { useComponents } from "./useComponents";
+import { constructNow } from "date-fns";
 
 export interface Option {
     label: string;
@@ -102,7 +103,7 @@ const useCustomCode = (): CustomCodeHook => {
                 setSnippets(snippetsResponse.result?.codes || []);
                 //TODO review this, when the data is not in the schema, it is not updated
                 if (result) {
-                    setMetadataFunctions([...(result.functions || []), ...(result.actions || [])]);
+                    setMetadataFunctions([...(result.functions || []), ...(result.actions || []), ...(result.hooks || [])]);
                     setTypes(result.types || [])
                     setCustomComponents(result.components || [])
                 }

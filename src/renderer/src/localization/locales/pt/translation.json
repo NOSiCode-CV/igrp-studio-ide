@@ -855,5 +855,6 @@
   "databaseUsername": "Nome de Usuário do Banco de Dados",
   "databasePassword": "Senha do Banco de Dados",
   "edit_connection": "Editar Conexão",
-  "edit_connection_description": "Modificar os detalhes da sua conexão de banco de dados"
+  "edit_connection_description": "Modificar os detalhes da sua conexão de banco de dados",
+  "template": "Template"
 }
