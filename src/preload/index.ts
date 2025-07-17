@@ -6,7 +6,7 @@ import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 
-const backend = require('i18next-electron-fs-backend')
+import { preloadBindings } from 'i18next-electron-fs-backend';
 
 const handleError = (error: unknown): HandlerResponse => ({
 	error: (error as Error).message || 'An unknown error occurred'
@@ -18,7 +18,7 @@ const api = {
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
-	openDirectory: (buttonLabel: string) => ipcRenderer.invoke('open-directory', buttonLabel),
+	openDirectory: (buttonLabel?: string) => ipcRenderer.invoke('open-directory', buttonLabel),
 
 	fetchFiles: (basePath: string) => ipcRenderer.invoke('igrp-studio:fetch-files', basePath),
 
@@ -39,10 +39,16 @@ const api = {
 
 	fetchData: (endpoint: string, headers: object) => ipcRenderer.invoke('fetch-data', endpoint, headers),
 
-	i18nextElectronBackend: backend.preloadBindings(ipcRenderer, process),
+	i18nextElectronBackend: preloadBindings(ipcRenderer, process),
 
 	runDoctorChecks: (): Promise<ToolCheck[]> => ipcRenderer.invoke('run-doctor-checks'),
 	saveDoctorReport: (results) => ipcRenderer.invoke('save-doctor-report', results),
+	
+	saveProjectIcon: (data: { filePath: string; fileData: ArrayBuffer; assetsPath: string }) => 
+		ipcRenderer.invoke('save-project-icon', data),
+	
+	getIconFile: (iconPath: string, workspacePath: string) => 
+		ipcRenderer.invoke('get-icon-file', iconPath, workspacePath),
 }
 
 const engine = {
@@ -56,6 +62,13 @@ const engine = {
 	delete: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
 		try {
 			return await ipcRenderer.invoke(EVENTS.ENGINE.DELETE_ELEMENT, config, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+	duplicate: async (config: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.ENGINE.DUPLICATE_ELEMENT, config, engineType, basePath)
 		} catch (error) {
 			return handleError(error)
 		}
@@ -359,6 +372,7 @@ const repo = {
             options: { services: string[]; timeout?: number }
         ) => ipcRenderer.invoke('docker-restart', projectPath, options),
         check: () => ipcRenderer.invoke('docker-check'),
+        daemonStatus: () => ipcRenderer.invoke('docker-daemon-status'),
     },
 };
 
@@ -448,4 +462,3 @@ declare global {
     appLogicAPI: typeof appLogic;
   }
 }
-

@@ -91,6 +91,7 @@ export interface IConnenctionRepository {
 export interface BaseEngine {
     createProject(project: ProjectData, basePath: string): Promise<void>;
     delete(config: DeleteConfig, basePath: string): Promise<void>;
+    duplicate(config: any, basePath: string): Promise<void>;
     createResponse?(config: ResponseConfig, basePath: string): Promise<void>;
 
     createEnum?(data: EnumConfig, basePath: string): Promise<void>;
@@ -132,6 +133,7 @@ export interface IBaseEngine {
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    duplicate: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 
     createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
     registry: (engineType: string) => Promise<HandlerResponse>;
@@ -152,5 +154,6 @@ export interface IDocker {
     status: (projectPath: string) => Promise<ServiceInfo[]>;
     stop: (projectPath: string, options: { services: string[] }) => Promise<void>;
     restart: (projectPath: string, options: { services: string[]; timeout?: number }) => Promise<void>;
-    check: () => Promise<boolean>
+    check: () => Promise<boolean>;
+    daemonStatus: () => Promise<{isRunning: boolean, error?: string, details?: string}>;
 }

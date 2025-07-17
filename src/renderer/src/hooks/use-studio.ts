@@ -162,9 +162,12 @@ const useStudio = () => {
         const options = pages?.children?.filter((page) => page?.content?.pageName).map((page) => {
             const { content } = page
             return {
-                value: content.pageName,
+                value: content.path,
                 label: content.description || content.pageName,
-                metadata: content
+                metadata: {
+                    path: content.path,
+                    segments: content.pageName,
+                }
             }
         }) ?? [];
         setPageOptions(options)

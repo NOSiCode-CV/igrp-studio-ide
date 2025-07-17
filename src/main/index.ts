@@ -1,14 +1,14 @@
 import {
     app,
-    shell,
     BrowserWindow,
-    ipcMain,
     dialog,
-    screen,
+    ipcMain,
     IpcMainInvokeEvent,
+    screen,
+    shell,
 } from 'electron';
 import path, { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
@@ -57,7 +57,7 @@ import { WorkspaceRepository } from './services/workspace-service';
 import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 import { folderWatcher } from './helpers/watch-folder';
 
-const backend = require('i18next-electron-fs-backend');
+import { mainBindings } from 'i18next-electron-fs-backend';
 
 let mainWindow: BrowserWindow;
 
@@ -107,7 +107,7 @@ function createWindow(): void {
 
     mainWindow.loadURL(startUrl);
 
-    backend.mainBindings(ipcMain, mainWindow, fs); // <- configures the backend
+    mainBindings(ipcMain, mainWindow, fs); // <- configures the backend
 
     closeApp(mainWindow);
 
@@ -199,13 +199,13 @@ app.whenReady().then(async () => {
     const initializeGitHubService = async () => {
         try {
             await GitHubService.initializeServices();
-        } catch { }
+        } catch {}
     };
 
     const initializeGitLabService = async () => {
         try {
             await GitLabService.initializeServices();
-        } catch { }
+        } catch {}
     };
 
     const initializeAllServices = async () => {
@@ -230,7 +230,7 @@ app.whenReady().then(async () => {
     // GitLab handler
     ipcMain.on('gitlab-oauth', async () => {
         const isDev = process.env.VITE_NODE_ENV === 'development';
-        console.log("isDev", isDev)
+        console.log('isDev', isDev);
         try {
             currentAuthProvider = 'gitlab'; // Add this line
             await gitlabAuth.setupOAuth(mainWindow, isDev);
@@ -285,8 +285,7 @@ ipcMain.handle(
         dirPath: string
     ): Promise<FileTree[] | { error: string }> => {
         try {
-            const fileTree = await readDirectory(dirPath);
-            return fileTree;
+            return readDirectory(dirPath);
         } catch (error) {
             console.error('Error reading directory:', error);
             return {
@@ -318,9 +317,7 @@ ipcMain.handle('get-app-version', () => {
     return app.getVersion();
 });
 
-
 ipcMain.on('open-directory-dialog', async (event) => {
-
     await dialog
         .showOpenDialog(mainWindow, {
             properties: ['openDirectory', 'createDirectory', 'showHiddenFiles'],
@@ -527,7 +524,6 @@ ipcMain.handle('download-update', async () => {
 ipcMain.handle('install-update', async () => {
     autoUpdater.quitAndInstall();
 });
-
 
 // Handle folder watching
 ipcMain.handle('watch-folder', (_, folderPath: string) => {

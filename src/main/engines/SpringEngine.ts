@@ -33,7 +33,39 @@ export class SpringEngine implements BaseEngine {
     throw new Error('Method not implemented.');
   }
   async delete(config: DeleteConfig, basePath: string): Promise<void> {
-    await deleteElement(config, basePath)
+    await deleteElement(config, basePath);
+  }
+
+  async duplicate(config: any, basePath: string): Promise<void> {
+    // For Spring engine, we'll create a copy with a modified name
+    const { name, type, module, content } = config;
+    const duplicateName = `${name}Copy`;
+    
+    // Create a deep copy of the content and update the name
+    const duplicateContent = JSON.parse(JSON.stringify(content));
+    duplicateContent.name = duplicateName;
+    duplicateContent.id = `${duplicateContent.id}_copy`;
+    
+    // Create the duplicate based on type
+    switch (type) {
+      case 'model':
+        await addModel({ ...duplicateContent, module }, basePath);
+        break;
+      case 'dto':
+        await addDTO({ ...duplicateContent, module }, basePath);
+        break;
+      case 'controller':
+        await addController({ ...duplicateContent, module }, basePath);
+        break;
+      case 'enum':
+        await addEnum({ ...duplicateContent, module }, basePath);
+        break;
+      case 'response':
+        await addResponse({ ...duplicateContent, module }, basePath);
+        break;
+      default:
+        throw new Error(`Unsupported type for duplication: ${type}`);
+    }
   }
 
   async createProject(project: ProjectData, basePath: string): Promise<void> {

@@ -8,3 +8,5 @@ out
 /tsconfig.web.tsbuildinfo
 # IDE specific
 .idea/
+
+yarn.lock

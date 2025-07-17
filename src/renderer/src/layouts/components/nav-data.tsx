@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { lazy } from 'react';
 import {
     Box,
     Cable,
+    Copy,
     DatabaseZap,
     FileJson2,
     Layers,
@@ -20,19 +20,11 @@ import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { FileTree, MenuItem } from 'src/main/types';
 
-const DatabaseManagerModal = lazy(
-    () => import('@renderer/generators/api/components/DatabaseManager')
-);
-
-const SerializationConfigModal = lazy(
-    () => import('@renderer/generators/api/components/serialization-config')
-);
-
 export interface DropdownItem {
     label: string;
     actionType: OptionType;
     icon?: LucideIcon;
-    componentName?: React.ReactNode;
+    modalType?: 'database-manager' | 'serialization-config';
 }
 
 const IGNORED_PATHS = new Set([
@@ -62,11 +54,6 @@ const createMenuItems = (t: any) => ({
         actionType: OPTION_TYPE.RESPONSE,
         icon: getIcon(OPTION_TYPE.RESPONSE),
     },
-    newPermission: {
-        label: t('newPermission'),
-        actionType: OPTION_TYPE.PERMISSIONS,
-        icon: getIcon(OPTION_TYPE.PERMISSIONS),
-    },
     newControllers: {
         label: t('newControllers'),
         actionType: OPTION_TYPE.ACTION,
@@ -75,13 +62,13 @@ const createMenuItems = (t: any) => ({
     importDataTableFromDatabase: {
         label: t('importDataTableFromDatabase'),
         actionType: OPTION_TYPE.MODAL,
-        componentName: <DatabaseManagerModal />,
+        modalType: 'database-manager',
         icon: DatabaseZap,
     },
     importJsonSchemaFiles: {
         label: t('importJsonSchemaFiles'),
         actionType: OPTION_TYPE.MODAL,
-        componentName: <SerializationConfigModal />,
+        modalType: 'serialization-config',
         icon: FileJson2,
     },
     erdDiagram: {
@@ -103,6 +90,11 @@ const createMenuItems = (t: any) => ({
         label: t('convertToDTO'),
         actionType: OPTION_TYPE.DATA_OBJECTS,
         icon: MoveRight,
+    },
+    duplicate: {
+        label: t('duplicate'),
+        actionType: OPTION_TYPE.DUPLICATE,
+        icon: Copy,
     },
 });
 
@@ -130,12 +122,9 @@ const useNavdata = (filesThree: FileTree[]) => {
                 menuItemsConfig.newDto,
                 menuItemsConfig.importJsonSchemaFiles,
             ],
-            subMenus: [menuItemsConfig.newAction, menuItemsConfig.delete],
-            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.delete],
-            defaultMenus: [menuItemsConfig.delete],
-            sharedExtension: [
-                menuItemsConfig.newPermission,
-            ],
+            subMenus: [menuItemsConfig.newAction, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            defaultMenus: [menuItemsConfig.duplicate, menuItemsConfig.delete],
             controllersExtension: [menuItemsConfig.newControllers],
         }),
         [menuItemsConfig]
@@ -159,7 +148,10 @@ const useNavdata = (filesThree: FileTree[]) => {
                 [OPTION_TYPE.CONTROLLER]: dropdownConfigs.subMenus,
                 [OPTION_TYPE.MODEL]: dropdownConfigs.modelMenus,
             };
-            return menuMap[category as keyof typeof menuMap] || dropdownConfigs.defaultMenus;
+            return (
+                menuMap[category as keyof typeof menuMap] ||
+                dropdownConfigs.defaultMenus
+            );
         },
         [dropdownConfigs]
     );
@@ -211,7 +203,6 @@ const useNavdata = (filesThree: FileTree[]) => {
                 const dropdownMenus = isShared
                     ? [
                           ...dropdownConfigs.baseDropdownMenus,
-                          ...dropdownConfigs.sharedExtension,
                       ]
                     : [
                           ...dropdownConfigs.controllersExtension,
@@ -262,7 +253,9 @@ const useNavdata = (filesThree: FileTree[]) => {
                                             id:
                                                 file.content?.type ===
                                                 OPTION_TYPE.CONTROLLER
-                                                    ? `${file.content?.id}-CONTROLLER`
+                                                    ? file.content?.id?.endsWith('-CONTROLLER')
+                                                        ? file.content?.id
+                                                        : `${file.content?.id}-CONTROLLER`
                                                     : file.content?.id,
                                             label:
                                                 file.content?.name || file.name,

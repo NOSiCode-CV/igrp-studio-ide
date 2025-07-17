@@ -203,7 +203,7 @@ const Overview = () => {
                                         </div>
                                         <Dependency
                                             dependsOn={
-                                                project?.service.dependsOn
+                                                project?.service?.dependsOn 
                                             }
                                         />
                                     </div>

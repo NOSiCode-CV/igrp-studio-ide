@@ -146,7 +146,6 @@ export function TableManager({
     };
 
     useEffect(() => {
-        console.log(selectedTables);
         onRowsSubmit(selectedTables);
     }, [selectedTables]);
 

@@ -1,4 +1,4 @@
-const knex = require('knex');
+import knex from 'knex';
 import { Connection } from '../types';
 import { SchemaInspector } from 'knex-schema-inspector';
 

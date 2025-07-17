@@ -7,6 +7,14 @@ import {
     DragEndResult,
 } from './types';
 
+interface DragOverParams {
+    e: DragEvent<HTMLDivElement>;
+    id?: string;
+    cellIndex?: number;
+    dropTargetId?: string;
+    countItems: number;
+}
+
 interface DragDropContextType {
     // State
     draggingItem: any;
@@ -24,12 +32,7 @@ interface DragDropContextType {
         e: DragEvent<HTMLDivElement>,
         targetId?: string
     ) => DragEndResult;
-    handleDragOver: (
-        e: DragEvent<HTMLDivElement>,
-        id?: string,
-        index?: number,
-        dropTargetId?: string
-    ) => void;
+    handleDragOver: (params: DragOverParams) => void;
     handleDragLeave: (e: DragEvent<HTMLDivElement>) => void;
     handleDragStartComponent: (
         _e: DragEvent<HTMLDivElement>,
@@ -124,12 +127,13 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // Handle drag over - core functionality
-    const handleDragOver = (
-        e: DragEvent<HTMLDivElement>,
-        id?: string,
-        cellIndex?: number,
-        dropTargetId?: string
-    ) => {
+    const handleDragOver = ({
+        e,
+        id,
+        cellIndex,
+        dropTargetId,
+        countItems,
+    }: DragOverParams) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -143,7 +147,13 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
                 e.currentTarget as HTMLElement
             ).getBoundingClientRect();
             const position = getDropPosition(e, targetRect, layoutMode);
-            setActiveDropZone({ id, cellIndex, position, dropTargetId });
+            setActiveDropZone({
+                id,
+                cellIndex,
+                position,
+                dropTargetId,
+                countItems,
+            });
         } else if (components.length > 0) {
             const position = layoutMode === 'vertical' ? 'bottom' : 'right';
             setActiveDropZone({
@@ -151,6 +161,7 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
                 cellIndex,
                 position,
                 dropTargetId,
+                countItems,
             });
         }
     };
