@@ -38,7 +38,30 @@ export class NextjsEngine implements BaseEngine {
   }
 
   async delete(config: DeleteConfig, basePath: string): Promise<void> {
-    await deleteElement(config, basePath)
+    await deleteElement(config, basePath);
+  }
+
+  async duplicate(config: any, basePath: string): Promise<void> {
+    // For Next.js engine, we'll create a copy with a modified name
+    const { name, type, module, content } = config;
+    const duplicateName = `${name}Copy`;
+    
+    // Create a deep copy of the content and update the name
+    const duplicateContent = JSON.parse(JSON.stringify(content));
+    duplicateContent.name = duplicateName;
+    duplicateContent.id = `${duplicateContent.id}_copy`;
+    
+    // Create the duplicate based on type
+    switch (type) {
+      case 'page':
+        await newPage({ ...duplicateContent, module }, basePath);
+        break;
+      case 'component':
+        await newComponent({ ...duplicateContent, module }, basePath);
+        break;
+      default:
+        throw new Error(`Unsupported type for duplication: ${type}`);
+    }
   }
 
   async createPage(pageConfig: any, basePath: string): Promise<void> {

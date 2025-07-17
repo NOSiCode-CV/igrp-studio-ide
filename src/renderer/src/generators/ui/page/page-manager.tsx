@@ -124,6 +124,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     }, [loadingTable, basePath]);
 
     useEffect(() => {
+        setContent([]);
+        setComponents([]);
         if (files) {
             const pages = files.find((page) => page.name === 'pages');
             const components = files.find((page) => page.name === 'components');

@@ -41,12 +41,6 @@ export const FrameworkIcon: React.FC<FrameworkIconProps> = ({
             width={size}
             height={size}
             className={cn('rounded-lg object-contain', className)}
-            onLoad={() => {
-                console.log(`Icon loaded successfully for ${framework}`);
-            }}
-            onError={(e) => {
-                console.error(`Failed to load icon for ${framework}:`, e);
-            }}
         />
     );
 };

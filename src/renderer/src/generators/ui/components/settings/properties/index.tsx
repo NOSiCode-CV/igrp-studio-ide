@@ -75,7 +75,6 @@ interface PageSelectionConfigProps {
     fieldPath?: string;
     key: string;
     parentKey?: string;
-    selectedPagePath: string | undefined;
     pageOptions: any;
     columnsOptions: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
     segments: Segment[];
@@ -89,16 +88,6 @@ const toMap = (items: any) => {
         items.map((value: string) => ({
             value,
             label: value,
-        }))
-    );
-};
-
-export const toMapPages = (items: any) => {
-    return (
-        items &&
-        items.map(({ label, metadata }: { label: string; metadata: any }) => ({
-            value: metadata.path,
-            label,
         }))
     );
 };
@@ -560,8 +549,9 @@ export const PageSelectionConfig = ({
     segments,
     onInputChange,
     onPageChange,
-    selectedPagePath,
 }: PageSelectionConfigProps) => {
+    const [selectedPagePath, setSelectedPagePath] = useState<string>(value);
+
     const [dynamicSegments, setDynamicPagePath] = useState(
         getDynamicSegments(selectedPagePath) ?? []
     );
@@ -572,9 +562,8 @@ export const PageSelectionConfig = ({
 
     // Handler to create segments with proper context
     const handleSegmentsChange = (items: Record<string, string>[]) => {
-        console.log(columnsOptions);
         const mappedSegments = items.map((item) => {
-            // Find the selected data field to determine context
+            // Find the selected data field to determine contextp
             const selectedField = columnsOptions.find(
                 (option) => option.value === item.columnName
             );
@@ -636,10 +625,17 @@ export const PageSelectionConfig = ({
             <IGRPCombobox
                 value={value}
                 onChange={(value) => {
+                    const page = pageOptions.find(
+                        (p: any) => p.value === value
+                    );
+
                     if (fieldPath) onInputChange?.(fieldPath, value as string);
-                    onPageChange(value as string);
+
+                    onPageChange(page?.metadata.pageName || '');
+
+                    setSelectedPagePath(value as string);
                 }}
-                options={toMapPages(pageOptions)}
+                options={pageOptions}
                 placeholder="Select Page"
                 className="w-full"
             />
@@ -705,18 +701,16 @@ const SlugBindingConfig = ({
     onInputChange: (fieldPath: string, value: any) => void;
 }) => {
     const [linkType, setLinkType] = useState<string>();
-    const [selectedPagePath, setSelectedPagePath] = useState<string>();
 
     useEffect(() => {
         const defaultType =
             value &&
             Array.isArray(pageOptions) &&
             pageOptions.some((page) => page.value === value)
-                ? 'LINK'
-                : 'PAGE';
+                ? 'PAGE'
+                : 'LINK';
 
         setLinkType(defaultType);
-        setSelectedPagePath(value);
     }, [pageOptions, value]);
 
     return (
@@ -727,7 +721,6 @@ const SlugBindingConfig = ({
                 value={linkType}
                 onValueChange={(e) => {
                     setLinkType(e);
-                    setSelectedPagePath(value);
                 }}
                 options={[
                     { value: 'LINK', label: 'Link' },
@@ -752,8 +745,7 @@ const SlugBindingConfig = ({
                     columnsOptions={columnsOptions}
                     segments={segments}
                     onInputChange={onInputChange}
-                    onPageChange={setSelectedPagePath}
-                    selectedPagePath={selectedPagePath}
+                    onPageChange={() => void 0}
                 />
             )}
         </>

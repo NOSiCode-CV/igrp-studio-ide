@@ -23,6 +23,10 @@ export class DotNetEngine implements BaseEngine {
     throw new Error('Method not implemented.');
   }
 
+  async duplicate(_config: any, _basePath: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
     const { config } = project;

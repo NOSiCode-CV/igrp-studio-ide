@@ -148,7 +148,7 @@ export interface Connection {
     databaseType: string;
     connectionType: 'general' | 'ssh';
     host: string;
-    port: number | null;
+    port: number | undefined;
     user: string;
     password: string;
     sshHost?: string;

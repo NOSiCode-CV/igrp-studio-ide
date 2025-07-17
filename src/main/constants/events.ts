@@ -3,6 +3,7 @@ export const EVENTS = {
         CREATE_PROJECT: 'engine:create-project',
         CREATE_PERMISSION: 'engine:create-permission',
         DELETE_ELEMENT: 'engine:delete-element',
+        DUPLICATE_ELEMENT: 'engine:duplicate-element',
         SERIALIZE_ELEMENT: 'engine:serialize-element',
         GET_DEPENDENCIES: 'engine:dependencies',
     },

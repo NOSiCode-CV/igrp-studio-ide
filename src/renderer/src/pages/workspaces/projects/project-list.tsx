@@ -56,7 +56,7 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
                         >
                             <TableCell className="font-medium">
                                 <div className="flex items-center gap-1.5">
-                                    <ProjectIcon project={project} />
+                                    <ProjectIcon project={project} workspacePath={workspace.path} />
                                     <div>
                                         <div className="text-xs">
                                             {project.name}

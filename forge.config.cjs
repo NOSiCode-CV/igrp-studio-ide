@@ -1,6 +1,6 @@
-const {
-    utils: { fromBuildIdentifier },
-} = require('@electron-forge/core');
+import generated from '@electron-forge/core';
+
+const { utils: { fromBuildIdentifier } } = generated;
 
 module.exports = {
     buildIdentifier: 'beta', //process.env.IS_BETA ? 'beta' : 'prod',

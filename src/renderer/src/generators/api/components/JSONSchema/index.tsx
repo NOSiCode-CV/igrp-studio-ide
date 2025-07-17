@@ -86,18 +86,6 @@ export function JSONSchemaBuilder({
         onSchemaChange?.({ ...schema, properties: orderedProperties });
     }, [schema, fieldOrder, onSchemaChange]);
 
-    /* const generateUniqueName = (
-        baseName: string,
-        existingNames: Set<string>
-    ): string => {
-        let uniqueName = baseName;
-        let counter = 1;
-        while (existingNames.has(uniqueName)) {
-            uniqueName = `${baseName}_${counter}`;
-            counter++;
-        }
-        return uniqueName;
-    }; */
 
     const checkAndUpdateDuplicateNames = (field: SchemaField): SchemaField => {
         const updatedField = { ...field };

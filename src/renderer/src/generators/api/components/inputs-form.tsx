@@ -1,3 +1,4 @@
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { LabelRequired } from '@renderer/components/label-required';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';
@@ -103,7 +104,7 @@ export const SelectInput = ({
                 {label}
             </Label>
         )}
-        <Select value={value} onValueChange={onChange}>
+        {/*  <Select value={value} onValueChange={onChange}>
             <SelectTrigger id={id} className="w-full">
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
@@ -114,8 +115,8 @@ export const SelectInput = ({
                     </SelectItem>
                 ))}
             </SelectContent>
-        </Select>
-        {/*  <IGRPCombobox
+        </Select> */}
+        <IGRPCombobox
             options={options}
             value={value as string}
             onChange={(e) => {
@@ -126,7 +127,7 @@ export const SelectInput = ({
                 'w-full h-9',
                 isTouched && error && 'border-destructive'
             )}
-        /> */}
+        />
         {error && isTouched && (
             <p className="text-xs text-destructive">{error}</p>
         )}

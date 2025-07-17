@@ -55,6 +55,7 @@ const Draggable = ({
         e.dataTransfer.setData('draggableIndex', JSON.stringify(index));
         e.dataTransfer.setData('dropTargetId', JSON.stringify(dropTargetId));
     };
+
     return (
         <div
             draggable
@@ -62,7 +63,13 @@ const Draggable = ({
             onDragEnd={onDragEnd}
             onDragLeave={handleDragLeave}
             onDragOver={(e) => {
-                handleDragOver(e, componentId, index, dropTargetId);
+                handleDragOver({
+                    e,
+                    id: componentId,
+                    cellIndex: index,
+                    dropTargetId,
+                    countItems: item.children?.length || 0,
+                });
                 handleLayoutChange(layout);
             }}
             className={cn(

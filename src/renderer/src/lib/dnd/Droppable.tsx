@@ -29,6 +29,8 @@ const Droppable = ({
     } = component || {};
 
     const [targetHovered, setTargetHovered] = useState<string>('');
+    const [isItemOverGenNoInfoComp, setIsItemOverGenNoInfoComp] =
+        useState<boolean>(false);
 
     const {
         activeDropZone,
@@ -55,22 +57,32 @@ const Droppable = ({
                 droppablePath: path,
             },
         });
+        setIsItemOverGenNoInfoComp(false);
+        setTargetHovered('');
     };
 
     const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         handleDragLeave(e);
         setTargetHovered('');
+        setIsItemOverGenNoInfoComp(false);
     };
 
     const onDragOverCapture = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setTargetHovered((e.target as HTMLElement)?.id);
+        setIsItemOverGenNoInfoComp(true);
     };
 
     const onDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        handleDragOver(e, componentId);
+        handleDragOver({
+            e,
+            id: componentId,
+            cellIndex: 0,
+            dropTargetId: componentId,
+            countItems: components?.length || 0,
+        });
     };
 
     useEffect(() => {
@@ -88,7 +100,7 @@ const Droppable = ({
             onDragOverCapture={onDragOverCapture}
             id={componentId}
             className={cn(
-                'space-y-3 min-h-12 rounded-lg bg-card', //border border-dashed border-gray-400 hover:border
+                'space-y-3 min-h-12 rounded-lg bg-card',
                 draggingItem &&
                     (activeDropZone?.dropTargetId === componentId ||
                         targetHovered === componentId) &&
@@ -97,7 +109,11 @@ const Droppable = ({
                 className
             )}
         >
-            {components.length === 0 ? <GenNoInfoComp /> : children}
+            {components.length === 0 ? (
+                <GenNoInfoComp isActive={isItemOverGenNoInfoComp} />
+            ) : (
+                children
+            )}
         </div>
     );
 };

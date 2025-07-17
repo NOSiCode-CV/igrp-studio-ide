@@ -11,7 +11,9 @@ const IDEInitialScreen = lazy(
     () => import('@renderer/pages/ide-initial-screen')
 );
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'));
-const ProjectSettings = lazy(() => import('@renderer/pages/project/project-settings'));
+const ProjectSettings = lazy(
+    () => import('@renderer/pages/project/project-settings')
+);
 const Connections = lazy(() => import('@renderer/pages/connections'));
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'));
 const AppLogicPage = lazy(() => import('@renderer/pages/applogic/app-logic'));
@@ -32,10 +34,6 @@ const apiRoutes = [
         path: '/project-settings',
         component: <ProjectSettings />,
     },
-    {
-        path: '/connections',
-        component: <Connections />,
-    },
 ];
 
 const othersRoutes = [
@@ -47,14 +45,17 @@ const othersRoutes = [
         path: ROUTES.PATH_IDE_APP_LOGIC,
         component: <AppLogicPage />,
     },
+    {
+        path: '/connections',
+        component: <Connections />,
+    },
 ];
 
 function AppRoutes() {
     return (
         <React.Fragment>
             <Suspense fallback={<Loader />}>
-                <HashRouter
-                >
+                <HashRouter>
                     <Routes>
                         <Route
                             path="/"

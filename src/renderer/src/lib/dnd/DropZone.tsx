@@ -7,8 +7,11 @@ interface DropZoneProps {
     componentId: string;
 }
 
-export const DropZone = ({ layoutMode, activeDropZone, componentId }: DropZoneProps) => {
-
+export const DropZone = ({
+    layoutMode,
+    activeDropZone,
+    componentId,
+}: DropZoneProps) => {
     return (
         <>
             <DropIndicator

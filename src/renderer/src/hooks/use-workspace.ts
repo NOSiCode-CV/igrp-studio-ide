@@ -174,10 +174,10 @@ export const useWorkspace = () => {
 
     const saveOrOpenProject = async ({ project, openProject,
         onSuccess }: openProjectProps) => {
-        setLoading(true);
         try {
             const { id } = project
             let response: any = {};
+            setLoading(true);
 
             if (id)
                 response = await window.igrpStudio.workspace.updateProject(id, project);
