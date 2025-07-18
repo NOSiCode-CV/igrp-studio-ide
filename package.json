@@ -1,6 +1,6 @@
 {
 	"name": "igrp-studio",
-	"version": "0.0.1-alpha.2",
+	"version": "0.1.0-beta.1",
 	"description": "IGRP Studio for development",
 	"main": "out/main/index.js",
 	"author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
@@ -32,8 +32,8 @@
 		"@hookform/resolvers": "^5.1.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-framework-react-design-system": "^0.0.0-alpha.221",
-		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.447",
-		"@igrp/igrp-studio-springboot-engine": "0.0.2-alpha.9",
+		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.448",
+		"@igrp/igrp-studio-springboot-engine": "0.1.0-beta.1",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^22.0.0",
 		"@radix-ui/react-accordion": "^1.2.11",

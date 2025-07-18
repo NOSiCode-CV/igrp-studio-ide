@@ -451,7 +451,6 @@ const InteractionEditor = ({
                 );
 
             case 'navigate':
-                console.log('currentAction', currentAction);
                 return (
                     <div className="space-y-4">
                         <PageSelectionConfig

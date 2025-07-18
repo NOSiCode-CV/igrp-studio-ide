@@ -70,7 +70,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                                 group="group/tabitem-trigger"
                                 className={cn(
                                     'opacity-0 group-hover/tabitem-trigger:opacity-100',
-                                    'data-[state=active]:opacity-100'
+                                    'data-[state=active]:opacity-100 right-0 left-auto'
                                 )}
                             >
                                 <span>{label || componentName}</span>

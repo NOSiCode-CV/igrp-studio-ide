@@ -631,7 +631,7 @@ export const PageSelectionConfig = ({
 
                     if (fieldPath) onInputChange?.(fieldPath, value as string);
 
-                    onPageChange(page?.metadata.pageName || '');
+                    onPageChange(value as string);
 
                     setSelectedPagePath(value as string);
                 }}
