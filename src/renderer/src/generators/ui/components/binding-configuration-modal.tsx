@@ -46,7 +46,7 @@ const defaultFieldType: LabeledElementField = {
     name: '',
     type: 'string',
     required: false,
-    defaultValue: '',
+    defaultValue: undefined,
     label: '',
 };
 
@@ -161,7 +161,6 @@ export const BindingConfigurationModal = ({
         return true;
     };
 
-
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: {
@@ -182,7 +181,22 @@ export const BindingConfigurationModal = ({
                     (field) => {
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         const { label, ...rest } = field; // Removes the 'label' property
-                        return rest;
+                        return {
+                            ...rest,
+                            defaultValue:
+                                rest.defaultValue === '' && rest.required
+                                    ? undefined
+                                    : rest.defaultValue,
+                            ...(rest.fields && {
+                                fields: rest.fields.map((field) => ({
+                                    ...field,
+                                    defaultValue:
+                                        field.defaultValue === '' && field.required
+                                            ? undefined
+                                            : field.defaultValue,
+                                })),
+                            }),
+                        };
                     }
                 ),
             };

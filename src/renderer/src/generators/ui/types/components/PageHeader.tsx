@@ -17,25 +17,14 @@ export interface PageHeaderProps {
 const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     const {
         id: componentId,
-        children: fields,
+        children: buttonComponents,
         componentName,
         label,
         properties,
     } = comp;
     const { title } = properties;
 
-    const [buttonComponents, setButtonComponents] = useState<
-        StructuredComponent[]
-    >([]);
-
     const { setEditingComponent } = useDroppedComponents();
-
-    useEffect(() => {
-        if (fields) {
-            const buttons = fields;
-            setButtonComponents(buttons);
-        }
-    }, [comp, fields]);
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -55,6 +44,7 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
                         dropTargetId={componentId}
                         layout="horizontal"
                         className="p-1"
+                        mode='MOVE'
                     >
                         <BoxField
                             comp={button}

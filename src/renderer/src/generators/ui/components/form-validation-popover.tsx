@@ -98,7 +98,7 @@ export function FormValidationPopover({
     };
 
     const getValidationOptions = () => {
-        const baseValidations = ['required', 'optional'];
+        const baseValidations = ['optional'];
         const stringValidations = ['minLength', 'maxLength', 'regex', 'email', 'url', 'uuid', 'startsWith', 'endsWith', 'includes'];
         const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite'];
         const dateValidations = ['minDate', 'maxDate'];
@@ -309,7 +309,7 @@ export function FormValidationPopover({
 
                                     
                                     <div className="flex flex-1 gap-2">
-                                        {['required', 'optional'].map((validation) => (
+                                        {['optional'].map((validation) => (
                                             <div
                                                 key={`${validation}-${index}`}
                                                 className="flex flex-1 items-center gap-4"
@@ -336,7 +336,7 @@ export function FormValidationPopover({
                                     <h4 className="text-sm font-medium">{t('typeSpecificValidations')}</h4>
                                     <div className="grid gap-3">
                                         {getValidationOptions()
-                                            .filter(validation => !['required', 'optional'].includes(validation))
+                                            .filter(validation => !['optional'].includes(validation))
                                             .filter(shouldShowValidation)
                                             .map((validation) => (
                                                 <div

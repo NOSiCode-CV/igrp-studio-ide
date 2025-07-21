@@ -13,7 +13,7 @@ interface DraggableProps {
     dropZone?: boolean;
     children: React.ReactNode;
     type?: string;
-    mode?: string;
+    mode?: 'DROP' | 'MOVE';
     isDisabled?: boolean;
 }
 
