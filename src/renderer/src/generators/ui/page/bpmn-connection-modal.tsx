@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import {
     Dialog,
@@ -31,7 +30,6 @@ export const BPMNConfigModal = ({
     onConfirm,
     config,
 }: BPMNConfigModalProps) => {
-    const { t } = useTranslation();
     const [formData, setFormData] = useState<Partial<BPMNConfig>>({
         name: config?.name || '',
         apiUrl: config?.apiUrl || '',

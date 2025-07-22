@@ -12,7 +12,6 @@ const mockProcessDefinitions: BPMNProcessDefinition[] = [
     deploymentId: 'deployment-001',
     resourceName: 'invoice-process.bpmn',
     diagramResourceName: 'invoice-process.png',
-    tenantId: null,
     suspended: false,
     startableInTasklist: true,
     startablePermissionCheck: true,
@@ -30,7 +29,6 @@ const mockProcessDefinitions: BPMNProcessDefinition[] = [
     deploymentId: 'deployment-002',
     resourceName: 'employee-onboarding.bpmn',
     diagramResourceName: 'employee-onboarding.png',
-    tenantId: null,
     suspended: false,
     startableInTasklist: true,
     startablePermissionCheck: true,
@@ -48,7 +46,7 @@ const mockProcessDefinitions: BPMNProcessDefinition[] = [
     deploymentId: 'deployment-003',
     resourceName: 'purchase-approval.bpmn',
     diagramResourceName: 'purchase-approval.png',
-    tenantId: null,
+    tenantId: undefined,
     suspended: false,
     startableInTasklist: true,
     startablePermissionCheck: true,
@@ -66,7 +64,7 @@ const mockProcessDefinitions: BPMNProcessDefinition[] = [
     deploymentId: 'deployment-004',
     resourceName: 'customer-support.bpmn',
     diagramResourceName: 'customer-support.png',
-    tenantId: null,
+    tenantId: undefined,
     suspended: false,
     startableInTasklist: true,
     startablePermissionCheck: true,
@@ -84,7 +82,7 @@ const mockProcessDefinitions: BPMNProcessDefinition[] = [
     deploymentId: 'deployment-005',
     resourceName: 'leave-request.bpmn',
     diagramResourceName: 'leave-request.png',
-    tenantId: null,
+    tenantId: undefined,
     suspended: true,
     startableInTasklist: false,
     startablePermissionCheck: true,
@@ -102,7 +100,7 @@ const mockProcessDefinitions: BPMNProcessDefinition[] = [
     deploymentId: 'deployment-006',
     resourceName: 'expense-report.bpmn',
     diagramResourceName: 'expense-report.png',
-    tenantId: null,
+    tenantId: undefined,
     suspended: false,
     startableInTasklist: true,
     startablePermissionCheck: true,
@@ -121,12 +119,12 @@ const mockProcessInstances: BPMNProcessInstance[] = [
     processDefinitionName: 'Invoice Processing',
     businessKey: 'INV-2024-001',
     startTime: '2024-01-20T09:00:00Z',
-    endTime: null,
+    endTime: undefined,
     durationInMillis: 86400000, // 24 hours
     startUserId: 'john.doe',
     startActivityId: 'start-invoice-process',
-    deleteReason: null,
-    tenantId: null,
+    deleteReason: undefined,
+    tenantId: undefined,
     state: 'active',
   },
   {
@@ -140,8 +138,8 @@ const mockProcessInstances: BPMNProcessInstance[] = [
     durationInMillis: 172800000, // 48 hours
     startUserId: 'hr.manager',
     startActivityId: 'start-onboarding',
-    deleteReason: null,
-    tenantId: null,
+    deleteReason: undefined,
+    tenantId: undefined,
     state: 'completed',
   },
   {
@@ -151,12 +149,12 @@ const mockProcessInstances: BPMNProcessInstance[] = [
     processDefinitionName: 'Purchase Approval',
     businessKey: 'PO-2024-001',
     startTime: '2024-01-20T11:15:00Z',
-    endTime: null,
+    endTime: undefined,
     durationInMillis: 43200000, // 12 hours
     startUserId: 'procurement.user',
     startActivityId: 'start-purchase-approval',
-    deleteReason: null,
-    tenantId: null,
+    deleteReason: undefined,
+    tenantId: undefined,
     state: 'active',
   }
 ];
@@ -170,21 +168,21 @@ const mockTasks: BPMNTask[] = [
     assignee: 'finance.manager',
     created: '2024-01-20T09:30:00Z',
     due: '2024-01-22T17:00:00Z',
-    followUp: null,
-    delegationState: null,
+    followUp: undefined,
+    delegationState: undefined,
     executionId: 'execution-001',
-    owner: null,
-    parentTaskId: null,
+    owner: undefined,
+    parentTaskId: undefined,
     priority: 50,
     processDefinitionId: 'invoice-process:1:123456',
     processInstanceId: 'instance-001',
     taskDefinitionKey: 'review-invoice',
-    caseExecutionId: null,
-    caseInstanceId: null,
-    caseDefinitionId: null,
+    caseExecutionId: undefined,
+    caseInstanceId: undefined,
+    caseDefinitionId: undefined,
     suspended: false,
     formKey: 'invoice-review-form',
-    tenantId: null,
+    tenantId: undefined,
   },
   {
     id: 'task-002',
@@ -193,21 +191,21 @@ const mockTasks: BPMNTask[] = [
     assignee: 'it.support',
     created: '2024-01-19T15:00:00Z',
     due: '2024-01-23T17:00:00Z',
-    followUp: null,
-    delegationState: null,
+    followUp: undefined,
+    delegationState: undefined,
     executionId: 'execution-002',
-    owner: null,
-    parentTaskId: null,
+    owner: undefined,
+    parentTaskId: undefined,
     priority: 30,
     processDefinitionId: 'employee-onboarding:2:789012',
     processInstanceId: 'instance-002',
     taskDefinitionKey: 'setup-it-equipment',
-    caseExecutionId: null,
-    caseInstanceId: null,
-    caseDefinitionId: null,
+    caseExecutionId: undefined,
+    caseInstanceId: undefined,
+    caseDefinitionId: undefined,
     suspended: false,
     formKey: 'it-setup-form',
-    tenantId: null,
+    tenantId: undefined,
   },
   {
     id: 'task-003',
@@ -216,21 +214,21 @@ const mockTasks: BPMNTask[] = [
     assignee: 'department.manager',
     created: '2024-01-20T11:30:00Z',
     due: '2024-01-24T17:00:00Z',
-    followUp: null,
-    delegationState: null,
+    followUp: undefined,
+    delegationState: undefined,
     executionId: 'execution-003',
-    owner: null,
-    parentTaskId: null,
+    owner: undefined,
+    parentTaskId: undefined,
     priority: 40,
     processDefinitionId: 'purchase-approval:1:345678',
     processInstanceId: 'instance-003',
     taskDefinitionKey: 'approve-purchase',
-    caseExecutionId: null,
-    caseInstanceId: null,
-    caseDefinitionId: null,
+    caseExecutionId: undefined,
+    caseInstanceId: undefined,
+    caseDefinitionId: undefined,
     suspended: false,
     formKey: 'purchase-approval-form',
-    tenantId: null,
+    tenantId: undefined,
   }
 ];
 
@@ -335,7 +333,7 @@ class BPMNMockService {
     throw new Error('Real API not implemented in mock service');
   }
 
-  async getProcessDefinitionXML(processDefinitionId: string): Promise<string> {
+  async getProcessDefinitionXML(_processDefinitionId: string): Promise<string> {
     if (this.useMockData) {
       await new Promise(resolve => setTimeout(resolve, 300));
       return mockBPMNXML;
@@ -343,70 +341,6 @@ class BPMNMockService {
     
     throw new Error('Real API not implemented in mock service');
   }
-
-  async startProcessInstance(
-    processDefinitionId: string,
-    variables?: Record<string, any>
-  ): Promise<{ id: string; definitionId: string; businessKey?: string }> {
-    if (this.useMockData) {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      const process = mockProcessDefinitions.find(p => p.id === processDefinitionId);
-      if (!process) {
-        throw new Error('Process definition not found');
-      }
-      
-      const instanceId = `instance-${Date.now()}`;
-      const businessKey = `BK-${Date.now()}`;
-      
-      // Add new instance to mock data
-      const newInstance: BPMNProcessInstance = {
-        id: instanceId,
-        processDefinitionId: process.id,
-        processDefinitionKey: process.key,
-        processDefinitionName: process.name,
-        businessKey,
-        startTime: new Date().toISOString(),
-        endTime: null,
-        durationInMillis: 0,
-        startUserId: 'current.user',
-        startActivityId: 'start-event',
-        deleteReason: null,
-        tenantId: null,
-        state: 'active',
-      };
-      
-      mockProcessInstances.push(newInstance);
-      
-      return {
-        id: instanceId,
-        definitionId: processDefinitionId,
-        businessKey,
-      };
-    }
-    
-    throw new Error('Real API not implemented in mock service');
-  }
-
-  async completeTask(
-    taskId: string,
-    variables?: Record<string, any>
-  ): Promise<void> {
-    if (this.useMockData) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const taskIndex = mockTasks.findIndex(t => t.id === taskId);
-      if (taskIndex === -1) {
-        throw new Error('Task not found');
-      }
-      
-      // Remove completed task
-      mockTasks.splice(taskIndex, 1);
-    } else {
-      throw new Error('Real API not implemented in mock service');
-    }
-  }
-
   // Configuration Management using global settings
   async deleteConfig(): Promise<void> {
     this.config = null;

@@ -25,6 +25,9 @@ interface CustomAPI {
     runDoctorChecks: () => Promise<ToolCheck[]>;
     saveDoctorReport: (results: ToolCheck[] ) => Promise<void>
 
+    saveProjectIcon: (data: { filePath: string; fileData: ArrayBuffer; assetsPath: string }) => Promise<any>;
+    getIconFile: (iconPath: string, workspacePath: string) => Promise<any>;
+
     i18nextElectronBackend: any,
 
 }
@@ -73,6 +76,12 @@ interface AppLogicAPI {
   onEnvironmentsChanged: (callback: (environments: AppLogicEnvironment[]) => void) => () => void
   removeAllListeners: () => void
 }
+
+interface IGRPStudioSettings {
+  setBPMNConfig: (config: any | null) => Promise<any>;
+  getBPMNConfig: () => Promise<any>;
+  deleteBPMNConfig: () => Promise<any>;
+}
 declare global {
     interface Window {
         electron: ElectronAPI & {
@@ -89,6 +98,7 @@ declare global {
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
         menu: CustomMenu,
         engine: IBaseEngine,
-        appLogicAPI: AppLogicAPI
+        appLogicAPI: AppLogicAPI,
+        igrpStudioSettings: IGRPStudioSettings
     }
 }

@@ -18,10 +18,9 @@ ipcMain.handle('run-doctor-checks', async (): Promise<ToolCheck[]> => {
 });
 
 // Save project icon file
-ipcMain.handle('save-project-icon', async (event, { filePath, fileData, assetsPath }) => {
+ipcMain.handle('save-project-icon', async (_event, { filePath, fileData, assetsPath }) => {
     try {
         const fs = require('fs');
-        const path = require('path');
         
         // Ensure assets directory exists
         await fs.promises.mkdir(assetsPath, { recursive: true });
@@ -38,7 +37,7 @@ ipcMain.handle('save-project-icon', async (event, { filePath, fileData, assetsPa
 });
 
 // Get icon file data for secure serving
-ipcMain.handle('get-icon-file', async (event, iconPath, workspacePath) => {
+ipcMain.handle('get-icon-file', async (_event, iconPath, workspacePath) => {
     try {
         const fs = require('fs');
         const path = require('path');

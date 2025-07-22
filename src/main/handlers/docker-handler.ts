@@ -1,5 +1,4 @@
 import { ipcMain } from "electron";
-import Docker from 'dockerode';
 import { ServiceInfo } from "../types";
 import { dockerService } from "../services/docker-service";
 import { ERROR_CODES, EVENTS } from "../constants/events";

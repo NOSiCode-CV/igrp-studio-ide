@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
 import { Badge } from '@renderer/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@renderer/components/ui/card';
@@ -10,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
-import { Plus, RefreshCw, Settings, Database, Play, Edit, Trash2 } from 'lucide-react';
+import { Plus, RefreshCw, Settings, Database, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BPMNConfig, BPMNProcessDefinition, BPMNPageDefinition } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
@@ -27,7 +26,6 @@ interface BPMNManagerProps {
 }
 
 export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
-    const { t } = useTranslation();
     const [config, setConfig] = useState<BPMNConfig | null>(null);
     const [processDefinitions, setProcessDefinitions] = useState<BPMNProcessDefinition[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +35,7 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
     const [deleteConfig, setDeleteConfig] = useState<BPMNConfig | null>(null);
     const [refreshing, setRefreshing] = useState(false);
 
-    const [useMockService, setUseMockService] = useState(true);
+    const [useMockService] = useState(true);
 
     // Get the appropriate service based on configuration
     const getService = () => {
@@ -154,7 +152,7 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
         }
     };
 
-    const handleViewProcess = (process: BPMNProcessDefinition) => {
+    const handleViewProcess = (_process: BPMNProcessDefinition) => {
         // TODO: Implement process details view
         toast.info('Process details view coming soon');
     };

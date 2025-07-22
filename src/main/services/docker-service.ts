@@ -18,7 +18,7 @@ export class DockerService {
     async checkDockerDaemon(): Promise<{ isRunning: boolean, error?: string, details?: string }> {
         try {
             // Try to get Docker info
-            const { stdout, stderr } = await execAsync('docker info', {
+            const { stdout } = await execAsync('docker info', {
                 timeout: 10000, // 10 second timeout
                 maxBuffer: 1024 * 1024 // 1MB buffer
             });

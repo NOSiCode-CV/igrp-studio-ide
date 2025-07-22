@@ -5,7 +5,7 @@ import { Badge } from '@renderer/components/ui/badge';
 import { Switch } from '@renderer/components/ui/switch';
 import { Label } from '@renderer/components/ui/label';
 import { Separator } from '@renderer/components/ui/separator';
-import { Settings, Database, Play, RefreshCw } from 'lucide-react';
+import { Settings, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { bpmnMockService } from '@renderer/services/bpmn-mock-service';
 import { bpmnService } from '@renderer/services/bpmn-service';
@@ -62,26 +62,6 @@ export const BPMNConfigSwitcher = ({ onConfigChange }: BPMNConfigSwitcherProps) 
       onConfigChange?.();
     } catch (error) {
       toast.error('Failed to switch BPMN service');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGenerateMockData = async () => {
-    setIsLoading(true);
-    try {
-      // Generate mock page definitions
-      const mockPages = bpmnMockService.generateMockPageDefinitions();
-      
-      // Save mock page definitions
-      for (const page of mockPages) {
-        await bpmnMockService.savePageDefinition(page);
-      }
-      
-      toast.success(`Generated ${mockPages.length} mock BPMN page definitions`);
-      onConfigChange?.();
-    } catch (error) {
-      toast.error('Failed to generate mock data');
     } finally {
       setIsLoading(false);
     }
@@ -182,15 +162,6 @@ export const BPMNConfigSwitcher = ({ onConfigChange }: BPMNConfigSwitcherProps) 
               >
                 <Play className="h-4 w-4 mr-2" />
                 Test Connection
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleGenerateMockData}
-                disabled={isLoading}
-              >
-                <Database className="h-4 w-4 mr-2" />
-                Generate Mock Data
               </Button>
             </div>
           </div>
