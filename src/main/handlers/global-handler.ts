@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import { IGRPStudioSettings } from "../helpers/igrp-studio-settings";
 import { DoctorService } from "../services/doctor-service";
-import { ToolCheck } from "../types";
+import { ToolCheck, BPMNConfig } from "../types";
 
 ipcMain.handle('theme:get', async () => {
     return IGRPStudioSettings.getActiveTheme();
@@ -87,3 +87,35 @@ ipcMain.handle('get-icon-file', async (event, iconPath, workspacePath) => {
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 });
+
+// BPMN Settings IPC Handlers
+ipcMain.handle('igrp-studio-settings:set-bpmn-config', async (_event, config: BPMNConfig | null) => {
+    try {
+        await IGRPStudioSettings.setBPMNConfig(config);
+        return { success: true };
+    } catch (error) {
+        console.error('Error setting BPMN config:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+
+ipcMain.handle('igrp-studio-settings:get-bpmn-config', async () => {
+    try {
+        const config = await IGRPStudioSettings.getBPMNConfig();
+        return config;
+    } catch (error) {
+        console.error('Error getting BPMN config:', error);
+        return null;
+    }
+});
+
+ipcMain.handle('igrp-studio-settings:delete-bpmn-config', async () => {
+    try {
+        await IGRPStudioSettings.deleteBPMNConfig();
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting BPMN config:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+

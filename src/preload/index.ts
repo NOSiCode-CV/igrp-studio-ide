@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ToolCheck } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ToolCheck, BPMNConfig } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
@@ -414,7 +414,14 @@ const appLogic = {
 	},
 
 	removeAllListeners: () => ipcRenderer.removeAllListeners(EVENTS.APPLOGIC.CHANGE),
-	}
+}
+
+const igrpStudioSettings = {
+	setBPMNConfig: (config: BPMNConfig | null) => ipcRenderer.invoke('igrp-studio-settings:set-bpmn-config', config),
+	getBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:get-bpmn-config'),
+	deleteBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:delete-bpmn-config'),
+	
+}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -439,6 +446,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('igrpStudio', repo)
 		contextBridge.exposeInMainWorld('menu', windowControls)
 		contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
+		contextBridge.exposeInMainWorld('igrpStudioSettings', igrpStudioSettings)
 
 	} catch (error) {
 		console.error(error)
@@ -450,6 +458,7 @@ if (process.contextIsolated) {
 	window.igrpStudio = repo
 	window.menu = windowControls
 	window.appLogicAPI = appLogic
+	window.igrpStudioSettings = igrpStudioSettings
 }
 
 declare global {
@@ -460,5 +469,6 @@ declare global {
     igrpStudio: typeof repo;
     menu: typeof windowControls;
     appLogicAPI: typeof appLogic;
+    igrpStudioSettings: typeof igrpStudioSettings;
   }
 }

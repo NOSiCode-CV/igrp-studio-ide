@@ -98,13 +98,12 @@ export function FormValidationPopover({
     };
 
     const getValidationOptions = () => {
-        const baseValidations = ['optional'];
         const stringValidations = ['minLength', 'maxLength', 'regex', 'email', 'url', 'uuid', 'startsWith', 'endsWith', 'includes'];
         const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite'];
         const dateValidations = ['minDate', 'maxDate'];
         const booleanValidations: string[] = [];
 
-        let validations = [...baseValidations];
+        let validations: string[] = [];
 
         if (isString || isEmail) {
             validations = [...validations, ...stringValidations];
@@ -206,12 +205,6 @@ export function FormValidationPopover({
         validations.forEach(validation => {
             if (field?.[validation]) {
                 switch (validation) {
-                    case 'required':
-                        // required is default in Zod
-                        break;
-                    case 'optional':
-                        schema += '.optional()';
-                        break;
                     case 'min':
                     case 'max':
                     case 'minLength':
@@ -302,32 +295,6 @@ export function FormValidationPopover({
                                     {t('setValidationsForFormField')}
                                 </p>
                                 
-                                {/* Basic validations */}
-                                <div className="space-y-3">
-                                    <h4 className="text-sm font-medium">{t('basicValidations')}</h4>
-                                    
-
-                                    
-                                    <div className="flex flex-1 gap-2">
-                                        {['optional'].map((validation) => (
-                                            <div
-                                                key={`${validation}-${index}`}
-                                                className="flex flex-1 items-center gap-4"
-                                            >
-                                                <Label htmlFor={`${validation}-${index}`}>
-                                                    {toInitCap(t(validation))}
-                                                </Label>
-                                                <Switch
-                                                    id={`${validation}-${index}`}
-                                                    onCheckedChange={(checked) =>
-                                                        handleValidationKeyChange(validation, checked)
-                                                    }
-                                                    checked={field?.validation?.[validation] || false}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
 
                                 <Separator orientation="horizontal" />
 

@@ -311,3 +311,92 @@ export interface BackupData {
   history: Record<string, ConnectionTest[]>
   requests: AppLogicRequest[]
 }
+
+// BPMN Process Management Interfaces
+export interface BPMNConfig {
+  id: string;
+  name: string;
+  apiUrl: string;
+  token: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  lastConnected?: string;
+  status: 'connected' | 'disconnected' | 'error';
+}
+
+export interface BPMNProcessDefinition {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  version: number;
+  category?: string;
+  deploymentId: string;
+  resourceName: string;
+  diagramResourceName?: string;
+  tenantId?: string;
+  suspended: boolean;
+  startableInTasklist: boolean;
+  startablePermissionCheck: boolean;
+  historyTimeToLive?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BPMNProcessInstance {
+  id: string;
+  processDefinitionId: string;
+  processDefinitionKey: string;
+  processDefinitionName: string;
+  businessKey?: string;
+  startTime: string;
+  endTime?: string;
+  durationInMillis?: number;
+  startUserId?: string;
+  startActivityId?: string;
+  deleteReason?: string;
+  tenantId?: string;
+  state: 'active' | 'suspended' | 'completed' | 'terminated';
+}
+
+export interface BPMNTask {
+  id: string;
+  name: string;
+  description?: string;
+  assignee?: string;
+  created: string;
+  due?: string;
+  followUp?: string;
+  delegationState?: string;
+  description?: string;
+  executionId: string;
+  owner?: string;
+  parentTaskId?: string;
+  priority: number;
+  processDefinitionId: string;
+  processInstanceId: string;
+  taskDefinitionKey: string;
+  caseExecutionId?: string;
+  caseInstanceId?: string;
+  caseDefinitionId?: string;
+  suspended: boolean;
+  formKey?: string;
+  tenantId?: string;
+}
+
+export interface BPMNPageDefinition {
+  id: string;
+  processDefinitionId: string;
+  processDefinitionKey: string;
+  pageName: string;
+  pagePath: string;
+  taskDefinitionKey?: string;
+  formKey?: string;
+  description?: string;
+  isStartPage: boolean;
+  isTaskPage: boolean;
+  content: { [key: string]: string };
+  createdAt: string;
+  updatedAt: string;
+}
