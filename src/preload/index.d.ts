@@ -81,13 +81,13 @@ interface IGRPStudioSettings {
   setBPMNConfig: (config: any | null) => Promise<any>;
   getBPMNConfig: () => Promise<any>;
   deleteBPMNConfig: () => Promise<any>;
+  getLanguage: () => Promise<string>;
+  setLanguage: (lang: string) => Promise<void>;
 }
 declare global {
     interface Window {
         electron: ElectronAPI & {
             getAppVersion: () => Promise<string>;
-            getLanguage: () => Promise<string>;
-            setLanguage: (lang: string) => Promise<void>;
             checkForUpdates: () => Promise<any>;
             downloadUpdate: () => Promise<any>;
             installUpdate: () => Promise<any>;

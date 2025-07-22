@@ -2,7 +2,7 @@
 import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController, getSpringDependencies } from '@igrp/igrp-studio-springboot-engine';
 import { BaseEngine } from '../interfaces';
 import { BaseApiConfig, ControllerConfig, DeleteConfig, DTOConfig, EnumConfig, ModelConfig, ModuleConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ProjectData, SpringConfigData } from '../types';
+import { ProjectData } from '../types';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 import { ensureDirectoryExists } from '../helpers';
 import { app } from 'electron';

@@ -422,8 +422,8 @@ const igrpStudioSettings = {
 	deleteBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:delete-bpmn-config'),
 	
 	// Language methods
-	getLanguage: () => ipcRenderer.invoke('get-language'),
-	setLanguage: (lang: string) => ipcRenderer.invoke('set-language', lang),
+	getLanguage: () => ipcRenderer.invoke('igrp-studio-settings:get-language'),
+	setLanguage: (lang: string) => ipcRenderer.invoke('igrp-studio-settings:set-language', lang),
 }
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -434,7 +434,7 @@ if (process.contextIsolated) {
 			...electronAPI,
 			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 			getLanguage: () => ipcRenderer.invoke("get-language"),
-			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
+			setLanguage: (lang: string) => ipcRenderer.invoke("igrp-studio-settings:set-language", lang),
 			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 			downloadUpdate: () => ipcRenderer.invoke('download-update'),
 			installUpdate: () => ipcRenderer.invoke('install-update'),
