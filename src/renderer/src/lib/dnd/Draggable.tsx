@@ -27,7 +27,6 @@ const Draggable = ({
     type = 'DEFAULT',
     mode = 'DROP',
     children,
-    isDisabled = false,
 }: DraggableProps) => {
     const { id: componentId } = item;
 
@@ -73,13 +72,12 @@ const Draggable = ({
                 handleLayoutChange(layout);
             }}
             className={cn(
-                'min-w-32',
+                mode === 'MOVE' && 'min-w-42',
                 dropZone &&
                     'relative border border-dashed  hover:border-primary/50 rounded-lg bg-card transition-all p-2',
                 draggedId === componentId && dropZone
                     ? 'opacity-25 border-primary bg-primary/35'
                     : 'border-border',
-                isDisabled && 'hover:border-destructive',
                 className
             )}
             id={`drag-${componentId}`}

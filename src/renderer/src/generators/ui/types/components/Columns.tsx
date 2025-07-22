@@ -67,7 +67,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
         className
     );
 
-    return <div className={cn('p-2', children.length > 0 && finalClasses)}>{children.length > 0 ? renderColumns() : <GenNoInfoComp type='COLUMNS'/>}</div>;
+    return <div className={cn('p-2 py-5', children.length > 0 && finalClasses)}>{children.length > 0 ? renderColumns() : <GenNoInfoComp type='COLUMNS'/>}</div>;
 };
 
 export default IGRPStudioColumns;

@@ -76,7 +76,7 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({
     );
 
     return (
-        <div className="w-full flex flex-col gap-3">
+        <div className="w-full flex flex-col py-3 space-y-3">
             {components.map((child, index) => {
                 const { properties, style, childProperties } = child;
                 const { className, ...args } = properties || {};

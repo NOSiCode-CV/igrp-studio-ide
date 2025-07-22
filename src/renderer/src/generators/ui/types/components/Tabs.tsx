@@ -12,6 +12,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import BoxField from '../tools/BoxFields';
 
 const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     comp,
@@ -51,18 +52,20 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                     index={index}
                     dropTargetId={componentId}
                     dropZone={true}
-                    className={cn('p-0 bg-muted/0 min-w-36', className)}
+                    className={cn('p-0 bg-muted/0', className)}
                     mode="MOVE"
                     layout="horizontal"
                 >
                     <TabsTrigger
                         value={child.id}
                         key={index}
-                        className="w-full"
+                        className="w-full flex flex-wrap"
                         asChild
                     >
                         <div>
-                            <BoxWrapper
+                            <BoxField
+                                parentComp={comp}
+                                index={index}
                                 comp={child}
                                 onEdit={() =>
                                     handleEditClick(child, parentComponentName)
@@ -74,7 +77,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                                 )}
                             >
                                 <span>{label || componentName}</span>
-                            </BoxWrapper>
+                            </BoxField>
                         </div>
                     </TabsTrigger>
                 </Draggable>

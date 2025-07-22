@@ -436,7 +436,7 @@ const FncComponent = ({
                                 onChange={(newCode) => {
                                     codeRef.current = newCode;
                                 }}
-                                height="30vh"
+                                height="40vh"
                                 language="typescript"
                             />
                         </div>
