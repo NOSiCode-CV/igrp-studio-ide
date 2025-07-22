@@ -118,3 +118,23 @@ ipcMain.handle('igrp-studio-settings:delete-bpmn-config', async () => {
     }
 });
 
+// Language Settings IPC Handlers
+ipcMain.handle('get-language', () => {
+    try {
+        return IGRPStudioSettings.getLanguage();
+    } catch (error) {
+        console.error('Error getting language:', error);
+        return 'en'; // fallback to default
+    }
+});
+
+ipcMain.handle('set-language', (_event, lang: string) => {
+    try {
+        IGRPStudioSettings.setLanguage(lang);
+        return lang; // Return the new language for confirmation
+    } catch (error) {
+        console.error('Error setting language:', error);
+        return 'en'; // fallback to default
+    }
+});
+

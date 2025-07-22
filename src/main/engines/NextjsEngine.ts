@@ -4,6 +4,7 @@ import { BaseEngine } from '../interfaces';
 import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
 import { ensureDirectoryExists } from '../helpers';
+import { app } from 'electron';
 
 
 export class NextjsEngine implements BaseEngine {
@@ -79,6 +80,7 @@ export class NextjsEngine implements BaseEngine {
 
     const appConfig: AppConfig = {
       ...config as NextConfigData,
+      version: app.getVersion(),
       type: 'nextjs',
       workspaceId,
       id

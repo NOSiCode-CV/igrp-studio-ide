@@ -64,11 +64,9 @@ export function Footer() {
 
     useEffect(() => {
         // Fetch app version from Electron
-        if (window.electron && window.electron.getAppVersion) {
-            window.electron.getAppVersion().then((version: string) => {
-                setAppVersion(version);
-            });
-        }
+        window.electron.getAppVersion().then((version: string) => {
+            setAppVersion(version);
+        });
     }, []);
 
     useEffect(() => {

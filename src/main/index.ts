@@ -41,11 +41,7 @@ import './handlers/global-handler';
 import './helpers/fetch-request';
 
 import { buildTaskbar } from './helpers/taskbar';
-import {
-    getCurrentLanguage,
-    loadConfig,
-    setCurrentLanguage,
-} from './helpers/language';
+
 import NextJsManager from './helpers/nextjsManager';
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
@@ -63,8 +59,7 @@ let mainWindow: BrowserWindow;
 
 let nextJsManager: NextJsManager;
 let currentAuthProvider: 'github' | 'gitlab' | null = null;
-// Load the initial language configuration
-loadConfig();
+
 dotenv.config();
 
 function createWindow(): void {
@@ -480,15 +475,7 @@ app.on('open-url', (event, url) => {
     }
 });
 
-// IPC handlers for language management
-ipcMain.handle('get-language', () => {
-    return getCurrentLanguage();
-});
 
-ipcMain.handle('set-language', (_, lang: string) => {
-    setCurrentLanguage(lang);
-    return lang; // Return the new language for confirmation
-});
 
 // NEXTJS
 ipcMain.on('start-nextjs', (_event, basePath) => {

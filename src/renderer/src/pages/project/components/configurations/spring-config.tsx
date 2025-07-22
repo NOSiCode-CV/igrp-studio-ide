@@ -1,16 +1,12 @@
-'use client';
-
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/textarea';
-import { useEffect, useState } from 'react';
 import { SpringConfigData } from 'src/main/types';
 import {
     DatabaseOptions,
     projectStructureStyle,
 } from '@renderer/constants/appConstants';
-import useCore from '@renderer/hooks/use-core';
 import { useTranslation } from 'react-i18next';
 import { LabelRequired } from '@renderer/components/label-required';
 import { Separator } from '@renderer/components/ui/separator';
@@ -33,8 +29,7 @@ const DEFAULT_SPRING_CONFIG: SpringConfigData = {
     projectStructureStyle: 'technical',
     enableObservability: false,
     enableEntityRevision: false,
-    igrpCoreVersion: '',
-    springBootVersion: '',
+    version: '',
     dependencies: [],
     enableGraalVm: false,
 };
@@ -44,25 +39,7 @@ export function SpringConfig({
     errors,
     onChange,
 }: SpringConfigProps) {
-    const [versions, setVersions] = useState([]);
-    const { getVersions } = useCore();
     const { t } = useTranslation(); // Hook for translations
-
-    useEffect(() => {
-        const fetchVersions = async () => {
-            const versionsData = await getVersions();
-            setVersions(versionsData);
-
-            if (versionsData.length > 0) {
-                const latestVersion = versionsData[0]?.value;
-                if (!data.igrpCoreVersion) {
-                    onChange({ ...data, igrpCoreVersion: latestVersion });
-                }
-            }
-        };
-
-        fetchVersions();
-    }, [getVersions]);
 
     const PackageName = () => {
         return (
@@ -164,22 +141,6 @@ export function SpringConfig({
                     {errors?.config && errors.config.database && (
                         <p className="text-xs text-destructive">
                             {errors.config.database}
-                        </p>
-                    )}
-                </div>
-                <div className="flex flex-col gap-3">
-                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
-                    <IGRPCombobox
-                        options={versions || []}
-                        value={data.igrpCoreVersion}
-                        onChange={(value) =>
-                            onChange({ ...data, igrpCoreVersion: value  as string })
-                        }
-                        className="w-full"
-                    />
-                    {errors?.config && errors.config.igrpCoreVersion && (
-                        <p className="text-xs text-destructive">
-                            {errors.config.igrpCoreVersion}
                         </p>
                     )}
                 </div>

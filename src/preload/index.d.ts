@@ -93,6 +93,9 @@ declare global {
             installUpdate: () => Promise<any>;
             watchFolder: (folderPath: string) => Promise<any>;
             onFolderChange: (callback: (event: any) => void) => void;
+            ipcRenderer: {
+                on: (channel: string, callback: (event: any, ...args: any[]) => void) => void;
+            };
         };
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },

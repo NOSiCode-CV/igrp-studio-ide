@@ -11,7 +11,7 @@ export const IGRPStudioSettings = {
       defaults: {
         activeTheme: 'default',
         bpmnConfig: null,
-
+        language: 'en',
       },
     });
   },
@@ -33,6 +33,19 @@ export const IGRPStudioSettings = {
 
   resetTheme() {
     store?.set('activeTheme', 'default');
+  },
+
+  // Language Configuration Methods
+  setLanguage(language: string) {
+    store?.set('language', language);
+  },
+
+  getLanguage(): string {
+    return store?.get('language', 'en');
+  },
+
+  resetLanguage() {
+    store?.set('language', 'en');
   },
 
   // BPMN Configuration Methods

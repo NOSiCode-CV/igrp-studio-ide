@@ -16,6 +16,7 @@ export interface NextConfigData {
     description?: string
     workspaceId: string;
     id: string;
+    version: string;
 }
 
 export interface DotNetConfigData {
@@ -26,7 +27,7 @@ export interface DotNetConfigData {
     projectStructureStyle: ProjectStructureStyle;
     name?: string;
     enableObservability: boolean;
-    igrpCoreVersion: string;
+    version: string;
 }
 
 export interface SpringConfigData {
@@ -39,8 +40,7 @@ export interface SpringConfigData {
     enableObservability: boolean;
     enableEntityRevision: boolean;
     projectStructureStyle: string;
-    igrpCoreVersion: string;
-    springBootVersion: string;
+    version: string;
     dependencies: Array<any>
     enableGraalVm: boolean
     package?: string;

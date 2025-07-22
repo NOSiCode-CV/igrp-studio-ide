@@ -421,6 +421,9 @@ const igrpStudioSettings = {
 	getBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:get-bpmn-config'),
 	deleteBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:delete-bpmn-config'),
 	
+	// Language methods
+	getLanguage: () => ipcRenderer.invoke('get-language'),
+	setLanguage: (lang: string) => ipcRenderer.invoke('set-language', lang),
 }
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
