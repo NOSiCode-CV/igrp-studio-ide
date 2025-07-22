@@ -625,13 +625,10 @@ export const PageSelectionConfig = ({
             <IGRPCombobox
                 value={value}
                 onChange={(value) => {
-                    const page = pageOptions.find(
-                        (p: any) => p.value === value
-                    );
 
                     if (fieldPath) onInputChange?.(fieldPath, value as string);
 
-                    onPageChange(page?.metadata.pageName || '');
+                    onPageChange(value as string);
 
                     setSelectedPagePath(value as string);
                 }}

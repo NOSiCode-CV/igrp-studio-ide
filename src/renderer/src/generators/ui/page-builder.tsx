@@ -16,6 +16,7 @@ import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { DragEndResult } from '@renderer/lib/dnd/types';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { APRESENTATION } from '@renderer/constants/appConstants';
+import RENDERER_CONFIG from '@renderer/renderer.config';
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
 import { useTagManager } from './hooks/useTagManager';
 import useStudio from '@renderer/hooks/use-studio';
@@ -217,14 +218,14 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
 
                 if (isPage)
                     tsFilePath = cleanPagePath
-                        ? `${basePath}/src/app/[locale]/(igrp)/(generated)/${cleanPagePath}/page.tsx`
-                        : `${basePath}/src/app/[locale]/(igrp)/(generated)/page.tsx`;
+                        ? `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${cleanPagePath}/page.tsx`
+                        : `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/page.tsx`;
                 else {
                     const withScopePage = content.scope === 'page';
                     if (withScopePage)
-                        tsFilePath = `${basePath}/src/app/[locale]/(igrp)/(generated)/${content.pagePath}/components/${content.name.toLowerCase()}.tsx`;
+                        tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${content.pagePath}/components/${content.name.toLowerCase()}.tsx`;
                     else
-                        tsFilePath = `${basePath}/src/components/${content.name.toLowerCase()}.tsx`;
+                        tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.customComponents}/${content.name.toLowerCase()}.tsx`;
                 }
 
                 return <CodeContentTS pagePath={tsFilePath} />;

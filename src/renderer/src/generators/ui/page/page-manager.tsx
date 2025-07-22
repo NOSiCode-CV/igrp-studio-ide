@@ -4,14 +4,14 @@ import { useDispatch } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@renderer/components/ui/button';
-import { LayoutGrid, Plus, TableIcon } from 'lucide-react';
+import { LayoutGrid, Plus, TableIcon, Workflow } from 'lucide-react';
 import { PageCardView } from './page-card-view';
 import { CreatePageModal } from './create-page-modal';
 import { DuplicatePageModal } from './duplicate-page-modal';
 import { PageTable } from './page-table';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { FileTree } from 'src/main/types';
+import { FileTree, BPMNPageDefinition } from 'src/main/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -35,6 +35,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import useStudio from '@renderer/hooks/use-studio';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
+import { BPMNManager } from './bpmn-manager';
 
 export interface PageDefinition {
     id: string;
@@ -51,7 +52,7 @@ export interface PageDefinition {
 }
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: PageDefinition) => void;
+    onPageClick?: (pageFile: PageDefinition | BPMNPageDefinition) => void;
 }
 
 const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
@@ -73,8 +74,13 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
     const [pageEditing, setPageEditing] = useState<PageDefinition>();
     const [pageToDuplicate, setPageToDuplicate] = useState<PageDefinition>();
+    const [activeTab, setActiveTab] = useState<string>('pages');
 
-    const handleAddComponents = (page: PageDefinition) => {
+    const handleAddComponents = (page: PageDefinition | BPMNPageDefinition) => {
+        // Switch to pages tab when opening a BPMN page
+        if ('processDefinitionId' in page) {
+            setActiveTab('pages');
+        }
         onPageClick?.(page);
     };
 
@@ -223,10 +229,14 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 title={project?.name}
                 description={project.config?.description}
             />
-            <IGRPTabs defaultValue="pages">
+            <IGRPTabs value={activeTab} onValueChange={setActiveTab}>
                 <IGRPTabsList className="w-full">
                     <IGRPTabsTrigger value="pages">
                         {t('pages')}
+                    </IGRPTabsTrigger>
+                    <IGRPTabsTrigger value="bpmn">
+                        <Workflow className="h-4 w-4 mr-2" />
+                        BPMN
                     </IGRPTabsTrigger>
                     <IGRPTabsTrigger value="settings">
                         {t('settings')}
@@ -355,6 +365,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                             />
                         )}
                     </>
+                </IGRPTabsContent>
+                <IGRPTabsContent value="bpmn" className="space-y-4 pt-3">
+                    <BPMNManager onPageClick={handleAddComponents} />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="settings" className="space-y-4">
                     <ProjectSettings

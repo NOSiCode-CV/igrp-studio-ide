@@ -1,3 +1,4 @@
+import { BPMNConfig } from '../types';
 
 let store: any = null;
 
@@ -9,6 +10,8 @@ export const IGRPStudioSettings = {
       clearInvalidConfig: true,
       defaults: {
         activeTheme: 'default',
+        bpmnConfig: null,
+
       },
     });
   },
@@ -30,5 +33,23 @@ export const IGRPStudioSettings = {
 
   resetTheme() {
     store?.set('activeTheme', 'default');
-  }
+  },
+
+  // BPMN Configuration Methods
+  async setBPMNConfig(config: BPMNConfig | null) {
+    const storeInstance = await this.getStore();
+    storeInstance.set('bpmnConfig', config);
+  },
+
+  async getBPMNConfig(): Promise<BPMNConfig | null> {
+    const storeInstance = await this.getStore();
+    return storeInstance.get('bpmnConfig', null);
+  },
+
+  async deleteBPMNConfig() {
+    const storeInstance = await this.getStore();
+    storeInstance.delete('bpmnConfig');
+  },
+
+
 };
