@@ -54,7 +54,8 @@ export async function runDoctorChecks(): Promise<ToolCheck[]> {
         if (tool.versionCheck) {
           success = isVersionValid(parsedVersion, tool.versionCheck.minMajor, tool.versionCheck.maxMajor);
           if (!success) {
-            finalError = `Version ${parsedVersion} is not compatible. Required: ${tool.versionCheck.minMajor}.x - ${tool.versionCheck.maxMajor}.x`;
+            const rangeDisplay = tool.versionCheck.range || `${tool.versionCheck.minMajor}.x - ${tool.versionCheck.maxMajor}.x`;
+            finalError = `Unsupported version: ${parsedVersion}. Required: ${rangeDisplay}`;
           }
         } else {
           success = true;
