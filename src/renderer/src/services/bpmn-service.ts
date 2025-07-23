@@ -1,4 +1,4 @@
-import { BPMNConfig, BPMNProcessDefinition, BPMNProcessInstance, BPMNTask } from 'src/main/types';
+import { BPMNConfig, BPMNProcessDefinition, BPMNProcessInstance, BPMNTask, BPMNProject, BPMNProjectProcessDefinition } from 'src/main/types';
 
 class BPMNService {
   private config: BPMNConfig | null = null;
@@ -11,13 +11,23 @@ class BPMNService {
       throw new Error('BPMN API not configured. Please set up the API configuration first.');
     }
 
-    const url = `${this.config.apiUrl}${endpoint}`;
+    const url = `${this.config.apiUrl}${this.config.basePath}${endpoint}`;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add any additional headers from options
+    if (options.headers) {
+      Object.assign(headers, options.headers);
+    }
+
+    // Only add Authorization header if token is provided
+    if (this.config.token) {
+      headers['Authorization'] = `Bearer ${this.config.token}`;
+    }
+
     const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.token}`,
-        ...options.headers,
-      },
+      headers,
       ...options,
     });
 
@@ -31,7 +41,8 @@ class BPMNService {
   // Configuration Management
   async setConfig(config: BPMNConfig): Promise<void> {
     this.config = config;
-    await window.igrpStudioSettings.setBPMNConfig(config);
+    // Note: This method is kept for backward compatibility
+    // The actual config management is now handled by the settings system
   }
 
   async getConfig(): Promise<BPMNConfig | null> {
@@ -43,10 +54,15 @@ class BPMNService {
 
   async testConnection(config: Omit<BPMNConfig, 'id' | 'createdAt' | 'status'>): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${config.apiUrl}/engine-rest/process-definition`, {
-        headers: {
-          'Authorization': `Bearer ${config.token}`,
-        },
+      const headers: Record<string, string> = {};
+      
+      // Only add Authorization header if token is provided
+      if (config.token) {
+        headers['Authorization'] = `Bearer ${config.token}`;
+      }
+
+      const response = await fetch(`${config.apiUrl}${config.basePath}/projects`, {
+        headers,
       });
       
       if (response.ok) {
@@ -60,36 +76,54 @@ class BPMNService {
   }
 
   async getProcessDefinitions(): Promise<BPMNProcessDefinition[]> {
-    const response = await this.makeRequest<{ data: any[] }>('/engine-rest/process-definition');
+    const response = await this.makeRequest<any[]>('/projects');
 
-    return response.data.map((item: any) => ({
-      id: item.id,
-      key: item.key,
+    return response.map((item: any) => ({
+      id: item.id || item.key,
+      key: item.key || item.id,
       name: item.name,
       description: item.description,
-      version: item.version,
+      version: item.version || 1,
       category: item.category,
-      deploymentId: item.deploymentId,
-      resourceName: item.resourceName,
-      diagramResourceName: item.diagramResourceName,
+      deploymentId: item.deploymentId || item.id,
+      resourceName: item.resourceName || `${item.key}.bpmn`,
+      diagramResourceName: item.diagramResourceName || `${item.key}.png`,
       tenantId: item.tenantId,
-      suspended: item.suspended,
-      startableInTasklist: item.startableInTasklist,
-      startablePermissionCheck: item.startablePermissionCheck,
-      historyTimeToLive: item.historyTimeToLive,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      suspended: item.suspended || false,
+      startableInTasklist: item.startableInTasklist || true,
+      startablePermissionCheck: item.startablePermissionCheck || true,
+      historyTimeToLive: item.historyTimeToLive || 30,
+      createdAt: item.createdAt || new Date().toISOString(),
+      updatedAt: item.updatedAt || new Date().toISOString(),
     }));
+  }
+
+  // New method to get all projects
+  async getProjects(): Promise<BPMNProject[]> {
+    const response = await this.makeRequest<BPMNProject[]>('/projects');
+    return response;
+  }
+
+  // New method to get process definitions for a specific project
+  async getProcessDefinitionsByProject(projectId: string): Promise<BPMNProjectProcessDefinition[]> {
+    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}`);
+    return response.processDefinitions || [];
+  }
+
+  // New method to get a specific project with its process definitions
+  async getProject(projectId: string): Promise<BPMNProject> {
+    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}`);
+    return response;
   }
 
   async getProcessInstances(processDefinitionId?: string): Promise<BPMNProcessInstance[]> {
     const endpoint = processDefinitionId 
-      ? `/engine-rest/process-instance?processDefinitionId=${processDefinitionId}`
-      : '/engine-rest/process-instance';
+      ? `/process-instances?processDefinitionId=${processDefinitionId}`
+      : '/process-instances';
 
-    const response = await this.makeRequest<{ data: any[] }>(endpoint);
+    const response = await this.makeRequest<any[]>(endpoint);
 
-    return response.data.map((item: any) => ({
+    return response.map((item: any) => ({
       id: item.id,
       processDefinitionId: item.processDefinitionId,
       processDefinitionKey: item.processDefinitionKey,
@@ -108,12 +142,12 @@ class BPMNService {
 
   async getTasks(processDefinitionId?: string): Promise<BPMNTask[]> {
     const endpoint = processDefinitionId 
-      ? `/engine-rest/task?processDefinitionId=${processDefinitionId}`
-      : '/engine-rest/task';
+      ? `/tasks?processDefinitionId=${processDefinitionId}`
+      : '/tasks';
 
-    const response = await this.makeRequest<{ data: any[] }>(endpoint);
+    const response = await this.makeRequest<any[]>(endpoint);
 
-    return response.data.map((item: any) => ({
+    return response.map((item: any) => ({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -140,7 +174,7 @@ class BPMNService {
 
   async getProcessDefinitionXML(processDefinitionId: string): Promise<string> {
     const response = await this.makeRequest<{ id: string; bpmn20Xml: string }>(
-      `/engine-rest/process-definition/${processDefinitionId}/xml`
+      `/projects/${processDefinitionId}/xml`
     );
     return response.bpmn20Xml;
   }
@@ -150,7 +184,7 @@ class BPMNService {
     variables?: Record<string, any>
   ): Promise<{ id: string; definitionId: string; businessKey?: string }> {
     const response = await this.makeRequest<{ id: string; definitionId: string; businessKey?: string }>(
-      `/engine-rest/process-definition/${processDefinitionId}/start`,
+      `/projects/${processDefinitionId}/start`,
       {
         method: 'POST',
         body: JSON.stringify({
@@ -169,7 +203,7 @@ class BPMNService {
     variables?: Record<string, any>
   ): Promise<void> {
     await this.makeRequest(
-      `/engine-rest/task/${taskId}/complete`,
+      `/tasks/${taskId}/complete`,
       {
         method: 'POST',
         body: JSON.stringify({
@@ -183,9 +217,13 @@ class BPMNService {
   }
 
   // Configuration Management using global settings
-  async deleteConfig(): Promise<void> {
+  async deleteConfig(configId?: string): Promise<void> {
     this.config = null;
-    await window.igrpStudioSettings.deleteBPMNConfig();
+    if (configId) {
+      await window.igrpStudioSettings.deleteBPMNConfig(configId);
+    } else {
+      await window.igrpStudioSettings.deleteAllBPMNConfigs();
+    }
   }
 
 

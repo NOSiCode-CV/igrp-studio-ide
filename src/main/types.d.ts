@@ -317,12 +317,18 @@ export interface BPMNConfig {
   id: string;
   name: string;
   apiUrl: string;
+  basePath: string;
   token: string;
   description?: string;
   isActive: boolean;
   createdAt: string;
   lastConnected?: string;
   status: 'connected' | 'disconnected' | 'error';
+}
+
+export interface BPMNConfigs {
+  configs: BPMNConfig[];
+  activeConfigId?: string;
 }
 
 export interface BPMNProcessDefinition {
@@ -389,8 +395,6 @@ export interface BPMNPageDefinition {
   id: string;
   processDefinitionId: string;
   processDefinitionKey: string;
-  pageName: string;
-  pagePath: string;
   taskDefinitionKey?: string;
   formKey?: string;
   description?: string;
@@ -399,4 +403,41 @@ export interface BPMNPageDefinition {
   content: { [key: string]: string };
   createdAt: string;
   updatedAt: string;
+}
+
+// New BPMN Project Structure Types
+export interface BPMNProjectArtifactVariable {
+  artifactVariableId: string;
+  name: string;
+  type: string;
+  defaultValue: string;
+  required: boolean;
+}
+
+export interface BPMNProjectArtifact {
+  projectArtifactId: string;
+  taskKey: string;
+  name: string;
+  artifactVariables: BPMNProjectArtifactVariable[];
+}
+
+export interface BPMNProjectProcessDefinition {
+  processDefinitionId: string;
+  processKey: string;
+  bpmnDiagramUrl: string;
+  version: number;
+  state: string;
+  deploymentId: string;
+  deploymentDate: string;
+  projectArtifacts: BPMNProjectArtifact[];
+}
+
+export interface BPMNProject {
+  projectId: string;
+  code: string;
+  name: string;
+  description: string;
+  active: boolean;
+  currentVersion: number;
+  processDefinitions: BPMNProjectProcessDefinition[];
 }

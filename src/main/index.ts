@@ -10,7 +10,7 @@ import {
 import path, { join } from 'path';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
-import { closeApp, installExtensions } from './helpers/utils';
+import { closeApp, installExtensions, downloadIgrpNextTemplate } from './helpers/utils';
 import fs from 'fs';
 import { FileTree, IOpenProject } from './types';
 
@@ -517,4 +517,32 @@ ipcMain.handle('watch-folder', (_, folderPath: string) => {
     return folderWatcher.watchFolder(folderPath, (event) => {
         mainWindow?.webContents.send('folder-change', event);
     });
+});
+
+// Test download functionality
+ipcMain.handle('test-download-template', async (_, destinationPath?: string) => {
+    try {
+        console.log('Testing template download...');
+        const success = await downloadIgrpNextTemplate(destinationPath, (progress) => {
+            console.log(`Download progress: ${progress.toFixed(2)}%`);
+            // Send progress to renderer if window exists
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('template-download-progress', progress);
+            }
+        });
+        
+        if (success) {
+            console.log('Template download test completed successfully');
+            return { success: true, message: 'Template downloaded successfully' };
+        } else {
+            console.error('Template download test failed');
+            return { success: false, message: 'Template download failed' };
+        }
+    } catch (error) {
+        console.error('Template download test error:', error);
+        return { 
+            success: false, 
+            message: error instanceof Error ? error.message : 'Unknown error occurred' 
+        };
+    }
 });

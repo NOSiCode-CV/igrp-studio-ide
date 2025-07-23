@@ -1,4 +1,4 @@
-import { BPMNConfig, BPMNProcessDefinition, BPMNProcessInstance, BPMNTask } from 'src/main/types';
+import { BPMNConfig, BPMNProcessDefinition, BPMNProcessInstance, BPMNTask, BPMNProject, BPMNProjectProcessDefinition, BPMNProjectArtifact, BPMNProjectArtifactVariable } from 'src/main/types';
 
 // Mock data for BPMN process definitions
 const mockProcessDefinitions: BPMNProcessDefinition[] = [
@@ -232,6 +232,171 @@ const mockTasks: BPMNTask[] = [
   }
 ];
 
+// Mock data for BPMN projects with nested process definitions
+const mockProjects: BPMNProject[] = [
+  {
+    projectId: 'project-001',
+    code: 'INV',
+    name: 'Invoice Management',
+    description: 'Complete invoice processing and approval workflow',
+    active: true,
+    currentVersion: 2,
+    processDefinitions: [
+      {
+        processDefinitionId: 'invoice-process:1:123456',
+        processKey: 'invoice-process',
+        bpmnDiagramUrl: 'https://example.com/diagrams/invoice-process.png',
+        version: 1,
+        state: 'active',
+        deploymentId: 'deployment-001',
+        deploymentDate: '2024-01-15T10:30:00Z',
+        projectArtifacts: [
+          {
+            projectArtifactId: 'artifact-001',
+            taskKey: 'review-invoice',
+            name: 'Review Invoice',
+            artifactVariables: [
+              {
+                artifactVariableId: 'var-001',
+                name: 'amount',
+                type: 'number',
+                defaultValue: '0',
+                required: true
+              },
+              {
+                artifactVariableId: 'var-002',
+                name: 'vendor',
+                type: 'string',
+                defaultValue: '',
+                required: true
+              }
+            ]
+          },
+          {
+            projectArtifactId: 'artifact-002',
+            taskKey: 'approve-invoice',
+            name: 'Approve Invoice',
+            artifactVariables: [
+              {
+                artifactVariableId: 'var-003',
+                name: 'approved',
+                type: 'boolean',
+                defaultValue: 'false',
+                required: true
+              },
+              {
+                artifactVariableId: 'var-004',
+                name: 'comments',
+                type: 'string',
+                defaultValue: '',
+                required: false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    projectId: 'project-002',
+    code: 'EMP',
+    name: 'Employee Management',
+    description: 'Employee onboarding and HR processes',
+    active: true,
+    currentVersion: 1,
+    processDefinitions: [
+      {
+        processDefinitionId: 'employee-onboarding:2:789012',
+        processKey: 'employee-onboarding',
+        bpmnDiagramUrl: 'https://example.com/diagrams/employee-onboarding.png',
+        version: 2,
+        state: 'active',
+        deploymentId: 'deployment-002',
+        deploymentDate: '2024-01-10T14:20:00Z',
+        projectArtifacts: [
+          {
+            projectArtifactId: 'artifact-003',
+            taskKey: 'setup-it',
+            name: 'Setup IT Equipment',
+            artifactVariables: [
+              {
+                artifactVariableId: 'var-005',
+                name: 'computerType',
+                type: 'string',
+                defaultValue: 'laptop',
+                required: true
+              },
+              {
+                artifactVariableId: 'var-006',
+                name: 'softwareList',
+                type: 'string',
+                defaultValue: '',
+                required: false
+              }
+            ]
+          },
+          {
+            projectArtifactId: 'artifact-004',
+            taskKey: 'training-complete',
+            name: 'Complete Training',
+            artifactVariables: [
+              {
+                artifactVariableId: 'var-007',
+                name: 'trainingModules',
+                type: 'array',
+                defaultValue: '[]',
+                required: true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    projectId: 'project-003',
+    code: 'PUR',
+    name: 'Purchase Management',
+    description: 'Purchase approval and procurement workflows',
+    active: true,
+    currentVersion: 1,
+    processDefinitions: [
+      {
+        processDefinitionId: 'purchase-approval:1:345678',
+        processKey: 'purchase-approval',
+        bpmnDiagramUrl: 'https://example.com/diagrams/purchase-approval.png',
+        version: 1,
+        state: 'active',
+        deploymentId: 'deployment-003',
+        deploymentDate: '2024-01-08T11:45:00Z',
+        projectArtifacts: [
+          {
+            projectArtifactId: 'artifact-005',
+            taskKey: 'review-purchase',
+            name: 'Review Purchase Request',
+            artifactVariables: [
+              {
+                artifactVariableId: 'var-008',
+                name: 'budget',
+                type: 'number',
+                defaultValue: '0',
+                required: true
+              },
+              {
+                artifactVariableId: 'var-009',
+                name: 'justification',
+                type: 'string',
+                defaultValue: '',
+                required: true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
+
 // Mock BPMN XML content
 const mockBPMNXML = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
@@ -272,7 +437,7 @@ class BPMNMockService {
   // Configuration Management
   async setConfig(config: BPMNConfig): Promise<void> {
     this.config = config;
-    await window.igrpStudioSettings.setBPMNConfig(config);
+    // Note: Mock service doesn't need to persist configs
   }
 
   async getConfig(): Promise<BPMNConfig | null> {
@@ -304,6 +469,41 @@ class BPMNMockService {
     }
     
     // Real API call would go here
+    throw new Error('Real API not implemented in mock service');
+  }
+
+  // New method to get all projects
+  async getProjects(): Promise<BPMNProject[]> {
+    if (this.useMockData) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      return mockProjects;
+    }
+    
+    throw new Error('Real API not implemented in mock service');
+  }
+
+  // New method to get process definitions for a specific project
+  async getProcessDefinitionsByProject(projectId: string): Promise<BPMNProjectProcessDefinition[]> {
+    if (this.useMockData) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const project = mockProjects.find(p => p.projectId === projectId);
+      return project?.processDefinitions || [];
+    }
+    
+    throw new Error('Real API not implemented in mock service');
+  }
+
+  // New method to get a specific project with its process definitions
+  async getProject(projectId: string): Promise<BPMNProject> {
+    if (this.useMockData) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const project = mockProjects.find(p => p.projectId === projectId);
+      if (!project) {
+        throw new Error('Project not found');
+      }
+      return project;
+    }
+    
     throw new Error('Real API not implemented in mock service');
   }
 

@@ -417,13 +417,17 @@ const appLogic = {
 }
 
 const igrpStudioSettings = {
-	setBPMNConfig: (config: BPMNConfig | null) => ipcRenderer.invoke('igrp-studio-settings:set-bpmn-config', config),
-	getBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:get-bpmn-config'),
-	deleteBPMNConfig: () => ipcRenderer.invoke('igrp-studio-settings:delete-bpmn-config'),
+	getBPMNConfigs: () => ipcRenderer.invoke(EVENTS.BPMN.GET_CONFIGS),
+	getBPMNConfig: () => ipcRenderer.invoke(EVENTS.BPMN.GET_CONFIG),
+	addBPMNConfig: (config: BPMNConfig) => ipcRenderer.invoke(EVENTS.BPMN.ADD_CONFIG, config),
+	updateBPMNConfig: (config: BPMNConfig) => ipcRenderer.invoke(EVENTS.BPMN.UPDATE_CONFIG, config),
+	deleteBPMNConfig: (configId: string) => ipcRenderer.invoke(EVENTS.BPMN.DELETE_CONFIG, configId),
+	setActiveBPMNConfig: (configId: string) => ipcRenderer.invoke(EVENTS.BPMN.SET_ACTIVE_CONFIG, configId),
+	deleteAllBPMNConfigs: () => ipcRenderer.invoke(EVENTS.BPMN.DELETE_ALL_CONFIGS),
 	
 	// Language methods
-	getLanguage: () => ipcRenderer.invoke('igrp-studio-settings:get-language'),
-	setLanguage: (lang: string) => ipcRenderer.invoke('igrp-studio-settings:set-language', lang),
+	getLanguage: () => ipcRenderer.invoke(EVENTS.LANGUAGE.GET_LANGUAGE),
+	setLanguage: (lang: string) => ipcRenderer.invoke(EVENTS.LANGUAGE.SET_LANGUAGE, lang),
 }
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -433,9 +437,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('electron', {
 			...electronAPI,
 			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
-			getLanguage: () => ipcRenderer.invoke("get-language"),
-			setLanguage: (lang: string) => ipcRenderer.invoke("igrp-studio-settings:set-language", lang),
-			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+				checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 			downloadUpdate: () => ipcRenderer.invoke('download-update'),
 			installUpdate: () => ipcRenderer.invoke('install-update'),
 			watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),

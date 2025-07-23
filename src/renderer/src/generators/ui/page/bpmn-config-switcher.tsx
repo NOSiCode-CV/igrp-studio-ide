@@ -25,6 +25,7 @@ export const BPMNConfigSwitcher = ({ onConfigChange }: BPMNConfigSwitcherProps) 
       id: 'mock-config',
       name: 'Mock BPMN Server',
       apiUrl: 'https://mock-bpmn-server.com',
+      basePath: '/api/v1',
       token: 'mock-token-12345',
       description: 'Mock BPMN server for testing and development',
       isActive: true,
@@ -37,6 +38,9 @@ export const BPMNConfigSwitcher = ({ onConfigChange }: BPMNConfigSwitcherProps) 
     // Set mock service to use mock data
     bpmnMockService.setUseMockData(true);
     bpmnMockService.setConfig(config);
+    
+    // Add mock config to the settings system
+    window.igrpStudioSettings.addBPMNConfig(config);
   }, []);
 
   const handleToggleMockData = async (enabled: boolean) => {
@@ -73,6 +77,7 @@ export const BPMNConfigSwitcher = ({ onConfigChange }: BPMNConfigSwitcherProps) 
       const result = await bpmnMockService.testConnection({
         name: mockConfig.name,
         apiUrl: mockConfig.apiUrl,
+        basePath: mockConfig.basePath,
         token: mockConfig.token,
         description: mockConfig.description,
         isActive: mockConfig.isActive,

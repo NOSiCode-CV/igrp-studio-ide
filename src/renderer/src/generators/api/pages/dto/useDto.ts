@@ -116,7 +116,11 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
                 basePath
             );
 
-            if (error) return showErrorToast(error);
+            if (error) {
+                console.log('error', error);
+                showErrorToast(error);
+                return;
+            }
 
             createGitCommit(basePath, `Add dto ${newValues.name}`);
             dispatch(onSetChangeStatus(true));

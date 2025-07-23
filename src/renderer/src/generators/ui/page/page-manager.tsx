@@ -36,6 +36,7 @@ import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import useStudio from '@renderer/hooks/use-studio';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import { BPMNManager } from './bpmn-manager';
+import { VersionAlert } from '@renderer/components/version-alert';
 
 export interface PageDefinition {
     id: string;
@@ -229,6 +230,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 title={project?.name}
                 description={project.config?.description}
             />
+
+            <VersionAlert projectVersion={project?.config?.version} className="mb-4" />
+
             <IGRPTabs value={activeTab} onValueChange={setActiveTab}>
                 <IGRPTabsList className="w-full">
                     <IGRPTabsTrigger value="pages">

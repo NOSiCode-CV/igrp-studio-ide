@@ -1,4 +1,4 @@
-import { BPMNConfig } from '../types';
+import { BPMNConfig, BPMNConfigs } from '../types';
 
 let store: any = null;
 
@@ -10,7 +10,7 @@ export const IGRPStudioSettings = {
       clearInvalidConfig: true,
       defaults: {
         activeTheme: 'default',
-        bpmnConfig: null,
+        bpmnConfigs: { configs: [], activeConfigId: undefined },
         language: 'en',
       },
     });
@@ -49,19 +49,79 @@ export const IGRPStudioSettings = {
   },
 
   // BPMN Configuration Methods
-  async setBPMNConfig(config: BPMNConfig | null) {
+  async setBPMNConfigs(configs: BPMNConfigs) {
     const storeInstance = await this.getStore();
-    storeInstance.set('bpmnConfig', config);
+    storeInstance.set('bpmnConfigs', configs);
+  },
+
+  async getBPMNConfigs(): Promise<BPMNConfigs> {
+    const storeInstance = await this.getStore();
+    console.log('configs', storeInstance.get('bpmnConfigs'));
+
+    return storeInstance.get('bpmnConfigs', { configs: [], activeConfigId: undefined });
   },
 
   async getBPMNConfig(): Promise<BPMNConfig | null> {
     const storeInstance = await this.getStore();
-    return storeInstance.get('bpmnConfig', null);
+    const configs = storeInstance.get('bpmnConfigs', { configs: [], activeConfigId: undefined });
+    if (configs.activeConfigId) {
+      return configs.configs.find((config: BPMNConfig) => config.id === configs.activeConfigId) || null;
+    }
+    return null;
   },
 
-  async deleteBPMNConfig() {
+  async addBPMNConfig(config: BPMNConfig): Promise<void> {
     const storeInstance = await this.getStore();
-    storeInstance.delete('bpmnConfig');
+    const configs = storeInstance.get('bpmnConfigs', { configs: [], activeConfigId: undefined });
+    // If this is the first config, make it active
+    if (configs.configs.length === 0) {
+      configs.activeConfigId = config.id;
+    }
+    
+    configs.configs.push(config);
+    storeInstance.set('bpmnConfigs', configs);
+  },
+
+  async updateBPMNConfig(config: BPMNConfig): Promise<void> {
+    const storeInstance = await this.getStore();
+    const configs = storeInstance.get('bpmnConfigs', { configs: [], activeConfigId: undefined });
+    
+    const index = configs.configs.findIndex((c: BPMNConfig) => c.id === config.id);
+    if (index !== -1) {
+      configs.configs[index] = config;
+      storeInstance.set('bpmnConfigs', configs);
+    }
+  },
+
+  async deleteBPMNConfig(configId: string): Promise<void> {
+    const storeInstance = await this.getStore();
+    const configs = storeInstance.get('bpmnConfigs', { configs: [], activeConfigId: undefined });
+    
+    configs.configs = configs.configs.filter((c: BPMNConfig) => c.id !== configId);
+    
+    // If we deleted the active config, set the first remaining config as active
+    if (configs.activeConfigId === configId) {
+      configs.activeConfigId = configs.configs.length > 0 ? configs.configs[0].id : undefined;
+    }
+    
+    storeInstance.set('bpmnConfigs', configs);
+  },
+
+  async setActiveBPMNConfig(configId: string): Promise<void> {
+    const storeInstance = await this.getStore();
+    const configs = storeInstance.get('bpmnConfigs', { configs: [], activeConfigId: undefined });
+    
+    // Verify the config exists
+    const configExists = configs.configs.some((c: BPMNConfig) => c.id === configId);
+    if (configExists) {
+      configs.activeConfigId = configId;
+      storeInstance.set('bpmnConfigs', configs);
+    }
+  },
+
+  async deleteAllBPMNConfigs() {
+    const storeInstance = await this.getStore();
+    storeInstance.set('bpmnConfigs', { configs: [], activeConfigId: undefined });
   },
 
 

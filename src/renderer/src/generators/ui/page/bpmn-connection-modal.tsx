@@ -33,6 +33,7 @@ export const BPMNConfigModal = ({
     const [formData, setFormData] = useState<Partial<BPMNConfig>>({
         name: config?.name || '',
         apiUrl: config?.apiUrl || '',
+        basePath: config?.basePath || '',
         token: config?.token || '',
         description: config?.description || '',
         isActive: config?.isActive ?? true,
@@ -45,8 +46,8 @@ export const BPMNConfigModal = ({
     };
 
     const handleTestConnection = async () => {
-        if (!formData.apiUrl || !formData.token) {
-            toast.error('Please fill in API URL and token');
+        if (!formData.apiUrl) {
+            toast.error('Please fill in API URL');
             return;
         }
 
@@ -55,7 +56,8 @@ export const BPMNConfigModal = ({
             const result = await bpmnService.testConnection({
                 name: formData.name || '',
                 apiUrl: formData.apiUrl,
-                token: formData.token,
+                basePath: formData.basePath || '',
+                token: formData.token || '',
                 description: formData.description,
                 isActive: formData.isActive ?? true,
             });
@@ -73,7 +75,7 @@ export const BPMNConfigModal = ({
     };
 
     const handleSave = async () => {
-        if (!formData.name || !formData.apiUrl || !formData.token) {
+        if (!formData.name || !formData.apiUrl) {
             toast.error('Please fill in all required fields');
             return;
         }
@@ -84,7 +86,8 @@ export const BPMNConfigModal = ({
                 id: config?.id || uuidv4(),
                 name: formData.name,
                 apiUrl: formData.apiUrl,
-                token: formData.token,
+                basePath: formData.basePath || '',
+                token: formData.token || '',
                 description: formData.description,
                 isActive: formData.isActive ?? true,
                 createdAt: config?.createdAt || new Date().toISOString(),
@@ -92,8 +95,13 @@ export const BPMNConfigModal = ({
                 status: 'disconnected',
             };
 
-            await bpmnService.setConfig(configData);
-            toast.success(config ? 'API configuration updated successfully' : 'API configuration saved successfully');
+            if (config) {
+                await window.igrpStudioSettings.updateBPMNConfig(configData);
+                toast.success('API configuration updated successfully');
+            } else {
+                await window.igrpStudioSettings.addBPMNConfig(configData);
+                toast.success('API configuration saved successfully');
+            }
             onConfirm();
         } catch (error) {
             toast.error('Failed to save API configuration');
@@ -133,13 +141,22 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="token">Access Token *</Label>
+                        <Label htmlFor="basePath">Base Path</Label>
+                        <Input
+                            id="basePath"
+                            value={formData.basePath}
+                            onChange={(e) => handleInputChange('basePath', e.target.value)}
+                            placeholder="/api/v1"
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="token">Access Token (Optional)</Label>
                         <Input
                             id="token"
                             type="password"
                             value={formData.token}
                             onChange={(e) => handleInputChange('token', e.target.value)}
-                            placeholder="Bearer token or API key"
+                            placeholder="Bearer token or API key (optional)"
                         />
                     </div>
                     <div className="grid gap-2">
@@ -165,7 +182,7 @@ export const BPMNConfigModal = ({
                     <Button
                         variant="outline"
                         onClick={handleTestConnection}
-                        disabled={isTesting || !formData.apiUrl || !formData.token}
+                        disabled={isTesting || !formData.apiUrl || !formData.basePath}
                     >
                         {isTesting ? 'Testing...' : 'Test Connection'}
                     </Button>

@@ -78,9 +78,14 @@ interface AppLogicAPI {
 }
 
 interface IGRPStudioSettings {
-  setBPMNConfig: (config: any | null) => Promise<any>;
+  setBPMNConfigs: (configs: any) => Promise<any>;
+  getBPMNConfigs: () => Promise<any>;
   getBPMNConfig: () => Promise<any>;
-  deleteBPMNConfig: () => Promise<any>;
+  addBPMNConfig: (config: any) => Promise<any>;
+  updateBPMNConfig: (config: any) => Promise<any>;
+  deleteBPMNConfig: (configId: string) => Promise<any>;
+  setActiveBPMNConfig: (configId: string) => Promise<any>;
+  deleteAllBPMNConfigs: () => Promise<any>;
   getLanguage: () => Promise<string>;
   setLanguage: (lang: string) => Promise<void>;
 }

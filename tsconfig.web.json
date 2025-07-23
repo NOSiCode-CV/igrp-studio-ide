@@ -16,7 +16,13 @@
     "jsxImportSource": "react", // Explicitly specify JSX import source
     "baseUrl": ".",
     "paths": {
-      "@renderer/*": ["src/renderer/src/*"]
+      "@renderer/*": ["src/renderer/src/*"],
+      "@components/*": ["src/renderer/src/components/*"],
+      "@hooks/*": ["src/renderer/src/hooks/*"],
+      "@services/*": ["src/renderer/src/services/*"],
+      "@utils/*": ["src/renderer/src/utils/*"],
+      "@assets/*": ["src/renderer/src/assets/*"],
+      "@types/*": ["src/main/types/*"]
     },
     // Add these recommended options
     "strict": true,
@@ -28,6 +34,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": false
   }
 }

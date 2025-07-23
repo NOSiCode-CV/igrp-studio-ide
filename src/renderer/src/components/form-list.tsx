@@ -325,11 +325,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     options={itemOptions || []}
                                     value={itemValue}
                                     onChange={(selectedOption) =>
-                                        onChangeValue(
-                                            item.key,
-                                            index,
-                                            selectedOption
-                                        )
+                                        onChangeValue({
+                                            key: item.key,
+                                            index: index,
+                                            value: selectedOption,
+                                            group: group,
+                                        })
                                     }
                                     className="w-auto h-8"
                                 />
@@ -349,13 +350,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                     id={`${item.key}_${index2}`}
                                                     onCheckedChange={(
                                                         checked
-                                                    ) =>
-                                                        onChangeValue(
-                                                            item.key,
-                                                            index,
-                                                            checked
-                                                        )
-                                                    }
+                                                    ) => {
+                                                        onChangeValue({
+                                                            key: item.key,
+                                                            index: index,
+                                                            value: checked,
+                                                            group: group,
+                                                        });
+                                                    }}
                                                     checked={
                                                         row?.[item.key] || false
                                                     }
