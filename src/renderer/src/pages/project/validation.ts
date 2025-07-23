@@ -82,19 +82,7 @@ export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
                                 t('thisFieldRequired', { name: t('database') })
                             )
                             : schema.notRequired();
-                    }),
-                    igrpCoreVersion: Yup.string().when(
-                        '$framework',
-                        (framework, schema) => {
-                            return framework && framework[0] === ENV_TYPES.SPRING
-                                ? schema.required(
-                                    t('thisFieldRequired', {
-                                        name: t('igrpCoreVersion'),
-                                    })
-                                )
-                                : schema.notRequired();
-                        }
-                    ),
+                    })
                 });
             }
             // Return an empty schema if the step is not 3
