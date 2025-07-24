@@ -37,6 +37,7 @@ import { RootState } from '@renderer/redux';
 import { GitContributors } from '@renderer/components/git/git-contributors';
 import { FrameworkIcon } from '@renderer/components/framework-icon';
 import { VersionAlert } from '@renderer/components/version-alert';
+import { springEngineChangelog } from '@renderer/components/version-alert-resume';
 
 const Overview = () => {
     const { t } = useTranslation();
@@ -142,6 +143,7 @@ const Overview = () => {
                             <VersionAlert 
                                 projectVersion={config?.version} 
                                 className="mb-4"
+                                changelogContent={springEngineChangelog}
                             />
 
                             <div className="grid grid-cols-3 gap-4">

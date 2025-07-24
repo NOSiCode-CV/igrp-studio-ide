@@ -37,6 +37,7 @@ import useStudio from '@renderer/hooks/use-studio';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
 import { BPMNManager } from './bpmn-manager';
 import { VersionAlert } from '@renderer/components/version-alert';
+import { nextjsEngineChangelog } from '@renderer/components/version-alert-resume';
 
 export interface PageDefinition {
     id: string;
@@ -231,7 +232,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 description={project.config?.description}
             />
 
-            <VersionAlert projectVersion={project?.config?.version} className="mb-4" />
+            <VersionAlert projectVersion={project?.config?.version} className="mb-4" changelogContent={nextjsEngineChangelog} />
 
             <IGRPTabs value={activeTab} onValueChange={setActiveTab}>
                 <IGRPTabsList className="w-full">

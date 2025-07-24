@@ -1052,10 +1052,10 @@
     vaul "1.1.2"
     zod "3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.453":
-  version "0.0.1-alpha.453"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.453.tgz#cf4d31db422004b254df15f3b73c52e976fa4bfa"
-  integrity sha512-WwLGOgoEAANkOFvSx2ZyTNZ6pHlsfXoCS3+M6JYzHUmlDFFR9QDNjsWwGOFzxkNM/FJhwHswpiaiMzrzXmrGqA==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.454":
+  version "0.0.1-alpha.454"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.454.tgz#22a7743fecb32f1e4e71effc84bdbee32161ca7c"
+  integrity sha512-pcmY51WIrvZt4/CiCe3mu2CkLijCCK5dbDkZdFClzu15nj4c4hs06In5yexr7AJ3L4eA3RtvNundWqXW5LoUag==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1064,6 +1064,7 @@
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
     ajv-formats "^3.0.1"
+    axios "^1.11.0"
     extract-zip "^2.0.1"
     fs-extra "^11.2.0"
     js-beautify "^1.15.4"
@@ -8607,10 +8608,10 @@ react-hook-form@7.58.0:
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.58.0.tgz#4d23308b587d637effe4e581f410e1ca8c434bef"
   integrity sha512-zGijmEed35oNfOfy7ub99jfjkiLhHwA3dl5AgyKdWC6QQzhnc7tkWewSa+T+A2EpLrc6wo5DUoZctS9kufWJjA==
 
-react-hook-form@^7.60.0:
-  version "7.60.0"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.60.0.tgz#cc4bfa2952d602fc8f1dcf2d4929fcb6d9cdc782"
-  integrity sha512-SBrYOvMbDB7cV8ZfNpaiLcgjH/a1c7aK0lK+aNigpf4xWLO8q+o4tcvVurv3c4EOyzn/3dCsYt4GKD42VvJ/+A==
+react-hook-form@^7.61.0:
+  version "7.61.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.61.0.tgz#531d842feed271e7a901a44dce30fb26c535eefd"
+  integrity sha512-o8S/HcCeuaAQVib36fPCgOLaaQN/v7Anj8zlYjcLMcz+4FnNfMsoDAEvVCefLb3KDnS43wq3pwcifehhkwowuQ==
 
 react-i18next@^15.6.1:
   version "15.6.1"
@@ -10638,7 +10639,7 @@ zod@^3.20.2:
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
   integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==
 
-zod@^4.0.5:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-4.0.5.tgz#b47825f318e7884d94bcd6f5385a1de805ccfb1c"
-  integrity sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==
+zod@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-4.0.7.tgz#2891a84b330da2e87210c3bd7f8bdb945015d458"
+  integrity sha512-AKvYUuvqmyRf21eNxjuO++WPrQHhWg8i/4POzBLL//qVhcxA6gOptSDxXKM2S+uh8FtPV3MU/QZKOxqwsRV5kg==
