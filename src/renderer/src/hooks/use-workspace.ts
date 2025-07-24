@@ -174,10 +174,10 @@ export const useWorkspace = () => {
 
     const saveOrOpenProject = async ({ project, openProject,
         onSuccess }: openProjectProps) => {
-        setLoading(true);
         try {
             const { id } = project
             let response: any = {};
+            setLoading(true);
 
             if (id)
                 response = await window.igrpStudio.workspace.updateProject(id, project);
@@ -215,13 +215,13 @@ export const useWorkspace = () => {
         }
     }
 
-    const navigateToNextPage = async (navigate, appConfig: ProjectData) => {
+    const navigateToNextPage = async (navigate: any, appConfig: ProjectData) => {
 
         const navigationMap = {
             [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
             [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
         };
-        const path = navigationMap[appConfig.framework];
+        const path = navigationMap[appConfig.framework as keyof typeof navigationMap];
         if (path)
             navigate(path);
     };

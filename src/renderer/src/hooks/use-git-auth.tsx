@@ -1,9 +1,5 @@
 import { RootState } from '@renderer/redux';
 import {
-    setRepositoriesGitHub,
-    setRepositoriesGitLab,
-    setUserGithub,
-    setUserGitLab,
     setGitLabProviders,
     addGitLabProvider,
     updateGitLabProvider,
@@ -29,8 +25,6 @@ const useGitAuth = () => {
         gitLabProviders,
         activeProviderId,
     } = useSelector((state: RootState) => state.git);
-
-    console.log('activeProviderId', activeProviderId);
 
     // Get the currently active provider
     const activeProvider =
@@ -155,7 +149,7 @@ const useGitAuth = () => {
     useEffect(() => {
         window.electron.ipcRenderer.on(
             'github-oauth-success',
-            async (_event, data) => {
+            async (_event: any, data: any) => {
                 await window.electron.ipcRenderer.invoke(
                     'gitauth-initialize',
                     data.access_token
@@ -167,7 +161,7 @@ const useGitAuth = () => {
 
         window.electron.ipcRenderer.on(
             'gitlab-oauth-success',
-            async (_event, data) => {
+            async (_event: any, data: any) => {
                 const providerId = data.providerId || activeProviderId;
                 if (providerId && providerId !== 'github') {
                     await window.electron.ipcRenderer.invoke(
@@ -287,7 +281,7 @@ const useGitAuth = () => {
             // Merge saved configurations with default provider
             const mergedProviders = [
                 defaultProvider,
-                ...config.filter((p) => !p.isDefault),
+                ...config.filter((p: any) => !p.isDefault),
             ];
 
             dispatch(setGitLabProviders(mergedProviders));

@@ -77,7 +77,7 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
         );
     };
 
-    const SelectedIconComp = icons[selectedIcon];
+    const SelectedIconComp = icons[selectedIcon as keyof typeof icons];
 
     return (
         <TooltipProvider>

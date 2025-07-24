@@ -1,4 +1,3 @@
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
@@ -23,11 +22,9 @@ const IGRPStudioFragment = ({ comp, onDragEnd }: CardComponentProps) => {
     };
 
     return (
-        <Droppable
-            onDrop={handleDrop}
-            component={comp}
-        >
-            {components && components.length > 0 ? (
+        <Droppable onDrop={handleDrop} component={comp}>
+            {components &&
+                components.length > 0 &&
                 components.map((child: StructuredComponent, index: number) => {
                     return (
                         <Draggable
@@ -51,10 +48,7 @@ const IGRPStudioFragment = ({ comp, onDragEnd }: CardComponentProps) => {
                             </BoxWrapper>
                         </Draggable>
                     );
-                })
-            ) : (
-                <GenNoInfoComp />
-            )}
+                })}
         </Droppable>
     );
 };

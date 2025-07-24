@@ -62,7 +62,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
             setTitle(name);
             formik.setFieldValue('name', name);
 
-            const attributes = values?.map((value) => ({
+            const attributes = values?.map((value: any) => ({
                 name: value.name,
                 code: value.attributes?.[0] || null,
                 description: value.attributes?.[1] || null,
@@ -75,7 +75,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
     }, [data]);
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 handleSave();
@@ -96,8 +96,8 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
             );
 
             const attributes = tablesColumns.values
-                ?.filter((attr) => attr.name !== 'Name')
-                .map(({ type, name }) => ({
+                ?.filter((attr: any) => attr.name !== 'Name')
+                .map(({ type, name }: { type: string, name: string }) => ({
                     type: type === 'text' ? 'string' : type,
                     name,
                 })) || [];

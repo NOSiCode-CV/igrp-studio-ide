@@ -1,7 +1,7 @@
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup';
 
-export function useProjectValidation({ t, step }) {
+export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
     const validationSchema = Yup.object().shape({
         name: Yup.string().required(
             t('fieldRequired', { name: t('projectName') })
@@ -82,19 +82,7 @@ export function useProjectValidation({ t, step }) {
                                 t('thisFieldRequired', { name: t('database') })
                             )
                             : schema.notRequired();
-                    }),
-                    igrpCoreVersion: Yup.string().when(
-                        '$framework',
-                        (framework, schema) => {
-                            return framework && framework[0] === ENV_TYPES.SPRING
-                                ? schema.required(
-                                    t('thisFieldRequired', {
-                                        name: t('igrpCoreVersion'),
-                                    })
-                                )
-                                : schema.notRequired();
-                        }
-                    ),
+                    })
                 });
             }
             // Return an empty schema if the step is not 3

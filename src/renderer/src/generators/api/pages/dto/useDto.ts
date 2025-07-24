@@ -62,11 +62,11 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
             const baseAttributeFields = initialValues.attributes[0] ? Object.keys(initialValues.attributes[0]) : [];
             const baseAttributeDefaults = initialValues.attributes[0] || {};
 
-            const mergedAttributes = attributes.map((attr) => {
+            const mergedAttributes = attributes.map((attr: any) => {
                 const mergedAttr = { ...baseAttributeDefaults };
-                baseAttributeFields.forEach((field) => {
+                baseAttributeFields.forEach((field: any) => {
                     if (attr[field] !== undefined) {
-                        mergedAttr[field] = attr[field];
+                        (mergedAttr as any)[field] = attr[field];
                     }
                 });
                 return mergedAttr;
@@ -92,7 +92,7 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
     }, [selectors, dto, models, data]);
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 handleSave(formik.values);
@@ -116,7 +116,11 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
                 basePath
             );
 
-            if (error) return showErrorToast(error);
+            if (error) {
+                console.log('error', error);
+                showErrorToast(error);
+                return;
+            }
 
             createGitCommit(basePath, `Add dto ${newValues.name}`);
             dispatch(onSetChangeStatus(true));

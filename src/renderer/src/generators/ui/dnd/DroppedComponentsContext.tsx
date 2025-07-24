@@ -406,7 +406,18 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
 
     //states
     const addState = (state: State) => {
-        setStates((prev = []) => [...prev, state]); // Fallback to empty array
+        setStates((prev = []) => {
+            // Check if a state with the same name already exists
+            const existingStateIndex = prev.findIndex(s => s.name === state.name);
+            if (existingStateIndex !== -1) {
+                // Replace the existing state with the same name
+                console.warn(`State with name "${state.name}" already exists. Replacing existing state.`);
+                const updatedStates = [...prev];
+                updatedStates[existingStateIndex] = state;
+                return updatedStates;
+            }
+            return [...prev, state];
+        });
     };
 
     const updateState = (id: string, updates: Partial<State>) => {

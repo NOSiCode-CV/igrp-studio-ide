@@ -1,4 +1,4 @@
-import { Plus, Trash2, Edit2, Mouse} from 'lucide-react';
+import { Plus, Trash2, Edit2, Mouse } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,10 +16,16 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { Label } from '@renderer/components/ui/label';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCombobox,
+    IGRPOptionsProps,
+} from '@igrp/igrp-framework-react-design-system';
 import useCustomCode from '../../../../hooks/useCustomCode';
 import { ImportComponent } from '../../../sidebar/custom-code/custom-code-imports';
-import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    Import,
+    Segment,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { SidebarInset } from '@renderer/components/ui/sidebar';
 import { FunctionSettingsSidebar } from '../../../sidebar/custom-code/functions-settings';
 import { getId } from '@renderer/utils';
@@ -28,8 +34,9 @@ import useStudio from '@renderer/hooks/use-studio';
 import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppLogicAction } from './app-logic/app-logic-action';
+import { PageSelectionConfig } from '../../properties';
 
-type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';;
+type ActionType = 'function' | 'navigate' | 'formSubmit' | 'applogic';
 
 const actionTypeOptions = [
     { value: 'function', label: 'Function' },
@@ -42,6 +49,7 @@ interface NavigationAction {
     name: string;
     path: string;
     params?: Record<string, string>;
+    segments?: Segment[];
 }
 
 interface FormSubmitAction {
@@ -69,6 +77,7 @@ interface TriggerControlsProps {
     interactionsType: any;
     componentTag: string;
     onInteractionsChange: (interactions: Record<string, Action>) => void;
+    columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
 }
 
 interface InteractionEditorProps {
@@ -81,6 +90,7 @@ interface InteractionEditorProps {
     setLocalInteractions: (interactions: Record<string, Action>) => void;
     localInteractions: Record<string, Action>;
     componentTag: string;
+    columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
 }
 
 export function TriggerControls({
@@ -88,6 +98,7 @@ export function TriggerControls({
     interactionsType,
     componentTag,
     onInteractionsChange,
+    columnsOptions = [],
 }: TriggerControlsProps) {
     const [localInteractions, setLocalInteractions] = useState<
         Record<string, Action>
@@ -158,46 +169,50 @@ export function TriggerControls({
             </div>
 
             <div className="space-y-1">
-                {Object.entries(localInteractions).map(
-                    ([key, interaction], index) => {
-                        return (
-                            <div
-                                key={index}
-                                className="group flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
-                            >
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        {interactionsType[key]?.label || key}
+                {localInteractions &&
+                    Object.entries(localInteractions).map(
+                        ([key, interaction], index) => {
+                            return (
+                                <div
+                                    key={index}
+                                    className="group flex items-center gap-2 p-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded transition-colors"
+                                >
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            {interactionsType[key]?.label ||
+                                                key}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            variant={'ghost'}
+                                            size={'icon'}
+                                            onClick={() => {
+                                                setOpen(true);
+                                                setInteraction(interaction);
+                                                setInteractionKey(key);
+                                            }}
+                                            className="w-6 h-6"
+                                        >
+                                            <Edit2 size={4} />
+                                        </Button>
+                                        <Button
+                                            variant={'ghost'}
+                                            size={'sm'}
+                                            onClick={() =>
+                                                removeInteraction(key)
+                                            }
+                                        >
+                                            <Trash2
+                                                size={4}
+                                                className="text-destructive"
+                                            />
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        variant={'ghost'}
-                                        size={'icon'}
-                                        onClick={() => {
-                                            setOpen(true);
-                                            setInteraction(interaction);
-                                            setInteractionKey(key);
-                                        }}
-                                        className="w-6 h-6"
-                                    >
-                                        <Edit2 size={4} />
-                                    </Button>
-                                    <Button
-                                        variant={'ghost'}
-                                        size={'sm'}
-                                        onClick={() => removeInteraction(key)}
-                                    >
-                                        <Trash2
-                                            size={4}
-                                            className="text-destructive"
-                                        />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    }
-                )}
+                            );
+                        }
+                    )}
             </div>
 
             {open && interaction && interactionKey && (
@@ -211,6 +226,7 @@ export function TriggerControls({
                     setLocalInteractions={setLocalInteractions}
                     localInteractions={localInteractions}
                     componentTag={componentTag}
+                    columnsOptions={columnsOptions}
                 />
             )}
         </div>
@@ -227,12 +243,16 @@ const InteractionEditor = ({
     setLocalInteractions,
     localInteractions,
     componentTag,
+    columnsOptions = [],
 }: InteractionEditorProps) => {
     const [actionType, setActionType] = useState<ActionType>(
         interaction.type || 'function'
     );
     const [currentAction, setCurrentAction] = useState<Action>(interaction);
-
+    /* const [selectedPagePath, setSelectedPagePath] = useState<string>(
+        currentAction?.navigate?.path || ''
+    );
+ */
     const { pageOptions: availablePages } = useStudio();
     const { getFormOptions } = useComponents();
     const availableForms = getFormOptions();
@@ -433,65 +453,38 @@ const InteractionEditor = ({
             case 'navigate':
                 return (
                     <div className="space-y-4">
-                        <IGRPCombobox
-                            label="Target Page"
-                            placeholder="Select page"
-                            value={
-                                currentAction.navigate?.name
-                                    ? currentAction.navigate.name.replace(
-                                          'goTo',
-                                          ''
-                                      )
-                                    : ''
-                            }
-                            onChange={(id) => {
-                                const page = availablePages.find(
-                                    (p) => p.value === id
-                                );
-                                if (page) {
-                                    setCurrentAction({
-                                        ...currentAction,
-                                        navigate: {
-                                            path: page.metadata.path,
-                                            name: `goTo${id}`,
-                                        },
-                                    });
-                                }
-                            }}
-                            options={availablePages}
-                        />
-
-                        {/* TODO: Fix this */}
-                        {/* <PageSelectionConfig
-                            value={
-                                currentAction.navigate?.name
-                                    ? currentAction.navigate.name.replace(
-                                          'goTo',
-                                          ''
-                                      )
-                                    : ''
-                            }
-                            fieldPath="navigate.name"
+                        <PageSelectionConfig
+                            columnsOptions={columnsOptions}
+                            segments={currentAction.navigate?.segments || []}
+                            value={currentAction.navigate?.path || ''}
                             key="navigate"
-                            selectedPagePath={selectedPagePath}
                             onPageChange={(value) => {
                                 const page = availablePages.find(
                                     (p) => p.value === value
                                 );
 
-                                setSelectedPagePath(value);
                                 if (page) {
                                     setCurrentAction({
                                         ...currentAction,
                                         navigate: {
-                                            path: page.metadata.path,
-                                            name: `goTo${value}`,
+                                            path: value,
+                                            name: `goTo${page.metadata.pageName}`,
+                                            segments: page.metadata.segments,
                                         },
                                     });
                                 }
                             }}
                             pageOptions={availablePages}
-                        /> */}
+                            onInputChange={(fieldPath, value) => {
+                                setCurrentAction({
+                                    ...currentAction,
+                                    navigate: {
+                                        ...currentAction.navigate!,
+                                        [fieldPath]: value,
+                                    },
+                                });
+                            }}
+                        />
 
                         <div className="space-y-2">
                             <Label>Navigation Parameters</Label>
@@ -546,8 +539,13 @@ const InteractionEditor = ({
                         />
                     </div>
                 );
-            case "applogic":
-                    return <AppLogicAction currentAction={currentAction} setCurrentAction={setCurrentAction} />
+            case 'applogic':
+                return (
+                    <AppLogicAction
+                        currentAction={currentAction}
+                        setCurrentAction={setCurrentAction}
+                    />
+                );
             default:
                 return null;
         }
@@ -616,4 +614,3 @@ const InteractionEditor = ({
         </Dialog>
     );
 };
-

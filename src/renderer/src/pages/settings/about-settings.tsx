@@ -35,7 +35,7 @@ export function AboutSettings() {
 
     useEffect(() => {
         if (window.electron && window.electron.getAppVersion) {
-            window.electron.getAppVersion().then((version) => {
+            window.electron.getAppVersion().then((version: string) => {
                 setAppVersion(version);
             });
         }

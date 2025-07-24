@@ -13,6 +13,7 @@ import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { useTagManager } from '../hooks/useTagManager';
 import { Badge } from '@renderer/components/ui/badge';
 import useStudio from '@renderer/hooks/use-studio';
+import useToast from '@renderer/hooks/useToast';
 
 export const AddComponentPopover = ({
     comp,
@@ -31,6 +32,7 @@ export const AddComponentPopover = ({
     } = useDroppedComponents();
     const { generateTag, rebuild } = useTagManager(availableComponents);
     const { findComponent } = useStudio();
+    const { showErrorToast } = useToast();
 
     const handleAddComponent = (item: any) => {
         const result: DragEndResult = {
@@ -47,7 +49,11 @@ export const AddComponentPopover = ({
             handleAddChildToComponent,
             handleReorderChildInComponent,
             generateTag,
-            findComponent,
+            findComponent: async (path: string, componentName: string) => {
+                const result = await findComponent(path, componentName);
+                return result || undefined;
+            },
+            showErrorToast,
         });
     };
 

@@ -100,8 +100,10 @@ const useCustomCode = (): CustomCodeHook => {
                 setMetadataStates(metadataStates || []);
 
                 setSnippets(snippetsResponse.result?.codes || []);
+                //TODO review this, when the data is not in the schema, it is not updated
+
                 if (result) {
-                    setMetadataFunctions(result.functions || []);
+                    setMetadataFunctions([...(result.functions || []), ...(result.actions || []), ...(result.hooks || [])]);
                     setTypes(result.types || [])
                     setCustomComponents(result.components || [])
                 }
@@ -114,12 +116,13 @@ const useCustomCode = (): CustomCodeHook => {
         };
         fetchData();
 
-        window.electron.ipcRenderer.on('folder-change', fetchData);
+        const handleFolderChange = () => fetchData();
+        window.electron.ipcRenderer.on('folder-change', handleFolderChange);
 
         return () => {
             window.electron.ipcRenderer.removeListener(
                 'folder-change',
-                fetchData
+                handleFolderChange
             );
         };
     }, [basePath]);

@@ -3,6 +3,7 @@ export const EVENTS = {
         CREATE_PROJECT: 'engine:create-project',
         CREATE_PERMISSION: 'engine:create-permission',
         DELETE_ELEMENT: 'engine:delete-element',
+        DUPLICATE_ELEMENT: 'engine:duplicate-element',
         SERIALIZE_ELEMENT: 'engine:serialize-element',
         GET_DEPENDENCIES: 'engine:dependencies',
     },
@@ -69,6 +70,20 @@ export const EVENTS = {
         CHANGE: 'app-logic:environments-changed',
         TEST: 'app-logic:test-environment'
 
+    },
+    // BPMN 'igrp-studio-settings:get-bpmn-configs
+    BPMN: {
+        GET_CONFIGS: 'igrp-studio-settings:get-bpmn-configs',
+        GET_CONFIG: 'igrp-studio-settings:get-bpmn-config',
+        ADD_CONFIG: 'igrp-studio-settings:add-bpmn-config',
+        UPDATE_CONFIG: 'igrp-studio-settings:update-bpmn-config',
+        DELETE_CONFIG: 'igrp-studio-settings:delete-bpmn-config',
+        SET_ACTIVE_CONFIG: 'igrp-studio-settings:set-active-bpmn-config',
+        DELETE_ALL_CONFIGS: 'igrp-studio-settings:delete-all-bpmn-configs',
+    },  
+    LANGUAGE: {
+        GET_LANGUAGE: 'igrp-studio-settings:get-language',
+        SET_LANGUAGE: 'igrp-studio-settings:set-language',
     },
     ERROR: 'error',
     LOG: 'log'

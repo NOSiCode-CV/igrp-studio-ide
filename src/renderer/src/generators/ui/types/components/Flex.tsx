@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
-import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
+import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxWrapper from '../tools/BoxWrapper';
@@ -9,24 +9,18 @@ import { flexVariants } from '../../utils/layout-mapping';
 import { EmptySlotComponent } from '../../components/EmptySlotComponent';
 import { COMPONENT } from '../../ComponentTypes';
 import { getHoverClasses } from '../../utils/tailwindGroups';
-import CardComponent from '../CardComponent';
+import CardComponent, { CardComponentProps } from '../CardComponent';
 
-export interface FlexProps {
-    comp: StructuredComponent;
-    onDragEnd: (result: DragEndResult) => void;
-    group?: string;
-    hoverClass?: string;
-}
-
-const IGRPStudioFlex: React.FC<FlexProps> = ({
+const IGRPStudioFlex: React.FC<CardComponentProps> = ({
     comp,
     group,
     hoverClass,
     onDragEnd,
-}: FlexProps) => {
+    className,
+}) => {
     const { children, properties, id: componentId } = comp;
 
-    const { variant, className } = properties || {};
+    const { variant } = properties || {};
 
     const { setEditingComponent } = useDroppedComponents();
 
@@ -56,7 +50,7 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
                             index={index}
                             dropTargetId={componentId}
                             mode="MOVE"
-                            className="p-1 min-w-32 text-center"
+                            className="p-1 text-center"
                         >
                             <BoxWrapper
                                 comp={comp}
@@ -90,16 +84,9 @@ const IGRPStudioFlex: React.FC<FlexProps> = ({
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className="p-2"
+            className={cn(flexVariants({ variant, className }))}
         >
-            <div
-                className={cn(
-                    flexVariants({ variant, className }),
-                    'space-y-2'
-                )}
-            >
-                {renderColumns()}
-            </div>
+            {renderColumns()}
         </Droppable>
     );
 };

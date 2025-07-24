@@ -159,13 +159,36 @@ export class WorkspaceRepository {
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
         const data = await this.loadData();
         let foundProject: ProjectData | undefined;
-        const { config: project, workspaceId, framework, path, type } = updates;
+        const { config: project, workspaceId, framework, path: projectPath, type, icon } = updates;
 
         for (const workspace of data.workspaces) {
             const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
             if (projectIndex !== -1 && workspace.projects) {
+                const oldProject = workspace.projects[projectIndex];
+                
+                // Clean up old icon file if icon is being updated
+                if (icon && icon !== oldProject.icon && oldProject.icon) {
+                    try {
+                        if (oldProject.icon.startsWith('icons/')) {
+                            // New centralized icons directory
+                            const oldIconPath = path.join(workspace.path, oldProject.icon);
+                            if (fs.existsSync(oldIconPath)) {
+                                fs.unlinkSync(oldIconPath);
+                            }
+                        } else if (oldProject.icon.startsWith('assets/')) {
+                            // Legacy project-specific assets directory
+                            const oldIconPath = path.join(oldProject.path || '', oldProject.icon);
+                            if (fs.existsSync(oldIconPath)) {
+                                fs.unlinkSync(oldIconPath);
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Failed to clean up old project icon file:', error);
+                    }
+                }
+
                 const updatedProject = {
-                    ...workspace.projects[projectIndex],
+                    ...oldProject,
                     ...updates,
                     updatedAt: new Date().toISOString()
                 };
@@ -189,7 +212,7 @@ export class WorkspaceRepository {
 
             const updatedProject: ProjectData = {
                 name: project.name || 'Unnamed Project',
-                path: path as string,
+                path: projectPath as string,
                 type,
                 workspaceId: workspaceId as string,
                 framework: framework as FrameworkType,
@@ -253,12 +276,14 @@ export class WorkspaceRepository {
     async deleteProject(projectId: string, basePath: string): Promise<void> {
         const data = await this.loadData();
         let deleted = false;
+        let projectToDelete: ProjectData | undefined;
 
         for (const workspace of data.workspaces) {
             if (workspace.projects) {
-                const initialLength = workspace.projects.length;
-                workspace.projects = workspace.projects.filter(p => p.id !== projectId);
-                if (workspace.projects.length !== initialLength) {
+                const projectIndex = workspace.projects.findIndex(p => p.id === projectId);
+                if (projectIndex !== -1) {
+                    projectToDelete = workspace.projects[projectIndex];
+                    workspace.projects.splice(projectIndex, 1);
                     workspace.updatedAt = new Date().toISOString();
                     deleted = true;
                     break;
@@ -267,6 +292,32 @@ export class WorkspaceRepository {
         }
 
         await removeProjectFromWorkspace(projectId, basePath);
+
+        // Clean up project icon files
+        if (projectToDelete && projectToDelete.icon) {
+            try {
+                if (projectToDelete.icon.startsWith('icons/')) {
+                    // New centralized icons directory
+                    const iconPath = path.join(basePath, projectToDelete.icon);
+                    if (fs.existsSync(iconPath)) {
+                        fs.unlinkSync(iconPath);
+                    }
+                } else if (projectToDelete.icon.startsWith('assets/')) {
+                    // Legacy project-specific assets directory
+                    const iconPath = path.join(basePath, projectToDelete.icon);
+                    if (fs.existsSync(iconPath)) {
+                        fs.unlinkSync(iconPath);
+                    }
+                    // Also try to remove the assets directory if it's empty
+                    const assetsDir = path.dirname(iconPath);
+                    if (fs.existsSync(assetsDir) && fs.readdirSync(assetsDir).length === 0) {
+                        fs.rmdirSync(assetsDir);
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to clean up project icon files:', error);
+            }
+        }
 
         if (!deleted) {
             throw new Error(`Project ${projectId} not found`);

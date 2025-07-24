@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
@@ -6,7 +5,6 @@ import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system';
-import GenNoInfoField from '../../components/GenNoInfoField';
 import CardComponent from '../CardComponent';
 
 export interface PageHeaderProps {
@@ -18,25 +16,14 @@ export interface PageHeaderProps {
 const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     const {
         id: componentId,
-        children: fields,
+        children: buttonComponents,
         componentName,
         label,
         properties,
     } = comp;
     const { title } = properties;
 
-    const [buttonComponents, setButtonComponents] = useState<
-        StructuredComponent[]
-    >([]);
-
     const { setEditingComponent } = useDroppedComponents();
-
-    useEffect(() => {
-        if (fields) {
-            const buttons = fields;
-            setButtonComponents(buttons);
-        }
-    }, [comp, fields]);
 
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
@@ -46,49 +33,46 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
     };
 
     const renderButtons = () => {
-        return buttonComponents.length === 0 ? (
-            <GenNoInfoField />
-        ) : (
-            buttonComponents.map(
-                (button: StructuredComponent, index: number) => {
-                    return (
-                        <Draggable
-                            key={button.id}
-                            item={button}
+        return buttonComponents.map(
+            (button: StructuredComponent, index: number) => {
+                return (
+                    <Draggable
+                        key={button.id}
+                        item={button}
+                        index={index}
+                        dropTargetId={componentId}
+                        layout="horizontal"
+                        className="p-1"
+                        mode='MOVE'
+                    >
+                        <BoxField
+                            comp={button}
+                            parentComp={comp}
+                            onEdit={() => handleEditClick(button)}
                             index={index}
-                            dropTargetId={componentId}
-                            layout="horizontal"
-                            className="p-1"
                         >
-                            <BoxField
+                            <CardComponent
                                 comp={button}
-                                parentComp={comp}
-                                onEdit={() => handleEditClick(button)}
-                                index={index}
-                            >
-                                <CardComponent
-                                    comp={button}
-                                    onDragEnd={onDragEnd}
-                                />
-                            </BoxField>
-                        </Draggable>
-                    );
-                }
-            )
+                                onDragEnd={onDragEnd}
+                            />
+                        </BoxField>
+                    </Draggable>
+                );
+            }
         );
     };
 
     return (
-        <Droppable component={comp} onDrop={onDragEnd} layout="horizontal">
-            <IGRPPageHeader
-                {...properties}
-                title={title || label || componentName}
+        <IGRPPageHeader {...properties} title={title || label || componentName}>
+            <Droppable
+                component={comp}
+                onDrop={onDragEnd}
+                layout="horizontal"
+                className={cn('flex flex-1 justify-end gap-3')}
             >
-                <div className={cn('flex flex-1 justify-end gap-3')}>
-                    {renderButtons()}
-                </div>
-            </IGRPPageHeader>
-        </Droppable>
+                {renderButtons()}
+            </Droppable>
+        </IGRPPageHeader>
     );
 };
 

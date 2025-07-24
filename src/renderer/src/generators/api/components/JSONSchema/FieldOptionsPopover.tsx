@@ -43,7 +43,7 @@ export function FieldOptionsPopover({
         onUpdate(updatedField);
     };
 
-    const handleChangeEditor = (_)=>{
+    const handleChangeEditor = (_: any)=>{
 
     }
 

@@ -98,7 +98,7 @@ export const GitService = {
         }
     },
 
-    async cloneRepository(repoUrl: string, basePath: string, window: BrowserWindow) {
+    async cloneRepository(repoUrl: string, basePath: string, window: BrowserWindow, auth?: { type: string; username?: string; password?: string; token?: string }) {
         try {
 
             const encapeBasePath = escapePath(basePath);
@@ -136,8 +136,43 @@ export const GitService = {
                 message: `Starting to clone into ${encapeBasePath}...`,
             });
 
+            // Prepare git clone command with authentication
+            let cloneCommand = `git clone ${repoUrl} ${encapeBasePath}`;
+            
+            // Add authentication if provided
+            if (auth && auth.type !== 'none') {
+                if (auth.type === 'basic' && auth.username && auth.password) {
+                    // For basic auth, we need to encode credentials in the URL
+                    const url = new URL(repoUrl);
+                    url.username = auth.username;
+                    url.password = auth.password;
+                    cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`;
+                } else if (auth.type === 'token' && auth.token) {
+                    // For token auth, we can use the token in the URL or set it as credential
+                    if (repoUrl.includes('github.com')) {
+                        // GitHub token authentication
+                        const url = new URL(repoUrl);
+                        url.username = auth.token;
+                        url.password = '';
+                        cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`;
+                    } else if (repoUrl.includes('gitlab.com')) {
+                        // GitLab token authentication
+                        const url = new URL(repoUrl);
+                        url.username = 'oauth2';
+                        url.password = auth.token;
+                        cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`;
+                    } else {
+                        // Generic token authentication
+                        const url = new URL(repoUrl);
+                        url.username = auth.token;
+                        url.password = '';
+                        cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`;
+                    }
+                }
+            }
+
             return new Promise((resolve, reject) => {
-                exec(`git clone ${repoUrl} ${encapeBasePath}`, async (error) => {
+                exec(cloneCommand, async (error) => {
 
                     if (error) {
                         window.webContents.send('clone-progress', {

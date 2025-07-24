@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Action, TriggerControls } from './components/trigger-controls';
 import Rules from './components/rules';
 import { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
 
 interface InteractionProps {
     comp: StructuredComponent;
@@ -14,12 +15,14 @@ interface InteractionProps {
         componentId: string,
         updates: Partial<StructuredComponent>
     ) => void;
+    columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
 }
 
 const Interactions = ({
     comp,
     path,
     onInteranctionsChange,
+    columnsOptions = [],
 }: InteractionProps) => {
     const { getInteractionsComponent, getRulesComponent } = useStudio();
 
@@ -61,6 +64,7 @@ const Interactions = ({
                 onInteractionsChange={handleInteractionsChange}
                 interactionsType={interactionsType}
                 componentTag={tag}
+                columnsOptions={columnsOptions}
             />
             {Object.keys(interactions || {}).length === 0 && (
                 <EmptyList

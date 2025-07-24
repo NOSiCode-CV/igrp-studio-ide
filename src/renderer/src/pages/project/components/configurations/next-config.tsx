@@ -18,6 +18,7 @@ const DEFAULT_NEXT_CONFIG: NextConfigData = {
     description: '',
     workspaceId: '',
     id: '',
+    version: '',
 };
 
 export function NextConfig({

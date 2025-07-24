@@ -2,7 +2,7 @@ import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import path, { join } from 'path';
 import { IOpenProject, Handler, ProjectData, FileTree } from '../types';
 import { promisify } from 'util';
-const fs = require("fs");
+import fs from 'fs';
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
     const result = await dialog.showOpenDialog({
@@ -87,9 +87,11 @@ export async function getJsonContent(filePath: string): Promise<any> {
 
 export async function getFileContent(filePath: string): Promise<any> {
     try {
-        return fs.readFileSync(filePath, 'utf-8');
+        // Normalize the file path to handle spaces and special characters
+        const normalizedPath = path.resolve(filePath);
+        return fs.readFileSync(normalizedPath, 'utf-8');
     } catch (err) {
-        console.error('Error reading JSON file:', err);
+        console.error('Error reading file:', err);
         return null;
     }
 }
@@ -116,7 +118,7 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
         // Lê o conteúdo do diretório .igrpstudio
         const files = fs.readdirSync(basePath);
 
-        const IGNORED_PATHS = ['baseApi.json', 'permissions.json', '.DS_store'];
+        const IGNORED_PATHS = ['baseApi.json', 'permissions.json', '.DS_store','.gitkeep'];
 
         // Mapeia os arquivos/pastas
         return files
@@ -183,7 +185,9 @@ export const readDirectory = (dirPath: string): FileTree[] => {
 
 export async function readProjectFile(filePath: string): Promise<any> {
     try {
-        return fs.readFileSync(filePath, 'utf-8');
+        // Normalize the file path to handle spaces and special characters
+        const normalizedPath = path.resolve(filePath);
+        return fs.readFileSync(normalizedPath, 'utf-8');
     } catch (err) {
         console.error('Error reading file:', err);
         return null;

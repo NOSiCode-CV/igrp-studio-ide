@@ -39,37 +39,79 @@ const POPOVER_COMPONENTS = {
     popoverRelation: RelationPopover,
 } as const;
 
+interface GroupField {
+    groupName: string;
+    groupIndex: number;
+}
+
+interface PopoverProps {
+    row: any;
+    index: number;
+    onChangeValue: any;
+    itemOptions: any;
+    group?: GroupField;
+}
+
+interface ChangeFnProps {
+    key: string;
+    index: number;
+    value: any;
+    group?: GroupField;
+}
+
 // Props mapping for each popover type
 const POPOVER_PROPS_MAPPING = {
-    popoverController: (row: any, index: number, changeValue: any, itemOptions: any) => ({
-        row,
-        changeValue: (element: string, value: any) => changeValue(element, index, value),
-        options: itemOptions || [],
-    }),
-    popoverModel: (row: any, index: number, changeValue: any, itemOptions: any) => ({
-        index,
-        row,
-        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
-        options: itemOptions || [],
-    }),
-    popoverDto: (row: any, index: number, changeValue: any, itemOptions: any) => ({
-        index,
-        row,
-        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
-        collectionTypes: itemOptions || [],
-    }),
-    popoverFormValidation: (row: any, index: number, changeValue: any) => ({
-        index,
-        field: row,
-        fieldType: row.type || 'string',
-        changeValue: (element: string, position: number, value: any) => changeValue(element, position, value),
-    }),
-    popoverRelation: (row: any, index: number, changeValue: any, itemOptions: any) => ({
-        field: row,
-        changeValue: (element: string, value: any) => changeValue(element, index, value),
-        options: itemOptions || [],
-    }),
-} as const; 
+    popoverController: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            index,
+            row,
+            changeValue: (element: string, value: any) =>
+                onChangeValue({ key: element, index, value, group }),
+            options: itemOptions || [],
+        };
+    },
+    popoverModel: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            index,
+            row,
+            changeValue: (element: string, position: number, value: any) =>
+                onChangeValue({ key: element, index: position, value, group }),
+            options: itemOptions || [],
+        };
+    },
+    popoverDto: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            index,
+            row,
+            changeValue: (element: string, position: number, value: any) =>
+                onChangeValue({ key: element, index: position, value, group }),
+            collectionTypes: itemOptions || [],
+        };
+    },
+    popoverFormValidation: (props: PopoverProps) => {
+        const { row, index, onChangeValue, group } = props;
+        return {
+            index,
+            field: row,
+            fieldType: row.type || 'string',
+            changeValue: (element: string, position: number, value: any) =>
+                onChangeValue({ key: element, index: position, value, group }),
+        };
+    },
+    popoverRelation: (props: PopoverProps) => {
+        const { row, index, onChangeValue, itemOptions, group } = props;
+        return {
+            field: row,
+            changeValue: (element: string, value: any) => {
+                onChangeValue({ key: element, index, value, group });
+            },
+            options: itemOptions || [],
+        };
+    },
+} as const;
 
 export const FormList: FunctionComponent<ITabelContainer> = ({
     data,
@@ -84,7 +126,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     btnLabels,
 }) => {
     const [formData, setFormData] = useState(data || []);
-    const [dynamicOptions, setDynamicOptions] = useState({});
+    const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>(
+        {}
+    );
 
     // Atualiza o formData quando os dados mudam
     useEffect(() => {
@@ -92,7 +136,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }, [data]);
 
     // Atualiza campos dependentes
-    const updateDependentFields = (key, index, selectedValue) => {
+    const updateDependentFields = (
+        key: string,
+        index: number,
+        selectedValue: any
+    ) => {
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
             const updatedOptions = dependentColumn.getOptions(selectedValue);
@@ -138,7 +186,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     }, [formData, columns]);
 
     // Função para atualizar as opções de um campo baseado em outro
-    const handleDependentChange = (key, index, selectedValue) => {
+    const handleDependentChange = (
+        key: string,
+        index: number,
+        selectedValue: any
+    ) => {
         changeValue(key, index, selectedValue);
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
@@ -248,13 +300,22 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     };
 
     // Optimized grouped items renderer using component registry
-    const renderGroupedItems = ({ items, row, index, index2 }: any) => {
+    const renderGroupedItems = ({
+        items,
+        row,
+        index,
+        index2,
+        group,
+        onChangeValue,
+    }: any) => {
         return (
             <div className="flex gap-2 align-center">
-                {items.map((item, itemIndex) => {
-                    const itemValue = row[item.key] || '';
+                {items.map((item: any, itemIndex: number) => {
+                    const itemValue = row?.[item.key] || '';
                     const itemOptions = item.options || [];
-                    
+
+                    if (!row) return null;
+
                     // Handle select component
                     if (item.type === 'select') {
                         return (
@@ -264,18 +325,19 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     options={itemOptions || []}
                                     value={itemValue}
                                     onChange={(selectedOption) =>
-                                        changeValue(
-                                            item.key,
-                                            index,
-                                            selectedOption
-                                        )
+                                        onChangeValue({
+                                            key: item.key,
+                                            index: index,
+                                            value: selectedOption,
+                                            group: group,
+                                        })
                                     }
                                     className="w-auto h-8"
                                 />
                             </div>
                         );
                     }
-                    
+
                     // Handle checkbox component
                     if (item.type === 'checkbox') {
                         return (
@@ -288,13 +350,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                     id={`${item.key}_${index2}`}
                                                     onCheckedChange={(
                                                         checked
-                                                    ) =>
-                                                        changeValue(
-                                                            item.key,
-                                                            index,
-                                                            checked
-                                                        )
-                                                    }
+                                                    ) => {
+                                                        onChangeValue({
+                                                            key: item.key,
+                                                            index: index,
+                                                            value: checked,
+                                                            group: group,
+                                                        });
+                                                    }}
                                                     checked={
                                                         row?.[item.key] || false
                                                     }
@@ -309,26 +372,44 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             </div>
                         );
                     }
-                    
+
                     // Handle popover components using registry
-                    if (POPOVER_COMPONENTS[item.type]) {
-                        const PopoverComponent = POPOVER_COMPONENTS[item.type];
-                        const propsMapping = POPOVER_PROPS_MAPPING[item.type];
-                        
+                    if (
+                        POPOVER_COMPONENTS[
+                            item.type as keyof typeof POPOVER_COMPONENTS
+                        ]
+                    ) {
+                        const PopoverComponent =
+                            POPOVER_COMPONENTS[
+                                item.type as keyof typeof POPOVER_COMPONENTS
+                            ];
+                        const propsMapping =
+                            POPOVER_PROPS_MAPPING[
+                                item.type as keyof typeof POPOVER_PROPS_MAPPING
+                            ];
+
                         // Special case for popoverRelation
-                        if (item.type === 'popoverRelation' && row['type'] !== 'relation') {
+                        if (
+                            item.type === 'popoverRelation' &&
+                            row['type'] !== 'relation'
+                        ) {
                             return null;
                         }
-                        
-                        const props = propsMapping(row, index, changeValue, itemOptions);
-                        
+                        const props = propsMapping({
+                            row,
+                            index,
+                            onChangeValue,
+                            itemOptions,
+                            group,
+                        });
+
                         return (
                             <div key={itemIndex} className="flex items-center">
-                                <PopoverComponent {...props} />
+                                <PopoverComponent {...(props as any)} />
                             </div>
                         );
                     }
-                    
+
                     return null;
                 })}
             </div>
@@ -337,15 +418,16 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 
     // Optimized field renderer using component registry
     const renderField = (
-        row,
-        index,
-        key,
-        type,
-        options,
-        selectValue,
-        selectMultiValues,
-        readonly,
-        onChangeValue
+        row: any,
+        index: number,
+        key: string,
+        type: string,
+        options: any,
+        selectValue: any,
+        selectMultiValues: any,
+        readonly: boolean,
+        onChangeValue: (props: ChangeFnProps) => void,
+        group?: GroupField
     ) => {
         // Handle input types (text, number)
         if (type === 'text' || type === 'number') {
@@ -360,22 +442,25 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     type={type}
                     value={row?.[key] || ''}
                     onChange={(ev) =>
-                        onChangeValue(key, index, ev.target.value)
+                        onChangeValue({
+                            key,
+                            index,
+                            value: ev.target.value,
+                            group,
+                        })
                     }
                     readOnly={readonly}
                 />
             );
         }
-        
+
         // Handle label type
         if (type === 'label') {
             return (
-                <Label htmlFor={`${key}_${index}`}>
-                    {row?.[key] || ''}
-                </Label>
+                <Label htmlFor={`${key}_${index}`}>{row?.[key] || ''}</Label>
             );
         }
-        
+
         // Handle select type
         if (type === 'select') {
             return (
@@ -391,7 +476,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 />
             );
         }
-        
+
         // Handle multiSelect type
         if (type === 'multiSelect') {
             return (
@@ -400,40 +485,60 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     options={dynamicOptions[`${index}-${key}`] || options}
                     value={selectMultiValues}
                     onChange={(selectedOption) => {
-                        onChangeValue(key, index, selectedOption);
+                        onChangeValue({
+                            key,
+                            index,
+                            value: selectedOption,
+                            group,
+                        });
                     }}
                 />
             );
         }
-        
+
         // Handle checkbox type
         if (type === 'checkbox') {
             return (
                 <Checkbox
                     id={`${key}_${index}`}
                     onCheckedChange={(checked) =>
-                        onChangeValue(key, index, checked)
+                        onChangeValue({
+                            key,
+                            index,
+                            value: checked,
+                            group,
+                        })
                     }
                     checked={row?.[key] || false}
                 />
             );
         }
-        
+
         // Handle popover types using registry
-        if (POPOVER_COMPONENTS[type]) {
-            const PopoverComponent = POPOVER_COMPONENTS[type];
-            const propsMapping = POPOVER_PROPS_MAPPING[type];
-            
+        if (type in POPOVER_COMPONENTS) {
+            const PopoverComponent =
+                POPOVER_COMPONENTS[type as keyof typeof POPOVER_COMPONENTS];
+            const propsMapping =
+                POPOVER_PROPS_MAPPING[
+                    type as keyof typeof POPOVER_PROPS_MAPPING
+                ];
+
             // Special case for popoverRelation
             if (type === 'popoverRelation' && row['type'] !== 'relation') {
                 return null;
             }
-            
-            const props = propsMapping(row, index, changeValue, options);
-            
-            return <PopoverComponent {...props} />;
+
+            const props = propsMapping({
+                row,
+                index,
+                onChangeValue,
+                itemOptions: options,
+                group,
+            });
+
+            return <PopoverComponent {...(props as any)} />;
         }
-        
+
         // Handle typeSelectorDropdown
         if (type === 'typeSelectorDropdown') {
             return (
@@ -441,20 +546,32 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     key={`${index}-${key}`}
                     type={row?.[key] || ''}
                     onTypeChange={(dataType: any) =>
-                        onChangeValue(key, index, dataType)
+                        onChangeValue({
+                            key,
+                            index,
+                            value: dataType,
+                            group,
+                        })
                     }
                     schemaTypes={options || []}
                     variant={'outline'}
                 />
             );
         }
-        
+
         // Default case - return null or a fallback component
         return null;
     };
 
     // Renderização das linhas da tabela
-    const renderTableRow = (rowId, index, row, className, onChangeValue) => {
+    const renderTableRow = (
+        rowId: string,
+        index: number,
+        row: any,
+        className: string,
+        onChangeValue: (props: ChangeFnProps) => void,
+        group?: GroupField
+    ) => {
         return (
             <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
                 {(provided: any) => (
@@ -473,7 +590,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           dynamicOptions?.[`${index}-${key}`] ||
                                           options
                                       )?.filter(
-                                          (d) =>
+                                          (d: any) =>
                                               row[key] && d.value === row[key]
                                       )[0]?.value
                                     : '';
@@ -481,10 +598,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     'multiSelect',
                                 ].includes(type)
                                     ? options
-                                          ?.filter((d) =>
+                                          ?.filter((d: any) =>
                                               row[key]?.includes(d.value)
                                           )
-                                          .map((d) => d.value)
+                                          .map((d: any) => d.value)
                                     : [];
                                 return (
                                     <TableCell
@@ -508,6 +625,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                       row,
                                                       index,
                                                       index2,
+                                                      group,
+                                                      onChangeValue,
                                                   })
                                                 : renderField(
                                                       row,
@@ -517,8 +636,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                       options,
                                                       selectValue,
                                                       selectMultiValues,
-                                                      readonly,
-                                                      onChangeValue
+                                                      readonly || false,
+                                                      onChangeValue,
+                                                      group
                                                   )}
                                         </div>
                                     </TableCell>
@@ -546,22 +666,17 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         );
     };
 
-    const onChangeValue = (
-        row: any,
-        rowIndex: number,
-        key: string,
-        index: number,
-        value: any
-    ) => {
+    const onChangeValue = (props: ChangeFnProps) => {
+        const { key, index, value, group } = props;
         //Chick if row is a subitems
         //TODO: Refatorar para usar o findFieldPath para pegar o path do campo
-        if (row) {
+
+        if (group) {
             formik.setFieldValue(
-                `${name}[${rowIndex}].fields[${index}].${key}`,
+                `${name}[${group.groupIndex}].${group.groupName}[${index}].${key}`,
                 value
             );
         } else changeValue(key, index, value);
-
     };
 
     // Renderização do componente completo
@@ -581,8 +696,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     const rowId =
                                         row.id || `row-${name}-${index}`;
                                     const isDataArray =
-                                        row.fields &&
-                                        row.fields.length > 0;
+                                        row.fields && row.fields.length > 0;
 
                                     return (
                                         <React.Fragment key={rowId}>
@@ -591,41 +705,36 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 index,
                                                 row,
                                                 '',
-                                                (
-                                                    key: string,
-                                                    index: number,
-                                                    value: any
-                                                ) => {
-                                                    onChangeValue(
-                                                        '',
-                                                        0,
-                                                        key,
-                                                        index,
-                                                        value
-                                                    );
+                                                (props: ChangeFnProps) => {
+                                                    onChangeValue(props);
                                                 }
                                             )}
                                             {isDataArray &&
                                                 row?.fields.map(
                                                     (col: any, ii: number) =>
                                                         renderTableRow(
-                                                            col.id ||
-                                                                `col-${index}-${ii}`,
+                                                            `col-${index}-${ii}`,
                                                             ii,
                                                             col,
                                                             'pl-10',
                                                             (
-                                                                key: string,
-                                                                _index: number,
-                                                                value: any
+                                                                props: ChangeFnProps
                                                             ) => {
-                                                                onChangeValue(
-                                                                    row,
+                                                                onChangeValue({
+                                                                    ...props,
+                                                                    group: {
+                                                                        groupName:
+                                                                            'fields',
+                                                                        groupIndex:
+                                                                            index,
+                                                                    },
+                                                                });
+                                                            },
+                                                            {
+                                                                groupName:
+                                                                    'fields',
+                                                                groupIndex:
                                                                     index,
-                                                                    key,
-                                                                    ii,
-                                                                    value
-                                                                );
                                                             }
                                                         )
                                                 )}

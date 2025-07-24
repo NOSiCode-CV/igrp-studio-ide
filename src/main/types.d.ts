@@ -16,6 +16,7 @@ export interface NextConfigData {
     description?: string
     workspaceId: string;
     id: string;
+    version: string;
 }
 
 export interface DotNetConfigData {
@@ -26,7 +27,7 @@ export interface DotNetConfigData {
     projectStructureStyle: ProjectStructureStyle;
     name?: string;
     enableObservability: boolean;
-    igrpCoreVersion: string;
+    version: string;
 }
 
 export interface SpringConfigData {
@@ -39,8 +40,7 @@ export interface SpringConfigData {
     enableObservability: boolean;
     enableEntityRevision: boolean;
     projectStructureStyle: string;
-    igrpCoreVersion: string;
-    springBootVersion: string;
+    version: string;
     dependencies: Array<any>
     enableGraalVm: boolean
     package?: string;
@@ -148,7 +148,7 @@ export interface Connection {
     databaseType: string;
     connectionType: 'general' | 'ssh';
     host: string;
-    port: number | null;
+    port: number | undefined;
     user: string;
     password: string;
     sshHost?: string;
@@ -310,4 +310,134 @@ export interface BackupData {
   settings: AppLogicSettings
   history: Record<string, ConnectionTest[]>
   requests: AppLogicRequest[]
+}
+
+// BPMN Process Management Interfaces
+export interface BPMNConfig {
+  id: string;
+  name: string;
+  apiUrl: string;
+  basePath: string;
+  token: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  lastConnected?: string;
+  status: 'connected' | 'disconnected' | 'error';
+}
+
+export interface BPMNConfigs {
+  configs: BPMNConfig[];
+  activeConfigId?: string;
+}
+
+export interface BPMNProcessDefinition {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  version: number;
+  category?: string;
+  deploymentId: string;
+  resourceName: string;
+  diagramResourceName?: string;
+  tenantId?: string;
+  suspended: boolean;
+  startableInTasklist: boolean;
+  startablePermissionCheck: boolean;
+  historyTimeToLive?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BPMNProcessInstance {
+  id: string;
+  processDefinitionId: string;
+  processDefinitionKey: string;
+  processDefinitionName: string;
+  businessKey?: string;
+  startTime: string;
+  endTime?: string;
+  durationInMillis?: number;
+  startUserId?: string;
+  startActivityId?: string;
+  deleteReason?: string;
+  tenantId?: string;
+  state: 'active' | 'suspended' | 'completed' | 'terminated';
+}
+
+export interface BPMNTask {
+  id: string;
+  name: string;
+  description?: string;
+  assignee?: string;
+  created: string;
+  due?: string;
+  followUp?: string;
+  delegationState?: string;
+  description?: string;
+  executionId: string;
+  owner?: string;
+  parentTaskId?: string;
+  priority: number;
+  processDefinitionId: string;
+  processInstanceId: string;
+  taskDefinitionKey: string;
+  caseExecutionId?: string;
+  caseInstanceId?: string;
+  caseDefinitionId?: string;
+  suspended: boolean;
+  formKey?: string;
+  tenantId?: string;
+}
+
+export interface BPMNPageDefinition {
+  id: string;
+  processDefinitionId: string;
+  processDefinitionKey: string;
+  taskDefinitionKey?: string;
+  formKey?: string;
+  description?: string;
+  isStartPage: boolean;
+  isTaskPage: boolean;
+  content: { [key: string]: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// New BPMN Project Structure Types
+export interface BPMNProjectArtifactVariable {
+  artifactVariableId: string;
+  name: string;
+  type: string;
+  defaultValue: string;
+  required: boolean;
+}
+
+export interface BPMNProjectArtifact {
+  projectArtifactId: string;
+  taskKey: string;
+  name: string;
+  artifactVariables: BPMNProjectArtifactVariable[];
+}
+
+export interface BPMNProjectProcessDefinition {
+  processDefinitionId: string;
+  processKey: string;
+  bpmnDiagramUrl: string;
+  version: number;
+  state: string;
+  deploymentId: string;
+  deploymentDate: string;
+  projectArtifacts: BPMNProjectArtifact[];
+}
+
+export interface BPMNProject {
+  projectId: string;
+  code: string;
+  name: string;
+  description: string;
+  active: boolean;
+  currentVersion: number;
+  processDefinitions: BPMNProjectProcessDefinition[];
 }

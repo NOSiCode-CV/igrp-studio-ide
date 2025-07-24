@@ -3,6 +3,7 @@ import { ENV_TYPES } from "@renderer/constants/appConstants";
 import { convertComponentsToJSONSchema, convertCompToInteractinsJSONSchema } from "@renderer/utils/convertComponentsToJSONSchema";
 import { capitalize, getLabel } from "@renderer/utils";
 import { FileTree, HandlerResponse } from "src/main/types";
+import RENDERER_CONFIG from "@renderer/renderer.config";
 
 export const EngineService = {
     async getAppMetadata(basePath: string): Promise<HandlerResponse> {
@@ -10,14 +11,14 @@ export const EngineService = {
     },
 
     async startWatching(folderPath: string): Promise<void> {
-        await window.electron.watchFolder(`${folderPath}/src/app/(myapp)`);
+        await window.electron.watchFolder(`${folderPath}/src/app/(igrp)`);
     },
 
     async getCodeSnippets(): Promise<HandlerResponse> {
         return await window.engine.getCodeSnippets(ENV_TYPES.NEXTJS);
     },
 
-    async registerComponent({ customComponents, appComponents, currentPage }: { customComponents: any, appComponents: FileTree[], currentPage: string }): Promise<void> {
+    async registerComponent({ customComponents, appComponents, currentPage, loadRegistryComponent }: { customComponents: any, appComponents: FileTree[], currentPage: string, loadRegistryComponent: () => void }): Promise<void> {
 
         const components: ComponentRegisterConfig[] = customComponents.map((component: any) => ({
             name: component.name,
@@ -54,7 +55,7 @@ export const EngineService = {
             defaultChildren: []
         }));
 
-        const _components: ComponentRegisterConfig[] = appComponents.filter((component) => component.content.scope === 'app' || ((component.content.type === 'page' && component.content.pageName === currentPage) || component.content.name !== currentPage))
+        const _components: ComponentRegisterConfig[] = appComponents.filter((component) => component.content.scope === 'app' || ((component.content.scope === 'page' && component.content.pageName === currentPage) || component.content.name !== currentPage))
             .map((component: any) => ({
                 name: capitalize(component.content.name),
                 label: component.content.description || getLabel(component.content.name),
@@ -66,7 +67,7 @@ export const EngineService = {
                 },
                 interactions: convertCompToInteractinsJSONSchema(component.content.args),
                 childrenTypes: [],
-                imports: [`import ${capitalize(component.content.name)} from '${component.content.pageName ? `@/app/[locale]/(igrp)/(generated)/${component.content.pagePath}/components/${component.content.name.toLowerCase()}` : `@/components/${component.content.name.toLowerCase()}`}'`],
+                imports: [`import ${capitalize(component.content.name)} from '${component.content.pageName ? RENDERER_CONFIG.generatedPath + component.content.pagePath + '/components/' + component.content.name.toLowerCase() : RENDERER_CONFIG.customComponentsPath + component.content.name.toLowerCase()}'`],
                 defaultValue: false,
                 allowTypes: false,
                 group: 'appComponents',
@@ -96,5 +97,7 @@ export const EngineService = {
         const { result, error } = await window.engine.registerComponent(ENV_TYPES.NEXTJS, { components: componentsToRegister });
         if (error)
             console.log(result, error)
+        else
+            loadRegistryComponent();
     }
 };

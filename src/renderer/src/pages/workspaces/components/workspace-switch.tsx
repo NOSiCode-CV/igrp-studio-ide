@@ -71,7 +71,6 @@ export function WorkspaceSwitcher({
     };
 
     const handleChangeWorkspace = (workspace: IWorkspace) => {
-        console.log(workspace);
         onWorkspaceChange(workspace);
         navigate(ROUTES.HOME);
     };

@@ -3,6 +3,7 @@ import { useDragDrop } from './drag-drop-context';
 import { useEffect, useState, type DragEvent } from 'react';
 import { LayoutMode, StructuredComponent } from './types';
 import { cn } from '../utils';
+import { GenNoInfoComp } from '../../generators/ui/components/GenNoInfoComp';
 
 interface DroppableProps {
     onDrop: (result: any) => void;
@@ -21,9 +22,15 @@ const Droppable = ({
     className,
     path,
 }: DroppableProps) => {
-    const { id: componentId, componentName } = component || {};
+    const {
+        id: componentId,
+        componentName,
+        children: components,
+    } = component || {};
 
     const [targetHovered, setTargetHovered] = useState<string>('');
+    const [isItemOverGenNoInfoComp, setIsItemOverGenNoInfoComp] =
+        useState<boolean>(false);
 
     const {
         activeDropZone,
@@ -50,22 +57,32 @@ const Droppable = ({
                 droppablePath: path,
             },
         });
+        setIsItemOverGenNoInfoComp(false);
+        setTargetHovered('');
     };
 
     const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         handleDragLeave(e);
         setTargetHovered('');
+        setIsItemOverGenNoInfoComp(false);
     };
 
     const onDragOverCapture = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setTargetHovered((e.target as HTMLElement)?.id);
+        setIsItemOverGenNoInfoComp(true);
     };
 
     const onDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        handleDragOver(e, componentId);
+        handleDragOver({
+            e,
+            id: componentId,
+            cellIndex: 0,
+            dropTargetId: componentId,
+            countItems: components?.length || 0,
+        });
     };
 
     useEffect(() => {
@@ -83,15 +100,20 @@ const Droppable = ({
             onDragOverCapture={onDragOverCapture}
             id={componentId}
             className={cn(
-                'p-3 min-h-12 rounded-lg bg-card', //border border-dashed border-gray-400 hover:border
+                'space-y-3 min-h-12 rounded-lg bg-card',
                 draggingItem &&
                     (activeDropZone?.dropTargetId === componentId ||
                         targetHovered === componentId) &&
                     'bg-primary/35',
+                components.length > 0 && 'p-3',
                 className
             )}
         >
-            {children}
+            {components.length === 0 ? (
+                <GenNoInfoComp isActive={isItemOverGenNoInfoComp} />
+            ) : (
+                children
+            )}
         </div>
     );
 };

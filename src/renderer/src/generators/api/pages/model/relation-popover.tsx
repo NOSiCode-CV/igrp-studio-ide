@@ -79,10 +79,10 @@ export function RelationPopover({
     useEffect(() => {
         if (localRelation.entity) {
             const model = models.find(
-                (t) => t.content.name === localRelation.entity
+                (t: any) => t.content.name === localRelation.entity
             );
             if (model) {
-                const targetTable = model.content.attributes.map((attr) => ({
+                const targetTable = model.content.attributes.map((attr: any) => ({
                     value: attr.name,
                     label: attr.name,
                 }));

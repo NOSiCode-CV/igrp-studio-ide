@@ -9,14 +9,14 @@ export function formatMethods(elements: string[], toUpperCase = false): { label:
 }
 
 export function toMap(items: any) {
-	return items.map((d) => ({
+	return items.map((d: any) => ({
 		value: d.content?.name || d.name,
 		label: d.content?.name || d.name
 	}));
 }
 
 export function getMapOptions(items: any) {
-	return items.map((d) => ({
+	return items.map((d: any) => ({
 		value: d.content?.name || d.name,
 		label: d.content?.name || d.name,
 		module: d.content?.module,
@@ -78,7 +78,7 @@ export const handleChangeValueObject = (
 	value: string
 ) => {
 
-	const isObject = typeof result === 'object' && element !== 'relation' && !Array.isArray(result)
+	const isObject = typeof result === 'object' && element !== 'relation' && !Array.isArray(result) && result.value
 
 	const typeValue = isObject ? result.value : result;
 	const typeModule = isObject ? result.module : '';
@@ -120,12 +120,12 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
 		const childrenMap: Record<string, FileTree> = {};
 
 		// Add existing children to the map
-		existingChildren.forEach((child) => {
+		existingChildren.forEach((child: any) => {
 			childrenMap[`${child.name}-${child.content.module}`] = child;
 		});
 
 		// Merge new children into the map
-		newChildren.forEach((child) => {
+		newChildren.forEach((child: any) => {
 			const name = `${child.name}-${child.content.module}`
 			if (childrenMap[name]) {
 				// If the child already exists, merge their children recursively
@@ -146,7 +146,7 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
 	};
 
 	// Iterate through the input files
-	files.forEach((file) => {
+	files.forEach((file: any) => {
 		if (mergedFilesMap[file.name]) {
 			// If the file/directory already exists, merge their children
 			if (file.children && mergedFilesMap[file.name].children) {
@@ -176,8 +176,8 @@ export const getModulesArray = (filesThree: FileTree[]) => {
 
 export const getMergedFiles = (studio: any, module: string) => {
 
-	const currentModuleData = studio.filesThree.find((item) => item.name === module) || {};
-	const sharedModuleData = studio.filesThree.find((item) => item.name === "shared") || {};
+	const currentModuleData = studio.filesThree.find((item: any) => item.name === module) || {};
+	const sharedModuleData = studio.filesThree.find((item: any) => item.name === "shared") || {};
 
 	let mergedFiles: any[] = [];
 

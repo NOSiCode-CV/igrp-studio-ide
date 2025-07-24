@@ -1,16 +1,16 @@
 import {
     app,
-    shell,
     BrowserWindow,
-    ipcMain,
     dialog,
-    screen,
+    ipcMain,
     IpcMainInvokeEvent,
+    screen,
+    shell,
 } from 'electron';
 import path, { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
-import { closeApp, installExtensions } from './helpers/utils';
+import { closeApp, installExtensions, downloadIgrpNextTemplate } from './helpers/utils';
 import fs from 'fs';
 import { FileTree, IOpenProject } from './types';
 
@@ -41,11 +41,7 @@ import './handlers/global-handler';
 import './helpers/fetch-request';
 
 import { buildTaskbar } from './helpers/taskbar';
-import {
-    getCurrentLanguage,
-    loadConfig,
-    setCurrentLanguage,
-} from './helpers/language';
+
 import NextJsManager from './helpers/nextjsManager';
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
@@ -57,14 +53,13 @@ import { WorkspaceRepository } from './services/workspace-service';
 import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 import { folderWatcher } from './helpers/watch-folder';
 
-const backend = require('i18next-electron-fs-backend');
+import { mainBindings } from 'i18next-electron-fs-backend';
 
 let mainWindow: BrowserWindow;
 
 let nextJsManager: NextJsManager;
 let currentAuthProvider: 'github' | 'gitlab' | null = null;
-// Load the initial language configuration
-loadConfig();
+
 dotenv.config();
 
 function createWindow(): void {
@@ -107,7 +102,7 @@ function createWindow(): void {
 
     mainWindow.loadURL(startUrl);
 
-    backend.mainBindings(ipcMain, mainWindow, fs); // <- configures the backend
+    mainBindings(ipcMain, mainWindow, fs); // <- configures the backend
 
     closeApp(mainWindow);
 
@@ -199,13 +194,13 @@ app.whenReady().then(async () => {
     const initializeGitHubService = async () => {
         try {
             await GitHubService.initializeServices();
-        } catch { }
+        } catch {}
     };
 
     const initializeGitLabService = async () => {
         try {
             await GitLabService.initializeServices();
-        } catch { }
+        } catch {}
     };
 
     const initializeAllServices = async () => {
@@ -230,7 +225,7 @@ app.whenReady().then(async () => {
     // GitLab handler
     ipcMain.on('gitlab-oauth', async () => {
         const isDev = process.env.VITE_NODE_ENV === 'development';
-        console.log("isDev", isDev)
+        console.log('isDev', isDev);
         try {
             currentAuthProvider = 'gitlab'; // Add this line
             await gitlabAuth.setupOAuth(mainWindow, isDev);
@@ -285,8 +280,7 @@ ipcMain.handle(
         dirPath: string
     ): Promise<FileTree[] | { error: string }> => {
         try {
-            const fileTree = await readDirectory(dirPath);
-            return fileTree;
+            return readDirectory(dirPath);
         } catch (error) {
             console.error('Error reading directory:', error);
             return {
@@ -304,17 +298,12 @@ ipcMain.handle(
     async (
         _event: IpcMainInvokeEvent,
         filePath: string
-    ): Promise<FileTree[] | { error: string }> => {
+    ): Promise<string | null> => {
         try {
             return await readProjectFile(filePath);
         } catch (error) {
             console.error('Error reading file:', error);
-            return {
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : 'Failed to read file',
-            };
+            return null;
         }
     }
 );
@@ -323,9 +312,7 @@ ipcMain.handle('get-app-version', () => {
     return app.getVersion();
 });
 
-
 ipcMain.on('open-directory-dialog', async (event) => {
-
     await dialog
         .showOpenDialog(mainWindow, {
             properties: ['openDirectory', 'createDirectory', 'showHiddenFiles'],
@@ -488,15 +475,7 @@ app.on('open-url', (event, url) => {
     }
 });
 
-// IPC handlers for language management
-ipcMain.handle('get-language', () => {
-    return getCurrentLanguage();
-});
 
-ipcMain.handle('set-language', (_, lang: string) => {
-    setCurrentLanguage(lang);
-    return lang; // Return the new language for confirmation
-});
 
 // NEXTJS
 ipcMain.on('start-nextjs', (_event, basePath) => {
@@ -533,10 +512,10 @@ ipcMain.handle('install-update', async () => {
     autoUpdater.quitAndInstall();
 });
 
-
 // Handle folder watching
 ipcMain.handle('watch-folder', (_, folderPath: string) => {
     return folderWatcher.watchFolder(folderPath, (event) => {
         mainWindow?.webContents.send('folder-change', event);
     });
 });
+

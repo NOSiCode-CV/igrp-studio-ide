@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { lazy } from 'react';
 import {
     Box,
     Cable,
+    Copy,
     DatabaseZap,
     FileJson2,
     Layers,
@@ -16,23 +16,15 @@ import {
 
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks';
 import { getBadgeColor, getIcon } from '@renderer/utils';
-import { OPTION_TYPE } from '@renderer/constants/appConstants';
+import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { FileTree, MenuItem } from 'src/main/types';
 
-const DatabaseManagerModal = lazy(
-    () => import('@renderer/generators/api/components/DatabaseManager')
-);
-
-const SerializationConfigModal = lazy(
-    () => import('@renderer/generators/api/components/serialization-config')
-);
-
 export interface DropdownItem {
     label: string;
-    actionType: OPTION_TYPE;
+    actionType: OptionType;
     icon?: LucideIcon;
-    componentName?: React.ReactNode;
+    modalType?: 'database-manager' | 'serialization-config';
 }
 
 const IGNORED_PATHS = new Set([
@@ -62,11 +54,6 @@ const createMenuItems = (t: any) => ({
         actionType: OPTION_TYPE.RESPONSE,
         icon: getIcon(OPTION_TYPE.RESPONSE),
     },
-    newPermission: {
-        label: t('newPermission'),
-        actionType: OPTION_TYPE.PERMISSIONS,
-        icon: getIcon(OPTION_TYPE.PERMISSIONS),
-    },
     newControllers: {
         label: t('newControllers'),
         actionType: OPTION_TYPE.ACTION,
@@ -75,13 +62,13 @@ const createMenuItems = (t: any) => ({
     importDataTableFromDatabase: {
         label: t('importDataTableFromDatabase'),
         actionType: OPTION_TYPE.MODAL,
-        componentName: <DatabaseManagerModal />,
+        modalType: 'database-manager',
         icon: DatabaseZap,
     },
     importJsonSchemaFiles: {
         label: t('importJsonSchemaFiles'),
         actionType: OPTION_TYPE.MODAL,
-        componentName: <SerializationConfigModal />,
+        modalType: 'serialization-config',
         icon: FileJson2,
     },
     erdDiagram: {
@@ -103,6 +90,11 @@ const createMenuItems = (t: any) => ({
         label: t('convertToDTO'),
         actionType: OPTION_TYPE.DATA_OBJECTS,
         icon: MoveRight,
+    },
+    duplicate: {
+        label: t('duplicate'),
+        actionType: OPTION_TYPE.DUPLICATE,
+        icon: Copy,
     },
 });
 
@@ -130,36 +122,36 @@ const useNavdata = (filesThree: FileTree[]) => {
                 menuItemsConfig.newDto,
                 menuItemsConfig.importJsonSchemaFiles,
             ],
-            subMenus: [menuItemsConfig.newAction, menuItemsConfig.delete],
-            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.delete],
-            defaultMenus: [menuItemsConfig.delete],
-            sharedExtension: [
-                menuItemsConfig.newPermission,
-            ],
+            subMenus: [menuItemsConfig.newAction, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            defaultMenus: [menuItemsConfig.duplicate, menuItemsConfig.delete],
             controllersExtension: [menuItemsConfig.newControllers],
         }),
         [menuItemsConfig]
     );
 
     const getDropdownMenus = useCallback(
-        (category: string) => {
+        (category: OptionType) => {
             const menuMap = {
                 [OPTION_TYPE.MODELS]: dropdownConfigs.schemas,
                 [OPTION_TYPE.DATA_OBJECTS]: dropdownConfigs.dto,
             };
-            return menuMap[category] || [];
+            return menuMap[category as keyof typeof menuMap] || [];
         },
         [dropdownConfigs]
     );
 
     const getDropdownSubMenus = useCallback(
-        (category: string) => {
+        (category: OptionType) => {
             const menuMap = {
                 [OPTION_TYPE.CONTROLLERS]: dropdownConfigs.subMenus,
                 [OPTION_TYPE.CONTROLLER]: dropdownConfigs.subMenus,
                 [OPTION_TYPE.MODEL]: dropdownConfigs.modelMenus,
             };
-            return menuMap[category] || dropdownConfigs.defaultMenus;
+            return (
+                menuMap[category as keyof typeof menuMap] ||
+                dropdownConfigs.defaultMenus
+            );
         },
         [dropdownConfigs]
     );
@@ -185,7 +177,7 @@ const useNavdata = (filesThree: FileTree[]) => {
             const { actions, type, id } = content;
 
             if (type === OPTION_TYPE.CONTROLLER && actions) {
-                return actions.map((action) => ({
+                return actions.map((action: any) => ({
                     id,
                     label: action.actionName,
                     path,
@@ -205,13 +197,12 @@ const useNavdata = (filesThree: FileTree[]) => {
     const menuItems = useMemo(() => {
         return filesThree
             .filter((folder) => !IGNORED_PATHS.has(folder.name))
-            .map((folder) => {
+            .map((folder: any) => {
                 const isShared = folder.name === 'shared';
 
                 const dropdownMenus = isShared
                     ? [
                           ...dropdownConfigs.baseDropdownMenus,
-                          ...dropdownConfigs.sharedExtension,
                       ]
                     : [
                           ...dropdownConfigs.controllersExtension,
@@ -230,10 +221,10 @@ const useNavdata = (filesThree: FileTree[]) => {
                 };
 
                 if (folder.children) {
-                    folder.children.forEach((child) => {
+                    folder.children.forEach((child: any) => {
                         if (
                             !Object.values(OPTION_TYPE).includes(
-                                child.name as OPTION_TYPE
+                                child.name as OptionType
                             )
                         ) {
                             return;
@@ -251,7 +242,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                             };
 
                             if (child.children) {
-                                child.children.forEach((file) => {
+                                child.children.forEach((file: any) => {
                                     if (!file.isDirectory) {
                                         const dropdownMenus =
                                             getDropdownSubMenus(
@@ -262,7 +253,9 @@ const useNavdata = (filesThree: FileTree[]) => {
                                             id:
                                                 file.content?.type ===
                                                 OPTION_TYPE.CONTROLLER
-                                                    ? `${file.content?.id}-CONTROLLER`
+                                                    ? file.content?.id?.endsWith('-CONTROLLER')
+                                                        ? file.content?.id
+                                                        : `${file.content?.id}-CONTROLLER`
                                                     : file.content?.id,
                                             label:
                                                 file.content?.name || file.name,

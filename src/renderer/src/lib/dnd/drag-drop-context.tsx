@@ -7,6 +7,14 @@ import {
     DragEndResult,
 } from './types';
 
+interface DragOverParams {
+    e: DragEvent<HTMLDivElement>;
+    id?: string;
+    cellIndex?: number;
+    dropTargetId?: string;
+    countItems: number;
+}
+
 interface DragDropContextType {
     // State
     draggingItem: any;
@@ -24,12 +32,7 @@ interface DragDropContextType {
         e: DragEvent<HTMLDivElement>,
         targetId?: string
     ) => DragEndResult;
-    handleDragOver: (
-        e: DragEvent<HTMLDivElement>,
-        id?: string,
-        index?: number,
-        dropTargetId?: string
-    ) => void;
+    handleDragOver: (params: DragOverParams) => void;
     handleDragLeave: (e: DragEvent<HTMLDivElement>) => void;
     handleDragStartComponent: (
         _e: DragEvent<HTMLDivElement>,
@@ -42,7 +45,7 @@ const DragDropContext = createContext<DragDropContextType | undefined>(
     undefined
 );
 
-export const DragProvider = ({ children }) => {
+export const DragProvider = ({ children }: { children: React.ReactNode }) => {
     const [layoutMode, setLayoutMode] = useState<LayoutMode>('vertical');
     const [components, setComponents] = useState<StructuredComponent[]>([]);
     const [draggingItem, setDraggingItem] = useState(null);
@@ -50,7 +53,7 @@ export const DragProvider = ({ children }) => {
     const [activeDropZone, setActiveDropZone] = useState<DropZone | null>(null);
 
     // Start dragging
-    const onDragStart = useCallback((item) => {
+    const onDragStart = useCallback((item: any) => {
         setDraggingItem(item);
     }, []);
 
@@ -91,15 +94,17 @@ export const DragProvider = ({ children }) => {
 
         const targetIndex = activeDropZone?.cellIndex || 0;
 
-        const insertIndex =
-            position === 'bottom' || position === 'right'
-                ? targetIndex + 1
-                : targetIndex;
-
-        const moveIndex =
+        /*const moveIndex =
             (position === 'top' || position === 'left') && targetIndex > 1
                 ? targetIndex - 1
-                : targetIndex;
+                : targetIndex; */
+
+        const newIndex =
+            activeDropZone?.position === 'right'
+                ? targetIndex + 1
+                : position === 'bottom'
+                  ? targetIndex + 1
+                  : targetIndex;
 
         setDraggedId(null);
         setActiveDropZone(null);
@@ -113,8 +118,8 @@ export const DragProvider = ({ children }) => {
             draggableId: droppedItem.id,
             position,
             destination: {
-                droppableId: targetId,
-                index: mode === 'MOVE' ? moveIndex : insertIndex,
+                droppableId: targetId || '',
+                index: newIndex, // mode === 'MOVE' ? moveIndex : targetIndex,
             },
             type,
             mode,
@@ -122,12 +127,13 @@ export const DragProvider = ({ children }) => {
     };
 
     // Handle drag over - core functionality
-    const handleDragOver = (
-        e: DragEvent<HTMLDivElement>,
-        id?: string,
-        cellIndex?: number,
-        dropTargetId?: string
-    ) => {
+    const handleDragOver = ({
+        e,
+        id,
+        cellIndex,
+        dropTargetId,
+        countItems,
+    }: DragOverParams) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -141,7 +147,13 @@ export const DragProvider = ({ children }) => {
                 e.currentTarget as HTMLElement
             ).getBoundingClientRect();
             const position = getDropPosition(e, targetRect, layoutMode);
-            setActiveDropZone({ id, cellIndex, position, dropTargetId });
+            setActiveDropZone({
+                id,
+                cellIndex,
+                position,
+                dropTargetId,
+                countItems,
+            });
         } else if (components.length > 0) {
             const position = layoutMode === 'vertical' ? 'bottom' : 'right';
             setActiveDropZone({
@@ -149,6 +161,7 @@ export const DragProvider = ({ children }) => {
                 cellIndex,
                 position,
                 dropTargetId,
+                countItems,
             });
         }
     };

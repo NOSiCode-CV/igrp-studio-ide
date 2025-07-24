@@ -22,8 +22,8 @@ export function LanguageSettings() {
             // Atualizar o idioma no i18next
             await i18n.changeLanguage(newLang);
 
-            // Salvar o novo idioma no main process (se necessário)
-            await window.electron.setLanguage(newLang);
+            // Salvar o novo idioma no main process usando igrpStudioSettings
+            await window.igrpStudioSettings.setLanguage(newLang);
 
             // Atualizar o estado local
             setCurrentLanguage(newLang);

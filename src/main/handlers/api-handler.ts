@@ -77,6 +77,14 @@ handleWithCustomErrors(
 );
 
 handleWithCustomErrors(
+    EVENTS.ENGINE.DUPLICATE_ELEMENT,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.duplicate(config, basePath);
+    }
+);
+
+handleWithCustomErrors(
     EVENTS.ENGINE.SERIALIZE_ELEMENT,
     async (_event, config: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType);

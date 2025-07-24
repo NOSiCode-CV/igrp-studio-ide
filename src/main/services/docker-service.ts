@@ -11,6 +11,63 @@ const execAsync = promisify(exec);
 export class DockerService {
     private composeCache: Record<string, DockerComposeConfig> = {};
 
+    /**
+     * Check if Docker daemon is running and accessible
+     * @returns Promise<{isRunning: boolean, error?: string, details?: string}>
+     */
+    async checkDockerDaemon(): Promise<{ isRunning: boolean, error?: string, details?: string }> {
+        try {
+            // Try to get Docker info
+            const { stdout } = await execAsync('docker info', {
+                timeout: 10000, // 10 second timeout
+                maxBuffer: 1024 * 1024 // 1MB buffer
+            });
+
+            // If we get here, Docker daemon is running
+            return { isRunning: true, details: stdout };
+        } catch (error: any) {
+            const errorMessage = error.stderr || error.stdout || error.message;
+
+            // Check for specific Docker daemon connection errors
+            if (errorMessage.includes('Cannot connect to the Docker daemon') ||
+                errorMessage.includes('docker.sock') ||
+                errorMessage.includes('Connection refused')) {
+                return {
+                    isRunning: false,
+                    error: 'Docker daemon is not running',
+                    details: 'Please start Docker Desktop or the Docker daemon service'
+                };
+            }
+
+            // Check for Docker not installed
+            if (errorMessage.includes('command not found') ||
+                errorMessage.includes('docker: not found')) {
+                return {
+                    isRunning: false,
+                    error: 'Docker is not installed',
+                    details: 'Please install Docker Desktop or Docker Engine'
+                };
+            }
+
+            // Other errors
+            return {
+                isRunning: false,
+                error: 'Docker daemon check failed',
+                details: errorMessage
+            };
+        }
+    }
+
+    /**
+     * Check if Docker is available and running before executing commands
+     * @throws Error if Docker daemon is not running
+     */
+    private async ensureDockerRunning(): Promise<void> {
+        const check = await this.checkDockerDaemon();
+        if (!check.isRunning) {
+            throw new Error(`Docker daemon is not running: ${check.error}. ${check.details}`);
+        }
+    }
 
     async loadComposeFile(projectPath: string): Promise<DockerComposeConfig> {
         const composePath = path.join(projectPath, 'igrp-compose.yaml');
@@ -66,13 +123,15 @@ export class DockerService {
     }
 
     async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
+        // Check if Docker daemon is running first
+        await this.ensureDockerRunning();
+
         const composeFile = path.join(projectPath, 'igrp-compose.yaml');
         const escapedComposeFile = escapePath(composeFile);
         const serviceParam = service || '';
 
         const envFilePath = path.join(projectPath, '.igrp.env');
         const escapedEnvFilePath = escapePath(envFilePath);
-
 
         // Prepare the init script first
         this.prepareInitScript(projectPath);
@@ -89,7 +148,14 @@ export class DockerService {
                 });
             return stdout;
         } catch (error: any) {
-            throw new Error(`Docker compose command failed: ${error.stderr || error.message}`);
+            // Check if the error is related to Docker daemon connection
+            const errorMessage = error.stderr || error.message;
+            if (errorMessage.includes('Cannot connect to the Docker daemon') ||
+                errorMessage.includes('docker.sock') ||
+                errorMessage.includes('Connection refused')) {
+                throw new Error(`Docker daemon is not running. Please start Docker Desktop or the Docker daemon service.`);
+            }
+            throw new Error(`Docker compose command failed: ${errorMessage}`);
         }
     }
 
@@ -119,6 +185,37 @@ export class DockerService {
             const serviceNames = Object.keys(allServices);
 
             try {
+                // Check Docker daemon status first
+                const dockerCheck = await this.checkDockerDaemon();
+                if (!dockerCheck.isRunning) {
+                    // Return all services as stopped with Docker daemon error
+                    return serviceNames.map(serviceName => {
+                        const serviceDef = allServices[serviceName];
+                        const { environment, depends_on, env_file, ...rest } = serviceDef;
+                        const processedVolumes = (serviceDef.volumes || []).map(volume => {
+                            if (typeof volume === 'string') {
+                                const [volumeName] = volume.split(':');
+                                const volumeConfig = volumes?.[volumeName];
+                                if (volumeConfig?.driver) {
+                                    return `${volume}:${volumeConfig.driver}`;
+                                }
+                            }
+                            return volume;
+                        });
+
+                        return {
+                            ...rest,
+                            name: serviceName,
+                            status: 'error',
+                            statusMessage: `Docker daemon not running: ${dockerCheck.error}`,
+                            dependsOn: depends_on && !Array.isArray(depends_on) ? [depends_on] : depends_on || [],
+                            environments: this.parseEnvironmentToArray(environment),
+                            env_file: env_file && env_file.map((file: string) => ({ file })),
+                            volumes: processedVolumes,
+                        };
+                    });
+                }
+
                 // Get running containers
                 const stdout = await this.executeComposeCommand(projectPath, 'ps --format json');
                 const runningContainers = stdout.trim()
@@ -207,7 +304,7 @@ export class DockerService {
             }
         } catch (error: any) {
             console.error('Error getting status:', error);
-            throw new Error(`Failed to get service status: ${error.message}`);
+            return [];
         }
     }
 

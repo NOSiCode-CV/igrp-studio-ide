@@ -7,7 +7,7 @@ import {
     TooltipTrigger,
 } from '@renderer/components/ui/tooltip';
 
-export function GitContributors({ projectPath }) {
+export function GitContributors({ projectPath }: { projectPath: string }) {
     const [contributors, setContributors] = useState<
         { name: string; email: string }[]
     >([]);

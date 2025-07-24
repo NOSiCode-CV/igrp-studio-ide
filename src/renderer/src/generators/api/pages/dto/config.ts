@@ -42,13 +42,13 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
-export const getTablesColumns = ({ selectors, dto, models, enums, current, t }): { [value: string]: IColumnsTabelProps[] } => {
+export const getTablesColumns = ({ selectors, dto, models, enums, current, t }: { selectors: any, dto: any, models: any, enums: any, current: any, t: any }): { [value: string]: IColumnsTabelProps[] } => {
 
     const { name: currentDto, module } = current || {}
 
     const collectionTypes = formatMethods(
         (
-            selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
+            selectors.find((selector: any) => 'COLLECTION_TYPES' in selector) as
             | { COLLECTION_TYPES: string[] }
             | undefined
         )?.COLLECTION_TYPES || [],
@@ -56,7 +56,7 @@ export const getTablesColumns = ({ selectors, dto, models, enums, current, t }):
     )
 
     const dataTypes = (
-        selectors.find((selector) => 'ATTRIBUTE_TYPES' in selector) as
+        selectors.find((selector: any) => 'ATTRIBUTE_TYPES' in selector) as
         | {
             ATTRIBUTE_TYPES: string[]
         }

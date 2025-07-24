@@ -31,6 +31,9 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
         check: async () => {
             return window.igrpStudio.docker.check();
         },
+        daemonStatus: async () => {
+            return window.igrpStudio.docker.daemonStatus();
+        },
         stop: async (projectPath: string, { services }) => {
             await window.igrpStudio.docker.stop(projectPath, { services })
         },
@@ -41,11 +44,19 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
 
     const checkDocker = useCallback(async () => {
         try {
-            const isRunning = await dockerOperations.check();
-            setIsDockerRunning(isRunning);
-            return isRunning;
+            const daemonStatus = await dockerOperations.daemonStatus();
+            setIsDockerRunning(daemonStatus.isRunning);
+            
+            if (!daemonStatus.isRunning) {
+                setError(new Error(`${daemonStatus.error}: ${daemonStatus.details}`));
+            } else {
+                setError(null);
+            }
+            
+            return daemonStatus.isRunning;
         } catch (err) {
             setIsDockerRunning(false);
+            setError(err as Error);
             return false;
         }
     }, []);
@@ -58,7 +69,7 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
             timeout?: number,
             dropVolume?: boolean
         }
-    ): Promise<ServiceInfo[] | boolean | void> => {
+    ): Promise<ServiceInfo[] | boolean | void | { isRunning: boolean; error?: string; details?: string }> => {
 
         const { services, timeout, dropVolume } = options || {}
 

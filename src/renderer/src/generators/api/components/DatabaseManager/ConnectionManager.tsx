@@ -8,7 +8,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@renderer/components/ui/dialog';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2, Edit } from 'lucide-react';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import { ConnectionForm } from './ConnectionForm';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
@@ -24,12 +24,14 @@ export function ConnectionManager({ title }: { title?: string }) {
         databaseType: '',
         connectionType: 'general',
         host: '',
-        port: null,
+        port: undefined,
         user: '',
         password: '',
         database: '',
     });
+    const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         const getConnections = async () => {
@@ -49,7 +51,7 @@ export function ConnectionManager({ title }: { title?: string }) {
             databaseType: '',
             connectionType: 'general',
             host: '',
-            port: null,
+            port: undefined,
             user: '',
             password: '',
             database: '',
@@ -57,9 +59,27 @@ export function ConnectionManager({ title }: { title?: string }) {
         setIsAddModalOpen(false);
     };
 
+    const handleEditConnection = async (values: Connection) => {
+        await window.igrpStudio.connection.save(values);
+
+        setConnections((prev) =>
+            prev.map((conn) =>
+                conn.name === editingConnection?.name ? { ...values } : conn
+            )
+        );
+
+        setEditingConnection(null);
+        setIsEditModalOpen(false);
+    };
+
     const handleDeleteConnection = async (name: string) => {
         setConnections((prev) => prev.filter((conn) => conn.name !== name));
         await window.igrpStudio.connection.delete(name);
+    };
+
+    const handleEditClick = (connection: Connection) => {
+        setEditingConnection(connection);
+        setIsEditModalOpen(true);
     };
 
     const columns: ColumnDef<Connection>[] = [
@@ -82,14 +102,24 @@ export function ConnectionManager({ title }: { title?: string }) {
         {
             header: t('actions'),
             cell: ({ row }) => (
-                <div>
+                <div className="flex space-x-2">
                     <Button
-                        variant="link"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditClick(row.original)}
+                    >
+                        <span className="sr-only">{t('edit')}</span>
+                        <Edit className="h-4 w-4 " />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() =>
                             handleDeleteConnection(row.original.name)
                         }
                     >
-                        {t('delete')}
+                        <span className="sr-only">{t('delete')}</span>
+                        <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                 </div>
             ),
@@ -126,6 +156,28 @@ export function ConnectionManager({ title }: { title?: string }) {
                     </DialogContent>
                 </Dialog>
             </div>
+
+            {/* Edit Connection Dialog */}
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t('edit_connection')}</DialogTitle>
+                        <DialogDescription>
+                            {t('edit_connection_description')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {editingConnection && (
+                        <ConnectionForm
+                            connection={editingConnection}
+                            onSubmit={handleEditConnection}
+                            onCancel={() => {
+                                setEditingConnection(null);
+                                setIsEditModalOpen(false);
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
             {/* Render connections table here */}
             <ScrollArea>

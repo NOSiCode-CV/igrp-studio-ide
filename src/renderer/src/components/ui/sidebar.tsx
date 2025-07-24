@@ -182,7 +182,6 @@ function Sidebar({
   }
 
   if (isMobile) {
-    const { t } = useTranslation();
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
@@ -198,8 +197,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>{t('sidebar')}</SheetTitle>
-            <SheetDescription>{t('displaysMobileSidebar')}</SheetDescription>
+            <SheetTitle>Sidebar</SheetTitle>
+            <SheetDescription>Displays Mobile Sidebar</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>

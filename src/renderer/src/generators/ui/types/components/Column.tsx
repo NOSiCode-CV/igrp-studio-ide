@@ -7,12 +7,15 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import { useResponsiveClasses } from '../../utils/layout-mapping';
 
 const IGRPStudioColumn: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
 }: CardComponentProps) => {
     const { children, id: componentId } = comp;
+
+    const { variant, className } = comp.properties;
 
     const { setEditingComponent } = useDroppedComponents();
 
@@ -49,11 +52,16 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
         });
     };
 
+    // Gera as classes responsivas usando o hook personalizado
+    const { classes: finalClasses } = useResponsiveClasses(
+        variant,
+        'span',
+        className
+    );
+
     return (
-        <Droppable component={comp} onDrop={onDragEnd}>
-            <div className={cn(`w-full flex flex-col gap-3 space-y-3`)}>
-                {renderComponents()}
-            </div>
+        <Droppable component={comp} onDrop={onDragEnd} className={cn(finalClasses)}>
+             {renderComponents()}
         </Droppable>
     );
 };

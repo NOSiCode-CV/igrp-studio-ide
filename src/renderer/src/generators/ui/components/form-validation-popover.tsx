@@ -46,6 +46,16 @@ export function FormValidationPopover({
     const [isDate, setIsDate] = useState(false);
     const [isEmail, setIsEmail] = useState(false);
 
+    const handleValidationKeyChange = (key: string, value: string | boolean | number) => {
+        const currentValidation = field?.validation || {};
+        const updatedValidation = {
+            ...currentValidation,
+            [key]: value
+        };
+        changeValue('validation', index, updatedValidation);
+    };
+
+
     useEffect(() => {
         setIsNumber(['number', 'integer', 'long', 'double', 'float'].includes(fieldType));
         setIsString(['string', 'text', 'textarea', 'password'].includes(fieldType));
@@ -88,13 +98,12 @@ export function FormValidationPopover({
     };
 
     const getValidationOptions = () => {
-        const baseValidations = ['required', 'optional'];
         const stringValidations = ['minLength', 'maxLength', 'regex', 'email', 'url', 'uuid', 'startsWith', 'endsWith', 'includes'];
         const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite'];
         const dateValidations = ['minDate', 'maxDate'];
-        const booleanValidations = [];
+        const booleanValidations: string[] = [];
 
-        let validations = [...baseValidations];
+        let validations: string[] = [];
 
         if (isString || isEmail) {
             validations = [...validations, ...stringValidations];
@@ -113,7 +122,7 @@ export function FormValidationPopover({
     };
 
     const renderValidationField = (validation: string) => {
-        const value = field?.[validation];
+        const value = field?.validation?.[validation];
         
         switch (validation) {
             case 'min':
@@ -130,7 +139,7 @@ export function FormValidationPopover({
                         onChange={(ev) => {
                             const numValue = Number(ev.target.value);
                             if (numValue >= 0) {
-                                changeValue(validation, index, numValue);
+                                handleValidationKeyChange(validation, numValue);
                             }
                         }}
                     />
@@ -141,7 +150,7 @@ export function FormValidationPopover({
                         className="h-8"
                         value={value || ''}
                         placeholder="/pattern/"
-                        onChange={(ev) => changeValue(validation, index, ev.target.value)}
+                        onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
                     />
                 );
             case 'startsWith':
@@ -152,7 +161,7 @@ export function FormValidationPopover({
                         className="h-8"
                         value={value || ''}
                         placeholder={t('enterValue')}
-                        onChange={(ev) => changeValue(validation, index, ev.target.value)}
+                        onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
                     />
                 );
             case 'minDate':
@@ -162,14 +171,14 @@ export function FormValidationPopover({
                         type="date"
                         className="h-8"
                         value={value || ''}
-                        onChange={(ev) => changeValue(validation, index, ev.target.value)}
+                        onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
                     />
                 );
             default:
                 return (
                     <Switch
                         checked={value || false}
-                        onCheckedChange={(checked) => changeValue(validation, index, checked)}
+                        onCheckedChange={(checked) => handleValidationKeyChange(validation, checked)}
                     />
                 );
         }
@@ -196,12 +205,6 @@ export function FormValidationPopover({
         validations.forEach(validation => {
             if (field?.[validation]) {
                 switch (validation) {
-                    case 'required':
-                        // required is default in Zod
-                        break;
-                    case 'optional':
-                        schema += '.optional()';
-                        break;
                     case 'min':
                     case 'max':
                     case 'minLength':
@@ -292,29 +295,6 @@ export function FormValidationPopover({
                                     {t('setValidationsForFormField')}
                                 </p>
                                 
-                                {/* Basic validations */}
-                                <div className="space-y-3">
-                                    <h4 className="text-sm font-medium">{t('basicValidations')}</h4>
-                                    <div className="flex flex-1 gap-2">
-                                        {['required', 'optional'].map((validation) => (
-                                            <div
-                                                key={`${validation}-${index}`}
-                                                className="flex flex-1 items-center gap-4"
-                                            >
-                                                <Label htmlFor={`${validation}-${index}`}>
-                                                    {toInitCap(t(validation))}
-                                                </Label>
-                                                <Switch
-                                                    id={`${validation}-${index}`}
-                                                    onCheckedChange={(checked) =>
-                                                        changeValue(validation, index, checked)
-                                                    }
-                                                    checked={field?.[validation] || false}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
 
                                 <Separator orientation="horizontal" />
 
@@ -323,7 +303,7 @@ export function FormValidationPopover({
                                     <h4 className="text-sm font-medium">{t('typeSpecificValidations')}</h4>
                                     <div className="grid gap-3">
                                         {getValidationOptions()
-                                            .filter(validation => !['required', 'optional'].includes(validation))
+                                            .filter(validation => !['optional'].includes(validation))
                                             .filter(shouldShowValidation)
                                             .map((validation) => (
                                                 <div
@@ -374,6 +354,13 @@ export function FormValidationPopover({
                                         <span className="font-medium">{t('activeValidations')}:</span>
                                     </div>
                                     <div className="space-y-1">
+                                        {/* Show validation key if present */}
+                                        {field?.validation?.key && (
+                                            <div className="text-xs text-muted-foreground ml-6">
+                                                • <span className="font-medium">{t('validationKey')}:</span> {field.validation.key}
+                                            </div>
+                                        )}
+                                        
                                         {getValidationOptions()
                                             .filter(validation => field?.[validation])
                                             .map((validation) => (
@@ -384,7 +371,8 @@ export function FormValidationPopover({
                                                     }
                                                 </div>
                                             ))}
-                                        {getValidationOptions().filter(validation => field?.[validation]).length === 0 && (
+                                        {getValidationOptions().filter(validation => field?.[validation]).length === 0 && 
+                                         !field?.validation?.key && (
                                             <div className="text-xs text-muted-foreground ml-6">
                                                 {t('noValidationsSet')}
                                             </div>

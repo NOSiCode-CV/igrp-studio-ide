@@ -12,7 +12,7 @@ import { useKeyPress } from '@renderer/hooks/useKeyDown';
 import { FileCode, Database, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const EmptyPage = ({ onClick }) => {
+const EmptyPage = ({ onClick }: { onClick: (option: string) => void }) => {
     const { t } = useTranslation();
 
     const actions = [

@@ -3,10 +3,13 @@ import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { cn } from '@renderer/lib/utils';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import { columnsVariants, columnVariants } from '../../utils/layout-mapping';
+import {
+    useResponsiveClasses,
+    generateResponsiveClasses,
+} from '../../utils/layout-mapping';
 import BoxWrapper from '../tools/BoxWrapper';
-import { useIsMobile } from '@renderer/hooks/use-mobile';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 
 const IGRPStudioColumns: React.FC<CardComponentProps> = ({
     comp,
@@ -18,8 +21,6 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
 
     const { setEditingComponent } = useDroppedComponents();
 
-    const isMobile = useIsMobile();
-
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
             path: componentName,
@@ -30,8 +31,12 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
     const renderColumns = () => {
         return children.map((comp: StructuredComponent, index: number) => {
             const { properties } = comp;
-
             const { variant, className } = properties || {};
+
+            // Use the function directly instead of the hook
+            const finalClasses = generateResponsiveClasses(variant);
+            const spanClasses = `span ${finalClasses} ${className || ''}`.trim();
+
 
             return (
                 <Draggable
@@ -39,9 +44,7 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
                     item={comp}
                     index={index}
                     dropZone={true}
-                    className={cn(
-                        columnVariants({ variant, className })
-                    )}
+                    className={spanClasses}
                 >
                     <BoxWrapper
                         comp={comp}
@@ -57,17 +60,14 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
         });
     };
 
-    return (
-        <div
-            className={cn(
-                'p-2',
-                columnsVariants({ variant, className }),
-                isMobile && 'grid-cols-2 w-full space-y-3'
-            )}
-        >
-            {renderColumns()}
-        </div>
+    // Gera as classes responsivas usando o hook personalizado
+    const { classes: finalClasses } = useResponsiveClasses(
+        variant,
+        'grid',
+        className
     );
+
+    return <div className={cn('p-2 py-5', children.length > 0 && finalClasses)}>{children.length > 0 ? renderColumns() : <GenNoInfoComp type='COLUMNS'/>}</div>;
 };
 
 export default IGRPStudioColumns;

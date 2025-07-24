@@ -29,18 +29,15 @@ import { MoreVertical, Plus } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Option } from '@renderer/generators/ui/hooks/useCustomCode';
 import { StateComponent } from '../../sidebar/custom-code/custom-code-state';
-import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    Segment,
+    State,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getDynamicSegments, RouteSegment } from './route-parser';
 import { Badge } from '@renderer/components/ui/badge';
 import { Separator } from '@renderer/components/ui/separator';
 import { DataValue } from '@renderer/lib/dnd/types';
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
-
-interface Segment {
-    name: string;
-    tag: string;
-    value?: string;
-}
 
 interface Data {
     state?: State;
@@ -75,12 +72,11 @@ interface SettingsProps {
 
 interface PageSelectionConfigProps {
     value: string;
-    fieldPath: string;
+    fieldPath?: string;
     key: string;
     parentKey?: string;
-    selectedPagePath: string | undefined;
     pageOptions: any;
-    columnsOptions: IGRPOptionsProps[];
+    columnsOptions: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
     segments: Segment[];
     onInputChange?: (fieldPath: string, value: any) => void;
     onPageChange: (value: string) => void;
@@ -92,16 +88,6 @@ const toMap = (items: any) => {
         items.map((value: string) => ({
             value,
             label: value,
-        }))
-    );
-};
-
-export const toMapPages = (items: any) => {
-    return (
-        items &&
-        items.map(({ label, metadata }) => ({
-            value: metadata.path,
-            label,
         }))
     );
 };
@@ -320,7 +306,10 @@ const RenderPropsConfig = ({
                                     name={key}
                                     value={value}
                                     onChange={(e) =>
-                                        onInputChange(fieldPath, e.target.value)
+                                        onInputChange(
+                                            fieldPath,
+                                            (e.target as HTMLInputElement).value
+                                        )
                                     }
                                 />
                             );
@@ -332,7 +321,10 @@ const RenderPropsConfig = ({
                                     name={key}
                                     value={value}
                                     onChange={(e) =>
-                                        onInputChange(fieldPath, e.target.value)
+                                        onInputChange(
+                                            fieldPath,
+                                            (e.target as HTMLInputElement).value
+                                        )
                                     }
                                 />
                             );
@@ -557,8 +549,9 @@ export const PageSelectionConfig = ({
     segments,
     onInputChange,
     onPageChange,
-    selectedPagePath,
 }: PageSelectionConfigProps) => {
+    const [selectedPagePath, setSelectedPagePath] = useState<string>(value);
+
     const [dynamicSegments, setDynamicPagePath] = useState(
         getDynamicSegments(selectedPagePath) ?? []
     );
@@ -567,15 +560,79 @@ export const PageSelectionConfig = ({
         setDynamicPagePath(getDynamicSegments(selectedPagePath));
     }, [selectedPagePath]);
 
+    // Handler to create segments with proper context
+    const handleSegmentsChange = (items: Record<string, string>[]) => {
+        const mappedSegments = items.map((item) => {
+            // Find the selected data field to determine contextp
+            const selectedField = columnsOptions.find(
+                (option) => option.value === item.columnName
+            );
+            return {
+                name: item.name,
+                tag: item.columnName,
+                value: undefined,
+                context: selectedField?.type,
+            };
+        });
+
+        onInputChange?.('segments', mappedSegments);
+    };
+
+    // Handler to get default segments for the form
+    const getDefaultSegments = () => {
+        if (segments && segments.length > 0) {
+            return segments.map((item: Segment) => ({
+                name: item.name,
+                columnName: item.tag || '',
+                value: '',
+            }));
+        }
+        return [{ name: '', columnName: '', value: '' }];
+    };
+
+    // Handler to get route segment options
+    const getRouteSegmentOptions = () => {
+        return dynamicSegments.map((segment: RouteSegment) => ({
+            label: `${segment.name} (${segment.type})`,
+            value: segment.originalSegment,
+        }));
+    };
+
+    // Handler to get data field options
+    const getDataFieldOptions = () => {
+        return columnsOptions.map((option) => ({
+            ...option,
+            label: option.label || option.value,
+        }));
+    };
+
+    const fieldPairs = [
+        {
+            key: 'name',
+            label: 'Route Segment',
+            options: getRouteSegmentOptions(),
+            placeholder: 'Select Route Segment',
+        },
+        {
+            key: 'columnName',
+            label: 'Data Field',
+            options: getDataFieldOptions(),
+        },
+    ];
+
     return (
         <div className="space-y-4">
             <IGRPCombobox
                 value={value}
                 onChange={(value) => {
-                    onInputChange?.(fieldPath, value as string);
+
+                    if (fieldPath) onInputChange?.(fieldPath, value as string);
+
                     onPageChange(value as string);
+
+                    setSelectedPagePath(value as string);
                 }}
-                options={toMapPages(pageOptions)}
+                options={pageOptions}
                 placeholder="Select Page"
                 className="w-full"
             />
@@ -605,49 +662,14 @@ export const PageSelectionConfig = ({
             {selectedPagePath && dynamicSegments.length > 0 && (
                 <>
                     <p className="text-sm text-muted-foreground">
-                        Map route segments to table columns
+                        Map route segments to data source fields
                     </p>
 
                     <DynamicKeyValueForm
                         required
-                        defaultItems={
-                            (segments &&
-                                segments.map((item: Segment) => ({
-                                    name: item.name,
-                                    columnName: item.tag,
-                                    value: '',
-                                }))) ||
-                            []
-                        }
-                        onAdd={(items) =>
-                            onInputChange?.(
-                                'segments',
-                                items.map((item) => ({
-                                    name: item.name,
-                                    tag: item.columnName,
-                                    value: undefined,
-                                }))
-                            )
-                        }
-                        fieldPairs={[
-                            {
-                                key: 'name',
-                                label: 'Name',
-                                options:
-                                    dynamicSegments.map(
-                                        (segment: RouteSegment) => ({
-                                            label: `${segment.name} (${segment.type})`,
-                                            value: segment.originalSegment,
-                                        })
-                                    ) || [],
-                                placeholder: 'Select Route Segment',
-                            },
-                            {
-                                key: 'columnName',
-                                label: 'Column Name',
-                                options: columnsOptions,
-                            },
-                        ]}
+                        defaultItems={getDefaultSegments()}
+                        onAdd={handleSegmentsChange}
+                        fieldPairs={fieldPairs}
                     />
                 </>
             )}
@@ -676,18 +698,16 @@ const SlugBindingConfig = ({
     onInputChange: (fieldPath: string, value: any) => void;
 }) => {
     const [linkType, setLinkType] = useState<string>();
-    const [selectedPagePath, setSelectedPagePath] = useState<string>();
 
     useEffect(() => {
         const defaultType =
             value &&
             Array.isArray(pageOptions) &&
             pageOptions.some((page) => page.value === value)
-                ? 'LINK'
-                : 'PAGE';
+                ? 'PAGE'
+                : 'LINK';
 
         setLinkType(defaultType);
-        setSelectedPagePath(value);
     }, [pageOptions, value]);
 
     return (
@@ -698,7 +718,6 @@ const SlugBindingConfig = ({
                 value={linkType}
                 onValueChange={(e) => {
                     setLinkType(e);
-                    setSelectedPagePath(value);
                 }}
                 options={[
                     { value: 'LINK', label: 'Link' },
@@ -723,8 +742,7 @@ const SlugBindingConfig = ({
                     columnsOptions={columnsOptions}
                     segments={segments}
                     onInputChange={onInputChange}
-                    onPageChange={setSelectedPagePath}
-                    selectedPagePath={selectedPagePath}
+                    onPageChange={() => void 0}
                 />
             )}
         </>

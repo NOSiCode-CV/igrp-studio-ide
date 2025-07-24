@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { Plus, Ellipsis } from 'lucide-react';
 import {
     DropdownMenu,
@@ -17,25 +17,61 @@ import { useDispatch } from 'react-redux';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useGit } from '@renderer/hooks/use-git';
 import { DropdownItem } from './nav-data';
+import { lazy } from 'react';
+
+// Lazy load modal components
+const DatabaseManagerModal = lazy(
+    () => import('@renderer/generators/api/components/DatabaseManager')
+);
+
+const SerializationConfigModal = lazy(
+    () => import('@renderer/generators/api/components/serialization-config')
+);
 
 interface DropdownSidebarMenuButtonProps {
     menuItem: MenuItem;
     basePath?: string;
 }
 
-interface ModalComponentProps {
-    item: any; 
-    basePath: string;
+// Modal manager component
+const ModalManager: React.FC<{
+    modalType: string;
     isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
-}
+    setIsOpen: (open: boolean) => void;
+    item: any;
+    basePath?: string;
+}> = ({ modalType, isOpen, setIsOpen, item, basePath }) => {
+    const renderModal = () => {
+        const props = {
+            item,
+            basePath,
+            isOpen,
+            setIsOpen,
+        };
+
+        switch (modalType) {
+            case 'database-manager':
+                return <DatabaseManagerModal {...props} />;
+            case 'serialization-config':
+                return <SerializationConfigModal {...props} />;
+            default:
+                return null;
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            {renderModal()}
+        </Suspense>
+    );
+};
 
 export const DropdownSidebarMenuButton: React.FC<
     DropdownSidebarMenuButtonProps
 > = ({ menuItem, basePath }) => {
-    const [activeComponent, setActiveComponent] =
-        useState<React.ReactNode | null>(null);
-
+    const [modalType, setModalType] = useState<string | null>(null);
     const [modalProps, setModalProps] = useState<Record<string, any>>({});
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -45,21 +81,51 @@ export const DropdownSidebarMenuButton: React.FC<
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
 
-    const {createGitCommit} =useGit()
+    const { createGitCommit } = useGit();
 
     const handleDropdownClick = (item: any) => {
         setItem(item);
         if (item.actionType === OPTION_TYPE.DELETE) {
             setIsOpenDelete(true);
-        } else if (item.componentName) {
-            setActiveComponent(item.componentName);
+        } else if (item.actionType === OPTION_TYPE.DUPLICATE) {
+            handleDuplicate(item);
+        } else if (item.modalType) {
+            setModalType(item.modalType);
             setModalProps(item || {});
             setIsOpen(true);
         } else if (item.dropdownclick) {
             item.dropdownclick(item);
         }
     };
-    if (!menuItem.dropdownMenus?.length) return;
+
+    const handleDuplicate = async (item: any) => {
+        if (!item || !basePath) return;
+
+        try {
+            const config = {
+                name: item.label,
+                type: item.type,
+                module: item.module,
+                content: item.content,
+            };
+
+            const { error } = await window.engine.duplicate(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
+
+            if (error) {
+                showErrorToast(error);
+            } else {
+                showSuccessToast(t('duplicatedSuccess', { name: item.label }));
+                createGitCommit(basePath, `Duplicate ${item.label}`);
+                dispatch(onSetChangeStatus(true));
+            }
+        } catch (error) {
+            showErrorToast(t('duplicateError', { name: item.label }));
+        }
+    };
 
     const handleDelete = async () => {
         if (!item || !basePath) return;
@@ -76,22 +142,22 @@ export const DropdownSidebarMenuButton: React.FC<
             basePath
         );
 
-        console.log(config)
-
         if (error) {
             showErrorToast(error);
         } else showSuccessToast(t('deletedSuccess', { name: item.label }));
-        
+
         createGitCommit(basePath, `Delete ${item.label}`);
 
         dispatch(onSetChangeStatus(true));
     };
 
-    const isDeleteAction = menuItem.dropdownMenus.some(
-        (menu) => menu.actionType === OPTION_TYPE.DELETE
+    const isDeleteAction = (menuItem.dropdownMenus ?? []).some(
+        (menu: any) => menu.actionType === OPTION_TYPE.DELETE
     );
 
-    return (
+    return (menuItem.dropdownMenus ?? []).length === 0 ? (
+        <></>
+    ) : (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -106,10 +172,12 @@ export const DropdownSidebarMenuButton: React.FC<
                 <DropdownMenuContent
                     side="right"
                     align="start"
-                    className="min-w-56 rounded-lg"
+                    className="min-w-56"
                 >
-                    {menuItem.dropdownMenus.map(
+                    {(menuItem.dropdownMenus ?? []).map(
                         (menu: DropdownItem, idx: number) => {
+                            const isDelete =
+                                menu.actionType === OPTION_TYPE.DELETE;
                             return (
                                 <React.Fragment key={idx}>
                                     {menu.actionType === OPTION_TYPE.DELETE && (
@@ -124,7 +192,9 @@ export const DropdownSidebarMenuButton: React.FC<
                                                 isNew: true,
                                             });
                                         }}
-                                        className="cursor-pointer"
+                                        variant={
+                                            isDelete ? 'destructive' : 'default'
+                                        }
                                     >
                                         {menu.icon ? (
                                             <menu.icon className={'h-4'} />
@@ -132,8 +202,7 @@ export const DropdownSidebarMenuButton: React.FC<
                                             <span className="h-4 me-4"></span>
                                         )}
                                         {menu.label}
-                                        {menu.actionType ===
-                                            OPTION_TYPE.DELETE && (
+                                        {isDelete && (
                                             <DropdownMenuShortcut>
                                                 ⌘+D
                                             </DropdownMenuShortcut>
@@ -145,16 +214,15 @@ export const DropdownSidebarMenuButton: React.FC<
                     )}
                 </DropdownMenuContent>
             </DropdownMenu>
-            {/* Render the selected component */}
-            {activeComponent && (
-                <div className="modal-container">
-                    {React.cloneElement(activeComponent as React.ReactElement<ModalComponentProps>, {
-                        item: modalProps,
-                        basePath: basePath,
-                        isOpen,
-                        setIsOpen,
-                    })}
-                </div>
+            
+            {modalType && (
+                <ModalManager
+                    modalType={modalType}
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    item={modalProps}
+                    basePath={basePath}
+                />
             )}
 
             <AlertDialogDelete

@@ -1,5 +1,4 @@
 import { ipcMain } from "electron";
-import Docker from 'dockerode';
 import { ServiceInfo } from "../types";
 import { dockerService } from "../services/docker-service";
 import { ERROR_CODES, EVENTS } from "../constants/events";
@@ -72,10 +71,21 @@ ipcMain.handle('docker-restart', async (event, projectPath: string, options: { s
 
 ipcMain.handle('docker-check', async () => {
     try {
-        const docker = new Docker();
-        await docker.ping();
-        return true;
+        const check = await dockerService.checkDockerDaemon();
+        return check.isRunning;
     } catch (err) {
         return false;
+    }
+});
+
+ipcMain.handle('docker-daemon-status', async () => {
+    try {
+        return await dockerService.checkDockerDaemon();
+    } catch (err) {
+        return {
+            isRunning: false,
+            error: 'Failed to check Docker daemon status',
+            details: err instanceof Error ? err.message : 'Unknown error'
+        };
     }
 });

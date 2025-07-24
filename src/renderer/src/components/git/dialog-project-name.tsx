@@ -16,6 +16,11 @@ export const ProjectNameDialog = ({
     onClose,
     defaultName,
     onConfirm,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    defaultName: string;
+    onConfirm: (projectName: string) => void;
 }) => {
     const { t } = useTranslation();
     const [projectName, setProjectName] = useState(defaultName);

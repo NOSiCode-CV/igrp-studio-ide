@@ -5,7 +5,7 @@ const useCore = () => {
     const getVersions = useCallback(async () => {
         const { result }: HandlerResponse = await window.api.getVersions(import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS);
 
-        return result.items.map((item) => {
+        return result.items.map((item: any) => {
             return {
                 label: item.version,
                 value: item.version,

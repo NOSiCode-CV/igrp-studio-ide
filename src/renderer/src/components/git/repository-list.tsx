@@ -120,7 +120,7 @@ export function RepositoryList() {
     useEffect(() => {
         window.electron.ipcRenderer.on(
             'clone-progress',
-            async (_event, data) => {
+            async (_event: any, data: any) => {
                 console.log(data)
                 if (data.status === 'success' || data.status === 'error') {
                     setCloningRepoId(null);
@@ -184,7 +184,7 @@ export function RepositoryList() {
 
         window.electron.ipcRenderer.on(
             'request-project-name',
-            (_event, { defaultName }) => {
+            (_event: any, { defaultName }: { defaultName: string }) => {
                 setNameDialog({
                     isOpen: true,
                     defaultName,

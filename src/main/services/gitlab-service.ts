@@ -2,6 +2,7 @@ import { Gitlab } from '@gitbeaker/node';
 import { GitStore } from './git-store';
 import { BrowserWindow } from 'electron';
 import { GitProviderConfig } from '../types';
+import { isOnline } from '../helpers/network-utils';
 
 let gitlab: any = null;
 
@@ -39,11 +40,18 @@ export const GitLabService = {
 
   async getUserInfo() {
     if (!gitlab) throw new Error('GitLab client not initialized');
+    
+    const online = await isOnline();
+    if (!online) throw new Error('ERR_INTERNET_DISCONNECTED');
+    
     return gitlab.Users.current();
   },
 
   async listIGRPStudioRepositoriesGitlab(_window: BrowserWindow) {
     try {
+      const online = await isOnline();
+      if (!online) throw new Error('ERR_INTERNET_DISCONNECTED');
+
       if (!gitlab) throw new Error('GitLab client not initialized');
       const igrpRepos: any = [];
       const batchSize = 10;

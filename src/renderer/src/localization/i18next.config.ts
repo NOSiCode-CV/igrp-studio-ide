@@ -8,9 +8,9 @@ import enCommon from '/src/localization/locales/en/translation.json';
 // @ts-ignore
 import ptCommon from '/src/localization/locales/pt/translation.json';
 
-// Fetch the initial language from the main process
+// Fetch the initial language from the main process using igrpStudioSettings
 const initializeI18n = async () => {
-  const currentLanguage = await window.electron.getLanguage();
+  const currentLanguage = await window.igrpStudioSettings.getLanguage();
 
   i18n
     .use(i18nextElectronFsBackend as Module)
