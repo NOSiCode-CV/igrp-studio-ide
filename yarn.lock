@@ -997,10 +997,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.221-2":
-  version "0.0.0-alpha.221-2"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.221-2.tgz#df7b8225e6575ff204ed981bb4739765a1c6de31"
-  integrity sha512-qM7sT1EM54pOn81hMhbT61O098RMx4ZreEdomqBACv9BrItDA8xU7cI+qnE8rxFWbL31oNaXKODSGLm6J/0wow==
+"@igrp/igrp-framework-react-design-system@^0.0.0-alpha.222":
+  version "0.0.0-alpha.222"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.0-alpha.222.tgz#953619e1c821719c481a0eb84bafec1c6ff42ef6"
+  integrity sha512-bHxFph89RVBfEd/5a6PX9te+Df37zDOZ3iuQuI7fqxUj9zE9IYPMHzvJliqtm84jPvtqs3EtM++FjWLp7iaJTw==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "1.2.11"
@@ -1039,7 +1039,6 @@
     input-otp "1.4.2"
     lucide-react "0.525.0"
     next-themes "0.4.6"
-    postcss "^8.5.6"
     react-day-picker "9.8.0"
     react-dropzone "14.3.8"
     react-hook-form "7.58.0"
