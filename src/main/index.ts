@@ -519,30 +519,3 @@ ipcMain.handle('watch-folder', (_, folderPath: string) => {
     });
 });
 
-// Test download functionality
-ipcMain.handle('test-download-template', async (_, destinationPath?: string) => {
-    try {
-        console.log('Testing template download...');
-        const success = await downloadIgrpNextTemplate(destinationPath, (progress) => {
-            console.log(`Download progress: ${progress.toFixed(2)}%`);
-            // Send progress to renderer if window exists
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send('template-download-progress', progress);
-            }
-        });
-        
-        if (success) {
-            console.log('Template download test completed successfully');
-            return { success: true, message: 'Template downloaded successfully' };
-        } else {
-            console.error('Template download test failed');
-            return { success: false, message: 'Template download failed' };
-        }
-    } catch (error) {
-        console.error('Template download test error:', error);
-        return { 
-            success: false, 
-            message: error instanceof Error ? error.message : 'Unknown error occurred' 
-        };
-    }
-});
