@@ -19,7 +19,6 @@ export const EngineService = {
     },
 
     async registerComponent({ customComponents, appComponents, currentPage, loadRegistryComponent }: { customComponents: any, appComponents: FileTree[], currentPage: string, loadRegistryComponent: () => void }): Promise<void> {
-      
         const components: ComponentRegisterConfig[] = customComponents.map((component: any) => ({
             name: component.name,
             label: getLabel(component.name),
