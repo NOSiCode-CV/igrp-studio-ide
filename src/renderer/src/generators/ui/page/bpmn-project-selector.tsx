@@ -23,16 +23,13 @@ import {
     BPMNPageDefinition,
 } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
-import { bpmnMockService } from '@renderer/services/bpmn-mock-service';
 
 interface BPMNProjectSelectorProps {
     onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
-    useMockService?: boolean;
 }
 
 export const BPMNProjectSelector = ({
     onPageClick,
-    useMockService = true,
 }: BPMNProjectSelectorProps) => {
     const [projects, setProjects] = useState<BPMNProject[]>([]);
     const [selectedProject, setSelectedProject] = useState<BPMNProject | null>(
@@ -44,15 +41,10 @@ export const BPMNProjectSelector = ({
     const [loading, setLoading] = useState(true);
     const [loadingProcesses, setLoadingProcesses] = useState(false);
 
-    // Get the appropriate service based on configuration
-    const getService = () => {
-        return useMockService ? bpmnMockService : bpmnService;
-    };
-
     // Load projects on component mount
     useEffect(() => {
         loadProjects();
-    }, [useMockService]);
+    }, []);
 
     // Load process definitions when project changes
     useEffect(() => {
@@ -66,7 +58,7 @@ export const BPMNProjectSelector = ({
     const loadProjects = async () => {
         try {
             setLoading(true);
-            const projectsData = await getService().getProjects();
+            const projectsData = await bpmnService.getProjects();
             setProjects(projectsData);
         } catch (error) {
             toast.error('Failed to load projects');
@@ -80,7 +72,7 @@ export const BPMNProjectSelector = ({
         try {
             setLoadingProcesses(true);
             const processes =
-                await getService().getProcessDefinitionsByProject(projectId);
+                await bpmnService.getProcessDefinitionsByProject(projectId);
             setProcessDefinitions(processes);
         } catch (error) {
             toast.error('Failed to load process definitions');
@@ -110,7 +102,7 @@ export const BPMNProjectSelector = ({
                     processKey: process.processKey,
                     processName: process.processKey,
                     processId: process.processDefinitionId,
-                    processVersion: process.version.toString(),
+                    processVersion: process.version?.toString() || 'N/A',
                     processCategory: selectedProject?.name || 'General',
                     projectId: selectedProject?.projectId || '',
                     projectCode: selectedProject?.code || '',
@@ -134,14 +126,16 @@ export const BPMNProjectSelector = ({
 
     const handleViewProcess = (process: BPMNProjectProcessDefinition) => {
         toast.info(`Viewing details for ${process.processKey}`, {
-            description: `Version ${process.version}, State: ${process.state}`,
+            description: `Version ${process.version}, State: ${process.status}`,
         });
     };
 
     const handleViewArtifacts = (process: BPMNProjectProcessDefinition) => {
-        const artifactCount = process.projectArtifacts.length;
+        const artifactCount = process.projectArtifacts?.length || 0;
         toast.info(`Process has ${artifactCount} artifacts`, {
-            description: process.projectArtifacts.map((a) => a.name).join(', '),
+            description:
+                process.projectArtifacts?.map((a) => a.name).join(', ') ||
+                'No artifacts',
         });
     };
 
@@ -166,77 +160,103 @@ export const BPMNProjectSelector = ({
                         <SelectValue placeholder="Choose a project..." />
                     </SelectTrigger>
                     <SelectContent>
-                        {projects.map((project) => (
-                            <SelectItem
-                                key={project.projectId}
-                                value={project.projectId}
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <span className="font-medium">
-                                        {project.name}
-                                    </span>
-                                    <Badge
-                                        variant={
-                                            project.active
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {project.code}
-                                    </Badge>
-                                    {!project.active && (
-                                        <Badge variant="outline">
-                                            Inactive
+                        {projects.length > 0 &&
+                            projects.map((project) => (
+                                <SelectItem
+                                    key={project.projectId}
+                                    value={project.projectId}
+                                >
+                                    <div className="flex items-center space-x-2">
+                                        <span className="font-medium">
+                                            {project.name}
+                                        </span>
+                                        <Badge
+                                            variant={
+                                                project.active
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
+                                        >
+                                            {project.code}
                                         </Badge>
-                                    )}
-                                </div>
-                            </SelectItem>
-                        ))}
+                                        {!project.active && (
+                                            <Badge variant="outline">
+                                                Inactive
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </SelectItem>
+                            ))}
                     </SelectContent>
                 </Select>
             </div>
 
             {/* Selected Project Info */}
             {selectedProject && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center space-x-2">
-                            <span>{selectedProject.name}</span>
-                            <Badge
-                                variant={
-                                    selectedProject.active
-                                        ? 'default'
-                                        : 'secondary'
-                                }
-                            >
-                                {selectedProject.code}
-                            </Badge>
-                        </CardTitle>
-                        <CardDescription>
-                            {selectedProject.description}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <span className="font-medium">Version:</span>{' '}
-                                {selectedProject.currentVersion}
+                <Card className="relative overflow-hidden  bg-gradient-to-br from-background to-muted/30">
+                    {/* Decorative background element */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-16 translate-x-16"></div>
+                    
+                    <CardHeader className="relative">
+                        <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                                <CardTitle className="flex items-center space-x-3 text-xl">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="font-bold">{selectedProject.name}</span>
+                                        <Badge
+                                            variant={selectedProject.active ? 'default' : 'secondary'}
+                                            className="text-xs px-2 py-1"
+                                        >
+                                            {selectedProject.code}
+                                        </Badge>
+                                    </div>
+                                </CardTitle>
+                                <CardDescription className="mt-2 text-base leading-relaxed">
+                                    {selectedProject.description || 'No description available'}
+                                </CardDescription>
                             </div>
-                            <div>
-                                <span className="font-medium">Status:</span>
+                            
+                            {/* Status indicator */}
+                            <div className="flex flex-col items-end space-y-2">
                                 <Badge
-                                    variant={
-                                        selectedProject.active
-                                            ? 'default'
-                                            : 'secondary'
-                                    }
-                                    className="ml-2"
+                                    variant={selectedProject.active ? 'default' : 'destructive'}
+                                    className={`px-3 py-1 text-xs font-medium ${
+                                        selectedProject.active 
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                    }`}
                                 >
-                                    {selectedProject.active
-                                        ? 'Active'
-                                        : 'Inactive'}
+                                    <div className="flex items-center space-x-1">
+                                        <div className={`w-2 h-2 rounded-full ${
+                                            selectedProject.active ? 'bg-green-500' : 'bg-red-500'
+                                        }`}></div>
+                                        <span>{selectedProject.active ? 'Active' : 'Inactive'}</span>
+                                    </div>
                                 </Badge>
                             </div>
+                        </div>
+                    </CardHeader>
+                    
+                    <CardContent className="relative">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Process Definitions Count */}
+                            <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-foreground">
+                                        {selectedProject.processDefinitions?.length || 0}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground font-medium">
+                                        Process Definitions
+                                    </div>
+                                </div>
+                            </div>
+
+                           
                         </div>
                     </CardContent>
                 </Card>
@@ -267,11 +287,21 @@ export const BPMNProjectSelector = ({
                                 >
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base">
-                                            {process.processKey}
+                                            <div>
+                                                <span className="font-medium">
+                                                    {process.title}
+                                                </span>
+                                                <Badge
+                                                    variant={'outline'}
+                                                    className="ml-2"
+                                                >
+                                                    {process.processKey}
+                                                </Badge>
+                                            </div>
                                         </CardTitle>
                                         <CardDescription className="text-sm">
-                                            Version {process.version} •{' '}
-                                            {process.state}
+                                            Version {process.version} •{'N/A'}{' '}
+                                            {process.status}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-3">
@@ -283,23 +313,24 @@ export const BPMNProjectSelector = ({
                                             <div>
                                                 Deployed:{' '}
                                                 {new Date(
-                                                    process.deploymentDate
+                                                    process.deploymentDate || ''
                                                 ).toLocaleDateString()}
                                             </div>
                                         </div>
 
-                                        {process.projectArtifacts.length >
-                                            0 && (
-                                            <div className="text-sm">
-                                                <span className="font-medium">
-                                                    Artifacts:
-                                                </span>{' '}
-                                                {
-                                                    process.projectArtifacts
-                                                        .length
-                                                }
-                                            </div>
-                                        )}
+                                        {process.projectArtifacts &&
+                                            process.projectArtifacts.length >
+                                                0 && (
+                                                <div className="text-sm">
+                                                    <span className="font-medium">
+                                                        Artifacts:
+                                                    </span>{' '}
+                                                    {
+                                                        process.projectArtifacts
+                                                            .length
+                                                    }
+                                                </div>
+                                            )}
 
                                         <Separator />
 
@@ -322,20 +353,21 @@ export const BPMNProjectSelector = ({
                                             >
                                                 View
                                             </Button>
-                                            {process.projectArtifacts.length >
-                                                0 && (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() =>
-                                                        handleViewArtifacts(
-                                                            process
-                                                        )
-                                                    }
-                                                >
-                                                    Artifacts
-                                                </Button>
-                                            )}
+                                            {process.projectArtifacts &&
+                                                process.projectArtifacts
+                                                    .length > 0 && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            handleViewArtifacts(
+                                                                process
+                                                            )
+                                                        }
+                                                    >
+                                                        Artifacts
+                                                    </Button>
+                                                )}
                                         </div>
                                     </CardContent>
                                 </Card>

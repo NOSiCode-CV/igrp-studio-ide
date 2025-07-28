@@ -19,7 +19,7 @@ export const EngineService = {
     },
 
     async registerComponent({ customComponents, appComponents, currentPage, loadRegistryComponent }: { customComponents: any, appComponents: FileTree[], currentPage: string, loadRegistryComponent: () => void }): Promise<void> {
-
+      
         const components: ComponentRegisterConfig[] = customComponents.map((component: any) => ({
             name: component.name,
             label: getLabel(component.name),
@@ -29,7 +29,7 @@ export const EngineService = {
                     properties: convertComponentsToJSONSchema(component.props),
                 }
             },
-            interactions: component.interactions,
+            interactions: convertCompToInteractinsJSONSchema(component.props),
             childrenTypes: [],
             imports: component.path ? [`import {${component.name}} from '${component.path}'`] : [],
             defaultValue: false,
