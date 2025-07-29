@@ -87,7 +87,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
 
     const renderContent = () => {
         return components.map((child: StructuredComponent, index: number) => {
-            const { children: components } = child;
+            const { children: components, id: componentId } = child;
 
             return (
                 <TabsContent value={child.id} key={index} asChild>
@@ -98,17 +98,13 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                     >
                         {components.length > 0 &&
                             components.map(
-                                (
-                                    childTab: StructuredComponent,
-                                    index: number
-                                ) => {
-                                    const { id: componentId } = comp;
+                                (childTab: StructuredComponent, ii: number) => {
 
                                     return (
                                         <Draggable
                                             key={childTab.id}
                                             item={childTab}
-                                            index={index}
+                                            index={ii}
                                             dropTargetId={componentId}
                                             mode="MOVE"
                                         >
@@ -118,7 +114,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                                                 onEdit={() =>
                                                     handleEditClick(
                                                         childTab,
-                                                        parentComponentName
+                                                        ''
                                                     )
                                                 }
                                                 group="group/tab-content"
