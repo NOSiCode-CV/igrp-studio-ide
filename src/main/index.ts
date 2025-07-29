@@ -10,7 +10,7 @@ import {
 import path, { join } from 'path';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
-import { closeApp, installExtensions, downloadIgrpNextTemplate } from './helpers/utils';
+import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
 import { FileTree, IOpenProject } from './types';
 
