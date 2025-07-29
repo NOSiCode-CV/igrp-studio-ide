@@ -40,6 +40,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     };
 
     const renderTriggers = () => {
+        //i want to break line when the trigger is too long
         return components.map((child: StructuredComponent, index: number) => {
             const { properties, componentName } = child;
 
@@ -59,7 +60,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                     <TabsTrigger
                         value={child.id}
                         key={index}
-                        className="w-full flex flex-wrap"
+                        className="min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2"
                         asChild
                     >
                         <div>
@@ -90,11 +91,11 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
             const { children: components, id: componentId } = child;
 
             return (
-                <TabsContent value={child.id} key={index} asChild>
+                <TabsContent value={child.id} key={index} asChild className="mt-4">
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
-                        className="rounded-lg border border-dashed"
+                        className="rounded-lg border border-dashed min-h-[200px]"
                     >
                         {components.length > 0 &&
                             components.map(
@@ -144,8 +145,10 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
             component={comp}
         >
             {components.length > 0 && (
-                <Tabs defaultValue={components[0].id}>
-                    <TabsList>{renderTriggers()}</TabsList>
+                <Tabs defaultValue={components[0].id} className="w-full">
+                    <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
+                        {renderTriggers()}
+                    </TabsList>
                     {renderContent()}
                 </Tabs>
             )}
