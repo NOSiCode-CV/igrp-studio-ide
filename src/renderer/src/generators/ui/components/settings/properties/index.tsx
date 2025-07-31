@@ -76,10 +76,13 @@ interface PageSelectionConfigProps {
     key: string;
     parentKey?: string;
     pageOptions: any;
-    columnsOptions: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
+    showNavigationParams?: boolean;
+    navigationParams?: Segment[];
     segments: Segment[];
+    columnsOptions: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[];
     onInputChange?: (fieldPath: string, value: any) => void;
     onPageChange: (value: string) => void;
+    onNavigationParamsChange?: (params: Segment[]) => void;
 }
 
 const toMap = (items: any) => {
@@ -102,7 +105,7 @@ const getNestedValue = (obj: any, path: string) => {
         );
 };
 
-const RENDER_IGNORE = ['segments'];
+const RENDER_IGNORE = ['segments', 'params'];
 
 const RenderPropsConfig = ({
     propsComp,
@@ -201,6 +204,7 @@ const RenderPropsConfig = ({
                         onInputChange={onInputChange}
                         columnsOptions={columnsOptions}
                         segments={formValues['segments']}
+                        navigationParams={formValues['params']}
                     />
                 </div>
             );
@@ -549,6 +553,9 @@ export const PageSelectionConfig = ({
     segments,
     onInputChange,
     onPageChange,
+    showNavigationParams = false,
+    navigationParams = [],
+    onNavigationParamsChange,
 }: PageSelectionConfigProps) => {
     const [selectedPagePath, setSelectedPagePath] = useState<string>(value);
 
@@ -576,6 +583,25 @@ export const PageSelectionConfig = ({
         });
 
         onInputChange?.('segments', mappedSegments);
+    };
+
+    // Handler to create segments with proper context
+    const handleParamsChange = (items: Record<string, string>[]) => {
+        const mappedParams = items.map((item) => {
+            const selectedField = columnsOptions.find(
+                (option) => option.value === item.paramName
+            );
+            return {
+                name: item.paramName,
+                tag: item.paramValue,
+                value: undefined,
+                context: selectedField?.type as 'column' | 'variable',
+            };
+        });
+
+        onNavigationParamsChange?.(mappedParams);
+
+        onInputChange?.('params', mappedParams);
     };
 
     // Handler to get default segments for the form
@@ -606,6 +632,13 @@ export const PageSelectionConfig = ({
         }));
     };
 
+    const getNavigationParamsOptions = () => {
+        return navigationParams.map((param) => ({
+            paramName: param.name,
+            paramValue: param.tag || '',
+        }));
+    };
+
     const fieldPairs = [
         {
             key: 'name',
@@ -620,12 +653,20 @@ export const PageSelectionConfig = ({
         },
     ];
 
+    const navigationParamsFieldPairs = [
+        { key: 'paramValue', label: 'Param Value' },
+        {
+            key: 'paramName',
+            label: 'Param Name',
+            options: getDataFieldOptions(),
+        },
+    ];
+
     return (
         <div className="space-y-4">
             <IGRPCombobox
                 value={value}
                 onChange={(value) => {
-
                     if (fieldPath) onInputChange?.(fieldPath, value as string);
 
                     onPageChange(value as string);
@@ -673,6 +714,20 @@ export const PageSelectionConfig = ({
                     />
                 </>
             )}
+
+            {showNavigationParams && (
+                <div className="space-y-2">
+                    <Label>Navigation Parameters</Label>
+
+                    <DynamicKeyValueForm
+                        defaultItems={getNavigationParamsOptions()}
+                        onAdd={(items) => {
+                            handleParamsChange(items);
+                        }}
+                        fieldPairs={navigationParamsFieldPairs}
+                    />
+                </div>
+            )}
         </div>
     );
 };
@@ -683,6 +738,7 @@ const SlugBindingConfig = ({
     key,
     parentKey,
     segments,
+    navigationParams,
     pageOptions,
     columnsOptions,
     onInputChange,
@@ -695,6 +751,7 @@ const SlugBindingConfig = ({
     columnsOptions: IGRPOptionsProps[];
     pageOptions: Option;
     segments: Segment[];
+    navigationParams: Segment[];
     onInputChange: (fieldPath: string, value: any) => void;
 }) => {
     const [linkType, setLinkType] = useState<string>();
@@ -743,6 +800,8 @@ const SlugBindingConfig = ({
                     segments={segments}
                     onInputChange={onInputChange}
                     onPageChange={() => void 0}
+                    showNavigationParams={true}
+                    navigationParams={navigationParams}
                 />
             )}
         </>

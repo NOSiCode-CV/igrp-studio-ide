@@ -43,6 +43,13 @@ const CardComponent = ({
 
     const classes = generateAllClasses(style);
 
+    // Extract icon properties for button components
+    const iconProps = iconProperties
+        ? {
+              ...iconProperties,
+          }
+        : {};
+
     return (
         <>
             {Component ? (
@@ -50,6 +57,7 @@ const CardComponent = ({
                 <Component
                     {...args}
                     {...FAKE_COMPONENT_DATA?.properties}
+                    {...iconProps}
                     className={cn(classes, className)}
                     comp={comp}
                     onDragEnd={onDragEnd}

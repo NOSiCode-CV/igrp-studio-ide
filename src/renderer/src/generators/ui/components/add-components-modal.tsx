@@ -103,7 +103,14 @@ export const AddComponentModal = ({
                 showErrorToast,
             });
         },
-        [children.length, generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponent, showErrorToast]
+        [
+            children.length,
+            generateTag,
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
+            findComponent,
+            showErrorToast,
+        ]
     );
 
     const handleOrderComponent = useCallback(
@@ -119,7 +126,13 @@ export const AddComponentModal = ({
                 showErrorToast,
             });
         },
-        [generateTag, handleAddChildToComponent, handleReorderChildInComponent, findComponent, showErrorToast]
+        [
+            generateTag,
+            handleAddChildToComponent,
+            handleReorderChildInComponent,
+            findComponent,
+            showErrorToast,
+        ]
     );
 
     const onEditComponent = (
@@ -306,10 +319,15 @@ const RenderCreatedComponents = ({
     // Render the icon for a component
     const renderIcon = (iconName: string) => {
         try {
-            const IconComponent = LucideIcons[iconName as keyof typeof LucideIcons] ?? ICON_MAP[iconName];
+            const IconComponent =
+                LucideIcons[iconName as keyof typeof LucideIcons] ??
+                ICON_MAP[iconName];
             if (IconComponent && typeof IconComponent === 'function') {
                 // Check if it's a React component by trying to render it
-                return React.createElement(IconComponent as React.ComponentType<any>, { className: "h-4 w-4" });
+                return React.createElement(
+                    IconComponent as React.ComponentType<any>,
+                    { className: 'h-4 w-4' }
+                );
             }
         } catch (error) {
             console.warn(`Failed to render icon: ${iconName}`, error);
@@ -366,13 +384,13 @@ const RenderCreatedComponents = ({
         <Droppable
             component={parentComp}
             onDrop={onOrderComponent}
-            className="w-full bg-none"
+            className="w-full bg-none min-h-[unset] p-0"
         >
             {components.map((component, index) => {
                 const { properties, label, id } = component;
                 return (
                     <React.Fragment key={index}>
-                        <div className="grid grid-cols-[1fr_auto] px-3 py-1 border-b last:border-b-0 hover:bg-muted/50">
+                        <div className="grid grid-cols-[1fr_auto] px-3 py-1 mb-0 border-b last:border-b-0 hover:bg-muted/50">
                             <div
                                 className="font-medium"
                                 style={{ paddingLeft: `${level * 20}px` }}
@@ -394,7 +412,7 @@ const RenderCreatedComponents = ({
                                         {renderIcon(
                                             properties?.iconProperties?.iconName
                                         )}
-                                        <span className='text-sm'>{`${label} (${properties.labelTrigger})`}</span>
+                                        <span className="text-sm">{`${label} (${properties.labelTrigger})`}</span>
                                     </div>
                                 </Draggable>
                             </div>
@@ -478,19 +496,15 @@ const ComponentTable = ({
                 </div>
             </div>
             {/* Table Body */}
-            <div>
-                <RenderCreatedComponents
-                    parentComp={parentComp}
-                    components={components}
-                    registryComponents={registryComponents}
-                    onEdit={onEdit}
-                    handleAddComponent={handleAddComponent}
-                    handleRemoveChildFromComponent={
-                        handleRemoveChildFromComponent
-                    }
-                    onOrderComponent={onOrderComponent}
-                />
-            </div>
+            <RenderCreatedComponents
+                parentComp={parentComp}
+                components={components}
+                registryComponents={registryComponents}
+                onEdit={onEdit}
+                handleAddComponent={handleAddComponent}
+                handleRemoveChildFromComponent={handleRemoveChildFromComponent}
+                onOrderComponent={onOrderComponent}
+            />
         </div>
     );
 };
