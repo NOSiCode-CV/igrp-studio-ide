@@ -61,6 +61,33 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
         }
     };
 
+    const loadConfigs = async () => {
+        try {
+           
+            const configsData =
+                await window.igrpStudioSettings.getBPMNConfigs();
+       
+            setConfigs(configsData);
+
+            // Set active config
+            if (configsData.activeConfigId) {
+                const active = configsData.configs.find(
+                    (c: BPMNConfig) => c.id === configsData.activeConfigId
+                );
+               // setActiveConfig(active || null);
+            } else {
+                console.log('No active config ID found');
+                //setActiveConfig(null);
+            }
+        } catch (error) {
+            toast.error('Failed to load API configurations');
+        }
+    };
+
+    useEffect(() => {
+        loadConfigs();
+    }, []);
+
     return (
         <div className="container mx-auto p-4 space-y-6">
             <div className="flex justify-between items-center">
