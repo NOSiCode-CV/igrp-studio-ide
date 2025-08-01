@@ -25,6 +25,7 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 import { Button } from '@renderer/components/ui/button';
+import { Badge } from '@renderer/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -429,6 +430,45 @@ const FncComponent = ({
                             <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                 {t('Function body')}
                             </Label>
+
+                            {/* Function Preview */}
+                            <div className="border-b bg-background p-3  font-mono text-sm">
+                                <div className="text-blue-600">
+                                    {formik.values.isAsync ? 'async ' : ''}
+                                    function{' '}
+                                    {formik.values.name || 'functionName'}
+                                </div>
+                                <div className="text-gray-600 ml-4">
+                                    (
+                                    {formik.values.arguments?.map(
+                                        (arg, index) => (
+                                            <span key={arg.id || index}>
+                                                {arg.name}: {arg.type}
+                                                {arg.isOptional ? '?' : ''}
+                                                {arg.isList ? '[]' : ''}
+                                                {index <
+                                                (formik.values.arguments
+                                                    ?.length || 0) -
+                                                    1
+                                                    ? ', '
+                                                    : ''}
+                                            </span>
+                                        )
+                                    ) || 'no arguments'}
+                                    )
+                                </div>
+                                <div className="text-green-600 mt-2">
+                                    →{' '}
+                                    {formik.values.returnValue?.type || 'void'}
+                                    {formik.values.returnValue?.isList
+                                        ? '[]'
+                                        : ''}
+                                    {formik.values.returnValue?.isNullable
+                                        ? ' | null'
+                                        : ''}
+                                </div>
+                            </div>
+
                             <MonacoEditor
                                 ref={editorRef}
                                 content={funct?.code || ''}

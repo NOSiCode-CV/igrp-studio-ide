@@ -37,38 +37,31 @@ const IGRPStudioRepetitive: React.FC<CardComponentProps> = ({
                         parentComp={comp}
                         onEdit={() => handleEdit(component, path)}
                     />
-                    {childComponents.length === 0 ? (
-                        <GenNoInfoComp
-                            type={getLabel(componentName).toUpperCase()}
-                        />
-                    ) : (
-                        childComponents.map((child, index) => {
-                            return (
-                                <Draggable
-                                    key={child.id}
-                                    item={child}
+                    {childComponents.map((child, index) => {
+                        return (
+                            <Draggable
+                                key={child.id}
+                                item={child}
+                                index={index}
+                                mode="MOVE"
+                                layout="horizontal"
+                                dropTargetId={componentId}
+                            >
+                                <BoxField
                                     index={index}
-                                    mode="MOVE"
-                                    layout="horizontal"
-                                    dropTargetId={componentId}
-                                    className={cn('border-none')}
+                                    parentComp={comp}
+                                    comp={child}
+                                    path={path}
+                                    onEdit={() => handleEdit(child, path)}
                                 >
-                                    <BoxField
-                                        index={index}
-                                        parentComp={comp}
+                                    <CardComponent
                                         comp={child}
-                                        path={path}
-                                        onEdit={() => handleEdit(child, path)}
-                                    >
-                                        <CardComponent
-                                            comp={child}
-                                            onDragEnd={onDragEnd}
-                                        />
-                                    </BoxField>
-                                </Draggable>
-                            );
-                        })
-                    )}
+                                        onDragEnd={onDragEnd}
+                                    />
+                                </BoxField>
+                            </Draggable>
+                        );
+                    })}
                 </Droppable>
             );
         },

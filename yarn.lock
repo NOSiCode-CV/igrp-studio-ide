@@ -997,10 +997,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/igrp-framework-react-design-system@^0.0.1-alpha.32":
-  version "0.0.1-alpha.32"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.0.1-alpha.32.tgz#5636f543c227d529fec888de42253c6d18deaaa8"
-  integrity sha512-bNW+6SIYZP8yv8wLUtcugM/16r5LSU7qoH64Rr7o1uIv3A9vWRKuC0Dx4rHYRWstPBSHWwdyvsGJSO19NsdOHw==
+"@igrp/igrp-framework-react-design-system@0.1.0-beta.1":
+  version "0.1.0-beta.1"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.1.tgz#9fadb4958d6aae1d7abca2fa567db51784f553e7"
+  integrity sha512-tIoUmkhW/cLJMpGkIICRBub3JFIEgEhRoBRWMzD2UmrBcZs+c+h6kr7SfD4oYGtKLFgP+1p0JnjONDFYqEGeAQ==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "^1.2.11"
@@ -1036,7 +1036,7 @@
     date-fns "4.1.0"
     embla-carousel-react "^8.6.0"
     input-otp "^1.4.2"
-    lucide-react "^0.534.0"
+    lucide-react "^0.535.0"
     next-themes "0.4.6"
     react-day-picker "^9.6.7"
     react-dropzone "14.3.8"
@@ -1049,10 +1049,10 @@
     vaul "^1.1.2"
     zod "^3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.459":
-  version "0.0.1-alpha.459"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.459.tgz#a4403bf56be982050d2a5d2eae2234952dd1c64d"
-  integrity sha512-XNOrLptXYm3RKeDOdSeydgKW1LmTreYhbGrI2HLEmau/iCr54qSNaQ3qw3bjs7c7J6h/MZEuWgzkdSJ1YiEZHQ==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.462":
+  version "0.0.1-alpha.462"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.462.tgz#6d709f3da0e907761260b5599147b554d514c2a4"
+  integrity sha512-+H6Kr8BWQ/L6yaXl+C9/QooTxRvlbqzW98MVSm5CiO3vcArZbZQZPX+7N60fuDqqhgns/xvCKCeaiDssWpURqQ==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -7465,10 +7465,10 @@ lucide-react@^0.525.0:
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.525.0.tgz#5f7bcecd65e4f9b2b5b6b5d295e3376df032d5e3"
   integrity sha512-Tm1txJ2OkymCGkvwoHt33Y2JpN5xucVq1slHcgE6Lk0WjDfjgKWor5CdVER8U6DvcfMwh4M8XxmpTiyzfmfDYQ==
 
-lucide-react@^0.534.0:
-  version "0.534.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.534.0.tgz#87b5083e20f97af294d91de43c7d1fbd049ed359"
-  integrity sha512-4Bz7rujQ/mXHqCwjx09ih/Q9SCizz9CjBV5repw9YSHZZZaop9/Oj0RgCDt6WdEaeAPfbcZ8l2b4jzApStqgNw==
+lucide-react@^0.535.0:
+  version "0.535.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.535.0.tgz#ee604b02a114ccf620c853fc850d8e1de319f567"
+  integrity sha512-2E3+YWGLpjZ8ejIYrdqxVjWMSMiRQHmU6xZYE9xA2SC5j2m0NeB4/acjhRdhxbfniBKoNEukDDQnmShTxwOQ4g==
 
 magic-string@^0.30.17:
   version "0.30.17"
