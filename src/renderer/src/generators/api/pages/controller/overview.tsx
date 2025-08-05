@@ -1,9 +1,9 @@
 import {
+    ColumnDef,
   IGRPAlertDialog,
     IGRPContainer,
     IGRPDataTable,
 } from '@igrp/igrp-framework-react-design-system';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 import {
     IGRPTabs,
     IGRPTabsContent,

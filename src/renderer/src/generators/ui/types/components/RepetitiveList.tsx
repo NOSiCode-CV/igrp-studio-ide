@@ -2,9 +2,6 @@ import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { getLabel } from '@renderer/utils';
-import { GenNoInfoComp } from '../../components/GenNoInfoComp';
-import { cn } from '@renderer/lib/utils';
 import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
@@ -27,7 +24,7 @@ const IGRPStudioRepetitive: React.FC<CardComponentProps> = ({
 
     const renderChildComp = useCallback(
         (component: StructuredComponent) => {
-            const { children: childComponents, componentName } = component;
+            const { children: childComponents } = component;
             const path = parentComponentName;
 
             return (

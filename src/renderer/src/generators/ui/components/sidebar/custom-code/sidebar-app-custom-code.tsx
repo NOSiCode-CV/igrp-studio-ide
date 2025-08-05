@@ -25,7 +25,6 @@ import {
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
 import { Button } from '@renderer/components/ui/button';
-import { Badge } from '@renderer/components/ui/badge';
 import {
     Dialog,
     DialogContent,

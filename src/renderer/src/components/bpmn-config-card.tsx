@@ -31,11 +31,9 @@ interface BPMNConfigCardProps {
 
 export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     config,
-    isActive,
     onEdit,
     onDelete,
     onToggleActive,
-    onTestConnection,
 }) => {
     const [isTesting, setIsTesting] = React.useState(false);
     const [isToggling, setIsToggling] = React.useState(false);

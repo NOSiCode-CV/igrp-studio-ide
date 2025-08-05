@@ -110,7 +110,7 @@ export const BPMNProjectSelector = ({
                 
 
             // Create a comprehensive page definition for the studio
-            const pageDefinition: BPMNPageDefinition = {
+            const pageDefinition: any = {
                 id: `bpmn-${process.processDefinitionId}`,
                 processDefinitionId: process.processDefinitionId,
                 processDefinitionKey: process.processKey,

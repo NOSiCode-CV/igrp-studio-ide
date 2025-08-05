@@ -633,10 +633,12 @@ export const PageSelectionConfig = ({
     };
 
     const getNavigationParamsOptions = () => {
-        return navigationParams.map((param) => ({
-            paramName: param.name,
-            paramValue: param.tag || '',
-        }));
+        return navigationParams && navigationParams.length > 0
+            ? navigationParams.map((param) => ({
+                  paramName: param.name,
+                  paramValue: param.tag || '',
+              }))
+            : [];
     };
 
     const fieldPairs = [

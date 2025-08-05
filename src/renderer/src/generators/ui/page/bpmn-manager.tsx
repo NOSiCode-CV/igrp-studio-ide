@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import {
     BPMNConfig,
     BPMNConfigs,
-    BPMNProcessDefinition,
     BPMNPageDefinition,
 } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
