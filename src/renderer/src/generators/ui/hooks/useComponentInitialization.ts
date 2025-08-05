@@ -4,7 +4,7 @@ import { newStructuredComponent } from '../dnd/helpers';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface ComponentInitializationProps {
-    isPage: boolean;
+    content: any;
     menuItems: any[];
     findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
     generateTag: (base: string) => string;
@@ -16,7 +16,7 @@ interface UseComponentInitializationReturn {
 }
 
 export const useComponentInitialization = ({
-    isPage,
+    content,
     findComponentById,
     generateTag,
     setAllComponents,
@@ -24,14 +24,19 @@ export const useComponentInitialization = ({
 
     const initializeComponents = useCallback(async () => {
         try {
+            const isPage = content.type === 'page';
+            const isBpmnProcess = content.type === 'bpmn-process'
+
+            let steps: any[] = [];
+
             const mainComponent = isPage
                 ? COMPONENT.PageContent
-                : COMPONENT.ComponentContent;
+                : isBpmnProcess
+                    ? COMPONENT.ProcessContent
+                    : COMPONENT.ComponentContent;
 
             const pageCompRegister = await findComponentById(mainComponent);
             const sectionCompRegister = await findComponentById(COMPONENT.Section);
-            const fragmetCompRegister = await findComponentById(COMPONENT.Fragment);
-
 
             if (!pageCompRegister) {
                 console.warn(`Component ${mainComponent} not found`);
@@ -43,18 +48,40 @@ export const useComponentInitialization = ({
                 [],
                 sectionCompRegister
             );
+            
+            if (isBpmnProcess) {
+                // Add BPMN artifacts to the page content
 
-            const fragment = newStructuredComponent(
-                COMPONENT.Fragment,
-                [],
-                fragmetCompRegister
-            );
+                try {
+                    const artifacts = content.artifacts || [];
+
+                    artifacts.forEach(async (artifact: any) => {
+                        const processStepCompRegister = await findComponentById(COMPONENT.ProcessStep);
+
+                        const processStep = newStructuredComponent(
+                            COMPONENT.ProcessStep,
+                            [],
+                            processStepCompRegister
+                        );
+
+                        processStep.properties = {
+                            ...processStep.properties,
+                            ...artifact
+                        };
+
+                        steps.push(processStep);
+                    })
+
+                } catch (error) {
+                    console.error('Error processing BPMN artifacts:', error);
+                }
+            }
 
             const pageContent = newStructuredComponent(
                 mainComponent,
                 isPage
                     ? [{ ...section, tag: generateTag(COMPONENT.Section) },]
-                    : [{ ...fragment, tag: generateTag(COMPONENT.Fragment) }],
+                    : steps,
                 pageCompRegister
             );
 
@@ -66,7 +93,7 @@ export const useComponentInitialization = ({
         } catch (error) {
             console.error('Error initializing components:', error);
         }
-    }, [isPage]);
+    }, []);
 
     return {
         initializeComponents,

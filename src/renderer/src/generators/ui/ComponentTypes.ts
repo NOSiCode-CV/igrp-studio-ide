@@ -116,6 +116,8 @@ export const GROUP_COMPONET: Record<string, string> = {
 export const COMPONENT: Record<string, string> = {
     ComponentContent: 'component',
     PageContent: "page",
+    ProcessContent: "process",
+    ProcessStep: "processStep",
     Columns: "columns",
     Column: "column",
     Grid: "grid",

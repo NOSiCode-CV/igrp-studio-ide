@@ -40,9 +40,12 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
     const handleConfigSave = async () => {
         setShowConfigModal(false);
         setEditingConfig(undefined);
+        // Reload configurations after save/update
+        await loadConfigs();
     };
 
     const handleEditConfig = (currentConfig: BPMNConfig) => {
+        console.log('Editing config:', currentConfig);
         setEditingConfig(currentConfig);
         setShowConfigModal(true);
     };
@@ -70,15 +73,15 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
             setConfigs(configsData);
 
             // Set active config
-            if (configsData.activeConfigId) {
+           /*  if (configsData.activeConfigId) {
                 const active = configsData.configs.find(
                     (c: BPMNConfig) => c.id === configsData.activeConfigId
                 );
-               // setActiveConfig(active || null);
+                setActiveConfig(active || null);
             } else {
                 console.log('No active config ID found');
-                //setActiveConfig(null);
-            }
+                setActiveConfig(null);
+            } */
         } catch (error) {
             toast.error('Failed to load API configurations');
         }
@@ -95,7 +98,10 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
                     title="BPMN Process Manager"
                     description="Connect to BPMN REST API and manage process definitions"
                 />
-                <Button onClick={() => setShowConfigModal(true)}>
+                <Button onClick={() => {
+                    setEditingConfig(undefined);
+                    setShowConfigModal(true);
+                }}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Configuration
                 </Button>
@@ -185,6 +191,7 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
             </Tabs>
 
             <BPMNConfigModal
+                key={`${editingConfig?.id || 'new'}-${showConfigModal ? 'open' : 'closed'}`}
                 isOpen={showConfigModal}
                 onClose={() => {
                     setShowConfigModal(false);

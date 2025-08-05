@@ -89,35 +89,61 @@ export const BPMNProjectSelector = ({
 
     const handleEditProcess = async (process: BPMNProjectProcessDefinition) => {
         try {
-            // Create a temporary page definition for the studio
+            // Show loading state
+            toast.loading(
+                `Loading process definition for ${process.processKey}...`
+            );
+
+            // Fetch the complete process definition details
+            const processDetails =
+                await bpmnService.getProcessDefinitionDetails(
+                    process.processDefinitionId
+                );
+            console.log('Process definition details:', processDetails);
+
+            // Get the BPMN XML content from the process details
+            const processXml =
+                processDetails.bpmFileContent ||
+                (await bpmnService.getProcessDefinitionXML(
+                    process.processDefinitionId
+                ));
+                
+
+            // Create a comprehensive page definition for the studio
             const pageDefinition: BPMNPageDefinition = {
-                id: `bpmn-${process.processDefinitionId}}`,
+                id: `bpmn-${process.processDefinitionId}`,
                 processDefinitionId: process.processDefinitionId,
                 processDefinitionKey: process.processKey,
-                description: `Process from ${selectedProject?.name} project`,
+                description: `Process from ${selectedProject?.name || 'BPMN'} project`,
                 isStartPage: true,
                 isTaskPage: false,
                 content: {
                     type: 'bpmn-process',
                     processKey: process.processKey,
-                    processName: process.processKey,
+                    processName:
+                        processDetails.title ||
+                        process.title ||
+                        process.processKey,
                     processId: process.processDefinitionId,
-                    processVersion: process.version?.toString() || 'N/A',
-                    processCategory: selectedProject?.name || 'General',
-                    projectId: selectedProject?.projectId || '',
-                    projectCode: selectedProject?.code || '',
+
                     projectName: selectedProject?.name || '',
-                    pageName: `${process.processKey} - ${selectedProject?.name || 'BPMN Process'}`,
+                    pageName: `${process.processKey} - ${process?.title || 'BPMN Process'}`,
                     pagePath: `/bpmn/${selectedProject?.code || 'project'}/${process.processKey}`,
+                    // Add artifacts information as JSON string
+                    artifacts: processDetails.projectArtifacts
                 },
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
             };
 
+            // Dismiss loading toast and show success
+            toast.dismiss();
             onPageClick?.(pageDefinition);
-            toast.success(`Opening ${process.processKey} in page builder`);
+            toast.success(`Opening ${process.processKey} in page builder`, {
+                description: `Loaded process definition with ${processXml ? 'XML content' : 'basic info'}`,
+            });
         } catch (error) {
-            toast.error('Failed to open process in page builder', {
+            toast.dismiss();
+            console.error('Error loading process definition:', error);
+            toast.error('Failed to load process definition', {
                 description:
                     error instanceof Error ? error.message : 'Unknown error',
             });
@@ -194,17 +220,20 @@ export const BPMNProjectSelector = ({
             {/* Selected Project Info */}
             {selectedProject && (
                 <Card className="relative overflow-hidden  bg-gradient-to-br from-background to-muted/30">
-                    {/* Decorative background element */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-16 translate-x-16"></div>
-                    
                     <CardHeader className="relative">
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
                                 <CardTitle className="flex items-center space-x-3 text-xl">
                                     <div className="flex items-center space-x-2">
-                                        <span className="font-bold">{selectedProject.name}</span>
+                                        <span className="font-bold">
+                                            {selectedProject.name}
+                                        </span>
                                         <Badge
-                                            variant={selectedProject.active ? 'default' : 'secondary'}
+                                            variant={
+                                                selectedProject.active
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
                                             className="text-xs px-2 py-1"
                                         >
                                             {selectedProject.code}
@@ -212,51 +241,73 @@ export const BPMNProjectSelector = ({
                                     </div>
                                 </CardTitle>
                                 <CardDescription className="mt-2 text-base leading-relaxed">
-                                    {selectedProject.description || 'No description available'}
+                                    {selectedProject.description ||
+                                        'No description available'}
                                 </CardDescription>
                             </div>
-                            
+
                             {/* Status indicator */}
                             <div className="flex flex-col items-end space-y-2">
                                 <Badge
-                                    variant={selectedProject.active ? 'default' : 'destructive'}
+                                    variant={
+                                        selectedProject.active
+                                            ? 'default'
+                                            : 'destructive'
+                                    }
                                     className={`px-3 py-1 text-xs font-medium ${
-                                        selectedProject.active 
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                                        selectedProject.active
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                                     }`}
                                 >
                                     <div className="flex items-center space-x-1">
-                                        <div className={`w-2 h-2 rounded-full ${
-                                            selectedProject.active ? 'bg-green-500' : 'bg-red-500'
-                                        }`}></div>
-                                        <span>{selectedProject.active ? 'Active' : 'Inactive'}</span>
+                                        <div
+                                            className={`w-2 h-2 rounded-full ${
+                                                selectedProject.active
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
+                                            }`}
+                                        ></div>
+                                        <span>
+                                            {selectedProject.active
+                                                ? 'Active'
+                                                : 'Inactive'}
+                                        </span>
                                     </div>
                                 </Badge>
                             </div>
                         </div>
                     </CardHeader>
-                    
+
                     <CardContent className="relative">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Process Definitions Count */}
                             <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
                                 <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <svg
+                                        className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        />
                                     </svg>
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold text-foreground">
-                                        {selectedProject.processDefinitions?.length || 0}
+                                        {selectedProject.processDefinitions
+                                            ?.length || 0}
                                     </div>
                                     <div className="text-xs text-muted-foreground font-medium">
                                         Process Definitions
                                     </div>
                                 </div>
                             </div>
-
-                           
                         </div>
                     </CardContent>
                 </Card>

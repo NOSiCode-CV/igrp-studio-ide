@@ -149,7 +149,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         });
 
         const { initializeComponents } = useComponentInitialization({
-            isPage,
+            content,
             menuItems,
             findComponentById,
             generateTag,

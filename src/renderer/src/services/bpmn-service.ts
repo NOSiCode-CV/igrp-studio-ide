@@ -189,6 +189,22 @@ class BPMNService {
     return response.bpmn20Xml;
   }
 
+  async getProcessDefinitionDetails(processDefinitionId: string): Promise<any> {
+    // First, find the project that contains this process definition
+    return await this.makeRequest<BPMNProject[]>(`/projects/process-definitions/${processDefinitionId}`);
+
+  }
+
+  async getProcessArtifacts(processDefinitionId: string): Promise<any[]> {
+    try {
+      const processDetails = await this.getProcessDefinitionDetails(processDefinitionId);
+      return processDetails.projectArtifacts || [];
+    } catch (error) {
+      console.error('Error fetching process artifacts:', error);
+      return [];
+    }
+  }
+
   // Configuration Management using global settings
   async deleteConfig(configId?: string): Promise<void> {
     this.config = null;
