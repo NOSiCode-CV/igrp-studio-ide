@@ -2,9 +2,10 @@
 import { addEnum, addResponse, deleteElement, newApi, serializeElement as createElement, addDTO, addModule, addModel, addController, getSpringDependencies } from '@igrp/igrp-studio-springboot-engine';
 import { BaseEngine } from '../interfaces';
 import { BaseApiConfig, ControllerConfig, DeleteConfig, DTOConfig, EnumConfig, ModelConfig, ModuleConfig, ResponseConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ProjectData, SpringConfigData } from '../types';
+import { ProjectData } from '../types';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 import { ensureDirectoryExists } from '../helpers';
+import { app } from 'electron';
 
 export class SpringEngine implements BaseEngine {
 
@@ -13,7 +14,6 @@ export class SpringEngine implements BaseEngine {
   }
 
   async createController(config: ControllerConfig, basePath: string): Promise<void> {
-    console.log(config)
     await addController(config, basePath)
   }
 
@@ -40,12 +40,12 @@ export class SpringEngine implements BaseEngine {
     // For Spring engine, we'll create a copy with a modified name
     const { name, type, module, content } = config;
     const duplicateName = `${name}Copy`;
-    
+
     // Create a deep copy of the content and update the name
     const duplicateContent = JSON.parse(JSON.stringify(content));
     duplicateContent.name = duplicateName;
     duplicateContent.id = `${duplicateContent.id}_copy`;
-    
+
     // Create the duplicate based on type
     switch (type) {
       case 'model':
@@ -71,7 +71,8 @@ export class SpringEngine implements BaseEngine {
   async createProject(project: ProjectData, basePath: string): Promise<void> {
 
     const appConfig: BaseApiConfig = {
-      ...project.config as SpringConfigData,
+      ...project.config,
+      version: app.getVersion(),
       workspaceId: project.workspaceId,
       id: project.id,
       type: 'springboot',

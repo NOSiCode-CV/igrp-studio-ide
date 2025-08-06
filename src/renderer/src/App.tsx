@@ -6,6 +6,9 @@ import rootReducer from './redux';
 import { ThemeProvider } from './components/theme-provider';
 import { ActiveThemeProvider } from './components/ActiveThemeProvider';
 import { ThemeService } from './services/ThemeService';
+
+import '@igrp/igrp-framework-react-design-system/dist/styles.css';
+
 // Configure Redux store
 const store = configureStore({ reducer: rootReducer, devTools: true });
 

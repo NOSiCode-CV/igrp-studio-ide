@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ToolCheck } from '../main/types'
+import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ToolCheck, BPMNConfig } from '../main/types'
 import { EVENTS } from '../main/constants/events'
 import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
@@ -414,7 +414,21 @@ const appLogic = {
 	},
 
 	removeAllListeners: () => ipcRenderer.removeAllListeners(EVENTS.APPLOGIC.CHANGE),
-	}
+}
+
+const igrpStudioSettings = {
+	getBPMNConfigs: () => ipcRenderer.invoke(EVENTS.BPMN.GET_CONFIGS),
+	getBPMNConfig: () => ipcRenderer.invoke(EVENTS.BPMN.GET_CONFIG),
+	addBPMNConfig: (config: BPMNConfig) => ipcRenderer.invoke(EVENTS.BPMN.ADD_CONFIG, config),
+	updateBPMNConfig: (config: BPMNConfig) => ipcRenderer.invoke(EVENTS.BPMN.UPDATE_CONFIG, config),
+	deleteBPMNConfig: (configId: string) => ipcRenderer.invoke(EVENTS.BPMN.DELETE_CONFIG, configId),
+	setActiveBPMNConfig: (configId: string) => ipcRenderer.invoke(EVENTS.BPMN.SET_ACTIVE_CONFIG, configId),
+	deleteAllBPMNConfigs: () => ipcRenderer.invoke(EVENTS.BPMN.DELETE_ALL_CONFIGS),
+	
+	// Language methods
+	getLanguage: () => ipcRenderer.invoke(EVENTS.LANGUAGE.GET_LANGUAGE),
+	setLanguage: (lang: string) => ipcRenderer.invoke(EVENTS.LANGUAGE.SET_LANGUAGE, lang),
+}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -423,9 +437,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('electron', {
 			...electronAPI,
 			getAppVersion: () => ipcRenderer.invoke('get-app-version'),
-			getLanguage: () => ipcRenderer.invoke("get-language"),
-			setLanguage: (lang: string) => ipcRenderer.invoke("set-language", lang),
-			checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+				checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 			downloadUpdate: () => ipcRenderer.invoke('download-update'),
 			installUpdate: () => ipcRenderer.invoke('install-update'),
 			watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
@@ -439,6 +451,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('igrpStudio', repo)
 		contextBridge.exposeInMainWorld('menu', windowControls)
 		contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
+		contextBridge.exposeInMainWorld('igrpStudioSettings', igrpStudioSettings)
 
 	} catch (error) {
 		console.error(error)
@@ -450,6 +463,7 @@ if (process.contextIsolated) {
 	window.igrpStudio = repo
 	window.menu = windowControls
 	window.appLogicAPI = appLogic
+	window.igrpStudioSettings = igrpStudioSettings
 }
 
 declare global {
@@ -460,5 +474,6 @@ declare global {
     igrpStudio: typeof repo;
     menu: typeof windowControls;
     appLogicAPI: typeof appLogic;
+    igrpStudioSettings: typeof igrpStudioSettings;
   }
 }

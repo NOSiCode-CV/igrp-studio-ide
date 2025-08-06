@@ -450,7 +450,7 @@ export class WorkspaceRepository {
         }) || [];
     }
 
-    async getRecentWorkspaces(limit = 5): Promise<IWorkspace[]> {
+    async getRecentWorkspaces(limit = 15): Promise<IWorkspace[]> {
         const workspaces = await this.listWorkspaces();
         return workspaces
             .sort((a, b) => {

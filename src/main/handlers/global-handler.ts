@@ -1,7 +1,10 @@
 import { ipcMain } from "electron";
 import { IGRPStudioSettings } from "../helpers/igrp-studio-settings";
 import { DoctorService } from "../services/doctor-service";
-import { ToolCheck } from "../types";
+import { ToolCheck, BPMNConfig } from "../types";
+import { EVENTS } from "../constants/events";
+import fs from 'fs';
+import path from "path";
 
 ipcMain.handle('theme:get', async () => {
     return IGRPStudioSettings.getActiveTheme();
@@ -18,10 +21,8 @@ ipcMain.handle('run-doctor-checks', async (): Promise<ToolCheck[]> => {
 });
 
 // Save project icon file
-ipcMain.handle('save-project-icon', async (event, { filePath, fileData, assetsPath }) => {
+ipcMain.handle('save-project-icon', async (_event, { filePath, fileData, assetsPath }) => {
     try {
-        const fs = require('fs');
-        const path = require('path');
         
         // Ensure assets directory exists
         await fs.promises.mkdir(assetsPath, { recursive: true });
@@ -38,10 +39,8 @@ ipcMain.handle('save-project-icon', async (event, { filePath, fileData, assetsPa
 });
 
 // Get icon file data for secure serving
-ipcMain.handle('get-icon-file', async (event, iconPath, workspacePath) => {
+ipcMain.handle('get-icon-file', async (_event, iconPath, workspacePath) => {
     try {
-        const fs = require('fs');
-        const path = require('path');
         
         let fullPath: string;
         
@@ -87,3 +86,95 @@ ipcMain.handle('get-icon-file', async (event, iconPath, workspacePath) => {
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 });
+
+// BPMN Settings IPC Handlers
+ipcMain.handle(EVENTS.BPMN.GET_CONFIGS, async () => {
+    try {
+        const configs = await IGRPStudioSettings.getBPMNConfigs();
+        return configs;
+    } catch (error) {
+        console.error('Error getting BPMN configs:', error);
+        return { configs: [], activeConfigId: undefined };
+    }
+});
+
+ipcMain.handle(EVENTS.BPMN.GET_CONFIG, async () => {
+    try {
+        const config = await IGRPStudioSettings.getBPMNConfig();
+        return config;
+    } catch (error) {
+        console.error('Error getting BPMN config:', error);
+        return null;
+    }
+});
+
+ipcMain.handle(EVENTS.BPMN.ADD_CONFIG, async (_event, config: BPMNConfig) => {
+    try {
+        await IGRPStudioSettings.addBPMNConfig(config);
+        return { success: true };
+    } catch (error) {
+        console.error('Error adding BPMN config:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+
+ipcMain.handle(EVENTS.BPMN.UPDATE_CONFIG, async (_event, config: BPMNConfig) => {
+    try {
+        await IGRPStudioSettings.updateBPMNConfig(config);
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating BPMN config:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+
+ipcMain.handle(EVENTS.BPMN.DELETE_CONFIG, async (_event, configId: string) => {
+    try {
+        await IGRPStudioSettings.deleteBPMNConfig(configId);
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting BPMN config:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+
+ipcMain.handle(EVENTS.BPMN.SET_ACTIVE_CONFIG, async (_event, configId: string) => {
+    try {
+        await IGRPStudioSettings.setActiveBPMNConfig(configId);
+        return { success: true };
+    } catch (error) {
+        console.error('Error setting active BPMN config:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+
+ipcMain.handle(EVENTS.BPMN.DELETE_ALL_CONFIGS, async () => {
+    try {
+        await IGRPStudioSettings.deleteAllBPMNConfigs();
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting all BPMN configs:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+});
+
+// Language Settings IPC Handlers
+ipcMain.handle(EVENTS.LANGUAGE.GET_LANGUAGE, () => {
+    try {
+        return IGRPStudioSettings.getLanguage();
+    } catch (error) {
+        console.error('Error getting language:', error);
+        return 'en'; // fallback to default
+    }
+});
+
+ipcMain.handle(EVENTS.LANGUAGE.SET_LANGUAGE, (_event, lang: string) => {
+    try {
+        IGRPStudioSettings.setLanguage(lang);
+        return lang; // Return the new language for confirmation
+    } catch (error) {
+        console.error('Error setting language:', error);
+        return 'en'; // fallback to default
+    }
+});
+

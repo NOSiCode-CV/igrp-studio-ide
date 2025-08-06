@@ -141,6 +141,7 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
             const { error } = await window.engine.createModel(values, ENV_TYPES.SPRING, basePath);
 
             if (error) {
+                console.log('error', error);
                 showErrorToast(error);
                 return;
             }

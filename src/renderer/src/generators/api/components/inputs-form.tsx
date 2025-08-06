@@ -3,13 +3,7 @@ import { LabelRequired } from '@renderer/components/label-required';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
+
 import { Switch } from '@renderer/components/ui/switch';
 import { cn } from '@renderer/lib/utils';
 
@@ -104,19 +98,8 @@ export const SelectInput = ({
                 {label}
             </Label>
         )}
-        {/*  <Select value={value} onValueChange={onChange}>
-            <SelectTrigger id={id} className="w-full">
-                <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-                {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select> */}
         <IGRPCombobox
+            name={id}
             options={options}
             value={value as string}
             onChange={(e) => {

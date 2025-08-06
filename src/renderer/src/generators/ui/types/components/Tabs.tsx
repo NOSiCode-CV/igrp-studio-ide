@@ -12,6 +12,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import BoxField from '../tools/BoxFields';
 
 const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     comp,
@@ -39,6 +40,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     };
 
     const renderTriggers = () => {
+        //i want to break line when the trigger is too long
         return components.map((child: StructuredComponent, index: number) => {
             const { properties, componentName } = child;
 
@@ -51,18 +53,20 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                     index={index}
                     dropTargetId={componentId}
                     dropZone={true}
-                    className={cn('p-0 bg-muted/0 min-w-36', className)}
+                    className={cn('p-0 bg-muted/0', className)}
                     mode="MOVE"
                     layout="horizontal"
                 >
                     <TabsTrigger
                         value={child.id}
                         key={index}
-                        className="w-full"
+                        className="min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2"
                         asChild
                     >
                         <div>
-                            <BoxWrapper
+                            <BoxField
+                                parentComp={comp}
+                                index={index}
                                 comp={child}
                                 onEdit={() =>
                                     handleEditClick(child, parentComponentName)
@@ -70,11 +74,11 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                                 group="group/tabitem-trigger"
                                 className={cn(
                                     'opacity-0 group-hover/tabitem-trigger:opacity-100',
-                                    'data-[state=active]:opacity-100'
+                                    'data-[state=active]:opacity-100 right-0 left-auto'
                                 )}
                             >
                                 <span>{label || componentName}</span>
-                            </BoxWrapper>
+                            </BoxField>
                         </div>
                     </TabsTrigger>
                 </Draggable>
@@ -84,28 +88,24 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
 
     const renderContent = () => {
         return components.map((child: StructuredComponent, index: number) => {
-            const { children: components } = child;
+            const { children: components, id: componentId } = child;
 
             return (
-                <TabsContent value={child.id} key={index} asChild>
+                <TabsContent value={child.id} key={index} asChild className="mt-4">
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
-                        className="rounded-lg border border-dashed"
+                        className="rounded-lg border border-dashed min-h-[200px]"
                     >
                         {components.length > 0 &&
                             components.map(
-                                (
-                                    childTab: StructuredComponent,
-                                    index: number
-                                ) => {
-                                    const { id: componentId } = comp;
+                                (childTab: StructuredComponent, ii: number) => {
 
                                     return (
                                         <Draggable
                                             key={childTab.id}
                                             item={childTab}
-                                            index={index}
+                                            index={ii}
                                             dropTargetId={componentId}
                                             mode="MOVE"
                                         >
@@ -115,7 +115,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                                                 onEdit={() =>
                                                     handleEditClick(
                                                         childTab,
-                                                        parentComponentName
+                                                        ''
                                                     )
                                                 }
                                                 group="group/tab-content"
@@ -145,8 +145,10 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
             component={comp}
         >
             {components.length > 0 && (
-                <Tabs defaultValue={components[0].id}>
-                    <TabsList>{renderTriggers()}</TabsList>
+                <Tabs defaultValue={components[0].id} className="w-full">
+                    <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
+                        {renderTriggers()}
+                    </TabsList>
                     {renderContent()}
                 </Tabs>
             )}

@@ -6,8 +6,15 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Button } from '@renderer/components/ui/button';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@renderer/components/ui/tooltip';
+import { Badge } from '@renderer/components/ui/badge';
 import { getId } from '@renderer/utils';
-import { FunctionSquare, Type } from 'lucide-react';
+import { FunctionSquare, Type, Info, Code, Zap } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface TabStatesProps {
@@ -19,8 +26,8 @@ interface TabStatesProps {
 }
 
 interface TabFunctionsProps {
-    functions: CustomFunctionConfig[];
-    currentFunction?: CustomFunctionConfig;
+    functions: ComponentCustomFunctionConfig[];
+    currentFunction?: ComponentCustomFunctionConfig;
     editorRef?: React.RefObject<any>;
     onInsertImport?: (importObj: Import) => void;
     globalFilter?: string;
@@ -44,6 +51,10 @@ function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+export interface ComponentCustomFunctionConfig extends CustomFunctionConfig {
+    args?: Arguments[]; // Alternative property for arguments in components
+}
+
 const TabStates = ({
     states,
     editorRef,
@@ -51,7 +62,6 @@ const TabStates = ({
     globalFilter,
     pageArguments,
 }: TabStatesProps) => {
-
     const allStates = useMemo(() => {
         const pageArgsAsStates: State[] = (pageArguments || []).map((arg) => ({
             ...arg,
@@ -93,50 +103,106 @@ const TabStates = ({
 
     return (
         <div className="space-y-4">
-            <p className="text-muted-foreground text-xs">
-                Use <strong>Name</strong> to insert the state name, or{' '}
-                <strong>Set</strong> to insert the setter function with its
-                default value.
-            </p>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>
+                    Use <strong>Name</strong> to insert the state variable, or{' '}
+                    <strong>Set</strong> to insert the setter function
+                </span>
+            </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
                 {filteredStates.length > 0 ? (
                     filteredStates.map((state, index) => (
                         <div
                             key={index}
-                            className="flex justify-between items-center w-full border p-2 rounded-sm hover:bg-accent hover:text-accent-foreground"
+                            className="flex flex-col w-full border p-3 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
-                            <div className="flex flex-col space-x-2">
-                                <span className="font-medium truncate max-w-[150px]">
-                                    {state.name}
-                                </span>
-                                <span className="text-muted-foreground text-sm">
-                                    {state.type}
-                                </span>
-                            </div>
-                            <div className="space-x-2 flex flex-1 justify-end">
-                                <Button
-                                    size={'sm'}
-                                    variant="outline"
-                                    onClick={() => {
-                                        handleInsertState(state);
-                                    }}
-                                >
-                                    Name
-                                </Button>
-                                {!pageArguments?.some(
-                                    (arg) => arg.id === state.id
-                                ) && (
-                                    <Button
-                                        size={'sm'}
-                                        variant="outline"
-                                        onClick={() => {
-                                            handleInsertStateSet(state);
-                                        }}
-                                    >
-                                        Set
-                                    </Button>
-                                )}
+                            <div className="flex justify-between items-start w-full">
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-medium text-sm truncate">
+                                            {state.name}
+                                        </span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-xs"
+                                        >
+                                            {state.type}
+                                        </Badge>
+                                        {pageArguments?.some(
+                                            (arg) => arg.id === state.id
+                                        ) && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="text-xs"
+                                            >
+                                                Page Arg
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    {state.defaultValue && (
+                                        <p className="text-xs text-muted-foreground">
+                                            Default: {state.defaultValue}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-2 ml-3">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    size={'sm'}
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                        handleInsertState(state)
+                                                    }
+                                                    className="flex items-center gap-1"
+                                                >
+                                                    <Code className="w-3 h-3" />
+                                                    Name
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>
+                                                    Insert state variable name
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+
+                                    {!pageArguments?.some(
+                                        (arg) => arg.id === state.id
+                                    ) && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        size={'sm'}
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            handleInsertStateSet(
+                                                                state
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1"
+                                                    >
+                                                        <Zap className="w-3 h-3" />
+                                                        Set
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        Insert setter function
+                                                        with default value
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))
@@ -191,33 +257,88 @@ const TabSnipptes = ({
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>
+                    Click "Insert Code" to add the code snippet to your editor
+                </span>
+            </div>
+
+            <div className="flex flex-col gap-3">
                 {filteredSnippets.length > 0 ? (
                     filteredSnippets.map((snippet, index) => (
                         <div
                             key={index}
-                            className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
+                            className="flex flex-col w-full border p-3 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
-                            <div className="flex flex-col">
-                                <div className="flex items-center space-x-2">
-                                    <span className="font-medium">
-                                        {snippet.title}
-                                    </span>
-                                    <span className="text-gray-400 text-sm">
-                                        {snippet.type}
-                                    </span>
+                            <div className="flex justify-between items-start w-full">
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-medium text-sm truncate">
+                                            {snippet.title}
+                                        </span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-xs"
+                                        >
+                                            {snippet.type}
+                                        </Badge>
+                                    </div>
+
+                                    {snippet.description && (
+                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                            {snippet.description}
+                                        </p>
+                                    )}
+
+                                    {snippet.code && (
+                                        <div className="mt-2">
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                                                <Code className="w-3 h-3" />
+                                                <span>Preview:</span>
+                                            </div>
+                                            <div className="bg-muted p-2 rounded text-xs font-mono overflow-x-auto">
+                                                {snippet.code
+                                                    .replace(
+                                                        '{{tag}}',
+                                                        componentTag
+                                                    )
+                                                    .substring(0, 100)}
+                                                {snippet.code.length > 100 &&
+                                                    '...'}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                    {snippet.description}
-                                </p>
+
+                                <div className="flex items-center gap-2 ml-3">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size={'sm'}
+                                                    onClick={() =>
+                                                        handleInsertSnippet(
+                                                            snippet
+                                                        )
+                                                    }
+                                                    className="flex items-center gap-1"
+                                                >
+                                                    <Zap className="w-3 h-3" />
+                                                    Insert
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>
+                                                    Insert code snippet into
+                                                    editor
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                             </div>
-                            <Button
-                                variant="outline"
-                                size={'sm'}
-                                onClick={() => handleInsertSnippet(snippet)}
-                            >
-                                Insert Code
-                            </Button>
                         </div>
                     ))
                 ) : (
@@ -231,7 +352,7 @@ const TabSnipptes = ({
                         description={
                             globalFilter
                                 ? 'Try adjusting your search terms'
-                                : 'Create your first custom Snnippt to add functionality to your page!'
+                                : 'Create your first custom snippet to add functionality to your page!'
                         }
                         className="py-12"
                     />
@@ -248,6 +369,7 @@ const TabsFunctions = ({
     onInsertImport,
     globalFilter,
 }: TabFunctionsProps) => {
+    console.log('functions', functions);
     const filteredFunctions = useMemo(() => {
         let filtered = currentFunction
             ? functions.filter((funct) => funct.id !== currentFunction.id)
@@ -268,11 +390,29 @@ const TabsFunctions = ({
         return filtered;
     }, [functions, currentFunction, globalFilter]);
 
-    const handleInsertFunction = (funct: CustomFunctionConfig) => {
+    const handleInsertFunction = (funct: ComponentCustomFunctionConfig) => {
         if (editorRef && editorRef.current) {
             let code = funct.code;
             if ((funct.id || !code) && funct.name) {
-                code = `${funct.name}();`;
+                // Build function call with arguments
+                const args = funct.arguments || funct.args || [];
+                if (args.length > 0) {
+                    // Create argument placeholders with types for better UX
+                    const argPlaceholders = args
+                        .map((arg) => {
+                            if (arg.isOptional) {
+                                return `${arg.name}?: ${arg.type}`;
+                            } else if (arg.isList) {
+                                return `${arg.name}: ${arg.type}[]`;
+                            } else {
+                                return `${arg.name}: ${arg.type}`;
+                            }
+                        })
+                        .join(', ');
+                    code = `${funct.name}(${argPlaceholders});`;
+                } else {
+                    code = `${funct.name}();`;
+                }
             }
             editorRef.current.insertTextAtCursor(code);
             if (funct.path)
@@ -283,32 +423,127 @@ const TabsFunctions = ({
         }
     };
 
+    const renderParameters = (params: any[]) => {
+        if (!params || params.length === 0) return null;
+
+        return (
+            <div className="mt-2 space-y-1">
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Code className="w-3 h-3" />
+                    <span>Parameters:</span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                    {params.map((param, idx) => (
+                        <TooltipProvider key={idx}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs cursor-help"
+                                    >
+                                        {param.name}
+                                        {param.isOptional && '?'}
+                                        {param.isList && '[]'}
+                                        <span className="text-muted-foreground ml-1">
+                                            : {param.type}
+                                        </span>
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <div className="text-xs">
+                                        <div className="font-medium">
+                                            {param.name}
+                                        </div>
+                                        <div className="text-muted-foreground">
+                                            Type: {param.type}
+                                        </div>
+                                        {param.isOptional && (
+                                            <div className="text-blue-500">
+                                                Optional
+                                            </div>
+                                        )}
+                                        {param.isList && (
+                                            <div className="text-green-500">
+                                                Array
+                                            </div>
+                                        )}
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>
+                    Click "Insert Code" to add the function call to your editor
+                </span>
+            </div>
+
+            <div className="flex flex-col gap-3">
                 {filteredFunctions.length > 0 ? (
                     filteredFunctions.map((funct, index) => (
                         <div
                             key={index}
-                            className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
+                            className="flex flex-col w-full border p-3 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
-                            <div className="flex items-center space-x-2">
-                                <span className="font-medium">
-                                    {funct.name}
-                                </span>
-                                <span className="text-gray-400 text-sm">
-                                    {funct.returnValue?.type}
-                                </span>
+                            <div className="flex justify-between items-start w-full">
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-medium text-sm truncate">
+                                            {funct.name}
+                                        </span>
+                                        {funct.returnValue?.type && (
+                                            <Badge
+                                                variant="outline"
+                                                className="text-xs"
+                                            >
+                                                → {funct.returnValue.type}
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    {/* Display function parameters */}
+                                    {(funct.arguments || funct.args) &&
+                                        renderParameters(
+                                            funct.arguments || funct.args
+                                        )}
+                                </div>
+
+                                <div className="flex items-center gap-2 ml-3">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    size={'sm'}
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        handleInsertFunction(
+                                                            funct
+                                                        );
+                                                    }}
+                                                    className="flex items-center gap-1"
+                                                >
+                                                    <Zap className="w-3 h-3" />
+                                                    Insert
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>
+                                                    Insert function call into
+                                                    editor
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                             </div>
-                            <Button
-                                size={'sm'}
-                                variant="outline"
-                                onClick={() => {
-                                    handleInsertFunction(funct);
-                                }}
-                            >
-                                Insert Code
-                            </Button>
                         </div>
                     ))
                 ) : (
@@ -365,35 +600,88 @@ const TabTypes = ({
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>
+                    Click "Insert Type" to add the type name and import
+                    statement to your editor
+                </span>
+            </div>
+
+            <div className="flex flex-col gap-3">
                 {filteredTypes.length > 0 ? (
                     filteredTypes.map((type, index) => (
                         <div
                             key={index}
-                            className="flex justify-between items-center w-full border p-2 rounded hover:bg-accent hover:text-accent-foreground"
+                            className="flex flex-col w-full border p-3 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
-                            <div className="flex flex-col">
-                                <div className="flex items-center space-x-2">
-                                    <span className="font-medium">
-                                        {type.name}
-                                    </span>
-                                    <span className="text-gray-400 text-sm">
-                                        {type.type}
-                                    </span>
+                            <div className="flex justify-between items-start w-full">
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-medium text-sm truncate">
+                                            {type.name}
+                                        </span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-xs"
+                                        >
+                                            {type.type}
+                                        </Badge>
+                                        {type.path && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="text-xs"
+                                            >
+                                                Import
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    {type.description && (
+                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                            {type.description}
+                                        </p>
+                                    )}
+
+                                    {type.path && (
+                                        <div className="mt-2">
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                                                <Code className="w-3 h-3" />
+                                                <span>From:</span>
+                                            </div>
+                                            <div className="bg-muted p-2 rounded text-xs font-mono overflow-x-auto">
+                                                {type.path}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                {type.description && (
-                                    <p className="text-sm text-muted-foreground">
-                                        {type.description}
-                                    </p>
-                                )}
+
+                                <div className="flex items-center gap-2 ml-3">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size={'sm'}
+                                                    onClick={() =>
+                                                        handleInsertType(type)
+                                                    }
+                                                    className="flex items-center gap-1"
+                                                >
+                                                    <Zap className="w-3 h-3" />
+                                                    Insert
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>
+                                                    Insert type name and import
+                                                    statement
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                             </div>
-                            <Button
-                                variant="outline"
-                                size={'sm'}
-                                onClick={() => handleInsertType(type)}
-                            >
-                                Insert Type
-                            </Button>
                         </div>
                     ))
                 ) : (

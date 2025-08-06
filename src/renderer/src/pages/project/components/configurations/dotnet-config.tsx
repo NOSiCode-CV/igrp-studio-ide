@@ -8,11 +8,9 @@ import {
 } from '@renderer/components/ui/radio-group';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { Textarea } from '@renderer/components/ui/textarea';
-import { useEffect, useState } from 'react';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
-import useCore from '@renderer/hooks/use-core';
 import { useTranslation } from 'react-i18next';
 import { FormikErrors } from 'formik';
 import { LabelRequired } from '@renderer/components/label-required';
@@ -30,32 +28,14 @@ const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
     database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
-    igrpCoreVersion: '',
+    version: '',
 };
 
 export function DotNetConfig({
     data = DEFAULT_DOTNET_CONFIG,
     onChange,
 }: DotNetConfigProps) {
-    const [versions, setVersions] = useState([]);
-    const { getVersions } = useCore();
     const { t } = useTranslation();
-
-    useEffect(() => {
-        const fetchVersions = async () => {
-            const versionsData = await getVersions();
-            setVersions(versionsData);
-
-            if (versionsData.length > 0) {
-                const latestVersion = versionsData[0]?.value;
-                if (!data.igrpCoreVersion) {
-                    onChange({ ...data, igrpCoreVersion: latestVersion });
-                }
-            }
-        };
-
-        fetchVersions();
-    }, [getVersions]);
 
     return (
         <div className="space-y-6">
@@ -106,17 +86,6 @@ export function DotNetConfig({
                             onChange({ ...data, database: value })
                         }
                         options={DatabaseOptions}
-                        className="w-full"
-                    />
-                </div>
-                <div className="space-y-2 flex flex-col">
-                    <LabelRequired>{t('igrpCoreVersion')}</LabelRequired>
-                    <IGRPCombobox
-                        options={versions || []}
-                        value={data.igrpCoreVersion}
-                        onChange={(value) =>
-                            onChange({ ...data, igrpCoreVersion: value as string})
-                        }
                         className="w-full"
                     />
                 </div>

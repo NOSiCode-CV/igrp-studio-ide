@@ -138,7 +138,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                 mode="MOVE"
                                 layout="horizontal"
                                 dropTargetId={dropTargetId}
-                                className={cn('border-none min-w-32 py-4')}
+                                className={cn('border-none  py-4')}
                             >
                                 <BoxField
                                     index={index}
@@ -152,7 +152,6 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                     <CardComponent
                                         comp={child}
                                         onDragEnd={onDragEnd}
-                                        className="min-w-32"
                                     />
                                 </BoxField>
                             </Draggable>

@@ -25,6 +25,9 @@ interface CustomAPI {
     runDoctorChecks: () => Promise<ToolCheck[]>;
     saveDoctorReport: (results: ToolCheck[] ) => Promise<void>
 
+    saveProjectIcon: (data: { filePath: string; fileData: ArrayBuffer; assetsPath: string }) => Promise<any>;
+    getIconFile: (iconPath: string, workspacePath: string) => Promise<any>;
+
     i18nextElectronBackend: any,
 
 }
@@ -73,22 +76,37 @@ interface AppLogicAPI {
   onEnvironmentsChanged: (callback: (environments: AppLogicEnvironment[]) => void) => () => void
   removeAllListeners: () => void
 }
+
+interface IGRPStudioSettings {
+  setBPMNConfigs: (configs: any) => Promise<any>;
+  getBPMNConfigs: () => Promise<any>;
+  getBPMNConfig: () => Promise<any>;
+  addBPMNConfig: (config: any) => Promise<any>;
+  updateBPMNConfig: (config: any) => Promise<any>;
+  deleteBPMNConfig: (configId: string) => Promise<any>;
+  setActiveBPMNConfig: (configId: string) => Promise<any>;
+  deleteAllBPMNConfigs: () => Promise<any>;
+  getLanguage: () => Promise<string>;
+  setLanguage: (lang: string) => Promise<void>;
+}
 declare global {
     interface Window {
         electron: ElectronAPI & {
             getAppVersion: () => Promise<string>;
-            getLanguage: () => Promise<string>;
-            setLanguage: (lang: string) => Promise<void>;
             checkForUpdates: () => Promise<any>;
             downloadUpdate: () => Promise<any>;
             installUpdate: () => Promise<any>;
             watchFolder: (folderPath: string) => Promise<any>;
             onFolderChange: (callback: (event: any) => void) => void;
+            ipcRenderer: {
+                on: (channel: string, callback: (event: any, ...args: any[]) => void) => void;
+            };
         };
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
         menu: CustomMenu,
         engine: IBaseEngine,
-        appLogicAPI: AppLogicAPI
+        appLogicAPI: AppLogicAPI,
+        igrpStudioSettings: IGRPStudioSettings
     }
 }

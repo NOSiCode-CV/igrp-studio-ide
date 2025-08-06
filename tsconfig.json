@@ -1,6 +1,9 @@
 {
   "files": [],
-  "references": [{ "path": "./tsconfig.node.json" }],
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.web.json" }
+  ],
   "compilerOptions": {
     "target": "ESNext", 
     "useDefineForClassFields": true,
@@ -19,7 +22,6 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
       "@main/*": ["src/main/*"],
       "@renderer/*": ["src/renderer/src/*"],
       "@assets/*": ["src/renderer/src/assets/*"],

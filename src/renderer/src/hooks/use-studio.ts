@@ -166,7 +166,8 @@ const useStudio = () => {
                 label: content.description || content.pageName,
                 metadata: {
                     path: content.path,
-                    segments: content.pageName,
+                    segments: content.segments,
+                    pageName: content.pageName,
                 }
             }
         }) ?? [];

@@ -69,7 +69,7 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
             timeout?: number,
             dropVolume?: boolean
         }
-    ): Promise<ServiceInfo[] | boolean | void> => {
+    ): Promise<ServiceInfo[] | boolean | void | { isRunning: boolean; error?: string; details?: string }> => {
 
         const { services, timeout, dropVolume } = options || {}
 

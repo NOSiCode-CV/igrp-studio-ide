@@ -50,7 +50,7 @@ const IGRPStudioFlex: React.FC<CardComponentProps> = ({
                             index={index}
                             dropTargetId={componentId}
                             mode="MOVE"
-                            className="p-1 min-w-32 text-center"
+                            className="p-1 text-center"
                         >
                             <BoxWrapper
                                 comp={comp}

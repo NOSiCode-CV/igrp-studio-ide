@@ -1,4 +1,4 @@
-import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ServiceInfo } from '@main/types';
+import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ServiceInfo, BPMNConfig } from '@main/types';
 import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { WatchEvent } from '@main/helpers/watch-folder';
 
@@ -113,6 +113,12 @@ interface Window {
     getStoreInfo: () => Promise<any>;
     onEnvironmentsChanged: (callback: (environments: any) => void) => () => void;
     removeAllListeners: () => void;
+  };
+  igrpStudioSettings: {
+    setBPMNConfig: (config: BPMNConfig | null) => Promise<void>;
+    getBPMNConfig: () => Promise<BPMNConfig | null>;
+    deleteBPMNConfig: () => Promise<void>;
+
   };
 }
 

@@ -6,6 +6,7 @@ export interface ToolConfig {
   versionCheck?: {
     minMajor: number;
     maxMajor: number;
+    range?: string;
   };
   extraCheck?: string;
   category: 'frontend' | 'backend' | 'development';
@@ -22,8 +23,9 @@ export const toolConfig: ToolConfig[] = [
     category: 'frontend',
     description: 'JavaScript runtime for frontend development',
     versionCheck: {
-      minMajor: 18,
+      minMajor: 20,
       maxMajor: 22,
+      range: "^20.19.0 || >=22.12.0",
     },
   },
   {
@@ -59,8 +61,13 @@ export const toolConfig: ToolConfig[] = [
     required: true,
     category: 'backend',
     description: 'Java runtime for backend development',
+    versionCheck: {
+      minMajor: 23,
+      maxMajor: 23,
+      range: "^23.0.0",
+    },
   },
-  {
+  /* {
     name: 'Maven',
     command: 'mvn',
     link: 'https://maven.apache.org/download.cgi',
@@ -68,7 +75,7 @@ export const toolConfig: ToolConfig[] = [
     category: 'backend',
     description: 'Java build and dependency management tool',
   },
-  /* {
+  {
     name: '.NET SDK',
     command: 'dotnet',
     link: 'https://dotnet.microsoft.com/download',

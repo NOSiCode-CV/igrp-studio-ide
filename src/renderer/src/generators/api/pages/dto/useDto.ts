@@ -115,8 +115,13 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
                 ENV_TYPES.SPRING,
                 basePath
             );
+            console.log('config', config);
 
-            if (error) return showErrorToast(error);
+            if (error) {
+                console.log('error', error);
+                showErrorToast(error);
+                return;
+            }
 
             createGitCommit(basePath, `Add dto ${newValues.name}`);
             dispatch(onSetChangeStatus(true));
