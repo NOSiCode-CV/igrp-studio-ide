@@ -41,6 +41,34 @@ const BoxWrapper = ({
         handleRemoveChildFromComponent({ droppableId: id, index: 0 });
     };
 
+    const onClickCloneComp = () => {
+        // Create a deep copy of the component
+        const cloneComponent = (component: StructuredComponent): StructuredComponent => {
+            const newId = generateId(component.componentName);
+            const newTag = `${component.tag}_copy`;
+            
+            return {
+                ...component,
+                id: newId,
+                tag: newTag,
+                children: component.children?.map(child => cloneComponent(child)) || [],
+            };
+        };
+
+        const clonedComponent = cloneComponent(comp);
+        
+        // Add the cloned component to the same parent
+        if (parentComp) {
+            // Find the index of the current component in its parent
+            const currentIndex = parentComp.children?.findIndex(child => child.id === comp.id) || 0;
+            // Add the cloned component right after the current component
+            handleAddChildToComponent(
+                { droppableId: parentComp.id, index: currentIndex + 1 },
+                clonedComponent
+            );
+        }
+    };
+
     const onClickStructure = (layout: string) => {
         const newLayout = layout
             .split(',')
@@ -114,6 +142,7 @@ const BoxWrapper = ({
                     handleClickDeleteComp={onClickDeleteComp}
                     handleClickBtnEdition={onClickBtnEdition}
                     handleClickStructComp={onClickStructure}
+                    handleClickCloneComp={onClickCloneComp}
                 />
             </div>
             {children}

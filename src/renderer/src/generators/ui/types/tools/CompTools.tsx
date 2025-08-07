@@ -20,6 +20,7 @@ interface ToolsProps {
     handleClickBtnEdition: () => void;
     handleClickDeleteComp: () => void;
     handleClickStructComp: (layout: string) => void;
+    handleClickCloneComp: () => void;
     comp: StructuredComponent;
     parentComp?: StructuredComponent;
     path?: string;
@@ -29,6 +30,7 @@ const CompTools = ({
     handleClickBtnEdition,
     handleClickDeleteComp,
     handleClickStructComp,
+    handleClickCloneComp,
     comp,
     parentComp,
     path,
@@ -82,7 +84,10 @@ const CompTools = ({
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded">
+                        <button 
+                            className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded"
+                            onClick={handleClickCloneComp}
+                        >
                             <Copy className="h-4" />
                         </button>
                     </TooltipTrigger>
