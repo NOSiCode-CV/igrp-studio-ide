@@ -60,7 +60,7 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
                     <TabsTrigger
                         value={child.id}
                         key={index}
-                        className="relative min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 data-[state=active]:bg-primary border-2 border-primary transition-all duration-200 hover:scale-105 data-[state=active]:scale-110 data-[state=active]:shadow-2xl data-[state=active]:min-h-[48px] data-[state=active]:py-3 data-[state=active]:px-4"
+                        className="relative min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 data-[state=active]:bg-primary border-2 border-primary transition-all duration-200 hover:scale-105 data-[state=active]:scale-110 data-[state=active]:shadow-2xl  data-[state=active]:py-2 data-[state=active]:px-4"
                         asChild
                     >
                         <div className="relative">

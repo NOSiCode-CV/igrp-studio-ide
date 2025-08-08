@@ -122,7 +122,8 @@ export const BPMNProjectSelector = ({
                     name: process.processKey,
                     pageName: `${process.processKey}`,
                     pagePath: ``,
-                    processVersion: process.version || 'v1',
+                    processVersion: `v${process.version}` || 'v1',
+                    description: process.title,
                     // Add artifacts information as JSON string
                     artifacts: processDetails.projectArtifacts,
                 },

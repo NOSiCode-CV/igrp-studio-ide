@@ -19,7 +19,7 @@ import { EmptyList } from '@renderer/components/empty-list';
 import { SubHeadline } from '@renderer/components/shared-ui';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { BPMNProjectSelector } from './bpmn-project-selector';
-import { BPMNConfigCard } from '@renderer/components/bpmn-config-card';
+import { BPMNConfigCard } from '@renderer/generators/ui/page/bpmn-config-card';
 
 interface BPMNManagerProps {
     onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
