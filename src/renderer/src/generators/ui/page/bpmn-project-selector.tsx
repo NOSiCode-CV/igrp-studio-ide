@@ -107,7 +107,6 @@ export const BPMNProjectSelector = ({
                 (await bpmnService.getProcessDefinitionXML(
                     process.processDefinitionId
                 ));
-                
 
             // Create a comprehensive page definition for the studio
             const pageDefinition: any = {
@@ -118,19 +117,14 @@ export const BPMNProjectSelector = ({
                 isStartPage: true,
                 isTaskPage: false,
                 content: {
-                    type: 'bpmn-process',
+                    type: 'process',
                     processKey: process.processKey,
-                    processName:
-                        processDetails.title ||
-                        process.title ||
-                        process.processKey,
-                    processId: process.processDefinitionId,
-
-                    projectName: selectedProject?.name || '',
-                    pageName: `${process.processKey} - ${process?.title || 'BPMN Process'}`,
-                    pagePath: `/bpmn/${selectedProject?.code || 'project'}/${process.processKey}`,
+                    name: process.processKey,
+                    pageName: `${process.processKey}`,
+                    pagePath: ``,
+                    processVersion: process.version || 'v1',
                     // Add artifacts information as JSON string
-                    artifacts: processDetails.projectArtifacts
+                    artifacts: processDetails.projectArtifacts,
                 },
             };
 

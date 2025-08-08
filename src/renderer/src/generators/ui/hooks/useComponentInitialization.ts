@@ -25,7 +25,7 @@ export const useComponentInitialization = ({
     const initializeComponents = useCallback(async () => {
         try {
             const isPage = content.type === 'page';
-            const isBpmnProcess = content.type === 'bpmn-process'
+            const isBpmnProcess = content.type === 'process'
 
             let steps: any[] = [];
 
@@ -48,7 +48,7 @@ export const useComponentInitialization = ({
                 [],
                 sectionCompRegister
             );
-            
+
             if (isBpmnProcess) {
                 // Add BPMN artifacts to the page content
 
@@ -66,8 +66,10 @@ export const useComponentInitialization = ({
 
                         processStep.properties = {
                             ...processStep.properties,
-                            ...artifact
+                            ...artifact,
                         };
+
+                        processStep.tag = artifact.taskKey
 
                         steps.push(processStep);
                     })

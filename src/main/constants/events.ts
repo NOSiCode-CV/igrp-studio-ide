@@ -18,6 +18,7 @@ export const EVENTS = {
     },
     NEXT: {
         CREATE_PAGE: 'next-engine:create-page',
+        CREATE_PROCESS: 'next-engine:create-process',
         DELETE_PAGE: 'next-engine:delete-page',
         REGISTRY_COMPONENT: 'engine:registry-component',
         GET_COMPONENT: 'engine:get-component',
@@ -84,6 +85,23 @@ export const EVENTS = {
     LANGUAGE: {
         GET_LANGUAGE: 'igrp-studio-settings:get-language',
         SET_LANGUAGE: 'igrp-studio-settings:set-language',
+    },
+    CONNECTION: {
+        GET_CONNECTIONS: 'igrp-studio-settings:get-connections',
+        SAVE_CONNECTION: 'igrp-studio-settings:save-connection',
+        DELETE_CONNECTION: 'igrp-studio-settings:delete-connection',
+        CONNECT_DATABASE: 'igrp-studio-settings:connect-database',
+        GET_TABLES: 'igrp-studio-settings:get-tables',
+        GET_TABLE_STRUCTURE: 'igrp-studio-settings:get-table-structure',
+    },
+    DOCKER: {
+        UP: 'docker-up',
+        DOWN: 'docker-down',
+        STATUS: 'docker-status',
+        STOP: 'docker-stop',
+        RESTART: 'docker-restart',
+        CHECK: 'docker-check',
+        DAEMON_STATUS: 'docker-daemon-status',
     },
     ERROR: 'error',
     LOG: 'log'

@@ -44,7 +44,7 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
         return components.map((child: StructuredComponent, index: number) => {
             const { properties, componentName } = child;
 
-            const { className, label } = properties || {};
+            const { className, name } = properties || {};
 
             return (
                 <Draggable
@@ -60,10 +60,18 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
                     <TabsTrigger
                         value={child.id}
                         key={index}
-                        className="min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2 "
+                        className="relative min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 data-[state=active]:bg-primary border-2 border-primary transition-all duration-200 hover:scale-105 data-[state=active]:scale-110 data-[state=active]:shadow-2xl data-[state=active]:min-h-[48px] data-[state=active]:py-3 data-[state=active]:px-4"
                         asChild
                     >
-                        <div>
+                        <div className="relative">
+                            {/* Connecting line to next step */}
+                            {index < components.length - 1 && (
+                                <div className="absolute top-1/2 -right-4 w-8 h-0.5 bg-primary transform -translate-y-1/2 z-0" />
+                            )}
+                            {/* Connecting line from previous step */}
+                            {index > 0 && (
+                                <div className="absolute top-1/2 -left-4 w-8 h-0.5 bg-primary transform -translate-y-1/2 z-0" />
+                            )}
                             <BoxField
                                 parentComp={comp}
                                 index={index}
@@ -77,7 +85,9 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
                                     'data-[state=active]:opacity-100 right-0 left-auto'
                                 )}
                             >
-                                <span>{label || componentName}</span>
+                                <span className="text-xs font-medium">
+                                    {name || componentName}
+                                </span>
                             </BoxField>
                         </div>
                     </TabsTrigger>
@@ -91,7 +101,12 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
             const { children: components, id: componentId } = child;
 
             return (
-                <TabsContent value={child.id} key={index} asChild className="mt-4">
+                <TabsContent
+                    value={child.id}
+                    key={index}
+                    asChild
+                    className="mt-4"
+                >
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
@@ -100,7 +115,6 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
                         {components.length > 0 &&
                             components.map(
                                 (childTab: StructuredComponent, ii: number) => {
-
                                     return (
                                         <Draggable
                                             key={childTab.id}
@@ -146,7 +160,7 @@ const IGRPStudioProcess: React.FC<CardComponentProps> = ({
         >
             {components.length > 0 && (
                 <Tabs defaultValue={components[0].id} className="w-full">
-                    <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
+                    <TabsList className="flex-wrap overflow-x-auto w-full h-auto min-h-[40px] gap-4 px-4 py-2 justify-center items-center">
                         {renderTriggers()}
                     </TabsList>
                     {renderContent()}
