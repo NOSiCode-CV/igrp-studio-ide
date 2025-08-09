@@ -8,6 +8,13 @@ import {
     SelectValue,
 } from '@renderer/components/ui/select';
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
+import {
     Card,
     CardContent,
     CardDescription,
@@ -21,15 +28,23 @@ import {
     BPMNProject,
     BPMNProjectProcessDefinition,
     BPMNPageDefinition,
+    BPMNProjectArtifact,
 } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
+import { ProcessConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+import { generateId, getId } from '@renderer/utils';
 
 interface BPMNProjectSelectorProps {
     onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
+    bpmnProcesses: any[];
+    basePath: string;
 }
 
 export const BPMNProjectSelector = ({
     onPageClick,
+    bpmnProcesses,
+    basePath,
 }: BPMNProjectSelectorProps) => {
     const [projects, setProjects] = useState<BPMNProject[]>([]);
     const [selectedProject, setSelectedProject] = useState<BPMNProject | null>(
@@ -45,6 +60,8 @@ export const BPMNProjectSelector = ({
     useEffect(() => {
         loadProjects();
     }, []);
+
+    // check if  processs key is prresent in bmpmtrpocess storage chekc name and version
 
     // Load process definitions when project changes
     useEffect(() => {
@@ -87,7 +104,50 @@ export const BPMNProjectSelector = ({
         setSelectedProject(project || null);
     };
 
-    const handleEditProcess = async (process: BPMNProjectProcessDefinition) => {
+    const handleGenerateProcess = async (
+        process: BPMNProjectProcessDefinition
+    ) => {
+        try {
+            // Show loading state
+            toast.loading(
+                `Loading process definition for ${process.processKey}...`
+            );
+
+            // Get the BPMN XML content from the process details
+          
+            // Create a comprehensive page definition for the studio
+            const processConfig: ProcessConfig = {
+                type: 'process',
+                processKey: process.processKey,
+                name: process.processKey,
+                processVersion: `v${process.version}` || 'v1',
+                description: process.title,
+                steps: process.projectArtifacts?.map((artifact) => ({
+                    id: artifact.taskKey,
+                    name: artifact.name
+                })),
+                id: getId(),
+            };
+            console.log('processConfig', processConfig);
+            const { error } = await window.engine.createProcess(
+                processConfig,
+                ENV_TYPES.NEXTJS,
+                basePath
+            );
+            console.log('error', error);
+        } catch (error) {
+            toast.dismiss();
+            console.error('Error loading process definition:', error);
+            toast.error('Failed to load process definition', {
+                description:
+                    error instanceof Error ? error.message : 'Unknown error',
+            });
+        }
+    };
+
+    const handleGenerateStepProcess = async (
+        process: BPMNProjectProcessDefinition
+    ) => {
         try {
             // Show loading state
             toast.loading(
@@ -145,19 +205,37 @@ export const BPMNProjectSelector = ({
         }
     };
 
-    const handleViewProcess = (process: BPMNProjectProcessDefinition) => {
-        toast.info(`Viewing details for ${process.processKey}`, {
-            description: `Version ${process.version}, State: ${process.status}`,
-        });
-    };
+    const handleDownloadArtifact = async (artifact: BPMNProjectArtifact) => {
+        try {
+            toast.loading(`Downloading artifact: ${artifact.name}...`);
 
-    const handleViewArtifacts = (process: BPMNProjectProcessDefinition) => {
-        const artifactCount = process.projectArtifacts?.length || 0;
-        toast.info(`Process has ${artifactCount} artifacts`, {
-            description:
-                process.projectArtifacts?.map((a) => a.name).join(', ') ||
-                'No artifacts',
-        });
+            // Fetch the artifact content
+            const artifactDetails = await bpmnService.getArtifactContent(
+                artifact.projectArtifactId
+            );
+
+            const blob = new Blob([artifactDetails.content], {
+                type: 'application/octet-stream',
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = artifact.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            toast.dismiss();
+            toast.success(`Downloaded artifact: ${artifact.name}`);
+        } catch (error) {
+            toast.dismiss();
+            console.error('Error downloading artifact:', error);
+            toast.error('Failed to download artifact', {
+                description:
+                    error instanceof Error ? error.message : 'Unknown error',
+            });
+        }
     };
 
     if (loading) {
@@ -167,6 +245,8 @@ export const BPMNProjectSelector = ({
             </div>
         );
     }
+
+    console.log('processDefinitions', processDefinitions);
 
     return (
         <div className="space-y-6">
@@ -295,8 +375,7 @@ export const BPMNProjectSelector = ({
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold text-foreground">
-                                        {selectedProject.processDefinitions
-                                            ?.length || 0}
+                                        {processDefinitions?.length || 0}
                                     </div>
                                     <div className="text-xs text-muted-foreground font-medium">
                                         Process Definitions
@@ -346,8 +425,11 @@ export const BPMNProjectSelector = ({
                                             </div>
                                         </CardTitle>
                                         <CardDescription className="text-sm">
-                                            Version {process.version} •{'N/A'}{' '}
-                                            {process.status}
+                                            Version{' '}
+                                            {process.version
+                                                ? process.version
+                                                : 'N/A'}{' '}
+                                            • {process.statusDesc}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-3">
@@ -381,39 +463,66 @@ export const BPMNProjectSelector = ({
                                         <Separator />
 
                                         <div className="flex space-x-2">
-                                            <Button
-                                                size="sm"
-                                                onClick={() =>
-                                                    handleEditProcess(process)
-                                                }
-                                                className="flex-1"
-                                            >
-                                                Edit Page
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() =>
-                                                    handleViewProcess(process)
-                                                }
-                                            >
-                                                View
-                                            </Button>
-                                            {process.projectArtifacts &&
-                                                process.projectArtifacts
-                                                    .length > 0 && (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        onClick={() =>
-                                                            handleViewArtifacts(
-                                                                process
-                                                            )
-                                                        }
+                                            {bpmnProcesses.find(
+                                                (p) =>
+                                                    p.name ===
+                                                        process.processKey &&
+                                                    p.children.some(
+                                                        (c: any) =>
+                                                            c.name ===
+                                                            `v${process.version}`
+                                                    )
+                                            ) ? (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger
+                                                        asChild
                                                     >
-                                                        Artifacts
-                                                    </Button>
-                                                )}
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="flex-1"
+                                                        >
+                                                            View Artifacts
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuLabel>
+                                                            Available Artifacts
+                                                        </DropdownMenuLabel>
+                                                        {process.projectArtifacts?.map(
+                                                            (
+                                                                artifact,
+                                                                index
+                                                            ) => (
+                                                                <DropdownMenuItem
+                                                                    key={index}
+                                                                    onClick={() =>
+                                                                        handleDownloadArtifact(
+                                                                            artifact
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        artifact.name
+                                                                    }
+                                                                </DropdownMenuItem>
+                                                            )
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            ) : (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        handleGenerateProcess(
+                                                            process
+                                                        )
+                                                    }
+                                                    className="flex-1"
+                                                >
+                                                    Generate Process
+                                                </Button>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>

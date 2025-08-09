@@ -100,7 +100,7 @@ class BPMNService {
 
   // New method to get process definitions for a specific project
   async getProcessDefinitionsByProject(projectId: string): Promise<BPMNProjectProcessDefinition[]> {
-    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}`);
+    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}/deployed-process`);
     return response.processDefinitions || [];
   }
 
@@ -202,6 +202,17 @@ class BPMNService {
     } catch (error) {
       console.error('Error fetching process artifacts:', error);
       return [];
+    }
+  }
+
+  async getArtifactContent(artifactId: string): Promise<{ content: string }> {
+    try {
+      // Note: The endpoint URL is a placeholder and needs to be verified.
+      const artifact = await this.makeRequest<{ content: string }>(`/projects/artifacts/${artifactId}/content`);
+      return artifact;
+    } catch (error) {
+      console.error(`Error fetching content for artifact ${artifactId}:`, error);
+      throw error; // Re-throw the error to be handled by the caller
     }
   }
 

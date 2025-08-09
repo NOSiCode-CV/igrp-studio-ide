@@ -80,7 +80,7 @@ export default function Doctor({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="sm:max-w-[600px] max-w-4xl max-h-[80vh]">
+            <DialogContent className="sm:max-w-[730px] max-w-4xl max-h-[80vh]">
                 <DialogHeader>
                     <DialogTitle className="flex gap-2 items-center text-xl">
                         <Stethoscope className="h-6 w-6" />
@@ -153,10 +153,10 @@ export default function Doctor({
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow>
-                                                            <TableHead className="w-[35%]">Tool</TableHead>
-                                                            <TableHead className="w-[15%]">Status</TableHead>
-                                                            <TableHead className="w-[30%]">Version / Error</TableHead>
-                                                            <TableHead className="w-[20%]">Action</TableHead>
+                                                            <TableHead>Tool</TableHead>
+                                                            <TableHead>Status</TableHead>
+                                                            <TableHead>Version / Error</TableHead>
+                                                            <TableHead>Action</TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
