@@ -15,6 +15,8 @@ const handleError = (error: unknown): HandlerResponse => ({
 // Custom APIs for renderer
 const api = {
 
+	reportError: (error: Error) => ipcRenderer.send('report-error', error),
+
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
@@ -483,5 +485,14 @@ declare global {
     menu: typeof windowControls;
     appLogicAPI: typeof appLogic;
     igrpStudioSettings: typeof igrpStudioSettings;
+  }
+}
+
+// Augment the Window interface to include reportError
+declare global {
+  interface Window {
+    api: {
+      reportError: (error: Error) => void;
+    }
   }
 }

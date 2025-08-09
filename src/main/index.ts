@@ -13,6 +13,7 @@ import icon from '../../resources/icon.png?asset';
 import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
 import { FileTree, IOpenProject } from './types';
+import { sendErrorReport } from './helpers/error-reporter';
 
 import {
     checkAndReadBaseApi,
@@ -61,6 +62,11 @@ let nextJsManager: NextJsManager;
 let currentAuthProvider: 'github' | 'gitlab' | null = null;
 
 dotenv.config();
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  sendErrorReport(error);
+});
 
 function createWindow(): void {
     // Create the browser window.
@@ -189,6 +195,10 @@ app.whenReady().then(async () => {
 
     // IPC test
     ipcMain.on('ping', () => console.log('pong'));
+
+    ipcMain.on('report-error', (_, error: Error) => {
+      sendErrorReport(error);
+    });
 
     await GitStore.initialize();
     const initializeGitHubService = async () => {
