@@ -33,7 +33,10 @@ import {
 import { bpmnService } from '@renderer/services/bpmn-service';
 import { ProcessConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
-import { generateId, getId } from '@renderer/utils';
+import useToast from '@renderer/hooks/useToast';
+import { useDispatch } from 'react-redux';
+import { getFileThree as onGetPages } from '@renderer/redux/thunks';
+import { getId } from '@renderer/utils';
 
 interface BPMNProjectSelectorProps {
     onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
@@ -55,6 +58,10 @@ export const BPMNProjectSelector = ({
     >([]);
     const [loading, setLoading] = useState(true);
     const [loadingProcesses, setLoadingProcesses] = useState(false);
+
+    const { showErrorToast,showSuccessToast } = useToast();
+
+    const dispatch:any= useDispatch();
 
     // Load projects on component mount
     useEffect(() => {
@@ -110,11 +117,9 @@ export const BPMNProjectSelector = ({
         try {
             // Show loading state
             toast.loading(
-                `Loading process definition for ${process.processKey}...`
+                `Generating process definition for ${process.processKey}...`
             );
 
-            // Get the BPMN XML content from the process details
-          
             // Create a comprehensive page definition for the studio
             const processConfig: ProcessConfig = {
                 type: 'process',
@@ -124,17 +129,26 @@ export const BPMNProjectSelector = ({
                 description: process.title,
                 steps: process.projectArtifacts?.map((artifact) => ({
                     id: artifact.taskKey,
-                    name: artifact.name
+                    name: artifact.name,
                 })),
                 id: getId(),
             };
-            console.log('processConfig', processConfig);
+          
             const { error } = await window.engine.createProcess(
                 processConfig,
                 ENV_TYPES.NEXTJS,
                 basePath
             );
             console.log('error', error);
+
+            if (error) {
+                showErrorToast(error);
+            }
+            toast.dismiss();
+            showSuccessToast('Process created successfully');
+
+            dispatch(onGetPages(basePath));
+
         } catch (error) {
             toast.dismiss();
             console.error('Error loading process definition:', error);
@@ -145,64 +159,33 @@ export const BPMNProjectSelector = ({
         }
     };
 
-    const handleGenerateStepProcess = async (
-        process: BPMNProjectProcessDefinition
+    const handleAddComponents = async (
+        processDefinition: BPMNProjectProcessDefinition,
+        processArtifact: BPMNProjectArtifact
     ) => {
-        try {
-            // Show loading state
-            toast.loading(
-                `Loading process definition for ${process.processKey}...`
-            );
 
-            // Fetch the complete process definition details
-            const processDetails =
-                await bpmnService.getProcessDefinitionDetails(
-                    process.processDefinitionId
-                );
-            console.log('Process definition details:', processDetails);
+        const processFinded = bpmnProcesses.find(
+            (p) =>
+                p.name ===
+                    processDefinition.processKey &&
+                p.children.some(
+                    (c: any) =>
+                        c.name ===
+                        `v${processDefinition.version}`
+                ))
 
-            // Get the BPMN XML content from the process details
-            const processXml =
-                processDetails.bpmFileContent ||
-                (await bpmnService.getProcessDefinitionXML(
-                    process.processDefinitionId
-                ));
+        const processVersionFinded = processFinded.children.find(
+            (c: any) => c.name === `v${processDefinition.version}`
+        );
 
-            // Create a comprehensive page definition for the studio
-            const pageDefinition: any = {
-                id: `bpmn-${process.processDefinitionId}`,
-                processDefinitionId: process.processDefinitionId,
-                processDefinitionKey: process.processKey,
-                description: `Process from ${selectedProject?.name || 'BPMN'} project`,
-                isStartPage: true,
-                isTaskPage: false,
-                content: {
-                    type: 'process',
-                    processKey: process.processKey,
-                    name: process.processKey,
-                    pageName: `${process.processKey}`,
-                    pagePath: ``,
-                    processVersion: `v${process.version}` || 'v1',
-                    description: process.title,
-                    // Add artifacts information as JSON string
-                    artifacts: processDetails.projectArtifacts,
-                },
-            };
+        if (!processVersionFinded) return;
 
-            // Dismiss loading toast and show success
-            toast.dismiss();
-            onPageClick?.(pageDefinition);
-            toast.success(`Opening ${process.processKey} in page builder`, {
-                description: `Loaded process definition with ${processXml ? 'XML content' : 'basic info'}`,
-            });
-        } catch (error) {
-            toast.dismiss();
-            console.error('Error loading process definition:', error);
-            toast.error('Failed to load process definition', {
-                description:
-                    error instanceof Error ? error.message : 'Unknown error',
-            });
-        }
+        const stepFindedChildren = processVersionFinded?.children.find(
+            (c: any) => c.name.replace('.json', '') === processArtifact.taskKey
+        );
+
+        onPageClick?.(stepFindedChildren);
+        
     };
 
     const handleDownloadArtifact = async (artifact: BPMNProjectArtifact) => {
@@ -245,8 +228,6 @@ export const BPMNProjectSelector = ({
             </div>
         );
     }
-
-    console.log('processDefinitions', processDefinitions);
 
     return (
         <div className="space-y-6">
@@ -410,7 +391,7 @@ export const BPMNProjectSelector = ({
                                     key={process.processDefinitionId}
                                     className="hover:shadow-md transition-shadow"
                                 >
-                                    <CardHeader className="pb-3">
+                                    <CardHeader>
                                         <CardTitle className="text-base">
                                             <div>
                                                 <span className="font-medium">
@@ -434,10 +415,6 @@ export const BPMNProjectSelector = ({
                                     </CardHeader>
                                     <CardContent className="space-y-3">
                                         <div className="text-sm text-muted-foreground">
-                                            <div>
-                                                Deployment:{' '}
-                                                {process.deploymentId}
-                                            </div>
                                             <div>
                                                 Deployed:{' '}
                                                 {new Date(
@@ -497,7 +474,8 @@ export const BPMNProjectSelector = ({
                                                                 <DropdownMenuItem
                                                                     key={index}
                                                                     onClick={() =>
-                                                                        handleDownloadArtifact(
+                                                                        handleAddComponents(
+                                                                            process,
                                                                             artifact
                                                                         )
                                                                     }

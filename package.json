@@ -33,7 +33,7 @@
 		"@hookform/resolvers": "^5.2.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-framework-react-design-system": "0.0.0-alpha.67",
-		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.473",
+		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.476",
 		"@igrp/igrp-studio-springboot-engine": "0.1.0-beta.1",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^22.0.0",
@@ -84,7 +84,7 @@
 		"express": "^5.1.0",
 		"formik": "^2.4.6",
 		"gojs": "^3.0.25",
-		"i18next": "^25.3.2",
+		"i18next": "^25.3.4",
 		"i18next-browser-languagedetector": "^8.2.0",
 		"i18next-electron-fs-backend": "^3.0.3",
 		"input-otp": "^1.4.2",
@@ -118,7 +118,7 @@
 		"uuid": "^11.1.0",
 		"vaul": "^1.1.2",
 		"yup": "^1.7.0",
-		"zod": "^4.0.16"
+		"zod": "^4.0.17"
 	},
 	"devDependencies": {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",

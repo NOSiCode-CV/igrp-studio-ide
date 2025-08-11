@@ -71,7 +71,7 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
         if (!page) return [];
 
         const componentsMap = extractComponentsFromPage(
-            page,
+            page.components,
             currentComp.componentName,
         );
 

@@ -48,7 +48,7 @@ export const usePageSave = ({
                 throw new Error('Base path is required');
             }
 
-            const isBpmnProcess = content.type === 'process'
+            const isBpmnProcess = content.type === 'processStep'
 
             const config = {
                 ...content,
@@ -60,25 +60,12 @@ export const usePageSave = ({
                 imports,
             };
 
-            /*  const pageConfig: PageConfig = {
-                 ...config,
-                 type: 'page',
-                 path: page.pagePath,
-                 pageName: page.pageName,
-             };
-             const compConfig: ComponentConfig = {
-                 ...config,
-                 type: 'component',
-                 name: page.name,
-                 scope: 'app',
-             }; */
-
             console.log('Saving configuration:', config);
 
             let error;
             
             if (isBpmnProcess) {
-                const result = await window.engine.createProcess(
+                const result = await window.engine.createProcessStep(
                     config,
                     ENV_TYPES.NEXTJS,
                     basePath

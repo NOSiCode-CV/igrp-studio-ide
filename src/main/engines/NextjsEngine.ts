@@ -1,7 +1,7 @@
 // engines/NextjsEngine.ts
-import { deleteElement, initCodeSnippets, initComponents, initServices, loadAppExports, loadCodeSnippetsRegistry, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage, newProcess, registerComponents } from '@igrp/igrp-studio-nextjs-engine';
+import { deleteElement, initCodeSnippets, initComponents, initServices, loadAppExports, loadCodeSnippetsRegistry, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage, newProcess, newProcessStep, registerComponents } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
-import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig, ProcessConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig, ProcessConfig, ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
 import { ensureDirectoryExists } from '../helpers';
 import { app } from 'electron';
@@ -95,5 +95,58 @@ export class NextjsEngine implements BaseEngine {
 
   async createProcess(process: ProcessConfig, basePath: string): Promise<void> {
     await newProcess(process, basePath);
+    if (!process.steps) {
+      return;
+    }
+    for (let index = 0; index < process.steps.length; index++) {
+      const step = process.steps[index];
+      const processStep: ProcessStepConfig = {
+        processKey: process.processKey,
+        processVersion: process.processVersion,
+        version: process.processVersion,
+        name: step.id,
+        type: 'processStep',
+        description: step.name,
+        id: step.id,
+        forceDynamic: false,
+        types: [],
+        imports: [],
+        states: [],
+        references: [],
+        functions: [],
+        projectArtifactId: '',
+        taskKey: step.id,
+        artifactVariables: [],
+        components:
+        {
+          id: `processstep_${step.id}`,
+          componentName: "processStep",
+          label: "Process Step",
+          properties: {
+            variables: [],
+            commonProperties: {}
+          },
+          children: [],
+          tag: `processStep_${index}`,
+          data: {},
+          interactions: {
+            onLoad: {
+              type: "function",
+              function: {
+                type: "function"
+              },
+              action: {}
+            }
+          }
+
+        },
+      }
+      await newProcessStep(processStep, basePath);
+    }
   }
+
+  async createProcessStep(step: ProcessStepConfig, basePath: string): Promise<void> {
+    await newProcessStep(step, basePath);
+  }
+
 }

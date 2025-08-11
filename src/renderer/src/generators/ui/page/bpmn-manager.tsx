@@ -46,7 +46,6 @@ export const BPMNManager = ({
     };
 
     const handleEditConfig = (currentConfig: BPMNConfig) => {
-        console.log('Editing config:', currentConfig);
         setEditingConfig(currentConfig);
         setShowConfigModal(true);
     };

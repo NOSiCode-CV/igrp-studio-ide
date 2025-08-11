@@ -6,7 +6,7 @@ import { engineTypes } from '@igrp/igrp-studio-springboot-engine'
 
 import { ipcMain } from 'electron';
 import { ProjectData } from '../types';
-import { ComponentRegistrationConfig, PageConfig, ProcessConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ComponentRegistrationConfig, PageConfig, ProcessConfig, ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { EVENTS } from '../constants/events';
 
 handleWithCustomErrors(
@@ -177,6 +177,13 @@ handleWithCustomErrors(
     }
 );
 
+handleWithCustomErrors(
+    EVENTS.NEXT.CREATE_PROCESS_STEP,
+    async (_event, step: ProcessStepConfig, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType);
+        await engine.createProcessStep?.(step, basePath);
+    }
+);
 
 ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
     return await engineTypes(module, basePath);

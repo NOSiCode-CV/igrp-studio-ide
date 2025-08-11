@@ -118,6 +118,7 @@ export interface BaseEngine {
     registerComponent?(config: ComponentRegistrationConfig): void
 
     createProcess?: (process: ProcessConfig, basePath: string) => Promise<void>;
+    createProcessStep?: (step: ProcessStepConfig, basePath: string) => Promise<void>;
 
 }
 
@@ -151,6 +152,7 @@ export interface IBaseEngine {
     registerComponent: (engineType: string, config: ComponentRegistrationConfig) => Promise<HandlerResponse>
 
     createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
 export interface IDocker {

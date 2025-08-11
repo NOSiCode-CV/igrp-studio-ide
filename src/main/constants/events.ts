@@ -25,7 +25,8 @@ export const EVENTS = {
         GET_SERVICE: 'engine:get-service',
         GET_CODE_SNIPPET: 'engine:get-code-snippet',
         LOAD_METADATA: 'engine:load-metadata',
-        REGISTER_COMPONENT: 'engine:register-component'
+        REGISTER_COMPONENT: 'engine:register-component',
+        CREATE_PROCESS_STEP: 'engine:create-process-step'
 
     },
     REPOSITORY: {

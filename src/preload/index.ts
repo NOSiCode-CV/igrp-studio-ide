@@ -203,6 +203,14 @@ const engine = {
 			return handleError(error)
 		}
 	},
+
+	createProcessStep: async (step: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PROCESS_STEP, step, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {

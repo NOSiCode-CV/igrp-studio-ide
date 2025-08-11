@@ -11,7 +11,7 @@ import { DuplicatePageModal } from './duplicate-page-modal';
 import { PageTable } from './page-table';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { FileTree, BPMNPageDefinition, BPMNProject } from 'src/main/types';
+import { FileTree, BPMNPageDefinition } from 'src/main/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -79,11 +79,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [activeTab, setActiveTab] = useState<string>('pages');
     const [bpmnProcesses, setBpmnProcesses] = useState<any>([]);
 
-    const handleAddComponents = (page: PageDefinition | BPMNPageDefinition) => {
-        // Switch to pages tab when opening a BPMN page
-        if ('processDefinitionId' in page) {
-            setActiveTab('pages');
-        }
+    const handleAddComponents = (page:   | BPMNPageDefinition) => {
         onPageClick?.(page);
     };
 
@@ -139,10 +135,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             const pages = files.find((page) => page.name === 'pages');
             const components = files.find((page) => page.name === 'components');
             const process = files.find((page) => page.name === 'process');
-
-            console.log('process', pages);
-            console.log('components', components);
-
+            
             if (pages && pages.children) {
                 setContent(pages.children);
             }

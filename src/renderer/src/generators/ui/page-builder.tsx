@@ -154,6 +154,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             findComponentById,
             generateTag,
             setAllComponents,
+            findComponent,
         });
 
         useEffect(() => {
@@ -166,14 +167,13 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                     const data = await window.api?.getJsonContent(pagePath);
 
                     setAllArguments(data.args);
+                    setAllTypes(data.types);
+                    setAllFunctions(data.functions);
+                    setAllStates(data.states);
+                    setAllImports(data.imports);
 
-                    if (data.components) {
-                        setAllComponents(data.components);
-                        setAllTypes(data.types);
-                        setAllFunctions(data.functions);
-                        setAllStates(data.states);
-                        setAllImports(data.imports);
-                    }
+                    if (data.components) setAllComponents(data.components);
+                    
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
                 } finally {

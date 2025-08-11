@@ -7,13 +7,9 @@ class BPMNService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    console.log('makeRequest called for endpoint:', endpoint);
-    console.log('Current config:', this.config);
-
+   
     if (!this.config) {
-      console.log('No config found, attempting to load...');
       this.config = await this.getConfig();
-      console.log('Config loaded in makeRequest:', this.config);
     }
 
     if (!this.config) {
@@ -55,16 +51,11 @@ class BPMNService {
   // Configuration Management
   async setConfig(config: BPMNConfig): Promise<void> {
     this.config = config;
-    // Note: This method is kept for backward compatibility
-    // The actual config management is now handled by the settings system
   }
 
   async getConfig(): Promise<BPMNConfig | null> {
-    console.log('getConfig called, current config:', this.config);
     if (!this.config) {
-      console.log('Loading config from settings...');
       this.config = await window.igrpStudioSettings.getBPMNConfig();
-      console.log('Config loaded:', this.config);
     }
     return this.config;
   }
@@ -94,7 +85,6 @@ class BPMNService {
   // New method to get all projects
   async getProjects(): Promise<BPMNProject[]> {
     const response = await this.makeRequest<PaginatedResponse<BPMNProject>>('/projects');
-    console.log('getProjects response', response);
     return response ? response.content : [];
   }
 

@@ -9,6 +9,7 @@ interface ComponentInitializationProps {
     findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
     generateTag: (base: string) => string;
     setAllComponents: (components: any) => void;
+    findComponent: (path: string | undefined, componentName: string) => Promise<ComponentRegisterConfig | undefined>;
 }
 
 interface UseComponentInitializationReturn {
@@ -20,25 +21,32 @@ export const useComponentInitialization = ({
     findComponentById,
     generateTag,
     setAllComponents,
+    findComponent
 }: ComponentInitializationProps): UseComponentInitializationReturn => {
 
     const initializeComponents = useCallback(async () => {
         try {
             const isPage = content.type === 'page';
-            const isBpmnProcess = content.type === 'process'
+            const isBpmnProcess = content.type === 'processStep'
 
             let steps: any[] = [];
 
             const mainComponent = isPage
                 ? COMPONENT.PageContent
                 : isBpmnProcess
-                    ? COMPONENT.ProcessContent
+                    ? COMPONENT.ProcessStep
                     : COMPONENT.ComponentContent;
 
-            const pageCompRegister = await findComponentById(mainComponent);
+            let pageCompRegister
+
+            if (isBpmnProcess) {
+                pageCompRegister = await findComponent('process', COMPONENT.ProcessStep);
+            } else {
+                pageCompRegister = await findComponentById(mainComponent);
+            }
             const sectionCompRegister = await findComponentById(COMPONENT.Section);
 
-            if (!pageCompRegister) {
+            if (!pageCompRegister && !isBpmnProcess) {
                 console.warn(`Component ${mainComponent} not found`);
                 return;
             }
@@ -48,36 +56,6 @@ export const useComponentInitialization = ({
                 [],
                 sectionCompRegister
             );
-
-            if (isBpmnProcess) {
-                // Add BPMN artifacts to the page content
-
-                try {
-                    const artifacts = content.artifacts || [];
-
-                    artifacts.forEach(async (artifact: any) => {
-                        const processStepCompRegister = await findComponentById(COMPONENT.ProcessStep);
-
-                        const processStep = newStructuredComponent(
-                            COMPONENT.ProcessStep,
-                            [],
-                            processStepCompRegister
-                        );
-
-                        processStep.properties = {
-                            ...processStep.properties,
-                            ...artifact,
-                        };
-
-                        processStep.tag = artifact.taskKey
-
-                        steps.push(processStep);
-                    })
-
-                } catch (error) {
-                    console.error('Error processing BPMN artifacts:', error);
-                }
-            }
 
             const pageContent = newStructuredComponent(
                 mainComponent,
