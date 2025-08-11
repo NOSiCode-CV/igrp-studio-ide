@@ -38,7 +38,7 @@ export function NextConfig({
                         onChange({ ...data, name: e.target.value })
                     }
                     placeholder="my-next-app"
-                    maxLength={30}
+                    maxLength={100}
                 />
                 {errors?.config && errors.config.name && (
                     <p className="text-xs text-destructive">
