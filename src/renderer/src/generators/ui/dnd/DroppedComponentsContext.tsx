@@ -375,7 +375,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     const getTypeByComponentId = (componentId: string): TypeDef | undefined => {
-        return types.length > 0 ? types.find((t) => t.componentId === componentId) : undefined;
+        return types && types.find((t) => t.componentId === componentId) || undefined;
     };
 
     const setAllTypes = (newTypes: TypeDef[]) => {
