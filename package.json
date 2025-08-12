@@ -33,7 +33,7 @@
 		"@hookform/resolvers": "^5.2.1",
 		"@igrp/dotnet-engine": "^0.0.1-alpha.12",
 		"@igrp/igrp-framework-react-design-system": "0.1.0-beta.1-7",
-		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.479",
+		"@igrp/igrp-studio-nextjs-engine": "0.0.1-alpha.480",
 		"@igrp/igrp-studio-springboot-engine": "0.1.0-beta.1",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^22.0.0",
