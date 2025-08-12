@@ -412,7 +412,7 @@ const RenderCreatedComponents = ({
                                         {renderIcon(
                                             properties?.iconProperties?.iconName
                                         )}
-                                        <span className="text-sm">{`${label} (${properties.labelTrigger})`}</span>
+                                        <span className="text-sm">{`${label} (${properties?.labelTrigger || 'Click'})`}</span>
                                     </div>
                                 </Draggable>
                             </div>
