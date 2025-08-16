@@ -29,8 +29,6 @@ export const useComponentInitialization = ({
             const isPage = content.type === 'page';
             const isBpmnProcess = content.type === 'processStep'
 
-            let steps: any[] = [];
-
             const mainComponent = isPage
                 ? COMPONENT.PageContent
                 : isBpmnProcess
@@ -59,9 +57,7 @@ export const useComponentInitialization = ({
 
             const pageContent = newStructuredComponent(
                 mainComponent,
-                isPage
-                    ? [{ ...section, tag: generateTag(COMPONENT.Section) },]
-                    : steps,
+                [{ ...section, tag: generateTag(COMPONENT.Section) }],
                 pageCompRegister
             );
 

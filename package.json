@@ -22,7 +22,8 @@
 		"release:mac:x64": "electron-vite build && electron-builder --mac --x64 --config --publish always",
 		"release:linux": "electron-vite build && electron-builder --linux --config --publish always",
 		"release:win": "electron-vite build && electron-builder --win --config --publish always",
-		"test": "jest"
+		"test": "jest",
+		"grpc-server": "node grpc-server.js"
 	},
 	"dependencies": {
 		"@electron-toolkit/preload": "^3.0.2",
@@ -37,6 +38,11 @@
 		"@igrp/igrp-studio-springboot-engine": "0.1.0-beta.1",
 		"@monaco-editor/react": "^4.7.0",
 		"@octokit/rest": "^22.0.0",
+		"@opentelemetry/api": "^1.9.0",
+		"@opentelemetry/exporter-logs-otlp-grpc": "^0.203.0",
+		"@opentelemetry/resources": "^2.0.1",
+		"@opentelemetry/sdk-logs": "^0.203.0",
+		"@opentelemetry/semantic-conventions": "^1.36.0",
 		"@radix-ui/react-accordion": "^1.2.11",
 		"@radix-ui/react-alert-dialog": "^1.1.14",
 		"@radix-ui/react-aspect-ratio": "^1.1.7",

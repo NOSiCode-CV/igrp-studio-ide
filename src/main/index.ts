@@ -13,7 +13,7 @@ import icon from '../../resources/icon.png?asset';
 import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
 import { FileTree, IOpenProject } from './types';
-import { sendErrorReport } from './helpers/error-reporter';
+import { initializeLogger, sendErrorReport } from './helpers/logger';
 
 import {
     checkAndReadBaseApi,
@@ -113,6 +113,10 @@ function createWindow(): void {
     closeApp(mainWindow);
 
     installExtensions(mainWindow);
+
+    initializeLogger({
+        endpoint: 'localhost:4317',
+    });
 }
 
 // This method will be called when Electron has finished
