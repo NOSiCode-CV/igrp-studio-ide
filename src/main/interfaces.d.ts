@@ -71,17 +71,17 @@ export interface IWorkspaceRepository {
 }
 
 export interface IProjectRepository {
-     save(project: ProjectData): Promise<ProjectData>;
-     delete(project: ProjectData): Promise<void>;
-     findAllRecent(): Promise<PageableProjects>;
-     findAll(): Promise<Array<ProjectData>>;
+    save(project: ProjectData): Promise<ProjectData>;
+    delete(project: ProjectData): Promise<void>;
+    findAllRecent(): Promise<PageableProjects>;
+    findAll(): Promise<Array<ProjectData>>;
 }
 
 export interface IConnenctionRepository {
-     save(connection: Connection): Promise<Connection>;
-     delete(connectionName: string): Promise<void>;
-     findAll(): Promise<Array<Connection>>;
-     findOne(name: string): Promise<Connection>;
+    save(connection: Connection): Promise<Connection>;
+    delete(connectionName: string): Promise<void>;
+    findAll(): Promise<Array<Connection>>;
+    findOne(name: string): Promise<Connection>;
 
     connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
     getTables: (connectionName: string) => Promise<DatabaseResponse>,
@@ -117,11 +117,15 @@ export interface BaseEngine {
 
     registerComponent?(config: ComponentRegistrationConfig): void
 
+    createProcess?: (process: ProcessConfig, basePath: string) => Promise<void>;
+    createProcessStep?: (step: ProcessStepConfig, basePath: string) => Promise<void>;
+
 }
 
 
 export interface IBaseEngine {
     createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
+
     createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 
     createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
@@ -146,6 +150,9 @@ export interface IBaseEngine {
     getCodeSnippets(engineType: string): CodeSnippetsRegistrationConfig;
 
     registerComponent: (engineType: string, config: ComponentRegistrationConfig) => Promise<HandlerResponse>
+
+    createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
 }
 
 export interface IDocker {
@@ -155,5 +162,5 @@ export interface IDocker {
     stop: (projectPath: string, options: { services: string[] }) => Promise<void>;
     restart: (projectPath: string, options: { services: string[]; timeout?: number }) => Promise<void>;
     check: () => Promise<boolean>;
-    daemonStatus: () => Promise<{isRunning: boolean, error?: string, details?: string}>;
+    daemonStatus: () => Promise<{ isRunning: boolean, error?: string, details?: string }>;
 }

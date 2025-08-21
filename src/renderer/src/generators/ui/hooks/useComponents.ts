@@ -78,6 +78,33 @@ export const useComponents = () => {
         return componentMap;
     }, [components]);
 
+    const extractComponentsFromPage = useCallback(
+        (
+            rootComponent: StructuredComponent,
+            componentName: string,
+        ): Map<string, StructuredComponent> => {
+            const componentMap = new Map<string, StructuredComponent>();
+
+            const processComponent = (child: StructuredComponent) => {
+                if (!child) return;
+
+                if (child.componentName === componentName) {
+                    componentMap.set(child.tag, child);
+                }
+
+                if (Array.isArray(child.children)) {
+                    child.children.forEach(processComponent);
+                }
+            };
+
+            if (rootComponent?.children) {
+                rootComponent.children.forEach(processComponent);
+            }
+
+            return componentMap;
+        },
+        [],
+    );
 
     const extractAllComponentsWithRefs = useCallback((): Map<string, StructuredComponent> => {
         const componentMap = new Map<string, StructuredComponent>();
@@ -157,6 +184,7 @@ export const useComponents = () => {
         extractAllStates,
         extractAllComponentsWithRefs,
         extractAllComponents,
+        extractComponentsFromPage,
         getFormOptions,
         getRefsOptions,
         componentArguments,

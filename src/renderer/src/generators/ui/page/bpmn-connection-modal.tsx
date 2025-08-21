@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@renderer/components/ui/button';
 import {
     Dialog,
@@ -31,15 +31,67 @@ export const BPMNConfigModal = ({
     config,
 }: BPMNConfigModalProps) => {
     const [formData, setFormData] = useState<Partial<BPMNConfig>>({
-        name: config?.name || '',
-        apiUrl: config?.apiUrl || '',
-        basePath: config?.basePath || '',
-        token: config?.token || '',
-        description: config?.description || '',
-        isActive: config?.isActive ?? true,
+        name: '',
+        apiUrl: '',
+        basePath: '',
+        token: '',
+        description: '',
+        isActive: true,
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
+    const [renderKey, setRenderKey] = useState(0);
+
+    // Update form data when config prop changes (for editing)
+    useEffect(() => {
+        if (config) {
+            setFormData({
+                name: config.name || '',
+                apiUrl: config.apiUrl || '',
+                basePath: config.basePath || '',
+                token: config.token || '',
+                description: config.description || '',
+                isActive: config.isActive ?? true,
+            });
+        } else {
+            // Reset form when creating new config
+            setFormData({
+                name: '',
+                apiUrl: '',
+                basePath: '',
+                token: '',
+                description: '',
+                isActive: true,
+            });
+        }
+    }, [config?.id, isOpen]);
+
+    // Reset form when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            setRenderKey(prev => prev + 1);
+            if (config) {
+                setFormData({
+                    name: config.name || '',
+                    apiUrl: config.apiUrl || '',
+                    basePath: config.basePath || '',
+                    token: config.token || '',
+                    description: config.description || '',
+                    isActive: config.isActive ?? true,
+                });
+            } else {
+                setFormData({
+                    name: '',
+                    apiUrl: '',
+                    basePath: '',
+                    token: '',
+                    description: '',
+                    isActive: true,
+                });
+            }
+        }
+    }, [isOpen, config?.id]);
+
 
     const handleInputChange = (field: keyof BPMNConfig, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -103,6 +155,8 @@ export const BPMNConfigModal = ({
                 toast.success('API configuration saved successfully');
             }
             onConfirm();
+            setRenderKey(0);
+            handleClose();
         } catch (error) {
             toast.error('Failed to save API configuration');
         } finally {
@@ -110,9 +164,25 @@ export const BPMNConfigModal = ({
         }
     };
 
+    const handleClose = () => {
+        // Reset form when modal is closed
+        if (!config) {
+            setFormData({
+                name: '',
+                apiUrl: '',
+                basePath: '',
+                token: '',
+                description: '',
+                isActive: true,
+            });
+        }
+        setRenderKey(0);
+        onClose();
+    };
+
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px]">
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+            <DialogContent key={`${config?.id || 'new'}-${renderKey}`} className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>
                         {config ? 'Edit BPMN API Configuration' : 'BPMN API Configuration'}
@@ -126,7 +196,7 @@ export const BPMNConfigModal = ({
                         <Label htmlFor="name">Configuration Name *</Label>
                         <Input
                             id="name"
-                            value={formData.name}
+                            value={formData.name || ''}
                             onChange={(e) => handleInputChange('name', e.target.value)}
                             placeholder="My BPMN API"
                         />
@@ -135,7 +205,7 @@ export const BPMNConfigModal = ({
                         <Label htmlFor="apiUrl">API URL *</Label>
                         <Input
                             id="apiUrl"
-                            value={formData.apiUrl}
+                            value={formData.apiUrl || ''}
                             onChange={(e) => handleInputChange('apiUrl', e.target.value)}
                             placeholder="https://my-bpmn-server.com"
                         />
@@ -144,7 +214,7 @@ export const BPMNConfigModal = ({
                         <Label htmlFor="basePath">Base Path</Label>
                         <Input
                             id="basePath"
-                            value={formData.basePath}
+                            value={formData.basePath || ''}
                             onChange={(e) => handleInputChange('basePath', e.target.value)}
                             placeholder="/api/v1"
                         />
@@ -154,7 +224,7 @@ export const BPMNConfigModal = ({
                         <Input
                             id="token"
                             type="password"
-                            value={formData.token}
+                            value={formData.token || ''}
                             onChange={(e) => handleInputChange('token', e.target.value)}
                             placeholder="Bearer token or API key (optional)"
                         />
@@ -163,7 +233,7 @@ export const BPMNConfigModal = ({
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             id="description"
-                            value={formData.description}
+                            value={formData.description || ''}
                             onChange={(e) => handleInputChange('description', e.target.value)}
                             placeholder="Optional description for this API configuration"
                             rows={3}
@@ -172,7 +242,7 @@ export const BPMNConfigModal = ({
                     <div className="flex items-center space-x-2">
                         <Switch
                             id="isActive"
-                            checked={formData.isActive}
+                            checked={formData.isActive ?? true}
                             onCheckedChange={(checked) => handleInputChange('isActive', checked)}
                         />
                         <Label htmlFor="isActive">Active Configuration</Label>
@@ -182,12 +252,12 @@ export const BPMNConfigModal = ({
                     <Button
                         variant="outline"
                         onClick={handleTestConnection}
-                        disabled={isTesting || !formData.apiUrl || !formData.basePath}
+                        disabled={isTesting || !formData.apiUrl}
                     >
                         {isTesting ? 'Testing...' : 'Test Connection'}
                     </Button>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={onClose}>
+                        <Button variant="outline" onClick={handleClose}>
                             Cancel
                         </Button>
                         <Button onClick={handleSave} disabled={isLoading}>

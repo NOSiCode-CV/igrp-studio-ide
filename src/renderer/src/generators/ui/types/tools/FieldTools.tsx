@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { AddComponentModal } from '../../components/add-components-modal';
 import { Badge } from '@renderer/components/ui/badge';
 import { useTranslation } from 'react-i18next';
+import { generateId } from '@renderer/utils';
 
 interface ToolsProps {
     onEdit: () => void;
@@ -26,7 +27,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
     const { id, componentName } = comp;
     const { componentName: parentComponentName } = parentComp;
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
-    const { handleRemoveChildFromComponent } = useDroppedComponents();
+    const { handleRemoveChildFromComponent, handleAddChildToComponent } = useDroppedComponents();
 
     const { getAcceptedChildren } = useStudio();
 
@@ -40,6 +41,29 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
 
     const onClickDeleteField = () => {
         handleRemoveChildFromComponent({ droppableId: id, index });
+    };
+
+    const onClickCloneField = () => {
+        // Create a deep copy of the component
+        const cloneComponent = (component: StructuredComponent): StructuredComponent => {
+            const newId = generateId(component.componentName);
+            const newTag = `${component.tag}_copy`;
+            
+            return {
+                ...component,
+                id: newId,
+                tag: newTag,
+                children: component.children?.map(child => cloneComponent(child)) || [],
+            };
+        };
+
+        const clonedComponent = cloneComponent(comp);
+        
+        // Add the cloned component to the same parent at the next index
+        handleAddChildToComponent(
+            { droppableId: parentComp.id, index: index + 1 },
+            clonedComponent
+        );
     };
 
     const [isOpen, setIsOpen] = useState(false);
@@ -73,6 +97,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Clone"
+                            onClick={onClickCloneField}
                         >
                             <Copy className="h-3.5" />
                         </button>

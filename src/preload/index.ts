@@ -15,6 +15,8 @@ const handleError = (error: unknown): HandlerResponse => ({
 // Custom APIs for renderer
 const api = {
 
+	reportError: (error: Error) => ipcRenderer.send('report-error', error),
+
 	fetchSelectors: (module: string, basePath: string) =>
 		ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
 
@@ -193,6 +195,22 @@ const engine = {
 			return handleError(error)
 		}
 	},
+
+	createProcess: async (process: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PROCESS, process, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
+
+	createProcessStep: async (step: any, engineType: string, basePath: string): Promise<HandlerResponse> => {
+		try {
+			return await ipcRenderer.invoke(EVENTS.NEXT.CREATE_PROCESS_STEP, step, engineType, basePath)
+		} catch (error) {
+			return handleError(error)
+		}
+	},
 }
 
 const repo = {
@@ -321,30 +339,30 @@ const repo = {
     },
     connection: {
         findAll: () => {
-            return ipcRenderer.invoke('igrp-studio:repo:connection.findAll');
+            return ipcRenderer.invoke(EVENTS.CONNECTION.GET_CONNECTIONS);
         },
         save: (connection: Connection) => {
             return ipcRenderer.invoke(
-                'igrp-studio:repo:connection.save',
+                EVENTS.CONNECTION.SAVE_CONNECTION,
                 connection
             );
         },
         delete: (connection: string) => {
             return ipcRenderer.invoke(
-                'igrp-studio:repo:connection.delete',
+                EVENTS.CONNECTION.DELETE_CONNECTION,
                 connection
             );
         },
         connectToDatabase: async (
             config: Connection
         ): Promise<DatabaseResponse> => {
-            return await ipcRenderer.invoke('connect-database', config);
+            return await ipcRenderer.invoke(EVENTS.CONNECTION.CONNECT_DATABASE, config);
         },
 
         getTables: async (
             connectionName: string
         ): Promise<DatabaseResponse> => {
-            return await ipcRenderer.invoke('get-tables', connectionName);
+            return await ipcRenderer.invoke(EVENTS.CONNECTION.GET_TABLES, connectionName);
         },
 
         getTableStructure: async (
@@ -352,7 +370,7 @@ const repo = {
             tableName: string
         ): Promise<DatabaseResponse> => {
             return await ipcRenderer.invoke(
-                'get-table-structure',
+                EVENTS.CONNECTION.GET_TABLE_STRUCTURE,
                 connectionName,
                 tableName
             );
@@ -360,19 +378,19 @@ const repo = {
     },
     docker: {
         up: (projectPath: string) =>
-            ipcRenderer.invoke('docker-up', projectPath),
+            ipcRenderer.invoke(EVENTS.DOCKER.UP, projectPath),
         down: (projectPath: string, options: { dropVolume?: boolean }) =>
-            ipcRenderer.invoke('docker-down', projectPath, options),
+            ipcRenderer.invoke(EVENTS.DOCKER.DOWN, projectPath, options),
         status: (projectPath: string) =>
-            ipcRenderer.invoke('docker-status', projectPath),
+            ipcRenderer.invoke(EVENTS.DOCKER.STATUS, projectPath),
         stop: (projectPath: string, options: { services: string[] }) =>
-            ipcRenderer.invoke('docker-stop', projectPath, options),
+            ipcRenderer.invoke(EVENTS.DOCKER.STOP, projectPath, options),
         restart: (
             projectPath: string,
             options: { services: string[]; timeout?: number }
-        ) => ipcRenderer.invoke('docker-restart', projectPath, options),
-        check: () => ipcRenderer.invoke('docker-check'),
-        daemonStatus: () => ipcRenderer.invoke('docker-daemon-status'),
+        ) => ipcRenderer.invoke(EVENTS.DOCKER.RESTART, projectPath, options),
+        check: () => ipcRenderer.invoke(EVENTS.DOCKER.CHECK),
+        daemonStatus: () => ipcRenderer.invoke(EVENTS.DOCKER.DAEMON_STATUS),
     },
 };
 
@@ -475,5 +493,14 @@ declare global {
     menu: typeof windowControls;
     appLogicAPI: typeof appLogic;
     igrpStudioSettings: typeof igrpStudioSettings;
+  }
+}
+
+// Augment the Window interface to include reportError
+declare global {
+  interface Window {
+    api: {
+      reportError: (error: Error) => void;
+    }
   }
 }

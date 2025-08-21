@@ -31,7 +31,6 @@ import { FunctionSettingsSidebar } from '../../../sidebar/custom-code/functions-
 import { getId } from '@renderer/utils';
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 import useStudio from '@renderer/hooks/use-studio';
-import DynamicKeyValueForm from '@renderer/components/domain-form';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { AppLogicAction } from './app-logic/app-logic-action';
 import { PageSelectionConfig } from '../../properties';
@@ -48,7 +47,7 @@ const actionTypeOptions = [
 interface NavigationAction {
     name: string;
     path: string;
-    params?: Record<string, string>;
+    params?: Segment[];
     segments?: Segment[];
 }
 
@@ -458,6 +457,19 @@ const InteractionEditor = ({
                             segments={currentAction.navigate?.segments || []}
                             value={currentAction.navigate?.path || ''}
                             key="navigate"
+                            showNavigationParams={true}
+                            navigationParams={
+                                currentAction.navigate?.params || []
+                            }
+                            onNavigationParamsChange={(params) => {
+                                setCurrentAction({
+                                    ...currentAction,
+                                    navigate: {
+                                        ...currentAction.navigate!,
+                                        params,
+                                    },
+                                });
+                            }}
                             onPageChange={(value) => {
                                 const page = availablePages.find(
                                     (p) => p.value === value
@@ -470,6 +482,9 @@ const InteractionEditor = ({
                                             path: value,
                                             name: `goTo${page.metadata.pageName}`,
                                             segments: page.metadata.segments,
+                                            params:
+                                                currentAction.navigate
+                                                    ?.params || [],
                                         },
                                     });
                                 }
@@ -485,37 +500,6 @@ const InteractionEditor = ({
                                 });
                             }}
                         />
-
-                        <div className="space-y-2">
-                            <Label>Navigation Parameters</Label>
-                            <DynamicKeyValueForm
-                                onAdd={(items) => {
-                                    setCurrentAction({
-                                        ...currentAction,
-                                        navigate: {
-                                            path:
-                                                currentAction?.navigate?.path ||
-                                                '',
-                                            name:
-                                                currentAction?.navigate?.name ||
-                                                '',
-                                            params: items.reduce(
-                                                (acc, item) => {
-                                                    acc[item.paramName] =
-                                                        item.paramValue;
-                                                    return acc;
-                                                },
-                                                {} as Record<string, string>
-                                            ),
-                                        },
-                                    });
-                                }}
-                                fieldPairs={[
-                                    { key: 'paramValue', label: 'Param Value' },
-                                    { key: 'paramName', label: 'Param Name' },
-                                ]}
-                            />
-                        </div>
                     </div>
                 );
 

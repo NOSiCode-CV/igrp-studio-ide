@@ -8,6 +8,13 @@ import {
     SelectValue,
 } from '@renderer/components/ui/select';
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
+import {
     Card,
     CardContent,
     CardDescription,
@@ -21,18 +28,26 @@ import {
     BPMNProject,
     BPMNProjectProcessDefinition,
     BPMNPageDefinition,
+    BPMNProjectArtifact,
 } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
-import { bpmnMockService } from '@renderer/services/bpmn-mock-service';
+import { ProcessConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+import useToast from '@renderer/hooks/useToast';
+import { useDispatch } from 'react-redux';
+import { getFileThree as onGetPages } from '@renderer/redux/thunks';
+import { getId } from '@renderer/utils';
 
 interface BPMNProjectSelectorProps {
     onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
-    useMockService?: boolean;
+    bpmnProcesses: any[];
+    basePath: string;
 }
 
 export const BPMNProjectSelector = ({
     onPageClick,
-    useMockService = true,
+    bpmnProcesses,
+    basePath,
 }: BPMNProjectSelectorProps) => {
     const [projects, setProjects] = useState<BPMNProject[]>([]);
     const [selectedProject, setSelectedProject] = useState<BPMNProject | null>(
@@ -44,15 +59,16 @@ export const BPMNProjectSelector = ({
     const [loading, setLoading] = useState(true);
     const [loadingProcesses, setLoadingProcesses] = useState(false);
 
-    // Get the appropriate service based on configuration
-    const getService = () => {
-        return useMockService ? bpmnMockService : bpmnService;
-    };
+    const { showErrorToast,showSuccessToast } = useToast();
+
+    const dispatch:any= useDispatch();
 
     // Load projects on component mount
     useEffect(() => {
         loadProjects();
-    }, [useMockService]);
+    }, []);
+
+    // check if  processs key is prresent in bmpmtrpocess storage chekc name and version
 
     // Load process definitions when project changes
     useEffect(() => {
@@ -66,7 +82,7 @@ export const BPMNProjectSelector = ({
     const loadProjects = async () => {
         try {
             setLoading(true);
-            const projectsData = await getService().getProjects();
+            const projectsData = await bpmnService.getProjects();
             setProjects(projectsData);
         } catch (error) {
             toast.error('Failed to load projects');
@@ -80,7 +96,7 @@ export const BPMNProjectSelector = ({
         try {
             setLoadingProcesses(true);
             const processes =
-                await getService().getProcessDefinitionsByProject(projectId);
+                await bpmnService.getProcessDefinitionsByProject(projectId);
             setProcessDefinitions(processes);
         } catch (error) {
             toast.error('Failed to load process definitions');
@@ -95,54 +111,114 @@ export const BPMNProjectSelector = ({
         setSelectedProject(project || null);
     };
 
-    const handleEditProcess = async (process: BPMNProjectProcessDefinition) => {
+    const handleGenerateProcess = async (
+        process: BPMNProjectProcessDefinition
+    ) => {
         try {
-            // Create a temporary page definition for the studio
-            const pageDefinition: BPMNPageDefinition = {
-                id: `bpmn-${process.processDefinitionId}}`,
-                processDefinitionId: process.processDefinitionId,
-                processDefinitionKey: process.processKey,
-                description: `Process from ${selectedProject?.name} project`,
-                isStartPage: true,
-                isTaskPage: false,
-                content: {
-                    type: 'bpmn-process',
-                    processKey: process.processKey,
-                    processName: process.processKey,
-                    processId: process.processDefinitionId,
-                    processVersion: process.version.toString(),
-                    processCategory: selectedProject?.name || 'General',
-                    projectId: selectedProject?.projectId || '',
-                    projectCode: selectedProject?.code || '',
-                    projectName: selectedProject?.name || '',
-                    pageName: `${process.processKey} - ${selectedProject?.name || 'BPMN Process'}`,
-                    pagePath: `/bpmn/${selectedProject?.code || 'project'}/${process.processKey}`,
-                },
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            };
+            // Show loading state
+            toast.loading(
+                `Generating process definition for ${process.processKey}...`
+            );
 
-            onPageClick?.(pageDefinition);
-            toast.success(`Opening ${process.processKey} in page builder`);
+            // Create a comprehensive page definition for the studio
+            const processConfig: ProcessConfig = {
+                type: 'process',
+                processKey: process.processKey,
+                name: process.processKey,
+                processVersion: `v${process.version}` || 'v1',
+                description: process.title,
+                steps: process.projectArtifacts?.map((artifact) => ({
+                    id: artifact.taskKey,
+                    name: artifact.name,
+                })),
+                id: getId(),
+            };
+          
+            const { error } = await window.engine.createProcess(
+                processConfig,
+                ENV_TYPES.NEXTJS,
+                basePath
+            );
+            console.log('error', error);
+
+            if (error) {
+                showErrorToast(error);
+            }
+            toast.dismiss();
+            showSuccessToast('Process created successfully');
+
+            dispatch(onGetPages(basePath));
+
         } catch (error) {
-            toast.error('Failed to open process in page builder', {
+            toast.dismiss();
+            console.error('Error loading process definition:', error);
+            toast.error('Failed to load process definition', {
                 description:
                     error instanceof Error ? error.message : 'Unknown error',
             });
         }
     };
 
-    const handleViewProcess = (process: BPMNProjectProcessDefinition) => {
-        toast.info(`Viewing details for ${process.processKey}`, {
-            description: `Version ${process.version}, State: ${process.state}`,
-        });
+    const handleAddComponents = async (
+        processDefinition: BPMNProjectProcessDefinition,
+        processArtifact: BPMNProjectArtifact
+    ) => {
+
+        const processFinded = bpmnProcesses.find(
+            (p) =>
+                p.name ===
+                    processDefinition.processKey &&
+                p.children.some(
+                    (c: any) =>
+                        c.name ===
+                        `v${processDefinition.version}`
+                ))
+
+        const processVersionFinded = processFinded.children.find(
+            (c: any) => c.name === `v${processDefinition.version}`
+        );
+
+        if (!processVersionFinded) return;
+
+        const stepFindedChildren = processVersionFinded?.children.find(
+            (c: any) => c.name.replace('.json', '') === processArtifact.taskKey
+        );
+
+        onPageClick?.(stepFindedChildren);
+        
     };
 
-    const handleViewArtifacts = (process: BPMNProjectProcessDefinition) => {
-        const artifactCount = process.projectArtifacts.length;
-        toast.info(`Process has ${artifactCount} artifacts`, {
-            description: process.projectArtifacts.map((a) => a.name).join(', '),
-        });
+    const handleDownloadArtifact = async (artifact: BPMNProjectArtifact) => {
+        try {
+            toast.loading(`Downloading artifact: ${artifact.name}...`);
+
+            // Fetch the artifact content
+            const artifactDetails = await bpmnService.getArtifactContent(
+                artifact.projectArtifactId
+            );
+
+            const blob = new Blob([artifactDetails.content], {
+                type: 'application/octet-stream',
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = artifact.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            toast.dismiss();
+            toast.success(`Downloaded artifact: ${artifact.name}`);
+        } catch (error) {
+            toast.dismiss();
+            console.error('Error downloading artifact:', error);
+            toast.error('Failed to download artifact', {
+                description:
+                    error instanceof Error ? error.message : 'Unknown error',
+            });
+        }
     };
 
     if (loading) {
@@ -166,76 +242,126 @@ export const BPMNProjectSelector = ({
                         <SelectValue placeholder="Choose a project..." />
                     </SelectTrigger>
                     <SelectContent>
-                        {projects.map((project) => (
-                            <SelectItem
-                                key={project.projectId}
-                                value={project.projectId}
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <span className="font-medium">
-                                        {project.name}
-                                    </span>
-                                    <Badge
-                                        variant={
-                                            project.active
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {project.code}
-                                    </Badge>
-                                    {!project.active && (
-                                        <Badge variant="outline">
-                                            Inactive
+                        {projects.length > 0 &&
+                            projects.map((project) => (
+                                <SelectItem
+                                    key={project.projectId}
+                                    value={project.projectId}
+                                >
+                                    <div className="flex items-center space-x-2">
+                                        <span className="font-medium">
+                                            {project.name}
+                                        </span>
+                                        <Badge
+                                            variant={
+                                                project.active
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
+                                        >
+                                            {project.code}
                                         </Badge>
-                                    )}
-                                </div>
-                            </SelectItem>
-                        ))}
+                                        {!project.active && (
+                                            <Badge variant="outline">
+                                                Inactive
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </SelectItem>
+                            ))}
                     </SelectContent>
                 </Select>
             </div>
 
             {/* Selected Project Info */}
             {selectedProject && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center space-x-2">
-                            <span>{selectedProject.name}</span>
-                            <Badge
-                                variant={
-                                    selectedProject.active
-                                        ? 'default'
-                                        : 'secondary'
-                                }
-                            >
-                                {selectedProject.code}
-                            </Badge>
-                        </CardTitle>
-                        <CardDescription>
-                            {selectedProject.description}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <span className="font-medium">Version:</span>{' '}
-                                {selectedProject.currentVersion}
+                <Card className="relative overflow-hidden  bg-gradient-to-br from-background to-muted/30">
+                    <CardHeader className="relative">
+                        <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                                <CardTitle className="flex items-center space-x-3 text-xl">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="font-bold">
+                                            {selectedProject.name}
+                                        </span>
+                                        <Badge
+                                            variant={
+                                                selectedProject.active
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
+                                            className="text-xs px-2 py-1"
+                                        >
+                                            {selectedProject.code}
+                                        </Badge>
+                                    </div>
+                                </CardTitle>
+                                <CardDescription className="mt-2 text-base leading-relaxed">
+                                    {selectedProject.description ||
+                                        'No description available'}
+                                </CardDescription>
                             </div>
-                            <div>
-                                <span className="font-medium">Status:</span>
+
+                            {/* Status indicator */}
+                            <div className="flex flex-col items-end space-y-2">
                                 <Badge
                                     variant={
                                         selectedProject.active
                                             ? 'default'
-                                            : 'secondary'
+                                            : 'destructive'
                                     }
-                                    className="ml-2"
+                                    className={`px-3 py-1 text-xs font-medium ${
+                                        selectedProject.active
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                    }`}
                                 >
-                                    {selectedProject.active
-                                        ? 'Active'
-                                        : 'Inactive'}
+                                    <div className="flex items-center space-x-1">
+                                        <div
+                                            className={`w-2 h-2 rounded-full ${
+                                                selectedProject.active
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
+                                            }`}
+                                        ></div>
+                                        <span>
+                                            {selectedProject.active
+                                                ? 'Active'
+                                                : 'Inactive'}
+                                        </span>
+                                    </div>
                                 </Badge>
+                            </div>
+                        </div>
+                    </CardHeader>
+
+                    <CardContent className="relative">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Process Definitions Count */}
+                            <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                                    <svg
+                                        className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-foreground">
+                                        {processDefinitions?.length || 0}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground font-medium">
+                                        Process Definitions
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </CardContent>
@@ -265,75 +391,114 @@ export const BPMNProjectSelector = ({
                                     key={process.processDefinitionId}
                                     className="hover:shadow-md transition-shadow"
                                 >
-                                    <CardHeader className="pb-3">
+                                    <CardHeader>
                                         <CardTitle className="text-base">
-                                            {process.processKey}
+                                            <div>
+                                                <span className="font-medium">
+                                                    {process.title}
+                                                </span>
+                                                <Badge
+                                                    variant={'outline'}
+                                                    className="ml-2"
+                                                >
+                                                    {process.processKey}
+                                                </Badge>
+                                            </div>
                                         </CardTitle>
                                         <CardDescription className="text-sm">
-                                            Version {process.version} •{' '}
-                                            {process.state}
+                                            Version{' '}
+                                            {process.version
+                                                ? process.version
+                                                : 'N/A'}{' '}
+                                            • {process.statusDesc}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-3">
                                         <div className="text-sm text-muted-foreground">
                                             <div>
-                                                Deployment:{' '}
-                                                {process.deploymentId}
-                                            </div>
-                                            <div>
                                                 Deployed:{' '}
                                                 {new Date(
-                                                    process.deploymentDate
+                                                    process.deploymentDate || ''
                                                 ).toLocaleDateString()}
                                             </div>
                                         </div>
 
-                                        {process.projectArtifacts.length >
-                                            0 && (
-                                            <div className="text-sm">
-                                                <span className="font-medium">
-                                                    Artifacts:
-                                                </span>{' '}
-                                                {
-                                                    process.projectArtifacts
-                                                        .length
-                                                }
-                                            </div>
-                                        )}
+                                        {process.projectArtifacts &&
+                                            process.projectArtifacts.length >
+                                                0 && (
+                                                <div className="text-sm">
+                                                    <span className="font-medium">
+                                                        Artifacts:
+                                                    </span>{' '}
+                                                    {
+                                                        process.projectArtifacts
+                                                            .length
+                                                    }
+                                                </div>
+                                            )}
 
                                         <Separator />
 
                                         <div className="flex space-x-2">
-                                            <Button
-                                                size="sm"
-                                                onClick={() =>
-                                                    handleEditProcess(process)
-                                                }
-                                                className="flex-1"
-                                            >
-                                                Edit Page
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() =>
-                                                    handleViewProcess(process)
-                                                }
-                                            >
-                                                View
-                                            </Button>
-                                            {process.projectArtifacts.length >
-                                                0 && (
+                                            {bpmnProcesses.find(
+                                                (p) =>
+                                                    p.name ===
+                                                        process.processKey &&
+                                                    p.children.some(
+                                                        (c: any) =>
+                                                            c.name ===
+                                                            `v${process.version}`
+                                                    )
+                                            ) ? (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger
+                                                        asChild
+                                                    >
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="flex-1"
+                                                        >
+                                                            View Artifacts
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuLabel>
+                                                            Available Artifacts
+                                                        </DropdownMenuLabel>
+                                                        {process.projectArtifacts?.map(
+                                                            (
+                                                                artifact,
+                                                                index
+                                                            ) => (
+                                                                <DropdownMenuItem
+                                                                    key={index}
+                                                                    onClick={() =>
+                                                                        handleAddComponents(
+                                                                            process,
+                                                                            artifact
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        artifact.name
+                                                                    }
+                                                                </DropdownMenuItem>
+                                                            )
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            ) : (
                                                 <Button
                                                     size="sm"
-                                                    variant="outline"
                                                     onClick={() =>
-                                                        handleViewArtifacts(
+                                                        handleGenerateProcess(
                                                             process
                                                         )
                                                     }
+                                                    className="flex-1"
                                                 >
-                                                    Artifacts
+                                                    Generate Process
                                                 </Button>
                                             )}
                                         </div>

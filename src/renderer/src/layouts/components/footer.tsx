@@ -55,10 +55,7 @@ export function Footer() {
         window.electron.ipcRenderer.on('message-update', handleLog);
 
         return () => {
-            window.electron.ipcRenderer.on(
-                'message-update',
-                handleLog
-            );
+            window.electron.ipcRenderer.on('message-update', handleLog);
         };
     }, []);
 
@@ -90,6 +87,10 @@ export function Footer() {
         if (appVersion) handleCheckUpdate();
     }, [appVersion, t]);
 
+    const simulateError = () => {
+        throw new Error('This is a simulated error from the renderer process.');
+    };
+    
     return (
         <TooltipProvider>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
@@ -105,7 +106,9 @@ export function Footer() {
                         ) : (
                             <span className="flex items-center space-x-1 text-amber-600">
                                 <AlertCircle className="h-4 w-4" />
-                                <span className="truncate max-w-[calc(100vw_-_500px)]">{log}</span>
+                                <span className="truncate max-w-[calc(100vw_-_500px)]">
+                                    {log}
+                                </span>
                             </span>
                         )}
                     </span>
@@ -113,6 +116,8 @@ export function Footer() {
 
                 <div className="flex items-center space-x-3">
                     <Separator orientation="vertical" className="h-4" />
+
+                    <button onClick={simulateError}>Simulate Error</button>
 
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -122,7 +127,7 @@ export function Footer() {
                                 className="h-6 w-6"
                                 onClick={() => setOpen(!open)}
                             >
-                                <Stethoscope className='text-muted-foreground'/>
+                                <Stethoscope className="text-muted-foreground" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent side="top">Doctor</TooltipContent>

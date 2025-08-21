@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import { ColumnDef, IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { Label } from '@renderer/components/ui/label';
@@ -17,7 +17,6 @@ import { Checkbox } from '@renderer/components/ui/checkbox';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils';
 import { useTranslation } from 'react-i18next';
 import { Connection } from 'src/main/types';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 
 const actions = [
     {
@@ -264,7 +263,7 @@ export function TableManager({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {previewColumns.map((column, key) => (
+                                        {previewColumns && previewColumns.map((column, key) => (
                                             <TableRow key={key}>
                                                 <TableCell>
                                                     {column?.name}

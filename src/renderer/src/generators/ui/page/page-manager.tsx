@@ -77,12 +77,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [pageEditing, setPageEditing] = useState<PageDefinition>();
     const [pageToDuplicate, setPageToDuplicate] = useState<PageDefinition>();
     const [activeTab, setActiveTab] = useState<string>('pages');
+    const [bpmnProcesses, setBpmnProcesses] = useState<any>([]);
 
-    const handleAddComponents = (page: PageDefinition | BPMNPageDefinition) => {
-        // Switch to pages tab when opening a BPMN page
-        if ('processDefinitionId' in page) {
-            setActiveTab('pages');
-        }
+    const handleAddComponents = (page:   | BPMNPageDefinition) => {
         onPageClick?.(page);
     };
 
@@ -137,7 +134,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         if (files) {
             const pages = files.find((page) => page.name === 'pages');
             const components = files.find((page) => page.name === 'components');
-
+            const process = files.find((page) => page.name === 'process');
+            
             if (pages && pages.children) {
                 setContent(pages.children);
             }
@@ -145,6 +143,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             if (components && components.children) {
                 setComponents(components.children);
             }
+
+            if (process && process.children) setBpmnProcesses(process.children);
         }
     }, [files]);
 
@@ -232,7 +232,11 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 description={project.config?.description}
             />
 
-            <VersionAlert projectVersion={project?.config?.version} className="mb-4" changelogContent={nextjsEngineChangelog} />
+            <VersionAlert
+                projectVersion={project?.config?.version}
+                className="mb-4"
+                changelogContent={nextjsEngineChangelog}
+            />
 
             <IGRPTabs value={activeTab} onValueChange={setActiveTab}>
                 <IGRPTabsList className="w-full">
@@ -372,7 +376,11 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                     </>
                 </IGRPTabsContent>
                 <IGRPTabsContent value="bpmn" className="space-y-4 pt-3">
-                    <BPMNManager onPageClick={handleAddComponents} />
+                    <BPMNManager
+                        onPageClick={handleAddComponents}
+                        bpmnProcesses={bpmnProcesses}
+                        basePath={basePath}
+                    />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="settings" className="space-y-4">
                     <ProjectSettings

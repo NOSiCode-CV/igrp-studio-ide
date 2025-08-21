@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package logging;
+
+service ErrorLogger {
+  rpc SendErrorReport (ErrorReportRequest) returns (ErrorReportResponse) {}
+}
+
+message ErrorReportRequest {
+  string errorId = 1;
+  string message = 2;
+  string stackTrace = 3;
+  string errorType = 4;
+  string platform = 5;
+  string osVersion = 6;
+  string electronVersion = 7;
+  string processType = 8;
+  string appVersion = 9;
+  string sessionId = 10;
+  int64 timestamp = 11;
+  map<string, string> additionalAttributes = 12;
+}
+
+message ErrorReportResponse {
+  bool success = 1;
+  string message = 2;
+  string reportId = 3;
+}

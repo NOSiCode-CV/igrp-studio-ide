@@ -98,19 +98,8 @@ export const SelectInput = ({
                 {label}
             </Label>
         )}
-        {/*  <Select value={value} onValueChange={onChange}>
-            <SelectTrigger id={id} className="w-full">
-                <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-                {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select> */}
         <IGRPCombobox
+            name={id}
             options={options}
             value={value as string}
             onChange={(e) => {

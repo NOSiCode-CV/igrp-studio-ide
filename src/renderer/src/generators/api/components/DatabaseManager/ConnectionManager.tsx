@@ -9,12 +9,11 @@ import {
     DialogTrigger,
 } from '@renderer/components/ui/dialog';
 import { Plus, Trash2, Edit } from 'lucide-react';
-import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
+import { ColumnDef, IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import { ConnectionForm } from './ConnectionForm';
 import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { Connection } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
-import { ColumnDef } from '@igrp/igrp-framework-react-design-system/dist/types/globals';
 
 export function ConnectionManager({ title }: { title?: string }) {
     const { t } = useTranslation(); // Initialize translation hook
@@ -127,8 +126,8 @@ export function ConnectionManager({ title }: { title?: string }) {
     ];
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between">
+        <div className="space-y-3">
+            <div className="flex justify-between mt-3">
                 {title && (
                     <div>
                         <h1 className="text-3xl font-semibold">{title}</h1>

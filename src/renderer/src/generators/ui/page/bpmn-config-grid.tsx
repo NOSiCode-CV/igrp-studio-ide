@@ -1,6 +1,6 @@
 import React from 'react';
 import { BPMNConfigCard } from './bpmn-config-card';
-import { EmptyList } from './empty-list';
+import { EmptyList } from '../../../components/empty-list';
 import { Button } from '@renderer/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { BPMNConfig } from 'src/main/types';
@@ -43,12 +43,7 @@ export const BPMNConfigGrid: React.FC<BPMNConfigGridProps> = ({
                 icon="settings"
                 title="No BPMN Configurations"
                 description="Get started by adding your first BPMN API configuration to connect to your workflow engine."
-                action={
-                    <Button onClick={onAddNew} className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        Add Configuration
-                    </Button>
-                }
+                onAction={onAddNew}
             />
         );
     }

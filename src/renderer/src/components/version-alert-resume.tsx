@@ -1,5 +1,3 @@
-import React from 'react';
-import { VersionAlert } from './version-alert';
 
 // Example: Spring Engine Changelog
 const springEngineChangelog = {

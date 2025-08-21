@@ -9,8 +9,8 @@ export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
             PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME,
             t('msgSpecialCharactersRegex')
         ).max(
-            50,
-            t('maxLengthExceeded', { max: 50 })
+            100,
+            t('maxLengthExceeded', { max: 100 })
         ),
         type: Yup.string().oneOf(
             ['frontend', 'backend'],
@@ -46,7 +46,7 @@ export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
                                         PATTERNS.NAME_APP_VALIDATION,
                                         t('msgInfoAccpet')
                                     )
-                                    .max(50, t('maxLengthExceeded', { max: 50 }))
+                                    .max(100, t('maxLengthExceeded', { max: 100 }))
                                 : schema.notRequired();
                     }),
                     // Validation for Spring-specific fields
@@ -60,7 +60,7 @@ export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
                                     PATTERNS.NO_SPACE_AND_HYPHEN,
                                     t('msgInfoAccpet')
                                 )
-                                .max(50, t('maxLengthExceeded', { max: 50 }))
+                                .max(100, t('maxLengthExceeded', { max: 100 }))
                             : schema.notRequired();
                     }),
                     artifact: Yup.string().when('$framework', (framework, schema) => {

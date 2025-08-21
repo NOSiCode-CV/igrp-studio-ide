@@ -1,4 +1,4 @@
-import { BPMNConfig, BPMNProcessDefinition, BPMNProcessInstance, BPMNTask, BPMNProject, BPMNProjectProcessDefinition } from 'src/main/types';
+import { BPMNConfig, BPMNProcessInstance, BPMNTask, BPMNProject, BPMNProjectProcessDefinition, HandlerResponse, PaginatedResponse } from 'src/main/types';
 
 class BPMNService {
   private config: BPMNConfig | null = null;
@@ -7,11 +7,17 @@ class BPMNService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+   
+    if (!this.config) {
+      this.config = await this.getConfig();
+    }
+
     if (!this.config) {
       throw new Error('BPMN API not configured. Please set up the API configuration first.');
     }
 
     const url = `${this.config.apiUrl}${this.config.basePath}${endpoint}`;
+    console.log('url', url);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -26,23 +32,25 @@ class BPMNService {
       headers['Authorization'] = `Bearer ${this.config.token}`;
     }
 
-    const response = await fetch(url, {
-      headers,
+    const result: HandlerResponse<T> = await window.api.fetchData(url, {
       ...options,
+      headers,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (result.error) {
+      throw new Error(result.error);
     }
 
-    return response.json();
+    if (!result.result) {
+      throw new Error('No data received from API');
+    }
+
+    return result.result;
   }
 
   // Configuration Management
   async setConfig(config: BPMNConfig): Promise<void> {
     this.config = config;
-    // Note: This method is kept for backward compatibility
-    // The actual config management is now handled by the settings system
   }
 
   async getConfig(): Promise<BPMNConfig | null> {
@@ -55,58 +63,34 @@ class BPMNService {
   async testConnection(config: Omit<BPMNConfig, 'id' | 'createdAt' | 'status'>): Promise<{ success: boolean; message: string }> {
     try {
       const headers: Record<string, string> = {};
-      
+
       // Only add Authorization header if token is provided
       if (config.token) {
         headers['Authorization'] = `Bearer ${config.token}`;
       }
 
-      const response = await fetch(`${config.apiUrl}${config.basePath}/projects`, {
+      const result: HandlerResponse = await window.api.fetchData(`${config.apiUrl}${config.basePath}/projects`, {
         headers,
       });
-      
-      if (response.ok) {
-        return { success: true, message: 'Connection successful' };
-      } else {
-        return { success: false, message: `Connection failed: ${response.status} ${response.statusText}` };
+
+      if (result.error) {
+        return { success: false, message: result.error };
       }
+
+      return { success: true, message: 'Connection successful' };
     } catch (error) {
       return { success: false, message: error instanceof Error ? error.message : 'Connection failed' };
     }
   }
-
-  async getProcessDefinitions(): Promise<BPMNProcessDefinition[]> {
-    const response = await this.makeRequest<any[]>('/projects');
-
-    return response.map((item: any) => ({
-      id: item.id || item.key,
-      key: item.key || item.id,
-      name: item.name,
-      description: item.description,
-      version: item.version || 1,
-      category: item.category,
-      deploymentId: item.deploymentId || item.id,
-      resourceName: item.resourceName || `${item.key}.bpmn`,
-      diagramResourceName: item.diagramResourceName || `${item.key}.png`,
-      tenantId: item.tenantId,
-      suspended: item.suspended || false,
-      startableInTasklist: item.startableInTasklist || true,
-      startablePermissionCheck: item.startablePermissionCheck || true,
-      historyTimeToLive: item.historyTimeToLive || 30,
-      createdAt: item.createdAt || new Date().toISOString(),
-      updatedAt: item.updatedAt || new Date().toISOString(),
-    }));
-  }
-
   // New method to get all projects
   async getProjects(): Promise<BPMNProject[]> {
-    const response = await this.makeRequest<BPMNProject[]>('/projects');
-    return response;
+    const response = await this.makeRequest<PaginatedResponse<BPMNProject>>('/projects');
+    return response ? response.content : [];
   }
 
   // New method to get process definitions for a specific project
   async getProcessDefinitionsByProject(projectId: string): Promise<BPMNProjectProcessDefinition[]> {
-    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}`);
+    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}/deployed-process`);
     return response.processDefinitions || [];
   }
 
@@ -117,7 +101,7 @@ class BPMNService {
   }
 
   async getProcessInstances(processDefinitionId?: string): Promise<BPMNProcessInstance[]> {
-    const endpoint = processDefinitionId 
+    const endpoint = processDefinitionId
       ? `/process-instances?processDefinitionId=${processDefinitionId}`
       : '/process-instances';
 
@@ -141,7 +125,7 @@ class BPMNService {
   }
 
   async getTasks(processDefinitionId?: string): Promise<BPMNTask[]> {
-    const endpoint = processDefinitionId 
+    const endpoint = processDefinitionId
       ? `/tasks?processDefinitionId=${processDefinitionId}`
       : '/tasks';
 
@@ -173,47 +157,53 @@ class BPMNService {
   }
 
   async getProcessDefinitionXML(processDefinitionId: string): Promise<string> {
+    // First, find the project that contains this process definition
+    const projects = await this.makeRequest<BPMNProject[]>('/projects');
+    let projectId: string | null = null;
+
+    for (const project of projects) {
+      const processDef = project.processDefinitions?.find(pd => pd.processDefinitionId === processDefinitionId);
+      if (processDef) {
+        projectId = project.projectId;
+        break;
+      }
+    }
+
+    if (!projectId) {
+      throw new Error(`Process definition ${processDefinitionId} not found in any project`);
+    }
+
     const response = await this.makeRequest<{ id: string; bpmn20Xml: string }>(
-      `/projects/${processDefinitionId}/xml`
+      `/projects/${projectId}/process-definitions/${processDefinitionId}/xml`
     );
     return response.bpmn20Xml;
   }
 
-  async startProcessInstance(
-    processDefinitionId: string,
-    variables?: Record<string, any>
-  ): Promise<{ id: string; definitionId: string; businessKey?: string }> {
-    const response = await this.makeRequest<{ id: string; definitionId: string; businessKey?: string }>(
-      `/projects/${processDefinitionId}/start`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          variables: variables ? Object.entries(variables).reduce((acc, [key, value]) => {
-            acc[key] = { value: value };
-            return acc;
-          }, {} as Record<string, { value: any }>) : {},
-        }),
-      }
-    );
-    return response;
+  async getProcessDefinitionDetails(processDefinitionId: string): Promise<any> {
+    // First, find the project that contains this process definition
+    return await this.makeRequest<BPMNProject[]>(`/projects/process-definitions/${processDefinitionId}`);
+
   }
 
-  async completeTask(
-    taskId: string,
-    variables?: Record<string, any>
-  ): Promise<void> {
-    await this.makeRequest(
-      `/tasks/${taskId}/complete`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          variables: variables ? Object.entries(variables).reduce((acc, [key, value]) => {
-            acc[key] = { value: value };
-            return acc;
-          }, {} as Record<string, { value: any }>) : {},
-        }),
-      }
-    );
+  async getProcessArtifacts(processDefinitionId: string): Promise<any[]> {
+    try {
+      const processDetails = await this.getProcessDefinitionDetails(processDefinitionId);
+      return processDetails.projectArtifacts || [];
+    } catch (error) {
+      console.error('Error fetching process artifacts:', error);
+      return [];
+    }
+  }
+
+  async getArtifactContent(artifactId: string): Promise<{ content: string }> {
+    try {
+      // Note: The endpoint URL is a placeholder and needs to be verified.
+      const artifact = await this.makeRequest<{ content: string }>(`/projects/artifacts/${artifactId}/content`);
+      return artifact;
+    } catch (error) {
+      console.error(`Error fetching content for artifact ${artifactId}:`, error);
+      throw error; // Re-throw the error to be handled by the caller
+    }
   }
 
   // Configuration Management using global settings

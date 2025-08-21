@@ -165,7 +165,13 @@ const SidebarAppCustomCode = ({ searchTerm }: { searchTerm: string }) => {
     );
 };
 
-const ResourceList = <T extends { id?: string; name: string }>({
+const ResourceList = <
+    T extends {
+        id?: string;
+        name: string;
+        actions?: { deletable?: boolean; editable?: boolean };
+    },
+>({
     title,
     items,
     searchTerm,
@@ -190,28 +196,40 @@ const ResourceList = <T extends { id?: string; name: string }>({
                                     <span className="font-medium">{title}</span>
                                 </SidebarMenuButton>
                                 <SidebarMenuSub>
-                                    {filteredItems.map((item, index) => (
-                                        <SidebarMenuSubItem key={index}>
-                                            <SidebarMenuSubButton asChild>
-                                                <div className="flex items-center justify-between w-full group/item relative">
-                                                    <span className="">
-                                                        {renderItemName(item)}
-                                                    </span>
-                                                    <div className="absolute right-2 top-1/2 -translate-y-1/2  opacity-0 group-hover/item:opacity-100">
-                                                        {onEdit && item.id && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="h-6 w-6"
-                                                                onClick={() =>
-                                                                    onEdit(item)
-                                                                }
-                                                            >
-                                                                <Pencil className="h-3 w-3" />
-                                                            </Button>
-                                                        )}
-                                                        {onDelete &&
-                                                            item.id && (
+                                    {filteredItems.map((item, index) => {
+                                        const hasDelete = item.actions
+                                            ? item.actions.deletable
+                                            : onDelete && item.id;
+
+                                        const hasEdit = item.actions
+                                            ? item.actions.editable
+                                            : !!item.id;
+
+                                        return (
+                                            <SidebarMenuSubItem key={index}>
+                                                <SidebarMenuSubButton asChild>
+                                                    <div className="flex items-center justify-between w-full group/item relative">
+                                                        <span className="">
+                                                            {renderItemName(
+                                                                item
+                                                            )}
+                                                        </span>
+                                                        <div className="absolute right-2 top-1/2 -translate-y-1/2  opacity-0 group-hover/item:opacity-100">
+                                                            {hasEdit && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6"
+                                                                    onClick={() =>
+                                                                        onEdit(
+                                                                            item
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Pencil className="h-3 w-3" />
+                                                                </Button>
+                                                            )}
+                                                            {hasDelete && (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
@@ -228,11 +246,12 @@ const ResourceList = <T extends { id?: string; name: string }>({
                                                                     <Trash2 className="h-3 w-3" />
                                                                 </Button>
                                                             )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </SidebarMenuSubButton>
-                                        </SidebarMenuSubItem>
-                                    ))}
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        );
+                                    })}
                                 </SidebarMenuSub>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -429,6 +448,45 @@ const FncComponent = ({
                             <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                 {t('Function body')}
                             </Label>
+
+                            {/* Function Preview */}
+                            <div className="border-b bg-background p-3  font-mono text-sm">
+                                <div className="text-blue-600">
+                                    {formik.values.isAsync ? 'async ' : ''}
+                                    function{' '}
+                                    {formik.values.name || 'functionName'}
+                                </div>
+                                <div className="text-gray-600 ml-4">
+                                    (
+                                    {formik.values.arguments?.map(
+                                        (arg, index) => (
+                                            <span key={arg.id || index}>
+                                                {arg.name}: {arg.type}
+                                                {arg.isOptional ? '?' : ''}
+                                                {arg.isList ? '[]' : ''}
+                                                {index <
+                                                (formik.values.arguments
+                                                    ?.length || 0) -
+                                                    1
+                                                    ? ', '
+                                                    : ''}
+                                            </span>
+                                        )
+                                    ) || 'no arguments'}
+                                    )
+                                </div>
+                                <div className="text-green-600 mt-2">
+                                    →{' '}
+                                    {formik.values.returnValue?.type || 'void'}
+                                    {formik.values.returnValue?.isList
+                                        ? '[]'
+                                        : ''}
+                                    {formik.values.returnValue?.isNullable
+                                        ? ' | null'
+                                        : ''}
+                                </div>
+                            </div>
+
                             <MonacoEditor
                                 ref={editorRef}
                                 content={funct?.code || ''}

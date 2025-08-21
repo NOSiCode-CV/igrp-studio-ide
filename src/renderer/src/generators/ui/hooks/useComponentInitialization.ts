@@ -4,11 +4,12 @@ import { newStructuredComponent } from '../dnd/helpers';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface ComponentInitializationProps {
-    isPage: boolean;
+    content: any;
     menuItems: any[];
     findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
     generateTag: (base: string) => string;
     setAllComponents: (components: any) => void;
+    findComponent: (path: string | undefined, componentName: string) => Promise<ComponentRegisterConfig | undefined>;
 }
 
 interface UseComponentInitializationReturn {
@@ -16,24 +17,34 @@ interface UseComponentInitializationReturn {
 }
 
 export const useComponentInitialization = ({
-    isPage,
+    content,
     findComponentById,
     generateTag,
     setAllComponents,
+    findComponent
 }: ComponentInitializationProps): UseComponentInitializationReturn => {
 
     const initializeComponents = useCallback(async () => {
         try {
+            const isPage = content.type === 'page';
+            const isBpmnProcess = content.type === 'processStep'
+
             const mainComponent = isPage
                 ? COMPONENT.PageContent
-                : COMPONENT.ComponentContent;
+                : isBpmnProcess
+                    ? COMPONENT.ProcessStep
+                    : COMPONENT.ComponentContent;
 
-            const pageCompRegister = await findComponentById(mainComponent);
+            let pageCompRegister
+
+            if (isBpmnProcess) {
+                pageCompRegister = await findComponent('process', COMPONENT.ProcessStep);
+            } else {
+                pageCompRegister = await findComponentById(mainComponent);
+            }
             const sectionCompRegister = await findComponentById(COMPONENT.Section);
-            const fragmetCompRegister = await findComponentById(COMPONENT.Fragment);
 
-
-            if (!pageCompRegister) {
+            if (!pageCompRegister && !isBpmnProcess) {
                 console.warn(`Component ${mainComponent} not found`);
                 return;
             }
@@ -44,17 +55,9 @@ export const useComponentInitialization = ({
                 sectionCompRegister
             );
 
-            const fragment = newStructuredComponent(
-                COMPONENT.Fragment,
-                [],
-                fragmetCompRegister
-            );
-
             const pageContent = newStructuredComponent(
                 mainComponent,
-                isPage
-                    ? [{ ...section, tag: generateTag(COMPONENT.Section) },]
-                    : [{ ...fragment, tag: generateTag(COMPONENT.Fragment) }],
+                [{ ...section, tag: generateTag(COMPONENT.Section) }],
                 pageCompRegister
             );
 
@@ -66,7 +69,7 @@ export const useComponentInitialization = ({
         } catch (error) {
             console.error('Error initializing components:', error);
         }
-    }, [isPage]);
+    }, []);
 
     return {
         initializeComponents,
