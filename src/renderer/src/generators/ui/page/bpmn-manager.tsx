@@ -8,7 +8,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { BPMNConfig, BPMNConfigs, BPMNPageDefinition } from 'src/main/types';
+import { BPMNConfig, BPMNConfigs, FileTree } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
 import { BPMNConfigModal } from './bpmn-connection-modal';
 import { EmptyList } from '@renderer/components/empty-list';
@@ -16,10 +16,11 @@ import { SubHeadline } from '@renderer/components/shared-ui';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { BPMNProjectSelector } from './bpmn-project-selector';
 import { BPMNConfigCard } from '@renderer/generators/ui/page/bpmn-config-card';
+import { PageDefinition } from './page-manager';
 
 interface BPMNManagerProps {
-    onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
-    bpmnProcesses: any[];
+    onPageClick?: (pageDefinition: PageDefinition) => void;
+    bpmnProcesses: FileTree[];
     basePath: string;
 }
 

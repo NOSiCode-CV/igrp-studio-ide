@@ -11,7 +11,7 @@ import { DuplicatePageModal } from './duplicate-page-modal';
 import { PageTable } from './page-table';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { FileTree, BPMNPageDefinition } from 'src/main/types';
+import { FileTree } from 'src/main/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -54,7 +54,7 @@ export interface PageDefinition {
 }
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: PageDefinition | BPMNPageDefinition) => void;
+    onPageClick?: (pageFile: PageDefinition) => void;
 }
 
 const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
@@ -77,9 +77,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [pageEditing, setPageEditing] = useState<PageDefinition>();
     const [pageToDuplicate, setPageToDuplicate] = useState<PageDefinition>();
     const [activeTab, setActiveTab] = useState<string>('pages');
-    const [bpmnProcesses, setBpmnProcesses] = useState<any>([]);
+    const [bpmnProcesses, setBpmnProcesses] = useState<FileTree[]>([]);
 
-    const handleAddComponents = (page:   | BPMNPageDefinition) => {
+    const handleAddComponents = (page: PageDefinition) => {
         onPageClick?.(page);
     };
 
@@ -135,7 +135,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             const pages = files.find((page) => page.name === 'pages');
             const components = files.find((page) => page.name === 'components');
             const process = files.find((page) => page.name === 'process');
-            
+
             if (pages && pages.children) {
                 setContent(pages.children);
             }

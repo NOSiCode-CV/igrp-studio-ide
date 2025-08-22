@@ -606,12 +606,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 return (
                                     <TableCell
                                         key={index2}
-                                        className={cn('py-1!', className)}
+                                        className={cn('py-1!')}
                                     >
                                         <div className="flex">
                                             {index2 === 0 && (
                                                 <button
-                                                    className="opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0"
+                                                    className={cn("opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0", className)}
                                                     {...provided.dragHandleProps}
                                                 >
                                                     <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -716,7 +716,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                             `col-${index}-${ii}`,
                                                             ii,
                                                             col,
-                                                            'pl-10',
+                                                            'mr-6',
                                                             (
                                                                 props: ChangeFnProps
                                                             ) => {

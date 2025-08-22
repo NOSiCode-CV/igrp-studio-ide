@@ -101,6 +101,7 @@ declare global {
             ipcRenderer: {
                 on: (channel: string, callback: (event: any, ...args: any[]) => void) => void;
             };
+            reportError: (error: Error) => void;
         };
         api: CustomAPI,
         igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },

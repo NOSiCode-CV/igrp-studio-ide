@@ -462,6 +462,7 @@ if (process.contextIsolated) {
 			onFolderChange: (callback: (event: WatchEvent) => void) => {
 				ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data));
 			},
+			reportError: (error: Error) => ipcRenderer.send('report-error', error),
 
 		})
 		contextBridge.exposeInMainWorld('api', api)
@@ -493,14 +494,5 @@ declare global {
     menu: typeof windowControls;
     appLogicAPI: typeof appLogic;
     igrpStudioSettings: typeof igrpStudioSettings;
-  }
-}
-
-// Augment the Window interface to include reportError
-declare global {
-  interface Window {
-    api: {
-      reportError: (error: Error) => void;
-    }
   }
 }

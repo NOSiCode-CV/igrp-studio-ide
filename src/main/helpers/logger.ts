@@ -1,6 +1,5 @@
 // logger.ts
 import { app, ipcMain } from 'electron';
-import { credentials, Metadata } from '@grpc/grpc-js';
 import { v4 as uuidv4 } from 'uuid';
 
 // Initialize the logger
@@ -19,15 +18,15 @@ const defaultConfig: LoggerConfig = {
   insecure: true,
 };
 
-export async function initializeLogger(config: Partial<LoggerConfig> = {}) {
+export async function initializeLogger(_config: Partial<LoggerConfig> = {}) {
   try {
-    const finalConfig = { ...defaultConfig, ...config };
-    
+   // const finalConfig = { ...defaultConfig, ...config };
+
     // Mark as initialized
     isInitialized = true;
-    
+
     // Set up IPC handler for renderer process errors
-    ipcMain.handle('send-error-report', async (event, { error, context = {} }) => {
+    ipcMain.handle('send-error-report', async (_event, { error, context = {} }) => {
       return await sendErrorReport(deserializeError(error), context);
     });
 
@@ -39,20 +38,6 @@ export async function initializeLogger(config: Partial<LoggerConfig> = {}) {
     console.error('Failed to initialize logger:', error);
     isInitialized = false;
   }
-}
-
-function createMetadata(customMetadata?: Record<string, string>): Metadata {
-  const metadata = new Metadata();
-  metadata.add('x-client-version', app.getVersion());
-  metadata.add('x-client-platform', process.platform);
-
-  if (customMetadata) {
-    Object.entries(customMetadata).forEach(([key, value]) => {
-      metadata.add(key, value);
-    });
-  }
-
-  return metadata;
 }
 
 function setupProcessHandlers() {
@@ -68,7 +53,7 @@ function setupProcessHandlers() {
   });
 
   // Handle Electron's renderer process crashes
-  app.on('render-process-gone', async (event, webContents, details) => {
+  app.on('render-process-gone', async (_event, _webContents, details) => {
     const error = new Error(`Renderer process gone: ${details.reason}`);
     await sendErrorReport(error, {
       errorType: 'rendererProcessGone',
@@ -177,7 +162,7 @@ export async function sendErrorReport(
 
     // Send to your existing otel-collector
     const success = await sendToOtelCollector(errorData);
-    
+
     if (success) {
       console.log('Error report sent to otel-collector successfully');
     } else {

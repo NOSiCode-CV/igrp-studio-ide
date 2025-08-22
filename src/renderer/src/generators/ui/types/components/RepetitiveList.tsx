@@ -4,7 +4,6 @@ import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxField from '../tools/BoxFields';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 import BoxWrapper from '../tools/BoxWrapper';
 

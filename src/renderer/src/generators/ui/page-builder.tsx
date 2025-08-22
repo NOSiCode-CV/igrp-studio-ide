@@ -114,13 +114,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                     handleAddChildToComponent,
                     handleReorderChildInComponent,
                     generateTag,
-                    findComponent: async (
-                        path: string,
-                        componentName: string
-                    ) => {
-                        const result = await findComponent(path, componentName);
-                        return result || undefined;
-                    },
+                    findComponent,
                     showErrorToast,
                 };
 
@@ -154,7 +148,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             findComponentById,
             generateTag,
             setAllComponents,
-            findComponent,
+            findComponent
         });
 
         useEffect(() => {
@@ -214,7 +208,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             } else if (activePresentation === APRESENTATION.CODE) {
                 // Ensure pagePath is properly formatted and handle spaces
                 const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
-                let tsFilePath = null;
+                let tsFilePath: string | null = null;
 
                 if (isPage)
                     tsFilePath = cleanPagePath
@@ -228,7 +222,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                         tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.customComponents}/${content.name.toLowerCase()}.tsx`;
                 }
 
-                return <CodeContentTS pagePath={tsFilePath} />;
+                return <CodeContentTS pagePath={tsFilePath ?? ''} />;
             } else {
                 return isLoading ? (
                     <Loader />

@@ -9,7 +9,7 @@ interface ComponentInitializationProps {
     findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
     generateTag: (base: string) => string;
     setAllComponents: (components: any) => void;
-    findComponent: (path: string | undefined, componentName: string) => Promise<ComponentRegisterConfig | undefined>;
+    findComponent: (path: string | undefined, componentName: string) => Promise<ComponentRegisterConfig | null>;
 }
 
 interface UseComponentInitializationReturn {

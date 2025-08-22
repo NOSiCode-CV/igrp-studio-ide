@@ -183,6 +183,7 @@ export const BindingConfigurationModal = ({
                         const { label, ...rest } = field; // Removes the 'label' property
                         return {
                             ...rest,
+                            type: rest.type || 'string',
                             defaultValue:
                                 rest.defaultValue === '' && rest.required
                                     ? undefined
@@ -190,6 +191,7 @@ export const BindingConfigurationModal = ({
                             ...(rest.fields && {
                                 fields: rest.fields.map((field) => ({
                                     ...field,
+                                    type: field.type || 'string',
                                     defaultValue:
                                         field.defaultValue === '' && field.required
                                             ? undefined

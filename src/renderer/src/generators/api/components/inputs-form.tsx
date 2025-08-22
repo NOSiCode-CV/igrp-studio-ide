@@ -73,6 +73,11 @@ export const TextInput = ({
             {isTouched && error && (
                 <p className="text-xs text-destructive">{error}</p>
             )}
+            {props.helperText && (
+                <p className="text-sm text-muted-foreground">
+                    {props.helperText}
+                </p>
+            )}
         </div>
     );
 };
