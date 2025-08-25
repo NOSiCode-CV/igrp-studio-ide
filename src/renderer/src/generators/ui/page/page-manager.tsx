@@ -120,6 +120,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         setShowDuplicateModal(false);
         setPageToDuplicate(undefined);
         isLoadingTable(true);
+        setIsSubPage(false);
     };
 
     useEffect(() => {
