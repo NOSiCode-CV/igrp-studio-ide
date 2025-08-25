@@ -40,7 +40,7 @@ const initialValues: PageConfig = {
 interface CreatePageModalProps {
     isOpen: boolean;
     basePath: string;
-    pageEditing?: PageDefinition;
+    isSubPage?: boolean;
     currentComponent?: PageDefinition;
     onClose: () => void;
     onConfirm: () => void;
@@ -51,7 +51,7 @@ export function CreatePageModal({
     basePath,
     onClose,
     onConfirm,
-    pageEditing,
+    isSubPage,
     currentComponent,
 }: CreatePageModalProps) {
     const { t } = useTranslation();
@@ -160,11 +160,11 @@ export function CreatePageModal({
         initialValues: formInitialValues,
         validationSchema,
         onSubmit: async (values, actions) => {
-            const newValues = pageEditing
+            const newValues = isSubPage
                 ? {
                       ...values,
-                      path: `${pageEditing?.content?.path}/${values.path}`,
-                      parentName: pageEditing?.content.pageName,
+                      path: `${currentComponent?.content?.path}/${values.path}`,
+                      parentName: currentComponent?.content?.pageName,
                   }
                 : values;
 
@@ -241,7 +241,7 @@ export function CreatePageModal({
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogTitle>
-                    {pageEditing ? t('createSubNewPage') : t('createNewPage')}
+                    {isSubPage ? t('createSubNewPage') : t('createNewPage')}
                 </DialogTitle>
                 <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Page' })}
