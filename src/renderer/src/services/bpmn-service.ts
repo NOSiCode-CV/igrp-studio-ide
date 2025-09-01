@@ -180,9 +180,8 @@ class BPMNService {
   }
 
   async getProcessDefinitionDetails(processDefinitionId: string): Promise<any> {
-    // First, find the project that contains this process definition
-    return await this.makeRequest<BPMNProject[]>(`/projects/process-definitions/${processDefinitionId}`);
-
+    // Get process definition details directly
+    return await this.makeRequest<any>(`/projects/process-definitions/${processDefinitionId}`);
   }
 
   async getProcessArtifacts(processDefinitionId: string): Promise<any[]> {

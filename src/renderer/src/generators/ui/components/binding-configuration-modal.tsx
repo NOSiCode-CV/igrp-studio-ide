@@ -184,18 +184,18 @@ export const BindingConfigurationModal = ({
                         return {
                             ...rest,
                             type: rest.type || 'string',
-                            defaultValue:
+                          /*   defaultValue:
                                 rest.defaultValue === '' && rest.required
-                                    ? undefined
-                                    : rest.defaultValue,
+                                    ? ''
+                                    : rest.defaultValue, */
                             ...(rest.fields && {
                                 fields: rest.fields.map((field) => ({
                                     ...field,
                                     type: field.type || 'string',
-                                    defaultValue:
+                                  /*   defaultValue:
                                         field.defaultValue === '' && field.required
-                                            ? undefined
-                                            : field.defaultValue,
+                                            ? ''
+                                            : field.defaultValue, */
                                 })),
                             }),
                         };

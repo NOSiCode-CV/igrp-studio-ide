@@ -7,6 +7,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@renderer/components/ui/select';
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from '@renderer/components/ui/tabs';
 
 import {
     Card,
@@ -32,7 +38,7 @@ import useToast from '@renderer/hooks/useToast';
 import { useDispatch } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { getId } from '@renderer/utils';
-import { Component, EllipsisVertical, Settings } from 'lucide-react';
+import { Component, EllipsisVertical, Settings, Wrench } from 'lucide-react';
 import { AddComponentsNameModal } from './add-components-name-modal';
 import {
     IGRPLoadingSpinner,
@@ -40,6 +46,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { nanoid } from '@reduxjs/toolkit';
 import { PageDefinition } from './page-manager';
+import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer';
 
 // Types
 interface BPMNProjectSelectorProps {
@@ -123,7 +130,10 @@ const ProcessCard = ({
             className={`hover:shadow-md transition-all cursor-pointer ${
                 isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
             }`}
-            onClick={() => onSelectProcess(process)}
+            onClick={() => {
+                console.log('Process clicked:', process.processDefinitionId);
+                onSelectProcess(process);
+            }}
         >
             <CardContent>
                 <div className="flex items-start justify-between">
@@ -197,12 +207,17 @@ export const BPMNProjectSelector = ({
     );
     const [selectedProcess, setSelectedProcess] =
         useState<BPMNProjectProcessDefinition | null>(null);
+    const [processDefinitionDetails, setProcessDefinitionDetails] =
+        useState<any>(null);
+    const [loadingProcessDetails, setLoadingProcessDetails] = useState(false);
     const [showAddComponentsModal, setShowAddComponentsModal] = useState(false);
     const [pendingComponentData, setPendingComponentData] = useState<{
         processDefinition: BPMNProjectProcessDefinition;
         processArtifact: BPMNProjectArtifact;
         processFound: FileTree;
-    } | null>(null);
+    } | undefined>(undefined);
+    const [oldProcessFound, setOldProcessFound] = useState<FileTree | undefined>(undefined);
+    const [activeTab, setActiveTab] = useState<string>('artifacts');
 
     const { projects, loading } = useBPMNProjects();
     const { processDefinitions, loading: loadingProcesses } =
@@ -210,6 +225,37 @@ export const BPMNProjectSelector = ({
 
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
+
+    // Fetch process definition details when a process is selected
+    useEffect(() => {
+        const fetchProcessDefinitionDetails = async () => {
+            if (selectedProcess?.processDefinitionId) {
+                try {
+                    setLoadingProcessDetails(true);
+                    const details =
+                        await bpmnService.getProcessDefinitionDetails(
+                            selectedProcess.processDefinitionId
+                        );
+                    setProcessDefinitionDetails(details);
+                    console.log('Process definition details:', details);
+                } catch (error) {
+                    console.error(
+                        'Error fetching process definition details:',
+                        error
+                    );
+                    showErrorToast(
+                        'Failed to fetch process definition details'
+                    );
+                } finally {
+                    setLoadingProcessDetails(false);
+                }
+            } else {
+                setProcessDefinitionDetails(null);
+            }
+        };
+
+        fetchProcessDefinitionDetails();
+    }, [selectedProcess]);
 
     const handleProjectChange = (projectId: string) => {
         const project = projects.find((p) => p.projectId === projectId);
@@ -224,6 +270,31 @@ export const BPMNProjectSelector = ({
                     (c: any) => c.name === `v${processDefinition.version}`
                 )
         );
+    };
+
+    const findProcessRecursive = (processDefinition: BPMNProjectProcessDefinition) => {
+        // Find the process by name
+        const process = bpmnProcesses.find((p) => p.name === processDefinition.processKey);
+        if (!process || !process.children) {
+            return undefined;
+        }
+
+        // Start from the current version and go backwards to find the first available version
+        let currentVersion = processDefinition.version || 1;
+        
+        while (currentVersion >= 1) {
+            const versionName = `v${currentVersion}`;
+            const versionFound = process.children.find((c: any) => c.name === versionName);
+            
+            if (versionFound) {
+                return process;
+            }
+            
+            currentVersion--;
+        }
+        
+        // If no version found, return the process anyway (for first-time creation)
+        return process;
     };
 
     const findStepProcess = (
@@ -345,6 +416,11 @@ export const BPMNProjectSelector = ({
     ) => {
         const processFound = findProcess(processDefinition);
 
+        if (!processFound) {
+            const processFound = findProcessRecursive(processDefinition);
+            setOldProcessFound(processFound as FileTree);
+        }
+
         // Store the data and open the modal
         setPendingComponentData({
             processDefinition,
@@ -425,18 +501,28 @@ export const BPMNProjectSelector = ({
                     {loadingProcesses ? (
                         <IGRPLoadingSpinner />
                     ) : processDefinitions.length > 0 ? (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            {processDefinitions.map((process) => (
-                                <ProcessCard
-                                    key={process.processDefinitionId}
-                                    process={process}
-                                    isSelected={
-                                        selectedProcess?.processDefinitionId ===
-                                        process.processDefinitionId
-                                    }
-                                    onSelectProcess={setSelectedProcess}
-                                />
-                            ))}
+                        <div className="space-y-4">
+                            {loadingProcessDetails && (
+                                <div className="flex items-center justify-center py-4">
+                                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                        <IGRPLoadingSpinner />
+                                        <span>Loading process details...</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                {processDefinitions.map((process) => (
+                                    <ProcessCard
+                                        key={process.processDefinitionId}
+                                        process={process}
+                                        isSelected={
+                                            selectedProcess?.processDefinitionId ===
+                                            process.processDefinitionId
+                                        }
+                                        onSelectProcess={setSelectedProcess}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     ) : (
                         <Card>
@@ -448,130 +534,179 @@ export const BPMNProjectSelector = ({
                 </div>
             )}
 
-            {/* Step 3: Process Artifacts */}
+            {/* Step 3: Process Details with Tabs */}
             {selectedProcess && (
                 <>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold">
+                        <Tabs
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full"
+                        >
+                            <TabsList className="grid grid-cols-2">
+                                <TabsTrigger value="artifacts">
                                     Process Artifacts
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Artifacts for process:{' '}
-                                    {selectedProcess.title}
-                                </p>
-                            </div>
-                            <div className="flex space-x-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="flex items-center space-x-2"
-                                >
-                                    <Settings />
-                                    Bulk Actions
-                                </Button>
-                            </div>
-                        </div>
+                                </TabsTrigger>
+                                <TabsTrigger value="diagram">
+                                    BPMN Diagram
+                                </TabsTrigger>
+                            </TabsList>
 
-                        <IGRPSeparator />
+                            <TabsContent
+                                value="artifacts"
+                                className="space-y-6"
+                            >
+                                <div className="flex items-center justify-between mt-4">
+                                    <div>
+                                        <h4 className="text-md font-medium">
+                                            Process Artifacts
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Artifacts for process:{' '}
+                                            {selectedProcess.title}
+                                        </p>
+                                    </div>
+                                    <div className="flex space-x-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex items-center space-x-2"
+                                        >
+                                            <Settings />
+                                            Bulk Actions
+                                        </Button>
+                                    </div>
+                                </div>
 
-                        {selectedProcess.projectArtifacts &&
-                        selectedProcess.projectArtifacts.length > 0 ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                {selectedProcess.projectArtifacts.map(
-                                    (artifact, index) => {
-                                        const processFound =
-                                            findProcess(selectedProcess);
+                                <IGRPSeparator />
 
-                                        const stepProcessFound =
-                                            findStepProcess(
-                                                selectedProcess,
-                                                processFound,
-                                                artifact
-                                            );
+                                {processDefinitionDetails &&
+                                processDefinitionDetails.projectArtifacts
+                                    .length > 0 ? (
+                                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                        {processDefinitionDetails.projectArtifacts.map(
+                                            (artifact: BPMNProjectArtifact, index: number) => {
+                                                const processFound =
+                                                    findProcess(
+                                                        selectedProcess
+                                                    );
 
-                                        return (
-                                            <Card
-                                                key={index}
-                                                className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
-                                            >
-                                                <CardHeader className="pb-3">
-                                                    <div className="flex items-start justify-between">
-                                                        <div className="flex-1">
-                                                            <CardTitle className="text-base font-medium">
-                                                                {artifact.name}
-                                                            </CardTitle>
-                                                            <div className="text-sm text-muted-foreground mt-1">
-                                                                {
-                                                                    artifact.taskKey
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col items-end space-y-2">
-                                                            <Badge
-                                                                variant="outline"
-                                                                className="text-xs"
-                                                            >
-                                                                v
-                                                                {selectedProcess.version ||
-                                                                    'N/A'}
-                                                            </Badge>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-6 w-6 p-0"
-                                                            >
-                                                                <EllipsisVertical />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <Button
-                                                        size="sm"
-                                                        className="w-full"
-                                                        variant={
-                                                            stepProcessFound
-                                                                ? 'outline'
-                                                                : 'default'
-                                                        }
-                                                        onClick={() => {
-                                                            stepProcessFound
-                                                                ? handleConfirmAddComponents(
-                                                                      stepProcessFound
-                                                                  )
-                                                                : handleModalConfiguration(
-                                                                      selectedProcess,
-                                                                      artifact
-                                                                  );
-                                                        }}
+                                                const stepProcessFound =
+                                                    findStepProcess(
+                                                        selectedProcess,
+                                                        processFound,
+                                                        artifact
+                                                    );
+
+                                                return (
+                                                    <Card
+                                                        key={index}
+                                                        className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
                                                     >
-                                                        {stepProcessFound ? (
-                                                            <>
-                                                                <Component />
-                                                                Add Components
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Settings />
-                                                                Generate Step
-                                                            </>
-                                                        )}
-                                                    </Button>
-                                                </CardContent>
-                                            </Card>
-                                        );
-                                    }
+                                                        <CardHeader className="pb-3">
+                                                            <div className="flex items-start justify-between">
+                                                                <div className="flex-1">
+                                                                    <CardTitle className="text-base font-medium">
+                                                                        {
+                                                                            artifact.name
+                                                                        }
+                                                                    </CardTitle>
+                                                                    <div className="text-sm text-muted-foreground mt-1">
+                                                                        {
+                                                                            artifact.taskKey
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex flex-col items-end space-y-2">
+                                                                    <Badge
+                                                                        variant="outline"
+                                                                        className="text-xs"
+                                                                    >
+                                                                        v
+                                                                        {selectedProcess.version ||
+                                                                            'N/A'}
+                                                                    </Badge>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-6 w-6 p-0"
+                                                                    >
+                                                                        <EllipsisVertical />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            <Button
+                                                                size="sm"
+                                                                className="w-full"
+                                                                variant={
+                                                                    stepProcessFound
+                                                                        ? 'outline'
+                                                                        : 'default'
+                                                                }
+                                                                onClick={() => {
+                                                                    stepProcessFound
+                                                                        ? handleConfirmAddComponents(
+                                                                              stepProcessFound
+                                                                          )
+                                                                        : handleModalConfiguration(
+                                                                              selectedProcess,
+                                                                              artifact
+                                                                          );
+                                                                }}
+                                                            >
+                                                                {stepProcessFound ? (
+                                                                    <>
+                                                                        <Component />
+                                                                        Add
+                                                                        Components
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Wrench />
+                                                                        Generate
+                                                                        Step
+                                                                    </>
+                                                                )}
+                                                            </Button>
+                                                        </CardContent>
+                                                    </Card>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Card>
+                                        <CardContent className="py-8 text-center text-muted-foreground">
+                                            No artifacts found for this process.
+                                        </CardContent>
+                                    </Card>
                                 )}
-                            </div>
-                        ) : (
-                            <Card>
-                                <CardContent className="py-8 text-center text-muted-foreground">
-                                    No artifacts found for this process.
-                                </CardContent>
-                            </Card>
-                        )}
+                            </TabsContent>
+
+                            <TabsContent value="diagram" className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h4 className="text-md font-medium">
+                                            BPMN Diagram
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Visual representation of process:{' '}
+                                            {selectedProcess.title}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {processDefinitionDetails?.bpmFileContent && (
+                                    <BPMNDiagramViewer
+                                        bpmnContent={
+                                            processDefinitionDetails.bpmFileContent
+                                        }
+                                    />
+                                )}
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </>
             )}
@@ -595,7 +730,7 @@ export const BPMNProjectSelector = ({
                     pendingComponentData?.processArtifact?.taskKey || ''
                 }
                 defaultName={pendingComponentData?.processArtifact?.name || ''}
-                processFound={pendingComponentData?.processFound}
+                processFound={pendingComponentData?.processFound || oldProcessFound}
             />
         </div>
     );
