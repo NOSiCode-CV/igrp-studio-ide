@@ -212,12 +212,17 @@ export const BPMNProjectSelector = ({
         useState<any>(null);
     const [loadingProcessDetails, setLoadingProcessDetails] = useState(false);
     const [showAddComponentsModal, setShowAddComponentsModal] = useState(false);
-    const [pendingComponentData, setPendingComponentData] = useState<{
-        processDefinition: BPMNProjectProcessDefinition;
-        processArtifact: BPMNProjectArtifact;
-        processFound: FileTree;
-    } | undefined>(undefined);
-    const [oldProcessFound, setOldProcessFound] = useState<FileTree | undefined>(undefined);
+    const [pendingComponentData, setPendingComponentData] = useState<
+        | {
+              processDefinition: BPMNProjectProcessDefinition;
+              processArtifact: BPMNProjectArtifact;
+              processFound: FileTree;
+          }
+        | undefined
+    >(undefined);
+    const [oldProcessFound, setOldProcessFound] = useState<
+        FileTree | undefined
+    >(undefined);
     const [activeTab, setActiveTab] = useState<string>('artifacts');
 
     const { projects, loading } = useBPMNProjects();
@@ -273,27 +278,33 @@ export const BPMNProjectSelector = ({
         );
     };
 
-    const findProcessRecursive = (processDefinition: BPMNProjectProcessDefinition) => {
+    const findProcessRecursive = (
+        processDefinition: BPMNProjectProcessDefinition
+    ) => {
         // Find the process by name
-        const process = bpmnProcesses.find((p) => p.name === processDefinition.processKey);
+        const process = bpmnProcesses.find(
+            (p) => p.name === processDefinition.processKey
+        );
         if (!process || !process.children) {
             return undefined;
         }
 
         // Start from the current version and go backwards to find the first available version
         let currentVersion = processDefinition.version || 1;
-        
+
         while (currentVersion >= 1) {
             const versionName = `v${currentVersion}`;
-            const versionFound = process.children.find((c: any) => c.name === versionName);
-            
+            const versionFound = process.children.find(
+                (c: any) => c.name === versionName
+            );
+
             if (versionFound) {
                 return process;
             }
-            
+
             currentVersion--;
         }
-        
+
         // If no version found, return the process anyway (for first-time creation)
         return process;
     };
@@ -383,8 +394,8 @@ export const BPMNProjectSelector = ({
                           tag: `processStep_${nanoid()}`,
                           data: {},
                           interactions: bpmnProcessStepInteractions,
-                          
-                         /*  interactions: {
+
+                          /*  interactions: {
                               onLoad: {
                                   type: 'function',
                                   function: {
@@ -584,11 +595,15 @@ export const BPMNProjectSelector = ({
                                 <IGRPSeparator />
 
                                 {processDefinitionDetails &&
-                                processDefinitionDetails.projectArtifacts
+                                processDefinitionDetails.processArtifacts &&
+                                processDefinitionDetails.processArtifacts
                                     .length > 0 ? (
                                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                        {processDefinitionDetails.projectArtifacts.map(
-                                            (artifact: BPMNProjectArtifact, index: number) => {
+                                        {processDefinitionDetails.processArtifacts.map(
+                                            (
+                                                artifact: BPMNProjectArtifact,
+                                                index: number
+                                            ) => {
                                                 const processFound =
                                                     findProcess(
                                                         selectedProcess
@@ -606,7 +621,7 @@ export const BPMNProjectSelector = ({
                                                         key={index}
                                                         className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
                                                     >
-                                                        <CardHeader className="pb-3">
+                                                        <CardHeader>
                                                             <div className="flex items-start justify-between">
                                                                 <div className="flex-1">
                                                                     <CardTitle className="text-base font-medium">
@@ -639,7 +654,17 @@ export const BPMNProjectSelector = ({
                                                                 </div>
                                                             </div>
                                                         </CardHeader>
-                                                        <CardContent>
+                                                        <CardContent className='space-y-2'>
+                                                            {artifact.subProcessTask && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className="text-xs"
+                                                                >
+                                                                    {
+                                                                        `Sub Process - ${artifact.subProcessName }`
+                                                                    }
+                                                                </Badge>
+                                                            )}
                                                             <Button
                                                                 size="sm"
                                                                 className="w-full"
@@ -733,7 +758,9 @@ export const BPMNProjectSelector = ({
                     pendingComponentData?.processArtifact?.taskKey || ''
                 }
                 defaultName={pendingComponentData?.processArtifact?.name || ''}
-                processFound={pendingComponentData?.processFound || oldProcessFound}
+                processFound={
+                    pendingComponentData?.processFound || oldProcessFound
+                }
             />
         </div>
     );
