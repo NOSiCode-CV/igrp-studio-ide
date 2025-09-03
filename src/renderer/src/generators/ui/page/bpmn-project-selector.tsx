@@ -47,6 +47,7 @@ import {
 import { nanoid } from '@reduxjs/toolkit';
 import { PageDefinition } from './page-manager';
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer';
+import { bpmnProcessStepInteractions } from './bpmn-process-step-interactions';
 
 // Types
 interface BPMNProjectSelectorProps {
@@ -381,7 +382,9 @@ export const BPMNProjectSelector = ({
                           children: [],
                           tag: `processStep_${nanoid()}`,
                           data: {},
-                          interactions: {
+                          interactions: bpmnProcessStepInteractions,
+                          
+                         /*  interactions: {
                               onLoad: {
                                   type: 'function',
                                   function: {
@@ -389,7 +392,7 @@ export const BPMNProjectSelector = ({
                                   },
                                   action: {},
                               },
-                          },
+                          }, */
                       },
             };
 

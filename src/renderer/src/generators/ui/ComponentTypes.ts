@@ -117,7 +117,7 @@ export const COMPONENT: Record<string, string> = {
     ComponentContent: 'component',
     PageContent: "page",
     ProcessContent: "process",
-    ProcessStep: "processStep",
+    ProcessStepContent: "processStep",
     Columns: "columns",
     Column: "column",
     Grid: "grid",

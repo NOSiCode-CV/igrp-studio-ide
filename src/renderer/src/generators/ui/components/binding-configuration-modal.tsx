@@ -48,6 +48,7 @@ const defaultFieldType: LabeledElementField = {
     required: false,
     defaultValue: undefined,
     label: '',
+    isList: false,
 };
 
 const FIELD_TYPES: SchemaTypeItem[] = [
@@ -131,7 +132,12 @@ export const BindingConfigurationModal = ({
                   },
                   {
                       key: 'required',
-                      name: '',
+                      name: 'Required?',
+                      type: 'checkbox',
+                  },
+                  {
+                      key: 'isList',
+                      name: 'IsList?',
                       type: 'checkbox',
                   },
               ]
@@ -184,18 +190,22 @@ export const BindingConfigurationModal = ({
                         return {
                             ...rest,
                             type: rest.type || 'string',
-                          /*   defaultValue:
-                                rest.defaultValue === '' && rest.required
+                            defaultValue:
+                                (rest.defaultValue === '' ||
+                                    rest.defaultValue === undefined) &&
+                                rest.required
                                     ? ''
-                                    : rest.defaultValue, */
+                                    : rest.defaultValue,
                             ...(rest.fields && {
                                 fields: rest.fields.map((field) => ({
                                     ...field,
                                     type: field.type || 'string',
-                                  /*   defaultValue:
-                                        field.defaultValue === '' && field.required
+                                    defaultValue:
+                                        (field.defaultValue === '' ||
+                                            field.defaultValue === undefined) &&
+                                        field.required
                                             ? ''
-                                            : field.defaultValue, */
+                                            : field.defaultValue,
                                 })),
                             }),
                         };
