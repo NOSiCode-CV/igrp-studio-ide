@@ -263,7 +263,7 @@ export function TableManager({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {previewColumns.map((column, key) => (
+                                        {previewColumns && previewColumns.map((column, key) => (
                                             <TableRow key={key}>
                                                 <TableCell>
                                                     {column?.name}

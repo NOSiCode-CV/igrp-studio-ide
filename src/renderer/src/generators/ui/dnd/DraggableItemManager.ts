@@ -8,7 +8,7 @@ interface DragEndHandlers {
     handleReorderChildInComponent: (draggableId: string, source: Source, destination: Destination) => void;
     generateTag: (name: string) => string;
     addState?: (state: State) => void;
-    findComponent: (path: string, componentName: string) => Promise<ComponentRegisterConfig | undefined>;
+    findComponent: (path: string, componentName: string) => Promise<ComponentRegisterConfig | null>;
     showErrorToast: (message: string) => void;
 }
 
@@ -97,6 +97,7 @@ const handleDropComponent = async (
     const tag = handlers.generateTag(draggableId);
     const data = getRequiredDataSchema(dataProperties);
     const interactions = getDefaultInteractions(interactionsProperties);
+    const _properties = getDefaultProperties(properties,tag);
 
     // Create the component object
     const component: StructuredComponent = {
@@ -109,10 +110,10 @@ const handleDropComponent = async (
         interactions,
         allowTypes,
         data: data,
-        properties: getDefaultProperties(properties),
+        properties: _properties,
     };
 
-        if (childrenTypes) {
+    if (childrenTypes) {
         const childPromises = childrenTypes
             .filter((child) => child.defaultValue)
             .map(async (child: ComponentRegisterConfig) => {
@@ -130,7 +131,7 @@ const handleDropComponent = async (
                 if (register) {
                     const childComponent = await createStructuredComponentRecursive(register, handlers.generateTag, handlers);
                     component.children?.push(childComponent);
-                } 
+                }
             }
         }
     }
@@ -147,6 +148,7 @@ async function createStructuredComponentRecursive(child: ComponentRegisterConfig
     const tag = generateTag(name);
     const data = getRequiredDataSchema(dataProperties);
     const interactions = getDefaultInteractions(interactionsProperties);
+    const _properties = getDefaultProperties(properties,tag);
 
     // Recursively create children if childrenTypes exist
     let children: StructuredComponent[] = [];
@@ -179,9 +181,9 @@ async function createStructuredComponentRecursive(child: ComponentRegisterConfig
         interactions,
         allowTypes,
         data,
-        properties: getDefaultProperties(properties),
+        properties: _properties,
     };
-    
+
     return childComponent;
 }
 

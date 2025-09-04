@@ -124,12 +124,6 @@ const TabStates = ({
                                         <span className="font-medium text-sm truncate">
                                             {state.name}
                                         </span>
-                                        <Badge
-                                            variant="outline"
-                                            className="text-xs"
-                                        >
-                                            {state.type}
-                                        </Badge>
                                         {pageArguments?.some(
                                             (arg) => arg.id === state.id
                                         ) && (
@@ -142,11 +136,13 @@ const TabStates = ({
                                         )}
                                     </div>
 
-                                    {state.defaultValue && (
-                                        <p className="text-xs text-muted-foreground">
-                                            Default: {state.defaultValue}
-                                        </p>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="outline">
+                                            {state.type} 
+                                            {state.defaultValue &&
+                                                ` - Default: ${state.defaultValue}`}
+                                        </Badge>
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-2 ml-3">

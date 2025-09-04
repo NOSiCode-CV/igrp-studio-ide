@@ -36,7 +36,7 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
         name: '',
         description: '',
         path: '',
-        module: '',
+        module: currentItem?.module,
     })
     const [data, setData] = useState<any>(null);
     const [enumTypes, setEnumTypes] = useState<SchemaTypeItem[]>([]);
@@ -73,11 +73,11 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
     }, [selectors, enumTypes]);
 
     useEffect(() => {
-        if (data) {
-            const { name, basePath, description, module } = data;
-            setTitle(`${name}(${basePath})`);
-            setController({ name, description, path: basePath, module });
-        }
+        if (!data) return;
+        const { name, basePath, description, module } = data;
+        setTitle(`${name}(${basePath})`);
+        setController({ name, description, path: basePath, module });
+
     }, [data]);
 
     useEffect(() => {
@@ -161,6 +161,8 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
                 showErrorToast(error);
                 return;
             }
+
+            setOldActionName(formik.values.actionName);
 
             createGitCommit(basePath, `Add action ${formik.values.actionName}`);
             dispatch(onSetChangeStatus(true));

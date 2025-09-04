@@ -8,52 +8,71 @@ import {
     SelectValue,
 } from '@renderer/components/ui/select';
 import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from '@renderer/components/ui/tabs';
+
+import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from '@renderer/components/ui/card';
 import { Badge } from '@renderer/components/ui/badge';
-import { Separator } from '@renderer/components/ui/separator';
 import { toast } from 'sonner';
 import {
     BPMNProject,
     BPMNProjectProcessDefinition,
-    BPMNPageDefinition,
+    BPMNProjectArtifact,
+    FileTree,
 } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
+import {
+    ProcessConfig,
+    ProcessStepConfig,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { ENV_TYPES } from '@renderer/constants/appConstants';
+import useToast from '@renderer/hooks/useToast';
+import { useDispatch } from 'react-redux';
+import { getFileThree as onGetPages } from '@renderer/redux/thunks';
+import { getId } from '@renderer/utils';
+import {
+    Calendar,
+    Component,
+    EllipsisVertical,
+    Settings,
+    Trash2,
+    Wrench,
+} from 'lucide-react';
+import { AddComponentsNameModal } from './add-components-name-modal';
+import {
+    IGRPLoadingSpinner,
+    IGRPSeparator,
+} from '@igrp/igrp-framework-react-design-system';
+import { nanoid } from '@reduxjs/toolkit';
+import { PageDefinition } from './page-manager';
+import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer';
+import { bpmnProcessStepInteractions } from './bpmn-process-step-interactions';
 
+// Types
 interface BPMNProjectSelectorProps {
-    onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
+    onPageClick?: (pageDefinition: PageDefinition) => void;
+    bpmnProcesses: FileTree[];
+    basePath: string;
 }
 
-export const BPMNProjectSelector = ({
-    onPageClick,
-}: BPMNProjectSelectorProps) => {
+interface ProcessCardProps {
+    process: BPMNProjectProcessDefinition;
+    isSelected: boolean;
+    onSelectProcess: (process: BPMNProjectProcessDefinition) => void;
+}
+
+// Custom Hooks
+const useBPMNProjects = () => {
     const [projects, setProjects] = useState<BPMNProject[]>([]);
-    const [selectedProject, setSelectedProject] = useState<BPMNProject | null>(
-        null
-    );
-    const [processDefinitions, setProcessDefinitions] = useState<
-        BPMNProjectProcessDefinition[]
-    >([]);
     const [loading, setLoading] = useState(true);
-    const [loadingProcesses, setLoadingProcesses] = useState(false);
-
-    // Load projects on component mount
-    useEffect(() => {
-        loadProjects();
-    }, []);
-
-    // Load process definitions when project changes
-    useEffect(() => {
-        if (selectedProject) {
-            loadProcessDefinitions(selectedProject.projectId);
-        } else {
-            setProcessDefinitions([]);
-        }
-    }, [selectedProject]);
 
     const loadProjects = async () => {
         try {
@@ -68,9 +87,22 @@ export const BPMNProjectSelector = ({
         }
     };
 
+    useEffect(() => {
+        loadProjects();
+    }, []);
+
+    return { projects, loading, loadProjects };
+};
+
+const useProcessDefinitions = (selectedProject: BPMNProject | null) => {
+    const [processDefinitions, setProcessDefinitions] = useState<
+        BPMNProjectProcessDefinition[]
+    >([]);
+    const [loading, setLoading] = useState(false);
+
     const loadProcessDefinitions = async (projectId: string) => {
         try {
-            setLoadingProcesses(true);
+            setLoading(true);
             const processes =
                 await bpmnService.getProcessDefinitionsByProject(projectId);
             setProcessDefinitions(processes);
@@ -78,105 +110,325 @@ export const BPMNProjectSelector = ({
             toast.error('Failed to load process definitions');
             console.error('Error loading process definitions:', error);
         } finally {
-            setLoadingProcesses(false);
+            setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (selectedProject) {
+            loadProcessDefinitions(selectedProject.projectId);
+        } else {
+            setProcessDefinitions([]);
+        }
+    }, [selectedProject]);
+
+    return { processDefinitions, loading, loadProcessDefinitions };
+};
+
+const ProcessCard = ({
+    process,
+    isSelected,
+    onSelectProcess,
+}: ProcessCardProps & {
+    isSelected: boolean;
+    onSelectProcess: (process: BPMNProjectProcessDefinition) => void;
+}) => {
+    return (
+        <Card
+            className={`hover:shadow-md transition-all cursor-pointer ${
+                isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
+            }`}
+            onClick={() => {
+                console.log('Process clicked:', process.processDefinitionId);
+                onSelectProcess(process);
+            }}
+        >
+            <CardContent>
+                <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                        <CardTitle className="text-base font-medium">
+                            {process.title}
+                        </CardTitle>
+                        <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
+                            <Calendar  className='w-4 h-4'/>
+                            {process.deploymentDate && (
+                                <span>
+                                    Deployed on{' '}
+                                    {new Date(
+                                        process.deploymentDate || ''
+                                    ).toLocaleDateString()}
+                                </span>
+                            )}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
+                            <Trash2 className='w-4 h-4'/>
+                            <span>
+                                {process.processArtifacts?.length || 0}{' '}
+                                artifacts
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end space-y-2">
+                        <Badge variant={'outline'}>
+                            v{process.version || 'N/A'}
+                            {' • Published'}
+                        </Badge>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
+// Main Component
+export const BPMNProjectSelector = ({
+    onPageClick,
+    bpmnProcesses,
+    basePath,
+}: BPMNProjectSelectorProps) => {
+    const [selectedProject, setSelectedProject] = useState<BPMNProject | null>(
+        null
+    );
+    const [selectedProcess, setSelectedProcess] =
+        useState<BPMNProjectProcessDefinition | null>(null);
+    const [processDefinitionDetails, setProcessDefinitionDetails] =
+        useState<any>(null);
+    const [loadingProcessDetails, setLoadingProcessDetails] = useState(false);
+    const [showAddComponentsModal, setShowAddComponentsModal] = useState(false);
+    const [pendingComponentData, setPendingComponentData] = useState<
+        | {
+              processDefinition: BPMNProjectProcessDefinition;
+              processArtifact: BPMNProjectArtifact;
+              processFound: FileTree;
+          }
+        | undefined
+    >(undefined);
+    const [oldProcessFound, setOldProcessFound] = useState<
+        FileTree | undefined
+    >(undefined);
+    const [activeTab, setActiveTab] = useState<string>('artifacts');
+
+    const { projects, loading } = useBPMNProjects();
+    const { processDefinitions, loading: loadingProcesses } =
+        useProcessDefinitions(selectedProject);
+
+    const { showErrorToast, showSuccessToast } = useToast();
+    const dispatch: any = useDispatch();
+
+    // Fetch process definition details when a process is selected
+    useEffect(() => {
+        const fetchProcessDefinitionDetails = async () => {
+            if (selectedProcess?.processDefinitionId) {
+                try {
+                    setLoadingProcessDetails(true);
+                    const details =
+                        await bpmnService.getProcessDefinitionDetails(
+                            selectedProcess.processDefinitionId
+                        );
+                    setProcessDefinitionDetails(details);
+                    console.log('Process definition details:', details);
+                } catch (error) {
+                    console.error(
+                        'Error fetching process definition details:',
+                        error
+                    );
+                    showErrorToast(
+                        'Failed to fetch process definition details'
+                    );
+                } finally {
+                    setLoadingProcessDetails(false);
+                }
+            } else {
+                setProcessDefinitionDetails(null);
+            }
+        };
+
+        fetchProcessDefinitionDetails();
+    }, [selectedProcess]);
 
     const handleProjectChange = (projectId: string) => {
         const project = projects.find((p) => p.projectId === projectId);
         setSelectedProject(project || null);
     };
 
-    const handleEditProcess = async (process: BPMNProjectProcessDefinition) => {
-        try {
-            // Show loading state
-            toast.loading(
-                `Loading process definition for ${process.processKey}...`
+    const findProcess = (processDefinition: BPMNProjectProcessDefinition) => {
+        return bpmnProcesses.find(
+            (p) =>
+                p.name === processDefinition.processKey &&
+                p.children?.some(
+                    (c: any) => c.name === `v${processDefinition.version}`
+                )
+        );
+    };
+
+    const findProcessRecursive = (
+        processDefinition: BPMNProjectProcessDefinition
+    ) => {
+        // Find the process by name
+        const process = bpmnProcesses.find(
+            (p) => p.name === processDefinition.processKey
+        );
+        if (!process || !process.children) {
+            return undefined;
+        }
+
+        // Start from the current version and go backwards to find the first available version
+        let currentVersion = processDefinition.version || 1;
+
+        while (currentVersion >= 1) {
+            const versionName = `v${currentVersion}`;
+            const versionFound = process.children.find(
+                (c: any) => c.name === versionName
             );
 
-            // Fetch the complete process definition details
-            const processDetails =
-                await bpmnService.getProcessDefinitionDetails(
-                    process.processDefinitionId
+            if (versionFound) {
+                return process;
+            }
+
+            currentVersion--;
+        }
+
+        // If no version found, return the process anyway (for first-time creation)
+        return process;
+    };
+
+    const findStepProcess = (
+        processDefinition: BPMNProjectProcessDefinition,
+        processFound: any,
+        processArtifact: BPMNProjectArtifact
+    ) => {
+        const processVersionFound = processFound?.children?.find(
+            (c: any) => c.name === `v${processDefinition.version}`
+        );
+
+        if (!processVersionFound) return;
+
+        return processVersionFound?.children.find(
+            (c: any) => c.content.taskKey === processArtifact.taskKey
+        );
+    };
+
+    const handleStepProcess = async (
+        componentDescription: string,
+        componentName: string,
+        previousComponent?: any
+    ) => {
+        try {
+            if (!pendingComponentData) return;
+
+            const { processDefinition, processArtifact, processFound } =
+                pendingComponentData;
+
+            const version = `v${processDefinition.version}` || 'v1';
+
+            if (!processFound) {
+                const processConfig: ProcessConfig = {
+                    type: 'process',
+                    processKey: processDefinition.processKey,
+                    name: processDefinition.processKey,
+                    processVersion: version,
+                    description: processDefinition.title,
+                    steps: processDefinition.processArtifacts?.map(
+                        (artifact) => ({
+                            id: artifact.taskKey,
+                            name: artifact.name,
+                        })
+                    ),
+                    id: getId(),
+                };
+
+                const { error } = await window.engine.createProcess(
+                    processConfig,
+                    ENV_TYPES.NEXTJS,
+                    basePath
                 );
-            console.log('Process definition details:', processDetails);
 
-            // Get the BPMN XML content from the process details
-            const processXml =
-                processDetails.bpmFileContent ||
-                (await bpmnService.getProcessDefinitionXML(
-                    process.processDefinitionId
-                ));
-                
+                if (error) showErrorToast(error);
+            }
 
-            // Create a comprehensive page definition for the studio
-            const pageDefinition: any = {
-                id: `bpmn-${process.processDefinitionId}`,
-                processDefinitionId: process.processDefinitionId,
-                processDefinitionKey: process.processKey,
-                description: `Process from ${selectedProject?.name || 'BPMN'} project`,
-                isStartPage: true,
-                isTaskPage: false,
-                content: {
-                    type: 'bpmn-process',
-                    processKey: process.processKey,
-                    processName:
-                        processDetails.title ||
-                        process.title ||
-                        process.processKey,
-                    processId: process.processDefinitionId,
-
-                    projectName: selectedProject?.name || '',
-                    pageName: `${process.processKey} - ${process?.title || 'BPMN Process'}`,
-                    pagePath: `/bpmn/${selectedProject?.code || 'project'}/${process.processKey}`,
-                    // Add artifacts information as JSON string
-                    artifacts: processDetails.projectArtifacts
-                },
+            const processStep: ProcessStepConfig = {
+                processKey: processDefinition.processKey,
+                processVersion: version,
+                version: version,
+                name: componentName,
+                type: 'processStep',
+                description: componentDescription,
+                id: getId(),
+                forceDynamic: false,
+                types: previousComponent ? previousComponent.types : [],
+                imports: previousComponent ? previousComponent.imports : [],
+                states: previousComponent ? previousComponent.states : [],
+                references: [],
+                functions: previousComponent ? previousComponent.functions : [],
+                projectArtifactId: '',
+                taskKey: processArtifact.taskKey,
+                artifactVariables: [],
+                components: previousComponent
+                    ? previousComponent.components
+                    : {
+                          id: `processstep_${componentName}`,
+                          componentName: 'processStep',
+                          label: 'Process Step',
+                          properties: {
+                              variables: [],
+                              commonProperties: {},
+                          },
+                          children: [],
+                          tag: `processStep_${nanoid()}`,
+                          data: {},
+                          interactions: bpmnProcessStepInteractions,
+                      },
             };
 
-            // Dismiss loading toast and show success
-            toast.dismiss();
-            onPageClick?.(pageDefinition);
-            toast.success(`Opening ${process.processKey} in page builder`, {
-                description: `Loaded process definition with ${processXml ? 'XML content' : 'basic info'}`,
-            });
+            const { error } = await window.engine.createProcessStep(
+                processStep,
+                ENV_TYPES.NEXTJS,
+                basePath
+            );
+
+            if (error) {
+                showErrorToast(error);
+            } else {
+                showSuccessToast('Process step created successfully');
+                dispatch(onGetPages(basePath));
+            }
         } catch (error) {
-            toast.dismiss();
             console.error('Error loading process definition:', error);
-            toast.error('Failed to load process definition', {
-                description:
-                    error instanceof Error ? error.message : 'Unknown error',
-            });
         }
     };
 
-    const handleViewProcess = (process: BPMNProjectProcessDefinition) => {
-        toast.info(`Viewing details for ${process.processKey}`, {
-            description: `Version ${process.version}, State: ${process.status}`,
+    const handleModalConfiguration = async (
+        processDefinition: BPMNProjectProcessDefinition,
+        processArtifact: BPMNProjectArtifact
+    ) => {
+        const processFound = findProcess(processDefinition);
+
+        if (!processFound) {
+            const processFound = findProcessRecursive(processDefinition);
+            setOldProcessFound(processFound as FileTree);
+        }
+
+        // Store the data and open the modal
+        setPendingComponentData({
+            processDefinition,
+            processArtifact,
+            processFound: processFound as FileTree,
         });
+        setShowAddComponentsModal(true);
     };
 
-    const handleViewArtifacts = (process: BPMNProjectProcessDefinition) => {
-        const artifactCount = process.projectArtifacts?.length || 0;
-        toast.info(`Process has ${artifactCount} artifacts`, {
-            description:
-                process.projectArtifacts?.map((a) => a.name).join(', ') ||
-                'No artifacts',
-        });
+    const handleConfirmAddComponents = (stepProcessFound: PageDefinition) => {
+        onPageClick?.(stepProcessFound);
     };
 
     if (loading) {
-        return (
-            <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <IGRPLoadingSpinner />;
     }
 
     return (
         <div className="space-y-6">
             {/* Project Selection */}
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col">
                 <label className="text-sm font-medium">Select Project</label>
                 <Select
                     onValueChange={handleProjectChange}
@@ -217,212 +469,47 @@ export const BPMNProjectSelector = ({
                 </Select>
             </div>
 
-            {/* Selected Project Info */}
-            {selectedProject && (
-                <Card className="relative overflow-hidden  bg-gradient-to-br from-background to-muted/30">
-                    <CardHeader className="relative">
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <CardTitle className="flex items-center space-x-3 text-xl">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="font-bold">
-                                            {selectedProject.name}
-                                        </span>
-                                        <Badge
-                                            variant={
-                                                selectedProject.active
-                                                    ? 'default'
-                                                    : 'secondary'
-                                            }
-                                            className="text-xs px-2 py-1"
-                                        >
-                                            {selectedProject.code}
-                                        </Badge>
-                                    </div>
-                                </CardTitle>
-                                <CardDescription className="mt-2 text-base leading-relaxed">
-                                    {selectedProject.description ||
-                                        'No description available'}
-                                </CardDescription>
-                            </div>
-
-                            {/* Status indicator */}
-                            <div className="flex flex-col items-end space-y-2">
-                                <Badge
-                                    variant={
-                                        selectedProject.active
-                                            ? 'default'
-                                            : 'destructive'
-                                    }
-                                    className={`px-3 py-1 text-xs font-medium ${
-                                        selectedProject.active
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                    }`}
-                                >
-                                    <div className="flex items-center space-x-1">
-                                        <div
-                                            className={`w-2 h-2 rounded-full ${
-                                                selectedProject.active
-                                                    ? 'bg-green-500'
-                                                    : 'bg-red-500'
-                                            }`}
-                                        ></div>
-                                        <span>
-                                            {selectedProject.active
-                                                ? 'Active'
-                                                : 'Inactive'}
-                                        </span>
-                                    </div>
-                                </Badge>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="relative">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* Process Definitions Count */}
-                            <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                                    <svg
-                                        className="w-5 h-5 text-blue-600 dark:text-blue-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                        />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-foreground">
-                                        {selectedProject.processDefinitions
-                                            ?.length || 0}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground font-medium">
-                                        Process Definitions
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {/* Process Definitions */}
+            {/* Step 2: Select Process */}
             {selectedProject && (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">
-                            Process Definitions
-                        </h3>
-                        {loadingProcesses && (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                        )}
+                        <div>
+                            <h3 className="text-lg font-semibold">
+                                Select Process
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                                Choose a specific process to view its artifacts,
+                                or load all project artifacts below.
+                            </p>
+                        </div>
+                        {loadingProcesses && <IGRPLoadingSpinner />}
                     </div>
 
                     {loadingProcesses ? (
-                        <div className="flex justify-center py-8">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                        </div>
+                        <IGRPLoadingSpinner />
                     ) : processDefinitions.length > 0 ? (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {processDefinitions.map((process) => (
-                                <Card
-                                    key={process.processDefinitionId}
-                                    className="hover:shadow-md transition-shadow"
-                                >
-                                    <CardHeader className="pb-3">
-                                        <CardTitle className="text-base">
-                                            <div>
-                                                <span className="font-medium">
-                                                    {process.title}
-                                                </span>
-                                                <Badge
-                                                    variant={'outline'}
-                                                    className="ml-2"
-                                                >
-                                                    {process.processKey}
-                                                </Badge>
-                                            </div>
-                                        </CardTitle>
-                                        <CardDescription className="text-sm">
-                                            Version {process.version} •{'N/A'}{' '}
-                                            {process.status}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-3">
-                                        <div className="text-sm text-muted-foreground">
-                                            <div>
-                                                Deployment:{' '}
-                                                {process.deploymentId}
-                                            </div>
-                                            <div>
-                                                Deployed:{' '}
-                                                {new Date(
-                                                    process.deploymentDate || ''
-                                                ).toLocaleDateString()}
-                                            </div>
-                                        </div>
-
-                                        {process.projectArtifacts &&
-                                            process.projectArtifacts.length >
-                                                0 && (
-                                                <div className="text-sm">
-                                                    <span className="font-medium">
-                                                        Artifacts:
-                                                    </span>{' '}
-                                                    {
-                                                        process.projectArtifacts
-                                                            .length
-                                                    }
-                                                </div>
-                                            )}
-
-                                        <Separator />
-
-                                        <div className="flex space-x-2">
-                                            <Button
-                                                size="sm"
-                                                onClick={() =>
-                                                    handleEditProcess(process)
-                                                }
-                                                className="flex-1"
-                                            >
-                                                Edit Page
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() =>
-                                                    handleViewProcess(process)
-                                                }
-                                            >
-                                                View
-                                            </Button>
-                                            {process.projectArtifacts &&
-                                                process.projectArtifacts
-                                                    .length > 0 && (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        onClick={() =>
-                                                            handleViewArtifacts(
-                                                                process
-                                                            )
-                                                        }
-                                                    >
-                                                        Artifacts
-                                                    </Button>
-                                                )}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
+                        <div className="space-y-4">
+                            {loadingProcessDetails && (
+                                <div className="flex items-center justify-center py-4">
+                                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                        <IGRPLoadingSpinner />
+                                        <span>Loading process details...</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                {processDefinitions.map((process) => (
+                                    <ProcessCard
+                                        key={process.processDefinitionId}
+                                        process={process}
+                                        isSelected={
+                                            selectedProcess?.processDefinitionId ===
+                                            process.processDefinitionId
+                                        }
+                                        onSelectProcess={setSelectedProcess}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     ) : (
                         <Card>
@@ -434,6 +521,195 @@ export const BPMNProjectSelector = ({
                 </div>
             )}
 
+            {/* Step 3: Process Details with Tabs */}
+            {selectedProcess && (
+                <>
+                    <div className="space-y-4">
+                        <Tabs
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full"
+                        >
+                            <TabsList className="grid grid-cols-2">
+                                <TabsTrigger value="artifacts">
+                                    Process Artifacts
+                                </TabsTrigger>
+                                <TabsTrigger value="diagram">
+                                    BPMN Diagram
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent
+                                value="artifacts"
+                                className="space-y-6"
+                            >
+                                <div className="flex items-center justify-between mt-4">
+                                    <div>
+                                        <h4 className="text-md font-medium">
+                                            Process Artifacts
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Artifacts for process:{' '}
+                                            {selectedProcess.title}
+                                        </p>
+                                    </div>
+                                    <div className="flex space-x-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex items-center space-x-2"
+                                        >
+                                            <Settings />
+                                            Bulk Actions
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <IGRPSeparator />
+
+                                {processDefinitionDetails &&
+                                processDefinitionDetails.processArtifacts &&
+                                processDefinitionDetails.processArtifacts
+                                    .length > 0 ? (
+                                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                        {processDefinitionDetails.processArtifacts.map(
+                                            (
+                                                artifact: BPMNProjectArtifact,
+                                                index: number
+                                            ) => {
+                                                const processFound =
+                                                    findProcess(
+                                                        selectedProcess
+                                                    );
+
+                                                const stepProcessFound =
+                                                    findStepProcess(
+                                                        selectedProcess,
+                                                        processFound,
+                                                        artifact
+                                                    );
+
+                                                return (
+                                                    <Card
+                                                        key={index}
+                                                        className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
+                                                    >
+                                                        <CardHeader>
+                                                            <div className="flex items-start justify-between">
+                                                                <div className="flex-1">
+                                                                    <CardTitle className="text-base font-medium">
+                                                                        {
+                                                                            artifact.name
+                                                                        }
+                                                                    </CardTitle>
+                                                                    <div className="text-sm text-muted-foreground mt-1">
+                                                                        {
+                                                                            artifact.taskKey
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex flex-col items-end space-y-2">
+                                                                    <Badge
+                                                                        variant="outline"
+                                                                        className="text-xs"
+                                                                    >
+                                                                        v
+                                                                        {selectedProcess.version ||
+                                                                            'N/A'}
+                                                                    </Badge>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-6 w-6 p-0"
+                                                                    >
+                                                                        <EllipsisVertical />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </CardHeader>
+                                                        <CardContent className="space-y-2">
+                                                            {artifact.subProcessTask && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className="text-xs"
+                                                                >
+                                                                    {`Sub Process - ${artifact.subProcessName}`}
+                                                                </Badge>
+                                                            )}
+                                                            <Button
+                                                                size="sm"
+                                                                className="w-full"
+                                                                variant={
+                                                                    stepProcessFound
+                                                                        ? 'outline'
+                                                                        : 'default'
+                                                                }
+                                                                onClick={() => {
+                                                                    stepProcessFound
+                                                                        ? handleConfirmAddComponents(
+                                                                              stepProcessFound
+                                                                          )
+                                                                        : handleModalConfiguration(
+                                                                              selectedProcess,
+                                                                              artifact
+                                                                          );
+                                                                }}
+                                                            >
+                                                                {stepProcessFound ? (
+                                                                    <>
+                                                                        <Component />
+                                                                        Add
+                                                                        Components
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Wrench />
+                                                                        Generate
+                                                                        Step
+                                                                    </>
+                                                                )}
+                                                            </Button>
+                                                        </CardContent>
+                                                    </Card>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Card>
+                                        <CardContent className="py-8 text-center text-muted-foreground">
+                                            No artifacts found for this process.
+                                        </CardContent>
+                                    </Card>
+                                )}
+                            </TabsContent>
+
+                            <TabsContent value="diagram" className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h4 className="text-md font-medium">
+                                            BPMN Diagram
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Visual representation of process:{' '}
+                                            {selectedProcess.title}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {processDefinitionDetails?.bpmFileContent && (
+                                    <BPMNDiagramViewer
+                                        bpmnContent={
+                                            processDefinitionDetails.bpmFileContent
+                                        }
+                                    />
+                                )}
+                            </TabsContent>
+                        </Tabs>
+                    </div>
+                </>
+            )}
+
             {/* No Projects Message */}
             {!loading && projects.length === 0 && (
                 <Card>
@@ -443,6 +719,20 @@ export const BPMNProjectSelector = ({
                     </CardContent>
                 </Card>
             )}
+
+            {/* Add Components Name Modal */}
+            <AddComponentsNameModal
+                open={showAddComponentsModal}
+                onOpenChange={setShowAddComponentsModal}
+                onConfirm={handleStepProcess}
+                defaultComponentName={
+                    pendingComponentData?.processArtifact?.taskKey || ''
+                }
+                defaultName={pendingComponentData?.processArtifact?.name || ''}
+                processFound={
+                    pendingComponentData?.processFound || oldProcessFound
+                }
+            />
         </div>
     );
 };

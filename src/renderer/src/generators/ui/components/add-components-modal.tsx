@@ -96,10 +96,7 @@ export const AddComponentModal = ({
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponent: async (path: string, componentName: string) => {
-                    const result = await findComponent(path, componentName);
-                    return result || undefined;
-                },
+                findComponent,
                 showErrorToast,
             });
         },
@@ -119,10 +116,7 @@ export const AddComponentModal = ({
                 handleAddChildToComponent,
                 handleReorderChildInComponent,
                 generateTag,
-                findComponent: async (path: string, componentName: string) => {
-                    const result = await findComponent(path, componentName);
-                    return result || undefined;
-                },
+                findComponent,
                 showErrorToast,
             });
         },
@@ -412,7 +406,7 @@ const RenderCreatedComponents = ({
                                         {renderIcon(
                                             properties?.iconProperties?.iconName
                                         )}
-                                        <span className="text-sm">{`${label} (${properties.labelTrigger})`}</span>
+                                        <span className="text-sm">{`${label} (${properties?.labelTrigger || 'Click'})`}</span>
                                     </div>
                                 </Draggable>
                             </div>

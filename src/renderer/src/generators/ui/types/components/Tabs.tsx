@@ -91,7 +91,12 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
             const { children: components, id: componentId } = child;
 
             return (
-                <TabsContent value={child.id} key={index} asChild className="mt-4">
+                <TabsContent
+                    value={child.id}
+                    key={index}
+                    asChild
+                    className="mt-4"
+                >
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
@@ -100,7 +105,6 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
                         {components.length > 0 &&
                             components.map(
                                 (childTab: StructuredComponent, ii: number) => {
-
                                     return (
                                         <Draggable
                                             key={childTab.id}
@@ -139,20 +143,19 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     };
 
     return (
-        <Droppable
-            className={cn('flex w-full flex-col gap-6', className)}
-            onDrop={onDragEnd}
-            component={comp}
-        >
-            {components.length > 0 && (
-                <Tabs defaultValue={components[0].id} className="w-full">
-                    <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
-                        {renderTriggers()}
-                    </TabsList>
-                    {renderContent()}
-                </Tabs>
-            )}
-        </Droppable>
+        <Tabs defaultValue={components[0].id} className="w-full">
+            <Droppable
+                className={cn('flex w-full flex-col gap-6', className)}
+                onDrop={onDragEnd}
+                component={comp}
+                path="tabs"
+            >
+                <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
+                    {renderTriggers()}
+                </TabsList>
+            </Droppable>
+            {renderContent()}
+        </Tabs>
     );
 };
 

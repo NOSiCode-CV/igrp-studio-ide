@@ -55,7 +55,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t('addResponse')}</DialogTitle>
                     <DialogDescription />
@@ -65,10 +65,10 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                         e.preventDefault();
                         handleSave();
                     }}
-                >1
+                >
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3">
-                            <Label className="">{t('httpStatusCode')}</Label>
+                            <Label>{t('httpStatusCode')}</Label>
                             <IGRPCombobox
                                 options={httpStatusCodes}
                                 value={statusCode}

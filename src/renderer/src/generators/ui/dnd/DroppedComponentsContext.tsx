@@ -375,11 +375,11 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     const getTypeByComponentId = (componentId: string): TypeDef | undefined => {
-        return types.find((t) => t.componentId === componentId);
+        return types.find((t) => t.componentId === componentId) || undefined;
     };
 
     const setAllTypes = (newTypes: TypeDef[]) => {
-        setTypes(newTypes);
+        setTypes(Array.isArray(newTypes) ? newTypes : []); // Ensure array
     };
 
     //functions
@@ -408,10 +408,14 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     const addState = (state: State) => {
         setStates((prev = []) => {
             // Check if a state with the same name already exists
-            const existingStateIndex = prev.findIndex(s => s.name === state.name);
+            const existingStateIndex = prev.findIndex(
+                (s) => s.name === state.name
+            );
             if (existingStateIndex !== -1) {
                 // Replace the existing state with the same name
-                console.warn(`State with name "${state.name}" already exists. Replacing existing state.`);
+                console.warn(
+                    `State with name "${state.name}" already exists. Replacing existing state.`
+                );
                 const updatedStates = [...prev];
                 updatedStates[existingStateIndex] = state;
                 return updatedStates;
@@ -503,7 +507,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
                 imports,
 
                 setAllArguments,
-                componentArguments
+                componentArguments,
             }}
         >
             {children}

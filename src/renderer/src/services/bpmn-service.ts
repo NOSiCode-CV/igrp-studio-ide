@@ -7,13 +7,9 @@ class BPMNService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    console.log('makeRequest called for endpoint:', endpoint);
-    console.log('Current config:', this.config);
-
+   
     if (!this.config) {
-      console.log('No config found, attempting to load...');
       this.config = await this.getConfig();
-      console.log('Config loaded in makeRequest:', this.config);
     }
 
     if (!this.config) {
@@ -55,16 +51,11 @@ class BPMNService {
   // Configuration Management
   async setConfig(config: BPMNConfig): Promise<void> {
     this.config = config;
-    // Note: This method is kept for backward compatibility
-    // The actual config management is now handled by the settings system
   }
 
   async getConfig(): Promise<BPMNConfig | null> {
-    console.log('getConfig called, current config:', this.config);
     if (!this.config) {
-      console.log('Loading config from settings...');
       this.config = await window.igrpStudioSettings.getBPMNConfig();
-      console.log('Config loaded:', this.config);
     }
     return this.config;
   }
@@ -94,13 +85,12 @@ class BPMNService {
   // New method to get all projects
   async getProjects(): Promise<BPMNProject[]> {
     const response = await this.makeRequest<PaginatedResponse<BPMNProject>>('/projects');
-    console.log('getProjects response', response);
     return response ? response.content : [];
   }
 
   // New method to get process definitions for a specific project
   async getProcessDefinitionsByProject(projectId: string): Promise<BPMNProjectProcessDefinition[]> {
-    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}`);
+    const response = await this.makeRequest<BPMNProject>(`/projects/${projectId}/deployed-process`);
     return response.processDefinitions || [];
   }
 
@@ -190,9 +180,8 @@ class BPMNService {
   }
 
   async getProcessDefinitionDetails(processDefinitionId: string): Promise<any> {
-    // First, find the project that contains this process definition
-    return await this.makeRequest<BPMNProject[]>(`/projects/process-definitions/${processDefinitionId}`);
-
+    // Get process definition details directly
+    return await this.makeRequest<any>(`/projects/process-definitions/${processDefinitionId}`);
   }
 
   async getProcessArtifacts(processDefinitionId: string): Promise<any[]> {
@@ -202,6 +191,17 @@ class BPMNService {
     } catch (error) {
       console.error('Error fetching process artifacts:', error);
       return [];
+    }
+  }
+
+  async getArtifactContent(artifactId: string): Promise<{ content: string }> {
+    try {
+      // Note: The endpoint URL is a placeholder and needs to be verified.
+      const artifact = await this.makeRequest<{ content: string }>(`/projects/artifacts/${artifactId}/content`);
+      return artifact;
+    } catch (error) {
+      console.error(`Error fetching content for artifact ${artifactId}:`, error);
+      throw error; // Re-throw the error to be handled by the caller
     }
   }
 

@@ -11,7 +11,7 @@ import { DuplicatePageModal } from './duplicate-page-modal';
 import { PageTable } from './page-table';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { FileTree, BPMNPageDefinition } from 'src/main/types';
+import { FileTree } from 'src/main/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -54,7 +54,7 @@ export interface PageDefinition {
 }
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: PageDefinition | BPMNPageDefinition) => void;
+    onPageClick?: (pageFile: PageDefinition) => void;
 }
 
 const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
@@ -65,7 +65,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
 
     const [content, setContent] = useState<any>([]);
     const [components, setComponents] = useState<any>([]);
-    const [page, setPage] = useState<PageDefinition>();
+
     const [showformPage, setFormPage] = useState<boolean>(false);
     const [showFormComponent, setFormComponent] = useState(false);
     const [showDuplicateModal, setShowDuplicateModal] =
@@ -74,21 +74,20 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [loadingTable, isLoadingTable] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
-    const [pageEditing, setPageEditing] = useState<PageDefinition>();
+
     const [pageToDuplicate, setPageToDuplicate] = useState<PageDefinition>();
     const [activeTab, setActiveTab] = useState<string>('pages');
+    const [bpmnProcesses, setBpmnProcesses] = useState<FileTree[]>([]);
+    const [currentComponent, setCurrentComponent] = useState<PageDefinition>();
+    const [isSubPage, setIsSubPage] = useState<boolean>(false);
 
-    const handleAddComponents = (page: PageDefinition | BPMNPageDefinition) => {
-        // Switch to pages tab when opening a BPMN page
-        if ('processDefinitionId' in page) {
-            setActiveTab('pages');
-        }
+    const handleAddComponents = (page: PageDefinition) => {
         onPageClick?.(page);
     };
 
     const handleDeletePage = (page: PageDefinition) => {
         setDeleteModal(true);
-        setPage(page);
+        setCurrentComponent(page);
     };
 
     const handleDuplicate = (page: PageDefinition) => {
@@ -97,31 +96,31 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     };
 
     const confirmDeletion = async () => {
-        if (!page) return;
+        if (!currentComponent) return;
         const pageConfig: DeleteConfig = {
-            type: page.type,
-            name: page.pageName,
-            id: page.id,
+            type: currentComponent.type,
+            name: currentComponent.pageName,
+            id: currentComponent.id,
         };
-        console.log(pageConfig);
         await window.engine.delete(pageConfig, ENV_TYPES.NEXTJS, basePath);
         setDeleteModal(false);
         isLoadingTable(true);
-        setPage(undefined);
+        setCurrentComponent(undefined);
     };
 
     const openDialogNewPage = (page?: PageDefinition) => {
         setFormPage(true);
-        setPageEditing(page);
+        setCurrentComponent(page);
     };
 
     const handleNewPage = () => {
         setFormPage(false);
-        setPage(undefined);
+        setCurrentComponent(undefined);
         setFormComponent(false);
         setShowDuplicateModal(false);
         setPageToDuplicate(undefined);
         isLoadingTable(true);
+        setIsSubPage(false);
     };
 
     useEffect(() => {
@@ -137,6 +136,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         if (files) {
             const pages = files.find((page) => page.name === 'pages');
             const components = files.find((page) => page.name === 'components');
+            const process = files.find((page) => page.name === 'process');
 
             if (pages && pages.children) {
                 setContent(pages.children);
@@ -145,6 +145,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             if (components && components.children) {
                 setComponents(components.children);
             }
+
+            if (process && process.children) setBpmnProcesses(process.children);
         }
     }, [files]);
 
@@ -186,7 +188,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         } else {
             setFormComponent(!showFormComponent);
         }
-        setPage(page);
+        setCurrentComponent(page);
     };
 
     const tableData: PageDefinition[] = [
@@ -232,7 +234,11 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 description={project.config?.description}
             />
 
-            <VersionAlert projectVersion={project?.config?.version} className="mb-4" changelogContent={nextjsEngineChangelog} />
+            <VersionAlert
+                projectVersion={project?.config?.version}
+                className="mb-4"
+                changelogContent={nextjsEngineChangelog}
+            />
 
             <IGRPTabs value={activeTab} onValueChange={setActiveTab}>
                 <IGRPTabsList className="w-full">
@@ -300,8 +306,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                         <DropdownMenuItem
                                             onSelect={() => {
                                                 openDialogNewPage();
-                                                setPage(undefined);
-                                                setPageEditing(undefined);
+                                                setCurrentComponent(undefined);
                                             }}
                                         >
                                             {t('createNewPage')}
@@ -309,8 +314,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                         <DropdownMenuItem
                                             onSelect={() => {
                                                 setFormComponent(true);
-                                                setPage(undefined);
-                                                setPageEditing(undefined);
+                                                setCurrentComponent(undefined);
                                             }}
                                         >
                                             {t('createNewComponent')}
@@ -347,6 +351,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                                 openDialogNewPage={
                                                     openDialogNewPage
                                                 }
+                                                setIsSubPage={setIsSubPage}
                                             />
                                         );
                                     })}
@@ -367,12 +372,17 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                 handleAddComponents={handleAddComponents}
                                 openDialogNewPage={openDialogNewPage}
                                 handleDuplicate={handleDuplicate}
+                                setIsSubPage={setIsSubPage}
                             />
                         )}
                     </>
                 </IGRPTabsContent>
                 <IGRPTabsContent value="bpmn" className="space-y-4 pt-3">
-                    <BPMNManager onPageClick={handleAddComponents} />
+                    <BPMNManager
+                        onPageClick={handleAddComponents}
+                        bpmnProcesses={bpmnProcesses}
+                        basePath={basePath}
+                    />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="settings" className="space-y-4">
                     <ProjectSettings
@@ -387,8 +397,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 isOpen={showformPage}
                 onClose={() => setFormPage(false)}
                 onConfirm={handleNewPage}
-                pageEditing={pageEditing}
-                currentComponent={page}
+                isSubPage={isSubPage}
+                currentComponent={currentComponent}
             />
 
             <CreateComponentModal
@@ -397,7 +407,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 onClose={() => setFormComponent(false)}
                 onConfirm={handleNewPage}
                 pageOptions={pageOptions}
-                currentComponent={page}
+                currentComponent={currentComponent}
             />
 
             <DuplicatePageModal
@@ -413,7 +423,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 onClose={() => setDeleteModal(false)}
                 onConfirm={confirmDeletion}
                 hasTrigger={false}
-                recordId={page?.pageName}
+                recordId={currentComponent?.pageName}
             />
         </div>
     );

@@ -1,7 +1,7 @@
 // engines/DotNetEngine.ts
 import { newApi } from '@igrp/dotnet-engine';
 import { BaseEngine } from '../interfaces';
-import { BaseApiConfig, ResponseConfig } from '@igrp/dotnet-engine/dist/interfaces/types';
+import { BaseApiConfig, ResponseConfig } from  '@igrp/dotnet-engine/dist/interfaces/types';
 import { ProjectData } from '../types';
 
 export class DotNetEngine implements BaseEngine {

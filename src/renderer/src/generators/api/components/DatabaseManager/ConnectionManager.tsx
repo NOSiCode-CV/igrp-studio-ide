@@ -126,8 +126,8 @@ export function ConnectionManager({ title }: { title?: string }) {
     ];
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between">
+        <div className="space-y-3">
+            <div className="flex justify-between mt-3">
                 {title && (
                     <div>
                         <h1 className="text-3xl font-semibold">{title}</h1>

@@ -21,8 +21,9 @@ export interface PageCardProps {
     onDelete: (page: any) => void;
     onEdit: (page: any) => void;
     onAddComponents: (page: PageDefinition) => void;
-    openDialogNewPage?: (page: PageDefinition) => void;
-    onDuplicate?: (page: PageDefinition) => void;
+    openDialogNewPage?: (page: PageDefinition, isSubPage?: boolean  ) => void;
+    onDuplicate?: (page: PageDefinition) => void;   
+    setIsSubPage: (isSubPage: boolean) => void;
 }
 
 export function PageCardView({
@@ -34,6 +35,7 @@ export function PageCardView({
     openDialogNewPage,
     subPages,
     onDuplicate,
+    setIsSubPage,
 }: PageCardProps) {
     const { isPage, description, pageName, pagePath } = page;
     const [isOpen, setIsOpen] = useState(false);
@@ -123,6 +125,7 @@ export function PageCardView({
                                     onAddComponents={onAddComponents}
                                     openDialogNewPage={openDialogNewPage}
                                     onDuplicate={onDuplicate}
+                                    setIsSubPage={setIsSubPage}
                                 />
                             </div>
                         </div>
@@ -162,6 +165,7 @@ export function PageCardView({
                                             onDelete={() => onDelete(subpage)}
                                             onAddComponents={onAddComponents}
                                             onDuplicate={onDuplicate}
+                                            setIsSubPage={setIsSubPage}
                                         />
                                     </div>
                                 ))}
@@ -197,6 +201,7 @@ export function PageCardView({
                                             onEdit={() => onEdit(subpage)}
                                             onAddComponents={onAddComponents}
                                             onDuplicate={onDuplicate}
+                                            setIsSubPage={setIsSubPage}
                                         />
                                     </div>
                                 ))}

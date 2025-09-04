@@ -7,6 +7,8 @@ import { ThemeProvider } from './components/theme-provider';
 import { ActiveThemeProvider } from './components/ActiveThemeProvider';
 import { ThemeService } from './services/ThemeService';
 
+import '@igrp/framework-process-studio-bpmn-editor/dist/src/styles.css';
+
 import '@igrp/igrp-framework-react-design-system/dist/styles.css';
 
 // Configure Redux store

@@ -178,7 +178,7 @@ const useNavdata = (filesThree: FileTree[]) => {
 
             if (type === OPTION_TYPE.CONTROLLER && actions) {
                 return actions.map((action: any) => ({
-                    id,
+                    id: `${id}-${action.actionName}`,
                     label: action.actionName,
                     path,
                     type: OPTION_TYPE.ACTION,
@@ -250,13 +250,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                                             );
 
                                         const fileMenuItem: MenuItem = {
-                                            id:
-                                                file.content?.type ===
-                                                OPTION_TYPE.CONTROLLER
-                                                    ? file.content?.id?.endsWith('-CONTROLLER')
-                                                        ? file.content?.id
-                                                        : `${file.content?.id}-CONTROLLER`
-                                                    : file.content?.id,
+                                            id: file.content?.id,
                                             label:
                                                 file.content?.name || file.name,
                                             path: file.path,
