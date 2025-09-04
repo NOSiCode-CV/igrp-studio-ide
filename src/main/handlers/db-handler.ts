@@ -2,25 +2,26 @@ import { ipcMain } from "electron";
 import { Connection, DatabaseResponse } from "../types";
 import { closeKnexConnection, createKnexConnection, getTables, getTableStructure } from "../helpers/Knex";
 import { ConnectionRepository } from "../services/database-service";
+import { EVENTS } from "../constants/events";
 
 const repoConnection = new ConnectionRepository()
 
 let globalKnex
 
-ipcMain.handle('igrp-studio:repo:connection.findAll', async (_event): Promise<Array<Connection>> => {
+ipcMain.handle(EVENTS.CONNECTION.GET_CONNECTIONS, async (_event): Promise<Array<Connection>> => {
     return await repoConnection.findAll()
 })
 
-ipcMain.handle('igrp-studio:repo:connection.save', async (_event, connection: Connection) => {
+ipcMain.handle(EVENTS.CONNECTION.SAVE_CONNECTION, async (_event, connection: Connection) => {
     await repoConnection.save(connection)
 })
 
-ipcMain.handle('igrp-studio:repo:connection.delete', async (_event, connectionName: string) => {
+ipcMain.handle(EVENTS.CONNECTION.DELETE_CONNECTION, async (_event, connectionName: string) => {
     await repoConnection.delete(connectionName)
 })
 
 // IPC Handlers Database
-ipcMain.handle('connect-database', async (_event, config): Promise<DatabaseResponse> => {
+ipcMain.handle(EVENTS.CONNECTION.CONNECT_DATABASE, async (_event, config): Promise<DatabaseResponse> => {
     try {
         globalKnex = await createKnexConnection(config);
         await getTables(globalKnex);
@@ -31,9 +32,13 @@ ipcMain.handle('connect-database', async (_event, config): Promise<DatabaseRespo
     }
 });
 
-ipcMain.handle('get-tables', async (_event, connectionName): Promise<DatabaseResponse> => {
+ipcMain.handle(EVENTS.CONNECTION.GET_TABLES, async (_event, connectionName): Promise<DatabaseResponse> => {
     try {
-        const connectionConfig: Connection = await repoConnection.findOne(connectionName)
+        const connectionConfig = await repoConnection.findOne(connectionName)
+        if (!connectionConfig) {
+            return { success: false, message: 'Connection not found' };
+        }
+        console.log('connectionConfig', connectionConfig)
         const knex = globalKnex || await createKnexConnection(connectionConfig)
         const tables = await getTables(knex);
         await closeKnexConnection(knex)
@@ -44,9 +49,12 @@ ipcMain.handle('get-tables', async (_event, connectionName): Promise<DatabaseRes
     }
 });
 
-ipcMain.handle('get-table-structure', async (_event, connectionName, tableName) => {
+ipcMain.handle(EVENTS.CONNECTION.GET_TABLE_STRUCTURE, async (_event, connectionName, tableName) => {
     try {
-        const connectionConfig: Connection = await repoConnection.findOne(connectionName)
+        const connectionConfig = await repoConnection.findOne(connectionName)
+        if (!connectionConfig) {
+            return { success: false, message: 'Connection not found' };
+        }
         const knex = globalKnex || await createKnexConnection(connectionConfig)
         const structure = await getTableStructure(knex, tableName);
         await closeKnexConnection(knex)

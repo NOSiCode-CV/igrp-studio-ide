@@ -1,4 +1,4 @@
-import { IGRPAlertDialog, IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPStatusBanner, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPStatusBanner, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -117,7 +117,7 @@ export const COMPONENT: Record<string, string> = {
     ComponentContent: 'component',
     PageContent: "page",
     ProcessContent: "process",
-    ProcessStep: "processStep",
+    ProcessStepContent: "processStep",
     Columns: "columns",
     Column: "column",
     Grid: "grid",
@@ -393,7 +393,6 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
     [COMPONENT.StatsCard]: IGRPStatsCard,
     [COMPONENT.Separator]: IGRPSeparator,
-    [COMPONENT.AlertDialog]: IGRPAlertDialog,
     [COMPONENT.StatusBanner]: IGRPStatusBanner,
 
     [COMPONENT.Table]: IGRPStudioTable,

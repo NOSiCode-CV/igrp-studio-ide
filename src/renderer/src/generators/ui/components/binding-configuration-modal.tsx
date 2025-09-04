@@ -48,6 +48,7 @@ const defaultFieldType: LabeledElementField = {
     required: false,
     defaultValue: undefined,
     label: '',
+    isList: false,
 };
 
 const FIELD_TYPES: SchemaTypeItem[] = [
@@ -131,7 +132,12 @@ export const BindingConfigurationModal = ({
                   },
                   {
                       key: 'required',
-                      name: '',
+                      name: 'Required?',
+                      type: 'checkbox',
+                  },
+                  {
+                      key: 'isList',
+                      name: 'IsList?',
                       type: 'checkbox',
                   },
               ]
@@ -183,16 +189,22 @@ export const BindingConfigurationModal = ({
                         const { label, ...rest } = field; // Removes the 'label' property
                         return {
                             ...rest,
+                            type: rest.type || 'string',
                             defaultValue:
-                                rest.defaultValue === '' && rest.required
-                                    ? undefined
+                                (rest.defaultValue === '' ||
+                                    rest.defaultValue === undefined) &&
+                                rest.required
+                                    ? ''
                                     : rest.defaultValue,
                             ...(rest.fields && {
                                 fields: rest.fields.map((field) => ({
                                     ...field,
+                                    type: field.type || 'string',
                                     defaultValue:
-                                        field.defaultValue === '' && field.required
-                                            ? undefined
+                                        (field.defaultValue === '' ||
+                                            field.defaultValue === undefined) &&
+                                        field.required
+                                            ? ''
                                             : field.defaultValue,
                                 })),
                             }),

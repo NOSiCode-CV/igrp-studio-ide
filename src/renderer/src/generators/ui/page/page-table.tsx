@@ -22,6 +22,7 @@ interface PageTableProps {
     handleAddComponents: (page: PageDefinition) => void;
     openDialogNewPage: (page?: PageDefinition) => void;
     handleDuplicate: (page: PageDefinition) => void;
+    setIsSubPage: (isSubPage: boolean) => void;
 }
 
 export const PageTable = ({
@@ -33,6 +34,7 @@ export const PageTable = ({
     handleAddComponents,
     openDialogNewPage,
     handleDuplicate,
+    setIsSubPage,
 }: PageTableProps) => {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -154,6 +156,7 @@ export const PageTable = ({
                                             onAddComponents={() => handleAddComponents(page)}
                                             openDialogNewPage={openDialogNewPage}
                                             onDuplicate={handleDuplicate}
+                                            setIsSubPage={setIsSubPage}
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -192,6 +195,7 @@ export const PageTable = ({
                                                 onAddComponents={() => handleAddComponents(comp)}
                                                 openDialogNewPage={openDialogNewPage}
                                                 onDuplicate={handleDuplicate}
+                                                setIsSubPage={setIsSubPage}
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -231,6 +235,7 @@ export const PageTable = ({
                                                 onAddComponents={() => handleAddComponents(subPage)}
                                                 openDialogNewPage={openDialogNewPage}
                                                 onDuplicate={handleDuplicate}
+                                                setIsSubPage={setIsSubPage}
                                             />
                                         </TableCell>
                                     </TableRow>

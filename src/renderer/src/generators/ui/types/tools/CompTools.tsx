@@ -64,6 +64,7 @@ const CompTools = ({
         }
     }, [isOpen, comp]);
 
+
     return (
         <TooltipProvider>
             <div className="flex justify-end shadow-lg align-middle py-0.5 space-x-0.5 z-50">

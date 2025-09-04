@@ -4,7 +4,7 @@ import { dockerService } from "../services/docker-service";
 import { ERROR_CODES, EVENTS } from "../constants/events";
 
 // IPC Handlers
-ipcMain.handle('docker-up', async (event, projectPath: string): Promise<void> => {
+ipcMain.handle(EVENTS.DOCKER.UP, async (event, projectPath: string): Promise<void> => {
     try {
         await dockerService.up(projectPath);
     } catch (error: any) {
@@ -16,7 +16,7 @@ ipcMain.handle('docker-up', async (event, projectPath: string): Promise<void> =>
     }
 });
 
-ipcMain.handle('docker-down', async (event, projectPath: string, options: { dropVolume: boolean }): Promise<void> => {
+ipcMain.handle(EVENTS.DOCKER.DOWN, async (event, projectPath: string, options: { dropVolume: boolean }): Promise<void> => {
     try {
         const { dropVolume } = options || {}
         await dockerService.down(projectPath, dropVolume);
@@ -29,7 +29,7 @@ ipcMain.handle('docker-down', async (event, projectPath: string, options: { drop
     }
 });
 
-ipcMain.handle('docker-status', async (event, projectPath: string): Promise<ServiceInfo[]> => {
+ipcMain.handle(EVENTS.DOCKER.STATUS, async (event, projectPath: string): Promise<ServiceInfo[]> => {
     try {
         return await dockerService.status(projectPath);
     } catch (error: any) {
@@ -41,7 +41,7 @@ ipcMain.handle('docker-status', async (event, projectPath: string): Promise<Serv
     }
 });
 
-ipcMain.handle('docker-stop', async (event, projectPath: string, options: { services: string[]; timeout?: number }): Promise<void> => {
+ipcMain.handle(EVENTS.DOCKER.STOP, async (event, projectPath: string, options: { services: string[]; timeout?: number }): Promise<void> => {
     try {
         const { services } = options || {}
         await dockerService.stop(projectPath, services);
@@ -55,7 +55,7 @@ ipcMain.handle('docker-stop', async (event, projectPath: string, options: { serv
     }
 });
 
-ipcMain.handle('docker-restart', async (event, projectPath: string, options: { services: string[]; timeout?: number }): Promise<void> => {
+ipcMain.handle(EVENTS.DOCKER.RESTART, async (event, projectPath: string, options: { services: string[]; timeout?: number }): Promise<void> => {
     try {
         const { services, timeout } = options || {}
         await dockerService.restart(projectPath, services, timeout);
@@ -69,7 +69,7 @@ ipcMain.handle('docker-restart', async (event, projectPath: string, options: { s
     }
 });
 
-ipcMain.handle('docker-check', async () => {
+ipcMain.handle(EVENTS.DOCKER.CHECK, async () => {
     try {
         const check = await dockerService.checkDockerDaemon();
         return check.isRunning;
@@ -78,7 +78,7 @@ ipcMain.handle('docker-check', async () => {
     }
 });
 
-ipcMain.handle('docker-daemon-status', async () => {
+ipcMain.handle(EVENTS.DOCKER.DAEMON_STATUS, async () => {
     try {
         return await dockerService.checkDockerDaemon();
     } catch (err) {

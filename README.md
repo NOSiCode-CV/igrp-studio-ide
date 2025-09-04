@@ -8,6 +8,11 @@ An Electron application with React and TypeScript
 
 ## Project Setup
 
+### Requirements
+```bash
+$ node - ^20.19.0 || >=22.12.0
+```
+
 ### Install
 
 ```bash

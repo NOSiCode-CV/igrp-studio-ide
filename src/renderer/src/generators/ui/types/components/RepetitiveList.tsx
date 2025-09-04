@@ -4,8 +4,8 @@ import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import TableTool from '../tools/tableTool';
 import Draggable from '@renderer/lib/dnd/Draggable';
-import BoxField from '../tools/BoxFields';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import BoxWrapper from '../tools/BoxWrapper';
 
 const IGRPStudioRepetitive: React.FC<CardComponentProps> = ({
     comp,
@@ -44,8 +44,7 @@ const IGRPStudioRepetitive: React.FC<CardComponentProps> = ({
                                 layout="horizontal"
                                 dropTargetId={componentId}
                             >
-                                <BoxField
-                                    index={index}
+                                <BoxWrapper
                                     parentComp={comp}
                                     comp={child}
                                     path={path}
@@ -55,7 +54,7 @@ const IGRPStudioRepetitive: React.FC<CardComponentProps> = ({
                                         comp={child}
                                         onDragEnd={onDragEnd}
                                     />
-                                </BoxField>
+                                </BoxWrapper>
                             </Draggable>
                         );
                     })}

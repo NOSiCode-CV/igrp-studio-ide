@@ -23,7 +23,7 @@ const SectionTool = ({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
-                        className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full z-50"
+                        className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/section:opacity-100 transition-opacity duration-300 rounded-full z-50"
                         onClick={() => onClickAddControl('top')}
                     >
                         <Plus className="h-7 w-7" />
@@ -38,7 +38,7 @@ const SectionTool = ({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
-                        className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 rounded-full z-50"
+                        className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/section:opacity-100 transition-opacity duration-300 rounded-full z-50"
                         onClick={() => onClickAddControl('bottom')}
                     >
                         <Plus className="h-7 w-7" />

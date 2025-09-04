@@ -1,7 +1,13 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
-import { Badge } from '@renderer/components/ui/badge';
 import { Button } from '@renderer/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@renderer/components/ui/dropdown-menu';
 import { Switch } from '@renderer/components/ui/switch';
 import { Label } from '@renderer/components/ui/label';
 import { 
@@ -9,12 +15,10 @@ import {
     TestTube, 
     Trash2, 
     Edit, 
-    ExternalLink, 
-    Wifi, 
-    WifiOff, 
-    AlertCircle,
+    ExternalLink,
     Clock,
-    Calendar
+    Calendar,
+    MoreHorizontal
 } from 'lucide-react';
 import { BPMNConfig } from 'src/main/types';
 import { toast } from 'sonner';
@@ -38,44 +42,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     const [isTesting, setIsTesting] = React.useState(false);
     const [isToggling, setIsToggling] = React.useState(false);
 
-    const getStatusIcon = () => {
-        switch (config.status) {
-            case 'connected':
-                return <Wifi className="h-4 w-4 text-green-500" />;
-            case 'disconnected':
-                return <WifiOff className="h-4 w-4 text-gray-500" />;
-            case 'error':
-                return <AlertCircle className="h-4 w-4 text-red-500" />;
-            default:
-                return <WifiOff className="h-4 w-4 text-gray-500" />;
-        }
-    };
-
-    const getStatusBadgeVariant = () => {
-        switch (config.status) {
-            case 'connected':
-                return 'default';
-            case 'disconnected':
-                return 'secondary';
-            case 'error':
-                return 'destructive';
-            default:
-                return 'secondary';
-        }
-    };
-
-    const getStatusText = () => {
-        switch (config.status) {
-            case 'connected':
-                return 'Connected';
-            case 'disconnected':
-                return 'Disconnected';
-            case 'error':
-                return 'Error';
-            default:
-                return 'Unknown';
-        }
-    };
+    
 
     const handleTestConnection = async () => {
         setIsTesting(true);
@@ -121,12 +88,6 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                         <CardTitle className="text-lg">{config.name}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                            {getStatusIcon()}
-                            <Badge variant={getStatusBadgeVariant()}>
-                                {getStatusText()}
-                            </Badge>
-                        </div>
                         <div className="flex items-center space-x-2">
                             <Switch
                                 id={`active-${config.id}`}
@@ -138,6 +99,31 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                                 Active
                             </Label>
                         </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-40">
+                                <DropdownMenuItem onClick={() => onEdit(config)}>
+                                    <Edit className="h-3 w-3 mr-2" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleTestConnection} disabled={isTesting}>
+                                    <TestTube className="h-3 w-3 mr-2" /> {isTesting ? 'Testing...' : 'Test'}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => window.open(config.apiUrl, '_blank')}>
+                                    <ExternalLink className="h-3 w-3 mr-2" /> Open
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => onDelete(config.id)}
+                                    className="text-destructive focus:text-destructive"
+                                >
+                                    <Trash2 className="h-3 w-3 mr-2" /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
                 {config.description && (
@@ -187,49 +173,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                 </div>
             </CardContent>
 
-            <CardFooter className="flex justify-between pt-3">
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(config)}
-                        className="flex items-center gap-1"
-                    >
-                        <Edit className="h-3 w-3" />
-                        Edit
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleTestConnection}
-                        disabled={isTesting}
-                        className="flex items-center gap-1"
-                    >
-                        <TestTube className="h-3 w-3" />
-                        {isTesting ? 'Testing...' : 'Test'}
-                    </Button>
-                </div>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(config.apiUrl, '_blank')}
-                        className="flex items-center gap-1"
-                    >
-                        <ExternalLink className="h-3 w-3" />
-                        Open
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onDelete(config.id)}
-                        className="flex items-center gap-1 text-destructive hover:text-destructive"
-                    >
-                        <Trash2 className="h-3 w-3" />
-                        Delete
-                    </Button>
-                </div>
-            </CardFooter>
+            <CardFooter className="pt-0" />
         </Card>
     );
 }; 

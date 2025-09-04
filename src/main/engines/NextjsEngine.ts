@@ -1,7 +1,7 @@
 // engines/NextjsEngine.ts
-import { deleteElement, initCodeSnippets, initComponents, initServices, loadAppExports, loadCodeSnippetsRegistry, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage, registerComponents } from '@igrp/igrp-studio-nextjs-engine';
+import { deleteElement, initCodeSnippets, initComponents, initServices, loadAppExports, loadCodeSnippetsRegistry, loadRegistry, loadServiceRegistry, newApp, newComponent, newPage, newProcess, newProcessStep, registerComponents } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
-import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { AppConfig, AppExportsConfig, CodeSnippetsRegistrationConfig, ComponentConfig, ComponentRegistrationConfig, DeleteConfig, DockerServiceRegistrationConfig, PageConfig, ProcessConfig, ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { NextConfigData, ProjectData } from '../types';
 import { ensureDirectoryExists } from '../helpers';
 import { app } from 'electron';
@@ -92,4 +92,13 @@ export class NextjsEngine implements BaseEngine {
     await newApp(appConfig, basePath);
 
   }
+
+  async createProcess(process: ProcessConfig, basePath: string): Promise<void> {
+    await newProcess(process, basePath);
+  }
+
+  async createProcessStep(step: ProcessStepConfig, basePath: string): Promise<void> {
+    await newProcessStep(step, basePath);
+  }
+
 }

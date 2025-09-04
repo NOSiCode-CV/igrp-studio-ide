@@ -1,9 +1,10 @@
 import { StructuredComponent } from "@renderer/lib/dnd/types";
 import { generateId } from "@renderer/utils";
 import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
+import { nanoid } from "@reduxjs/toolkit";
 
 // Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
-export const getDefaultProperties = (schema: any): any => {
+export const getDefaultProperties = (schema: any,tag?:string): any => {
     const properties: any = {};
 
     for (const key in schema) {
@@ -13,9 +14,11 @@ export const getDefaultProperties = (schema: any): any => {
         if (prop.type === 'array' && !prop.items?.enum) {
             properties[key] = [];
         } else if (prop.type === 'object' && prop.properties) {
-            properties[key] = getDefaultProperties(prop.properties); // Recursive call
-        } else if (prop.required || prop.default)
-            properties[key] = prop.default
+            properties[key] = getDefaultProperties(prop.properties, tag); // Recursive call
+        } else if (prop.required || prop.default){
+            properties[key] = prop.default === '{{id}}' ? `${tag}-${nanoid(4)}` : prop.default
+        }
+           
     }
 
     return properties;

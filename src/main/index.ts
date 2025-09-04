@@ -13,6 +13,7 @@ import icon from '../../resources/icon.png?asset';
 import { closeApp, installExtensions } from './helpers/utils';
 import fs from 'fs';
 import { FileTree, IOpenProject } from './types';
+import { initializeLogger, sendErrorReport } from './helpers/logger';
 
 import {
     checkAndReadBaseApi,
@@ -62,6 +63,11 @@ let currentAuthProvider: 'github' | 'gitlab' | null = null;
 
 dotenv.config();
 
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  sendErrorReport(error);
+});
+
 function createWindow(): void {
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -107,6 +113,10 @@ function createWindow(): void {
     closeApp(mainWindow);
 
     installExtensions(mainWindow);
+
+    initializeLogger({
+        endpoint: 'localhost:4317',
+    });
 }
 
 // This method will be called when Electron has finished
@@ -189,6 +199,10 @@ app.whenReady().then(async () => {
 
     // IPC test
     ipcMain.on('ping', () => console.log('pong'));
+
+    ipcMain.on('report-error', (_, error: Error) => {
+      sendErrorReport(error);
+    });
 
     await GitStore.initialize();
     const initializeGitHubService = async () => {

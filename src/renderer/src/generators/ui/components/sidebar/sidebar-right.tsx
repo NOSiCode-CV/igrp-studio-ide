@@ -43,6 +43,7 @@ import {
 import Loader from '@renderer/components/loader';
 import { getRequiredDataSchema } from '../../dnd/helpers';
 import { useComponents } from '../../hooks/useComponents';
+import CopyContent from './copy-content';
 
 interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent;
@@ -179,16 +180,6 @@ const SidebarRight = ({
             // Check if each key in data exists in response
             if (data && requiredDataSchema) {
                 const cleanedData = { ...data };
-                //let hasChanges = false;
-
-                // Iterate through each key in the current data
-                /*   Object.keys(data).forEach((key) => {
-                    // If the key doesn't exist in the response, remove it
-                    if (!(key in requiredDataSchema)) {
-                        delete cleanedData[key];
-                        hasChanges = true;
-                    }
-                }); */
 
                 // Iterate through each key in the response
                 Object.keys(requiredDataSchema).forEach((key) => {
@@ -599,11 +590,14 @@ const SidebarRight = ({
                             />
                         </div>
                         <Tabs className="flex-1 px-2" defaultValue="props">
-                            <TabsList className="grid w-full grid-cols-3">
+                            <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="props">Props</TabsTrigger>
                                 <TabsTrigger value="styles">Style</TabsTrigger>
                                 <TabsTrigger value="interactions">
                                     Interactions
+                                </TabsTrigger>
+                                <TabsTrigger value="copy-content">
+                                    Copy
                                 </TabsTrigger>
                             </TabsList>
 
@@ -732,6 +726,9 @@ const SidebarRight = ({
                                     }
                                     columnsOptions={columnsOptions}
                                 />
+                            </TabsContent>
+                            <TabsContent value="copy-content" className="space-y-6">
+                                <CopyContent currentComp={currentComp} />
                             </TabsContent>
                         </Tabs>
                     </>

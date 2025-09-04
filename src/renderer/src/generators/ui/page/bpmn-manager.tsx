@@ -8,24 +8,27 @@ import {
 } from '@renderer/components/ui/tabs';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-    BPMNConfig,
-    BPMNConfigs,
-    BPMNPageDefinition,
-} from 'src/main/types';
+import { BPMNConfig, BPMNConfigs, FileTree } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
 import { BPMNConfigModal } from './bpmn-connection-modal';
 import { EmptyList } from '@renderer/components/empty-list';
 import { SubHeadline } from '@renderer/components/shared-ui';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { BPMNProjectSelector } from './bpmn-project-selector';
-import { BPMNConfigCard } from '@renderer/components/bpmn-config-card';
+import { BPMNConfigCard } from '@renderer/generators/ui/page/bpmn-config-card';
+import { PageDefinition } from './page-manager';
 
 interface BPMNManagerProps {
-    onPageClick?: (pageDefinition: BPMNPageDefinition) => void;
+    onPageClick?: (pageDefinition: PageDefinition) => void;
+    bpmnProcesses: FileTree[];
+    basePath: string;
 }
 
-export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
+export const BPMNManager = ({
+    onPageClick,
+    bpmnProcesses,
+    basePath,
+}: BPMNManagerProps) => {
     const [configs, setConfigs] = useState<BPMNConfigs>({
         configs: [],
         activeConfigId: undefined,
@@ -44,7 +47,6 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
     };
 
     const handleEditConfig = (currentConfig: BPMNConfig) => {
-        console.log('Editing config:', currentConfig);
         setEditingConfig(currentConfig);
         setShowConfigModal(true);
     };
@@ -65,14 +67,13 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
 
     const loadConfigs = async () => {
         try {
-           
             const configsData =
                 await window.igrpStudioSettings.getBPMNConfigs();
-       
+
             setConfigs(configsData);
 
             // Set active config
-           /*  if (configsData.activeConfigId) {
+            /*  if (configsData.activeConfigId) {
                 const active = configsData.configs.find(
                     (c: BPMNConfig) => c.id === configsData.activeConfigId
                 );
@@ -97,10 +98,12 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
                     title="BPMN Process Manager"
                     description="Connect to BPMN REST API and manage process definitions"
                 />
-                <Button onClick={() => {
-                    setEditingConfig(undefined);
-                    setShowConfigModal(true);
-                }}>
+                <Button
+                    onClick={() => {
+                        setEditingConfig(undefined);
+                        setShowConfigModal(true);
+                    }}
+                >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Configuration
                 </Button>
@@ -115,7 +118,11 @@ export const BPMNManager = ({ onPageClick }: BPMNManagerProps) => {
                 </TabsList>
 
                 <TabsContent value="projects" className="space-y-4">
-                    <BPMNProjectSelector onPageClick={onPageClick} />
+                    <BPMNProjectSelector
+                        onPageClick={onPageClick}
+                        bpmnProcesses={bpmnProcesses}
+                        basePath={basePath}
+                    />
                 </TabsContent>
 
                 <TabsContent value="configuration" className="space-y-4">

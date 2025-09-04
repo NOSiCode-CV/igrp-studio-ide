@@ -255,7 +255,7 @@ export function CreateComponentModal({
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
+                                    <pre className="p-4 rounded-lg text-sm overflow-x-auto">
                                         <code>
                                             {`export default function  myComponent(`}
                                             {(formik.values.args || [])

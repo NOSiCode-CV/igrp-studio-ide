@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { COMPONENT, GROUP_COMPONET, ICON_MAP } from '../ComponentTypes';
 
-const HIDDEN_COMPONENTS = [COMPONENT.Column, COMPONENT.PageContent, COMPONENT.ComponentContent, COMPONENT.ProcessContent]
+const HIDDEN_COMPONENTS = [COMPONENT.Column, COMPONENT.PageContent, COMPONENT.ComponentContent, COMPONENT.ProcessContent, COMPONENT.ProcessStepContent]
 
 const useConfigdata = (components: ComponentRegisterConfig[]) => {
 

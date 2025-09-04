@@ -1,57 +1,22 @@
 {
   "files": [],
-  "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.web.json" }
-  ],
-  "compilerOptions": {
-    "target": "ESNext", 
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }],
+"compilerOptions": {
+    "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": {
-      "@main/*": ["src/main/*"],
-      "@renderer/*": ["src/renderer/src/*"],
-      "@assets/*": ["src/renderer/src/assets/*"],
-      "@components/*": ["src/renderer/src/components/*"],
-      "@hooks/*": ["src/renderer/src/hooks/*"],
-      "@services/*": ["src/renderer/src/services/*"],
-      "@utils/*": ["src/renderer/src/utils/*"],
-      "@types/*": ["src/main/types/*"]
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/main/types",
-      "./src/renderer/src/types"
-    ],
-    "types": ["node", "jest","electron"]
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.d.ts",
-    "src/main/types.d.ts",
-    "src/main/interfaces.d.ts",
-    "env.d.ts",
-    "vite-env.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "release",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+    "types": ["node"]
+  }
 }

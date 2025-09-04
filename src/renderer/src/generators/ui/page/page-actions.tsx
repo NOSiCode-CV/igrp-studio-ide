@@ -26,6 +26,7 @@ export const PageActionMenu = ({
     onAddComponents,
     openDialogNewPage,
     onDuplicate,
+    setIsSubPage,
 }: PageCardProps) => {
     const { t } = useTranslation();
     const { isPage } = page;
@@ -52,7 +53,10 @@ export const PageActionMenu = ({
                 </DropdownMenuItem>
                 {isPage && (
                     <DropdownMenuItem
-                        onSelect={() => openDialogNewPage?.(page)}
+                        onSelect={() => {
+                            openDialogNewPage?.(page);
+                            setIsSubPage(true);
+                        }}
                     >
                         <Component />
                         {t('Create SubPage')}

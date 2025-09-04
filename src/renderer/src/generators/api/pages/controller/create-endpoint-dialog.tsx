@@ -38,6 +38,7 @@ export function CreateEndpointDialog({
     onConfirm,
     onClose,
 }: CreateEndpointDialogProps) {
+    console.log('controller', controller)
     const { t } = useTranslation();
 
     const dispatch: any = useDispatch();

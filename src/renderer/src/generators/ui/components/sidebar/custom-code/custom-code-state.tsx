@@ -12,6 +12,7 @@ import {
 } from '@renderer/components/ui/dialog';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import {
+    CheckboxInput,
     SelectInput,
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
@@ -56,6 +57,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
             type: 'string',
             defaultValue: '',
             imports: [],
+            isArray: false,
         },
         validationSchema: stateValidationSchema,
         onSubmit: (values, actions) => {
@@ -148,6 +150,15 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                         isTouched={formik.touched.defaultValue}
                         error={formik.errors.defaultValue}
                         isRequired
+                    />
+
+                    <CheckboxInput
+                        label={t('isArray')}
+                        id="isArray"
+                        value={formik.values.isArray}
+                        onChange={(value) => formik.setFieldValue('isArray', value)}
+                        isTouched={formik.touched.isArray}
+                        error={formik.errors.isArray}
                     />
 
                     <ImportComponent

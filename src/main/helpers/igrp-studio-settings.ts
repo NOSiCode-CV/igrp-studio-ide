@@ -1,4 +1,4 @@
-import { BPMNConfig, BPMNConfigs } from '../types';
+import { BPMNConfig, BPMNConfigs, Connection } from '../types';
 
 let store: any = null;
 
@@ -12,6 +12,7 @@ export const IGRPStudioSettings = {
         activeTheme: 'default',
         bpmnConfigs: { configs: [], activeConfigId: undefined },
         language: 'en',
+        connections: [],
       },
     });
   },
@@ -124,5 +125,44 @@ export const IGRPStudioSettings = {
     storeInstance.set('bpmnConfigs', { configs: [], activeConfigId: undefined });
   },
 
+  // Database Connection Methods
+  async getAllConnections(): Promise<Array<Connection>> {
+    const storeInstance = await this.getStore();
+    return storeInstance.get('connections', []);
+  },
+
+  async getConnection(name: string): Promise<Connection | undefined> {
+    const storeInstance = await this.getStore();
+    const connections = storeInstance.get('connections', []);
+    return connections.find((conn: Connection) => conn.name === name);
+  },
+
+  async saveConnection(connection: Connection): Promise<Connection> {
+    const storeInstance = await this.getStore();
+    const connections = storeInstance.get('connections', []);
+    
+    const index = connections.findIndex((conn: Connection) => conn.name === connection.name);
+    if (index === -1) {
+      connections.push(connection);
+    } else {
+      connections[index] = { ...connections[index], ...connection };
+    }
+    
+    storeInstance.set('connections', connections);
+    return connection;
+  },
+
+  async deleteConnection(connectionName: string): Promise<void> {
+    const storeInstance = await this.getStore();
+    const connections = storeInstance.get('connections', []);
+    
+    const index = connections.findIndex((conn: Connection) => conn.name === connectionName);
+    if (index === -1) {
+      throw new Error("Connection not found.");
+    }
+    
+    connections.splice(index, 1);
+    storeInstance.set('connections', connections);
+  }
 
 };
