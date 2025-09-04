@@ -437,7 +437,7 @@ export interface BPMNProjectProcessDefinition {
   statusDesc: string;
   deploymentId?: string;
   deploymentDate?: string;
-  projectArtifacts?: BPMNProjectArtifact[];
+  processArtifacts?: BPMNProjectArtifact[];
 }
 
 export interface BPMNProject {

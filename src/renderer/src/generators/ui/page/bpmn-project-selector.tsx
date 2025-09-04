@@ -38,7 +38,14 @@ import useToast from '@renderer/hooks/useToast';
 import { useDispatch } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { getId } from '@renderer/utils';
-import { Component, EllipsisVertical, Settings, Wrench } from 'lucide-react';
+import {
+    Calendar,
+    Component,
+    EllipsisVertical,
+    Settings,
+    Trash2,
+    Wrench,
+} from 'lucide-react';
 import { AddComponentsNameModal } from './add-components-name-modal';
 import {
     IGRPLoadingSpinner,
@@ -143,19 +150,7 @@ const ProcessCard = ({
                             {process.title}
                         </CardTitle>
                         <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
-                            <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                            </svg>
+                            <Calendar  className='w-4 h-4'/>
                             {process.deploymentDate && (
                                 <span>
                                     Deployed on{' '}
@@ -166,21 +161,9 @@ const ProcessCard = ({
                             )}
                         </div>
                         <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
-                            <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                            </svg>
+                            <Trash2 className='w-4 h-4'/>
                             <span>
-                                {process.projectArtifacts?.length || 0}{' '}
+                                {process.processArtifacts?.length || 0}{' '}
                                 artifacts
                             </span>
                         </div>
@@ -345,7 +328,7 @@ export const BPMNProjectSelector = ({
                     name: processDefinition.processKey,
                     processVersion: version,
                     description: processDefinition.title,
-                    steps: processDefinition.projectArtifacts?.map(
+                    steps: processDefinition.processArtifacts?.map(
                         (artifact) => ({
                             id: artifact.taskKey,
                             name: artifact.name,
@@ -394,16 +377,6 @@ export const BPMNProjectSelector = ({
                           tag: `processStep_${nanoid()}`,
                           data: {},
                           interactions: bpmnProcessStepInteractions,
-
-                          /*  interactions: {
-                              onLoad: {
-                                  type: 'function',
-                                  function: {
-                                      type: 'function',
-                                  },
-                                  action: {},
-                              },
-                          }, */
                       },
             };
 
@@ -654,15 +627,13 @@ export const BPMNProjectSelector = ({
                                                                 </div>
                                                             </div>
                                                         </CardHeader>
-                                                        <CardContent className='space-y-2'>
+                                                        <CardContent className="space-y-2">
                                                             {artifact.subProcessTask && (
                                                                 <Badge
                                                                     variant="secondary"
                                                                     className="text-xs"
                                                                 >
-                                                                    {
-                                                                        `Sub Process - ${artifact.subProcessName }`
-                                                                    }
+                                                                    {`Sub Process - ${artifact.subProcessName}`}
                                                                 </Badge>
                                                             )}
                                                             <Button
