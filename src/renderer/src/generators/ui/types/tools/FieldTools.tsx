@@ -14,6 +14,7 @@ import { AddComponentModal } from '../../components/add-components-modal';
 import { Badge } from '@renderer/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 import { generateId } from '@renderer/utils';
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 
 interface ToolsProps {
     onEdit: () => void;
@@ -27,8 +28,9 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
     const { id, componentName } = comp;
     const { componentName: parentComponentName } = parentComp;
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
-    const { handleRemoveChildFromComponent, handleAddChildToComponent } = useDroppedComponents();
-
+    const { handleRemoveChildFromComponent, handleAddChildToComponent } =
+        useDroppedComponents();
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const { getAcceptedChildren } = useStudio();
 
     useEffect(() => {
@@ -45,20 +47,24 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
 
     const onClickCloneField = () => {
         // Create a deep copy of the component
-        const cloneComponent = (component: StructuredComponent): StructuredComponent => {
+        const cloneComponent = (
+            component: StructuredComponent
+        ): StructuredComponent => {
             const newId = generateId(component.componentName);
             const newTag = `${component.tag}_copy`;
-            
+
             return {
                 ...component,
                 id: newId,
                 tag: newTag,
-                children: component.children?.map(child => cloneComponent(child)) || [],
+                children:
+                    component.children?.map((child) => cloneComponent(child)) ||
+                    [],
             };
         };
 
         const clonedComponent = cloneComponent(comp);
-        
+
         // Add the cloned component to the same parent at the next index
         handleAddChildToComponent(
             { droppableId: parentComp.id, index: index + 1 },
@@ -130,7 +136,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Delete"
-                            onClick={onClickDeleteField}
+                            onClick={() => setDeleteModal(true)}
                         >
                             <Trash className="h-3.5" />
                         </button>
@@ -170,6 +176,13 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                     />
                 )}
             </div>
+            <AlertDialogDelete
+                isOpen={deleteModal}
+                onClose={() => setDeleteModal(false)}
+                onConfirm={onClickDeleteField}
+                hasTrigger={false}
+                recordId={componentName}
+            />
         </TooltipProvider>
     );
 };

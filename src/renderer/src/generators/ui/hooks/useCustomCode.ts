@@ -14,6 +14,7 @@ export interface Option {
 const defaultTypes = [
     { value: 'string', label: 'String' },
     { value: 'number', label: 'Number' },
+    { value: 'Date', label: 'Date' },
     { value: 'boolean', label: 'Boolean' },
     { value: 'object', label: 'Object' },
     { value: 'array', label: 'Array' },

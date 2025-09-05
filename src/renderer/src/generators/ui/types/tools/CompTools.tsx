@@ -15,6 +15,7 @@ import { AddComponentPopover } from '../../components/add-components-popover';
 import { useTranslation } from 'react-i18next';
 import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 
 interface ToolsProps {
     handleClickBtnEdition: () => void;
@@ -44,6 +45,7 @@ const CompTools = ({
     const isGrids = [COMPONENT.Columns].includes(componentName);
 
     const [components, setComponents] = useState<ComponentRegisterConfig[]>([]);
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const [currentComponent, setCurrentComponent] =
         useState<StructuredComponent | null>(null);
@@ -63,7 +65,6 @@ const CompTools = ({
             setCurrentComponent(null);
         }
     }, [isOpen, comp]);
-
 
     return (
         <TooltipProvider>
@@ -85,7 +86,7 @@ const CompTools = ({
 
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button 
+                        <button
                             className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded"
                             onClick={handleClickCloneComp}
                         >
@@ -120,7 +121,7 @@ const CompTools = ({
                     <TooltipTrigger asChild>
                         <button
                             className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded"
-                            onClick={handleClickDeleteComp}
+                            onClick={() => setDeleteModal(true)}
                         >
                             <Trash className="h-4" />
                         </button>
@@ -168,6 +169,14 @@ const CompTools = ({
                     </>
                 )}
             </div>
+
+            <AlertDialogDelete
+                isOpen={deleteModal}
+                onClose={() => setDeleteModal(false)}
+                onConfirm={handleClickDeleteComp}
+                hasTrigger={false}
+                recordId={componentName}
+            />
         </TooltipProvider>
     );
 };
