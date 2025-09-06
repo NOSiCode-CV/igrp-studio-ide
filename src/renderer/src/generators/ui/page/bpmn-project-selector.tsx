@@ -42,6 +42,7 @@ import {
     Calendar,
     Component,
     EllipsisVertical,
+    RefreshCw,
     Settings,
     Trash2,
     Wrench,
@@ -209,7 +210,7 @@ export const BPMNProjectSelector = ({
     const [activeTab, setActiveTab] = useState<string>('artifacts');
 
     const { projects, loading } = useBPMNProjects();
-    const { processDefinitions, loading: loadingProcesses } =
+    const { processDefinitions, loading: loadingProcesses, loadProcessDefinitions } =
         useProcessDefinitions(selectedProject);
 
     const { showErrorToast, showSuccessToast } = useToast();
@@ -482,7 +483,22 @@ export const BPMNProjectSelector = ({
                                 or load all project artifacts below.
                             </p>
                         </div>
-                        {loadingProcesses && <IGRPLoadingSpinner />}
+                        <div className="flex items-center space-x-2">
+                            {loadingProcesses && <IGRPLoadingSpinner />}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2"
+                                onClick={() =>
+                                    selectedProject &&
+                                    loadProcessDefinitions(selectedProject.projectId)
+                                }
+                                title="Refresh processes"
+                            >
+                                <RefreshCw className='w-4 h-4'/>
+                                Refresh
+                            </Button>
+                        </div>
                     </div>
 
                     {loadingProcesses ? (
