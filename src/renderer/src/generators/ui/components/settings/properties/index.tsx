@@ -155,9 +155,19 @@ const RenderPropsConfig = ({
             );
         } else if (key === 'iconName' || xUiWidget === 'icon') {
             return (
-                <>
+                <div className=" group space-y-2">
                     <Label htmlFor={key} className="flex justify-between ">
                         <span>{xMetaLabel}</span>
+                        <FieldActions
+                            field={key}
+                            statesOptions={statesOptions}
+                            argumentsOptions={argumentsOptions}
+                            value={value}
+                            tag={tag}
+                            type={type}
+                            onSelectState={onSelectState}
+                            dataProperties={dataProperties}
+                        />
                     </Label>
                     <IconBrowser
                         selectedIcon={value}
@@ -165,7 +175,7 @@ const RenderPropsConfig = ({
                             onInputChange(fieldPath, icon);
                         }}
                     />
-                </>
+                </div>
             );
         } else if (key === 'options') {
             return (

@@ -44,7 +44,7 @@ import './helpers/fetch-request';
 import { buildTaskbar } from './helpers/taskbar';
 
 import NextJsManager from './helpers/nextjsManager';
-import { initComponents } from '@igrp/igrp-studio-nextjs-engine';
+import { initComponents, loadEngineConfiguration, setEngineConfiguration } from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
 import AppUpdater from './helpers/electron-updater';
 import { autoUpdater } from 'electron-updater';
@@ -55,6 +55,7 @@ import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 import { folderWatcher } from './helpers/watch-folder';
 
 import { mainBindings } from 'i18next-electron-fs-backend';
+import { ENV_TYPES } from './engines/EngineFactory';
 
 let mainWindow: BrowserWindow;
 
@@ -64,8 +65,8 @@ let currentAuthProvider: 'github' | 'gitlab' | null = null;
 dotenv.config();
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  sendErrorReport(error);
+    console.error('Uncaught Exception:', error);
+    sendErrorReport(error);
 });
 
 function createWindow(): void {
@@ -201,20 +202,20 @@ app.whenReady().then(async () => {
     ipcMain.on('ping', () => console.log('pong'));
 
     ipcMain.on('report-error', (_, error: Error) => {
-      sendErrorReport(error);
+        sendErrorReport(error);
     });
 
     await GitStore.initialize();
     const initializeGitHubService = async () => {
         try {
             await GitHubService.initializeServices();
-        } catch {}
+        } catch { }
     };
 
     const initializeGitLabService = async () => {
         try {
             await GitLabService.initializeServices();
-        } catch {}
+        } catch { }
     };
 
     const initializeAllServices = async () => {
@@ -264,6 +265,12 @@ app.whenReady().then(async () => {
     new AppUpdater(mainWindow);
 
     await IGRPStudioSettings.initialize();
+
+    setEngineConfiguration({
+        environment: "production",
+    });
+
+    loadEngineConfiguration()
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

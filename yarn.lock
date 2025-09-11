@@ -42,7 +42,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.28.4.tgz#96fdf1af1b8859c8474ab39c295312bfb7c24b04"
   integrity sha512-YsmSKC29MJwf0gF8Rjjrg5LQCmyh+j/nD8/eP7f+BeoQTKYqs9RoWbjGOdy0+1Ekr68RJZMUOPVQaQisnIo4Rw==
 
-"@babel/core@^7.23.9", "@babel/core@^7.27.4", "@babel/core@^7.27.7", "@babel/core@^7.28.3":
+"@babel/core@^7.23.9", "@babel/core@^7.27.4", "@babel/core@^7.27.7", "@babel/core@^7.28.0":
   version "7.28.4"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.28.4.tgz#12a550b8794452df4c8b084f95003bce1742d496"
   integrity sha512-2BCOP7TN8M+gVDj7/ht3hsaO/B/n5oDbiAyyvnRlNOs+u1o+JWNYTQrmpuNp1/Wq2gcFrI01JAW+paEKDMx/CA==
@@ -601,9 +601,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -1154,10 +1154,10 @@
     tailwind-merge "^3.3.1"
     zod "^3.25.67"
 
-"@igrp/igrp-framework-react-design-system@0.1.0-beta.1-7":
-  version "0.1.0-beta.1-7"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.1-7.tgz#a4657b8bd1937bbdf1eb33e7dc4b654c9ec89aa0"
-  integrity sha512-T+YwSQuQ2ANfizqOJmkpNwh1VU9Sd4HYeRujDC3yBXXLNB8MhjCTKKf3g47LyNFDOghz9qEspEWAjWDaWGpsdQ==
+"@igrp/igrp-framework-react-design-system@0.1.0-beta.3":
+  version "0.1.0-beta.3"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.3.tgz#640b9e22a790f3cf38e0cc831aead5b35b2ca6f8"
+  integrity sha512-dM6YvqIWBBvjjHLHt8R/+I4MJFR6XmDM4F5jm46puzLGEGdvDMarN4sOsW3YZRpUjZtiQ49reSORXTe+VUTMiQ==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "^1.2.11"
@@ -1193,7 +1193,7 @@
     date-fns "4.1.0"
     embla-carousel-react "^8.6.0"
     input-otp "^1.4.2"
-    lucide-react "^0.535.0"
+    lucide-react "^0.542.0"
     next-themes "0.4.6"
     react-day-picker "^9.6.7"
     react-dropzone "14.3.8"
@@ -1259,10 +1259,10 @@
     vaul "^1.1.2"
     zod "^3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.494":
-  version "0.0.1-alpha.494"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.494.tgz#caf825a987e8ee1e45ee795e4c9371afc479313e"
-  integrity sha512-Q3buena7K0U99pqDP8nYGmLqPMt/efVyzskHgVhbqCf+JHKQAZ44R9U1+CvucVJuEMPIKU1rDiBYglt3EL261g==
+"@igrp/igrp-studio-nextjs-engine@0.0.1-alpha.499":
+  version "0.0.1-alpha.499"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.0.1-alpha.499.tgz#2925e406c23bf4b6129e5662e4ef786a907cd96e"
+  integrity sha512-kfEbTT7XPodng0snSM97AVFGWZdIADyDPO1/tjj4x/uK4/I2ogdoUn+IVDF87RhxawJLtdx7xWEWb3CTWzoD4g==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -2788,10 +2788,10 @@
     redux-thunk "^3.1.0"
     reselect "^5.1.0"
 
-"@rolldown/pluginutils@1.0.0-beta.34":
-  version "1.0.0-beta.34"
-  resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.34.tgz#4421645c676926faa4574940d72fa7ce0ec7d419"
-  integrity sha512-LyAREkZHP5pMom7c24meKmJCdhf2hEyvam2q0unr3or9ydwDL+DJ8chTF6Av/RFPb3rH8UFBdMzO5MxTZW97oA==
+"@rolldown/pluginutils@1.0.0-beta.27":
+  version "1.0.0-beta.27"
+  resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz#47d2bf4cef6d470b22f5831b420f8964e0bf755f"
+  integrity sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==
 
 "@rollup/rollup-android-arm-eabi@4.50.0":
   version "4.50.0"
@@ -3717,15 +3717,15 @@
   resolved "https://registry.yarnpkg.com/@unrs/resolver-binding-win32-x64-msvc/-/resolver-binding-win32-x64-msvc-1.11.1.tgz#538b1e103bf8d9864e7b85cc96fa8d6fb6c40777"
   integrity sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==
 
-"@vitejs/plugin-react@5.0.2":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react/-/plugin-react-5.0.2.tgz#3b5d73fc0e4370a0fafe27154d2c208e2bca8f71"
-  integrity sha512-tmyFgixPZCx2+e6VO9TNITWcCQl8+Nl/E8YbAyPVv85QCc7/A3JrdfG2A8gIzvVhWuzMOVrFW1aReaNxrI6tbw==
+"@vitejs/plugin-react@4.7.2":
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react/-/plugin-react-4.7.0.tgz#647af4e7bb75ad3add578e762ad984b90f4a24b9"
+  integrity sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==
   dependencies:
-    "@babel/core" "^7.28.3"
+    "@babel/core" "^7.28.0"
     "@babel/plugin-transform-react-jsx-self" "^7.27.1"
     "@babel/plugin-transform-react-jsx-source" "^7.27.1"
-    "@rolldown/pluginutils" "1.0.0-beta.34"
+    "@rolldown/pluginutils" "1.0.0-beta.27"
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.17.0"
 

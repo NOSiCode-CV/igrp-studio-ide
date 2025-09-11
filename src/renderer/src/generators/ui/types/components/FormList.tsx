@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
-import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { Button } from '@renderer/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -64,7 +63,6 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
                                     mode="MOVE"
                                     layout="horizontal"
                                     dropTargetId={componentId}
-                                    className={cn('border-none')}
                                 >
                                     <BoxWrapper
                                         parentComp={comp}
