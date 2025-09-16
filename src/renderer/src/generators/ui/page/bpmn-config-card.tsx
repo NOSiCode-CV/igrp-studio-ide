@@ -21,8 +21,6 @@ import {
     MoreHorizontal
 } from 'lucide-react';
 import { BPMNConfig } from 'src/main/types';
-import { toast } from 'sonner';
-import { bpmnService } from '@renderer/services/bpmn-service';
 
 interface BPMNConfigCardProps {
     config: BPMNConfig;
@@ -35,9 +33,11 @@ interface BPMNConfigCardProps {
 
 export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     config,
+    isActive,
     onEdit,
     onDelete,
     onToggleActive,
+    onTestConnection,
 }) => {
     const [isTesting, setIsTesting] = React.useState(false);
     const [isToggling, setIsToggling] = React.useState(false);
@@ -47,14 +47,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     const handleTestConnection = async () => {
         setIsTesting(true);
         try {
-            const result = await bpmnService.testConnection(config);
-            if (result.success) {
-                toast.success('Connection test successful!');
-            } else {
-                toast.error(`Connection test failed: ${result.message}`);
-            }
-        } catch (error) {
-            toast.error('Connection test failed');
+            await onTestConnection(config);
         } finally {
             setIsTesting(false);
         }
@@ -63,7 +56,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     const handleToggleActive = async () => {
         setIsToggling(true);
         try {
-            await onToggleActive(config.id, !config.isActive);
+            await onToggleActive(config.id, !isActive);
         } finally {
             setIsToggling(false);
         }
@@ -80,7 +73,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     };
 
     return (
-        <Card className={`transition-all duration-200 hover:shadow-md ${!config.isActive ? 'opacity-60' : ''}`}>
+        <Card className={`transition-all duration-200 hover:shadow-md ${!isActive ? 'opacity-60' : ''}`}>
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
@@ -91,7 +84,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                         <div className="flex items-center space-x-2">
                             <Switch
                                 id={`active-${config.id}`}
-                                checked={config.isActive}
+                                checked={isActive}
                                 onCheckedChange={handleToggleActive}
                                 disabled={isToggling}
                             />

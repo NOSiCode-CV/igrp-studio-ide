@@ -5,18 +5,24 @@ class BPMNService {
 
   private async makeRequest<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    configOverride?: BPMNConfig
   ): Promise<T> {
    
-    if (!this.config) {
-      this.config = await this.getConfig();
+    let activeConfig = configOverride;
+    
+    if (!activeConfig) {
+      if (!this.config) {
+        this.config = await this.getActiveConfig();
+      }
+      activeConfig = this.config || undefined;
     }
 
-    if (!this.config) {
+    if (!activeConfig) {
       throw new Error('BPMN API not configured. Please set up the API configuration first.');
     }
 
-    const url = `${this.config.apiUrl}${this.config.basePath}${endpoint}`;
+    const url = `${activeConfig.apiUrl}${activeConfig.basePath}${endpoint}`;
     console.log('url', url);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -28,8 +34,8 @@ class BPMNService {
     }
 
     // Only add Authorization header if token is provided
-    if (this.config.token) {
-      headers['Authorization'] = `Bearer ${this.config.token}`;
+    if (activeConfig.token) {
+      headers['Authorization'] = `Bearer ${activeConfig.token}`;
     }
 
     const result: HandlerResponse<T> = await window.api.fetchData(url, {
@@ -58,6 +64,25 @@ class BPMNService {
       this.config = await window.igrpStudioSettings.getBPMNConfig();
     }
     return this.config;
+  }
+
+  async getActiveConfig(): Promise<BPMNConfig | null> {
+    const configs = await window.igrpStudioSettings.getBPMNConfigs();
+    if (configs.activeConfigId) {
+      const activeConfig = configs.configs.find(c => c.id === configs.activeConfigId);
+      if (activeConfig) {
+        this.config = activeConfig;
+        return activeConfig;
+      }
+    }
+    // Clear cached config if no active config found
+    this.config = null;
+    return null;
+  }
+
+  // Method to clear cached config and force refresh
+  clearConfig(): void {
+    this.config = null;
   }
 
   async testConnection(config: Omit<BPMNConfig, 'id' | 'createdAt' | 'status'>): Promise<{ success: boolean; message: string }> {

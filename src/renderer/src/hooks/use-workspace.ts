@@ -188,6 +188,7 @@ export const useWorkspace = () => {
 
             if (error) {
                 showErrorToast(error);
+                console.log(error);
                 return
             }
 

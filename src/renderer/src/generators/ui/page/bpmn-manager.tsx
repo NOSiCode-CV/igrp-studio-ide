@@ -42,8 +42,12 @@ export const BPMNManager = ({
     const handleConfigSave = async () => {
         setShowConfigModal(false);
         setEditingConfig(undefined);
+        // Clear BPMN service cache to force refresh
+        bpmnService.clearConfig();
         // Reload configurations after save/update
         await loadConfigs();
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
     };
 
     const handleEditConfig = (currentConfig: BPMNConfig) => {
@@ -56,7 +60,12 @@ export const BPMNManager = ({
 
         try {
             await window.igrpStudioSettings.deleteBPMNConfig(deleteConfig.id);
-
+            // Clear BPMN service cache to force refresh
+            bpmnService.clearConfig();
+            // Reload configurations after delete
+            await loadConfigs();
+            // Dispatch custom event to notify other components
+            window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
             toast.success('API configuration deleted successfully');
         } catch (error) {
             toast.error('Failed to delete API configuration');
@@ -151,7 +160,16 @@ export const BPMNManager = ({
                                                 await window.igrpStudioSettings.setActiveBPMNConfig(
                                                     configId
                                                 );
+                                            } else {
+                                                // If deactivating, set no active config
+                                                await window.igrpStudioSettings.setActiveBPMNConfig('');
                                             }
+                                            // Clear BPMN service cache to force refresh
+                                            bpmnService.clearConfig();
+                                            // Reload configurations to reflect changes
+                                            await loadConfigs();
+                                            // Dispatch custom event to notify other components
+                                            window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
                                             toast.success(
                                                 `Configuration ${isActive ? 'activated' : 'deactivated'} successfully`
                                             );

@@ -130,19 +130,19 @@ export class DockerService {
         const escapedComposeFile = escapePath(composeFile);
         const serviceParam = service || '';
 
-        const envFilePath = path.join(projectPath, '.igrp.env');
-        const escapedEnvFilePath = escapePath(envFilePath);
+       /*  const envFilePath = path.join(projectPath, '.igrp.env');
+        const escapedEnvFilePath = escapePath(envFilePath); */
 
         // Prepare the init script first
         this.prepareInitScript(projectPath);
 
-        if (!fs.existsSync(envFilePath)) {
+       /*  if (!fs.existsSync(envFilePath)) {
             throw new Error(`Environment file not found: ${envFilePath}`);
-        }
+        } */
 
         try {
             const { stdout } = await execAsync(
-                `docker compose -f ${escapedComposeFile} --env-file ${escapedEnvFilePath} ${command} ${serviceParam}`
+                `docker compose -f ${escapedComposeFile}  ${command} ${serviceParam}`
                 , {
                     maxBuffer: 1024 * 1024 * 10,
                 });
