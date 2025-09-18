@@ -42,6 +42,7 @@ import {
     Calendar,
     Component,
     EllipsisVertical,
+    RefreshCw,
     Settings,
     Trash2,
     Wrench,
@@ -70,7 +71,7 @@ interface ProcessCardProps {
 }
 
 // Custom Hooks
-const useBPMNProjects = () => {
+const useBPMNProjects = (refreshTrigger?: number) => {
     const [projects, setProjects] = useState<BPMNProject[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -89,7 +90,7 @@ const useBPMNProjects = () => {
 
     useEffect(() => {
         loadProjects();
-    }, []);
+    }, [refreshTrigger]);
 
     return { projects, loading, loadProjects };
 };
@@ -207,13 +208,39 @@ export const BPMNProjectSelector = ({
         FileTree | undefined
     >(undefined);
     const [activeTab, setActiveTab] = useState<string>('artifacts');
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-    const { projects, loading } = useBPMNProjects();
-    const { processDefinitions, loading: loadingProcesses } =
+    const { projects, loading } = useBPMNProjects(refreshTrigger);
+    const { processDefinitions, loading: loadingProcesses, loadProcessDefinitions } =
         useProcessDefinitions(selectedProject);
 
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
+
+    // Listen for configuration changes and refresh projects
+    useEffect(() => {
+        const handleConfigChange = () => {
+            // Clear the BPMN service cache to force it to use the new active config
+            bpmnService.clearConfig();
+            setRefreshTrigger(prev => prev + 1);
+        };
+
+        // Listen for storage changes (when BPMN configs are updated)
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key?.includes('bpmn') || e.key?.includes('BPMN')) {
+                handleConfigChange();
+            }
+        };
+
+        // Listen for custom events (if the app uses them for config changes)
+        window.addEventListener('bpmn-config-changed', handleConfigChange);
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('bpmn-config-changed', handleConfigChange);
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
 
     // Fetch process definition details when a process is selected
     useEffect(() => {
@@ -428,8 +455,23 @@ export const BPMNProjectSelector = ({
     return (
         <div className="space-y-6">
             {/* Project Selection */}
-            <div className="space-y-2 flex flex-col">
-                <label className="text-sm font-medium">Select Project</label>
+            <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Select Project</label>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            bpmnService.clearConfig();
+                            setRefreshTrigger(prev => prev + 1);
+                        }}
+                        disabled={loading}
+                        className="flex items-center gap-2"
+                    >
+                        <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
+                </div>
                 <Select
                     onValueChange={handleProjectChange}
                     value={selectedProject?.projectId || ''}
@@ -482,7 +524,22 @@ export const BPMNProjectSelector = ({
                                 or load all project artifacts below.
                             </p>
                         </div>
-                        {loadingProcesses && <IGRPLoadingSpinner />}
+                        <div className="flex items-center space-x-2">
+                            {loadingProcesses && <IGRPLoadingSpinner />}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2"
+                                onClick={() =>
+                                    selectedProject &&
+                                    loadProcessDefinitions(selectedProject.projectId)
+                                }
+                                title="Refresh processes"
+                            >
+                                <RefreshCw className='w-4 h-4'/>
+                                Refresh
+                            </Button>
+                        </div>
                     </div>
 
                     {loadingProcesses ? (

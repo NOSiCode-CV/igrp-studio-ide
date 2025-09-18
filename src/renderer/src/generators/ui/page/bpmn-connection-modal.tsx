@@ -154,6 +154,12 @@ export const BPMNConfigModal = ({
                 await window.igrpStudioSettings.addBPMNConfig(configData);
                 toast.success('API configuration saved successfully');
             }
+            
+            // If this is the first config or if it's set as active, make it the active config
+            if (formData.isActive) {
+                await window.igrpStudioSettings.setActiveBPMNConfig(configData.id);
+            }
+            
             onConfirm();
             setRenderKey(0);
             handleClose();
@@ -182,7 +188,7 @@ export const BPMNConfigModal = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent key={`${config?.id || 'new'}-${renderKey}`} className="sm:max-w-[500px]">
+            <DialogContent key={`${config?.id || 'new'}-${renderKey}`} className="max-w-[500px] w-[95vw] mx-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {config ? 'Edit BPMN API Configuration' : 'BPMN API Configuration'}

@@ -167,6 +167,27 @@ export const BindingConfigurationModal = ({
         return true;
     };
 
+    const getDefaultValue = (field: LabeledElementField) => {
+        if ((field.defaultValue === '' || field.defaultValue === undefined ) && field.required) {
+            if (field.type === 'string') {
+                return '';
+            }
+            if (field.type === 'number') {
+                return '0';
+            }
+            if (field.type === 'boolean') {
+                return 'false';
+            }
+            if (field.type === 'date') {
+                return 'new Date()';
+            }
+            if (field.type === 'array') {
+                return '[]';
+            }
+        }
+        return field.defaultValue;
+    };
+
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: {
@@ -190,22 +211,12 @@ export const BindingConfigurationModal = ({
                         return {
                             ...rest,
                             type: rest.type || 'string',
-                            defaultValue:
-                                (rest.defaultValue === '' ||
-                                    rest.defaultValue === undefined) &&
-                                rest.required
-                                    ? ''
-                                    : rest.defaultValue,
+                            defaultValue: getDefaultValue(field),
                             ...(rest.fields && {
                                 fields: rest.fields.map((field) => ({
                                     ...field,
                                     type: field.type || 'string',
-                                    defaultValue:
-                                        (field.defaultValue === '' ||
-                                            field.defaultValue === undefined) &&
-                                        field.required
-                                            ? ''
-                                            : field.defaultValue,
+                                    defaultValue: getDefaultValue(field),
                                 })),
                             }),
                         };

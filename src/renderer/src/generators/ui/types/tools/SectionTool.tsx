@@ -13,9 +13,7 @@ interface RowOptionsProps {
     onEdit: () => void;
 }
 
-const SectionTool = ({
-    onClickAddControl,
-}: RowOptionsProps) => {
+const SectionTool = ({ onClickAddControl }: RowOptionsProps) => {
     const { t } = useTranslation();
     return (
         <div id="row-tools">
@@ -48,70 +46,6 @@ const SectionTool = ({
                     <p>{t('addNewRowBottom')}</p>
                 </TooltipContent>
             </Tooltip>
-
-            {/* Action buttons */}
-          {/*   <div className="absolute z-10 left-0 -top-6 rounded opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 bg-gray-600 text-white">
-                <div className="flex">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
-                                onClick={(e) => e.preventDefault()}
-                            >
-                                <Move className="h-4" />
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('sort')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
-                                onClick={(e) => e.preventDefault()}
-                            >
-                                <Copy className="h-4" />
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('clone')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
-                                onClick={onEdit}
-                            >
-                                <Settings className="h-4" />
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('edit')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onClickDeleteSection();
-                                }}
-                            >
-                                <Trash className="h-4" />
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('deleteSection')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
-            </div> */}
         </div>
     );
 };

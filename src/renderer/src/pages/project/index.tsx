@@ -102,7 +102,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         initialValues,
         validationSchema,
         onSubmit: (values, actions) => {
-            console.log(t('formSubmittedWithValues') + 99, values);
+            console.log(values);
             actions.setSubmitting(false);
             saveOrOpenProject({ project: { ...formik.values } });
         },
