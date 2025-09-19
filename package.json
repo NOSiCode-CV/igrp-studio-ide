@@ -88,6 +88,7 @@
 		"electron-store": "^10.1.0",
 		"electron-updater": "^6.6.2",
 		"embla-carousel-react": "^8.6.0",
+		"eslint-plugin-react-refresh": "^0.4.20",
 		"express": "^5.1.0",
 		"formik": "^2.4.6",
 		"gojs": "^3.0.26",
