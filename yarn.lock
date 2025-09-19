@@ -601,9 +601,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -1216,10 +1216,10 @@
     vaul "^1.1.2"
     zod "^3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.6":
-  version "0.1.0-beta.6"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.6.tgz#a9f6eb062742b440f9305707df76825dfb7b5b6d"
-  integrity sha512-swtEoblW3rwAZJbhqsyEAhcVtPdzBEJNXszC6gczESG7wrTQ3cKxdXSkZFGU4hGjV1I1GT5z06qZIzCS6nQz+A==
+"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.7":
+  version "0.1.0-beta.7"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.7.tgz#cbed97e36b441144f5f3a177b90e448754e68481"
+  integrity sha512-fKR2Mq5MXPksjzVTw7Pk6Y4+bSwWoXZr9zGo3N5vfksbucTCS/NVTNXNONpaGrYFKC7J1vjv1jaHeI/ZHCylUA==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
