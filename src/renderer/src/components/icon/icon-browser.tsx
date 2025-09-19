@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
     Tooltip,
     TooltipContent,
@@ -7,7 +7,6 @@ import {
 } from '../ui/tooltip';
 import { icons } from 'lucide-react';
 import { getLabel } from '@renderer/utils';
-import { Grid } from 'react-window';
 import { useDebounce } from 'use-debounce';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
@@ -18,7 +17,7 @@ interface IconBrowserProps {
     onSelectedIcon: (icon: string) => void;
 }
 
-const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
+const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 200);
@@ -38,40 +37,6 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const handleIconClick = (iconName: string) => {
         onSelectedIcon(iconName);
         setOpen(false);
-    };
-
-    const gridRef = useRef<any>(null);
-
-    const columnCount = 8;
-    const rowCount = Math.ceil(filteredIcons.length / columnCount);
-
-    useEffect(() => {
-        gridRef.current?.scrollTo({ scrollTop: 0 });
-    }, [filteredIcons]);
-
-    const Cell = ({ columnIndex, rowIndex, style }: { columnIndex: number; rowIndex: number; style: React.CSSProperties }) => {
-        const index = rowIndex * columnCount + columnIndex;
-        if (index >= filteredIcons.length) return <div />;
-
-        const iconName = filteredIcons[index];
-        const IconComponent = icons[iconName];
-
-        return (
-            <div
-                style={style}
-                className="p-2 flex items-center justify-center cursor-pointer"
-                key={index}
-            >
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <IconComponent
-                            onClick={() => handleIconClick(iconName)}
-                        />
-                    </TooltipTrigger>
-                    <TooltipContent>{getLabel(iconName)}</TooltipContent>
-                </Tooltip>
-            </div>
-        );
     };
 
     const SelectedIconComp = icons[selectedIcon as keyof typeof icons];
@@ -94,21 +59,39 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                             setSearch(e.target.value);
                         }}
                     />
-                    <Grid
-                        ref={gridRef}
-                        columnCount={columnCount}
-                        columnWidth={50}
-                        height={300}
-                        rowCount={rowCount}
-                        rowHeight={50}
-                        width={columnCount * 50 + 20}
-                    >
-                        {Cell}
-                    </Grid>
+                    <div className="max-h-[300px] overflow-y-auto">
+                        <div className="grid grid-cols-8 gap-2 p-2">
+                            {filteredIcons.map((iconName, index) => {
+                                const IconComponent = icons[iconName];
+                                return (
+                                    <div
+                                        key={index}
+                                        className="p-2 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded"
+                                    >
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <IconComponent
+                                                    onClick={() =>
+                                                        handleIconClick(
+                                                            iconName
+                                                        )
+                                                    }
+                                                    className="w-5 h-5"
+                                                />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {getLabel(iconName)}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </PopoverContent>
             </Popover>
         </TooltipProvider>
     );
 };
 
-export default IconBrowser;
+export default IconBrowserNew;
