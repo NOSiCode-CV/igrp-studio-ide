@@ -50,13 +50,13 @@ export default function Doctor({
 
         return {
             category,
-            title: category === 'frontend' ? 'Frontend Development' : 
+            title: category === 'frontend' ? 'Frontend Development' :
                    category === 'backend' ? 'Backend Development' : 'Development Infrastructure',
             description: category === 'frontend' ? 'Tools for React, Next.js, and modern web development' :
                         category === 'backend' ? 'Tools for Java, Spring Boot, and .NET development' :
                         'Essential development tools and infrastructure',
-            icon: category === 'frontend' ? <Globe className="h-6 w-6" /> : 
-                  category === 'backend' ? <Settings className="h-6 w-6" /> : 
+            icon: category === 'frontend' ? <Globe className="h-6 w-6" /> :
+                  category === 'backend' ? <Settings className="h-6 w-6" /> :
                   <Wrench className="h-6 w-6" />,
             tools: categoryTools,
             totalTools: categoryTools.length,
@@ -80,8 +80,8 @@ export default function Doctor({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="sm:max-w-[730px] max-w-4xl max-h-[80vh]">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-4xl w-[90vw] h-[90vh] overflow-hidden">
+                <DialogHeader >
                     <DialogTitle className="flex gap-2 items-center text-xl">
                         <Stethoscope className="h-6 w-6" />
                         <span>System Health Check</span>
@@ -91,7 +91,7 @@ export default function Doctor({
                     </DialogDescription>
                 </DialogHeader>
 
-                
+
                     {loading ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="flex items-center gap-2 text-gray-600">
@@ -100,7 +100,7 @@ export default function Doctor({
                             </div>
                         </div>
                     ) : (
-                        <ScrollArea className="h-[60vh] pr-4">
+                        <ScrollArea className="flex-1 min-h-0 pr-4">
                             {/* Overall Status */}
                             <div className="mb-6">
                                 {allGood ? (
@@ -139,8 +139,8 @@ export default function Doctor({
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         {status.icon}
-                                                        <Badge 
-                                                            variant={status.status === 'success' ? 'default' : 
+                                                        <Badge
+                                                            variant={status.status === 'success' ? 'default' :
                                                                     status.status === 'partial' ? 'secondary' : 'destructive'}
                                                             className="text-xs"
                                                         >
@@ -219,8 +219,8 @@ export default function Doctor({
                                 <div className="mt-6 pt-4 border-t">
                                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                                         <span>
-                                            Total tools checked: {results.length} • 
-                                            Successful: {results.filter(t => t.success).length} • 
+                                            Total tools checked: {results.length} •
+                                            Successful: {results.filter(t => t.success).length} •
                                             Required missing: {results.filter(t => t.required && !t.success).length}
                                         </span>
                                         <span>Last checked: {new Date().toLocaleTimeString()}</span>
@@ -229,7 +229,8 @@ export default function Doctor({
                             )}
                        </ScrollArea>
                     )}
-                
+
+
             </DialogContent>
         </Dialog>
     );
