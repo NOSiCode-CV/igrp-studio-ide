@@ -8,7 +8,7 @@ import {
 } from "../ui/dialog";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system";
 import { useTranslation } from "react-i18next";
 
 interface RemoteUrlDialogProps {
@@ -45,12 +45,12 @@ export function RemoteUrlDialog({ isOpen, onClose, onConfirm }: RemoteUrlDialogP
                   />
               </div>
               <DialogFooter>
-                  <Button variant="outline" onClick={onClose}>
+                  <IGRPButtonPrimitive variant="outline" onClick={onClose}>
                       {t('cancel')}
-                  </Button>
-                  <Button onClick={handleConfirm} disabled={!url.trim()} variant={"default"}>
+                  </IGRPButtonPrimitive>
+                  <IGRPButtonPrimitive onClick={handleConfirm} disabled={!url.trim()} variant={"default"}>
                       {t('addRemote')}
-                  </Button>
+                  </IGRPButtonPrimitive>
               </DialogFooter>
           </DialogContent>
       </Dialog>

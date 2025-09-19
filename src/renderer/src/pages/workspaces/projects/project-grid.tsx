@@ -12,7 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils';
 import { ProjectIcon } from '@renderer/components/shared-ui';
 import { ProjectActions } from './project-actions';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { PortsBadgeList } from '../components/ports-badge-list';
 import Dependency from '../components/dependency';
 import { useTranslation } from 'react-i18next';
@@ -113,7 +113,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                         </>
                                     )}
                                 </div>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant={'outline'}
                                     size={'sm'}
                                     className="w-full"
@@ -124,7 +124,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                 >
                                     <Folder />
                                     {t('open')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </CardFooter>
                         </Card>
                     );

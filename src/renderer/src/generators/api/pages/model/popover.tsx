@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Label } from '@renderer/components/ui/label';
 import {
     Popover,
@@ -51,14 +51,14 @@ export function PopoverModel({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <PopoverTrigger asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             className="flex items-center"
                             size={'icon'}
                         >
                             <PackageCheck className="w-4 h-4" />
                             <span className="sr-only">{t('advanced')}</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top" align="center">

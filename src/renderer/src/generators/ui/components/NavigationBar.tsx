@@ -1,5 +1,5 @@
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -47,18 +47,18 @@ const NavigationBar = ({
 
                 {/*   <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             variant={'secondary'}
                             onClick={onClickSourceCode}
                         >
                             <AppWindowMac />
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </TooltipTrigger>
                     <TooltipContent>{t('sourceCode')}</TooltipContent>
                 </Tooltip> */}
                 <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
-                    <Button
+                    <IGRPButtonPrimitive
                         size="sm"
                         variant={
                             activePresentation === APRESENTATION.CODE
@@ -69,8 +69,8 @@ const NavigationBar = ({
                         className="h-7"
                     >
                         Code
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         size="sm"
                         onClick={() => onSwitch(APRESENTATION.DESIGN)}
                         variant={
@@ -81,8 +81,8 @@ const NavigationBar = ({
                         className="h-7"
                     >
                         Design
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         size="sm"
                         onClick={() => onSwitch(APRESENTATION.JSON)}
                         variant={
@@ -93,18 +93,18 @@ const NavigationBar = ({
                         className="h-7"
                     >
                         Json
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
                 {/*  <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
+                            <IGRPButtonPrimitive
                                 size="sm"
                                 onClick={onSwitch}
                                 variant={'secondary'}
                             >
                                 {isDesign ? <FileJsonIcon /> : <Eye />}
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TooltipTrigger>
                         <TooltipContent>
                             {isDesign ? 'Show Code [JSON]' : 'Show Design'}
@@ -113,9 +113,9 @@ const NavigationBar = ({
                 </div> */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button size="sm" onClick={handleSaveClick}>
+                        <IGRPButtonPrimitive size="sm" onClick={handleSaveClick}>
                             {t('save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </TooltipTrigger>
                     <TooltipContent>
                         {'Add Components to Page'}

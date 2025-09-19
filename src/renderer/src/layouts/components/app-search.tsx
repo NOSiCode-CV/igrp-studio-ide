@@ -1,4 +1,4 @@
-import { Button } from "@renderer/components/ui/button";
+import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system";
 import { Label } from "@renderer/components/ui/label";
 import { SidebarGroup, SidebarGroupContent, SidebarInput } from "@renderer/components/ui/sidebar";
 import { cn } from "@renderer/lib/utils";
@@ -36,7 +36,7 @@ const FormSearch = ({ onSearch, sidebarState, className, placeholder }: SearchPr
                         <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
                     </SidebarGroupContent>
                 </SidebarGroup>) : (
-                <Button
+                <IGRPButtonPrimitive
                     variant="ghost"
                     size="icon"
                     className="w-full"
@@ -44,7 +44,7 @@ const FormSearch = ({ onSearch, sidebarState, className, placeholder }: SearchPr
                     aria-label="Expand sidebar to search"
                 >
                     <Search className="h-4 w-4" />
-                </Button>
+                </IGRPButtonPrimitive>
             )}
         </div>
     )

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Input } from '@renderer/components/ui/input';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Search, X } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
 
@@ -38,14 +38,14 @@ export const GlobalTabFilter = ({
                     className="pl-8 pr-8"
                 />
                 {showClearButton && value && (
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
                         onClick={handleClear}
                         className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                     >
                         <X className="h-3 w-3" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
             </div>
         </div>

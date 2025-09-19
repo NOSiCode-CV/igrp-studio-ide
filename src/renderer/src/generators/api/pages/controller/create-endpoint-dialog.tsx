@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -185,7 +185,7 @@ export function CreateEndpointDialog({
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">{t('save')}</Button>
+                        <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
                     </DialogFooter>
                 </form>
             </DialogContent>

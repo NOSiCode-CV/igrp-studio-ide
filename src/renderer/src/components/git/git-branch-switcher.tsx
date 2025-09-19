@@ -21,7 +21,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@renderer/components/ui/popover';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -123,14 +123,14 @@ export function BranchSwitcher({
         return (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant={'outline'}
                         onClick={handleInitGit}
                         className="h-6 text-xs"
                     >
                         <GitFork className="h-3 w-3" />
                         {t('initGit')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{t('initializeGit')}</p>
@@ -178,7 +178,7 @@ export function BranchSwitcher({
 
     if (isLoading) {
         return (
-            <Button
+            <IGRPButtonPrimitive
                 variant="outline"
                 className="w-[250px] justify-between"
                 disabled
@@ -186,14 +186,14 @@ export function BranchSwitcher({
                 <GitBranch className="mr-2 h-4 w-4" />
                 {t('loadingBranches')}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
+            </IGRPButtonPrimitive>
         );
     }
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
+                <IGRPButtonPrimitive
                     variant={'outline'}
                     role="combobox"
                     aria-expanded={open}
@@ -202,7 +202,7 @@ export function BranchSwitcher({
                     <GitBranch className="h-3 w-3 " />
                     <span>{activeBranch || t('selectBranch')}</span>
                     <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-                </Button>
+                </IGRPButtonPrimitive>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">
                 <Command>
@@ -273,13 +273,13 @@ export function BranchSwitcher({
                                         placeholder={t('branchNamePlaceholder')}
                                         autoFocus
                                     />
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         size="sm"
                                         disabled={!newBranchName.trim()}
                                         onClick={handleCreateBranch}
                                     >
                                         {t('create')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </div>
                             )}
                         </CommandGroup>

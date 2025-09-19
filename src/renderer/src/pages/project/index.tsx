@@ -9,7 +9,7 @@ import {
     PlusCircle,
     Loader2,
 } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -399,7 +399,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         {t('recommendedSize')}
                                     </div>
                                 </div>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="outline"
                                     size="sm"
                                     type="button"
@@ -410,7 +410,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     }
                                 >
                                     {t('upload')}...
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </>
                         )}
                     </div>
@@ -606,7 +606,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 placeholder={t('enterProjectDirectory')}
                                 readOnly
                             />
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="outline"
                                 size="icon"
                                 type="button"
@@ -617,7 +617,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 disabled
                             >
                                 <FolderOpen className="h-4 w-4" />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                         {formik.touched.path && formik.errors.path && (
                             <p className="text-xs text-destructive">
@@ -679,10 +679,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 {children ? (
                     children
                 ) : (
-                    <Button>
+                    <IGRPButtonPrimitive>
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
             </DialogTrigger>
             <DialogContent
@@ -717,19 +717,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <DialogFooter>
                             <div className="flex w-full justify-between mt-4">
                                 {step > 1 ? (
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         variant="outline"
                                         onClick={handleBack}
                                     >
                                         <ArrowLeft className="w-4 h-4 mr-2" />
                                         {t('back')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 ) : (
                                     <div />
                                 )}
                                 {step < STEPS.length ? (
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         onClick={(e) => {
                                             e.preventDefault();
@@ -739,9 +739,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     >
                                         {t('next')}
                                         <ArrowRight className="w-4 h-4 ml-2" />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 ) : (
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="submit"
                                         disabled={formik.isSubmitting}
                                     >
@@ -749,7 +749,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             <Loader2 className="animate-spin" />
                                         )}
                                         {t('createProject')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 )}
                             </div>
                         </DialogFooter>

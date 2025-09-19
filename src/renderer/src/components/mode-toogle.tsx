@@ -1,6 +1,6 @@
 import { Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,11 +22,11 @@ export function ModeToggle() {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <IGRPButtonPrimitive variant="ghost" size="icon">
                             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                             <span className="sr-only">Toggle theme</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -49,7 +49,7 @@ export function ModeToggle() {
 }
 
 {/* <div className="bg-background/80 backdrop-blur-sm border rounded-lg flex items-center">
-            <Button
+            <IGRPButtonPrimitive
                 variant="ghost"
                 size="icon"
                 className={cn(
@@ -60,8 +60,8 @@ export function ModeToggle() {
                 aria-label="Light mode"
             >
                 <Sun className="h-4 w-4" />
-            </Button>
-            <Button
+            </IGRPButtonPrimitive>
+            <IGRPButtonPrimitive
                 variant="ghost"
                 size="icon"
                 className={cn(
@@ -72,8 +72,8 @@ export function ModeToggle() {
                 aria-label="Dark mode"
             >
                 <Moon className="h-4 w-4" />
-            </Button>
-            <Button
+            </IGRPButtonPrimitive>
+            <IGRPButtonPrimitive
                 variant="ghost"
                 size="icon"
                 className={cn(
@@ -84,5 +84,5 @@ export function ModeToggle() {
                 aria-label="System mode"
             >
                 <Monitor className="h-4 w-4" />
-            </Button>
+            </IGRPButtonPrimitive>
         </div> */}

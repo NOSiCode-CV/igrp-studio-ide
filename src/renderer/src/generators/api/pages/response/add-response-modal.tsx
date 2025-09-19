@@ -1,5 +1,5 @@
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogClose,
@@ -99,11 +99,11 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="secondary">
+                                <IGRPButtonPrimitive type="button" variant="secondary">
                                     {t('close')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </DialogClose>
-                            <Button type="submit">{t('save')}</Button>
+                            <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
                         </DialogFooter>
                     </div>
                 </form>

@@ -5,7 +5,7 @@ import {
     BreadcrumbLink,
     BreadcrumbList,
 } from '@renderer/components/ui/breadcrumb';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Separator } from '@renderer/components/ui/separator';
 import { SidebarTrigger } from '@renderer/components/ui/sidebar';
 import {
@@ -80,14 +80,14 @@ const NavigationBar = ({
                         <>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         size="sm"
                                         variant={'secondary'}
                                         onClick={handleSourceCode}
                                     >
                                         <AppWindowMac />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     {t('sourceCode')}
@@ -96,7 +96,7 @@ const NavigationBar = ({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         variant="outline"
                                         onClick={(e) => {
@@ -110,7 +110,7 @@ const NavigationBar = ({
                                         <span className="sr-only">
                                             {t('delete')}
                                         </span>
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>{t('delete')}</TooltipContent>
                             </Tooltip>
@@ -118,9 +118,9 @@ const NavigationBar = ({
                     )}
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button color="success" type="submit">
+                            <IGRPButtonPrimitive color="success" type="submit">
                                 {t('save')}
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TooltipTrigger>
                         <TooltipContent>{t('save')}</TooltipContent>
                     </Tooltip>

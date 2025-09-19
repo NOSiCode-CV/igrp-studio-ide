@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Table,
     TableBody,
@@ -135,7 +135,7 @@ export default function DynamicKeyValueForm({
                             </TableHead>
                         ))}
                         <TableHead>
-                            <Button
+                            <IGRPButtonPrimitive
                                 onClick={addItem}
                                 size="sm"
                                 variant={'ghost'}
@@ -144,7 +144,7 @@ export default function DynamicKeyValueForm({
                             >
                                 <Plus className="h-4 w-4" />
                                 <span className="sr-only">{t('addRow')}</span>
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -194,7 +194,7 @@ export default function DynamicKeyValueForm({
                                 </TableCell>
                             ))}
                             <TableCell>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeItem(item.id)}
@@ -203,7 +203,7 @@ export default function DynamicKeyValueForm({
                                     disabled={required && items.length <= 1}
                                 >
                                     <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </TableCell>
                         </TableRow>
                     ))}

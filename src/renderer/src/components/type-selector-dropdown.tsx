@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -53,13 +53,13 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button
+                <IGRPButtonPrimitive
                     variant={variant}
                     className={cn('h-6 px-2 text-sm', className)}
                 >
                     <span className="flex flex-1">{type || 'Set Type'}</span>
                     {children}
-                </Button>
+                </IGRPButtonPrimitive>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
                 {schemaTypes &&

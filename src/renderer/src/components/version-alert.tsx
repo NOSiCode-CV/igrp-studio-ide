@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, FileText, X, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Alert,
     AlertDescription,
@@ -145,14 +145,14 @@ export function VersionAlert({
             <div className="flex items-center gap-2">
                 <Dialog open={showChangelog} onOpenChange={setShowChangelog}>
                     <DialogTrigger asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="outline"
                             size="sm"
                             className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/30"
                         >
                             <FileText className="h-3.5 w-3.5 mr-1" />
                             View Changelog
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
@@ -182,13 +182,13 @@ export function VersionAlert({
                             ))}
                         </div>
                         <div className="flex justify-end gap-2 pt-4 border-t">
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="outline"
                                 onClick={() => setShowChangelog(false)}
                             >
                                 Close
-                            </Button>
-                            <Button
+                            </IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive
                                 onClick={() => {
                                     const releaseUrl = `https://github.com/NOSiCode-CV/igrp-studio-ide/releases/tag/v0.0.59`;///${appVersion}
                                     window.open(releaseUrl, '_blank');
@@ -198,19 +198,19 @@ export function VersionAlert({
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 View {appVersion} Release
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </DialogContent>
                 </Dialog>
                 {showDismiss && onDismiss && (
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-amber-600 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/30"
                         onClick={onDismiss}
                     >
                         <X className="h-3.5 w-3.5" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
             </div>
         </Alert>

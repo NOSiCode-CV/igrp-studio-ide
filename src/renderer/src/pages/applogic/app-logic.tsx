@@ -171,19 +171,19 @@ export default function AppLogicPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={exportEnvironments}>
+                    <IGRPButtonPrimitive variant="outline" onClick={exportEnvironments}>
                         <Download className="h-4 w-4 mr-2" />
                         Export
-                    </Button>
+                    </IGRPButtonPrimitive>
                     <Dialog
                         open={isCreateDialogOpen}
                         onOpenChange={setIsCreateDialogOpen}
                     >
                         <DialogTrigger asChild>
-                            <Button variant={'default'}>
+                            <IGRPButtonPrimitive variant={'default'}>
                                 <Plus className="h-4 w-4 mr-2" />
                                 New Environment
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
@@ -226,13 +226,13 @@ export default function AppLogicPage() {
                             : 'Start by creating your first API environment'}
                     </p>
                     {!searchTerm && (
-                        <Button
+                        <IGRPButtonPrimitive
                             onClick={() => setIsCreateDialogOpen(true)}
                             variant={'default'}
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Create Environment
-                        </Button>
+                        </IGRPButtonPrimitive>
                     )}
                 </div>
             ) : (
@@ -252,13 +252,13 @@ export default function AppLogicPage() {
                                     </div>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
                                                 className="opacity-0 group-hover:opacity-100"
                                             >
                                                 <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem
@@ -322,7 +322,7 @@ export default function AppLogicPage() {
                                                     ? environment.apiKey
                                                     : '••••••••••••••••'}
                                             </span>
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() =>
@@ -337,8 +337,8 @@ export default function AppLogicPage() {
                                                 ) : (
                                                     <Eye className="h-3 w-3" />
                                                 )}
-                                            </Button>
-                                            <Button
+                                            </IGRPButtonPrimitive>
+                                            <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() =>
@@ -349,7 +349,7 @@ export default function AppLogicPage() {
                                                 className="h-6 w-6 p-0"
                                             >
                                                 <Copy className="h-3 w-3" />
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                     </div>
 

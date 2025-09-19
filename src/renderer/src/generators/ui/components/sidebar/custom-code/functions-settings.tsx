@@ -4,7 +4,7 @@ import {
     SidebarHeader,
 } from '@renderer/components/ui/sidebar';
 import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import {
     Arguments,
@@ -474,7 +474,7 @@ export const FunctionArguments = ({
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
                                                     <Label>Parameters</Label>
-                                                    <Button
+                                                    <IGRPButtonPrimitive
                                                         type="button"
                                                         variant="outline"
                                                         size="sm"
@@ -486,7 +486,7 @@ export const FunctionArguments = ({
                                                     >
                                                         <Plus className="h-4 w-4 mr-1" />
                                                         Add Parameter
-                                                    </Button>
+                                                    </IGRPButtonPrimitive>
                                                 </div>
 
                                                 {arg?.functionParameters &&
@@ -567,7 +567,7 @@ export const FunctionArguments = ({
                                                                         Optional
                                                                     </Label>
                                                                 </div>
-                                                                <Button
+                                                                <IGRPButtonPrimitive
                                                                     type="button"
                                                                     variant="ghost"
                                                                     size="sm"
@@ -579,7 +579,7 @@ export const FunctionArguments = ({
                                                                     }
                                                                 >
                                                                     <Trash2 className="h-4 w-4 text-red-500" />
-                                                                </Button>
+                                                                </IGRPButtonPrimitive>
                                                             </div>
                                                         )
                                                     )}
@@ -659,7 +659,7 @@ export const FunctionArguments = ({
                                     )} */}
 
                                     <div className="flex flex-1 justify-end">
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant={'ghost'}
                                             size={'icon'}
                                             className="text-destructive text-sm text-right"
@@ -672,7 +672,7 @@ export const FunctionArguments = ({
                                             <span className="sr-only">
                                                 Remove
                                             </span>
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 </div>
                             </div>
@@ -680,14 +680,14 @@ export const FunctionArguments = ({
                     </AccordionItem>
                 ))}
             </Accordion>
-            <Button
+            <IGRPButtonPrimitive
                 onClick={addArgument}
                 className="w-full"
                 variant="outline"
                 type="button"
             >
                 <Plus className="h-4 w-4 mr-2" /> Add Argument
-            </Button>
+            </IGRPButtonPrimitive>
         </div>
     );
 };

@@ -13,7 +13,7 @@ import { FormList } from '@renderer/components/form-list';
 import { handleChangeValueObject } from '@renderer/generators/api/helpers';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     SelectInput,
     TextInput,
@@ -520,7 +520,7 @@ export const BindingConfigurationModal = ({
                         >
                             <div className="flex">
                                 <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         variant={
                                             newBinding ? 'outline' : 'ghost'
@@ -530,8 +530,8 @@ export const BindingConfigurationModal = ({
                                         size="sm"
                                     >
                                         New
-                                    </Button>
-                                    <Button
+                                    </IGRPButtonPrimitive>
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         onClick={() => setNewBinding(false)}
                                         className="rounded-lg"
@@ -541,7 +541,7 @@ export const BindingConfigurationModal = ({
                                         }
                                     >
                                         Existing
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </div>
                             </div>
 
@@ -589,7 +589,7 @@ export const BindingConfigurationModal = ({
 
                             <DialogFooter className="space-x-2">
                                 <DialogClose>Close</DialogClose>
-                                <Button
+                                <IGRPButtonPrimitive
                                     type="submit"
                                     disabled={formik.isSubmitting}
                                 >
@@ -597,7 +597,7 @@ export const BindingConfigurationModal = ({
                                         <Loader2 className="animate-spin" />
                                     )}
                                     Save changes
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </DialogFooter>
                         </form>
                     </ScrollArea>

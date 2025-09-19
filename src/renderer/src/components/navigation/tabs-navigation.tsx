@@ -13,7 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { TAB_DEFAULT, TabItem, useTabs } from './TabContext';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
-import { Button } from '../ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { OptionType } from '@renderer/constants/appConstants';
 import { SHORTCUTS } from '@renderer/constants/shortcut';
 
@@ -121,7 +121,7 @@ const TabsNavigation = ({
                                                     )}
                                                     <span>{tab.title}</span>
                                                     {tab.id !== TAB_DEFAULT && (
-                                                        <Button
+                                                        <IGRPButtonPrimitive
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleCloseTab(
@@ -135,7 +135,7 @@ const TabsNavigation = ({
                                                             )}
                                                         >
                                                             <X className="h-3" />
-                                                        </Button>
+                                                        </IGRPButtonPrimitive>
                                                     )}
                                                 </div>
                                             </div>
@@ -195,7 +195,7 @@ const TabsNavigation = ({
                 </ScrollArea>
                 {btnNew && (
                     <div className="flex items-center px-2 gap-2">
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
@@ -203,7 +203,7 @@ const TabsNavigation = ({
                         >
                             <Plus className="h-4 w-4" />
                             <span className="sr-only">{t('newEndpoint')}</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 )}
             </div>

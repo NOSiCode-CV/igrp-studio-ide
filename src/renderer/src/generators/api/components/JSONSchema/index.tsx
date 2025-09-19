@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Table,
     TableBody,
@@ -382,7 +382,7 @@ export function JSONSchemaBuilder({
                                 Object.entries(newFields).length === 0 && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 type="button"
                                                 onClick={() =>
                                                     handleAddNewField()
@@ -395,7 +395,7 @@ export function JSONSchemaBuilder({
                                                 <span className="sr-only">
                                                     {t('addNewField')}
                                                 </span>
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             {t('addNewField')}

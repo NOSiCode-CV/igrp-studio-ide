@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import {
@@ -145,7 +145,7 @@ const CreateWorkspace = ({
                                 readOnly
                                 placeholder={t('workspace.locationPlaceholder')}
                             />
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="outline"
                                 size="icon"
                                 onClick={handleSelectDirectory}
@@ -156,19 +156,19 @@ const CreateWorkspace = ({
                                 <span className="sr-only">
                                     {t('workspace.browseButton')}
                                 </span>
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button
+                        <IGRPButtonPrimitive
                             onClick={handleCreate}
                             disabled={isCreating || !directoryPath}
                         >
                             {isCreating
                                 ? t('creating')
                                 : t('workspace.createButton')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 </div>
             </DialogContent>

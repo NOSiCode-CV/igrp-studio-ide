@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Plus, ChevronRight } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Popover,
     PopoverContent,
@@ -70,14 +70,14 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
         <div className="relative">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 px-2">
+                    <IGRPButtonPrimitive variant="ghost" size="sm" className="h-8 px-2">
                         <Plus className="h-4 w-4" />
                         {t('add')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </PopoverTrigger>
                 <PopoverContent className="p-0" align="end">
                     <div className="flex flex-col">
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             className="justify-start px-4 py-2 text-sm font-normal"
                             onClick={() => {
@@ -86,16 +86,16 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                             }}
                         >
                             {t('addBlankResponse')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                         <HoverCard openDelay={0} closeDelay={0}>
                             <HoverCardTrigger asChild>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="ghost"
                                     className="justify-between px-4 py-2 text-sm font-normal hover:bg-muted group"
                                 >
                                     {t('referenceResponseComponent')}
                                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </HoverCardTrigger>
                            {responseTypes && responseTypes.length > 0 && <HoverCardContent
                                 className="w-60 p-0"

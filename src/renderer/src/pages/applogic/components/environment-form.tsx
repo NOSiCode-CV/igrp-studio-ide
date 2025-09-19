@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Button } from "@renderer/components/ui/button"
+import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system"
 import { Input } from "@renderer/components/ui/input"
 import { Label } from "@renderer/components/ui/label"
 import { Textarea } from "@renderer/components/ui/textarea"
@@ -120,12 +120,12 @@ export function EnvironmentForm({ environment, onSubmit, onCancel, loading }: En
       )}
 
       <div className="flex justify-end gap-2 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <IGRPButtonPrimitive type="button" variant="outline" onClick={onCancel}>
           Cancel
-        </Button>
-        <Button type="submit" disabled={loading}>
+        </IGRPButtonPrimitive>
+        <IGRPButtonPrimitive type="submit" disabled={loading}>
           {loading ? "Saving..." : environment ? "Update Environment" : "Create Environment"}
-        </Button>
+        </IGRPButtonPrimitive>
       </div>
     </form>
   )

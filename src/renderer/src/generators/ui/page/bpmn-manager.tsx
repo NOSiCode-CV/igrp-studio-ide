@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tabs,
     TabsContent,
@@ -107,7 +107,7 @@ export const BPMNManager = ({
                     title="BPMN Process Manager"
                     description="Connect to BPMN REST API and manage process definitions"
                 />
-                <Button
+                <IGRPButtonPrimitive
                     onClick={() => {
                         setEditingConfig(undefined);
                         setShowConfigModal(true);
@@ -115,7 +115,7 @@ export const BPMNManager = ({
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Configuration
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
 
             <Tabs defaultValue="projects" className="space-y-4">

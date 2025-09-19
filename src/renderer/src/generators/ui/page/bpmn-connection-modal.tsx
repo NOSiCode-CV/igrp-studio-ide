@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -255,20 +255,20 @@ export const BPMNConfigModal = ({
                     </div>
                 </div>
                 <DialogFooter className="flex justify-between">
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         onClick={handleTestConnection}
                         disabled={isTesting || !formData.apiUrl}
                     >
                         {isTesting ? 'Testing...' : 'Test Connection'}
-                    </Button>
+                    </IGRPButtonPrimitive>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleClose}>
+                        <IGRPButtonPrimitive variant="outline" onClick={handleClose}>
                             Cancel
-                        </Button>
-                        <Button onClick={handleSave} disabled={isLoading}>
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive onClick={handleSave} disabled={isLoading}>
                             {isLoading ? 'Saving...' : (config ? 'Update' : 'Save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 </DialogFooter>
             </DialogContent>

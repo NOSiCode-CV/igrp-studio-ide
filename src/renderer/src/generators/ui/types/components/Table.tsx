@@ -13,7 +13,7 @@ import {
 import { cn } from '@renderer/lib/utils';
 import { Checkbox } from '@renderer/components/ui/checkbox';
 import { COMPONENT } from '../../ComponentTypes';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Ellipsis } from 'lucide-react';
 import BoxField from '../tools/BoxFields';
 import TableTool from '../tools/tableTool';
@@ -109,9 +109,9 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             </Badge>
                         ) : child.componentName ===
                           COMPONENT.TableActionListCell ? (
-                            <Button variant="secondary" size="icon">
+                            <IGRPButtonPrimitive variant="secondary" size="icon">
                                 <Ellipsis />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         ) : (
                             row[child.id]
                         )}

@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,12 +20,12 @@ const SectionTool = ({ onClickAddControl }: RowOptionsProps) => {
             {/* Top-aligned button */}
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button
+                    <IGRPButtonPrimitive
                         className="size-7 absolute left-1/2 transform -translate-x-1/2 top-[-20px] p-2 opacity-0 group-hover/section:opacity-100 transition-opacity duration-300 rounded-full z-50"
                         onClick={() => onClickAddControl('top')}
                     >
                         <Plus className="h-7 w-7" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{t('addNewRowTop')}</p>
@@ -35,12 +35,12 @@ const SectionTool = ({ onClickAddControl }: RowOptionsProps) => {
             {/* Bottom-aligned button */}
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button
+                    <IGRPButtonPrimitive
                         className="size-7 absolute left-1/2 transform -translate-x-1/2 bottom-[-15px] p-2 opacity-0 group-hover/section:opacity-100 transition-opacity duration-300 rounded-full z-50"
                         onClick={() => onClickAddControl('bottom')}
                     >
                         <Plus className="h-7 w-7" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{t('addNewRowBottom')}</p>

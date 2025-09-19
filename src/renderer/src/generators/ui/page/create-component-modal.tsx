@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
@@ -317,16 +317,16 @@ export function CreateComponentModal({
                         </div>
                     </div>
                     <DialogFooter className="flex justify-between">
-                        <Button type="button" variant="ghost" onClick={onClose}>
+                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             type="submit"
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
                             {formik.isSubmitting ? t('saving') : t('save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogFooter>
                 </form>
             </DialogContent>

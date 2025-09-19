@@ -10,7 +10,7 @@ import { getLabel } from '@renderer/utils';
 import { useDebounce } from 'use-debounce';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
-import { Button } from '../ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface IconBrowserProps {
     selectedIcon: string;
@@ -45,10 +45,10 @@ const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
         <TooltipProvider>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button size={'sm'} variant={'outline'}>
+                    <IGRPButtonPrimitive size={'sm'} variant={'outline'}>
                         {SelectedIconComp && <SelectedIconComp />}
                         {selectedIcon || 'Select Icon'}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </PopoverTrigger>
 
                 <PopoverContent className="w-[435px] z-[60]">

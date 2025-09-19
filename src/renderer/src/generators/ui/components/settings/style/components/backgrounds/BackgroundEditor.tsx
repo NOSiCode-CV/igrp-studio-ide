@@ -11,7 +11,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@renderer/components/ui/popover';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface BackgroundEditorProps {
     background: BackgroundStyle;
@@ -34,9 +34,9 @@ export function BackgroundEditor({
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="ghost" size={'icon'} onClick={onEdit}>
+                <IGRPButtonPrimitive variant="ghost" size={'icon'} onClick={onEdit}>
                     <Edit2 />
-                </Button>
+                </IGRPButtonPrimitive>
             </PopoverTrigger>
             <PopoverContent className="w-80">
                 <div className="space-y-2">

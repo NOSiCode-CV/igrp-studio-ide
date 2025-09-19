@@ -1,6 +1,6 @@
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { nanoid } from '@reduxjs/toolkit';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogClose,
@@ -170,12 +170,12 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
 
                     <DialogFooter className="space-x-2">
                         <DialogClose>Close</DialogClose>
-                        <Button type="submit" disabled={formik.isSubmitting}>
+                        <IGRPButtonPrimitive type="submit" disabled={formik.isSubmitting}>
                             {formik.isSubmitting && (
                                 <Loader2 className="animate-spin" />
                             )}
                             Save changes
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogFooter>
                 </form>
             </DialogContent>

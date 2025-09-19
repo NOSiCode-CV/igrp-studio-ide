@@ -4,7 +4,7 @@ import { BackgroundEditor } from './BackgroundEditor';
 import { getBackgroundStyles } from './utils';
 import type { BackgroundStyle } from '../effects/types';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface BackgroundListItemProps {
     background: BackgroundStyle;
@@ -78,7 +78,7 @@ export function BackgroundListItem({
                     onChange={onChange}
                     onEdit={onEdit}
                 />
-                <Button
+                <IGRPButtonPrimitive
                     variant={'ghost'}
                     size={'icon'}
                     onClick={(e) => {
@@ -87,7 +87,7 @@ export function BackgroundListItem({
                     }}
                 >
                     <Trash2 size={10} />
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );

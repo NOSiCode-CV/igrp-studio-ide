@@ -5,7 +5,7 @@ import {
     State,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { EmptyList } from '@renderer/components/empty-list';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -149,7 +149,7 @@ const TabStates = ({
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     size={'sm'}
                                                     variant="outline"
                                                     onClick={() =>
@@ -159,7 +159,7 @@ const TabStates = ({
                                                 >
                                                     <Code className="w-3 h-3" />
                                                     Name
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
@@ -175,7 +175,7 @@ const TabStates = ({
                                         <TooltipProvider>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Button
+                                                    <IGRPButtonPrimitive
                                                         size={'sm'}
                                                         variant="outline"
                                                         onClick={() =>
@@ -187,7 +187,7 @@ const TabStates = ({
                                                     >
                                                         <Zap className="w-3 h-3" />
                                                         Set
-                                                    </Button>
+                                                    </IGRPButtonPrimitive>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>
@@ -311,7 +311,7 @@ const TabSnipptes = ({
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     variant="outline"
                                                     size={'sm'}
                                                     onClick={() =>
@@ -323,7 +323,7 @@ const TabSnipptes = ({
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Insert
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
@@ -516,7 +516,7 @@ const TabsFunctions = ({
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     size={'sm'}
                                                     variant="outline"
                                                     onClick={() => {
@@ -528,7 +528,7 @@ const TabsFunctions = ({
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Insert
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
@@ -656,7 +656,7 @@ const TabTypes = ({
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     variant="outline"
                                                     size={'sm'}
                                                     onClick={() =>
@@ -666,7 +666,7 @@ const TabTypes = ({
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Insert
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>

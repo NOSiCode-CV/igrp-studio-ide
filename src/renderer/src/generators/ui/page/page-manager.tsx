@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { LayoutGrid, Plus, TableIcon, Workflow } from 'lucide-react';
 import { PageCardView } from './page-card-view';
 import { CreatePageModal } from './create-page-modal';
@@ -297,10 +297,10 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                 </ToggleGroup>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button size="sm" variant="default">
+                                        <IGRPButtonPrimitive size="sm" variant="default">
                                             <Plus className="h-4 w-4" />
                                             {t('add')}
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem

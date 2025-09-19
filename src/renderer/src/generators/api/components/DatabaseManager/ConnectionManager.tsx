@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -102,15 +102,15 @@ export function ConnectionManager({ title }: { title?: string }) {
             header: t('actions'),
             cell: ({ row }) => (
                 <div className="flex space-x-2">
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEditClick(row.original)}
                     >
                         <span className="sr-only">{t('edit')}</span>
                         <Edit className="h-4 w-4 " />
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="icon"
                         onClick={() =>
@@ -119,7 +119,7 @@ export function ConnectionManager({ title }: { title?: string }) {
                     >
                         <span className="sr-only">{t('delete')}</span>
                         <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
             ),
         },
@@ -135,10 +135,10 @@ export function ConnectionManager({ title }: { title?: string }) {
                 )}
                 <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <IGRPButtonPrimitive>
                             <Plus className="h-4" />
                             {t('new')} {/* Use translation for button text */}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>

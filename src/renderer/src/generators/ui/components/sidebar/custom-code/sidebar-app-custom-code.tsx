@@ -24,7 +24,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -216,7 +216,7 @@ const ResourceList = <
                                                         </span>
                                                         <div className="absolute right-2 top-1/2 -translate-y-1/2  opacity-0 group-hover/item:opacity-100">
                                                             {hasEdit && (
-                                                                <Button
+                                                                <IGRPButtonPrimitive
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     className="h-6 w-6"
@@ -227,10 +227,10 @@ const ResourceList = <
                                                                     }
                                                                 >
                                                                     <Pencil className="h-3 w-3" />
-                                                                </Button>
+                                                                </IGRPButtonPrimitive>
                                                             )}
                                                             {hasDelete && (
-                                                                <Button
+                                                                <IGRPButtonPrimitive
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     className="h-6 w-6 text-destructive hover:text-destructive"
@@ -244,7 +244,7 @@ const ResourceList = <
                                                                     }}
                                                                 >
                                                                     <Trash2 className="h-3 w-3" />
-                                                                </Button>
+                                                                </IGRPButtonPrimitive>
                                                             )}
                                                         </div>
                                                     </div>
@@ -277,9 +277,9 @@ const CustomCodeMenu = () => {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant={'outline'} size={'icon'}>
+                    <IGRPButtonPrimitive variant={'outline'} size={'icon'}>
                         <Plus />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48">
                     <DropdownMenuItem onClick={() => setOpenFnc(true)}>
@@ -410,7 +410,7 @@ const FncComponent = ({
                                             {funct ? funct.name : ''}
                                         </span>
                                     </div>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="submit"
                                         disabled={
                                             formik.isSubmitting ||
@@ -431,7 +431,7 @@ const FncComponent = ({
                                         ) : (
                                             'Create Function'
                                         )}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </div>
                             </DialogTitle>
                             <DialogDescription />

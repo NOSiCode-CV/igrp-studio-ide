@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Badge } from '@renderer/components/ui/badge';
 import { ChevronDown, ChevronRight, FileText, Component } from 'lucide-react';
 import {
@@ -81,7 +81,7 @@ export const PageTable = ({
                                 <TableRow >
                                     <TableCell>
                                         {hasChildren && (
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => toggleRowExpansion(page.pageName)}
@@ -92,7 +92,7 @@ export const PageTable = ({
                                                 ) : (
                                                     <ChevronRight className="h-4 w-4" />
                                                 )}
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         )}
                                     </TableCell>
                                     <TableCell>

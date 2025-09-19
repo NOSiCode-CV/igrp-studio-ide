@@ -10,7 +10,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from './ui/tooltip';
-import { Button } from './ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 export const supportChannels = [
     {
@@ -72,7 +72,7 @@ export default function SupportContent({}: SupportContentProps) {
                         {supportChannels.map((channel) => (
                             <Tooltip key={channel.name}>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant={'ghost'}
                                         size={'icon'}
                                         className={channel.iconClassName}
@@ -89,7 +89,7 @@ export default function SupportContent({}: SupportContentProps) {
                                             alt={channel.name}
                                             className="h-5 w-5"
                                         />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     {t('supportContactVia', { channel: channel.name })}

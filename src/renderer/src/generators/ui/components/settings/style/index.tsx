@@ -29,7 +29,7 @@ import {
     AccordionTrigger,
 } from '@renderer/components/ui/accordion';
 import { generateAllClasses } from './utils';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface StyleSection {
     id: string;
@@ -175,7 +175,7 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                             <div className="flex align-middle items-center gap-2">
                                 {section.icon}
                                 {section.title}
-                                <Button
+                                <IGRPButtonPrimitive
                                     asChild
                                     variant={'ghost'}
                                     size={'sm'}
@@ -191,7 +191,7 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                                     title={`Reset ${section.title} styles`}
                                 >
                                     <RotateCcw className='h-4'/>
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </div>
                         </AccordionTrigger>
                         <AccordionContent>

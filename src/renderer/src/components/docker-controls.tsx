@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Square, Loader2, ChevronDown, Trash2 } from 'lucide-react';
-import { Button } from './ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,7 +33,7 @@ const DockerControls: React.FC<DockerControlsProps> = ({
     return (
         <TooltipProvider>
             <div className="flex items-center border rounded-md space-x-1">
-                <Button
+                <IGRPButtonPrimitive
                     variant="ghost"
                     size="sm"
                     className={`
@@ -66,20 +66,20 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                             )}
                         </div>
                     </div>
-                </Button>
+                </IGRPButtonPrimitive>
                 <Separator
                     orientation="vertical"
                     className="data-[orientation=vertical]:h-4"
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             size="sm"
                             className="h-6 text-xs"
                         >
                             <ChevronDown className="h-3.5 w-3.5 text-igrp" />
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem

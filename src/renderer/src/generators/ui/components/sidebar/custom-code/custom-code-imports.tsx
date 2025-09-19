@@ -1,7 +1,7 @@
 import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { nanoid } from '@reduxjs/toolkit';
 import { Badge } from '@renderer/components/ui/badge';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import {
@@ -72,7 +72,7 @@ const ImportComponent = ({
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
                 <div className="flex items-center justify-between">
                     <CollapsibleTrigger asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             className="flex items-center gap-2 p-0 h-auto hover:bg-transparent"
                         >
@@ -85,7 +85,7 @@ const ImportComponent = ({
                             <Label className="cursor-pointer">
                                 {t('imports.title')}
                             </Label>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </CollapsibleTrigger>
                     <Badge variant="outline" className="text-xs">
                         {t('imports.count', { count: imports.length })}
@@ -105,14 +105,14 @@ const ImportComponent = ({
                                         <span className="font-mono">
                                             {imp.namespace}
                                         </span>
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="ghost"
                                             size="icon"
                                             className="h-4 w-4 p-0 ml-1"
                                             onClick={() => removeImport(imp.id)}
                                         >
                                             <X className="h-3 w-3" />
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </Badge>
                                 ))}
                             </div>
@@ -130,7 +130,7 @@ const ImportComponent = ({
                                 className="h-8 flex-1"
                                 onKeyDown={(e) => e.key === 'Enter' && addImport()}
                             />
-                            <Button
+                            <IGRPButtonPrimitive
                                 type="button"
                                 size="sm"
                                 className="h-8"
@@ -138,7 +138,7 @@ const ImportComponent = ({
                                 disabled={!newImport}
                             >
                                 <Plus /> {t('add')}
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
                 </CollapsibleContent>

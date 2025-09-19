@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Label } from '@renderer/components/ui/label';
 import {
     Select,
@@ -454,7 +454,7 @@ export function AppLogicAction({
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                     <Label>Application (Tag)</Label>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="sm"
                                         onClick={() =>
@@ -467,7 +467,7 @@ export function AppLogicAction({
                                         <RefreshCw
                                             className={`h-3 w-3 ${loadingEndpoints ? 'animate-spin' : ''}`}
                                         />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </div>
                                 <Select
                                     value={selectedApplicationTag}
@@ -605,7 +605,7 @@ export function AppLogicAction({
                                                 });
                                             }}
                                         />
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
@@ -617,11 +617,11 @@ export function AppLogicAction({
                                             }}
                                         >
                                             Remove
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 )
                             )}
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
@@ -632,7 +632,7 @@ export function AppLogicAction({
                                 }}
                             >
                                 Add Header
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
                 </TabsContent>
@@ -671,7 +671,7 @@ export function AppLogicAction({
                                                 {selectedEndpoint.path}
                                             </span>
                                         </div>
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
@@ -688,7 +688,7 @@ export function AppLogicAction({
                                         >
                                             <Copy className="h-3 w-3" />
                                             Copy cURL
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 </div>
 
@@ -794,7 +794,7 @@ export function AppLogicAction({
                                 </div>
                                 <pre className="bg-gray-900 text-green-400 p-3 rounded-md text-xs mt-1 overflow-x-auto relative group">
                                     {generateCurlCommand()}
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="secondary"
                                         size="sm"
                                         onClick={() => {
@@ -810,7 +810,7 @@ export function AppLogicAction({
                                         className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0"
                                     >
                                         <Copy className="h-3.5 w-3.5" />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </pre>
                             </div>
                         </div>

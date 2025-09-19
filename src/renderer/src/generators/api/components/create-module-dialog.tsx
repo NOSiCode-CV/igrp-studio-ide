@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Plus } from 'lucide-react';
 import * as Yup from 'yup';
 
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -108,12 +108,12 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <DialogTrigger asChild>
-                            <Button
+                            <IGRPButtonPrimitive
                                 size="icon"
                                 className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
                             >
                                 <Plus className="h-4 w-4" />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </DialogTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -161,7 +161,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit">{t('saveModule')}</Button>
+                            <IGRPButtonPrimitive type="submit">{t('saveModule')}</IGRPButtonPrimitive>
                         </DialogFooter>
                     </form>
                 </DialogContent>

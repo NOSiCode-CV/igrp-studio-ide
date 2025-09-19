@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@renderer/components/ui/dropdown-menu';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import {
     Dialog,
@@ -130,9 +130,9 @@ export function TriggerControls({
         return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant={'secondary'} size={'sm'}>
+                    <IGRPButtonPrimitive variant={'secondary'} size={'sm'}>
                         <Plus size={10} />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="min-w-60">
                     {Object.keys(interactionsType).map((key, index) => {
@@ -183,7 +183,7 @@ export function TriggerControls({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant={'ghost'}
                                             size={'icon'}
                                             onClick={() => {
@@ -194,8 +194,8 @@ export function TriggerControls({
                                             className="w-6 h-6"
                                         >
                                             <Edit2 size={4} />
-                                        </Button>
-                                        <Button
+                                        </IGRPButtonPrimitive>
+                                        <IGRPButtonPrimitive
                                             variant={'ghost'}
                                             size={'sm'}
                                             onClick={() =>
@@ -206,7 +206,7 @@ export function TriggerControls({
                                                 size={4}
                                                 className="text-destructive"
                                             />
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 </div>
                             );
@@ -549,12 +549,12 @@ const InteractionEditor = ({
                                 </DialogDescription>
                             </div>
                             <div>
-                                <Button
+                                <IGRPButtonPrimitive
                                     size={'sm'}
                                     onClick={() => saveInteraction()}
                                 >
                                     Save changes
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </div>
                         </div>
                     </DialogHeader>

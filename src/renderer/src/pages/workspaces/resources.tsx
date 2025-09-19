@@ -12,7 +12,7 @@ import {
     PlusCircle,
     Server,
 } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Select,
     SelectContent,
@@ -272,10 +272,10 @@ const Resources = () => {
 
         return (
             <>
-                <Button onClick={() => setOpen(true)}>
+                <IGRPButtonPrimitive onClick={() => setOpen(true)}>
                     <PlusCircle className="w-4 h-4" />
                     {t('newService')}
-                </Button>
+                </IGRPButtonPrimitive>
 
                 {open && (
                     <ConfigurationDialog
@@ -299,10 +299,10 @@ const Resources = () => {
                     : t('noProjectsYet')}
             </p>
             <ProjectWizard>
-                <Button size="sm">
+                <IGRPButtonPrimitive size="sm">
                     <PlusCircle className="h-3.5 w-3.5 mr-1" />
                     {t('createNewProject')}
-                </Button>
+                </IGRPButtonPrimitive>
             </ProjectWizard>
         </div>
     );
@@ -318,10 +318,10 @@ const Resources = () => {
                     : t('noServicesYet')}
             </p>
             <ConfigurationDialog services={filteredServices} isNew={true}>
-                <Button size="sm">
+                <IGRPButtonPrimitive size="sm">
                     <PlusCircle className="h-3.5 w-3.5 mr-1" />
                     {t('addNewService')}
-                </Button>
+                </IGRPButtonPrimitive>
             </ConfigurationDialog>
         </div>
     );

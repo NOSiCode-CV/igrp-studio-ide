@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GitCommit, GitBranch, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useGit } from '@renderer/hooks/use-git';
-import { Button } from '../ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ScrollArea } from '../ui/scroll-area';
 import {
     Tooltip,
@@ -101,13 +101,13 @@ export function GitCommitsSidebar({
                 <div className="flex flex-col items-center justify-center h-full p-4 text-destructive">
                     <AlertTriangle className="h-6 w-6 mb-2" />
                     <p className="text-center">{error}</p>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         className="mt-4"
                         onClick={fetchCommits}
                     >
                         {t('retry')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
             );
         }

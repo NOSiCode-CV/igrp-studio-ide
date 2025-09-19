@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
@@ -47,9 +47,9 @@ const PreviewMenu = ({ basePath }: LogTerminalProps) => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" size="sm">
+                        <IGRPButtonPrimitive variant="secondary" size="sm">
                             <MoreVertical className="h-4 w-4" />
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent>

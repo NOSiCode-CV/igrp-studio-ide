@@ -13,7 +13,7 @@ import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { FocusEvent, useEffect, useState } from 'react';
 import {
     CheckboxInput,
@@ -326,16 +326,16 @@ export function CreatePageModal({
                         />
                     </div>
                     <DialogFooter className="flex justify-between">
-                        <Button type="button" variant="ghost" onClick={onClose}>
+                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             type="submit"
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
                             {formik.isSubmitting ? t('saving') : t('save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogFooter>
                 </form>
             </DialogContent>

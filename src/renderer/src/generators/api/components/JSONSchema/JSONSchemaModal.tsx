@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -36,9 +36,9 @@ export function JSONSchemaModal({ generateJSONSchema }: JSONSchemaModalProps) {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size={'sm'} className="h-6 w-6">
+                        <IGRPButtonPrimitive variant="ghost" size={'sm'} className="h-6 w-6">
                             <FileJson className="h-4 w-4" />
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogTrigger>
                 </TooltipTrigger>
                 <TooltipContent>{t('jsonSchemaPreview')}</TooltipContent>

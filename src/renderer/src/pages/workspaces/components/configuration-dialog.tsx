@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogContent,
@@ -581,7 +581,7 @@ export function ConfigurationDialog({
                                                             <span className="font-mono">
                                                                 {port}
                                                             </span>
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-4 w-4 p-0 ml-1"
@@ -592,7 +592,7 @@ export function ConfigurationDialog({
                                                                 }
                                                             >
                                                                 <X className="h-3 w-3" />
-                                                            </Button>
+                                                            </IGRPButtonPrimitive>
                                                         </Badge>
                                                     )
                                                 )}
@@ -612,7 +612,7 @@ export function ConfigurationDialog({
                                                 placeholder="e.g., 5432:5432"
                                                 className="h-8 flex-1"
                                             />
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 type="button"
                                                 size="sm"
                                                 className="h-8"
@@ -620,7 +620,7 @@ export function ConfigurationDialog({
                                                 disabled={!newPort}
                                             >
                                                 {t('add')}
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             {t('portsFormat')}
@@ -661,7 +661,7 @@ export function ConfigurationDialog({
                                                                     {env.value}
                                                                 </div>
                                                             </div>
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-6 w-6"
@@ -672,7 +672,7 @@ export function ConfigurationDialog({
                                                                 }
                                                             >
                                                                 <Trash2 className="h-3 w-3" />
-                                                            </Button>
+                                                            </IGRPButtonPrimitive>
                                                         </div>
                                                     )
                                                 )}
@@ -705,7 +705,7 @@ export function ConfigurationDialog({
                                                     placeholder={t('value')}
                                                     className="h-8 flex-1"
                                                 />
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     type="button"
                                                     size="sm"
                                                     className="h-8"
@@ -713,7 +713,7 @@ export function ConfigurationDialog({
                                                     disabled={!newEnvName}
                                                 >
                                                     {t('add')}
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </div>
                                         </div>
                                     </div>
@@ -746,7 +746,7 @@ export function ConfigurationDialog({
                                                             <span className="font-mono text-xs truncate max-w-[200px]">
                                                                 {volume}
                                                             </span>
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-4 w-4 p-0 ml-1"
@@ -757,7 +757,7 @@ export function ConfigurationDialog({
                                                                 }
                                                             >
                                                                 <X className="h-3 w-3" />
-                                                            </Button>
+                                                            </IGRPButtonPrimitive>
                                                         </Badge>
                                                     )
                                                 )}
@@ -777,7 +777,7 @@ export function ConfigurationDialog({
                                                 placeholder="e.g., data:/var/lib/data"
                                                 className="h-8 flex-1"
                                             />
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 type="button"
                                                 size="sm"
                                                 className="h-8"
@@ -785,7 +785,7 @@ export function ConfigurationDialog({
                                                 disabled={!newVolume}
                                             >
                                                 {t('add')}
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             {t('volumesFormat')}
@@ -989,15 +989,15 @@ export function ConfigurationDialog({
                 </Tabs>
 
                 <DialogFooter className="pt-2">
-                    <Button variant="outline" onClick={() => setOpen?.(false)}>
+                    <IGRPButtonPrimitive variant="outline" onClick={() => setOpen?.(false)}>
                         {t('cancel')}
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         onClick={handleSave}
                         disabled={isSubmitting || !name}
                     >
                         {isSubmitting ? t('saving') : t('saveService')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

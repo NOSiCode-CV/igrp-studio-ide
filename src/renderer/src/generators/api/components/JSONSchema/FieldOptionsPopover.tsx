@@ -4,7 +4,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@renderer/components/ui/popover';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { Switch } from '@renderer/components/ui/switch';
@@ -50,7 +50,7 @@ export function FieldOptionsPopover({
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button
+                <IGRPButtonPrimitive
                     variant="ghost"
                     className="flex items-center h-6 w-6"
                     size={'icon'}
@@ -58,7 +58,7 @@ export function FieldOptionsPopover({
                 >
                     <PackageCheck className="w-4 h-4" /> {/* Settings icon */}
                     <span className="sr-only">{t('Advanced')}</span>
-                </Button>
+                </IGRPButtonPrimitive>
             </PopoverTrigger>
             <PopoverContent className="w-[425px]">
                 <Tabs defaultValue="dataType">

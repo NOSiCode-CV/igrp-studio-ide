@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@renderer/components/ui/label';
@@ -43,7 +43,7 @@ export function AppearanceSettings() {
                             const isActive = activeTheme === theme.name;
 
                             return mounted ? (
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="outline"
                                     size="sm"
                                     key={theme.name}
@@ -91,7 +91,7 @@ export function AppearanceSettings() {
                                             ? t('default')
                                             : theme.label}
                                     </span>
-                                </Button>
+                                </IGRPButtonPrimitive>
                             ) : (
                                 <Skeleton
                                     className="h-8 w-[32px] xl:w-[86px]"

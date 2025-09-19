@@ -7,7 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@renderer/components/ui/dialog';
-import { Button } from '../ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '../ui/input';
 import { useTranslation } from 'react-i18next';
 
@@ -42,15 +42,15 @@ export const ProjectNameDialog = ({
                     />
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={onClose}>
+                    <IGRPButtonPrimitive variant="outline" onClick={onClose}>
                         {t('cancel')}
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         onClick={() => onConfirm(projectName)}
                         disabled={!projectName.trim()}
                     >
                         {t('confirm')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

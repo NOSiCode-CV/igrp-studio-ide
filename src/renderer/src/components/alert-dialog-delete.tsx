@@ -12,7 +12,7 @@ import {
 } from './ui/alert-dialog';
 import { Trash } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from './ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface DeleteModalProps {
     isOpen: boolean;
@@ -34,13 +34,13 @@ const AlertDialogDelete: React.FC<DeleteModalProps> = ({
         <AlertDialog open={isOpen} onOpenChange={onClose}>
             {hasTrigger && (
                 <AlertDialogTrigger>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         size="sm"
                         className="outline  outline-red-500 text-red-500"
                     >
                         <Trash /> {t('delete')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </AlertDialogTrigger>
             )}
             <AlertDialogContent>

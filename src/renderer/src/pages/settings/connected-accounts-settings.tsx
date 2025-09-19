@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -77,10 +77,10 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="flex space-x-2">
-                <Button onClick={handleSave}>{t('save_configuration')}</Button>
-                <Button variant="outline" onClick={onCancel}>
+                <IGRPButtonPrimitive onClick={handleSave}>{t('save_configuration')}</IGRPButtonPrimitive>
+                <IGRPButtonPrimitive variant="outline" onClick={onCancel}>
                     {t('cancel')}
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );
@@ -143,30 +143,30 @@ function Account({
 
             <div className="flex items-center space-x-2">
                 {!isActive && connected && (
-                    <Button variant="outline" size="sm" onClick={onActivate}>
+                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onActivate}>
                         {t('activate')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
 
                 {!isDefault && onEdit && (
-                    <Button variant="outline" size="sm" onClick={onEdit}>
+                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onEdit}>
                         <Settings size={16} />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
 
                 {!isDefault && onDelete && (
-                    <Button variant="outline" size="sm" onClick={onDelete}>
+                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onDelete}>
                         <Trash2 size={16} />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
 
-                <Button
+                <IGRPButtonPrimitive
                     variant={connected ? 'outline' : 'default'}
                     onClick={handleClick}
                     disabled={isDefault && !isConfigured}
                 >
                     {connected ? t('disconnect') : t('connect')}
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );
@@ -309,7 +309,7 @@ export function ConnectedAccountsSettings() {
 
                 {/* Add GitLab Button */}
                 <div className="pt-2">
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         onClick={() => {
                             setEditingProvider(null);
@@ -318,7 +318,7 @@ export function ConnectedAccountsSettings() {
                     >
                         <Plus size={16} className="mr-2" />
                         {t('add_gitlab')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
             </div>
         </div>

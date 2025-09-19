@@ -1,6 +1,6 @@
 // page-card-view.tsx
 import { Card, CardContent } from '@renderer/components/ui/card';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ChevronRight, ComponentIcon } from 'lucide-react';
 import { PageDefinition } from './page-manager';
 import { Badge } from '@renderer/components/ui/badge';
@@ -56,7 +56,7 @@ export function PageCardView({
                         <div className="flex items-center">
                             {hasChild && (
                                 <CollapsibleTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="icon"
                                         className="h-5 w-5 p-0 mr-1"
@@ -68,7 +68,7 @@ export function PageCardView({
                                             )}
                                         />
                                         <span className="sr-only">Toggle</span>
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </CollapsibleTrigger>
                             )}
                             <div className="flex items-center gap-2 flex-1 min-w-0">

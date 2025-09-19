@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Switch } from '@renderer/components/ui/switch';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
@@ -260,14 +260,14 @@ export function FormValidationPopover({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <PopoverTrigger asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             className="flex items-center"
                             size={'icon'}
                         >
                             <Shield className="w-4 h-4" />
                             <span className="sr-only">{t('validation')}</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top" align="center">
@@ -332,7 +332,7 @@ export function FormValidationPopover({
                                     </pre>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="outline"
                                         size="sm"
                                         onClick={() => {
@@ -340,7 +340,7 @@ export function FormValidationPopover({
                                         }}
                                     >
                                         {t('copyToClipboard')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </div>
                             </TabsContent>
 

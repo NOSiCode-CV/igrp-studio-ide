@@ -23,7 +23,7 @@ import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
 import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace';
 import { cn } from '@renderer/lib/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -202,7 +202,7 @@ export function WorkspaceSwitcher({
                                         </div>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -219,7 +219,7 @@ export function WorkspaceSwitcher({
                                                                 'text-igrp'
                                                         )}
                                                     />
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 {workspace.pinned

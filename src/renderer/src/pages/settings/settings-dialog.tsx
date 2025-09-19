@@ -40,7 +40,7 @@ import { LanguageSettings } from './language-settings';
 import { ConnectedAccountsSettings } from './connected-accounts-settings';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -75,10 +75,10 @@ export function SettingsDialog() {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <IGRPButtonPrimitive variant="ghost" size="sm">
                             <Settings className="w-5 h-5" />
                             <span className="sr-only">{t('settings')}</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogTrigger>
                 </TooltipTrigger>
                 <TooltipContent>{t('settings')}</TooltipContent>

@@ -14,7 +14,7 @@ import {
 import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
 import useToast from '@renderer/hooks/useToast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -239,9 +239,9 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost">
+                                            <IGRPButtonPrimitive variant="ghost">
                                                 <Code />
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </DropdownMenuTrigger>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -276,12 +276,12 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="sm">
+                                    <IGRPButtonPrimitive variant="ghost" size="sm">
                                         <Bell className="w-5 h-5" />
                                         <span className="sr-only">
                                             {t('notifications')}
                                         </span>
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>{t('notifications')}</p>

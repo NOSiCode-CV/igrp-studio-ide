@@ -16,7 +16,7 @@ import {
     CardTitle,
 } from '@renderer/components/ui/card';
 import { ProjectConfigForm } from '@renderer/pages/project';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { Label } from '@renderer/components/ui/label';
 import { Input } from '@renderer/components/ui/input';
@@ -288,7 +288,7 @@ const Overview = () => {
                                             readOnly
                                             className="h-8 font-mono bg-muted/50 flex-1 rounded-r-none"
                                         />
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             className="h-8 rounded-l-none border-l-0"
@@ -301,7 +301,7 @@ const Overview = () => {
                                             ) : (
                                                 <Copy className="h-3.5 w-3.5" />
                                             )}
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                     <p className="text-[10px] text-muted-foreground mt-1">
                                         {t('projectIdDescription')}
@@ -315,9 +315,9 @@ const Overview = () => {
                                 onChange={setData}
                             />
                             <div className="pt-2">
-                                <Button onClick={handleSave}>
+                                <IGRPButtonPrimitive onClick={handleSave}>
                                     {t('saveSettings')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </div>
                         </CardContent>
                     </Card>

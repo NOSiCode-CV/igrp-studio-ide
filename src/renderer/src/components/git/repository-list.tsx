@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Filter, AlertCircle, X } from 'lucide-react';
 import { Badge } from '@renderer/components/ui/badge';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -266,10 +266,10 @@ export function RepositoryList() {
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-1">
+                        <IGRPButtonPrimitive variant="outline" size="sm" className="gap-1">
                             <Filter className="h-4 w-4" />
                             {t('filter')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
@@ -313,7 +313,7 @@ export function RepositoryList() {
                             className="h-3 w-3"
                         />
                         {platformFilter === 'github' ? 'GitHub' : 'GitLab'}
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             size="sm"
                             className="h-4 w-4 p-0 ml-1"
@@ -321,7 +321,7 @@ export function RepositoryList() {
                         >
                             <X className="h-4 w-4" />
                             <span className="sr-only">{t('removeFilter')}</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </Badge>
                 </div>
             )}

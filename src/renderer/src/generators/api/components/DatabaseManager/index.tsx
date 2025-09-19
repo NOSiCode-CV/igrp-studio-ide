@@ -16,7 +16,7 @@ import {
 } from '@renderer/components/ui/tabs';
 import { TableManager } from './TableManager';
 import { ConnectionManager } from './ConnectionManager';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { getValuesToSubmit, initialValues } from '../../pages/model/config';
 import useToast from '@renderer/hooks/useToast';
 import { useTranslation } from 'react-i18next';
@@ -223,17 +223,17 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 </Tabs>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button
+                        <IGRPButtonPrimitive
                             type="button"
                             variant="secondary"
                             onClick={() => handleClose}
                         >
                             {t('close')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogClose>
-                    <Button type="submit" onClick={handleClickSubmit}>
+                    <IGRPButtonPrimitive type="submit" onClick={handleClickSubmit}>
                         {t('save')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

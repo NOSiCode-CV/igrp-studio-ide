@@ -3,7 +3,7 @@
 import { Bug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Drawer,
     DrawerContent,
@@ -33,9 +33,9 @@ export function DebugTerminal() {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DrawerTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
                             <Bug className="h-3.5 w-3.5 text-muted-foreground" />
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DrawerTrigger>
                 </TooltipTrigger>
                 <TooltipContent>{t('debug')}</TooltipContent>

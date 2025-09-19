@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Dialog,
     DialogDescription,
@@ -97,7 +97,7 @@ const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
                                             {capitalize(property)}
                                         </h3>
                                         <div className="flex items-center gap-1">
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 variant={'ghost'}
                                                 size={'icon'}
                                                 onClick={() => {
@@ -119,7 +119,7 @@ const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
                                                 }}
                                             >
                                                 <Edit className="w-4 h-4" />
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                     </div>
                                 )
@@ -173,9 +173,9 @@ const RuleEditor = ({
                             </div>
                             <div>
                                 {' '}
-                                <Button type="submit" onClick={onSave}>
+                                <IGRPButtonPrimitive type="submit" onClick={onSave}>
                                     Save
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </div>
                         </div>
                     </DialogHeader>

@@ -1,5 +1,5 @@
 import { Repository } from 'src/main/types';
-import { Button } from '../ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { GitFork } from 'lucide-react';
 import { Card } from '../ui/card';
 import useToast from '../../hooks/useToast';
@@ -77,23 +77,23 @@ export function CardGitProject({
             </p>
             <div className="flex justify-end space-x-2">
                 <div className="mt-4 flex justify-between gap-2 items-center">
-                    <Button
+                    <IGRPButtonPrimitive
                         size="sm"
                         variant="outline"
                         onClick={() => window.open(repo.html_url)}
                     >
                         {t('view')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                     {isCloned ? (
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             variant="outline"
                             onClick={handleOpen}
                         >
                             {t('open')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     ) : (
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             variant="outline"
                             onClick={() => handleClone(repo)}
@@ -101,7 +101,7 @@ export function CardGitProject({
                         >
                             <GitFork className="w-4 h-4 mr-2" />
                             {isCloning ? t('cloning') : t('clone')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     )}
                 </div>
             </div>

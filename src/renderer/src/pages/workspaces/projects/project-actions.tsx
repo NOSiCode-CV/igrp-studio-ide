@@ -7,7 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from '@renderer/components/ui/dropdown-menu';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import useToast from '@renderer/hooks/useToast';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
@@ -70,13 +70,13 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                         <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="min-w-48">
                     {onEdit && (

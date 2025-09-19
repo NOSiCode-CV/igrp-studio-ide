@@ -13,7 +13,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@renderer/components/ui/accordion';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Popover,
     PopoverContent,
@@ -435,7 +435,7 @@ const FieldActions = ({
         <>
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
                         className="p-0 opacity-0 group-hover:opacity-100 transition-opacity h-6"
@@ -447,7 +447,7 @@ const FieldActions = ({
                             </div>
                         )}
                         <MoreVertical className="w-3 h-3" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="space-y-3">
                     <p className="text-sm text-muted-foreground">
@@ -535,7 +535,7 @@ const FieldActions = ({
                         </div>
                     </>
                     <div className="flex justify-end">
-                        <Button
+                        <IGRPButtonPrimitive
                             variant={'secondary'}
                             size={'sm'}
                             onClick={() => setOpen(!open)}
@@ -545,7 +545,7 @@ const FieldActions = ({
                                 <Plus />
                             </span>
                             Generate New State
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 </PopoverContent>
             </Popover>

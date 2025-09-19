@@ -6,7 +6,7 @@ import {
 } from '@renderer/components/ui/dropdown-menu';
 import { PageCardProps } from './page-card-view';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Component,
     Edit,
@@ -33,13 +33,13 @@ export const PageActionMenu = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button
+                <IGRPButtonPrimitive
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
                 >
                     <MoreHorizontal className="h-3 w-3" />
-                </Button>
+                </IGRPButtonPrimitive>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEdit}><Edit/>{t('edit')}</DropdownMenuItem>

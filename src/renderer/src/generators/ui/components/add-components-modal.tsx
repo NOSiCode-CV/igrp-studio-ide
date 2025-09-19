@@ -16,7 +16,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import {
@@ -263,10 +263,10 @@ const renderAddComponents = (
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size={'sm'}>
+                <IGRPButtonPrimitive variant="outline" size={'sm'}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Component
-                </Button>
+                </IGRPButtonPrimitive>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 {components.map((comp) => (
@@ -411,7 +411,7 @@ const RenderCreatedComponents = ({
                                 </Draggable>
                             </div>
                             <div className="flex gap-2">
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="ghost"
                                     size="sm"
                                     onClick={() =>
@@ -423,8 +423,8 @@ const RenderCreatedComponents = ({
                                 >
                                     <LucideIcons.Edit />
                                     <span className="sr-only">Edit</span>
-                                </Button>
-                                <Button
+                                </IGRPButtonPrimitive>
+                                <IGRPButtonPrimitive
                                     variant="ghost"
                                     size="sm"
                                     className="text-destructive"
@@ -437,7 +437,7 @@ const RenderCreatedComponents = ({
                                 >
                                     <LucideIcons.Trash />
                                     <span className="sr-only">Delete</span>
-                                </Button>
+                                </IGRPButtonPrimitive>
                                 {canAcceptChildren(component) &&
                                     renderAddComponents(
                                         getAcceptedChildren(component),

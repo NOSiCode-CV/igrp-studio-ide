@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import {
@@ -324,14 +324,14 @@ export function CloneProjectModal({
                                     </Tabs>
                                 </div>
                             </div>
-                            <Button 
+                            <IGRPButtonPrimitive 
                                 onClick={handleCloneProject} 
                                 className="w-full"
                                 disabled={isCloning}
                             >
                                 <GitFork className="w-4 h-4 mr-2" />
                                 {isCloning ? t('cloningProject') : t('cloneProject')}
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TabsContent>
                         <TabsContent
                             value="search"

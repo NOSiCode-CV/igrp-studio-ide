@@ -5,7 +5,7 @@ import {
     SidebarContent,
     SidebarHeader,
 } from '@renderer/components/ui/sidebar';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { useTranslation } from 'react-i18next';
 import RenderPropsConfig from '../settings/properties';
@@ -550,17 +550,17 @@ const SidebarRight = ({
                     <div className="flex items-center gap-2">
                         {!comp && (
                             <>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="outline"
                                     size="icon"
                                     onClick={resetTempData}
                                     title="Reset changes"
                                 >
                                     <RotateCcw className="h-4 w-4" />
-                                </Button>
-                                <Button variant={'ghost'} onClick={handleClose}>
+                                </IGRPButtonPrimitive>
+                                <IGRPButtonPrimitive variant={'ghost'} onClick={handleClose}>
                                     <X />
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </>
                         )}
                     </div>

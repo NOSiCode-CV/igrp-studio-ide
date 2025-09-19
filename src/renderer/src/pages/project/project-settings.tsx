@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Card,
     CardContent,
@@ -42,14 +42,14 @@ function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
                 )}
             </div>
             {onEdit && (
-                <Button
+                <IGRPButtonPrimitive
                     variant="outline"
                     size="sm"
                     onClick={onEdit}
                     className="hidden"
                 >
                     {t('edit')}
-                </Button>
+                </IGRPButtonPrimitive>
             )}
         </div>
     );

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { TableCell, TableRow } from '@renderer/components/ui/table';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
@@ -215,7 +215,7 @@ export function SchemaFieldRow({
                     {(type === 'object' || type === 'array') && (
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
+                                <IGRPButtonPrimitive
                                     type="button"
                                     variant="ghost"
                                     size="icon"
@@ -227,7 +227,7 @@ export function SchemaFieldRow({
                                     ) : (
                                         <ChevronRight size={14} />
                                     )}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {t('addSubNewField')}
@@ -284,7 +284,7 @@ export function SchemaFieldRow({
                         {(type === 'object' || type === 'array') && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         onClick={handleAddSubfield}
                                         size="icon"
@@ -295,14 +295,14 @@ export function SchemaFieldRow({
                                         <span className="sr-only">
                                             {t('addSubNewField')}
                                         </span>
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     {t('addSubNewField')}
                                 </TooltipContent>
                             </Tooltip>
                         )}
-                        <Button
+                        <IGRPButtonPrimitive
                             type="button"
                             onClick={() => onDelete(index)}
                             size="icon"
@@ -311,7 +311,7 @@ export function SchemaFieldRow({
                         >
                             <Trash2 size={14} />
                             <span className="sr-only">{t('delete')}</span>
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 </TableCell>
             </TableRow>
@@ -325,14 +325,14 @@ export function SchemaFieldRow({
                                     paddingLeft: `${(depth + 1) * 20 + 8}px`,
                                 }}
                             >
-                                <Button
+                                <IGRPButtonPrimitive
                                     type="button"
                                     variant="ghost"
                                     className="h-6 w-full text-sm text-muted-foreground justify-start"
                                     onClick={handleAddSubfield}
                                 >
                                     {t('NofieldsdefinedAdd')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </TableCell>
                         </TableRow>
                     )}

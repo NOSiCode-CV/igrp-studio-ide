@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -249,10 +249,10 @@ export function DuplicatePageModal({
                         )}
                     </div>
                     <DialogFooter className="flex justify-between">
-                        <Button type="button" variant="ghost" onClick={onClose}>
+                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             type="submit"
                             disabled={formik.isSubmitting}
                             color="primary"
@@ -260,7 +260,7 @@ export function DuplicatePageModal({
                             {formik.isSubmitting
                                 ? t('duplicating')
                                 : t('duplicate')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </DialogFooter>
                 </form>
             </DialogContent>

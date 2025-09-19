@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import useGitAuth from '@renderer/hooks/use-git-auth';
-import { Button } from './ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function GitConnectionMenu() {
@@ -26,7 +26,7 @@ function GitConnectionMenu() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 {userGitHub || userGitLab ? (
-                    <Button variant="ghost" size="icon" className="p-0">
+                    <IGRPButtonPrimitive variant="ghost" size="icon" className="p-0">
                         <Avatar className="h-8 w-8">
                             <>
                                 <AvatarImage
@@ -49,11 +49,11 @@ function GitConnectionMenu() {
                                 </AvatarFallback>
                             </>
                         </Avatar>
-                    </Button>
+                    </IGRPButtonPrimitive>
                 ) : (
-                    <Button variant="ghost" size="icon" className="p-0">
+                    <IGRPButtonPrimitive variant="ghost" size="icon" className="p-0">
                         <User2Icon className="h-4 w-4" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -73,13 +73,13 @@ function GitConnectionMenu() {
                             </div>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="icon"
                                         onClick={logoutGithub}
                                     >
                                         <LogOut className="h-3 w-3" />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>{t('logout')}</p>
@@ -113,13 +113,13 @@ function GitConnectionMenu() {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => logoutGitLab()}
                                     >
                                         <LogOut className="h-3 w-3" />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>{t('logout')}</p>

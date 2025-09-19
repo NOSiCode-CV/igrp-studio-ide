@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@renderer/components/ui/table';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { GripVertical, Plus, Trash } from 'lucide-react';
 import { Checkbox } from '@renderer/components/ui/checkbox';
@@ -275,7 +275,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     addRow();
@@ -286,7 +286,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                             >
                                                 <Plus size={14} />
                                                 <span className="sr-only">{`New ${btnLabels}`}</span>
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </TooltipTrigger>
                                         <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
                                     </Tooltip>
@@ -647,7 +647,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         )}
                         {removeRow && (
                             <TableCell className="py-1!">
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="ghost"
                                     size="icon"
                                     className={`text-destructive opacity-0 group-hover/item:opacity-100`}
@@ -657,7 +657,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     }}
                                 >
                                     <Trash />
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </TableCell>
                         )}
                     </TableRow>

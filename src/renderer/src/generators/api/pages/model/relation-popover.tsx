@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronsUpDown } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Popover,
     PopoverContent,
@@ -126,12 +126,12 @@ export function RelationPopover({
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                <Button variant="link" className="w-full justify-start">
+                <IGRPButtonPrimitive variant="link" className="w-full justify-start">
                     {field.relation && field.relation.entity
                         ? `${field.relation.type} ${t('with')} ${field.relation.entity}.${field.relation.referencedColumnName}`
                         : t('setRelation')}
                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
+                </IGRPButtonPrimitive>
             </PopoverTrigger>
             <PopoverContent className="w-100 space-y-3">
                 <Tabs defaultValue="relationSettings">
@@ -374,13 +374,13 @@ export function RelationPopover({
                     </TabsContent>
                 </Tabs>
                 <div className="flex justify-between">
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         onClick={() => changeValue('relation', undefined)}
                     >
                         {t('removeRelation')}
-                    </Button>
-                    <Button onClick={handleUpdate}>{t('apply')}</Button>
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive onClick={handleUpdate}>{t('apply')}</IGRPButtonPrimitive>
                 </div>
             </PopoverContent>
         </Popover>

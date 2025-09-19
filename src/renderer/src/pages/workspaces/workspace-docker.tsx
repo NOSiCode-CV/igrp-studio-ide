@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Card,
     CardContent,
@@ -70,14 +70,14 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             <div className="text-xs font-medium px-3">
                             {t('igrpComposeYml')}
                             </div>
-                            <Button
+                            <IGRPButtonPrimitive
                                 size="sm"
                                 variant="ghost"
                                 className="h-6 w-6 p-0"
                                 onClick={() => loadComposeFile(workspace.path)}
                             >
                                 <RefreshCw className="h-3.5 w-3.5" />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                         {content && (
                             <MonacoEditor
@@ -95,7 +95,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                         {t('servicesEnabled')}
                     </div>
                     <div className="flex gap-2">
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             className="h-7"
                             variant="outline"
@@ -112,8 +112,8 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                                     {t('copy')}
                                 </>
                             )}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             size="sm"
                             className="h-7"
                             variant="outline"
@@ -121,7 +121,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                         >
                             <Save className="h-3.5 w-3.5 mr-1" />
                             {t('save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 </CardFooter>
             </Card>

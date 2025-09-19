@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -94,9 +94,9 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <IGRPButtonPrimitive variant="ghost" size="icon" className="h-8 w-8">
                                     <MoreHorizontal className="h-4 w-4" />
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="min-w-40">
                                 <DropdownMenuItem onClick={() => onEdit(config)}>

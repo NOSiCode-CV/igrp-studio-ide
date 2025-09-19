@@ -7,7 +7,7 @@ import {
     DialogDescription,
     DialogFooter,
 } from '@renderer/components/ui/dialog';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import {
     SelectInput,
@@ -157,17 +157,17 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
                 </div>
 
                 <DialogFooter className="gap-2">
-                    <Button variant="outline" onClick={handleCancel}>
+                    <IGRPButtonPrimitive variant="outline" onClick={handleCancel}>
                         Cancel
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         onClick={handleConfirm}
                         disabled={!description.trim() || !componentName.trim()}
                         className="gap-2"
                     >
                         <Plus className="h-4 w-4" />
                         {previousComponent ? 'Copy Step' : 'Generate Step'}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

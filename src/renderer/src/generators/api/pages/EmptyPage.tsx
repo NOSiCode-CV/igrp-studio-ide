@@ -1,5 +1,5 @@
 import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Card, CardContent } from '@renderer/components/ui/card';
 import {
     Tooltip,
@@ -63,14 +63,14 @@ const EmptyPage = ({ onClick }: { onClick: (option: string) => void }) => {
                             </div>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="default"
                                         className="w-full truncate"
                                     >
                                         <span className="block text-ellipsis overflow-hidden whitespace-nowrap">
                                             {action.title} ({action.shortcut})
                                         </span>
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     {action.title} - {action.shortcut}

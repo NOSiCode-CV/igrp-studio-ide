@@ -8,7 +8,7 @@ import {
     Lock,
     AlertCircle,
 } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -138,14 +138,14 @@ export function ListGitProject({
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
+                            <IGRPButtonPrimitive
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => window.open(repo.html_url)}
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 <span className="sr-only">{t('view')}</span>
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TooltipTrigger>
                         <TooltipContent>
                             <p>{t('viewRepository')}</p>
@@ -153,16 +153,16 @@ export function ListGitProject({
                     </Tooltip>
 
                     {isCloned ? (
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             variant="secondary"
                             onClick={handleOpen}
                         >
                             <FolderOpen className="h-4 w-4 mr-2" />
                             {t('open')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     ) : (
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             variant="outline"
                             onClick={() => handleClone(repo)}
@@ -170,7 +170,7 @@ export function ListGitProject({
                         >
                             <GitFork className="h-4 w-4 mr-2" />
                             {isCloning ? 'Cloning...' : 'Clone'}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     )}
                 </div>
             </div>

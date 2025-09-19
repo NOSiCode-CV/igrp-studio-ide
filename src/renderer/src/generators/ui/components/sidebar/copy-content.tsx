@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useTranslation } from 'react-i18next';
@@ -143,9 +143,9 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
                     name="component"
                     label={t('Components')}
                 />
-                <Button className="mt-2" onClick={handleCopyClick}>
+                <IGRPButtonPrimitive className="mt-2" onClick={handleCopyClick}>
                     {t('Copy Properties')}
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import { Form, Formik } from 'formik';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 import { Label } from '@renderer/components/ui/label';
 import { useTranslation } from 'react-i18next';
@@ -541,7 +541,7 @@ export function ConnectionForm({
                     </Tabs>
 
                     <div className="flex justify-between items-center">
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="link"
                             className="link text-igrp"
                             type="button"
@@ -550,15 +550,15 @@ export function ConnectionForm({
                             }
                         >
                             {t('testConnection')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                         <div className="flex space-x-2 mt-4">
-                            <Button variant="outline" onClick={onCancel}>
+                            <IGRPButtonPrimitive variant="outline" onClick={onCancel}>
                                 {t('cancel')}
-                            </Button>
-                            <Button type="submit">
+                            </IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive type="submit">
                                 {connection.name ? t('Update') : t('Add')}{' '}
                                 Connection
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
                 </Form>

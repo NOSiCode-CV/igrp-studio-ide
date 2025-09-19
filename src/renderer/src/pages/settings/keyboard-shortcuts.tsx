@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@renderer/components/ui/input';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { SHORTCUTS } from '@renderer/constants/shortcut';
 import { Switch } from '@renderer/components/ui/switch';
@@ -113,9 +113,9 @@ export default function KeyboardShortcuts() {
             </span>
             <Switch checked={enabled} onCheckedChange={setEnabled} />
           </div>
-          <Button variant="outline" size="sm" onClick={() => setEnabled(true)}>
+          <IGRPButtonPrimitive variant="outline" size="sm" onClick={() => setEnabled(true)}>
             {t('resetToDefault')}
-          </Button>
+          </IGRPButtonPrimitive>
         </div>
         
         <div className="relative">

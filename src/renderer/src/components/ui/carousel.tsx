@@ -7,7 +7,7 @@ import useEmblaCarousel, {
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
 import { cn } from "@renderer/lib/utils"
-import { Button } from "@renderer/components/ui/button"
+import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system"
 import { useTranslation } from 'react-i18next';
 
 type CarouselApi = UseEmblaCarouselType[1]
@@ -182,7 +182,7 @@ function CarouselPrevious({
   const { orientation, scrollPrev, canScrollPrev } = useCarousel()
 
   return (
-    <Button
+    <IGRPButtonPrimitive
       data-slot="carousel-previous"
       variant={variant}
       size={size}
@@ -199,7 +199,7 @@ function CarouselPrevious({
     >
       <ArrowLeft />
       <span className="sr-only">{t('previous_slide')}</span>
-    </Button>
+    </IGRPButtonPrimitive>
   )
 }
 
@@ -213,7 +213,7 @@ function CarouselNext({
   const { orientation, scrollNext, canScrollNext } = useCarousel()
 
   return (
-    <Button
+    <IGRPButtonPrimitive
       data-slot="carousel-next"
       variant={variant}
       size={size}
@@ -230,7 +230,7 @@ function CarouselNext({
     >
       <ArrowRight />
       <span className="sr-only">{t('next_slide')}</span>
-    </Button>
+    </IGRPButtonPrimitive>
   )
 }
 

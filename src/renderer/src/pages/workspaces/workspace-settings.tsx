@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Card,
     CardContent,
@@ -117,7 +117,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 readOnly
                                 className="h-8 text-xs font-mono bg-muted/50 flex-1 rounded-r-none"
                             />
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="outline"
                                 size="sm"
                                 className="h-8 rounded-l-none border-l-0"
@@ -128,7 +128,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 ) : (
                                     <Copy className="h-3.5 w-3.5" />
                                 )}
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                                 {t('workspaceIdDescription')}
@@ -170,7 +170,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             })}
                         </div>
                     )}
-                    <Button
+                    <IGRPButtonPrimitive
                         size="sm"
                         className="h-7"
                         onClick={handleSaveWorkspace}
@@ -181,7 +181,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         }
                     >
                         {isSaving ? t('saving') : t('saveChanges')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </CardFooter>
             </Card>
 
@@ -254,14 +254,14 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             </div>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         variant="destructive"
                                         size="sm"
                                         className="h-7"
                                     >
                                         <Trash2 className="h-3.5 w-3.5 mr-1" />
                                         <span>{t('delete')}</span>
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="compact-dialog">
                                     <AlertDialogHeader className="compact-dialog-header">

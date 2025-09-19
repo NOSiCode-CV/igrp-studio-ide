@@ -3,7 +3,7 @@
 import type * as React from 'react';
 import { CuboidIcon as Cube, Plus } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Separator } from './ui/separator';
 import { useTranslation } from 'react-i18next';
 
@@ -45,10 +45,10 @@ export function EmptyList({
             </p>
 
             {actionLabel && onAction && (
-                <Button onClick={onAction} variant="outline" size="sm">
+                <IGRPButtonPrimitive onClick={onAction} variant="outline" size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     {actionLabel}
-                </Button>
+                </IGRPButtonPrimitive>
             )}
 
             {shortcut && (

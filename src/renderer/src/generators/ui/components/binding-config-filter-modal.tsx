@@ -12,7 +12,7 @@ import { FormList } from '@renderer/components/form-list';
 import { handleChangeValueObject } from '@renderer/generators/api/helpers';
 import { FormikProps, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Loader2 } from 'lucide-react';
@@ -208,7 +208,7 @@ export const BindingConfigurationFilterModal = ({
 
                             <DialogFooter className="space-x-2">
                                 <DialogClose>Close</DialogClose>
-                                <Button
+                                <IGRPButtonPrimitive
                                     type="submit"
                                     disabled={formik.isSubmitting}
                                 >
@@ -216,7 +216,7 @@ export const BindingConfigurationFilterModal = ({
                                         <Loader2 className="animate-spin" />
                                     )}
                                     Save changes
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </DialogFooter>
                         </form>
                     </ScrollArea>

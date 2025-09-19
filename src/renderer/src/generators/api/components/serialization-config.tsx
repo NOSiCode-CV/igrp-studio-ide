@@ -8,7 +8,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@renderer/components/ui/dialog';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Input } from '@renderer/components/ui/input';
 
 import MonacoEditor from '@renderer/components/monaco-editor';
@@ -197,7 +197,7 @@ export default function SerializationConfigModal({
                         }}
                     />
                     <DialogFooter>
-                        <Button type="submit">{t('save')}</Button>
+                        <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
                     </DialogFooter>
                 </form>
             </DialogContent>

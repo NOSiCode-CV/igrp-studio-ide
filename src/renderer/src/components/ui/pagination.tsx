@@ -6,7 +6,8 @@ import {
 } from "lucide-react"
 
 import { cn } from "@renderer/lib/utils"
-import { Button, buttonVariants } from "@renderer/components/ui/button"
+import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system"
+import { buttonVariants } from "@renderer/components/ui/button"
 import { useTranslation } from 'react-i18next';
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
@@ -40,7 +41,7 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 
 type PaginationLinkProps = {
   isActive?: boolean
-} & Pick<React.ComponentProps<typeof Button>, "size"> &
+} & Pick<React.ComponentProps<typeof IGRPButtonPrimitive>, "size"> &
   React.ComponentProps<"a">
 
 function PaginationLink({

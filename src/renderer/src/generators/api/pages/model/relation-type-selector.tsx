@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -91,7 +91,7 @@ export function RelationTypeSelector({
                             <React.Fragment key={type}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             size="icon"
                                             onClick={() => onChange(type)}
                                             className={cn(
@@ -101,7 +101,7 @@ export function RelationTypeSelector({
                                             )}
                                         >
                                             {relationTypeIcons[type as keyof typeof relationTypeIcons]}
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>{type}</p>

@@ -1,5 +1,5 @@
 import { RefreshCw } from 'lucide-react';
-import { Button } from '../ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { cn } from '@renderer/lib/utils';
 import AlertDialogSync from './alert-dialog';
@@ -52,7 +52,7 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
         <>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
                         onClick={() => setShowConfirm(true)}
@@ -65,7 +65,7 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
                             )}
                         />
                         {isSyncing && t('syncing')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{t('pullAndPushChanges')}</p>

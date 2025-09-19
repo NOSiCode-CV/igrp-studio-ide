@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Select,
     SelectContent,
@@ -458,7 +458,7 @@ export const BPMNProjectSelector = ({
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Select Project</label>
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         size="sm"
                         onClick={() => {
@@ -470,7 +470,7 @@ export const BPMNProjectSelector = ({
                     >
                         <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
                 <Select
                     onValueChange={handleProjectChange}
@@ -526,7 +526,7 @@ export const BPMNProjectSelector = ({
                         </div>
                         <div className="flex items-center space-x-2">
                             {loadingProcesses && <IGRPLoadingSpinner />}
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 px-2"
@@ -538,7 +538,7 @@ export const BPMNProjectSelector = ({
                             >
                                 <RefreshCw className='w-4 h-4'/>
                                 Refresh
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
 
@@ -611,14 +611,14 @@ export const BPMNProjectSelector = ({
                                         </p>
                                     </div>
                                     <div className="flex space-x-2">
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             className="flex items-center space-x-2"
                                         >
                                             <Settings />
                                             Bulk Actions
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 </div>
 
@@ -674,13 +674,13 @@ export const BPMNProjectSelector = ({
                                                                         {selectedProcess.version ||
                                                                             'N/A'}
                                                                     </Badge>
-                                                                    <Button
+                                                                    <IGRPButtonPrimitive
                                                                         variant="ghost"
                                                                         size="sm"
                                                                         className="h-6 w-6 p-0"
                                                                     >
                                                                         <EllipsisVertical />
-                                                                    </Button>
+                                                                    </IGRPButtonPrimitive>
                                                                 </div>
                                                             </div>
                                                         </CardHeader>
@@ -693,7 +693,7 @@ export const BPMNProjectSelector = ({
                                                                     {`Sub Process - ${artifact.subProcessName}`}
                                                                 </Badge>
                                                             )}
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 size="sm"
                                                                 className="w-full"
                                                                 variant={
@@ -725,7 +725,7 @@ export const BPMNProjectSelector = ({
                                                                         Step
                                                                     </>
                                                                 )}
-                                                            </Button>
+                                                            </IGRPButtonPrimitive>
                                                         </CardContent>
                                                     </Card>
                                                 );

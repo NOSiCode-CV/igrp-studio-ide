@@ -9,7 +9,7 @@ import {
     Stethoscope,
 } from 'lucide-react';
 
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Tooltip,
     TooltipContent,
@@ -121,14 +121,14 @@ export function Footer() {
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
+                            <IGRPButtonPrimitive
                                 size={'icon'}
                                 variant={'ghost'}
                                 className="h-6 w-6"
                                 onClick={() => setOpen(!open)}
                             >
                                 <Stethoscope className="text-muted-foreground" />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TooltipTrigger>
                         <TooltipContent side="top">Doctor</TooltipContent>
                     </Tooltip>
@@ -155,13 +155,13 @@ export function Footer() {
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6"
                             >
                                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </TooltipTrigger>
                         <TooltipContent side="top">
                             <p>{t('helpCenter')}</p>

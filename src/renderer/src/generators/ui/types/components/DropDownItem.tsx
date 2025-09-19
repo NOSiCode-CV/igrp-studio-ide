@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,9 +20,9 @@ export function DropDownItem({ comp }: DropdownItemProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant={'ghost'} size={'icon'}>
+                <IGRPButtonPrimitive variant={'ghost'} size={'icon'}>
                     <Ellipsis />
-                </Button>
+                </IGRPButtonPrimitive>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useIsMobile } from "@renderer/hooks/use-mobile"
 import { cn } from "@renderer/lib/utils"
-import { Button } from "@renderer/components/ui/button"
+import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system"
 import { Input } from "@renderer/components/ui/input"
 import { Separator } from "@renderer/components/ui/separator"
 import {
@@ -263,7 +263,7 @@ function SidebarTrigger({
   const { t } = useTranslation();
 
   return (
-    <Button
+    <IGRPButtonPrimitive
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
@@ -277,7 +277,7 @@ function SidebarTrigger({
     >
       <PanelLeftIcon />
       <span className="sr-only">{t('toggleSidebar')}</span>
-    </Button>
+    </IGRPButtonPrimitive>
   )
 }
 
