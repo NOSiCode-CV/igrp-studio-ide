@@ -7,7 +7,7 @@ import {
 } from '../ui/tooltip';
 import { icons } from 'lucide-react';
 import { getLabel } from '@renderer/utils';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { Grid } from 'react-window';
 import { useDebounce } from 'use-debounce';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
@@ -49,9 +49,9 @@ const IconBrowser = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
         gridRef.current?.scrollTo({ scrollTop: 0 });
     }, [filteredIcons]);
 
-    const Cell = ({ columnIndex, rowIndex, style }: any) => {
+    const Cell = ({ columnIndex, rowIndex, style }: { columnIndex: number; rowIndex: number; style: React.CSSProperties }) => {
         const index = rowIndex * columnCount + columnIndex;
-        if (index >= filteredIcons.length) return null;
+        if (index >= filteredIcons.length) return <div />;
 
         const iconName = filteredIcons[index];
         const IconComponent = icons[iconName];
