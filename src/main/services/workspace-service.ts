@@ -21,8 +21,25 @@ export class WorkspaceRepository {
 
     private async loadData(): Promise<{ workspaces: IWorkspace[] }> {
         await this.ensureFileExists(WORKSPACE_FILE, JSON.stringify({ workspaces: [] }, null, 2));
-        const data = await readFile(WORKSPACE_FILE, 'utf-8');
-        return data ? JSON.parse(data) : { workspaces: [] }
+        const raw = await readFile(WORKSPACE_FILE, 'utf-8');
+        if (!raw) return { workspaces: [] };
+        try {
+            return JSON.parse(raw);
+        } catch (err) {
+            // If JSON is corrupted (e.g., trailing characters), back it up and reset to a safe default
+            try {
+                if (!fs.existsSync(BACKUP_DIR)) {
+                    await mkdir(BACKUP_DIR, { recursive: true });
+                }
+                const safeTime = new Date().toISOString().replace(/:/g, '-');
+                const backupPath = path.join(BACKUP_DIR, `corrupt-workspaces-${safeTime}.json`);
+                await writeFile(backupPath, raw);
+            } catch (backupErr) {
+                // ignore backup errors to avoid blocking app startup
+            }
+            await writeFile(WORKSPACE_FILE, JSON.stringify({ workspaces: [] }, null, 2));
+            return { workspaces: [] };
+        }
     }
 
     private async saveData(data: { workspaces: IWorkspace[] }): Promise<void> {
@@ -165,7 +182,7 @@ export class WorkspaceRepository {
             const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
             if (projectIndex !== -1 && workspace.projects) {
                 const oldProject = workspace.projects[projectIndex];
-                
+
                 // Clean up old icon file if icon is being updated
                 if (icon && icon !== oldProject.icon && oldProject.icon) {
                     try {
