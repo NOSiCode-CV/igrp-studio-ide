@@ -55,7 +55,6 @@ import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 import { folderWatcher } from './helpers/watch-folder';
 
 import { mainBindings } from 'i18next-electron-fs-backend';
-import { ENV_TYPES } from './engines/EngineFactory';
 
 let mainWindow: BrowserWindow;
 

@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import {
     Card,
     CardContent,
@@ -46,6 +45,7 @@ import { toast } from 'sonner';
 import { useAppLogic } from '@renderer/hooks/use-app-logic';
 import { EnvironmentForm } from './components/environment-form';
 import type { AppLogicEnvironment } from 'src/main/types';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 export default function AppLogicPage() {
     const {
