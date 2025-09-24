@@ -67,13 +67,13 @@ export default function Doctor({
 
         return {
             category,
-            title: category === 'frontend' ? 'Frontend Development' : 
+            title: category === 'frontend' ? 'Frontend Development' :
                    category === 'backend' ? 'Backend Development' : 'Development Infrastructure',
             description: category === 'frontend' ? 'Tools for React, Next.js, and modern web development' :
                         category === 'backend' ? 'Tools for Java, Spring Boot, and .NET development' :
                         'Essential development tools and infrastructure',
-            icon: category === 'frontend' ? <Globe className="h-6 w-6" /> : 
-                  category === 'backend' ? <Settings className="h-6 w-6" /> : 
+            icon: category === 'frontend' ? <Globe className="h-6 w-6" /> :
+                  category === 'backend' ? <Settings className="h-6 w-6" /> :
                   <Wrench className="h-6 w-6" />,
             tools: categoryTools,
             totalTools: categoryTools.length,
@@ -108,7 +108,7 @@ export default function Doctor({
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
 
-                
+
                     {loading ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="flex items-center gap-2 text-gray-600">
@@ -157,7 +157,7 @@ export default function Doctor({
                                                     <div className="flex items-center gap-2">
                                                         {status.icon}
                                                         <IGRPBadgePrimitive
-                                                            variant={status.status === 'success' ? 'default' : 
+                                                            variant={status.status === 'success' ? 'default' :
                                                                     status.status === 'partial' ? 'secondary' : 'destructive'}
                                                             className="text-xs"
                                                         >
@@ -236,8 +236,8 @@ export default function Doctor({
                                 <div className="mt-6 pt-4 border-t">
                                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                                         <span>
-                                            Total tools checked: {results.length} • 
-                                            Successful: {results.filter(t => t.success).length} • 
+                                            Total tools checked: {results.length} •
+                                            Successful: {results.filter(t => t.success).length} •
                                             Required missing: {results.filter(t => t.required && !t.success).length}
                                         </span>
                                         <span>Last checked: {new Date().toLocaleTimeString()}</span>
