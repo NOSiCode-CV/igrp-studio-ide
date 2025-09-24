@@ -1,26 +1,26 @@
 'use client';
 import { useState } from 'react';
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
-import { Badge } from '@renderer/components/ui/badge';
-import { Input } from '@renderer/components/ui/input';
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@renderer/components/ui/dialog';
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive   ,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuTriggerPrimitive    ,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     Plus,
     MoreHorizontal,
@@ -175,35 +175,35 @@ export default function AppLogicPage() {
                         <Download className="h-4 w-4 mr-2" />
                         Export
                     </IGRPButtonPrimitive>
-                    <Dialog
+                    <IGRPDialogPrimitive
                         open={isCreateDialogOpen}
                         onOpenChange={setIsCreateDialogOpen}
                     >
-                        <DialogTrigger asChild>
+                        <IGRPDialogTriggerPrimitive asChild>
                             <IGRPButtonPrimitive variant={'default'}>
                                 <Plus className="h-4 w-4 mr-2" />
                                 New Environment
                             </IGRPButtonPrimitive>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>
+                        </IGRPDialogTriggerPrimitive>
+                        <IGRPDialogContentPrimitive onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()} className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <IGRPDialogHeaderPrimitive>
+                                <IGRPDialogTitlePrimitive>
                                     Create New Environment
-                                </DialogTitle>
-                            </DialogHeader>
+                                </IGRPDialogTitlePrimitive>
+                            </IGRPDialogHeaderPrimitive>
                             <EnvironmentForm
                                 onSubmit={handleCreateEnvironment}
                                 onCancel={() => setIsCreateDialogOpen(false)}
                             />
-                        </DialogContent>
-                    </Dialog>
+                        </IGRPDialogContentPrimitive>
+                    </IGRPDialogPrimitive>
                 </div>
             </div>            
 
             {/* Search */}
             <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
+                <IGRPInputText
                     placeholder="Search environments..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -238,20 +238,20 @@ export default function AppLogicPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredEnvironments.map((environment) => (
-                        <Card
+                        <IGRPCardPrimitive
                             key={environment.id}
                             className="relative group hover:shadow-md transition-shadow"
                         >
-                            <CardHeader className="pb-3">
+                            <IGRPCardHeaderPrimitive className="pb-3">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center gap-2">
                                         {getStatusIcon(environment.status)}
-                                        <CardTitle className="text-lg">
+                                        <IGRPCardTitlePrimitive className="text-lg">
                                             {environment.name}
-                                        </CardTitle>
+                                        </IGRPCardTitlePrimitive>
                                     </div>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
+                                    <IGRPDropdownMenuPrimitive>
+                                        <IGRPDropdownMenuTriggerPrimitive asChild>
                                             <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
@@ -259,9 +259,9 @@ export default function AppLogicPage() {
                                             >
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </IGRPButtonPrimitive>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
+                                        </IGRPDropdownMenuTriggerPrimitive>
+                                        <IGRPDropdownMenuContentPrimitive align="end">
+                                            <IGRPDropdownMenuItemPrimitive
                                                 onClick={() =>
                                                     handleTestEnvironment(
                                                         environment.id
@@ -273,8 +273,8 @@ export default function AppLogicPage() {
                                             >
                                                 <TestTube className="h-4 w-4 mr-2" />
                                                 Test Connection
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
+                                            </IGRPDropdownMenuItemPrimitive>
+                                            <IGRPDropdownMenuItemPrimitive
                                                 onClick={() =>
                                                     setEditingEnvironment(
                                                         environment
@@ -283,8 +283,8 @@ export default function AppLogicPage() {
                                             >
                                                 <Edit className="h-4 w-4 mr-2" />
                                                 Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
+                                            </IGRPDropdownMenuItemPrimitive>
+                                            <IGRPDropdownMenuItemPrimitive
                                                 className="text-red-600"
                                                 onClick={() =>
                                                     handleDeleteEnvironment(
@@ -294,15 +294,15 @@ export default function AppLogicPage() {
                                             >
                                                 <Trash2 className="h-4 w-4 mr-2" />
                                                 Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                            </IGRPDropdownMenuItemPrimitive>
+                                        </IGRPDropdownMenuContentPrimitive>
+                                    </IGRPDropdownMenuPrimitive>
                                 </div>
-                                <Badge variant="outline" className="w-fit">
+                                <IGRPBadge variant="outline" className="w-fit">
                                     {environment.status}
-                                </Badge>
-                            </CardHeader>
-                            <CardContent>
+                                </IGRPBadge>
+                            </IGRPCardHeaderPrimitive>
+                            <IGRPCardContentPrimitive>
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Globe className="h-4 w-4" />
@@ -376,21 +376,21 @@ export default function AppLogicPage() {
                                         )}
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </IGRPCardContentPrimitive>
+                        </IGRPCardPrimitive>
                     ))}
                 </div>
             )}
 
             {/* Edit Dialog */}
-            <Dialog
+            <IGRPDialogPrimitive
                 open={!!editingEnvironment}
                 onOpenChange={() => setEditingEnvironment(null)}
             >
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>Edit Environment</DialogTitle>
-                    </DialogHeader>
+                <IGRPDialogContentPrimitive className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <IGRPDialogHeaderPrimitive>
+                        <IGRPDialogTitlePrimitive>Edit Environment</IGRPDialogTitlePrimitive>
+                    </IGRPDialogHeaderPrimitive>
                     {editingEnvironment && (
                         <EnvironmentForm
                             environment={editingEnvironment}
@@ -398,8 +398,8 @@ export default function AppLogicPage() {
                             onCancel={() => setEditingEnvironment(null)}
                         />
                     )}
-                </DialogContent>
-            </Dialog>
+                </IGRPDialogContentPrimitive>
+            </IGRPDialogPrimitive>
         </div>
     );
 }

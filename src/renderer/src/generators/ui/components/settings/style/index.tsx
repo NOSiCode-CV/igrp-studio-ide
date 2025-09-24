@@ -22,14 +22,8 @@ import { EffectsSection } from './components/EffectsSection';
 import { CustomPropertiesSection } from './components/CustomPropertiesSection';
 import { StyleComponent } from './types';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from '@renderer/components/ui/accordion';
 import { generateAllClasses } from './utils';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPAccordionItemPrimitive, IGRPAccordionContentPrimitive, IGRPAccordionPrimitive, IGRPAccordionTriggerPrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface StyleSection {
     id: string;
@@ -168,10 +162,10 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
 
     return (
         <div className="p-1.5">
-            <Accordion type="single" collapsible className="w-full">
+            <IGRPAccordionPrimitive type="single" collapsible className="w-full">
                 {sections.map((section) => (
-                    <AccordionItem key={section.id} value={section.id}>
-                        <AccordionTrigger className="group">
+                    <IGRPAccordionItemPrimitive key={section.id} value={section.id}>
+                        <IGRPAccordionTriggerPrimitive className="group">
                             <div className="flex align-middle items-center gap-2">
                                 {section.icon}
                                 {section.title}
@@ -193,17 +187,17 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                                     <RotateCcw className='h-4'/>
                                 </IGRPButtonPrimitive>
                             </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
+                        </IGRPAccordionTriggerPrimitive>
+                        <IGRPAccordionContentPrimitive>
                             <section.component
                                 onChangeStyles={onChangeStyles}
                                 styles={styleState}
                                 resetStyles={resetStyles}
                             />
-                        </AccordionContent>
-                    </AccordionItem>
+                        </IGRPAccordionContentPrimitive>
+                    </IGRPAccordionItemPrimitive>
                 ))}
-            </Accordion>
+            </IGRPAccordionPrimitive>
 
             {/* Style Class Info */}
             {classes && (

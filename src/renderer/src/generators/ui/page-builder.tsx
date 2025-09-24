@@ -12,7 +12,7 @@ import useToast from '@renderer/hooks/useToast';
 import { CodeContentJson, CodeContentTS } from './components/CodeContent';
 
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
-import { SidebarInset } from '@renderer/components/ui/sidebar';
+import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { DragEndResult } from '@renderer/lib/dnd/types';
 import { useDroppedComponents } from './dnd/DroppedComponentsContext';
 import { APRESENTATION } from '@renderer/constants/appConstants';
@@ -246,13 +246,13 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         return (
             <div className="flex flex-1 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath} />
-                <SidebarInset>
+                <IGRPSidebarInsetPrimitive>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>
                             {renderContent}
                         </ContainerScrollArea>
                     </div>
-                </SidebarInset>
+                </IGRPSidebarInsetPrimitive>
                 {currentComponent && <SidebarRight />}
             </div>
         );

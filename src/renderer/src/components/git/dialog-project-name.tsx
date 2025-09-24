@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Input } from '../ui/input';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 export const ProjectNameDialog = ({
@@ -26,14 +26,14 @@ export const ProjectNameDialog = ({
     const [projectName, setProjectName] = useState(defaultName);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t('enterProjectName')}</DialogTitle>
-                    <DialogDescription />
-                </DialogHeader>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>{t('enterProjectName')}</IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive />
+                </IGRPDialogHeaderPrimitive>
                 <div className="py-4">
-                    <Input
+                    <IGRPInputText
                         type="text"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
@@ -41,7 +41,7 @@ export const ProjectNameDialog = ({
                         placeholder={t('projectNamePlaceholder')}
                     />
                 </div>
-                <DialogFooter>
+                <IGRPDialogFooterPrimitive>
                     <IGRPButtonPrimitive variant="outline" onClick={onClose}>
                         {t('cancel')}
                     </IGRPButtonPrimitive>
@@ -51,8 +51,8 @@ export const ProjectNameDialog = ({
                     >
                         {t('confirm')}
                     </IGRPButtonPrimitive>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </IGRPDialogFooterPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };

@@ -1,15 +1,8 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import {
@@ -183,21 +176,21 @@ export function DuplicatePageModal({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogTitle>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogTitlePrimitive>
                     {t('duplicateItem', {
                         type: isPage ? 'page' : 'component',
                         name:
                             pageToDuplicate?.description ||
                             pageToDuplicate?.pageName,
                     })}
-                </DialogTitle>
-                <DialogDescription>
+                </IGRPDialogTitlePrimitive>
+                <IGRPDialogDescriptionPrimitive>
                     {t('duplicateItemDescription', {
                         type: isPage ? 'page' : 'component',
                     })}
-                </DialogDescription>
+                </IGRPDialogDescriptionPrimitive>
                 <form
                     className="needs-validation space-y-4"
                     onSubmit={(e) => {
@@ -248,7 +241,7 @@ export function DuplicatePageModal({
                             />
                         )}
                     </div>
-                    <DialogFooter className="flex justify-between">
+                    <IGRPDialogFooterPrimitive className="flex justify-between">
                         <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
                         </IGRPButtonPrimitive>
@@ -261,9 +254,9 @@ export function DuplicatePageModal({
                                 ? t('duplicating')
                                 : t('duplicate')}
                         </IGRPButtonPrimitive>
-                    </DialogFooter>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

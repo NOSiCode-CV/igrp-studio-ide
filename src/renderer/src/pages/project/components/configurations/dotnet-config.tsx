@@ -1,13 +1,7 @@
 'use client';
 
-import { Label } from '@renderer/components/ui/label';
-import { Input } from '@renderer/components/ui/input';
-import {
-    RadioGroup,
-    RadioGroupItem,
-} from '@renderer/components/ui/radio-group';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Textarea } from '@renderer/components/ui/textarea';
+import { IGRPCheckboxPrimitive, IGRPInputPrimitive, IGRPLabel, IGRPRadioGroupItemPrimitive, IGRPRadioGroupPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
@@ -41,7 +35,7 @@ export function DotNetConfig({
         <div className="space-y-6">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <Input
+                <IGRPInputText
                     id="name"
                     value={data.name}
                     onChange={(e) =>
@@ -53,8 +47,8 @@ export function DotNetConfig({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="description">{t('description')}</Label>
-                <Textarea
+                <IGRPLabel htmlFor="description">{t('description')}</IGRPLabel>
+                <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}
                     onChange={(e) =>
@@ -66,7 +60,7 @@ export function DotNetConfig({
 
             <div className="space-y-2">
                 <LabelRequired>{t('artifact')}</LabelRequired>
-                <Input
+                <IGRPInputPrimitive
                     id="artifact"
                     value={data.artifact}
                     onChange={(e) =>
@@ -93,8 +87,8 @@ export function DotNetConfig({
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
-                    <Label>{t('projectStructureStyle')}</Label>
-                    <RadioGroup
+                    <IGRPLabel>{t('projectStructureStyle')}</IGRPLabel>
+                    <IGRPRadioGroupPrimitive
                         value={data.projectStructureStyle}
                         onValueChange={(value) =>
                             onChange({
@@ -107,18 +101,18 @@ export function DotNetConfig({
                         className="flex gap-4"
                     >
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="technical" id="technical" />
-                            <Label htmlFor="technical">{t('technical')}</Label>
+                            <IGRPRadioGroupItemPrimitive value="technical" id="technical" />
+                            <IGRPLabel htmlFor="technical">{t('technical')}</IGRPLabel>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="domain" id="domain" />
-                            <Label htmlFor="domain">{t('domainDriven')}</Label>
+                            <IGRPRadioGroupItemPrimitive value="domain" id="domain" />
+                            <IGRPLabel htmlFor="domain">{t('domainDriven')}</IGRPLabel>
                         </div>
-                    </RadioGroup>
+                    </IGRPRadioGroupPrimitive>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    <Checkbox
+                    <IGRPCheckboxPrimitive
                         id="observability"
                         checked={data.enableObservability}
                         onCheckedChange={(checked) =>
@@ -128,9 +122,9 @@ export function DotNetConfig({
                             })
                         }
                     />
-                    <Label htmlFor="observability">
+                    <IGRPLabel htmlFor="observability">
                         {t('enableObservability')}
-                    </Label>
+                    </IGRPLabel>
                 </div>
             </div>
         </div>

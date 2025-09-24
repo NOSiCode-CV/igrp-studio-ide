@@ -1,10 +1,10 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useEffect, useState } from 'react';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { nanoid } from '@reduxjs/toolkit';
 import { GitLabProvider } from '@renderer/redux/git/reducer';
@@ -39,8 +39,8 @@ function GitLabConfigForm({
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <Label>{t('custom_gitlab_name')}</Label>
-                <Input
+                <IGRPLabel>{t('custom_gitlab_name')}</IGRPLabel>
+                <IGRPInputText
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -49,8 +49,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>{t('gitlab_base_url')}</Label>
-                <Input
+                <IGRPLabel>{t('gitlab_base_url')}</IGRPLabel>
+                <IGRPInputText
                     type="text"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
@@ -59,8 +59,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>{t('client_id')}</Label>
-                <Input
+                <IGRPLabel>{t('client_id')}</IGRPLabel>
+                <IGRPInputText
                     type="text"
                     value={clientId}
                     onChange={(e) => setClientId(e.target.value)}
@@ -68,8 +68,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>{t('client_secret')}</Label>
-                <Input
+                <IGRPLabel>{t('client_secret')}</IGRPLabel>
+                <IGRPInputPrimitive
                     type="password"
                     value={clientSecret}
                     onChange={(e) => setClientSecret(e.target.value)}

@@ -1,13 +1,12 @@
 'use client';
 
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPSkeletonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { baseColors } from './base-color';
 import { useTheme } from 'next-themes';
-import { Skeleton } from '@renderer/components/ui/skeleton';
 import { Check } from 'lucide-react';
 import { ThemeService } from '@renderer/services/ThemeService';
 import { useThemeConfig } from '@renderer/components/ActiveThemeProvider';
@@ -37,7 +36,7 @@ export function AppearanceSettings() {
             </div>
             <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs"> {t('accentColor')}</Label>
+                    <IGRPLabel className="text-xs"> {t('accentColor')}</IGRPLabel>
                     <div className="grid w-full grid-cols-6 gap-3">
                         {baseColors.map((theme) => {
                             const isActive = activeTheme === theme.name;
@@ -93,7 +92,7 @@ export function AppearanceSettings() {
                                     </span>
                                 </IGRPButtonPrimitive>
                             ) : (
-                                <Skeleton
+                                <IGRPSkeletonPrimitive
                                     className="h-8 w-[32px] xl:w-[86px]"
                                     key={theme.name}
                                 />

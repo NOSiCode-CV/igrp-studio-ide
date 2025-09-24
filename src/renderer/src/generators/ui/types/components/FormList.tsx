@@ -5,7 +5,7 @@ import Droppable from '@renderer/lib/dnd/Droppable';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
@@ -42,12 +42,12 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
                             <p className="text-sm font-medium">{label}</p>
                             <p className="text-xs">{description}</p>
                         </div>
-                        <Badge
+                        <IGRPBadge
                             variant="outline"
                             className="font-normal text-xs"
                         >
                             {badgeValue || 'nobadge'}
-                        </Badge>
+                        </IGRPBadge>
                     </div>
                     <Droppable
                         component={component}

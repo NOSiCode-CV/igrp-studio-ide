@@ -1,14 +1,14 @@
 import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { nanoid } from '@reduxjs/toolkit';
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@renderer/components/ui/collapsible';
+    IGRPCollapsiblePrimitive,
+    IGRPCollapsibleContentPrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { Plus, X, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -69,9 +69,9 @@ const ImportComponent = ({
 
     return (
         <div className="space-y-2">
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <IGRPCollapsiblePrimitive open={isOpen} onOpenChange={setIsOpen}>
                 <div className="flex items-center justify-between">
-                    <CollapsibleTrigger asChild>
+                    <IGRPCollapsibleTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="ghost"
                             className="flex items-center gap-2 p-0 h-auto hover:bg-transparent"
@@ -82,24 +82,24 @@ const ImportComponent = ({
                                     isOpen && 'rotate-90'
                                 )}
                             />
-                            <Label className="cursor-pointer">
+                            <IGRPLabel className="cursor-pointer">
                                 {t('imports.title')}
-                            </Label>
+                            </IGRPLabel>
                         </IGRPButtonPrimitive>
-                    </CollapsibleTrigger>
-                    <Badge variant="outline" className="text-xs">
+                    </IGRPCollapsibleTriggerPrimitive>
+                    <IGRPBadge variant="outline" className="text-xs">
                         {t('imports.count', { count: imports.length })}
-                    </Badge>
+                    </IGRPBadge>
                 </div>
 
-                <CollapsibleContent>
+                <IGRPCollapsibleContentPrimitive>
                     <div className="border rounded-md p-3 space-y-2 mt-2">
                         {imports.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
                                 {imports.map((imp) => (
-                                    <Badge
+                                    <IGRPBadge
                                         key={imp.id}
-                                        variant="secondary"
+                                        variant="soft"
                                         className="px-2 py-1 flex items-center gap-1"
                                     >
                                         <span className="font-mono">
@@ -113,7 +113,7 @@ const ImportComponent = ({
                                         >
                                             <X className="h-3 w-3" />
                                         </IGRPButtonPrimitive>
-                                    </Badge>
+                                    </IGRPBadge>
                                 ))}
                             </div>
                         ) : (
@@ -123,7 +123,7 @@ const ImportComponent = ({
                         )}
 
                         <div className="flex gap-2">
-                            <Input
+                            <IGRPInputText
                                 value={newImport}
                                 onChange={(e) => setNewImport(e.target.value)}
                                 placeholder={t('imports.placeholder')}
@@ -141,8 +141,8 @@ const ImportComponent = ({
                             </IGRPButtonPrimitive>
                         </div>
                     </div>
-                </CollapsibleContent>
-            </Collapsible>
+                </IGRPCollapsibleContentPrimitive>
+            </IGRPCollapsiblePrimitive>
         </div>
     );
 };

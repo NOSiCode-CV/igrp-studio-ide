@@ -1,15 +1,14 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
+import { IGRPCard, IGRPCardContent, IGRPCardDescription, IGRPCardFooter, IGRPCardHeader, IGRPCardTitle, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
-import { Switch } from '@renderer/components/ui/switch';
-import { Label } from '@renderer/components/ui/label';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { 
     Settings, 
     TestTube, 
@@ -73,60 +72,60 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     };
 
     return (
-        <Card className={`transition-all duration-200 hover:shadow-md ${!isActive ? 'opacity-60' : ''}`}>
-            <CardHeader className="pb-3">
+        <IGRPCard className={`transition-all duration-200 hover:shadow-md ${!isActive ? 'opacity-60' : ''}`}>
+            <IGRPCardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                         <Settings className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-lg">{config.name}</CardTitle>
+                        <IGRPCardTitle className="text-lg">{config.name}</IGRPCardTitle>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex items-center space-x-2">
-                            <Switch
+                            <IGRPSwitchPrimitive
                                 id={`active-${config.id}`}
                                 checked={isActive}
                                 onCheckedChange={handleToggleActive}
                                 disabled={isToggling}
                             />
-                            <Label htmlFor={`active-${config.id}`} className="text-xs">
+                            <IGRPLabel htmlFor={`active-${config.id}`} className="text-xs">
                                 Active
-                            </Label>
+                            </IGRPLabel>
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                        <IGRPDropdownMenuPrimitive>
+                            <IGRPDropdownMenuTriggerPrimitive asChild>
                                 <IGRPButtonPrimitive variant="ghost" size="icon" className="h-8 w-8">
                                     <MoreHorizontal className="h-4 w-4" />
                                 </IGRPButtonPrimitive>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="min-w-40">
-                                <DropdownMenuItem onClick={() => onEdit(config)}>
+                            </IGRPDropdownMenuTriggerPrimitive>
+                            <IGRPDropdownMenuContentPrimitive align="end" className="min-w-40">
+                                <IGRPDropdownMenuItemPrimitive onClick={() => onEdit(config)}>
                                     <Edit className="h-3 w-3 mr-2" /> Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleTestConnection} disabled={isTesting}>
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuItemPrimitive onClick={handleTestConnection} disabled={isTesting}>
                                     <TestTube className="h-3 w-3 mr-2" /> {isTesting ? 'Testing...' : 'Test'}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => window.open(config.apiUrl, '_blank')}>
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuSeparatorPrimitive />
+                                <IGRPDropdownMenuItemPrimitive   onClick={() => window.open(config.apiUrl, '_blank')}>
                                     <ExternalLink className="h-3 w-3 mr-2" /> Open
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuItemPrimitive
                                     onClick={() => onDelete(config.id)}
                                     className="text-destructive focus:text-destructive"
                                 >
                                     <Trash2 className="h-3 w-3 mr-2" /> Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </IGRPDropdownMenuItemPrimitive>
+                            </IGRPDropdownMenuContentPrimitive>
+                        </IGRPDropdownMenuPrimitive>
                     </div>
                 </div>
                 {config.description && (
-                    <CardDescription className="mt-2">
+                    <IGRPCardDescription className="mt-2">
                         {config.description}
-                    </CardDescription>
+                    </IGRPCardDescription>
                 )}
-            </CardHeader>
+            </IGRPCardHeader>
 
-            <CardContent className="space-y-3">
+            <IGRPCardContent className="space-y-3">
                 <div className="grid grid-cols-1 gap-2 text-sm">
                     <div className="flex items-center justify-between">
                         <span className="font-medium text-muted-foreground">API URL:</span>
@@ -164,9 +163,9 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                         </div>
                     )}
                 </div>
-            </CardContent>
+            </IGRPCardContent>
 
-            <CardFooter className="pt-0" />
-        </Card>
+            <IGRPCardFooter className="pt-0" />
+        </IGRPCard>
     );
 }; 

@@ -1,12 +1,13 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-} from '@renderer/components/ui/dialog';
+
 import useStudio from '@renderer/hooks/use-studio';
+import {
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogDescriptionPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     Destination,
     DragEndResult,
@@ -20,12 +21,12 @@ import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { EmptyList } from '@renderer/components/empty-list';
 import { Plus } from 'lucide-react';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
-import { SidebarInset } from '@renderer/components/ui/sidebar';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTagManager } from '../hooks/useTagManager';
 import * as LucideIcons from 'lucide-react';
 import SidebarRight from './sidebar/sidebar-right';
@@ -145,17 +146,17 @@ export const AddComponentModal = ({
 
     return (
         <>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] !max-w-[80vw] !h-[80vh]">
-                    <SidebarInset>
-                        <DialogHeader className="p-4">
+            <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+                <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] !max-w-[80vw] !h-[80vh]">
+                    <IGRPSidebarInsetPrimitive>
+                        <IGRPDialogHeaderPrimitive className="p-4">
                             <div className="flex justify-between">
                                 <div>
-                                    <DialogTitle>Add Component</DialogTitle>
-                                    <DialogDescription>
+                                    <IGRPDialogTitlePrimitive>Add Component</IGRPDialogTitlePrimitive>
+                                    <IGRPDialogDescriptionPrimitive>
                                         Select a component to add to your{' '}
                                         {componentName}
-                                    </DialogDescription>
+                                    </IGRPDialogDescriptionPrimitive>
                                 </div>
                                 <div className="justify-end">
                                     {renderAddComponents(
@@ -165,7 +166,7 @@ export const AddComponentModal = ({
                                     )}
                                 </div>
                             </div>
-                        </DialogHeader>
+                        </IGRPDialogHeaderPrimitive>
                         <div className="flex-1 overflow-auto p-4">
                             <div className="space-y-3">
                                 <div>
@@ -239,15 +240,14 @@ export const AddComponentModal = ({
                                 </ul>
                             </div>
                         </div>
-                    </SidebarInset>
+                    </IGRPSidebarInsetPrimitive>
                     <SidebarRight
                         comp={currentComponent}
                         path={currentPath}
                         parentComp={parentComp}
-                        className="h-full"
                     />
-                </DialogContent>
-            </Dialog>
+                </IGRPDialogContentPrimitive>
+            </IGRPDialogPrimitive>
         </>
     );
 };
@@ -261,24 +261,24 @@ const renderAddComponents = (
     ) => void
 ) => {
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        <IGRPDropdownMenuPrimitive>
+            <IGRPDropdownMenuTriggerPrimitive asChild>
                 <IGRPButtonPrimitive variant="outline" size={'sm'}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Component
                 </IGRPButtonPrimitive>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            </IGRPDropdownMenuTriggerPrimitive>
+            <IGRPDropdownMenuContentPrimitive align="end">
                 {components.map((comp) => (
-                    <DropdownMenuItem
+                    <IGRPDropdownMenuItemPrimitive
                         key={comp.name}
                         onSelect={() => handleAddComponent(comp, droppableId)}
                     >
                         {comp.label}
-                    </DropdownMenuItem>
+                    </IGRPDropdownMenuItemPrimitive>
                 ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
+            </IGRPDropdownMenuContentPrimitive>
+        </IGRPDropdownMenuPrimitive>
     );
 };
 

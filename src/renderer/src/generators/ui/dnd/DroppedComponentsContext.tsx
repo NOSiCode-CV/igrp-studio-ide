@@ -5,7 +5,6 @@ import React, {
     ReactNode,
     useCallback,
 } from 'react';
-import { useSidebar } from '@renderer/components/ui/sidebar';
 import {
     Destination,
     DroppedComponentsContextType,
@@ -20,6 +19,7 @@ import {
     State,
     TypeDef,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { useIGRPSidebarPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 const DroppedComponentsContext = createContext<
     DroppedComponentsContextType | undefined
@@ -28,7 +28,7 @@ const DroppedComponentsContext = createContext<
 export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
-    const { toggleSidebar, setOpen } = useSidebar();
+    const { toggleSidebar, setOpen } = useIGRPSidebarPrimitive();
 
     const [components, setComponents] = useState<StructuredComponent>({
         id: '',

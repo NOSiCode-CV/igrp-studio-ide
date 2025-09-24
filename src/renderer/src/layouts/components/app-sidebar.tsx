@@ -1,37 +1,35 @@
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarTrigger,
-    useSidebar,
-} from '@renderer/components/ui/sidebar';
+    IGRPSidebarPrimitive,
+    IGRPSidebarContentPrimitive,
+    IGRPSidebarFooterPrimitive,
+    IGRPSidebarGroupPrimitive,
+    IGRPSidebarGroupContentPrimitive,
+    IGRPSidebarHeaderPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+    IGRPSidebarMenuSubPrimitive,
+    IGRPSidebarTriggerPrimitive,
+    useIGRPSidebar,
+    IGRPCollapsiblePrimitive,
+    IGRPCollapsibleContentPrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@renderer/components/ui/collapsible';
 import { ProjectData, MenuItem } from 'src/main/types';
-import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area';
+import { IGRPScrollAreaPrimitive, IGRPScrollBarPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { AppSidebarHeader } from './app-sidebar-header';
-import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
-import FileExplorerSidebar from '@renderer/components/fileExplorer';
+import FileExplorerIGRPSidebar from '@renderer/components/fileExplorer';
+import { DropdownSidebarMenuButton } from './dropdown-sidebar';
 
-interface AppSidebarProps {
+interface AppIGRPSidebarProps {
     className?: string;
     menuItems: MenuItem[];
     config?: ProjectData;
@@ -39,16 +37,16 @@ interface AppSidebarProps {
     header?: boolean;
 }
 
-export function AppSidebar({
+export function AppIGRPSidebar({
     className,
     menuItems,
     config,
     basePath,
     header,
-}: AppSidebarProps) {
+}: AppIGRPSidebarProps) {
     const { t } = useTranslation();
-    const { setOpen } = useSidebar();
-    const { state: sidebarState } = useSidebar();
+    const { setOpen } = useIGRPSidebar();
+    const { state: sidebarState } = useIGRPSidebar();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
 
@@ -86,25 +84,25 @@ export function AppSidebar({
 
     return (
         <>
-            <Sidebar
+            <IGRPSidebarPrimitive
                 collapsible="icon"
                 className={cn(
                     'overflow-hidden *:data-[sidebar=sidebar]:flex-row !top-(--header-height) h-[calc(100svh-var(--header-height-two))] group-data-[side=left]:border-r-0',
                     className
                 )}
             >
-                {/* First Sidebar */}
-                <Sidebar
+                {/* First IGRPSidebar */}
+                <IGRPSidebarPrimitive
                     collapsible="none"
                     className={cn(
                         'w-[calc(var(--sidebar-width-icon)+1px)]! border-r',
                         'w-20!'
                     )}
                 >
-                    <SidebarHeader className="pr-0">
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton
+                    <IGRPSidebarHeaderPrimitive className="pr-0">
+                        <IGRPSidebarMenuPrimitive>
+                            <IGRPSidebarMenuItemPrimitive>
+                                <IGRPSidebarMenuButtonPrimitive
                                     size="lg"
                                     asChild
                                     className="md:h-8 md:p-0 items-center justify-center"
@@ -114,17 +112,17 @@ export function AppSidebar({
                                             <Home className="size-4" />
                                         </div>
                                     </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarHeader>
-                    <SidebarContent>
-                        <SidebarGroup>
-                            <SidebarGroupContent className="md:px-0">
-                                <SidebarMenu>
+                                </IGRPSidebarMenuButtonPrimitive>
+                            </IGRPSidebarMenuItemPrimitive>
+                        </IGRPSidebarMenuPrimitive>
+                    </IGRPSidebarHeaderPrimitive>
+                    <IGRPSidebarContentPrimitive>
+                        <IGRPSidebarGroupPrimitive>
+                            <IGRPSidebarGroupContentPrimitive className="md:px-0">
+                                <IGRPSidebarMenuPrimitive>
                                     {menuIcons.map((item, index) => (
-                                        <SidebarMenuItem key={index}>
-                                            <SidebarMenuButton
+                                        <IGRPSidebarMenuItemPrimitive key={index}>
+                                            <IGRPSidebarMenuButtonPrimitive
                                                 tooltip={{
                                                     children: item.label,
                                                     hidden: false,
@@ -152,20 +150,20 @@ export function AppSidebar({
                                                 <span className="w-16 text-xs text-center text-ellipsis truncate">
                                                     {item.label}
                                                 </span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
+                                            </IGRPSidebarMenuButtonPrimitive>
+                                        </IGRPSidebarMenuItemPrimitive>
                                     ))}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                    </SidebarContent>
-                    <SidebarFooter className="items-center justify-center">
-                        <SidebarTrigger className="items-center justify-center" />
-                    </SidebarFooter>
-                </Sidebar>
+                                </IGRPSidebarMenuPrimitive>
+                            </IGRPSidebarGroupContentPrimitive>
+                        </IGRPSidebarGroupPrimitive>
+                    </IGRPSidebarContentPrimitive>
+                    <IGRPSidebarFooterPrimitive  className="items-center justify-center">
+                        <IGRPSidebarTriggerPrimitive className="items-center justify-center" />
+                    </IGRPSidebarFooterPrimitive>
+                </IGRPSidebarPrimitive>
 
-                {/* Second Sidebar */}
-                <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+                {/* Second IGRPSidebar */}
+                <IGRPSidebarPrimitive collapsible="none" className="hidden flex-1 md:flex">
                     {header && (
                         <AppSidebarHeader
                             name={config?.name}
@@ -175,11 +173,11 @@ export function AppSidebar({
                             handleSearch={handleSearch}
                         />
                     )}
-                    <SidebarContent>
-                        <ScrollArea className="w-[300px]">
+                    <IGRPSidebarContentPrimitive>
+                        <IGRPScrollAreaPrimitive className="w-[300px]">
                             <div className="flex">
                                 {activeMenuGroup === 'Explorer' ? (
-                                    <FileExplorerSidebar
+                                    <FileExplorerIGRPSidebar
                                         basePath={basePath}
                                         searchTerm={searchQuery}
                                     />
@@ -194,14 +192,14 @@ export function AppSidebar({
                                         }}
                                     />
                                 ) : (
-                                    <SidebarGroup>
-                                        <SidebarGroupContent>
+                                    <IGRPSidebarGroupPrimitive>
+                                        <IGRPSidebarGroupContentPrimitive>
                                             {activeMenu.map(
                                                 (
                                                     item: MenuItem,
                                                     index: number
                                                 ) => (
-                                                    <SidebarMenu key={index}>
+                                                    <IGRPSidebarMenuPrimitive key={index}>
                                                         <Three
                                                             key={index}
                                                             level={index}
@@ -217,18 +215,18 @@ export function AppSidebar({
                                                                 activeMenuGroup
                                                             }
                                                         />
-                                                    </SidebarMenu>
+                                                    </IGRPSidebarMenuPrimitive>
                                                 )
                                             )}
-                                        </SidebarGroupContent>
-                                    </SidebarGroup>
+                                        </IGRPSidebarGroupContentPrimitive>
+                                    </IGRPSidebarGroupPrimitive>
                                 )}
                             </div>
-                            <ScrollBar orientation="horizontal" />
-                        </ScrollArea>
-                    </SidebarContent>
-                </Sidebar>
-            </Sidebar>
+                            <IGRPScrollBarPrimitive orientation="horizontal" />
+                        </IGRPScrollAreaPrimitive>
+                    </IGRPSidebarContentPrimitive>
+                </IGRPSidebarPrimitive>
+            </IGRPSidebarPrimitive>
         </>
     );
 }
@@ -261,7 +259,7 @@ function Three({
 
     const TreeItem = () => {
         return (
-            <SidebarMenuButton
+            <IGRPSidebarMenuButtonPrimitive
                 onClick={(e) => {
                     e.stopPropagation();
                     handleNavigation(item.link);
@@ -303,7 +301,7 @@ function Three({
                         basePath={basePath}
                     />
                 </div>
-            </SidebarMenuButton>
+            </IGRPSidebarMenuButtonPrimitive>
         );
     };
 
@@ -312,17 +310,17 @@ function Three({
     }
 
     return (
-        <SidebarMenuItem>
-            <Collapsible
+        <IGRPSidebarMenuItemPrimitive>
+            <IGRPCollapsiblePrimitive
                 className="group/collapsible"
                 open={open}
                 onOpenChange={handleOpenChange}
             >
-                <CollapsibleTrigger asChild>
+                <IGRPCollapsibleTriggerPrimitive asChild>
                     <TreeItem />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <SidebarMenuSub className="pr-0! mr-0!">
+                </IGRPCollapsibleTriggerPrimitive>
+                <IGRPCollapsibleContentPrimitive>
+                    <IGRPSidebarMenuSubPrimitive className="pr-0! mr-0!">
                         {item.subItems?.map((subItem, index) => (
                             <Three
                                 key={index}
@@ -334,9 +332,9 @@ function Three({
                                 activeMenuGroup={activeMenuGroup}
                             />
                         ))}
-                    </SidebarMenuSub>
-                </CollapsibleContent>
-            </Collapsible>
-        </SidebarMenuItem>
+                    </IGRPSidebarMenuSubPrimitive>
+                </IGRPCollapsibleContentPrimitive>
+            </IGRPCollapsiblePrimitive>
+        </IGRPSidebarMenuItemPrimitive>
     );
 }

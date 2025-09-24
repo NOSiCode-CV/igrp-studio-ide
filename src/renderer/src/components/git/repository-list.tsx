@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { Filter, AlertCircle, X } from 'lucide-react';
-import { Badge } from '@renderer/components/ui/badge';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
-import { Skeleton } from '@renderer/components/ui/skeleton';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
+    IGRPBadgePrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPSkeletonPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Repository, RepositoryPlatform } from 'src/main/types';
 import { ListGitProject } from './list-git-project';
 import { PlatformIcon } from './platform-icon';
@@ -39,7 +39,7 @@ export function RepositoryList() {
     const [nameDialog, setNameDialog] = useState({
         isOpen: false,
         defaultName: '',
-        onConfirm: (_name: string) => { },
+        onConfirm: (_name: string) => {},
     });
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -121,7 +121,7 @@ export function RepositoryList() {
         window.electron.ipcRenderer.on(
             'clone-progress',
             async (_event: any, data: any) => {
-                console.log(data)
+                console.log(data);
                 if (data.status === 'success' || data.status === 'error') {
                     setCloningRepoId(null);
                 }
@@ -130,7 +130,6 @@ export function RepositoryList() {
                         t('repositoryClonedSuccessfully', { path: data.path })
                     );
                     try {
-
                         const { project, path } = data;
                         const { config, type } = project;
 
@@ -264,20 +263,24 @@ export function RepositoryList() {
                     className="w-full"
                     onChange={(value) => setSearchQuery(value)}
                 />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <IGRPButtonPrimitive variant="outline" size="sm" className="gap-1">
+                <IGRPDropdownMenuPrimitive>
+                    <IGRPDropdownMenuTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            size="sm"
+                            className="gap-1"
+                        >
                             <Filter className="h-4 w-4" />
                             {t('filter')}
                         </IGRPButtonPrimitive>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
+                    </IGRPDropdownMenuTriggerPrimitive>
+                    <IGRPDropdownMenuContentPrimitive align="end">
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => setPlatformFilter('all')}
                         >
                             {t('allPlatforms')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
+                        </IGRPDropdownMenuItemPrimitive>
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => setPlatformFilter('github')}
                             className="flex items-center gap-2"
                         >
@@ -286,8 +289,8 @@ export function RepositoryList() {
                                 className="h-4 w-4"
                             />
                             {t('github')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
+                        </IGRPDropdownMenuItemPrimitive>
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => setPlatformFilter('gitlab')}
                             className="flex items-center gap-2"
                         >
@@ -296,16 +299,18 @@ export function RepositoryList() {
                                 className="h-4 w-4"
                             />
                             {t('gitlab')}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </IGRPDropdownMenuItemPrimitive>
+                    </IGRPDropdownMenuContentPrimitive>
+                </IGRPDropdownMenuPrimitive>
             </div>
 
             {platformFilter !== 'all' && (
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">{t('filterBy')}</span>
-                    <Badge
-                        variant="secondary"
+                    <span className="text-sm text-gray-500">
+                        {t('filterBy')}
+                    </span>
+                    <IGRPBadgePrimitive
+                        variant="solid"
                         className="flex items-center gap-1"
                     >
                         <PlatformIcon
@@ -322,12 +327,12 @@ export function RepositoryList() {
                             <X className="h-4 w-4" />
                             <span className="sr-only">{t('removeFilter')}</span>
                         </IGRPButtonPrimitive>
-                    </Badge>
+                    </IGRPBadgePrimitive>
                 </div>
             )}
 
             <div className="border rounded-md overflow-hidden">
-                <ScrollArea className="h-[400px]">
+                <IGRPScrollAreaPrimitive className="h-[400px]">
                     {isLoading ? (
                         <div className="divide-y">
                             {Array.from({ length: 5 }).map((_, index) => (
@@ -335,14 +340,14 @@ export function RepositoryList() {
                                     key={index}
                                     className="p-4 flex items-center"
                                 >
-                                    <Skeleton className="h-10 w-10 rounded-full mr-4" />
+                                    <IGRPSkeletonPrimitive className="h-10 w-10 rounded-full mr-4" />
                                     <div className="space-y-2 flex-1">
-                                        <Skeleton className="h-4 w-3/4" />
-                                        <Skeleton className="h-3 w-1/2" />
+                                        <IGRPSkeletonPrimitive className="h-4 w-3/4" />
+                                        <IGRPSkeletonPrimitive className="h-3 w-1/2" />
                                     </div>
                                     <div className="flex gap-2">
-                                        <Skeleton className="h-8 w-8 rounded-md" />
-                                        <Skeleton className="h-8 w-20 rounded-md" />
+                                        <IGRPSkeletonPrimitive className="h-8 w-8 rounded-md" />
+                                        <IGRPSkeletonPrimitive className="h-8 w-20 rounded-md" />
                                     </div>
                                 </div>
                             ))}
@@ -371,7 +376,7 @@ export function RepositoryList() {
                             ))}
                         </div>
                     )}
-                </ScrollArea>
+                </IGRPScrollAreaPrimitive>
             </div>
 
             <ProjectNameDialog

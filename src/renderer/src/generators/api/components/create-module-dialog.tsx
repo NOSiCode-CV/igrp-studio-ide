@@ -4,24 +4,8 @@ import * as React from 'react';
 import { Plus } from 'lucide-react';
 import * as Yup from 'yup';
 
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@renderer/components/ui/dialog';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPDialogTriggerPrimitive, IGRPInputPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipProviderPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
@@ -103,30 +87,30 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
     };
 
     return (
-        <TooltipProvider>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <DialogTrigger asChild>
+        <IGRPTooltipProviderPrimitive>
+            <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
+                        <IGRPDialogTriggerPrimitive asChild>
                             <IGRPButtonPrimitive
                                 size="icon"
                                 className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
                             >
                                 <Plus className="h-4 w-4" />
                             </IGRPButtonPrimitive>
-                        </DialogTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                        </IGRPDialogTriggerPrimitive>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('createNewModule')}</p>
-                    </TooltipContent>
-                </Tooltip>
-                <DialogContent className="max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>{t('createNewModule')}</DialogTitle>
-                        <DialogDescription>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
+                <IGRPDialogContentPrimitive className="max-w-[425px]">
+                    <IGRPDialogHeaderPrimitive>
+                        <IGRPDialogTitlePrimitive>{t('createNewModule')}</IGRPDialogTitlePrimitive>
+                        <IGRPDialogDescriptionPrimitive>
                             {t('dialogDescription')}
-                        </DialogDescription>
-                    </DialogHeader>
+                        </IGRPDialogDescriptionPrimitive>
+                    </IGRPDialogHeaderPrimitive>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
@@ -135,11 +119,11 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                     >
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="name" className="text-right">
+                                <IGRPLabelPrimitive htmlFor="name" className="text-right">
                                 {t('moduleName')}
-                                </Label>
+                                </IGRPLabelPrimitive>
                                 <div className="col-span-3">
-                                    <Input
+                                    <IGRPInputPrimitive
                                         id="name"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -160,12 +144,12 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                                 </div>
                             </div>
                         </div>
-                        <DialogFooter>
+                        <IGRPDialogFooterPrimitive>
                             <IGRPButtonPrimitive type="submit">{t('saveModule')}</IGRPButtonPrimitive>
-                        </DialogFooter>
+                        </IGRPDialogFooterPrimitive>
                     </form>
-                </DialogContent>
-            </Dialog>
-        </TooltipProvider>
+                </IGRPDialogContentPrimitive>
+            </IGRPDialogPrimitive>
+        </IGRPTooltipProviderPrimitive>
     );
 }

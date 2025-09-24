@@ -1,13 +1,13 @@
 'use client';
 
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
+    IGRPCard,
+    IGRPCardContent,
+    IGRPCardDescription,
+    IGRPCardHeader,
+    IGRPCardTitle,
+} from '@igrp/igrp-framework-react-design-system';
 import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
@@ -22,12 +22,12 @@ export function ServiceGrid({ services }: ServiceGridProps) {
         <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {services.map((service, index) => (
-                    <Card
+                    <IGRPCard
                         key={index}
                         className="group border rounded-lg shadow-sm gap-3"
                     >
-                        <CardHeader>
-                            <CardTitle>
+                        <IGRPCardHeader>
+                            <IGRPCardTitle>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1">
                                         <div
@@ -35,38 +35,38 @@ export function ServiceGrid({ services }: ServiceGridProps) {
                                         >
                                             {getServiceIcon(service.labels?.type)}
                                         </div>
-                                        <Badge
+                                        <IGRPBadge
                                             variant="outline"
                                             className="capitalize"
                                         >
                                             {service.labels?.type}
-                                        </Badge>
+                                        </IGRPBadge>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <Badge
+                                        <IGRPBadge
                                             variant="outline"
                                             className={`capitalize ${getStatusColor(service.status)}`}
                                         >
                                             {service.status}
-                                        </Badge>
+                                        </IGRPBadge>
                                         <ServiceActions
                                             service={service}
                                             services={services}
                                         />
                                     </div>
                                 </div>
-                            </CardTitle>
-                            <CardDescription className="truncate">
+                            </IGRPCardTitle>
+                            <IGRPCardDescription className="truncate">
                                 {service.name}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                            </IGRPCardDescription>
+                        </IGRPCardHeader>
+                        <IGRPCardContent>
                             <div className="grid grid-cols-1">
                                 <PortsBadgeList ports={service.ports} />    
                                 <Dependency dependsOn={service.dependsOn} />
                             </div>
-                        </CardContent>
-                    </Card>
+                        </IGRPCardContent>
+                    </IGRPCard>
                 ))}
             </div>
         </>

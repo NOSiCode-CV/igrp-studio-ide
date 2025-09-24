@@ -3,8 +3,7 @@
 import type * as React from 'react';
 import { CuboidIcon as Cube, Plus } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Separator } from './ui/separator';
+import { IGRPButtonPrimitive, IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 interface EmptyListProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -53,7 +52,7 @@ export function EmptyList({
 
             {shortcut && (
                 <>
-                    <Separator orientation="horizontal" />
+                    <IGRPSeparatorPrimitive orientation="horizontal" />
                     <p className="mt-4 text-sm text-muted-foreground">
                     {t('createShortcut')}{' '}
                         <kbd className="font-semibold">{shortcut}</kbd>

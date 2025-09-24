@@ -2,11 +2,10 @@
 
 import * as React from 'react';
 import { Search } from 'lucide-react';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPInputText, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { SHORTCUTS } from '@renderer/constants/shortcut';
-import { Switch } from '@renderer/components/ui/switch';
 
 interface Shortcut {
   name: string;
@@ -111,7 +110,7 @@ export default function KeyboardShortcuts() {
             <span className="text-sm text-muted-foreground">
               {t('keyboardShortcuts')}
             </span>
-            <Switch checked={enabled} onCheckedChange={setEnabled} />
+            <IGRPSwitchPrimitive checked={enabled} onCheckedChange={setEnabled} />
           </div>
           <IGRPButtonPrimitive variant="outline" size="sm" onClick={() => setEnabled(true)}>
             {t('resetToDefault')}
@@ -120,7 +119,7 @@ export default function KeyboardShortcuts() {
         
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
+          <IGRPInputText
             placeholder={t('searchShortcuts')}
             className="pl-8"
             value={search}

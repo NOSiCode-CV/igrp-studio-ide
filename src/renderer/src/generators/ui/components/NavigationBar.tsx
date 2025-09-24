@@ -1,10 +1,10 @@
-import { TooltipProvider } from '@radix-ui/react-tooltip';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { APRESENTATION } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
 
@@ -41,12 +41,12 @@ const NavigationBar = ({
     }; */
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="flex flex-1 justify-end items-center space-x-2">
                 {/*  <PreviewMenu basePath={basePath} /> */}
 
-                {/*   <Tooltip>
-                    <TooltipTrigger asChild>
+                {/*   <IGRPTooltip>
+                    <IGRPTooltipTrigger asChild>
                         <IGRPButtonPrimitive
                             size="sm"
                             variant={'secondary'}
@@ -54,9 +54,9 @@ const NavigationBar = ({
                         >
                             <AppWindowMac />
                         </IGRPButtonPrimitive>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('sourceCode')}</TooltipContent>
-                </Tooltip> */}
+                    </IGRPTooltipTrigger>
+                    <IGRPTooltipContent>{t('sourceCode')}</IGRPTooltipContent>
+                </IGRPTooltip> */}
                 <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
                     <IGRPButtonPrimitive
                         size="sm"
@@ -96,8 +96,8 @@ const NavigationBar = ({
                     </IGRPButtonPrimitive>
                 </div>
                 {/*  <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
+                    <IGRPTooltip>
+                        <IGRPTooltipTrigger asChild>
                             <IGRPButtonPrimitive
                                 size="sm"
                                 onClick={onSwitch}
@@ -105,24 +105,27 @@ const NavigationBar = ({
                             >
                                 {isDesign ? <FileJsonIcon /> : <Eye />}
                             </IGRPButtonPrimitive>
-                        </TooltipTrigger>
-                        <TooltipContent>
+                        </IGRPTooltipTrigger>
+                        <IGRPTooltipContent>
                             {isDesign ? 'Show Code [JSON]' : 'Show Design'}
-                        </TooltipContent>
-                    </Tooltip>
+                        </IGRPTooltipContent>
+                    </IGRPTooltip>
                 </div> */}
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <IGRPButtonPrimitive size="sm" onClick={handleSaveClick}>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive
+                            size="sm"
+                            onClick={handleSaveClick}
+                        >
                             {t('save')}
                         </IGRPButtonPrimitive>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         {'Add Components to Page'}
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

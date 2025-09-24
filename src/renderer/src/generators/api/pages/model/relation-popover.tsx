@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronsUpDown } from 'lucide-react';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPSwitchPrimitive, IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
-import { Label } from '@renderer/components/ui/label';
-import { Input } from '@renderer/components/ui/input';
+    IGRPPopoverPrimitive,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { RelationTypeSelector } from './relation-type-selector';
 import {
     CascadeTypes,
@@ -19,15 +19,8 @@ import {
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { formatMethods } from '../../helpers';
-import { Switch } from '@renderer/components/ui/switch';
 import { LabelRequired } from '@renderer/components/label-required';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
 import MultipleSelector from '@renderer/components/multiples-selector';
 
 interface RelationPopoverProps {
@@ -124,24 +117,24 @@ export function RelationPopover({
     };
 
     return (
-        <Popover onOpenChange={setOpen} open={open}>
-            <PopoverTrigger asChild>
+        <IGRPPopoverPrimitive onOpenChange={setOpen} open={open}>
+            <IGRPPopoverTriggerPrimitive asChild>
                 <IGRPButtonPrimitive variant="link" className="w-full justify-start">
                     {field.relation && field.relation.entity
                         ? `${field.relation.type} ${t('with')} ${field.relation.entity}.${field.relation.referencedColumnName}`
                         : t('setRelation')}
                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
                 </IGRPButtonPrimitive>
-            </PopoverTrigger>
-            <PopoverContent className="w-100 space-y-3">
-                <Tabs defaultValue="relationSettings">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="relationSettings">
+            </IGRPPopoverTriggerPrimitive>
+            <IGRPPopoverContentPrimitive className="w-100 space-y-3">
+                <IGRPTabsPrimitive defaultValue="relationSettings">
+                    <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
+                        <IGRPTabsTriggerPrimitive value="relationSettings">
                             {t('relationSettings')}
-                        </TabsTrigger>
-                        <TabsTrigger value="others">{t('others')}</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="relationSettings" className="space-y-4">
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="others">{t('others')}</IGRPTabsTriggerPrimitive>
+                    </IGRPTabsListPrimitive>
+                    <IGRPTabsContentPrimitive value="relationSettings" className="space-y-4">
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <p className="text-sm text-muted-foreground">
@@ -162,11 +155,11 @@ export function RelationPopover({
                             <div className="grid grid-cols-2 gap-3">
                                 {localRelation.type === 'ManyToMany' && (
                                     <div className="col-span-2 space-y-2 flex flex-col">
-                                        <Label htmlFor="joinTable">
+                                        <IGRPLabel htmlFor="joinTable">
                                             {t('entityName')}
-                                        </Label>
+                                        </IGRPLabel>
                                         <div>
-                                            <Input
+                                            <IGRPInputText
                                                 id="joinTable"
                                                 value={
                                                     localRelation.joinTable ||
@@ -195,9 +188,9 @@ export function RelationPopover({
                                     </div>
                                 )}
                                 <div className="space-y-2 flex flex-col">
-                                    <Label htmlFor="entity">
+                                    <IGRPLabel htmlFor="entity">
                                         {t('entity')}
-                                    </Label>
+                                    </IGRPLabel>
                                     <TypeSelectorDropdown
                                         type={localRelation.entity}
                                         onTypeChange={({ value, module }) =>
@@ -221,9 +214,9 @@ export function RelationPopover({
                                     )}
                                 </div>
                                 <div className="space-y-2 flex flex-col">
-                                    <Label htmlFor="referencedColumnName">
+                                    <IGRPLabel htmlFor="referencedColumnName">
                                         {t('referenceColumnName')}
-                                    </Label>
+                                    </IGRPLabel>
                                     <IGRPCombobox
                                         value={
                                             localRelation.referencedColumnName
@@ -247,11 +240,11 @@ export function RelationPopover({
                             {localRelation.cardinality === 'twoWay' &&
                                 localRelation.type === 'ManyToMany' && (
                                     <div className="space-y-2">
-                                        <Label htmlFor="inverseJoinColumn">
+                                        <IGRPLabel htmlFor="inverseJoinColumn">
                                             {t('fieldNameIn')}{' '}
                                             {localRelation.joinTable}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabel>
+                                        <IGRPInputText
                                             id="inverseJoinColumn"
                                             value={
                                                 localRelation.inverseJoinColumn ||
@@ -275,11 +268,11 @@ export function RelationPopover({
                                 localRelation.type === 'OneToMany') &&
                                 localRelation.type !== 'ManyToMany' && (
                                     <div className="space-y-2">
-                                        <Label htmlFor="mappedBy">
+                                        <IGRPLabel htmlFor="mappedBy">
                                             {t('fieldNameIn')}{' '}
                                             {localRelation.entity}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabel>
+                                        <IGRPInputText
                                             id="mappedBy"
                                             value={localRelation.mappedBy || ''}
                                             onChange={(e) =>
@@ -296,7 +289,7 @@ export function RelationPopover({
                                 )}
 
                             <div className="flex items-center space-x-2">
-                                <Switch
+                                <IGRPSwitchPrimitive
                                     id="cardinality"
                                     checked={
                                         localRelation.cardinality === 'twoWay'
@@ -310,13 +303,13 @@ export function RelationPopover({
                                         })
                                     }
                                 />
-                                <Label htmlFor="cardinality">
+                                <IGRPLabel htmlFor="cardinality">
                                     {t('twoWayRelationship')}
-                                </Label>
+                                </IGRPLabel>
                             </div>
                         </div>
-                    </TabsContent>
-                    <TabsContent value="others" className="space-y-4">
+                    </IGRPTabsContentPrimitive>
+                    <IGRPTabsContentPrimitive value="others" className="space-y-4">
                         <div className="space-y-2 flex flex-col">
                             <LabelRequired>{t('fetchType')}</LabelRequired>
                             <IGRPCombobox
@@ -337,7 +330,8 @@ export function RelationPopover({
                             )}
                         </div>
                         <div className="flex items-center space-x-2">
-                            <Switch
+                            <IGRPSwitchPrimitive
+                                name="Orphan Removal"
                                 id="Orphan Removal"
                                 checked={localRelation.orphanRemoval}
                                 onCheckedChange={(checked) =>
@@ -347,9 +341,9 @@ export function RelationPopover({
                                     })
                                 }
                             />
-                            <Label htmlFor="orphanRemoval">
+                            <IGRPLabel htmlFor="orphanRemoval">
                                 {t('orphanRemoval')}
-                            </Label>
+                            </IGRPLabel>
                         </div>
                         <div className="space-y-2 flex flex-col">
                             <LabelRequired>{t('cascadeType')}</LabelRequired>
@@ -371,8 +365,8 @@ export function RelationPopover({
                                 placeholder={t('selectCascadeTypes')}
                             />
                         </div>
-                    </TabsContent>
-                </Tabs>
+                    </IGRPTabsContentPrimitive>
+                </IGRPTabsPrimitive>
                 <div className="flex justify-between">
                     <IGRPButtonPrimitive
                         variant="outline"
@@ -382,7 +376,7 @@ export function RelationPopover({
                     </IGRPButtonPrimitive>
                     <IGRPButtonPrimitive onClick={handleUpdate}>{t('apply')}</IGRPButtonPrimitive>
                 </div>
-            </PopoverContent>
-        </Popover>
+            </IGRPPopoverContentPrimitive>
+        </IGRPPopoverPrimitive>
     );
 }

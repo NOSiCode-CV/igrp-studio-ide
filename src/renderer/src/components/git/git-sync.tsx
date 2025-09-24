@@ -1,15 +1,14 @@
 import { RefreshCw } from 'lucide-react';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import AlertDialogSync from './alert-dialog';
-import { RemoteUrlDialog } from './remote-url-dialog';
 import { useState } from 'react';
 import useToast from '../../hooks/useToast';
 import { useGit } from '@renderer/hooks/use-git';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';   
+import { RemoteUrlDialog } from './remote-url-dialog';
 
 const SyncButton = ({ basePath }: { basePath: string }) => {
     const { t } = useTranslation();
@@ -50,8 +49,8 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
 
     return (
         <>
-            <Tooltip>
-                <TooltipTrigger asChild>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
                     <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
@@ -66,11 +65,11 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
                         />
                         {isSyncing && t('syncing')}
                     </IGRPButtonPrimitive>
-                </TooltipTrigger>
-                <TooltipContent>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>
                     <p>{t('pullAndPushChanges')}</p>
-                </TooltipContent>
-            </Tooltip>
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
 
             <AlertDialogSync
                 isOpen={showConfirm}

@@ -1,13 +1,13 @@
 import {
-    SidebarGroup,
-    SidebarInset,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-} from '@renderer/components/ui/sidebar';
+    IGRPSidebarGroupPrimitive,
+    IGRPSidebarInsetPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+    IGRPSidebarMenuSubPrimitive,
+    IGRPSidebarMenuSubButtonPrimitive,
+    IGRPSidebarMenuSubItemPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     ChevronRight,
     FunctionSquare,
@@ -19,19 +19,19 @@ import {
 } from 'lucide-react';
 import { EmptyList } from '@renderer/components/empty-list';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import { FormikProps, useFormik } from 'formik';
@@ -46,13 +46,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import { PATTERNS } from '@renderer/constants/appConstants';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { StateComponent } from './custom-code-state';
 import useCustomCode from '../../../hooks/useCustomCode';
 import { SnnipetComponent } from './custom-code-snippet';
 import { ImportComponent } from './custom-code-imports';
 import { FunctionSettingsSidebar } from './functions-settings';
-import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
+import AlertIGRPDialogPrimitiveDelete from '@renderer/components/alert-dialog-delete';
 
 interface ResourceListProps<T> {
     title: string;
@@ -189,13 +189,13 @@ const ResourceList = <
         <>
             {filteredItems.length > 0 && (
                 <>
-                    <SidebarGroup>
-                        <SidebarMenu>
-                            <SidebarMenuItem key={title}>
-                                <SidebarMenuButton asChild>
+                    <IGRPSidebarGroupPrimitive>
+                        <IGRPSidebarMenuPrimitive>
+                            <IGRPSidebarMenuItemPrimitive key={title}>
+                                    <IGRPSidebarMenuButtonPrimitive asChild>
                                     <span className="font-medium">{title}</span>
-                                </SidebarMenuButton>
-                                <SidebarMenuSub>
+                                </IGRPSidebarMenuButtonPrimitive>
+                                <IGRPSidebarMenuSubPrimitive>
                                     {filteredItems.map((item, index) => {
                                         const hasDelete = item.actions
                                             ? item.actions.deletable
@@ -206,8 +206,8 @@ const ResourceList = <
                                             : !!item.id;
 
                                         return (
-                                            <SidebarMenuSubItem key={index}>
-                                                <SidebarMenuSubButton asChild>
+                                            <IGRPSidebarMenuSubItemPrimitive key={index}>
+                                                <IGRPSidebarMenuSubButtonPrimitive asChild>
                                                     <div className="flex items-center justify-between w-full group/item relative">
                                                         <span className="">
                                                             {renderItemName(
@@ -248,18 +248,18 @@ const ResourceList = <
                                                             )}
                                                         </div>
                                                     </div>
-                                                </SidebarMenuSubButton>
-                                            </SidebarMenuSubItem>
+                                                </IGRPSidebarMenuSubButtonPrimitive>
+                                            </IGRPSidebarMenuSubItemPrimitive>
                                         );
                                     })}
-                                </SidebarMenuSub>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroup>
+                                </IGRPSidebarMenuSubPrimitive>
+                            </IGRPSidebarMenuItemPrimitive>
+                        </IGRPSidebarMenuPrimitive>
+                    </IGRPSidebarGroupPrimitive>
                 </>
             )}
             {editModal}
-            <AlertDialogDelete
+            <AlertIGRPDialogPrimitiveDelete
                 isOpen={isDelete}
                 onClose={() => setIsDelete(false)}
                 onConfirm={() => currentItem && onDelete?.(currentItem)}
@@ -275,27 +275,27 @@ const CustomCodeMenu = () => {
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <IGRPDropdownMenuPrimitive>
+                <IGRPDropdownMenuTriggerPrimitive asChild>
                     <IGRPButtonPrimitive variant={'outline'} size={'icon'}>
                         <Plus />
                     </IGRPButtonPrimitive>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48">
-                    <DropdownMenuItem onClick={() => setOpenFnc(true)}>
+                </IGRPDropdownMenuTriggerPrimitive>
+                <IGRPDropdownMenuContentPrimitive className="w-48">
+                    <IGRPDropdownMenuItemPrimitive onClick={() => setOpenFnc(true)}>
                         <div className="flex flex-1 justify-between items-center">
                             <span>Function</span>
                             <ChevronRight className="w-8 h-8" />
                         </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setOpenState(true)}>
+                    </IGRPDropdownMenuItemPrimitive>
+                    <IGRPDropdownMenuItemPrimitive onClick={() => setOpenState(true)}>
                         <div className="flex flex-1 justify-between items-center">
                             <span>State</span>
                             <ChevronRight className="w-8 h-8" />
                         </div>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                    </IGRPDropdownMenuItemPrimitive>
+                </IGRPDropdownMenuContentPrimitive>
+            </IGRPDropdownMenuPrimitive>
             {openfnc && <FncComponent open={openfnc} setOpen={setOpenFnc} />}
             {openState && (
                 <StateComponent open={openState} setOpen={setOpenState} />
@@ -392,15 +392,15 @@ const FncComponent = ({
     const editorRef = useRef<any>(null);
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
-                <SidebarInset>
+        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
+                <IGRPSidebarInsetPrimitive>
                     <form
                         onSubmit={formik.handleSubmit}
                         className="space-y-4 p-4"
                     >
-                        <DialogHeader>
-                            <DialogTitle>
+                        <IGRPDialogHeaderPrimitive>
+                            <IGRPDialogTitlePrimitive>
                                 <div className="flex items-center gap-2 justify-between">
                                     <div>
                                         {funct
@@ -433,9 +433,9 @@ const FncComponent = ({
                                         )}
                                     </IGRPButtonPrimitive>
                                 </div>
-                            </DialogTitle>
-                            <DialogDescription />
-                        </DialogHeader>
+                            </IGRPDialogTitlePrimitive>
+                            <IGRPDialogDescriptionPrimitive />
+                        </IGRPDialogHeaderPrimitive>
 
                         <ImportComponent
                             initialImports={formik.values?.imports || []}
@@ -445,9 +445,9 @@ const FncComponent = ({
                         />
 
                         <div className="flex-1 border rounded">
-                            <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                            <IGRPLabel className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                 {t('Function body')}
-                            </Label>
+                            </IGRPLabel>
 
                             {/* Function Preview */}
                             <div className="border-b bg-background p-3  font-mono text-sm">
@@ -499,7 +499,7 @@ const FncComponent = ({
                             />
                         </div>
                     </form>
-                </SidebarInset>
+                </IGRPSidebarInsetPrimitive>
                 <FunctionSettingsSidebar
                     formik={formik}
                     editorRef={editorRef}
@@ -509,8 +509,8 @@ const FncComponent = ({
                         handleChangeImport(importObj)
                     }
                 />
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };
 

@@ -1,20 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, FileText, X, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from '@renderer/components/ui/alert';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@renderer/components/ui/dialog';
+import { IGRPAlertDescriptionPrimitive, IGRPAlertPrimitive, IGRPAlertTitlePrimitive, IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPDialogTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 
 interface ChangelogSection {
@@ -124,7 +111,7 @@ export function VersionAlert({
     }
 
     return (
-        <Alert
+        <IGRPAlertPrimitive
             className={cn(
                 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20',
                 className
@@ -132,19 +119,19 @@ export function VersionAlert({
         >
             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             <div className="flex-1">
-                <AlertTitle className="text-amber-800 dark:text-amber-200">
+                <IGRPAlertTitlePrimitive className="text-amber-800 dark:text-amber-200">
                     {t('versionOutdated')}
-                </AlertTitle>
-                <AlertDescription className="text-amber-700 dark:text-amber-300">
+                </IGRPAlertTitlePrimitive>
+                <IGRPAlertDescriptionPrimitive className="text-amber-700 dark:text-amber-300">
                     {t('versionOutdatedDescription', {
                         projectVersion,
                         appVersion,
                     })}
-                </AlertDescription>
+                </IGRPAlertDescriptionPrimitive>
             </div>
             <div className="flex items-center gap-2">
-                <Dialog open={showChangelog} onOpenChange={setShowChangelog}>
-                    <DialogTrigger asChild>
+                <IGRPDialogPrimitive open={showChangelog} onOpenChange={setShowChangelog}>
+                    <IGRPDialogTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="outline"
                             size="sm"
@@ -153,17 +140,17 @@ export function VersionAlert({
                             <FileText className="h-3.5 w-3.5 mr-1" />
                             View Changelog
                         </IGRPButtonPrimitive>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
+                    </IGRPDialogTriggerPrimitive>
+                    <IGRPDialogContentPrimitive className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <IGRPDialogHeaderPrimitive>
+                            <IGRPDialogTitlePrimitive className="flex items-center gap-2">
                                 <FileText className="h-5 w-5" />
                                 {finalChangelogContent.title}
-                            </DialogTitle>
-                            <DialogDescription>
+                            </IGRPDialogTitlePrimitive>
+                            <IGRPDialogDescriptionPrimitive>
                                 Version {finalChangelogContent.version} • {finalChangelogContent.date}
-                            </DialogDescription>
-                        </DialogHeader>
+                            </IGRPDialogDescriptionPrimitive>
+                        </IGRPDialogHeaderPrimitive>
                         <div className="space-y-6">
                             {finalChangelogContent.sections.map((section, index) => (
                                 <div key={index} className="space-y-3">
@@ -200,8 +187,8 @@ export function VersionAlert({
                                 View {appVersion} Release
                             </IGRPButtonPrimitive>
                         </div>
-                    </DialogContent>
-                </Dialog>
+                    </IGRPDialogContentPrimitive>
+                </IGRPDialogPrimitive>
                 {showDismiss && onDismiss && (
                     <IGRPButtonPrimitive
                         variant="ghost"
@@ -213,6 +200,6 @@ export function VersionAlert({
                     </IGRPButtonPrimitive>
                 )}
             </div>
-        </Alert>
+        </IGRPAlertPrimitive>
     );
 }

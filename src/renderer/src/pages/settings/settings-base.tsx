@@ -1,5 +1,5 @@
 import type React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@renderer/components/ui/card"
+import { IGRPCardPrimitive, IGRPCardHeaderPrimitive, IGRPCardTitlePrimitive, IGRPCardDescriptionPrimitive, IGRPCardContentPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface SettingsBaseProps {
   title: string
@@ -9,13 +9,13 @@ interface SettingsBaseProps {
 
 export function SettingsBase({ title, description, children }: SettingsBaseProps) {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
+    <IGRPCardPrimitive className="w-full">
+      <IGRPCardHeaderPrimitive>
+        <IGRPCardTitlePrimitive>{title}</IGRPCardTitlePrimitive>
+        <IGRPCardDescriptionPrimitive>{description}</IGRPCardDescriptionPrimitive>
+      </IGRPCardHeaderPrimitive>
+      <IGRPCardContentPrimitive>{children}</IGRPCardContentPrimitive>
+    </IGRPCardPrimitive>
   )
 }
 

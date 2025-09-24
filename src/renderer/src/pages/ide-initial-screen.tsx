@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import Loader from '@renderer/components/loader';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
 import { Container, FolderKanban, Network, Settings, Timer } from 'lucide-react';
 import WelcomeHeader from './workspaces/welcome-header';
 import Resources from './workspaces/resources';
@@ -15,6 +9,7 @@ import { WorkspaceSettings } from './workspaces/workspace-settings';
 import CreateWorkspace from './workspaces/components/create-workspace';
 import { useTranslation } from 'react-i18next';
 import { EmptyList } from '@renderer/components/empty-list';
+import { IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 
 const IDEInitialScreen = () => {
@@ -67,34 +62,34 @@ const IDEInitialScreen = () => {
             ) : (
                 <>
                     <WelcomeHeader />
-                    <Tabs defaultValue="resources">
-                        <TabsList className="mb-3">
-                            <TabsTrigger value="resources">
+                    <IGRPTabsPrimitive defaultValue="resources">
+                        <IGRPTabsListPrimitive className="mb-3">
+                            <IGRPTabsTriggerPrimitive value="resources">
                                 <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
                                 {t('resources')}
-                            </TabsTrigger>
-                            <TabsTrigger value="diagram">
+                            </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="diagram">
                                 <Network className="h-3.5 w-3.5 mr-1.5" />
                                 {t('diagram')}
-                            </TabsTrigger>
-                            <TabsTrigger value="config">
+                            </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="config">
                                 <Container className="h-3.5 w-3.5 mr-1.5" />
                                 {t('docker')}
-                            </TabsTrigger>
-                            <TabsTrigger value="settings">
+                            </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="settings">
                                 <Settings className="h-3.5 w-3.5 mr-1.5" />
                                 {t('settings')}
-                            </TabsTrigger>
-                        </TabsList>
+                            </IGRPTabsTriggerPrimitive>
+                        </IGRPTabsListPrimitive>
 
-                        <TabsContent
+                        <IGRPTabsContentPrimitive
                             value="resources"
                             className="mt-0 space-y-6"
                         >
                             {hasWorkspace && workspace && <Resources />}
-                        </TabsContent>
+                        </IGRPTabsContentPrimitive>
 
-                        <TabsContent value="diagram" className="mt-0">
+                        <IGRPTabsContentPrimitive value="diagram" className="mt-0">
                             {/* <WorkspaceDiagram workspace={workspace} /> */
                                 <EmptyList
                                     title="Coming soon"
@@ -103,16 +98,16 @@ const IDEInitialScreen = () => {
                                     icon={<Timer className="h-12 w-12" />}
                                 />
                             }
-                        </TabsContent>
+                        </IGRPTabsContentPrimitive>
 
-                        <TabsContent value="config" className="mt-0">
+                        <IGRPTabsContentPrimitive value="config" className="mt-0">
                             <WorkspaceDocker workspace={workspace} />
-                        </TabsContent>
+                        </IGRPTabsContentPrimitive>
 
-                        <TabsContent value="settings" className="mt-0">
+                        <IGRPTabsContentPrimitive value="settings" className="mt-0">
                             <WorkspaceSettings workspace={workspace} />
-                        </TabsContent>
-                    </Tabs>
+                        </IGRPTabsContentPrimitive>
+                    </IGRPTabsPrimitive>
                 </>
             )}
 

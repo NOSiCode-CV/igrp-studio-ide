@@ -1,15 +1,7 @@
 import { Github, Gitlab, GitlabIcon, LogOut, User2Icon } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useTranslation } from 'react-i18next';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu';
 import useGitAuth from '@renderer/hooks/use-git-auth';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { IGRPButtonPrimitive, IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive, IGRPUserAvatarFallbackPrimitive, IGRPUserAvatarImagePrimitive, IGRPUserAvatarPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 function GitConnectionMenu() {
     const { t } = useTranslation();
@@ -23,13 +15,13 @@ function GitConnectionMenu() {
     } = useGitAuth();
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        <IGRPDropdownMenuPrimitive>
+            <IGRPDropdownMenuTriggerPrimitive asChild>
                 {userGitHub || userGitLab ? (
                     <IGRPButtonPrimitive variant="ghost" size="icon" className="p-0">
-                        <Avatar className="h-8 w-8">
+                        <IGRPUserAvatarPrimitive className="h-8 w-8">
                             <>
-                                <AvatarImage
+                                <IGRPUserAvatarImagePrimitive
                                     src={
                                         userGitHub?.avatar_url ||
                                         userGitLab?.avatar_url
@@ -39,25 +31,25 @@ function GitConnectionMenu() {
                                         userGitLab?.username
                                     }
                                 />
-                                <AvatarFallback>
+                                <IGRPUserAvatarFallbackPrimitive>
                                     {userGitHub?.login
                                         .charAt(0)
                                         .toUpperCase() ||
                                         userGitLab?.username
                                             .charAt(0)
                                             .toUpperCase()}
-                                </AvatarFallback>
+                                </IGRPUserAvatarFallbackPrimitive>
                             </>
-                        </Avatar>
+                        </IGRPUserAvatarPrimitive>
                     </IGRPButtonPrimitive>
                 ) : (
                     <IGRPButtonPrimitive variant="ghost" size="icon" className="p-0">
                         <User2Icon className="h-4 w-4" />
                     </IGRPButtonPrimitive>
                 )}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+            </IGRPDropdownMenuTriggerPrimitive>
+            <IGRPDropdownMenuContentPrimitive align="end">
+                <IGRPDropdownMenuItemPrimitive>
                     {userGitHub ? (
                         <div className="flex items-center justify-between space-x-3 w-full">
                             <div className="flex items-center space-x-2">
@@ -71,8 +63,8 @@ function GitConnectionMenu() {
                                     </p>
                                 </div>
                             </div>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                                <IGRPTooltipPrimitive>
+                                <IGRPTooltipTriggerPrimitive asChild>
                                     <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="icon"
@@ -80,11 +72,11 @@ function GitConnectionMenu() {
                                     >
                                         <LogOut className="h-3 w-3" />
                                     </IGRPButtonPrimitive>
-                                </TooltipTrigger>
-                                <TooltipContent>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
                                     <p>{t('logout')}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
                         </div>
                     ) : (
                         <div
@@ -95,8 +87,8 @@ function GitConnectionMenu() {
                             <span>{t('connectGitHub')}</span>
                         </div>
                     )}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {}}>
+                </IGRPDropdownMenuItemPrimitive>
+                <IGRPDropdownMenuItemPrimitive onClick={() => {}}>
                     {userGitLab ? (
                         <div className="flex items-center justify-between space-x-3 w-full">
                             <div className="flex items-center space-x-2">
@@ -111,8 +103,8 @@ function GitConnectionMenu() {
                                 </div>
                             </div>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                            <IGRPTooltipPrimitive>
+                                <IGRPTooltipTriggerPrimitive asChild>
                                     <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="icon"
@@ -120,11 +112,11 @@ function GitConnectionMenu() {
                                     >
                                         <LogOut className="h-3 w-3" />
                                     </IGRPButtonPrimitive>
-                                </TooltipTrigger>
-                                <TooltipContent>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
                                     <p>{t('logout')}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
                         </div>
                     ) : (
                         <div
@@ -135,9 +127,9 @@ function GitConnectionMenu() {
                             <span>{t('connectGitLab')}</span>
                         </div>
                     )}
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                </IGRPDropdownMenuItemPrimitive>
+            </IGRPDropdownMenuContentPrimitive>
+        </IGRPDropdownMenuPrimitive>
     );
 }
 

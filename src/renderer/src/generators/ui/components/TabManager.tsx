@@ -3,7 +3,6 @@ import FormEngine from '../page-builder';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
 import PageManager from '../page/page-manager';
 import NavigationBar from './NavigationBar';
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
 import { cn } from '@renderer/lib/utils';
 import {
     TAB_DEFAULT,
@@ -14,6 +13,7 @@ import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout';
 import { APRESENTATION, OPTION_TYPE } from '@renderer/constants/appConstants';
+import { IGRPSidebarInsetPrimitive, IGRPSidebarProviderPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface ContentProps {
     basePath: string;
@@ -94,7 +94,7 @@ export default function TabManager({ basePath }: ContentProps) {
                     )}
                 >
                     {tab.id === TAB_DEFAULT ? (
-                        <SidebarInset>
+                        <IGRPSidebarInsetPrimitive>
                             <ContainerScrollArea>
                                 <div className="flex flex-1 flex-col gap-4 p-4">
                                     <PageManager
@@ -102,10 +102,10 @@ export default function TabManager({ basePath }: ContentProps) {
                                     />
                                 </div>
                             </ContainerScrollArea>
-                        </SidebarInset>
+                        </IGRPSidebarInsetPrimitive>
                     ) : (
                         <DroppedComponentsProvider>
-                            <SidebarProvider
+                            <IGRPSidebarProviderPrimitive
                                 style={
                                     {
                                         '--sidebar-width': '380px',
@@ -131,7 +131,7 @@ export default function TabManager({ basePath }: ContentProps) {
                                         />
                                     </DragProvider>
                                 )}
-                            </SidebarProvider>
+                            </IGRPSidebarProviderPrimitive>
                         </DroppedComponentsProvider>
                     )}
                 </div>

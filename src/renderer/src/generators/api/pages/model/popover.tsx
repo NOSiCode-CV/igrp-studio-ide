@@ -1,27 +1,19 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPButtonPrimitive, IGRPPopoverContentPrimitive, IGRPPopoverTriggerPrimitive, IGRPSeparatorPrimitive, IGRPSwitchPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
+    IGRPPopoverPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { PackageCheck } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@renderer/components/ui/switch';
-import { Separator } from '@renderer/components/ui/separator';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 
 interface PopoverProps {
@@ -47,10 +39,10 @@ export function PopoverModel({
     }, [row]);
 
     return (
-        <Popover>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
+        <IGRPPopoverPrimitive>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive     asChild>
+                    <IGRPPopoverTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="ghost"
                             className="flex items-center"
@@ -59,23 +51,23 @@ export function PopoverModel({
                             <PackageCheck className="w-4 h-4" />
                             <span className="sr-only">{t('advanced')}</span>
                         </IGRPButtonPrimitive>
-                    </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
+                    </IGRPPopoverTriggerPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive side="top" align="center">
                     {t('openAdvancedSettings')}
-                </TooltipContent>
-            </Tooltip>
-            <PopoverContent className="w-100" align="end" side="bottom">
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <IGRPPopoverContentPrimitive className="w-100" align="end" side="bottom">
                 <div className="grid gap-4">
                     <div className="space-y-2">
-                        <Tabs defaultValue="dataType">
-                            <TabsList className="grid w-full grid-cols-1">
-                                <TabsTrigger value="dataType">
+                        <IGRPTabsPrimitive defaultValue="dataType">
+                            <IGRPTabsListPrimitive    className="grid w-full grid-cols-1">
+                                <IGRPTabsTriggerPrimitive value="dataType">
                                     {t('settings')}
-                                </TabsTrigger>
-                            </TabsList>
+                                </IGRPTabsTriggerPrimitive>
+                            </IGRPTabsListPrimitive>
 
-                            <TabsContent value="dataType" className="space-y-4">
+                            <IGRPTabsContentPrimitive value="dataType" className="space-y-4">
                                 <div className="flex flex-1 gap-2">
                                     {['unique', 'nullable', 'primaryKey'].map(
                                         (field) => (
@@ -83,12 +75,12 @@ export function PopoverModel({
                                                 key={`${field}-${index}`}
                                                 className="flex flex-1 items-center gap-4"
                                             >
-                                                <Label
+                                                <IGRPLabel
                                                     htmlFor={`${field}-${index}`}
                                                 >
                                                     {t(field)}
-                                                </Label>
-                                                <Switch
+                                                </IGRPLabel>
+                                                <IGRPSwitchPrimitive
                                                     id={`${field}-${index}`}
                                                     onCheckedChange={(
                                                         checked
@@ -109,16 +101,16 @@ export function PopoverModel({
                                 </div>
                                 {options.revision && (
                                     <>
-                                        <Separator orientation="horizontal" />
+                                        <IGRPSeparator orientation="horizontal" />
 
                                         <div className="flex flex-1 gap-2">
                                             <div className="flex flex-1 items-center gap-4">
-                                                <Label
+                                                <IGRPLabel
                                                     htmlFor={`skipFieldRevision`}
                                                 >
                                                     {t('skipFieldRevision')}
-                                                </Label>
-                                                <Switch
+                                                </IGRPLabel>
+                                                <IGRPSwitchPrimitive
                                                     id={`skipFieldRevision-${index}`}
                                                     onCheckedChange={(
                                                         checked
@@ -139,14 +131,14 @@ export function PopoverModel({
                                         </div>
                                     </>
                                 )}
-                                <Separator orientation="horizontal" />
+                                <IGRPSeparatorPrimitive orientation="horizontal" />
                                 <div className="grid grid-cols-2 gap-2">
                                     <>
                                         {isPrimary && (
                                             <div className="space-y-2 col-span-2 flex flex-col">
-                                                <Label htmlFor="generationType">
+                                                <IGRPLabel htmlFor="generationType">
                                                     {t('generationType')}
-                                                </Label>
+                                                </IGRPLabel>
                                                 <IGRPCombobox
                                                     placeholder={`Select Generation Type`}
                                                     options={
@@ -169,10 +161,10 @@ export function PopoverModel({
                                             </div>
                                         )}
                                         <div className="space-y-2">
-                                            <Label htmlFor="length">
+                                            <IGRPLabel htmlFor="length">
                                                 {t('length')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabel>
+                                            <IGRPInputText
                                                 id="length"
                                                 className="h-8"
                                                 value={row?.['length'] || ''}
@@ -186,10 +178,10 @@ export function PopoverModel({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="defaultValue">
+                                            <IGRPLabel htmlFor="defaultValue">
                                                 {t('defaultValue')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabel>
+                                            <IGRPInputText
                                                 id="defaultValue"
                                                 className="h-8"
                                                 value={
@@ -206,11 +198,11 @@ export function PopoverModel({
                                         </div>
                                     </>
                                 </div>
-                            </TabsContent>
-                        </Tabs>
+                            </IGRPTabsContentPrimitive>
+                        </IGRPTabsPrimitive>
                     </div>
                 </div>
-            </PopoverContent>
-        </Popover>
+            </IGRPPopoverContentPrimitive>
+        </IGRPPopoverPrimitive>
     );
 }

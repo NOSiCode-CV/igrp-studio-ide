@@ -1,4 +1,4 @@
-import { Card } from '@renderer/components/ui/card';
+import { IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system';
 import NavigationBar from '../../components/navigation-bar';
 import { TextInput } from '../../components/inputs-form';
 import { FormList } from '../../../../components/form-list';
@@ -39,7 +39,7 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <Card className="rounded-sm p-6">
+                <IGRPCardPrimitive className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
                         <TextInput
                             id="name"
@@ -76,7 +76,7 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                             />
                         </div>
                     </div>
-                </Card>
+                </IGRPCardPrimitive>
             </div>
         </form>
     );

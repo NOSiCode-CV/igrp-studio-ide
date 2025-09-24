@@ -1,4 +1,4 @@
-import { Card } from '@renderer/components/ui/card';
+import { IGRPCardPrimitive, IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import {
@@ -11,8 +11,7 @@ import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
 import { useTranslation } from 'react-i18next';
 import { useDto } from './useDto';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 
 interface DtoProps {
     selectors: Array<any>;
@@ -86,7 +85,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                 title={t('dto')}
             />
             <div className="space-y-4 p-4">
-                <Card className="rounded-sm p-6">
+                <IGRPCardPrimitive className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <TextInput
@@ -135,10 +134,10 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 isTouched={formik.touched.extends}
                             />
                             <div className="flex flex-1 space-x-2">
-                                <Label htmlFor="enableCustonValidation">
+                                <IGRPLabel htmlFor="enableCustonValidation">
                                     {t('enableCustonValidation')}
-                                </Label>
-                                <Checkbox
+                                </IGRPLabel>
+                                <IGRPCheckboxPrimitive
                                     id="enableCustonValidation"
                                     onCheckedChange={(checked: boolean) =>
                                         formik.setFieldValue(
@@ -161,7 +160,7 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                             </div>
                         ))}
                     </div>
-                </Card>
+                </IGRPCardPrimitive>
             </div>
         </form>
     );

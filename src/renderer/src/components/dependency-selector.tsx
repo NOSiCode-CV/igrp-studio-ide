@@ -2,16 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from './ui/command';
+    IGRPCommandPrimitive,
+    IGRPCommandEmptyPrimitive,
+    IGRPCommandGroupPrimitive,
+    IGRPCommandInputPrimitive,
+    IGRPCommandItemPrimitive,
+    IGRPCommandListPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 
@@ -98,19 +98,19 @@ export default function DependencySelector({
             <h2>Further dependencies</h2>
 
             <div className="relative" ref={commandRef}>
-                <Command className="rounded-lg border shadow-md">
-                    <CommandInput
+                <IGRPCommandPrimitive className="rounded-lg border shadow-md">
+                    <IGRPCommandInputPrimitive
                         placeholder="Type to filter, for example starter, devtools, commons, ..."
                         onFocus={() => setOpen(true)}
                         className="h-9"
                     />
                     {open && (
                         
-                        <CommandList className="max-h-[200px] overflow-auto">
-                            <CommandEmpty>{t('noDependencies')}</CommandEmpty>
-                            <CommandGroup>
+                        <IGRPCommandListPrimitive className="max-h-[200px] overflow-auto">
+                            <IGRPCommandEmptyPrimitive>{t('noDependencies')}</IGRPCommandEmptyPrimitive>
+                            <IGRPCommandGroupPrimitive>
                                 {availableForSelection.map((dependency, index) => (
-                                    <CommandItem
+                                    <IGRPCommandItemPrimitive
                                         key={index}
                                         onSelect={() =>
                                             handleAddDependency(dependency)
@@ -137,18 +137,18 @@ export default function DependencySelector({
                                         >
                                             <Plus className="h-4 w-4" />
                                         </button>
-                                    </CommandItem>
+                                    </IGRPCommandItemPrimitive>
                                 ))}
-                            </CommandGroup>
-                        </CommandList>
+                            </IGRPCommandGroupPrimitive>
+                        </IGRPCommandListPrimitive>
                     )}
-                </Command>
+                </IGRPCommandPrimitive>
             </div>
             <div className="flex flex-wrap gap-2">
                 {selectedDependencies.map((dependency) => (
-                    <Badge
+                    <IGRPBadge
                         key={`${dependency.groupId}:${dependency.artifactId}`}
-                        variant="secondary"
+                        variant="soft"
                         className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md flex items-center gap-2"
                     >
                         {getDependencyFullName(dependency)}
@@ -158,7 +158,7 @@ export default function DependencySelector({
                         >
                             <X className="h-4 w-4" />
                         </button>
-                    </Badge>
+                    </IGRPBadge>
                 ))}
                 <p className="text-sm text-gray-500 mt-2">
                 {t('igrpStudioInfo')}

@@ -1,12 +1,10 @@
-import { Card } from '@renderer/components/ui/card';
+import { IGRPCardPrimitive, IGRPCheckboxPrimitive, IGRPTabsPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
-import { Label } from '@renderer/components/ui/label';
-import { Checkbox } from '@renderer/components/ui/checkbox';
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import { useModel } from './useModel';
@@ -77,7 +75,7 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <Card className="p-6 rounded-sm">
+                <IGRPCardPrimitive className="p-6 rounded-sm">
                     <div className="space-y-6">
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <TextInput
@@ -106,19 +104,19 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                         </div>
                         <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
                             <div className="flex items-center space-x-2">
-                                <Checkbox
+                                <IGRPCheckboxPrimitive
                                     id="audit"
                                     onCheckedChange={(checked) =>
                                         formik.setFieldValue('audit', checked)
                                     }
                                     checked={formik.values.audit}
                                 />
-                                <Label htmlFor="audit">{t('auditModel')}</Label>
+                                <IGRPLabel htmlFor="audit">{t('auditModel')}</IGRPLabel>
                             </div>
 
                             {enableEntityRevision && (
                                 <div className="flex items-center space-x-2">
-                                    <Checkbox
+                                    <IGRPCheckboxPrimitive
                                         id="revision"
                                         onCheckedChange={(checked) =>
                                             formik.setFieldValue(
@@ -128,60 +126,60 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                                         }
                                         checked={formik.values.revision}
                                     />
-                                    <Label htmlFor="revision">
+                                    <IGRPLabel htmlFor="revision">
                                         {t('revision')}
-                                    </Label>
+                                    </IGRPLabel>
                                 </div>
                             )}
                             <div className="flex items-center space-x-2">
-                                <Checkbox
+                                <IGRPCheckboxPrimitive
                                     id="crud"
                                     onCheckedChange={(checked) =>
                                         formik.setFieldValue('crud', checked)
                                     }
                                     checked={formik.values.crud}
                                 />
-                                <Label htmlFor="Crud">{t('crud')}</Label>
+                                <IGRPLabel htmlFor="Crud">{t('crud')}</IGRPLabel>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="graphql" disabled />
-                                <Label htmlFor="graphql">
+                                <IGRPCheckboxPrimitive id="graphql" disabled />
+                                <IGRPLabel htmlFor="graphql">
                                     {t('graphql')}
                                     <span className="ml-2 text-xs text-muted-foreground">
                                         ({t('comingSoon')})
                                     </span>
-                                </Label>
+                                </IGRPLabel>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="odata" disabled />
-                                <Label htmlFor="odata">
+                                <IGRPCheckboxPrimitive id="odata" disabled />
+                                <IGRPLabel htmlFor="odata">
                                     {t('odata')}
                                     <span className="ml-2 text-xs text-muted-foreground">
                                         ({t('comingSoon')})
                                     </span>
-                                </Label>
+                                </IGRPLabel>
                             </div>
                         </div>
                     </div>
-                </Card>
-                <Card className="p-6 rounded-sm">
-                    <Tabs defaultValue="attributes">
-                        <TabsList className="grid w-full grid-cols-3">
+                </IGRPCardPrimitive>
+                <IGRPCardPrimitive className="p-6 rounded-sm">
+                    <IGRPTabsPrimitive defaultValue="attributes">
+                        <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
                             {TabList.map(({ value }, key) => (
-                                <TabsTrigger key={key} value={value}>
+                                <IGRPTabsTriggerPrimitive key={key} value={value}>
                                     {t(value)}
-                                </TabsTrigger>
+                                </IGRPTabsTriggerPrimitive>
                             ))}
-                        </TabsList>
+                        </IGRPTabsListPrimitive>
                         {TabList.map(({ value }, key) => (
-                            <TabsContent key={key} value={value}>
+                            <IGRPTabsContentPrimitive key={key} value={value}>
                                 <div className="border pt-3 rounded-sm">
                                     {renderFormList(value)}
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
                         ))}
-                    </Tabs>
-                </Card>
+                    </IGRPTabsPrimitive>
+                </IGRPCardPrimitive>
             </div>
         </form>
     );

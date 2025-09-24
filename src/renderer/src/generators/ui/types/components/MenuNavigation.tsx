@@ -6,15 +6,15 @@ import { GenNoInfoComp } from '../../components/GenNoInfoComp';
 import { getLabel } from '@renderer/utils';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import { ArrowRight, ChevronRight } from 'lucide-react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import BoxField from '../tools/BoxFields';
-import { Badge } from '@renderer/components/ui/badge';
+import {
+    IGRPBadgePrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { CardComponentProps } from '../CardComponent';
 
 const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
@@ -113,24 +113,24 @@ const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
     return (
         <Droppable className={cn('p-0')} onDrop={onDragEnd} component={comp}>
             {components.length > 0 ? (
-                <Card className="shadow-sm py-0 gap-0">
-                    <CardHeader className="px-4  pt-2">
+                <IGRPCardPrimitive className="shadow-sm py-0 gap-0">
+                    <IGRPCardHeaderPrimitive className="px-4  pt-2">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium">
+                            <IGRPCardTitlePrimitive className="text-sm font-medium">
                                 {title}
-                            </CardTitle>
-                            <Badge
+                            </IGRPCardTitlePrimitive>
+                            <IGRPBadgePrimitive
                                 variant="outline"
                                 className="font-normal text-xs"
                             >
                                 {content || 'New'}
-                            </Badge>
+                            </IGRPBadgePrimitive>
                         </div>
-                    </CardHeader>
-                    <CardContent className="px-0 py-0">
+                    </IGRPCardHeaderPrimitive>
+                    <IGRPCardContentPrimitive className="px-0 py-0">
                         <div className="divide-y">{renderContent()}</div>
-                    </CardContent>
-                </Card>
+                    </IGRPCardContentPrimitive>
+                </IGRPCardPrimitive>
             ) : (
                 <GenNoInfoComp
                     type={getLabel(parentComponentName).toUpperCase()}

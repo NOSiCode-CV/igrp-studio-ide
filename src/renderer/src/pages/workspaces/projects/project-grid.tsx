@@ -1,10 +1,10 @@
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardFooterPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { Clock, Folder } from 'lucide-react';
@@ -63,12 +63,12 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                     const dependsOn = service?.dependsOn || [];
                     const ports = service?.ports || [];
                     return (
-                        <Card
+                        <IGRPCardPrimitive
                             key={index}
                             className="cursor-pointer group gap-2 border rounded-lg shadow-sm"
                         >
-                            <CardHeader>
-                                <CardTitle>
+                            <IGRPCardHeaderPrimitive>
+                                <IGRPCardTitlePrimitive>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon project={project} workspacePath={workspace.path} />
@@ -83,9 +83,9 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                             services={services}
                                         />
                                     </div>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
+                                </IGRPCardTitlePrimitive>
+                            </IGRPCardHeaderPrimitive>
+                            <IGRPCardContentPrimitive>
                                 {project.config?.description && (
                                     <p className="text-sm text-muted-foreground">
                                         {project.config.description}
@@ -97,8 +97,8 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                 {ports.length > 0 && (
                                     <Dependency dependsOn={dependsOn} />
                                 )}
-                            </CardContent>
-                            <CardFooter className="flex flex-wrap text-muted-foreground justify-between gap-2">
+                            </IGRPCardContentPrimitive>
+                            <IGRPCardFooterPrimitive className="flex flex-wrap text-muted-foreground justify-between gap-2">
                                 <div className="text-xs flex items-center">
                                     {project.updatedAt && (
                                         <>
@@ -125,8 +125,8 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                     <Folder />
                                     {t('open')}
                                 </IGRPButtonPrimitive>
-                            </CardFooter>
-                        </Card>
+                            </IGRPCardFooterPrimitive>
+                        </IGRPCardPrimitive>
                     );
                 })
             )}

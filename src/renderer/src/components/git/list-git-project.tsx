@@ -8,13 +8,8 @@ import {
     Lock,
     AlertCircle,
 } from 'lucide-react';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipProviderPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+    
 import { Repository, RepositoryPlatform } from 'src/main/types';
 import useToast from '@renderer/hooks/useToast';
 import { PlatformIcon } from './platform-icon';
@@ -81,7 +76,7 @@ export function ListGitProject({
     };
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="flex items-center justify-between py-3 px-4 hover:bg-muted transition-colors">
                 <div className="flex-1 min-w-0 mr-4">
                     <div className="flex items-center gap-2">
@@ -91,28 +86,28 @@ export function ListGitProject({
                         />
                         <div className="flex-1 min-w-0 max-w-70">
                             <div className="flex items-center gap-2">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
                                         <h3 className="font-medium text-base truncate">
                                             {repo.full_name}
                                         </h3>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>
                                         {' '}
                                         {repo.full_name}
-                                    </TooltipContent>
-                                </Tooltip>
+                                    </IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
                                 {repo.private && (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
+                                    <IGRPTooltipPrimitive>
+                                        <IGRPTooltipTriggerPrimitive asChild>
                                             <span>
                                                 <Lock className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" />
                                             </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                        </IGRPTooltipTriggerPrimitive>
+                                        <IGRPTooltipContentPrimitive>
                                             <p>{t('privateRepository')}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        </IGRPTooltipContentPrimitive>
+                                    </IGRPTooltipPrimitive>
                                 )}
                             </div>
                             <p className="text-sm text-gray-600 truncate">
@@ -136,8 +131,8 @@ export function ListGitProject({
                 )}
 
                 <div className="flex items-center gap-2 flex-shrink-0">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
                             <IGRPButtonPrimitive
                                 size="sm"
                                 variant="ghost"
@@ -146,11 +141,11 @@ export function ListGitProject({
                                 <ExternalLink className="h-4 w-4" />
                                 <span className="sr-only">{t('view')}</span>
                             </IGRPButtonPrimitive>
-                        </TooltipTrigger>
-                        <TooltipContent>
+                        </IGRPTooltipTriggerPrimitive>
+                            <IGRPTooltipContentPrimitive>
                             <p>{t('viewRepository')}</p>
-                        </TooltipContent>
-                    </Tooltip>
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
 
                     {isCloned ? (
                         <IGRPButtonPrimitive
@@ -174,6 +169,6 @@ export function ListGitProject({
                     )}
                 </div>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 }

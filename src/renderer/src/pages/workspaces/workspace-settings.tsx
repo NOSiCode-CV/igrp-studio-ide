@@ -3,32 +3,30 @@
 import { useState } from 'react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
-import { Separator } from '@renderer/components/ui/separator';
-import { Switch } from '@renderer/components/ui/switch';
+    IGRPCard,
+    IGRPCardContent,
+    IGRPCardDescription,
+    IGRPCardFooter,
+    IGRPCardHeader,
+    IGRPCardTitle,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
+import { IGRPSwitch } from '@igrp/igrp-framework-react-design-system';
 import { Copy, Check, Trash2, AlertTriangle, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@renderer/components/ui/alert-dialog';
+    IGRPModalDialog,
+    IGRPModalDialogContent,
+    IGRPModalDialogDescription,
+    IGRPModalDialogFooter,
+    IGRPModalDialogHeader,
+    IGRPModalDialogTitle,
+    IGRPModalDialogTrigger,
+} from '@igrp/igrp-framework-react-design-system';
 import { IWorkspace } from 'src/main/types';
-import { Textarea } from '@renderer/components/ui/textarea';
+import { IGRPTextarea } from '@igrp/igrp-framework-react-design-system';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocale } from '@renderer/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
@@ -98,20 +96,20 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
     return (
         <div className="space-y-4">
-            <Card>
-                <CardHeader className="compact-card-header">
-                    <CardTitle className="text-sm">
+            <IGRPCard>
+                <IGRPCardHeader className="compact-card-header">
+                    <IGRPCardTitle className="text-sm">
                         {t('workspaceInformation')}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
+                    </IGRPCardTitle>
+                    <IGRPCardDescription className="text-xs">
                     {t('workspaceInformation')}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="compact-card-content space-y-3">
+                    </IGRPCardDescription>
+                </IGRPCardHeader>
+                <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="space-y-2">
-                        <Label htmlFor="workspace-id">{t('workspaceId')}</Label>
+                        <IGRPLabel htmlFor="workspace-id">{t('workspaceId')}</IGRPLabel>
                         <div className="flex space-x-2">
-                            <Input
+                            <IGRPInputText
                                 id="workspace-id"
                                 value={workspace.id}
                                 readOnly
@@ -136,8 +134,8 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="workspace-name">{t('nameDescription')}</Label>
-                        <Input
+                        <IGRPLabel htmlFor="workspace-name">{t('nameDescription')}</IGRPLabel>
+                        <IGRPInputText
                             id="workspace-name"
                             value={workspaceName}
                             onChange={(e) => setWorkspaceName(e.target.value)}
@@ -146,10 +144,11 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="workspace-description">
+                        <IGRPLabel htmlFor="workspace-description">
                             {t('description')}
-                        </Label>
-                        <Textarea
+                        </IGRPLabel>
+                        <IGRPTextarea
+                            name="workspace-description"
                             id="workspace-description"
                             value={workspaceDescription}
                             onChange={(e) =>
@@ -158,8 +157,8 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             className="h-20 text-xs resize-none"
                         />
                     </div>
-                </CardContent>
-                <CardFooter className="compact-card-footer flex justify-between">
+                </IGRPCardContent>
+                <IGRPCardFooter className="compact-card-footer flex justify-between">
                     {workspace.updatedAt && (
                         <div className="flex items-center text-xs text-muted-foreground">
                             <Clock className="h-3.5 w-3.5 mr-1" />
@@ -182,17 +181,17 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     >
                         {isSaving ? t('saving') : t('saveChanges')}
                     </IGRPButtonPrimitive>
-                </CardFooter>
-            </Card>
+                </IGRPCardFooter>
+            </IGRPCard>
 
-            <Card>
-                <CardHeader className="compact-card-header">
-                    <CardTitle className="text-sm">{t('advancedSettings')}</CardTitle>
-                    <CardDescription className="text-xs">
+            <IGRPCard>
+                <IGRPCardHeader className="compact-card-header">
+                    <IGRPCardTitle className="text-sm">{t('advancedSettings')}</IGRPCardTitle>
+                    <IGRPCardDescription className="text-xs">
                              {t('configureAdvancedOptions')}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="compact-card-content space-y-3">
+                    </IGRPCardDescription>
+                </IGRPCardHeader>
+                <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-xs font-medium">{t('autoSave')}</div>
@@ -200,10 +199,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                               {t('autoSaveChanges')}
                             </div>
                         </div>
-                        <Switch defaultChecked />
+                        <IGRPSwitch name="auto-save" defaultChecked />
                     </div>
 
-                    <Separator />
+                    <IGRPSeparator />
 
                     <div className="flex items-center justify-between">
                         <div>
@@ -214,10 +213,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                              {t('trackChanges')}
                             </div>
                         </div>
-                        <Switch defaultChecked />
+                        <IGRPSwitch name="enable-versioning" defaultChecked />
                     </div>
 
-                    <Separator />
+                    <IGRPSeparator />
 
                     <div className="flex items-center justify-between">
                         <div>
@@ -228,20 +227,20 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             {t('enableExperimentalFeatures')}
                             </div>
                         </div>
-                        <Switch />
+                        <IGRPSwitch name="experimental-features" />
                     </div>
-                </CardContent>
-            </Card>
-            <Card className="border-destructive/50">
-                <CardHeader className="compact-card-header">
-                    <CardTitle className="text-sm text-destructive">
+                </IGRPCardContent>
+            </IGRPCard>
+            <IGRPCard className="border-destructive/50">
+                <IGRPCardHeader className="compact-card-header">
+                    <IGRPCardTitle className="text-sm text-destructive">
                         {t('dangerZone')}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
+                    </IGRPCardTitle>
+                    <IGRPCardDescription className="text-xs">
                         {t('irreversibleActions')}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="compact-card-content">
+                    </IGRPCardDescription>
+                </IGRPCardHeader>
+                <IGRPCardContent className="compact-card-content">
                     <div className="border rounded-md border-destructive/30 p-3">
                         <div className="flex items-start justify-between">
                             <div>
@@ -252,8 +251,8 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 {t('deleteWarning')}
                                 </p>
                             </div>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
+                            <IGRPModalDialog>
+                                <IGRPModalDialogTrigger asChild>
                                     <IGRPButtonPrimitive
                                         variant="destructive"
                                         size="sm"
@@ -262,22 +261,22 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         <Trash2 className="h-3.5 w-3.5 mr-1" />
                                         <span>{t('delete')}</span>
                                     </IGRPButtonPrimitive>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent className="compact-dialog">
-                                    <AlertDialogHeader className="compact-dialog-header">
-                                        <AlertDialogTitle className="text-base flex items-center gap-2">
+                                </IGRPModalDialogTrigger>
+                                <IGRPModalDialogContent className="compact-dialog">
+                                    <IGRPModalDialogHeader className="compact-dialog-header">
+                                        <IGRPModalDialogTitle className="text-base flex items-center gap-2">
                                             <AlertTriangle className="h-4 w-4 text-destructive" />
                                             {t('deleteWorkspace')}
-                                        </AlertDialogTitle>
-                                        <AlertDialogDescription className="text-xs">
+                                        </IGRPModalDialogTitle>
+                                        <IGRPModalDialogDescription className="text-xs">
                                              {t('cannotUndoAction')}
                                             <span className="font-medium">
                                                 {' '}
                                                 {workspace.name}{' '}
                                             </span>
                                             {t('workspaceAndProjects')}
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
+                                        </IGRPModalDialogDescription>
+                                    </IGRPModalDialogHeader>
                                     <div className="py-3">
                                         <div className="border rounded-md p-2 bg-muted/30">
                                             <div className="text-xs font-medium mb-1">
@@ -296,25 +295,28 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                             </div>
                                         </div>
                                     </div>
-                                    <AlertDialogFooter className="compact-dialog-footer flex flex-1 items-center ">
-                                        <AlertDialogCancel className="h-7 text-xs">
-                                        {t('cancel')}
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction
+                                    <IGRPModalDialogFooter className="compact-dialog-footer flex flex-1 items-center ">
+                                        <IGRPButtonPrimitive
+                                            variant="outline"
+                                            className="h-7 text-xs"
+                                        >
+                                            {t('cancel')}
+                                        </IGRPButtonPrimitive>
+                                        <IGRPButtonPrimitive
                                             className="h-7 text-xs bg-destructive hover:bg-destructive/90"
                                             onClick={handleDeleteWorkspace}
                                         >
                                             {isDeleting
                                                 ? t('deleting')
                                                 :  t('deleteWorkspace')}
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                        </IGRPButtonPrimitive>
+                                    </IGRPModalDialogFooter>
+                                </IGRPModalDialogContent>
+                            </IGRPModalDialog>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </IGRPCardContent>
+            </IGRPCard>
         </div>
     );
 }

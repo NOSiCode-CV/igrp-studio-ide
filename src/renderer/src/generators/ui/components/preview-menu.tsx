@@ -1,18 +1,18 @@
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Play, StopCircle, Eye, MoreVertical } from 'lucide-react';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface LogTerminalProps {
     basePath: string;
@@ -43,31 +43,31 @@ const PreviewMenu = ({ basePath }: LogTerminalProps) => {
     };
 
     return (
-        <DropdownMenu>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
+        <IGRPDropdownMenuPrimitive>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPDropdownMenuTriggerPrimitive asChild>
                         <IGRPButtonPrimitive variant="secondary" size="sm">
                             <MoreVertical className="h-4 w-4" />
                         </IGRPButtonPrimitive>
-                    </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
+                    </IGRPDropdownMenuTriggerPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>
                     <p>{t('preview')}</p>
-                </TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleStart}>
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <IGRPDropdownMenuContentPrimitive>
+                <IGRPDropdownMenuItemPrimitive onClick={handleStart}>
                     <Play className="h-4 w-4 mr-2" /> {t('startNext')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleStop}>
+                </IGRPDropdownMenuItemPrimitive>
+                <IGRPDropdownMenuItemPrimitive   onClick={handleStop}>
                     <StopCircle className="h-4 w-4 mr-2" /> {t('stopNext')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handlePreview}>
+                </IGRPDropdownMenuItemPrimitive>
+                <IGRPDropdownMenuItemPrimitive onClick={handlePreview}>
                     <Eye className="h-4 w-4 mr-2" /> {t('openPreview')}
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                </IGRPDropdownMenuItemPrimitive>
+            </IGRPDropdownMenuContentPrimitive>
+        </IGRPDropdownMenuPrimitive>
     );
 };
 

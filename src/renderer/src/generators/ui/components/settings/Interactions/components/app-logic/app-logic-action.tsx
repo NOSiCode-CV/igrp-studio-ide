@@ -1,22 +1,22 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPButtonPrimitive, IGRPInputPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
-import { Input } from '@renderer/components/ui/input';
+    IGRPSelectPrimitive,
+    IGRPSelectContentPrimitive,
+    IGRPSelectItemPrimitive,
+    IGRPSelectTriggerPrimitive,
+    IGRPSelectValuePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Loader2, RefreshCw, Copy } from 'lucide-react';
 import { useAppLogic } from '@renderer/hooks/use-app-logic';
 import useToast from '@renderer/hooks/useToast';
@@ -383,31 +383,31 @@ export function AppLogicAction({
 
     return (
         <div className="space-y-4">
-            <Tabs
+            <IGRPTabsPrimitive
                 defaultValue="config"
                 className="w-full"
                 onValueChange={setActiveTab}
                 value={activeTab}
             >
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="config">Configuration</TabsTrigger>
-                    <TabsTrigger value="headers">Headers</TabsTrigger>
-                    <TabsTrigger value="preview">Preview</TabsTrigger>
-                </TabsList>
+                <IGRPTabsListPrimitive   className="grid w-full grid-cols-3">
+                    <IGRPTabsTriggerPrimitive value="config">Configuration</IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="headers">Headers</IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="preview">Preview</IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
 
-                <TabsContent value="config" className="space-y-4">
+                <IGRPTabsContentPrimitive value="config" className="space-y-4">
                     <div className="space-y-2">
-                        <Label>Environment</Label>
-                        <Select
+                        <IGRPLabel>Environment</IGRPLabel>
+                        <IGRPSelectPrimitive
                             value={selectedEnvironmentId}
                             onValueChange={handleEnvironmentSelect}
                         >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select an environment" />
-                            </SelectTrigger>
-                            <SelectContent>
+                            <IGRPSelectTriggerPrimitive>
+                                <IGRPSelectValuePrimitive placeholder="Select an environment" />
+                            </IGRPSelectTriggerPrimitive>
+                            <IGRPSelectContentPrimitive>
                                 {environments.map((environment) => (
-                                    <SelectItem
+                                    <IGRPSelectItemPrimitive
                                         key={environment.id}
                                         value={environment.id}
                                     >
@@ -425,16 +425,16 @@ export function AppLogicAction({
                                             />
                                             {environment.name}
                                         </div>
-                                    </SelectItem>
+                                    </IGRPSelectItemPrimitive>
                                 ))}
-                            </SelectContent>
-                        </Select>
+                            </IGRPSelectContentPrimitive>
+                        </IGRPSelectPrimitive>
                     </div>
 
                     {selectedEnvironment && (
                         <div className="space-y-2">
-                            <Label>Base URL</Label>
-                            <Input
+                            <IGRPLabel>Base URL</IGRPLabel>
+                            <IGRPInputText
                                 value={selectedEnvironment.url}
                                 disabled
                                 className="bg-gray-50 text-gray-500"
@@ -453,7 +453,7 @@ export function AppLogicAction({
                         <>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <Label>Application (Tag)</Label>
+                                    <IGRPLabel>Application (Tag)</IGRPLabel>
                                     <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="sm"
@@ -469,16 +469,16 @@ export function AppLogicAction({
                                         />
                                     </IGRPButtonPrimitive>
                                 </div>
-                                <Select
+                                <IGRPSelectPrimitive
                                     value={selectedApplicationTag}
                                     onValueChange={handleApplicationSelect}
                                 >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select application" />
-                                    </SelectTrigger>
-                                    <SelectContent>
+                                    <IGRPSelectTriggerPrimitive className='w-full truncate'>
+                                        <IGRPSelectValuePrimitive placeholder="Select application" />
+                                    </IGRPSelectTriggerPrimitive>
+                                    <IGRPSelectContentPrimitive>
                                         {processedApplications.map((app) => (
-                                            <SelectItem
+                                            <IGRPSelectItemPrimitive
                                                 key={app.tag}
                                                 value={app.tag}
                                             >
@@ -490,26 +490,26 @@ export function AppLogicAction({
                                                         {app.description}
                                                     </div>
                                                 </div>
-                                            </SelectItem>
+                                            </IGRPSelectItemPrimitive>
                                         ))}
-                                    </SelectContent>
-                                </Select>
+                                    </IGRPSelectContentPrimitive>
+                                </IGRPSelectPrimitive>
                             </div>
 
                             {selectedApplication && (
                                 <div className="space-y-2">
-                                    <Label>Endpoint</Label>
-                                    <Select
+                                    <IGRPLabel>Endpoint</IGRPLabel>
+                                    <IGRPSelectPrimitive
                                         value={selectedEndpointId}
                                         onValueChange={handleEndpointSelect}
                                     >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select endpoint" />
-                                        </SelectTrigger>
-                                        <SelectContent>
+                                        <IGRPSelectTriggerPrimitive className='w-full truncate' disabled>
+                                            <IGRPSelectValuePrimitive placeholder="Select endpoint" />
+                                        </IGRPSelectTriggerPrimitive>
+                                        <IGRPSelectContentPrimitive>
                                             {selectedApplication.endpoints.map(
                                                 (endpoint) => (
-                                                    <SelectItem
+                                                    <IGRPSelectItemPrimitive
                                                         key={
                                                             endpoint.resourceId
                                                         }
@@ -543,11 +543,11 @@ export function AppLogicAction({
                                                                 {endpoint.path}
                                                             </span>
                                                         </div>
-                                                    </SelectItem>
+                                                    </IGRPSelectItemPrimitive>
                                                 )
                                             )}
-                                        </SelectContent>
-                                    </Select>
+                                        </IGRPSelectContentPrimitive>
+                                    </IGRPSelectPrimitive>
                                 </div>
                             )}
                         </>
@@ -558,8 +558,8 @@ export function AppLogicAction({
                             selectedEndpoint.method === 'PUT' ||
                             selectedEndpoint.method === 'PATCH') && (
                             <div className="space-y-2">
-                                <Label>Request Body (JSON)</Label>
-                                <textarea
+                                <IGRPLabel>Request Body (JSON)</IGRPLabel>
+                                <IGRPTextAreaPrimitive
                                     className="w-full h-32 p-2 border rounded-md font-mono text-sm"
                                     placeholder='{"key": "value"}'
                                     value={JSON.stringify(
@@ -573,16 +573,16 @@ export function AppLogicAction({
                                 />
                             </div>
                         )}
-                </TabsContent>
+                </IGRPTabsContentPrimitive>
 
-                <TabsContent value="headers" className="space-y-4">
+                <IGRPTabsContentPrimitive value="headers" className="space-y-4">
                     <div className="space-y-2">
-                        <Label>Custom Headers</Label>
+                        <IGRPLabel>Custom Headers</IGRPLabel>
                         <div className="space-y-2">
                             {Object.entries(customHeaders).map(
                                 ([key, value], index) => (
                                     <div key={index} className="flex gap-2">
-                                        <Input
+                                        <IGRPInputPrimitive
                                             placeholder="Header name"
                                             value={key}
                                             onChange={(e) => {
@@ -595,7 +595,7 @@ export function AppLogicAction({
                                                 handleHeadersChange(newHeaders);
                                             }}
                                         />
-                                        <Input
+                                        <IGRPInputPrimitive
                                             placeholder="Header value"
                                             value={value}
                                             onChange={(e) => {
@@ -635,9 +635,9 @@ export function AppLogicAction({
                             </IGRPButtonPrimitive>
                         </div>
                     </div>
-                </TabsContent>
+                </IGRPTabsContentPrimitive>
 
-                <TabsContent value="preview" className="space-y-4">
+                <IGRPTabsContentPrimitive value="preview" className="space-y-4">
                     {selectedEnvironment && selectedEndpoint ? (
                         <div className="space-y-4">
                             <div className="border rounded-md overflow-hidden">
@@ -695,9 +695,9 @@ export function AppLogicAction({
                                 <div className="p-4">
                                     <div className="space-y-3">
                                         <div>
-                                            <Label className="text-sm font-medium">
+                                            <IGRPLabel className="text-sm font-medium">
                                                 Headers
-                                            </Label>
+                                            </IGRPLabel>
                                             <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                 {JSON.stringify(
                                                     {
@@ -715,9 +715,9 @@ export function AppLogicAction({
 
                                         {selectedEndpoint.inputBody && (
                                             <div>
-                                                <Label className="text-sm font-medium">
+                                                <IGRPLabel className="text-sm font-medium">
                                                     Request body
-                                                </Label>
+                                                </IGRPLabel>
                                                 <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                     {JSON.stringify(
                                                         selectedEndpoint.inputBody,
@@ -738,9 +738,9 @@ export function AppLogicAction({
                                         <div className="p-4">
                                             <div className="space-y-3">
                                                 <div>
-                                                    <Label className="text-sm font-medium">
+                                                    <IGRPLabel className="text-sm font-medium">
                                                         Request Body
-                                                    </Label>
+                                                    </IGRPLabel>
                                                     <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                         {requestBody}
                                                     </pre>
@@ -755,9 +755,9 @@ export function AppLogicAction({
                                     <div className="p-4">
                                         <div className="space-y-3">
                                             <div>
-                                                <Label className="text-sm font-medium">
+                                                <IGRPLabel className="text-sm font-medium">
                                                     Response Body
-                                                </Label>
+                                                </IGRPLabel>
                                                 <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                     {requestBody}
                                                 </pre>
@@ -770,9 +770,9 @@ export function AppLogicAction({
                                     <div className="p-4">
                                         <div className="space-y-3">
                                             <div>
-                                                <Label className="text-sm font-medium">
+                                                <IGRPLabel className="text-sm font-medium">
                                                     Response Body
-                                                </Label>
+                                                </IGRPLabel>
                                                 <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                     {JSON.stringify(
                                                         {},
@@ -788,9 +788,9 @@ export function AppLogicAction({
                             {/* cURL Command Preview */}
                             <div>
                                 <div className="flex items-center justify-between">
-                                    <Label className="text-sm font-medium">
+                                    <IGRPLabel className="text-sm font-medium">
                                         cURL Command
-                                    </Label>
+                                    </IGRPLabel>
                                 </div>
                                 <pre className="bg-gray-900 text-green-400 p-3 rounded-md text-xs mt-1 overflow-x-auto relative group">
                                     {generateCurlCommand()}
@@ -822,8 +822,8 @@ export function AppLogicAction({
                             </p>
                         </div>
                     )}
-                </TabsContent>
-            </Tabs>
+                </IGRPTabsContentPrimitive>
+            </IGRPTabsPrimitive>
         </div>
     );
 }

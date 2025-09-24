@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
+    IGRPTablePrimitive,
+    IGRPTableBodyPrimitive,
+    IGRPTableCellPrimitive,
+    IGRPTableHeadPrimitive,
+    IGRPTableHeaderPrimitive,
+    IGRPTableRowPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus, Trash2 } from 'lucide-react';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 
@@ -126,15 +126,15 @@ export default function DynamicKeyValueForm({
 
     return (
         <div className="w-full border bg-card rounded-lg space-y-6 px-2">
-            <Table>
-                <TableHeader>
-                    <TableRow>
+            <IGRPTablePrimitive>
+                <IGRPTableHeaderPrimitive>
+                    <IGRPTableRowPrimitive>
                         {fieldPairs.map((pair) => (
-                            <TableHead key={pair.key}>
+                            <IGRPTableHeadPrimitive key={pair.key}>
                                 {t(pair.label)}
-                            </TableHead>
+                            </IGRPTableHeadPrimitive>
                         ))}
-                        <TableHead>
+                        <IGRPTableHeadPrimitive>
                             <IGRPButtonPrimitive
                                 onClick={addItem}
                                 size="sm"
@@ -145,14 +145,14 @@ export default function DynamicKeyValueForm({
                                 <Plus className="h-4 w-4" />
                                 <span className="sr-only">{t('addRow')}</span>
                             </IGRPButtonPrimitive>
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
+                        </IGRPTableHeadPrimitive>
+                    </IGRPTableRowPrimitive>
+                </IGRPTableHeaderPrimitive>
+                <IGRPTableBodyPrimitive>
                     {items.map((item) => (
-                        <TableRow key={item.id}>
+                        <IGRPTableRowPrimitive key={item.id}>
                             {fieldPairs.map((pair) => (
-                                <TableCell key={`${item.id}-${pair.key}`}>
+                                <IGRPTableCellPrimitive key={`${item.id}-${pair.key}`}>
                                     <div className="flex flex-col">
                                         {pair.options &&
                                         pair.options.length > 0 ? (
@@ -169,7 +169,7 @@ export default function DynamicKeyValueForm({
                                                 placeholder={pair.placeholder}
                                             />
                                         ) : (
-                                            <Input
+                                            <IGRPInputText
                                                 value={item[pair.key] || ''}
                                                 onChange={(e) =>
                                                     updateItem(
@@ -191,9 +191,9 @@ export default function DynamicKeyValueForm({
                                             />
                                         )}
                                     </div>
-                                </TableCell>
+                                </IGRPTableCellPrimitive>
                             ))}
-                            <TableCell>
+                            <IGRPTableCellPrimitive>
                                 <IGRPButtonPrimitive
                                     variant="ghost"
                                     size="icon"
@@ -204,11 +204,11 @@ export default function DynamicKeyValueForm({
                                 >
                                     <Trash2 className="h-4 w-4 text-destructive" />
                                 </IGRPButtonPrimitive>
-                            </TableCell>
-                        </TableRow>
+                            </IGRPTableCellPrimitive>
+                        </IGRPTableRowPrimitive>
                     ))}
-                </TableBody>
-            </Table>
+                </IGRPTableBodyPrimitive>
+            </IGRPTablePrimitive>
             {Object.values(errors).length > 0 && (
                 <div className="text-sm text-red-500 px-4 pb-2">
                     {Object.values(errors).map((error, index) => (

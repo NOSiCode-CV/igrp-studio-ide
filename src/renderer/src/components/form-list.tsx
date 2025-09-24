@@ -1,33 +1,33 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { ITabelContainer } from '../generators/api/types/Interfaces';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
+    IGRPTablePrimitive,
+    IGRPTableBodyPrimitive,
+    IGRPTableCellPrimitive,
+    IGRPTableHeadPrimitive,
+    IGRPTableHeaderPrimitive,
+    IGRPTableRowPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { GripVertical, Plus, Trash } from 'lucide-react';
-import { Checkbox } from '@renderer/components/ui/checkbox';
+import { IGRPCheckbox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import MultipleSelector from '@renderer/components/multiples-selector';
 import { cn } from '@renderer/lib/utils';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { PopoverController } from '../generators/api/pages/controller/popover';
 import { PopoverModel } from '../generators/api/pages/model/popover';
 import { PopoverDto } from '../generators/api/pages/dto/popover-dto';
-import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
-import { Label } from './ui/label';
+import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { FormValidationPopover } from '../generators/ui/components/form-validation-popover';
 
 // Component registry for popover types
@@ -254,10 +254,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     const renderTableHeader = () => {
         return (
             <>
-                <TableHeader>
-                    <TableRow>
+                <IGRPTableHeaderPrimitive>
+                    <IGRPTableRowPrimitive>
                         {columns.map(({ name, width }, index) => (
-                            <TableHead style={{ width }} key={index}>
+                            <IGRPTableHeadPrimitive style={{ width }} key={index}>
                                 {index === 0 ? (
                                     <span className="flex items-center">
                                         <button className="me-1" disabled>
@@ -268,13 +268,13 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 ) : (
                                     name
                                 )}
-                            </TableHead>
+                            </IGRPTableHeadPrimitive>
                         ))}
-                        <TableHead className="text-right">
+                        <IGRPTableHeadPrimitive className="text-right">
                             {addRow && (
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
+                                <IGRPTooltipProviderPrimitive>
+                                    <IGRPTooltipPrimitive>
+                                        <IGRPTooltipTriggerPrimitive asChild>
                                             <IGRPButtonPrimitive
                                                 onClick={(e) => {
                                                     e.preventDefault();
@@ -287,14 +287,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                 <Plus size={14} />
                                                 <span className="sr-only">{`New ${btnLabels}`}</span>
                                             </IGRPButtonPrimitive>
-                                        </TooltipTrigger>
-                                        <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                        </IGRPTooltipTriggerPrimitive>
+                                        <IGRPTooltipContentPrimitive>{`New ${btnLabels}`}</IGRPTooltipContentPrimitive>
+                                    </IGRPTooltipPrimitive>
+                                </IGRPTooltipProviderPrimitive>
                             )}
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
+                        </IGRPTableHeadPrimitive>
+                    </IGRPTableRowPrimitive>
+                </IGRPTableHeaderPrimitive>
             </>
         );
     };
@@ -342,11 +342,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     if (item.type === 'checkbox') {
                         return (
                             <div key={itemIndex} className="flex items-center">
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
+                                <IGRPTooltipProviderPrimitive>
+                                    <IGRPTooltipPrimitive>
+                                        <IGRPTooltipTriggerPrimitive asChild>
                                             <div className="flex align-center">
-                                                <Checkbox
+                                                <IGRPCheckbox
+                                                    name={`${item.key}_${index2}`}
                                                     id={`${item.key}_${index2}`}
                                                     onCheckedChange={(
                                                         checked
@@ -363,12 +364,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                     }
                                                 />
                                             </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                        </IGRPTooltipTriggerPrimitive>
+                                        <IGRPTooltipContentPrimitive>
                                             {item.name}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                        </IGRPTooltipContentPrimitive>
+                                    </IGRPTooltipPrimitive>
+                                </IGRPTooltipProviderPrimitive>
                             </div>
                         );
                     }
@@ -432,7 +433,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle input types (text, number)
         if (type === 'text' || type === 'number') {
             return (
-                <Input
+                <IGRPInputText
                     className={cn(
                         'h-8 text-sm',
                         errors?.[index]?.[key] && touched?.[index]?.[key]
@@ -457,7 +458,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle label type
         if (type === 'label') {
             return (
-                <Label htmlFor={`${key}_${index}`}>{row?.[key] || ''}</Label>
+                <IGRPLabelPrimitive htmlFor={`${key}_${index}`}>{row?.[key] || ''}</IGRPLabelPrimitive>
             );
         }
 
@@ -499,7 +500,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle checkbox type
         if (type === 'checkbox') {
             return (
-                <Checkbox
+                <IGRPCheckbox
+                    name={`${key}_${index}`}
                     id={`${key}_${index}`}
                     onCheckedChange={(checked) =>
                         onChangeValue({
@@ -575,7 +577,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         return (
             <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
                 {(provided: any) => (
-                    <TableRow
+                    <IGRPTableRowPrimitive
                         className={`group/item`}
                         ref={provided.innerRef}
                         {...provided.draggableProps}
@@ -604,7 +606,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                           .map((d: any) => d.value)
                                     : [];
                                 return (
-                                    <TableCell
+                                    <IGRPTableCellPrimitive
                                         key={index2}
                                         className={cn('py-1!')}
                                     >
@@ -641,12 +643,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                                       group
                                                   )}
                                         </div>
-                                    </TableCell>
+                                    </IGRPTableCellPrimitive>
                                 );
                             }
                         )}
                         {removeRow && (
-                            <TableCell className="py-1!">
+                            <IGRPTableCellPrimitive className="py-1!">
                                 <IGRPButtonPrimitive
                                     variant="ghost"
                                     size="icon"
@@ -658,9 +660,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 >
                                     <Trash />
                                 </IGRPButtonPrimitive>
-                            </TableCell>
+                            </IGRPTableCellPrimitive>
                         )}
-                    </TableRow>
+                    </IGRPTableRowPrimitive>
                 )}
             </Draggable>
         );
@@ -686,12 +688,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId={`${name}`}>
                     {(provided: any) => (
-                        <Table
+                        <IGRPTablePrimitive
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                         >
                             {renderTableHeader()}
-                            <TableBody>
+                            <IGRPTableBodyPrimitive>
                                 {formData.map((row: any, index: number) => {
                                     const rowId =
                                         row.id || `row-${name}-${index}`;
@@ -742,8 +744,8 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     );
                                 })}
                                 {provided.placeholder}
-                            </TableBody>
-                        </Table>
+                            </IGRPTableBodyPrimitive>
+                        </IGRPTablePrimitive>
                     )}
                 </Droppable>
             </DragDropContext>

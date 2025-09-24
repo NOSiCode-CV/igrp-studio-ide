@@ -1,10 +1,8 @@
-import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
-import { LabelRequired } from '@renderer/components/label-required';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPCheckboxPrimitive, IGRPCombobox, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 
-import { Switch } from '@renderer/components/ui/switch';
+import { LabelRequired } from '@renderer/components/label-required';
 import { cn } from '@renderer/lib/utils';
 
 export interface InputProps {
@@ -55,9 +53,9 @@ export const TextInput = ({
             {isRequired ? (
                 <LabelRequired>{label}</LabelRequired>
             ) : (
-                <Label htmlFor={id}>{label}</Label>
+                <IGRPLabel htmlFor={id}>{label}</IGRPLabel>
             )}
-            <Input
+            <IGRPInputText
                 id={id}
                 type="text"
                 className={cn(
@@ -99,9 +97,9 @@ export const SelectInput = ({
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <Label htmlFor={id} className={cn(classNameLabel)}>
+            <IGRPLabel htmlFor={id} className={cn(classNameLabel)}>
                 {label}
-            </Label>
+            </IGRPLabel>
         )}
         <IGRPCombobox
             name={id}
@@ -133,11 +131,11 @@ export const CheckboxInput = ({
     error,
 }: CheckboxProps) => (
     <div className="flex flex-1 gap-2">
-        <Checkbox checked={value} onCheckedChange={onChange} />
+        <IGRPCheckboxPrimitive name={id} checked={value} onCheckedChange={onChange} />
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <Label htmlFor={id}>{label}</Label>
+            <IGRPLabel htmlFor={id}>{label}</IGRPLabel>
         )}
         {error && isTouched && (
             <p className="text-xs text-destructive">{error}</p>
@@ -158,9 +156,9 @@ export const SwitchInput = ({
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <Label htmlFor={id}>{label}</Label>
+            <IGRPLabel htmlFor={id}>{label}</IGRPLabel>
         )}
-        <Switch checked={value} onCheckedChange={onChange} />
+        <IGRPSwitchPrimitive name={id} checked={value} onCheckedChange={onChange} />
         {error && isTouched && (
             <p className="text-xs text-destructive">{error}</p>
         )}

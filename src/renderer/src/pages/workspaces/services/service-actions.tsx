@@ -1,14 +1,8 @@
 'use client';
 
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
 import {
     ExternalLink,
     Play,
@@ -61,15 +55,15 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <IGRPDropdownMenuPrimitive>
+                <IGRPDropdownMenuTriggerPrimitive asChild>
                     <IGRPButtonPrimitive variant="ghost" size="icon" className="h-7 w-7">
                         <MoreVertical className="h-4 w-4" />
                     </IGRPButtonPrimitive>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                </IGRPDropdownMenuTriggerPrimitive>
+                <IGRPDropdownMenuContentPrimitive align="end" className="w-48">
                     {service.status === 'running' ? (
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => {
                                 stopService([service.name]);
                             }}
@@ -77,9 +71,9 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         >
                             <Square className="mr-2 h-4 w-4 text-red-600" />
                             {t('stopService')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     ) : (
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => {
                                 restartService([service.name], 300);
                             }}
@@ -87,10 +81,10 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         >
                             <Play className="mr-2 h-4 w-4 text-green-600" />
                             {t('startService')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
-                    <DropdownMenuItem
+                    <IGRPDropdownMenuItemPrimitive
                         className="focus:bg-accent"
                         onClick={() => {
                             setEditService(true);
@@ -98,17 +92,17 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                     >
                         <Edit className="mr-2 h-4 w-4" />
                         {t('editService')}
-                    </DropdownMenuItem>
+                    </IGRPDropdownMenuItemPrimitive>
 
                     {getServiceUrl(service) && (
-                        <DropdownMenuItem onClick={handleServiceUrl}>
+                        <IGRPDropdownMenuItemPrimitive onClick={handleServiceUrl}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             {t('openInBrowser')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
                     {service.labels?.uuid && (
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             className="text-red-600 focus:text-red-600 focus:bg-red-50"
                             onClick={() => {
                                 setIsDialogOpen(true);
@@ -116,10 +110,10 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         >
                             <Trash className="mr-2 h-4 w-4 text-red-600" />
                             {t('removeService')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
-                </DropdownMenuContent>
-            </DropdownMenu>
+                </IGRPDropdownMenuContentPrimitive>
+            </IGRPDropdownMenuPrimitive>
 
 
             <AlertDialogDelete

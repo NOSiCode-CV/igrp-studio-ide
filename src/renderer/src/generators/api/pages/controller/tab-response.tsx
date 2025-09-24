@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
@@ -264,8 +264,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <Label>{t('name')}</Label>
-                                    <Input
+                                    <IGRPLabel>{t('name')}</IGRPLabel>
+                                    <IGRPInputText
                                         name={t('name')}
                                         value={name}
                                         onChange={(e) =>
@@ -325,7 +325,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    <Label>{t('collectionType')}</Label>
+                                    <IGRPLabel>{t('collectionType')}</IGRPLabel>
                                     <IGRPCombobox
                                         options={collectionTypes}
                                         value={collectionType}
@@ -363,8 +363,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                             {/* Descritpion */}
                             <div className="flex flex-col gap-2">
-                                <Label>{t('description')}</Label>
-                                <Input
+                                <IGRPLabel>{t('description')}</IGRPLabel>
+                                <IGRPInputText
                                     type="text"
                                     name="description"
                                     value={description}

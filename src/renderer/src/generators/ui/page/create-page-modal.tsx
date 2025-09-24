@@ -2,18 +2,11 @@ import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { FocusEvent, useEffect, useState } from 'react';
 import {
     CheckboxInput,
@@ -238,14 +231,14 @@ export function CreatePageModal({
     }, [formik.values.path]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogTitle>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogTitlePrimitive>
                     {isSubPage ? t('createSubNewPage') : t('createNewPage')}
-                </DialogTitle>
-                <DialogDescription>
+                </IGRPDialogTitlePrimitive>
+                <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Page' })}
-                </DialogDescription>
+                </IGRPDialogDescriptionPrimitive>
                 <form
                     className="needs-validation space-y-4"
                     onSubmit={(e) => {
@@ -325,7 +318,7 @@ export function CreatePageModal({
                             value={formik.values.forceDynamic}
                         />
                     </div>
-                    <DialogFooter className="flex justify-between">
+                    <IGRPDialogFooterPrimitive className="flex justify-between">
                         <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
                         </IGRPButtonPrimitive>
@@ -336,9 +329,9 @@ export function CreatePageModal({
                         >
                             {formik.isSubmitting ? t('saving') : t('save')}
                         </IGRPButtonPrimitive>
-                    </DialogFooter>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

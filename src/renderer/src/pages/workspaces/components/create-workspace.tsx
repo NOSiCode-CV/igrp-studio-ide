@@ -1,20 +1,20 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Input } from '@renderer/components/ui/input';
-import { useTranslation } from 'react-i18next';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { FolderOpen } from 'lucide-react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IWorkspace } from 'src/main/types';
-import { Textarea } from '@renderer/components/ui/textarea';
+import { IGRPTextarea } from '@igrp/igrp-framework-react-design-system';
 
 interface CreateWorkspaceProps {
     open: boolean;
@@ -83,28 +83,37 @@ const CreateWorkspace = ({
 
     const handleSelectDirectory = async () => {
         window.electron.ipcRenderer.send('open-directory-dialog');
-        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
-            if (!result.canceled) {
-                setDirectoryPath(result.filePaths[0]);
+        window.electron.ipcRenderer.on(
+            'file-content',
+            (_e: any, result: any) => {
+                if (!result.canceled) {
+                    setDirectoryPath(result.filePaths[0]);
+                }
             }
-        });
+        );
     };
 
     return (
-        <Dialog open={open} onOpenChange={() => onOpenChange?.(!open)} modal>
-            <DialogContent className="max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle>{t('workspace.createTitle')}</DialogTitle>
-                    <DialogDescription className="text-xs">
+        <IGRPDialogPrimitive
+            open={open}
+            onOpenChange={() => onOpenChange?.(!open)}
+            modal
+        >
+            <IGRPDialogContentPrimitive className="max-w-[500px]">
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('workspace.createTitle')}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive className="text-xs">
                         {t('createWorkspaceInfo')}
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
                 <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                        <Label htmlFor="workspaceName">
+                        <IGRPLabel htmlFor="workspaceName">
                             {t('workspace.nameLabel')}
-                        </Label>
-                        <Input
+                        </IGRPLabel>
+                        <IGRPInputText
                             ref={inputRef}
                             id="workspaceName"
                             value={workspaceName}
@@ -115,8 +124,10 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="slug">{t('workspace.slug')}</Label>
-                        <Input
+                        <IGRPLabel htmlFor="slug">
+                            {t('workspace.slug')}
+                        </IGRPLabel>
+                        <IGRPInputText
                             id="slug"
                             value={slug}
                             onChange={(e) => setSlug(e.target.value)}
@@ -125,9 +136,12 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="compact-form-field space-y-2">
-                        <Label htmlFor="description">{t('description')}</Label>
-                        <Textarea
+                        <IGRPLabel htmlFor="description">
+                            {t('description')}
+                        </IGRPLabel>
+                        <IGRPTextarea
                             id="description"
+                            name="description"
                             placeholder={t('workspace.describe')}
                             value={workspaceDescription}
                             onChange={(e) =>
@@ -138,9 +152,9 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="space-y-2">
-                        <Label>{t('workspace.locationLabel')}</Label>
+                        <IGRPLabel>{t('workspace.locationLabel')}</IGRPLabel>
                         <div className="flex gap-2">
-                            <Input
+                            <IGRPInputText
                                 value={directoryPath}
                                 readOnly
                                 placeholder={t('workspace.locationPlaceholder')}
@@ -171,8 +185,8 @@ const CreateWorkspace = ({
                         </IGRPButtonPrimitive>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };
 

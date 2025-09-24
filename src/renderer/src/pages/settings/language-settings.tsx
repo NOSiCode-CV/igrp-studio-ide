@@ -1,4 +1,4 @@
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { useState } from 'react';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +44,7 @@ export function LanguageSettings() {
             </div>
             <div className="space-y-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="language">{t('language_label')}</Label>
+                    <IGRPLabel htmlFor="language">{t('language_label')}</IGRPLabel>
                     <IGRPCombobox
                         value={currentLanguage}
                         options={languages}

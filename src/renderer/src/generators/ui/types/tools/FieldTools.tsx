@@ -1,17 +1,17 @@
 import { Copy, Move, Settings, Trash } from 'lucide-react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import useStudio from '@renderer/hooks/use-studio';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useEffect, useState } from 'react';
 import { AddComponentModal } from '../../components/add-components-modal';
-import { Badge } from '@renderer/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 import { generateId } from '@renderer/utils';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
@@ -86,20 +86,20 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
     const { t } = useTranslation();
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="shadow-lg flex justify-end p-0 space-x-0 py-0.5 px-1">
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded">
                             <Move className="h-3.5" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('move')}</p>
-                    </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Clone"
@@ -107,14 +107,14 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         >
                             <Copy className="h-3.5" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('clone')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Edit"
@@ -125,14 +125,14 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         >
                             <Settings className="h-3.5" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('edit')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button
                             className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                             title="Delete"
@@ -140,16 +140,16 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                         >
                             <Trash className="h-3.5" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('delete')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
                 {components.length > 0 && path && (
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Badge
-                                variant={'secondary'}
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
+                            <IGRPBadgePrimitive
+                                variant={'soft'}
                                 className="rounded-sm cursor-pointer h-6"
                                 onClick={(e) => {
                                     e.stopPropagation();
@@ -158,12 +158,12 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                                 }}
                             >
                                 <span className="text-xs">Add Comp</span>
-                            </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
+                            </IGRPBadgePrimitive>
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive>
                             <p>Add Comp</p>
-                        </TooltipContent>
-                    </Tooltip>
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
                 )}
 
                 {isOpen && path && currentComponent && (
@@ -183,7 +183,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                 hasTrigger={false}
                 recordId={componentName}
             />
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

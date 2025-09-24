@@ -1,13 +1,13 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+  IGRPDialogPrimitive,
+  IGRPDialogContentPrimitive,
+  IGRPDialogHeaderPrimitive,
+  IGRPDialogTitlePrimitive,
+  IGRPDialogDescriptionPrimitive,
+  IGRPDialogFooterPrimitive,
+  IGRPInputPrimitive,
+} from "@igrp/igrp-framework-react-design-system";
 import { useState } from "react";
-import { Input } from "../ui/input";
 import { IGRPButtonPrimitive } from "@igrp/igrp-framework-react-design-system";
 import { useTranslation } from "react-i18next";
 
@@ -28,31 +28,31 @@ export function RemoteUrlDialog({ isOpen, onClose, onConfirm }: RemoteUrlDialogP
   };
 
   return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent>
-              <DialogHeader>
-                  <DialogTitle>{t('addRemoteRepository')}</DialogTitle>
-                  <DialogDescription>
+      <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+          <IGRPDialogContentPrimitive>
+              <IGRPDialogHeaderPrimitive>
+                  <IGRPDialogTitlePrimitive>{t('addRemoteRepository')}</IGRPDialogTitlePrimitive>
+                  <IGRPDialogDescriptionPrimitive>
                       {t('enterRemoteRepositoryUrl')}
-                  </DialogDescription>
-              </DialogHeader>
+                  </IGRPDialogDescriptionPrimitive>
+              </IGRPDialogHeaderPrimitive>
               <div className="py-4">
-                  <Input
+                  <IGRPInputPrimitive
                       placeholder={t('remoteRepositoryUrlPlaceholder')}
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       className="w-full"
                   />
               </div>
-              <DialogFooter>
+              <IGRPDialogFooterPrimitive>
                   <IGRPButtonPrimitive variant="outline" onClick={onClose}>
                       {t('cancel')}
                   </IGRPButtonPrimitive>
                   <IGRPButtonPrimitive onClick={handleConfirm} disabled={!url.trim()} variant={"default"}>
                       {t('addRemote')}
                   </IGRPButtonPrimitive>
-              </DialogFooter>
-          </DialogContent>
-      </Dialog>
+              </IGRPDialogFooterPrimitive>
+          </IGRPDialogContentPrimitive>
+      </IGRPDialogPrimitive>
   );
 }

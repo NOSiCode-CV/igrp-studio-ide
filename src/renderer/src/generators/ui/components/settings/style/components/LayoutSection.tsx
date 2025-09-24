@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { FlexControls } from './FlexControls';
 import { GridControls } from './GridControls';
-import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs';
+import { IGRPTabsPrimitive, IGRPTabsListPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { LayoutStyle, SectionProps } from '../types';
 
 export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
@@ -214,10 +214,10 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                     Display
                 </label>
 
-                <Tabs defaultValue="block" value={layoutStyle.type}>
-                    <TabsList className="grid w-full grid-cols-4">
+                <IGRPTabsPrimitive   defaultValue="block" value={layoutStyle.type}>
+                    <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
                         {layoutTypes.main.map((option) => (
-                            <TabsTrigger
+                            <IGRPTabsTriggerPrimitive
                                 key={option.value}
                                 value={option.value}
                                 onClick={() =>
@@ -237,9 +237,9 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                                 <span className="font-medium">
                                     {option.label}
                                 </span>
-                            </TabsTrigger>
+                            </IGRPTabsTriggerPrimitive>
                         ))}
-                    </TabsList>
+                    </IGRPTabsListPrimitive>
 
                     <div className="relative mt-0.5">
                         <button
@@ -329,7 +329,7 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                     {isBlock && renderBlockControls()}
                     {isFlex && renderFlexControls()}
                     {isGrid && renderGridControls()}
-                </Tabs>
+                </IGRPTabsPrimitive>
             </div>
         </div>
     );

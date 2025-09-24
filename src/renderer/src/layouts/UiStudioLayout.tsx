@@ -2,9 +2,8 @@ import React from 'react';
 import Header from './components/header';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import { SidebarProvider } from '@renderer/components/ui/sidebar';
+import { IGRPSidebarProvider, IGRPToasterPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Footer } from './components/footer';
-import { Toaster } from '@renderer/components/ui/sonner';
 
 interface LayoutProps {
     children: React.ReactElement<{ basePath: string }>;
@@ -31,7 +30,7 @@ const Layout = (props: LayoutProps) => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] [--header-height-three:calc(--spacing(28))]">
-            <SidebarProvider
+            <IGRPSidebarProvider
                 style={
                     {
                         '--sidebar-width': '380px',
@@ -39,7 +38,7 @@ const Layout = (props: LayoutProps) => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <Toaster position="top-right" richColors closeButton expand/>
+                    <IGRPToasterPrimitive position="top-right" richColors closeButton expand/>
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
@@ -49,7 +48,7 @@ const Layout = (props: LayoutProps) => {
                     </div>
                     <Footer />
                 </div>
-            </SidebarProvider>
+            </IGRPSidebarProvider>
         </div>
     );
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { Card, CardContent, CardHeader } from '@renderer/components/ui/card';
+import { IGRPCardPrimitive, IGRPCardContentPrimitive, IGRPCardHeaderPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { Activity, Box, Database, FileText, Plus } from 'lucide-react';
@@ -29,7 +29,7 @@ function StatsCard({
     onClick,
 }: StatsCardProps) {
     return (
-        <Card className="group relative">
+        <IGRPCardPrimitive className="group relative">
             <div
                 className={cn(
                     `absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg`,
@@ -37,7 +37,7 @@ function StatsCard({
                     'z-0'
                 )}
             ></div>
-            <CardHeader>
+            <IGRPCardHeaderPrimitive>
                 <div className="flex items-center justify-between ">
                     <div className="flex items-center">
                         <Icon className={cn(`w-5 h-5 mr-2`, iconColor)} />
@@ -56,16 +56,16 @@ function StatsCard({
                         </button>
                     )}
                 </div>
-            </CardHeader>
-            <CardContent>
+            </IGRPCardHeaderPrimitive>
+            <IGRPCardContentPrimitive>
                 <div className="text-2xl font-bold">{value}</div>
                 {description && (
                     <p className="text-xs text-muted-foreground mt-1">
                         {description}
                     </p>
                 )}
-            </CardContent>
-        </Card>
+            </IGRPCardContentPrimitive>
+        </IGRPCardPrimitive>
     );
 }
 

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { BPMNConfig, BPMNConfigs, FileTree } from 'src/main/types';
@@ -118,23 +118,23 @@ export const BPMNManager = ({
                 </IGRPButtonPrimitive>
             </div>
 
-            <Tabs defaultValue="projects" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="projects">Projects</TabsTrigger>
-                    <TabsTrigger value="configuration">
+            <IGRPTabsPrimitive defaultValue="projects" className="space-y-4">
+                <IGRPTabsListPrimitive>
+                    <IGRPTabsTriggerPrimitive value="projects">Projects</IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="configuration">
                         API Configuration
-                    </TabsTrigger>
-                </TabsList>
+                    </IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
 
-                <TabsContent value="projects" className="space-y-4">
+                <IGRPTabsContentPrimitive value="projects" className="space-y-4">
                     <BPMNProjectSelector
                         onPageClick={onPageClick}
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
-                </TabsContent>
+                </IGRPTabsContentPrimitive>
 
-                <TabsContent value="configuration" className="space-y-4">
+                <IGRPTabsContentPrimitive value="configuration" className="space-y-4">
                     {configs.configs.length > 0 ? (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {configs.configs.map((config) => (
@@ -211,8 +211,8 @@ export const BPMNManager = ({
                             description="Add your BPMN REST API configurations to get started with process management."
                         />
                     )}
-                </TabsContent>
-            </Tabs>
+                </IGRPTabsContentPrimitive>
+            </IGRPTabsPrimitive>
 
             <BPMNConfigModal
                 key={`${editingConfig?.id || 'new'}-${showConfigModal ? 'open' : 'closed'}`}

@@ -1,8 +1,7 @@
 'use client';
 
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPButtonPrimitive, IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { CircleArrowUp, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from '@renderer/assets/images/igrp-green.svg';
@@ -101,7 +100,7 @@ export function AboutSettings() {
                     </div>
                 </div>
 
-                <Separator />
+                <IGRPSeparator />
 
                 {/* Software Update */}
                 <div className="space-y-4">
@@ -109,7 +108,7 @@ export function AboutSettings() {
                         {t('software_update')}
                     </h3>
                     <div className="flex items-center space-x-2">
-                        <Checkbox id="notifications" />
+                        <IGRPCheckboxPrimitive id="notifications" />
                         <label
                             htmlFor="notifications"
                             className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -119,7 +118,7 @@ export function AboutSettings() {
                     </div>
                 </div>
 
-                <Separator />
+                <IGRPSeparator />
 
                 {/* Other Information */}
                 <div className="space-y-4">

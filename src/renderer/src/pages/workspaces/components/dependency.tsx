@@ -1,4 +1,4 @@
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { getServiceColor } from '../services';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                 // Handle string dependencies
                 if (typeof dependency === 'string') {
                     return (
-                        <Badge
+                        <IGRPBadge
                             key={`${dependency}-${i}`}
                             variant="outline"
                             className={cn("w-full md:max-w-50 truncate whitespace-nowrap inline-block rounded-lg text-xs font-medium",
@@ -30,21 +30,21 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                             )}
                         >
                             {dependency}
-                        </Badge>
+                        </IGRPBadge>
                     );
                 }
 
                 // Handle object dependencies
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 return Object.entries(dependency).map(([depId, _config]) => (
-                    <Badge
+                    <IGRPBadge
                         key={`${depId}-${i}`}
                         variant="outline"
                         className="text-xs truncate overflow-hidden text-ellipsis  wrap-break-word"
                     >
                       {depId}
                      {/*  {config?.condition ? ` (${config.condition})` : ''} */}
-                    </Badge>
+                    </IGRPBadge>
                 ));
             })}
         </>

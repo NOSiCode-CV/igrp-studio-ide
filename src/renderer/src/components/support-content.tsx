@@ -5,11 +5,11 @@ import {
     Headset,
 } from 'lucide-react';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from './ui/tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 export const supportChannels = [
@@ -56,7 +56,7 @@ export default function SupportContent({}: SupportContentProps) {
     };
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="space-y-2 mb-4 rounded-lg p-2 shadow-lg border w-full">
                 <div className="flex items-center gap-2">
                     <span className="h-6 w-6">
@@ -70,8 +70,8 @@ export default function SupportContent({}: SupportContentProps) {
                     </p>
                     <div className="mt-4 flex justify-center gap-2">
                         {supportChannels.map((channel) => (
-                            <Tooltip key={channel.name}>
-                                <TooltipTrigger asChild>
+                            <IGRPTooltipPrimitive key={channel.name}>
+                                <IGRPTooltipTriggerPrimitive asChild>
                                     <IGRPButtonPrimitive
                                         variant={'ghost'}
                                         size={'icon'}
@@ -90,15 +90,15 @@ export default function SupportContent({}: SupportContentProps) {
                                             className="h-5 w-5"
                                         />
                                     </IGRPButtonPrimitive>
-                                </TooltipTrigger>
-                                <TooltipContent>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
                                     {t('supportContactVia', { channel: channel.name })}
-                                </TooltipContent>
-                            </Tooltip>
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
                         ))}
                     </div>
                 </div>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 }

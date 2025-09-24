@@ -5,14 +5,11 @@ import { useTranslation } from 'react-i18next';
 
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Drawer,
-    DrawerContent,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from '@renderer/components/ui/drawer';
-import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
-import { ScrollArea } from './ui/scroll-area';
+    IGRPScrollAreaPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useRef, useState } from 'react';
 import {
     IGRPTabs,
@@ -29,25 +26,23 @@ interface ConsoleMessage {
 export function DebugTerminal() {
     const { t } = useTranslation();
     return (
-        <Drawer modal={false}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DrawerTrigger asChild>
-                        <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
-                            <Bug className="h-3.5 w-3.5 text-muted-foreground" />
-                        </IGRPButtonPrimitive>
-                    </DrawerTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t('debug')}</TooltipContent>
-            </Tooltip>
-            <DrawerContent
+        <div>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
+                        <Bug className="h-3.5 w-3.5 text-muted-foreground" />
+                    </IGRPButtonPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>{t('debug')}</IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <div
                 aria-describedby={undefined}
                 className="h-[40vh] z-40 mb-8"
             >
                 <div className="flex h-full flex-col -mt-6">
-                    <DrawerHeader className="p-0">
-                        <DrawerTitle />
-                    </DrawerHeader>
+                    <div className="p-0">
+                        <div />
+                    </div>
                     <IGRPTabs
                         defaultValue="debug"
                         className="flex h-full flex-col"
@@ -71,8 +66,8 @@ export function DebugTerminal() {
                         </div>
                     </IGRPTabs>
                 </div>
-            </DrawerContent>
-        </Drawer>
+            </div>
+        </div>
     );
 }
 
@@ -109,7 +104,7 @@ function ConsoleTab() {
 
     return (
         <div className="h-full">
-            <ScrollArea className="h-full w-full" ref={scrollRef}>
+            <IGRPScrollAreaPrimitive className="h-full w-full" ref={scrollRef}>
                 <div className="font-mono text-sm p-4  min-h-full">
                     {logs.length > 0 ? (
                         <pre className="text-sm">
@@ -128,7 +123,7 @@ function ConsoleTab() {
                         </div>
                     )}
                 </div>
-            </ScrollArea>
+            </IGRPScrollAreaPrimitive>
         </div>
     );
 }

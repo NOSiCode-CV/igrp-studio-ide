@@ -1,20 +1,16 @@
 import { useState, useEffect } from 'react';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@renderer/components/ui/dialog';
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { FileJson } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
-    Tooltip,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import { TooltipContent } from '@radix-ui/react-tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPTooltipContentPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface JSONSchemaModalProps {
     generateJSONSchema: () => string;
@@ -32,30 +28,30 @@ export function JSONSchemaModal({ generateJSONSchema }: JSONSchemaModalProps) {
     }, [isOpen, generateJSONSchema]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DialogTrigger asChild>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPDialogTriggerPrimitive asChild>
                         <IGRPButtonPrimitive variant="ghost" size={'sm'} className="h-6 w-6">
                             <FileJson className="h-4 w-4" />
                         </IGRPButtonPrimitive>
-                    </DialogTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t('jsonSchemaPreview')}</TooltipContent>
-            </Tooltip>
-            <DialogContent className="md:max-h-[70vh] md:max-w-[700px] max-w-[800px]">
-                <DialogHeader>
-                    <DialogTitle>{t('jsonSchemaPreview')}</DialogTitle>
-                    <DialogDescription>
+                    </IGRPDialogTriggerPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>{t('jsonSchemaPreview')}</IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <IGRPDialogContentPrimitive className="md:max-h-[70vh] md:max-w-[700px] max-w-[800px]">
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>{t('jsonSchemaPreview')}</IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
                         {t('jsonSchemaPreview')}
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
                 <div className="my-1">
                     <pre className="p-4 rounded overflow-auto max-h-[60vh]">
                         {jsonSchema}
                     </pre>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

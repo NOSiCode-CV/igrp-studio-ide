@@ -1,28 +1,17 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Switch } from '@renderer/components/ui/switch';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPButtonPrimitive, IGRPInputPrimitive, IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPSwitch } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPPopoverPrimitive,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    } from '@igrp/igrp-framework-react-design-system';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toInitCap } from '@renderer/utils';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
 import { Shield, AlertCircle } from 'lucide-react';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 
 interface FormValidationPopoverProps {
     children?: ReactNode;
@@ -130,7 +119,7 @@ export function FormValidationPopover({
             case 'minLength':
             case 'maxLength':
                 return (
-                    <Input
+                    <IGRPInputText
                         type="number"
                         className="h-8"
                         value={value || ''}
@@ -146,7 +135,7 @@ export function FormValidationPopover({
                 );
             case 'regex':
                 return (
-                    <Input
+                    <IGRPInputText
                         className="h-8"
                         value={value || ''}
                         placeholder="/pattern/"
@@ -157,7 +146,7 @@ export function FormValidationPopover({
             case 'endsWith':
             case 'includes':
                 return (
-                    <Input
+                    <IGRPInputPrimitive
                         className="h-8"
                         value={value || ''}
                         placeholder={t('enterValue')}
@@ -167,7 +156,7 @@ export function FormValidationPopover({
             case 'minDate':
             case 'maxDate':
                 return (
-                    <Input
+                    <IGRPInputPrimitive
                         type="date"
                         className="h-8"
                         value={value || ''}
@@ -176,7 +165,8 @@ export function FormValidationPopover({
                 );
             default:
                 return (
-                    <Switch
+                    <IGRPSwitch
+                        name={validation}
                         checked={value || false}
                         onCheckedChange={(checked) => handleValidationKeyChange(validation, checked)}
                     />
@@ -256,10 +246,10 @@ export function FormValidationPopover({
     };
 
     return (
-        <Popover>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
+        <IGRPPopoverPrimitive>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPPopoverTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="ghost"
                             className="flex items-center"
@@ -268,35 +258,35 @@ export function FormValidationPopover({
                             <Shield className="w-4 h-4" />
                             <span className="sr-only">{t('validation')}</span>
                         </IGRPButtonPrimitive>
-                    </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
+                    </IGRPPopoverTriggerPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive side="top" align="center">
                     {t('openValidationSettings')}
-                </TooltipContent>
-            </Tooltip>
-            <PopoverContent className="w-96" align="end" side="bottom">
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <IGRPPopoverContentPrimitive className="w-96" align="end" side="bottom">
                 <div className="grid gap-4">
                     <div className="space-y-2">
-                        <Tabs defaultValue="validations">
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="validations">
+                            <IGRPTabsPrimitive  defaultValue="validations">
+                            <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
+                                <IGRPTabsTriggerPrimitive value="validations">
                                     {t('validations')}
-                                </TabsTrigger>
-                                <TabsTrigger value="zod">
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="zod">
                                     Zod Schema
-                                </TabsTrigger>
-                                <TabsTrigger value="preview">
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="preview">
                                     {t('preview')}
-                                </TabsTrigger>
-                            </TabsList>
+                                </IGRPTabsTriggerPrimitive>
+                            </IGRPTabsListPrimitive>
 
-                            <TabsContent value="validations" className="space-y-4">
+                            <IGRPTabsContentPrimitive value="validations" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('setValidationsForFormField')}
                                 </p>
                                 
 
-                                <Separator orientation="horizontal" />
+                                <IGRPSeparator orientation="horizontal" />
 
                                 {/* Type-specific validations */}
                                 <div className="space-y-3">
@@ -310,9 +300,9 @@ export function FormValidationPopover({
                                                     key={`${validation}-${index}`}
                                                     className="flex items-center gap-4"
                                                 >
-                                                    <Label htmlFor={`${validation}-${index}`} className="w-24">
+                                                    <IGRPLabel htmlFor={`${validation}-${index}`} className="w-24">
                                                         {toInitCap(t(validation))}
-                                                    </Label>
+                                                    </IGRPLabel>
                                                     <div className="flex-1">
                                                         {renderValidationField(validation)}
                                                     </div>
@@ -320,9 +310,9 @@ export function FormValidationPopover({
                                             ))}
                                     </div>
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent value="zod" className="space-y-4">
+                            <IGRPTabsContentPrimitive value="zod" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('generatedZodSchema')}
                                 </p>
@@ -342,9 +332,9 @@ export function FormValidationPopover({
                                         {t('copyToClipboard')}
                                     </IGRPButtonPrimitive>
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent value="preview" className="space-y-4">
+                            <IGRPTabsContentPrimitive value="preview" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('validationPreview')}
                                 </p>
@@ -379,11 +369,11 @@ export function FormValidationPopover({
                                         )}
                                     </div>
                                 </div>
-                            </TabsContent>
-                        </Tabs>
+                            </IGRPTabsContentPrimitive>
+                        </IGRPTabsPrimitive>
                     </div>
                 </div>
-            </PopoverContent>
-        </Popover>
+            </IGRPPopoverContentPrimitive>
+        </IGRPPopoverPrimitive>
     );
 } 

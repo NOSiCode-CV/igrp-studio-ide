@@ -1,8 +1,8 @@
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-} from '@renderer/components/ui/sidebar';
+    IGRPSidebarPrimitive,
+    IGRPSidebarContentPrimitive,
+    IGRPSidebarHeaderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus, Trash2 } from 'lucide-react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
@@ -16,20 +16,20 @@ import {
     TextInput,
 } from '@renderer/generators/api/components/inputs-form';
 import { useTranslation } from 'react-i18next';
-import { Label } from '@renderer/components/ui/label';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from '@renderer/components/ui/accordion';
+    IGRPAccordionPrimitive,
+    IGRPAccordionContentPrimitive,
+    IGRPAccordionItemPrimitive,
+    IGRPAccordionTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useCustomCode from '../../../hooks/useCustomCode';
 import {
     TabsFunctions,
@@ -38,8 +38,8 @@ import {
     TabTypes,
 } from './custom-code-tabs';
 import { cn } from '@renderer/lib/utils';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { GlobalTabFilter, useGlobalTabFilter } from './global-tab-filter';
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents';
 
@@ -55,7 +55,7 @@ export const returnTypeOptions = [
 ];
 
 interface FunctionSettingsSidebarProps
-    extends React.ComponentProps<typeof Sidebar> {
+    extends React.ComponentProps<typeof IGRPSidebarPrimitive> {
     formik?: any;
     componentTag: string;
     editorRef?: React.RefObject<any>;
@@ -85,7 +85,7 @@ export const FunctionSettingsSidebar = ({
     }, [arguments_]);
 
     return (
-        <Sidebar
+        <IGRPSidebarPrimitive
             {...props}
             collapsible="none"
             className="top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!"
@@ -95,7 +95,7 @@ export const FunctionSettingsSidebar = ({
                 } as React.CSSProperties
             }
         >
-            <SidebarHeader>
+            <IGRPSidebarHeaderPrimitive>
                 <div className="flex flex-col mt-2">
                     <h1 className="text-2xl font-bold mb-1">
                         Function Settings
@@ -104,8 +104,8 @@ export const FunctionSettingsSidebar = ({
                         Manage your parameters below.
                     </p>
                 </div>
-            </SidebarHeader>
-            <SidebarContent className="gap-4 p-2">
+            </IGRPSidebarHeaderPrimitive>
+            <IGRPSidebarContentPrimitive className="gap-4 p-2">
                 <GlobalTabFilter
                     value={filterValue}
                     onChange={setFilterValue}
@@ -113,26 +113,26 @@ export const FunctionSettingsSidebar = ({
                     activeTab={activeTab}
                 />
 
-                <Tabs
+                <IGRPTabsPrimitive
                     defaultValue={formik ? 'props' : 'states'}
                     onValueChange={setActiveTab}
                 >
-                    <TabsList
+                    <IGRPTabsListPrimitive
                         className={cn(
                             'grid w-full grid-cols-5',
                             !formik ? 'grid-cols-4' : ''
                         )}
                     >
                         {formik && (
-                            <TabsTrigger value="props">Props</TabsTrigger>
+                            <IGRPTabsTriggerPrimitive value="props">Props</IGRPTabsTriggerPrimitive>
                         )}
-                        <TabsTrigger value="states">States</TabsTrigger>
-                        <TabsTrigger value="functions">Functions</TabsTrigger>
-                        <TabsTrigger value="snippets">Snippets</TabsTrigger>
-                        <TabsTrigger value="types">Types</TabsTrigger>
-                    </TabsList>
+                        <IGRPTabsTriggerPrimitive value="states">States</IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="functions">Functions</IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="snippets">Snippets</IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="types">Types</IGRPTabsTriggerPrimitive>
+                    </IGRPTabsListPrimitive>
                     {formik && (
-                        <TabsContent value="props" className="space-y-4">
+                        <IGRPTabsContentPrimitive value="props" className="space-y-4">
                             <TextInput
                                 label={t('name')}
                                 id="name"
@@ -154,7 +154,7 @@ export const FunctionSettingsSidebar = ({
                                 onBlur={formik.handleBlur}
                                 error={formik.errors.isAsync}
                             />
-                            <Separator />
+                            <IGRPSeparatorPrimitive />
                             <div className="flex flex-col gap-2">
                                 <SelectInput
                                     label={t('Return Type')}
@@ -206,31 +206,31 @@ export const FunctionSettingsSidebar = ({
                                     </div>
                                 </div>
                             </div>
-                            <Separator />
+                            <IGRPSeparatorPrimitive />
                             <FunctionArguments
                                 value={arguments_}
                                 onChange={setArguments}
                                 returnTypeOptions={returnTypeOptions}
                             />
-                        </TabsContent>
+                        </IGRPTabsContentPrimitive>
                     )}
-                    <TabsContent value="states" className="space-y-4">
+                    <IGRPTabsContentPrimitive value="states" className="space-y-4">
                         <TabStates
                             states={states}
                             pageArguments={componentArguments}
                             editorRef={editorRef}
                             globalFilter={filterValue}
                         />
-                    </TabsContent>
-                    <TabsContent value="snippets" className="space-y-4">
+                    </IGRPTabsContentPrimitive>
+                    <IGRPTabsContentPrimitive value="snippets" className="space-y-4">
                         <TabSnipptes
                             snippets={snippets}
                             editorRef={editorRef}
                             componentTag={componentTag}
                             globalFilter={filterValue}
                         />
-                    </TabsContent>
-                    <TabsContent value="functions" className="space-y-4">
+                    </IGRPTabsContentPrimitive>
+                    <IGRPTabsContentPrimitive value="functions" className="space-y-4">
                         <TabsFunctions
                             functions={functions}
                             editorRef={editorRef}
@@ -238,18 +238,18 @@ export const FunctionSettingsSidebar = ({
                             onInsertImport={onInsertImport}
                             globalFilter={filterValue}
                         />
-                    </TabsContent>
-                    <TabsContent value="types" className="space-y-4">
+                    </IGRPTabsContentPrimitive>
+                    <IGRPTabsContentPrimitive value="types" className="space-y-4">
                         <TabTypes
                             types={types}
                             editorRef={editorRef}
                             globalFilter={filterValue}
                             onInsertImport={onInsertImport}
                         />
-                    </TabsContent>
-                </Tabs>
-            </SidebarContent>
-        </Sidebar>
+                    </IGRPTabsContentPrimitive>
+                </IGRPTabsPrimitive>
+            </IGRPSidebarContentPrimitive>
+        </IGRPSidebarPrimitive>
     );
 };
 
@@ -351,11 +351,11 @@ export const FunctionArguments = ({
 
     return (
         <div className="flex flex-col gap-2">
-            <Label>Define Arguments</Label>
-            <Accordion type="single" collapsible className="w-full">
+            <IGRPLabelPrimitive>Define Arguments</IGRPLabelPrimitive>
+            <IGRPAccordionPrimitive type="single" collapsible className="w-full">
                 {arguments_.map((arg, index) => (
-                    <AccordionItem value={`argName-${index}`} key={arg.id}>
-                        <AccordionTrigger>
+                    <IGRPAccordionItemPrimitive value={`argName-${index}`} key={arg.id}>
+                        <IGRPAccordionTriggerPrimitive>
                             <div className="flex justify-between items-center w-full">
                                 <div className="flex items-center space-x-2">
                                     <span className="font-medium">
@@ -368,8 +368,8 @@ export const FunctionArguments = ({
                                     </span>
                                 </div>
                             </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="border rounded-lg  space-y-4 p-3">
+                        </IGRPAccordionTriggerPrimitive>
+                        <IGRPAccordionContentPrimitive className="border rounded-lg  space-y-4 p-3">
                             <div className="p-1 space-y-3">
                                 <TextInput
                                     id={`argName-${arg.id}`}
@@ -473,7 +473,7 @@ export const FunctionArguments = ({
 
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
-                                                    <Label>Parameters</Label>
+                                                    <IGRPLabelPrimitive>Parameters</IGRPLabelPrimitive>
                                                     <IGRPButtonPrimitive
                                                         type="button"
                                                         variant="outline"
@@ -497,7 +497,7 @@ export const FunctionArguments = ({
                                                                 className="flex items-center gap-2 p-3 border rounded bg-gray-50"
                                                             >
                                                                 <div className="flex-1">
-                                                                    <Input
+                                                                    <IGRPInputPrimitive
                                                                         placeholder={`Parameter ${paramIndex + 1} name`}
                                                                         value={
                                                                             param.name
@@ -542,7 +542,7 @@ export const FunctionArguments = ({
                                                                     />
                                                                 </div>
                                                                 <div className="flex items-center space-x-2">
-                                                                    <Checkbox
+                                                                    <IGRPCheckboxPrimitive
                                                                         id={`paramOptional-${param.id}`}
                                                                         checked={
                                                                             param.isOptional
@@ -560,12 +560,12 @@ export const FunctionArguments = ({
                                                                             )
                                                                         }
                                                                     />
-                                                                    <Label
+                                                                    <IGRPLabelPrimitive
                                                                         htmlFor={`paramOptional-${param.id}`}
                                                                         className="text-sm"
                                                                     >
                                                                         Optional
-                                                                    </Label>
+                                                                    </IGRPLabelPrimitive>
                                                                 </div>
                                                                 <IGRPButtonPrimitive
                                                                     type="button"
@@ -676,10 +676,10 @@ export const FunctionArguments = ({
                                     </div>
                                 </div>
                             </div>
-                        </AccordionContent>
-                    </AccordionItem>
+                        </IGRPAccordionContentPrimitive>
+                    </IGRPAccordionItemPrimitive>
                 ))}
-            </Accordion>
+            </IGRPAccordionPrimitive>
             <IGRPButtonPrimitive
                 onClick={addArgument}
                 className="w-full"

@@ -5,19 +5,19 @@ import { FolderKanban, ListFilter, Pin, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuShortcutPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    SidebarGroup,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@renderer/components/ui/sidebar';
+    IGRPSidebarGroupPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IWorkspace } from 'src/main/types';
 import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
 import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace';
@@ -25,10 +25,10 @@ import { cn } from '@renderer/lib/utils';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 
@@ -113,20 +113,20 @@ export function WorkspaceSwitcher({
 
     return (
         <>
-            <SidebarMenu className="mt-3">
-                <SidebarGroup className="p-0">
-                    <SidebarMenu className="gap-1">
-                        <DropdownMenu modal={false}>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-primary bg-primary/5">
+            <IGRPSidebarMenuPrimitive className="mt-3">
+                <IGRPSidebarGroupPrimitive className="p-0">
+                    <IGRPSidebarMenuPrimitive className="gap-1">
+                        <IGRPDropdownMenuPrimitive modal={false}>
+                            <IGRPDropdownMenuTriggerPrimitive asChild>
+                                <IGRPSidebarMenuItemPrimitive>
+                                    <IGRPSidebarMenuButtonPrimitive className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-primary bg-primary/5">
                                         <FolderKanban className="h-4 w-4 flex-shrink-0" />
                                         <span>{t('workspaces')}</span>
                                         <ListFilter className="ml-auto h-3 w-3" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
+                                    </IGRPSidebarMenuButtonPrimitive>
+                                </IGRPSidebarMenuItemPrimitive>
+                            </IGRPDropdownMenuTriggerPrimitive>
+                            <IGRPDropdownMenuContentPrimitive
                                 className="w-[--radix-dropdown-menu-trigger-width] min-w-72 rounded-lg"
                                 align="start"
                                 side={'right'}
@@ -142,7 +142,7 @@ export function WorkspaceSwitcher({
                                     }
                                 />
                                 {filteredWorkspaces.map((workspace, index) => (
-                                    <DropdownMenuItem
+                                    <IGRPDropdownMenuItemPrimitive
                                         key={index}
                                         onSelect={() =>
                                             handleChangeWorkspace(workspace)
@@ -156,13 +156,13 @@ export function WorkspaceSwitcher({
                                     >
                                         {workspace.name}
 
-                                        <DropdownMenuShortcut>
+                                        <IGRPDropdownMenuShortcutPrimitive>
                                             ⌘{index + 1}
-                                        </DropdownMenuShortcut>
-                                    </DropdownMenuItem>
+                                        </IGRPDropdownMenuShortcutPrimitive>
+                                    </IGRPDropdownMenuItemPrimitive>
                                 ))}
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
+                                <IGRPDropdownMenuSeparatorPrimitive />
+                                <IGRPDropdownMenuItemPrimitive
                                     className="gap-2 p-2"
                                     onSelect={(e) => {
                                         e.preventDefault();
@@ -175,16 +175,16 @@ export function WorkspaceSwitcher({
                                     <div className="font-medium text-muted-foreground">
                                         {t('addWorkspace')}
                                     </div>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </IGRPDropdownMenuItemPrimitive>
+                            </IGRPDropdownMenuContentPrimitive>
+                        </IGRPDropdownMenuPrimitive>
                         {/* Pinned Workspaces */}
                         {pinnedWorkspaces.map((workspace) => (
-                            <SidebarMenuItem
+                            <IGRPSidebarMenuItemPrimitive
                                 key={workspace.id}
                                 className="ml-3 border-l-0"
                             >
-                                <SidebarMenuButton
+                                <IGRPSidebarMenuButtonPrimitive
                                     asChild
                                     className={
                                         workspace.name ===
@@ -200,8 +200,8 @@ export function WorkspaceSwitcher({
                                         <div className="flex items-center gap-2">
                                             <span>{workspace.name}</span>
                                         </div>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
+                                        <IGRPTooltipPrimitive>
+                                            <IGRPTooltipTriggerPrimitive asChild>
                                                 <IGRPButtonPrimitive
                                                     variant="ghost"
                                                     size="icon"
@@ -220,20 +220,20 @@ export function WorkspaceSwitcher({
                                                         )}
                                                     />
                                                 </IGRPButtonPrimitive>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
+                                            </IGRPTooltipTriggerPrimitive>
+                                            <IGRPTooltipContentPrimitive>
                                                 {workspace.pinned
                                                     ? t('unpinWorkspace')
                                                     : t('pinWorkspace')}
-                                            </TooltipContent>
-                                        </Tooltip>
+                                            </IGRPTooltipContentPrimitive>
+                                        </IGRPTooltipPrimitive>
                                     </div>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                                </IGRPSidebarMenuButtonPrimitive>
+                            </IGRPSidebarMenuItemPrimitive>
                         ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            </SidebarMenu>
+                    </IGRPSidebarMenuPrimitive>
+                </IGRPSidebarGroupPrimitive>
+            </IGRPSidebarMenuPrimitive>
             <CreateWorkspace
                 open={showWorkspaceDialog}
                 onOpenChange={setShowWorkspaceDialog}

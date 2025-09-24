@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { ProjectData } from 'src/main/types';
 import { LucideIcon, Search } from 'lucide-react';
-import { Input } from './ui/input';
 import * as LucideIcons from 'lucide-react';
 import { FrameworkIcon } from './framework-icon';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface HeadlineProps {
     icon?: LucideIcon; // Optional icon
@@ -116,7 +116,7 @@ function SearchInput({
             <Search
                 className={`absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground ${iconClassName}`}
             />
-            <Input
+            <IGRPInputPrimitive
                 type="text"
                 placeholder={placeholder}
                 className={`pl-8 h-8 text-xs ${inputClassName}`}
@@ -170,7 +170,6 @@ function SubHeadline({
 }
 
 function getIcon(iconName: string) {
-    console.log(iconName);
     return LucideIcons[iconName as keyof typeof LucideIcons] || undefined;
 }
 

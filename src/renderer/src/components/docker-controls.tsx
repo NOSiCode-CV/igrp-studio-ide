@@ -2,16 +2,20 @@ import React, { useState } from 'react';
 import { Play, Square, Loader2, ChevronDown, Trash2 } from 'lucide-react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Separator } from './ui/separator';
-import { Checkbox } from './ui/checkbox';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { 
+    IGRPTooltipPrimitive, 
+    IGRPTooltipContentPrimitive, 
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipProviderPrimitive 
+} from '@igrp/igrp-framework-react-design-system';
 
 interface DockerControlsProps {
     loading: boolean;
@@ -31,7 +35,7 @@ const DockerControls: React.FC<DockerControlsProps> = ({
     const [dropVolume, setDropVolume] = useState<boolean>(false);
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="flex items-center border rounded-md space-x-1">
                 <IGRPButtonPrimitive
                     variant="ghost"
@@ -67,12 +71,12 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                         </div>
                     </div>
                 </IGRPButtonPrimitive>
-                <Separator
+                <IGRPSeparatorPrimitive
                     orientation="vertical"
                     className="data-[orientation=vertical]:h-4"
                 />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                <IGRPDropdownMenuPrimitive>
+                    <IGRPDropdownMenuTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="ghost"
                             size="sm"
@@ -80,18 +84,18 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                         >
                             <ChevronDown className="h-3.5 w-3.5 text-igrp" />
                         </IGRPButtonPrimitive>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
+                    </IGRPDropdownMenuTriggerPrimitive>
+                    <IGRPDropdownMenuContentPrimitive align="end" className="w-48">
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => onStopAll()}
                             className="group"
                         >
                             <Square className="h-3.5 w-3.5" />
                             <span className="font-medium">{t('stop')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        </IGRPDropdownMenuItemPrimitive>
+                        <IGRPDropdownMenuSeparatorPrimitive />
 
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={(e) => {
                                 // Only handle the action if the click wasn't on the checkbox
                                 if (
@@ -117,28 +121,29 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                                     className="checkbox-container"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Checkbox
+                                    <IGRPTooltipPrimitive>
+                                        <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPCheckboxPrimitive
+                                                name="drop-volume"
                                                 checked={dropVolume}
                                                 onCheckedChange={(
                                                     checked: boolean
                                                 ) => setDropVolume(checked)}
                                             />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                        </IGRPTooltipTriggerPrimitive>
+                                        <IGRPTooltipContentPrimitive>
                                             <p>
                                             {t('deleteContainersVolumes')}
                                             </p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        </IGRPTooltipContentPrimitive>
+                                    </IGRPTooltipPrimitive>
                                 </div>
                             </div>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </IGRPDropdownMenuItemPrimitive>
+                    </IGRPDropdownMenuContentPrimitive>
+                </IGRPDropdownMenuPrimitive>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

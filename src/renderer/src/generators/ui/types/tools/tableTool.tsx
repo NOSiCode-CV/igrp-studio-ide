@@ -1,15 +1,10 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { AddComponentPopover } from '../../components/add-components-popover';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
 import { Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BindingConfigurationFilterModal } from '../../components/binding-config-filter-modal';
 import { useEffect, useState } from 'react';
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadgePrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useStudio from '@renderer/hooks/use-studio';
@@ -66,19 +61,19 @@ const TableTool = ({
                             {comp.label || comp.componentName}
                         </span>
                     </div>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
                             <button
                                 className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
                                 onClick={onEdit}
                             >
                                 <Settings className="h-3.5" />
                             </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive>
                             <p>{t('edit')}</p>
-                        </TooltipContent>
-                    </Tooltip>
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
 
                     <div className="space-x-1">
                         {components.length > 0 && (
@@ -89,10 +84,10 @@ const TableTool = ({
                         )}
                         {tableColumns.length > 0 && (
                             <>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Badge
-                                            variant={'secondary'}
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
+                                        <IGRPBadgePrimitive
+                                            variant={'soft'}
                                             className="rounded-sm cursor-pointer h-6"
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -103,12 +98,12 @@ const TableTool = ({
                                             <span className="text-xs">
                                                 Binding Filter
                                             </span>
-                                        </Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                        </IGRPBadgePrimitive>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>
                                         <p>Binding Filter Configuration </p>
-                                    </TooltipContent>
-                                </Tooltip>
+                                    </IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
 
                                 {isOpen && currentComponent && (
                                     <BindingConfigurationFilterModal

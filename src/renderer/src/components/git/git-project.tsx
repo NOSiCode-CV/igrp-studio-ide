@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Repository } from 'src/main/types';
 import useToast from '../../hooks/useToast';
 import { ProjectNameDialog } from './dialog-project-name';
-import { CardGitProject } from './card-git-project';
 import { EmptyState } from '../empty-state';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -11,9 +10,10 @@ import useGitAuth from '@renderer/hooks/use-git-auth';
 import { LoadingSpinner } from '../loading-spinner';
 import { useGit } from '@renderer/hooks/use-git';
 import { useTranslation } from 'react-i18next';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { getUUID } from '@renderer/utils';
+import { CardGitProject } from './card-git-project';
+import { IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 export default function GitProject() {
     const { t } = useTranslation();
@@ -222,17 +222,21 @@ export default function GitProject() {
         <div>
             {/* Only show tabs if both GitHub and GitLab have repositories */}
             {hasGithubRepos && hasGitlabRepos ? (
-                <Tabs
+                <IGRPTabsPrimitive
                     defaultValue={activeTab}
                     onValueChange={setActiveTab}
                     className="mb-6"
                 >
-                    <TabsList className="grid w-[400px] grid-cols-2">
-                        <TabsTrigger value="github">GitHub</TabsTrigger>
-                        <TabsTrigger value="gitlab">GitLab</TabsTrigger>
-                    </TabsList>
+                    <IGRPTabsListPrimitive className="grid w-[400px] grid-cols-2">
+                        <IGRPTabsTriggerPrimitive value="github">
+                            GitHub
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="gitlab">
+                            GitLab
+                        </IGRPTabsTriggerPrimitive>
+                    </IGRPTabsListPrimitive>
 
-                    <TabsContent value="github">
+                    <IGRPTabsContentPrimitive value="github">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {repositoriesGitHub?.map((repo) => (
                                 <CardGitProject
@@ -245,9 +249,9 @@ export default function GitProject() {
                                 />
                             ))}
                         </div>
-                    </TabsContent>
+                    </IGRPTabsContentPrimitive>
 
-                    <TabsContent value="gitlab">
+                    <IGRPTabsContentPrimitive value="gitlab">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {repositoriesGitLab?.map((repo) => (
                                 <CardGitProject
@@ -260,8 +264,8 @@ export default function GitProject() {
                                 />
                             ))}
                         </div>
-                    </TabsContent>
-                </Tabs>
+                    </IGRPTabsContentPrimitive>
+                </IGRPTabsPrimitive>
             ) : // If only GitHub has repositories
             hasGithubRepos ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,13 +1,13 @@
 'use client';
 
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
+    IGRPTablePrimitive,
+    IGRPTableBodyPrimitive,
+    IGRPTableCellPrimitive,
+    IGRPTableHeadPrimitive,
+    IGRPTableHeaderPrimitive,
+    IGRPTableRowPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { formatDistanceToNow } from 'date-fns';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { ProjectIcon } from '@renderer/components/shared-ui';
@@ -37,24 +37,24 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
 
     return (
         <div className="rounded-md border overflow-hidden">
-            <Table className="compact-table">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t('name')}</TableHead>
-                        <TableHead>{t('framework')}</TableHead>
-                        <TableHead>{t('dependencies')}</TableHead>
-                        <TableHead>{t('lastUpdated')}</TableHead>
-                        <TableHead className="w-[80px]"></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
+            <IGRPTablePrimitive className="compact-table">
+                <IGRPTableHeaderPrimitive>
+                    <IGRPTableRowPrimitive>
+                        <IGRPTableHeadPrimitive>{t('name')}</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>{t('framework')}</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>{t('dependencies')}</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>{t('lastUpdated')}</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive className="w-[80px]"></IGRPTableHeadPrimitive>
+                    </IGRPTableRowPrimitive>
+                </IGRPTableHeaderPrimitive>
+                <IGRPTableBodyPrimitive>
                     {projects.map((project) => (
-                        <TableRow
+                        <IGRPTableRowPrimitive
                             key={project.id}
                             className="hover:bg-muted/50 group cursor-pointer"
                             onClick={() => handleProjectClick(project)}
                         >
-                            <TableCell className="font-medium">
+                            <IGRPTableCellPrimitive className="font-medium">
                                 <div className="flex items-center gap-1.5">
                                     <ProjectIcon project={project} workspacePath={workspace.path} />
                                     <div>
@@ -66,24 +66,24 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
                                         </div>
                                     </div>
                                 </div>
-                            </TableCell>
-                            <TableCell className="text-xs">
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive className="text-xs">
                                 {project.framework}
-                            </TableCell>
-                            <TableCell>
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive>
                                 <Dependency
                                     dependsOn={project.dependsOn}
                                     isTable
                                 />
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-xs">
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive className="text-muted-foreground text-xs">
                                 {project.updatedAt &&
                                     formatDistanceToNow(
                                         new Date(project.updatedAt),
                                         { addSuffix: true }
                                     )}
-                            </TableCell>
-                            <TableCell>
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive>
                                 <ProjectActions
                                     project={project}
                                     projects={projects}
@@ -95,11 +95,11 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
                                     }
                                     services={services}
                                 />
-                            </TableCell>
-                        </TableRow>
+                            </IGRPTableCellPrimitive>
+                        </IGRPTableRowPrimitive>
                     ))}
-                </TableBody>
-            </Table>
+                </IGRPTableBodyPrimitive>
+            </IGRPTablePrimitive>
         </div>
     );
 }

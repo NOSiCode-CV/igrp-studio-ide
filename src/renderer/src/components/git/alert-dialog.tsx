@@ -1,13 +1,12 @@
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '../ui/alert-dialog';
+    IGRPModalDialog,
+    IGRPModalDialogContent,
+    IGRPModalDialogDescription,
+    IGRPModalDialogFooter,
+    IGRPModalDialogHeader,
+    IGRPModalDialogTitle,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 interface SyncAlertProps {
@@ -26,26 +25,26 @@ const AlertDialogSync: React.FC<SyncAlertProps> = ({
     const { t } = useTranslation();
 
     return (
-        <AlertDialog open={isOpen} onOpenChange={onClose}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>
+        <IGRPModalDialog open={isOpen} onOpenChange={onClose}>
+            <IGRPModalDialogContent>
+                <IGRPModalDialogHeader>
+                    <IGRPModalDialogTitle>
                         {t('confirmSynchronization')}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
+                    </IGRPModalDialogTitle>
+                    <IGRPModalDialogDescription>
                         {t('syncDescription', { branch })}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => onClose(false)}>
+                    </IGRPModalDialogDescription>
+                </IGRPModalDialogHeader>
+                <IGRPModalDialogFooter>
+                    <IGRPButtonPrimitive variant="outline" onClick={() => onClose(false)}>
                         {t('cancel')}
-                    </AlertDialogCancel>
-                    <AlertDialogAction onClick={onConfirm}>
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive onClick={onConfirm}>
                         {t('syncChanges')}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </IGRPButtonPrimitive>
+                </IGRPModalDialogFooter>
+            </IGRPModalDialogContent>
+        </IGRPModalDialog>
     );
 };
 

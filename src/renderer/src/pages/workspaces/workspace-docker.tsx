@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
+    IGRPCard,
+    IGRPCardContent,
+    IGRPCardDescription,
+    IGRPCardFooter,
+    IGRPCardHeader,
+    IGRPCardTitle,
+} from '@igrp/igrp-framework-react-design-system';
 import { Save, Copy, RefreshCw } from 'lucide-react';
 import { IWorkspace } from 'src/main/types';
 import MonacoEditor from '@renderer/components/monaco-editor';
@@ -55,16 +55,16 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
 
     return (
         <div className="space-y-4">
-            <Card>
-                <CardHeader className="compact-card-header">
-                    <CardTitle className="text-sm">
+            <IGRPCard>
+                <IGRPCardHeader className="compact-card-header">
+                    <IGRPCardTitle className="text-sm">
                     {t('dockerComposeConfiguration')}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
+                    </IGRPCardTitle>
+                    <IGRPCardDescription className="text-xs">
                     {t('manageComposeFile')}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="compact-card-content space-y-3">
+                    </IGRPCardDescription>
+                </IGRPCardHeader>
+                <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="border rounded-md overflow-hidden">
                         <div className="bg-muted/30 border-b py-1.5 flex items-center justify-between">
                             <div className="text-xs font-medium px-3">
@@ -88,8 +88,8 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             />
                         )}
                     </div>
-                </CardContent>
-                <CardFooter className="compact-card-footer flex justify-between">
+                </IGRPCardContent>
+                <IGRPCardFooter className="compact-card-footer flex justify-between">
                     <div className="text-xs text-muted-foreground">
                         {services.filter((s) => s.status === 'running').length}{' '}
                         {t('servicesEnabled')}
@@ -123,8 +123,8 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             {t('save')}
                         </IGRPButtonPrimitive>
                     </div>
-                </CardFooter>
-            </Card>
+                </IGRPCardFooter>
+            </IGRPCard>
         </div>
     );
 }

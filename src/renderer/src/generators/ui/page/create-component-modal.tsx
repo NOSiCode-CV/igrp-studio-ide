@@ -1,16 +1,9 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPButtonPrimitive, IGRPCardContentPrimitive, IGRPCardHeaderPrimitive, IGRPCardPrimitive, IGRPCardTitlePrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import {
@@ -24,18 +17,12 @@ import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { TextInput } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
 import { FocusEvent } from 'react';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import {
     FunctionArguments,
     returnTypeOptions,
 } from '../components/sidebar/custom-code/functions-settings';
 import { PageDefinition } from './page-manager';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 
 const initialValues: ComponentConfig = {
     type: 'component',
@@ -180,12 +167,12 @@ export function CreateComponentModal({
     }, [arguments_]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
-                <DialogTitle>{t('createNewComponent')}</DialogTitle>
-                <DialogDescription>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
+                <IGRPDialogTitlePrimitive>{t('createNewComponent')}</IGRPDialogTitlePrimitive>
+                <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Component' })}
-                </DialogDescription>
+                </IGRPDialogDescriptionPrimitive>
                 <form
                     className="needs-validation"
                     onSubmit={(e) => {
@@ -216,7 +203,7 @@ export function CreateComponentModal({
                                 placeholder="TodoItem"
                             />
                             <div className="grid grid-cols-1 items-center gap-3">
-                                <Label htmlFor="Associar">{t('pages')}</Label>
+                                <IGRPLabel htmlFor="Associar">{t('pages')}</IGRPLabel>
                                 <IGRPCombobox
                                     name="pagePath"
                                     className="col-span-3"
@@ -248,13 +235,13 @@ export function CreateComponentModal({
                                 />
                             </div>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>
+                            <IGRPCardPrimitive>
+                                <IGRPCardHeaderPrimitive>
+                                    <IGRPCardTitlePrimitive>
                                         Generated Component Signature
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                                    </IGRPCardTitlePrimitive>
+                                </IGRPCardHeaderPrimitive>
+                                <IGRPCardContentPrimitive>
                                     <pre className="p-4 rounded-lg text-sm overflow-x-auto">
                                         <code>
                                             {`export default function  myComponent(`}
@@ -300,12 +287,12 @@ export function CreateComponentModal({
 }`}
                                         </code>
                                     </pre>
-                                </CardContent>
-                            </Card>
+                                </IGRPCardContentPrimitive>
+                            </IGRPCardPrimitive>
                         </div>
                         <div className="col-span-1 py-4">
                             <div className="flex flex-row space-x-3 w-full h-full">
-                                <Separator orientation="vertical" />
+                                <IGRPSeparator orientation="vertical" />
                                 <div className="w-full flex-1">
                                     <FunctionArguments
                                         value={formik.values?.args || []}
@@ -316,7 +303,7 @@ export function CreateComponentModal({
                             </div>
                         </div>
                     </div>
-                    <DialogFooter className="flex justify-between">
+                    <IGRPDialogFooterPrimitive className="flex justify-between">
                         <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
                         </IGRPButtonPrimitive>
@@ -327,9 +314,9 @@ export function CreateComponentModal({
                         >
                             {formik.isSubmitting ? t('saving') : t('save')}
                         </IGRPButtonPrimitive>
-                    </DialogFooter>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

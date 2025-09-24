@@ -1,11 +1,9 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { Ellipsis } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -18,21 +16,21 @@ export function DropDownItem({ comp }: DropdownItemProps) {
     const { children } = comp;
     const { t } = useTranslation();
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        <IGRPDropdownMenuPrimitive>
+            <IGRPDropdownMenuTriggerPrimitive asChild>
                 <IGRPButtonPrimitive variant={'ghost'} size={'icon'}>
                     <Ellipsis />
                 </IGRPButtonPrimitive>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+            </IGRPDropdownMenuTriggerPrimitive>
+            <IGRPDropdownMenuContentPrimitive    className="w-56">
+                <IGRPDropdownMenuLabelPrimitive>{t('actions')}</IGRPDropdownMenuLabelPrimitive>
                 {children.length > 0 &&
                     children.map((child) => (
-                        <DropdownMenuItem key={child.id}>
+                        <IGRPDropdownMenuItemPrimitive key={child.id}>
                             {child.label}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
+            </IGRPDropdownMenuContentPrimitive>
+        </IGRPDropdownMenuPrimitive>
     );
 }

@@ -12,29 +12,17 @@ import {
     PlusCircle,
     Server,
 } from 'lucide-react';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
+import { IGRPButtonPrimitive, IGRPSelectContentPrimitive, IGRPSelectItemPrimitive, IGRPSelectPrimitive, IGRPSelectTriggerPrimitive, IGRPSelectValuePrimitive, IGRPToggleGroupItemPrimitive, IGRPToggleGroupPrimitive, IGRPTogglePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
-import {
-    ToggleGroup,
-    ToggleGroupItem,
-} from '@renderer/components/ui/toggle-group';
 import { ProjectWizard } from '@renderer/pages/project';
 import { CloneProjectModal } from '@renderer/components/git/clone-project-modal';
 import useToast from '@renderer/hooks/useToast';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from '@renderer/components/ui/dropdown-menu';
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
-import { Toggle } from '@renderer/components/ui/toggle';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { ServiceGrid } from './services/service-grid';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
 import { ConfigurationDialog } from './components/configuration-dialog';
@@ -107,43 +95,52 @@ const ResourceSection = ({
                         onChange={onSearchChange}
                         className="lg:w-[250px]"
                     />
-                    <ToggleGroup
+                    <IGRPToggleGroupPrimitive
                         type="single"
                         value={viewMode}
                         onValueChange={(value) =>
                             value && onViewModeChange(value as ViewMode)
                         }
                     >
-                        <ToggleGroupItem
+                        <IGRPToggleGroupItemPrimitive
                             value="grid"
                             size="sm"
                             className="h-8 w-8"
                         >
                             <LayoutGrid className="h-3.5 w-3.5" />
-                        </ToggleGroupItem>
-                        <ToggleGroupItem
+                        </IGRPToggleGroupItemPrimitive>
+                        <IGRPToggleGroupItemPrimitive
                             value="list"
                             size="sm"
                             className="h-8 w-8"
                         >
                             <List className="h-3.5 w-3.5" />
-                        </ToggleGroupItem>
-                    </ToggleGroup>
+                        </IGRPToggleGroupItemPrimitive>
+                    </IGRPToggleGroupPrimitive>
                 </div>
                 <div className="flex items-center gap-2">
                     <span>{t('sortBy')}</span>
-                    <Select value={sortValue} onValueChange={onSortChange}>
-                        <SelectTrigger className="w-[180px] !h-7">
-                            <SelectValue placeholder={t('orderBy')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="lastModified">
+                    <IGRPSelectPrimitive
+                        value={sortValue}
+                        onValueChange={onSortChange}
+                    >
+                        <IGRPSelectTriggerPrimitive className="w-[180px] !h-7">
+                            <IGRPSelectValuePrimitive
+                                placeholder={t('orderBy')}
+                            />
+                        </IGRPSelectTriggerPrimitive>
+                        <IGRPSelectContentPrimitive >
+                            <IGRPSelectItemPrimitive value="lastModified">
                                 {t('lastModified')}
-                            </SelectItem>
-                            <SelectItem value="name">{t('name')}</SelectItem>
-                            <SelectItem value="type">{t('type')}</SelectItem>
-                        </SelectContent>
-                    </Select>
+                            </IGRPSelectItemPrimitive>
+                            <IGRPSelectItemPrimitive value="name">
+                                {t('name')}
+                            </IGRPSelectItemPrimitive>
+                            <IGRPSelectItemPrimitive value="type">
+                                {t('type')}
+                            </IGRPSelectItemPrimitive>
+                        </IGRPSelectContentPrimitive>
+                    </IGRPSelectPrimitive>
                 </div>
             </div>
             {isEmpty ? emptyState : children}
@@ -236,25 +233,27 @@ const Resources = () => {
         const [openCloneProject, setOpenCloneProject] = useState(false);
         return (
             <>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Toggle size={'sm'} variant={'outline'}>
+                <IGRPDropdownMenuPrimitive>
+                    <IGRPDropdownMenuTriggerPrimitive asChild>
+                        <IGRPTogglePrimitive size={'sm'} variant={'outline'}>
                             <EllipsisVertical />
-                        </Toggle>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onClick={onHandleOpenProjectClick}>
+                        </IGRPTogglePrimitive>
+                    </IGRPDropdownMenuTriggerPrimitive>
+                    <IGRPDropdownMenuContentPrimitive>
+                        <IGRPDropdownMenuItemPrimitive
+                            onClick={onHandleOpenProjectClick}
+                        >
                             <FolderOpen className="w-4 h-4 mr-2" />
                             <span>{t('openProject')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
+                        </IGRPDropdownMenuItemPrimitive>
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => setOpenCloneProject(true)}
                         >
                             <GitFork className="w-4 h-4 mr-2" />
                             {t('cloneProject')}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </IGRPDropdownMenuItemPrimitive>
+                    </IGRPDropdownMenuContentPrimitive>
+                </IGRPDropdownMenuPrimitive>
                 <ProjectWizard />
                 {openCloneProject && (
                     <CloneProjectModal
@@ -310,8 +309,7 @@ const Resources = () => {
     const ServiceEmptyState = () => (
         <div className="border border-dashed rounded-md p-6 text-center">
             <Server className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <h3 className="text-sm font-medium">{t('noServicesFound')}
-            </h3>
+            <h3 className="text-sm font-medium">{t('noServicesFound')}</h3>
             <p className="text-xs text-muted-foreground mb-3">
                 {serviceSearchQuery
                     ? `${t('noServicesMatching')} "${serviceSearchQuery}"`

@@ -1,7 +1,6 @@
 import { Repository } from 'src/main/types';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { GitFork } from 'lucide-react';
-import { Card } from '../ui/card';
 import useToast from '../../hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
@@ -60,7 +59,7 @@ export function CardGitProject({
     };
 
     return (
-        <Card
+        <IGRPCardPrimitive
             key={repo.id}
             className="border rounded-lg p-4 hover:shadow-lg transition"
         >
@@ -105,6 +104,6 @@ export function CardGitProject({
                     )}
                 </div>
             </div>
-        </Card>
+        </IGRPCardPrimitive>
     );
 }

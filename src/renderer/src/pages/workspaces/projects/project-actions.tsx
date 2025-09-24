@@ -1,12 +1,12 @@
 'use client';
 
 import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import useToast from '@renderer/hooks/useToast';
@@ -68,8 +68,8 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <IGRPDropdownMenuPrimitive>
+                <IGRPDropdownMenuTriggerPrimitive asChild>
                     <IGRPButtonPrimitive
                         variant="ghost"
                         size="icon"
@@ -77,24 +77,24 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     >
                         <MoreVertical className="h-4 w-4" />
                     </IGRPButtonPrimitive>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="min-w-48">
+                </IGRPDropdownMenuTriggerPrimitive>
+                <IGRPDropdownMenuContentPrimitive className="min-w-48">
                     {onEdit && (
-                        <DropdownMenuItem onClick={onEdit}>
+                        <IGRPDropdownMenuItemPrimitive onClick={onEdit}>
                             <Edit className="mr-2 h-4 w-4" />
                             {t('editProject')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
                     {service?.status === 'running' && (
-                        <DropdownMenuItem onClick={handleExternalLink}>
+                        <IGRPDropdownMenuItemPrimitive onClick={handleExternalLink}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             {t('openInBrowser')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
                  
                     {project.framework === ENV_TYPES.DOTNET && (
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={onConvertToSpringBoot}
                             disabled
                         >
@@ -103,17 +103,17 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                             <span className="ml-auto text-xs text-muted-foreground">
                                 {t('comingSoon')}
                             </span>
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
                     {project.framework === ENV_TYPES.SPRING && (
-                        <DropdownMenuItem onClick={onConvertToDotNet} disabled>
+                        <IGRPDropdownMenuItemPrimitive onClick={onConvertToDotNet} disabled>
                             <Repeat className="mr-2 h-4 w-4 text-gray-500" />
                             {t('convertToDotNet')}
                             <span className="ml-auto text-xs text-muted-foreground">
                                 {t('comingSoon')}
                             </span>
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
                     {service && (
@@ -124,18 +124,18 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                             isNew={false}
                             project={project}
                         >
-                            <DropdownMenuItem
+                            <IGRPDropdownMenuItemPrimitive
                                 onSelect={(e) => e.preventDefault()}
                                 className="focus:bg-accent"
                             >
                                 <Edit className="mr-2 h-4 w-4" />
                                {t('configureService')}
-                            </DropdownMenuItem>
+                            </IGRPDropdownMenuItemPrimitive>
                         </ConfigurationDialog>
                     )}
-                    <DropdownMenuSeparator />
+                    <IGRPDropdownMenuSeparatorPrimitive />
 
-                    <DropdownMenuItem
+                    <IGRPDropdownMenuItemPrimitive
                         className="text-red-600 focus:text-red-600 focus:bg-red-50"
                         onClick={() => {
                             setIsDialogOpen(true);
@@ -143,9 +143,9 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     >
                         <Trash className="mr-2 h-4 w-4 text-red-600" />
                         {t('removeProject')}
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                    </IGRPDropdownMenuItemPrimitive>
+                </IGRPDropdownMenuContentPrimitive>
+            </IGRPDropdownMenuPrimitive>
 
             <AlertDialogDelete
                 onConfirm={handleDelete}

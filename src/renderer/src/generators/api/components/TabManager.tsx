@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { ContainerScrollArea } from './ContainerScrollArea';
 import PageController from '../pages/PageWrapper';
 import Overview from '../pages/overview';
@@ -43,7 +43,7 @@ const TabManager = ({ currentItem }: ContentProps) => {
                 setActiveTab={setActiveTab}
             />
 
-            <Separator />
+            <IGRPSeparator />
 
             <ContainerScrollArea>
                 {/* Tab Content */}

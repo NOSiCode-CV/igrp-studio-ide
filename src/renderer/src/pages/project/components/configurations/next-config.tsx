@@ -1,9 +1,8 @@
 'use client';
 
-import { Label } from '@renderer/components/ui/label';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPLabelPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { NextConfigData } from 'src/main/types';
-import { Textarea } from '@renderer/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { LabelRequired } from '@renderer/components/label-required';
 
@@ -31,7 +30,7 @@ export function NextConfig({
         <div className="space-y-6">
             <div className="space-y-2">
                 <LabelRequired>{t('applicationName')}</LabelRequired>
-                <Input
+                <IGRPInputPrimitive
                     id="name"
                     value={data.name}
                     onChange={(e) =>
@@ -48,8 +47,8 @@ export function NextConfig({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="description">{t('description')}</Label>
-                <Textarea
+                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
+                <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}
                     onChange={(e) =>
