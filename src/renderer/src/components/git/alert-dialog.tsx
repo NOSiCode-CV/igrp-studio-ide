@@ -36,7 +36,10 @@ const AlertDialogSync: React.FC<SyncAlertProps> = ({
                     </IGRPModalDialogDescription>
                 </IGRPModalDialogHeader>
                 <IGRPModalDialogFooter>
-                    <IGRPButtonPrimitive variant="outline" onClick={() => onClose(false)}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={() => onClose(false)}
+                    >
                         {t('cancel')}
                     </IGRPButtonPrimitive>
                     <IGRPButtonPrimitive onClick={onConfirm}>

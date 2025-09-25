@@ -105,7 +105,9 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
                         </IGRPCollapsibleContentPrimitive>
                     </IGRPCollapsiblePrimitive>
                 ) : (
-                    <IGRPSidebarMenuButtonPrimitive onClick={() => handleFileSelect(item)}>
+                    <IGRPSidebarMenuButtonPrimitive
+                        onClick={() => handleFileSelect(item)}
+                    >
                         <div className="flex items-center gap-2">
                             <File className="w-4 h-4" />
                             <span>{item.name}</span>
@@ -118,7 +120,9 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({
 
     return (
         <IGRPScrollAreaPrimitive className="flex-1 p-2 overflow-auto">
-            <IGRPSidebarMenuPrimitive>{renderTree(fileTree)}</IGRPSidebarMenuPrimitive>
+            <IGRPSidebarMenuPrimitive>
+                {renderTree(fileTree)}
+            </IGRPSidebarMenuPrimitive>
         </IGRPScrollAreaPrimitive>
     );
 };

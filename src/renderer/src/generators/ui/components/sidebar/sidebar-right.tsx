@@ -1,6 +1,11 @@
 import { RotateCcw, Settings, X } from 'lucide-react';
 
-import { IGRPButtonPrimitive, IGRPSidebarContentPrimitive, IGRPSidebarHeaderPrimitive, IGRPSidebarPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPSidebarContentPrimitive,
+    IGRPSidebarHeaderPrimitive,
+    IGRPSidebarPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { useTranslation } from 'react-i18next';
 import RenderPropsConfig from '../settings/properties';
@@ -40,7 +45,8 @@ import { getRequiredDataSchema } from '../../dnd/helpers';
 import { useComponents } from '../../hooks/useComponents';
 import CopyContent from './copy-content';
 
-interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> {
+interface SidebarRightProps
+    extends ComponentProps<typeof IGRPSidebarPrimitive> {
     comp?: StructuredComponent;
     parentComp?: StructuredComponent;
     path?: string;
@@ -181,7 +187,7 @@ const SidebarRight = ({
                     // If the key doesn't exist in the current data, add it
                     if (!(key in data)) {
                         cleanedData[key] = requiredDataSchema[key];
-                       // hasChanges = true;
+                        // hasChanges = true;
                     }
                 });
 
@@ -194,7 +200,7 @@ const SidebarRight = ({
                         Object.keys(cleanedData[key]).length === 0
                     ) {
                         delete cleanedData[key];
-                       // hasChanges = true;
+                        // hasChanges = true;
                     }
                 });
 
@@ -270,7 +276,9 @@ const SidebarRight = ({
                 const source = // Filter properties based on schema and requirements
                     Object.entries(currentComp?.properties ?? {}).reduce(
                         (acc, [key, value]) => {
-                            const schemaConfig = (data as Record<string, any>)?.[key];
+                            const schemaConfig = (
+                                data as Record<string, any>
+                            )?.[key];
 
                             // Skip if property not in schema
                             if (!schemaConfig) {
@@ -553,7 +561,10 @@ const SidebarRight = ({
                                 >
                                     <RotateCcw className="h-4 w-4" />
                                 </IGRPButtonPrimitive>
-                                <IGRPButtonPrimitive variant={'ghost'} onClick={handleClose}>
+                                <IGRPButtonPrimitive
+                                    variant={'ghost'}
+                                    onClick={handleClose}
+                                >
                                     <X />
                                 </IGRPButtonPrimitive>
                             </>
@@ -584,10 +595,17 @@ const SidebarRight = ({
                                 onChange={udpateTag}
                             />
                         </div>
-                        <IGRPTabsPrimitive className="flex-1 px-2" defaultValue="props">
+                        <IGRPTabsPrimitive
+                            className="flex-1 px-2"
+                            defaultValue="props"
+                        >
                             <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
-                                <IGRPTabsTriggerPrimitive value="props">Props</IGRPTabsTriggerPrimitive>
-                                <IGRPTabsTriggerPrimitive value="styles">Style</IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="props">
+                                    Props
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="styles">
+                                    Style
+                                </IGRPTabsTriggerPrimitive>
                                 <IGRPTabsTriggerPrimitive value="interactions">
                                     Interactions
                                 </IGRPTabsTriggerPrimitive>
@@ -596,7 +614,10 @@ const SidebarRight = ({
                                 </IGRPTabsTriggerPrimitive>
                             </IGRPTabsListPrimitive>
 
-                            <IGRPTabsContentPrimitive value="props" className="space-y-6">
+                            <IGRPTabsContentPrimitive
+                                value="props"
+                                className="space-y-6"
+                            >
                                 <IGRPAccordionPrimitive
                                     type="single"
                                     collapsible
@@ -700,7 +721,10 @@ const SidebarRight = ({
                                     )}
                                 </IGRPAccordionPrimitive>
                             </IGRPTabsContentPrimitive>
-                            <IGRPTabsContentPrimitive value="styles" className="space-y-6">
+                            <IGRPTabsContentPrimitive
+                                value="styles"
+                                className="space-y-6"
+                            >
                                 <StyleTab
                                     comp={tempEditingComponent}
                                     path={currentPath}
@@ -722,7 +746,10 @@ const SidebarRight = ({
                                     columnsOptions={columnsOptions}
                                 />
                             </IGRPTabsContentPrimitive>
-                            <IGRPTabsContentPrimitive value="copy-content" className="space-y-6">
+                            <IGRPTabsContentPrimitive
+                                value="copy-content"
+                                className="space-y-6"
+                            >
                                 <CopyContent currentComp={currentComp} />
                             </IGRPTabsContentPrimitive>
                         </IGRPTabsPrimitive>

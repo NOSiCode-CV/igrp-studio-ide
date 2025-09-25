@@ -13,7 +13,10 @@ import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout';
 import { APRESENTATION, OPTION_TYPE } from '@renderer/constants/appConstants';
-import { IGRPSidebarInsetPrimitive, IGRPSidebarProviderPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPSidebarInsetPrimitive,
+    IGRPSidebarProviderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface ContentProps {
     basePath: string;

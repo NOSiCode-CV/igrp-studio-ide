@@ -1,5 +1,12 @@
 import { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { IGRPButtonPrimitive, IGRPTableCellPrimitive, IGRPTableRowPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPTableCellPrimitive,
+    IGRPTableRowPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { SchemaField } from '../../types/schema';
@@ -113,7 +120,7 @@ export function SchemaFieldRow({
             ...field,
             type,
             objectType,
-            module
+            module,
         };
 
         if (type === 'object') {
@@ -223,7 +230,10 @@ export function SchemaFieldRow({
                                     )}
                                 </IGRPButtonPrimitive>
                             </IGRPTooltipTriggerPrimitive>
-                            <IGRPTooltipContentPrimitive side="top" align="center">
+                            <IGRPTooltipContentPrimitive
+                                side="top"
+                                align="center"
+                            >
                                 {t('addSubNewField')}
                             </IGRPTooltipContentPrimitive>
                         </IGRPTooltipPrimitive>
@@ -291,7 +301,10 @@ export function SchemaFieldRow({
                                         </span>
                                     </IGRPButtonPrimitive>
                                 </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive side="top" align="center">
+                                <IGRPTooltipContentPrimitive
+                                    side="top"
+                                    align="center"
+                                >
                                     {t('addSubNewField')}
                                 </IGRPTooltipContentPrimitive>
                             </IGRPTooltipPrimitive>

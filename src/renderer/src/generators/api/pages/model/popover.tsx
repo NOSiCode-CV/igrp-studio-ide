@@ -1,8 +1,15 @@
-import { IGRPButtonPrimitive, IGRPPopoverContentPrimitive, IGRPPopoverTriggerPrimitive, IGRPSeparatorPrimitive, IGRPSwitchPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import {
-    IGRPPopoverPrimitive,
+    IGRPButtonPrimitive,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    IGRPSeparatorPrimitive,
+    IGRPSwitchPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPPopoverPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTabsPrimitive,
     IGRPTabsContentPrimitive,
@@ -41,7 +48,7 @@ export function PopoverModel({
     return (
         <IGRPPopoverPrimitive>
             <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive     asChild>
+                <IGRPTooltipTriggerPrimitive asChild>
                     <IGRPPopoverTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="ghost"
@@ -57,17 +64,24 @@ export function PopoverModel({
                     {t('openAdvancedSettings')}
                 </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
-            <IGRPPopoverContentPrimitive className="w-100" align="end" side="bottom">
+            <IGRPPopoverContentPrimitive
+                className="w-100"
+                align="end"
+                side="bottom"
+            >
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <IGRPTabsPrimitive defaultValue="dataType">
-                            <IGRPTabsListPrimitive    className="grid w-full grid-cols-1">
+                            <IGRPTabsListPrimitive className="grid w-full grid-cols-1">
                                 <IGRPTabsTriggerPrimitive value="dataType">
                                     {t('settings')}
                                 </IGRPTabsTriggerPrimitive>
                             </IGRPTabsListPrimitive>
 
-                            <IGRPTabsContentPrimitive value="dataType" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="dataType"
+                                className="space-y-4"
+                            >
                                 <div className="flex flex-1 gap-2">
                                     {['unique', 'nullable', 'primaryKey'].map(
                                         (field) => (

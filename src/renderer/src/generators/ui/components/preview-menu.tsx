@@ -60,7 +60,7 @@ const PreviewMenu = ({ basePath }: LogTerminalProps) => {
                 <IGRPDropdownMenuItemPrimitive onClick={handleStart}>
                     <Play className="h-4 w-4 mr-2" /> {t('startNext')}
                 </IGRPDropdownMenuItemPrimitive>
-                <IGRPDropdownMenuItemPrimitive   onClick={handleStop}>
+                <IGRPDropdownMenuItemPrimitive onClick={handleStop}>
                     <StopCircle className="h-4 w-4 mr-2" /> {t('stopNext')}
                 </IGRPDropdownMenuItemPrimitive>
                 <IGRPDropdownMenuItemPrimitive onClick={handlePreview}>

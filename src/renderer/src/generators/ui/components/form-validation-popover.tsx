@@ -1,4 +1,14 @@
-import { IGRPButtonPrimitive, IGRPInputPrimitive, IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPInputPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPSwitch } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
@@ -6,7 +16,7 @@ import {
     IGRPPopoverPrimitive,
     IGRPPopoverContentPrimitive,
     IGRPPopoverTriggerPrimitive,
-    } from '@igrp/igrp-framework-react-design-system';
+} from '@igrp/igrp-framework-react-design-system';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toInitCap } from '@renderer/utils';
@@ -35,19 +45,25 @@ export function FormValidationPopover({
     const [isDate, setIsDate] = useState(false);
     const [isEmail, setIsEmail] = useState(false);
 
-    const handleValidationKeyChange = (key: string, value: string | boolean | number) => {
+    const handleValidationKeyChange = (
+        key: string,
+        value: string | boolean | number
+    ) => {
         const currentValidation = field?.validation || {};
         const updatedValidation = {
             ...currentValidation,
-            [key]: value
+            [key]: value,
         };
         changeValue('validation', index, updatedValidation);
     };
 
-
     useEffect(() => {
-        setIsNumber(['number', 'integer', 'long', 'double', 'float'].includes(fieldType));
-        setIsString(['string', 'text', 'textarea', 'password'].includes(fieldType));
+        setIsNumber(
+            ['number', 'integer', 'long', 'double', 'float'].includes(fieldType)
+        );
+        setIsString(
+            ['string', 'text', 'textarea', 'password'].includes(fieldType)
+        );
         setIsBoolean(fieldType === 'boolean');
         setIsDate(['date', 'datetime', 'time'].includes(fieldType));
         setIsEmail(fieldType === 'email');
@@ -87,8 +103,25 @@ export function FormValidationPopover({
     };
 
     const getValidationOptions = () => {
-        const stringValidations = ['minLength', 'maxLength', 'regex', 'email', 'url', 'uuid', 'startsWith', 'endsWith', 'includes'];
-        const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite'];
+        const stringValidations = [
+            'minLength',
+            'maxLength',
+            'regex',
+            'email',
+            'url',
+            'uuid',
+            'startsWith',
+            'endsWith',
+            'includes',
+        ];
+        const numberValidations = [
+            'min',
+            'max',
+            'positive',
+            'negative',
+            'int',
+            'finite',
+        ];
         const dateValidations = ['minDate', 'maxDate'];
         const booleanValidations: string[] = [];
 
@@ -112,7 +145,7 @@ export function FormValidationPopover({
 
     const renderValidationField = (validation: string) => {
         const value = field?.validation?.[validation];
-        
+
         switch (validation) {
             case 'min':
             case 'max':
@@ -123,7 +156,11 @@ export function FormValidationPopover({
                         type="number"
                         className="h-8"
                         value={value || ''}
-                        placeholder={validation === 'min' || validation === 'minLength' ? '>=0' : '>=0'}
+                        placeholder={
+                            validation === 'min' || validation === 'minLength'
+                                ? '>=0'
+                                : '>=0'
+                        }
                         min={0}
                         onChange={(ev) => {
                             const numValue = Number(ev.target.value);
@@ -139,7 +176,12 @@ export function FormValidationPopover({
                         className="h-8"
                         value={value || ''}
                         placeholder="/pattern/"
-                        onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
+                        onChange={(ev) =>
+                            handleValidationKeyChange(
+                                validation,
+                                ev.target.value
+                            )
+                        }
                     />
                 );
             case 'startsWith':
@@ -150,7 +192,12 @@ export function FormValidationPopover({
                         className="h-8"
                         value={value || ''}
                         placeholder={t('enterValue')}
-                        onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
+                        onChange={(ev) =>
+                            handleValidationKeyChange(
+                                validation,
+                                ev.target.value
+                            )
+                        }
                     />
                 );
             case 'minDate':
@@ -160,7 +207,12 @@ export function FormValidationPopover({
                         type="date"
                         className="h-8"
                         value={value || ''}
-                        onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
+                        onChange={(ev) =>
+                            handleValidationKeyChange(
+                                validation,
+                                ev.target.value
+                            )
+                        }
                     />
                 );
             default:
@@ -168,7 +220,9 @@ export function FormValidationPopover({
                     <IGRPSwitch
                         name={validation}
                         checked={value || false}
-                        onCheckedChange={(checked) => handleValidationKeyChange(validation, checked)}
+                        onCheckedChange={(checked) =>
+                            handleValidationKeyChange(validation, checked)
+                        }
                     />
                 );
         }
@@ -177,7 +231,7 @@ export function FormValidationPopover({
     const generateZodSchema = () => {
         const validations = getValidationOptions();
         let schema = 'z.';
-        
+
         // Base type
         if (isString || isEmail) {
             schema += 'string()';
@@ -192,7 +246,7 @@ export function FormValidationPopover({
         }
 
         // Apply validations
-        validations.forEach(validation => {
+        validations.forEach((validation) => {
             if (field?.[validation]) {
                 switch (validation) {
                     case 'min':
@@ -264,10 +318,14 @@ export function FormValidationPopover({
                     {t('openValidationSettings')}
                 </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
-            <IGRPPopoverContentPrimitive className="w-96" align="end" side="bottom">
+            <IGRPPopoverContentPrimitive
+                className="w-96"
+                align="end"
+                side="bottom"
+            >
                 <div className="grid gap-4">
                     <div className="space-y-2">
-                            <IGRPTabsPrimitive  defaultValue="validations">
+                        <IGRPTabsPrimitive defaultValue="validations">
                             <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
                                 <IGRPTabsTriggerPrimitive value="validations">
                                     {t('validations')}
@@ -280,31 +338,47 @@ export function FormValidationPopover({
                                 </IGRPTabsTriggerPrimitive>
                             </IGRPTabsListPrimitive>
 
-                            <IGRPTabsContentPrimitive value="validations" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="validations"
+                                className="space-y-4"
+                            >
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('setValidationsForFormField')}
                                 </p>
-                                
 
                                 <IGRPSeparator orientation="horizontal" />
 
                                 {/* Type-specific validations */}
                                 <div className="space-y-3">
-                                    <h4 className="text-sm font-medium">{t('typeSpecificValidations')}</h4>
+                                    <h4 className="text-sm font-medium">
+                                        {t('typeSpecificValidations')}
+                                    </h4>
                                     <div className="grid gap-3">
                                         {getValidationOptions()
-                                            .filter(validation => !['optional'].includes(validation))
+                                            .filter(
+                                                (validation) =>
+                                                    !['optional'].includes(
+                                                        validation
+                                                    )
+                                            )
                                             .filter(shouldShowValidation)
                                             .map((validation) => (
                                                 <div
                                                     key={`${validation}-${index}`}
                                                     className="flex items-center gap-4"
                                                 >
-                                                    <IGRPLabel htmlFor={`${validation}-${index}`} className="w-24">
-                                                        {toInitCap(t(validation))}
+                                                    <IGRPLabel
+                                                        htmlFor={`${validation}-${index}`}
+                                                        className="w-24"
+                                                    >
+                                                        {toInitCap(
+                                                            t(validation)
+                                                        )}
                                                     </IGRPLabel>
                                                     <div className="flex-1">
-                                                        {renderValidationField(validation)}
+                                                        {renderValidationField(
+                                                            validation
+                                                        )}
                                                     </div>
                                                 </div>
                                             ))}
@@ -312,7 +386,10 @@ export function FormValidationPopover({
                                 </div>
                             </IGRPTabsContentPrimitive>
 
-                            <IGRPTabsContentPrimitive value="zod" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="zod"
+                                className="space-y-4"
+                            >
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('generatedZodSchema')}
                                 </p>
@@ -326,7 +403,9 @@ export function FormValidationPopover({
                                         variant="outline"
                                         size="sm"
                                         onClick={() => {
-                                            navigator.clipboard.writeText(generateZodSchema());
+                                            navigator.clipboard.writeText(
+                                                generateZodSchema()
+                                            );
                                         }}
                                     >
                                         {t('copyToClipboard')}
@@ -334,39 +413,58 @@ export function FormValidationPopover({
                                 </div>
                             </IGRPTabsContentPrimitive>
 
-                            <IGRPTabsContentPrimitive value="preview" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="preview"
+                                className="space-y-4"
+                            >
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('validationPreview')}
                                 </p>
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm">
                                         <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                                        <span className="font-medium">{t('activeValidations')}:</span>
+                                        <span className="font-medium">
+                                            {t('activeValidations')}:
+                                        </span>
                                     </div>
                                     <div className="space-y-1">
                                         {/* Show validation key if present */}
                                         {field?.validation?.key && (
                                             <div className="text-xs text-muted-foreground ml-6">
-                                                • <span className="font-medium">{t('validationKey')}:</span> {field.validation.key}
+                                                •{' '}
+                                                <span className="font-medium">
+                                                    {t('validationKey')}:
+                                                </span>{' '}
+                                                {field.validation.key}
                                             </div>
                                         )}
-                                        
+
                                         {getValidationOptions()
-                                            .filter(validation => field?.[validation])
+                                            .filter(
+                                                (validation) =>
+                                                    field?.[validation]
+                                            )
                                             .map((validation) => (
-                                                <div key={validation} className="text-xs text-muted-foreground ml-6">
+                                                <div
+                                                    key={validation}
+                                                    className="text-xs text-muted-foreground ml-6"
+                                                >
                                                     • {toInitCap(t(validation))}
-                                                    {field[validation] !== true && field[validation] !== false && 
-                                                        `: ${field[validation]}`
-                                                    }
+                                                    {field[validation] !==
+                                                        true &&
+                                                        field[validation] !==
+                                                            false &&
+                                                        `: ${field[validation]}`}
                                                 </div>
                                             ))}
-                                        {getValidationOptions().filter(validation => field?.[validation]).length === 0 && 
-                                         !field?.validation?.key && (
-                                            <div className="text-xs text-muted-foreground ml-6">
-                                                {t('noValidationsSet')}
-                                            </div>
-                                        )}
+                                        {getValidationOptions().filter(
+                                            (validation) => field?.[validation]
+                                        ).length === 0 &&
+                                            !field?.validation?.key && (
+                                                <div className="text-xs text-muted-foreground ml-6">
+                                                    {t('noValidationsSet')}
+                                                </div>
+                                            )}
                                     </div>
                                 </div>
                             </IGRPTabsContentPrimitive>
@@ -376,4 +474,4 @@ export function FormValidationPopover({
             </IGRPPopoverContentPrimitive>
         </IGRPPopoverPrimitive>
     );
-} 
+}

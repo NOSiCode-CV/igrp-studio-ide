@@ -1,11 +1,20 @@
-
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
 import { FormList } from '@renderer/components/form-list';
 import { handleChangeValueObject } from '@renderer/generators/api/helpers';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { IGRPButtonPrimitive, IGRPDialogClosePrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogClosePrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPScrollAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     SelectInput,
     TextInput,
@@ -159,7 +168,10 @@ export const BindingConfigurationModal = ({
     };
 
     const getDefaultValue = (field: LabeledElementField) => {
-        if ((field.defaultValue === '' || field.defaultValue === undefined ) && field.required) {
+        if (
+            (field.defaultValue === '' || field.defaultValue === undefined) &&
+            field.required
+        ) {
             if (field.type === 'string') {
                 return '';
             }
@@ -496,10 +508,12 @@ export const BindingConfigurationModal = ({
     return (
         <>
             <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-                <IGRPDialogContentPrimitive  className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[80vh]">
+                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[80vh]">
                     <IGRPScrollAreaPrimitive className="h-full p-4 max-h-[70vh] overflow-auto">
                         <IGRPDialogHeaderPrimitive className="mb-4">
-                            <IGRPDialogTitlePrimitive>Binding Configuration</IGRPDialogTitlePrimitive>
+                            <IGRPDialogTitlePrimitive>
+                                Binding Configuration
+                            </IGRPDialogTitlePrimitive>
                             <IGRPDialogDescriptionPrimitive>
                                 Make changes to your Binding Configuration here.
                                 Click save when you're done.
@@ -579,7 +593,9 @@ export const BindingConfigurationModal = ({
                             </div>
 
                             <IGRPDialogFooterPrimitive className="space-x-2">
-                                <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
+                                <IGRPDialogClosePrimitive>
+                                    Close
+                                </IGRPDialogClosePrimitive>
                                 <IGRPButtonPrimitive
                                     type="submit"
                                     disabled={formik.isSubmitting}

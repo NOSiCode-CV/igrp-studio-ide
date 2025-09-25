@@ -4,12 +4,15 @@ import {
     IGRPDialogPrimitive,
     IGRPDialogContentPrimitive,
     IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive   ,
+    IGRPDialogHeaderPrimitive,
     IGRPDialogTitlePrimitive,
     IGRPDialogTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { Plus, Trash2, Edit } from 'lucide-react';
-import { ColumnDef, IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
+import {
+    ColumnDef,
+    IGRPDataTable,
+} from '@igrp/igrp-framework-react-design-system';
 import { ConnectionForm } from './ConnectionForm';
 import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Connection } from 'src/main/types';
@@ -28,7 +31,8 @@ export function ConnectionManager({ title }: { title?: string }) {
         password: '',
         database: '',
     });
-    const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
+    const [editingConnection, setEditingConnection] =
+        useState<Connection | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -133,7 +137,10 @@ export function ConnectionManager({ title }: { title?: string }) {
                         <h1 className="text-3xl font-semibold">{title}</h1>
                     </div>
                 )}
-                <IGRPDialogPrimitive open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                <IGRPDialogPrimitive
+                    open={isAddModalOpen}
+                    onOpenChange={setIsAddModalOpen}
+                >
                     <IGRPDialogTriggerPrimitive asChild>
                         <IGRPButtonPrimitive>
                             <Plus className="h-4" />
@@ -142,7 +149,9 @@ export function ConnectionManager({ title }: { title?: string }) {
                     </IGRPDialogTriggerPrimitive>
                     <IGRPDialogContentPrimitive>
                         <IGRPDialogHeaderPrimitive>
-                            <IGRPDialogTitlePrimitive>{t('add_new_connection')}</IGRPDialogTitlePrimitive>
+                            <IGRPDialogTitlePrimitive>
+                                {t('add_new_connection')}
+                            </IGRPDialogTitlePrimitive>
                             <IGRPDialogDescriptionPrimitive>
                                 {t('fill_details_to_add_connection')}
                             </IGRPDialogDescriptionPrimitive>
@@ -157,13 +166,18 @@ export function ConnectionManager({ title }: { title?: string }) {
             </div>
 
             {/* Edit Connection Dialog */}
-            <IGRPDialogPrimitive open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+            <IGRPDialogPrimitive
+                open={isEditModalOpen}
+                onOpenChange={setIsEditModalOpen}
+            >
                 <IGRPDialogContentPrimitive>
                     <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive>{t('edit_connection')}</IGRPDialogTitlePrimitive>
+                        <IGRPDialogTitlePrimitive>
+                            {t('edit_connection')}
+                        </IGRPDialogTitlePrimitive>
                         <IGRPDialogDescriptionPrimitive>
                             {t('edit_connection_description')}
-                        </IGRPDialogDescriptionPrimitive    >
+                        </IGRPDialogDescriptionPrimitive>
                     </IGRPDialogHeaderPrimitive>
                     {editingConnection && (
                         <ConnectionForm

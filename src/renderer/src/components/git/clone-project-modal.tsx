@@ -172,7 +172,10 @@ export function CloneProjectModal({
                     <IGRPDialogDescriptionPrimitive />
                 </IGRPDialogHeaderPrimitive>
                 <div className="flex-1 overflow-hidden flex flex-col">
-                    <IGRPTabsPrimitive defaultValue="url" className="w-full flex-1 flex flex-col">
+                    <IGRPTabsPrimitive
+                        defaultValue="url"
+                        className="w-full flex-1 flex flex-col"
+                    >
                         <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
                             <IGRPTabsTriggerPrimitive value="url">
                                 {t('repositoryUrl')}
@@ -181,8 +184,11 @@ export function CloneProjectModal({
                                 {t('searchRepositories')}
                             </IGRPTabsTriggerPrimitive>
                         </IGRPTabsListPrimitive>
-                        
-                        <IGRPTabsContentPrimitive value="url" className="space-y-4 flex-1 overflow-auto">
+
+                        <IGRPTabsContentPrimitive
+                            value="url"
+                            className="space-y-4 flex-1 overflow-auto"
+                        >
                             <div className="grid gap-6 py-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 grid gap-2">
@@ -199,9 +205,7 @@ export function CloneProjectModal({
                                             )}
                                             value={projectUrl}
                                             onChange={(e) =>
-                                                setProjectUrl(
-                                                    e.target.value
-                                                )
+                                                setProjectUrl(e.target.value)
                                             }
                                             className="bg-background text-foreground placeholder-muted-foreground"
                                         />
@@ -211,7 +215,10 @@ export function CloneProjectModal({
                                     <IGRPLabel className="text-muted-foreground">
                                         {t('authentication')}
                                     </IGRPLabel>
-                                    <IGRPTabsPrimitive value={authType} onValueChange={setAuthType}>
+                                    <IGRPTabsPrimitive
+                                        value={authType}
+                                        onValueChange={setAuthType}
+                                    >
                                         <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
                                             <IGRPTabsTriggerPrimitive value="none">
                                                 {t('none')}
@@ -223,21 +230,25 @@ export function CloneProjectModal({
                                                 {t('token')}
                                             </IGRPTabsTriggerPrimitive>
                                         </IGRPTabsListPrimitive>
-                                        
-                                        <IGRPTabsContentPrimitive value="none" className="mt-4">
+
+                                        <IGRPTabsContentPrimitive
+                                            value="none"
+                                            className="mt-4"
+                                        >
                                             {/* No authentication content */}
                                         </IGRPTabsContentPrimitive>
-                                        
-                                        <IGRPTabsContentPrimitive value="basic" className="mt-4">
+
+                                        <IGRPTabsContentPrimitive
+                                            value="basic"
+                                            className="mt-4"
+                                        >
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="grid gap-2">
                                                     <IGRPLabel
                                                         htmlFor="username"
                                                         className="text-muted-foreground"
                                                     >
-                                                        {t(
-                                                            'username'
-                                                        )}
+                                                        {t('username')}
                                                     </IGRPLabel>
                                                     <div className="relative">
                                                         <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -246,15 +257,10 @@ export function CloneProjectModal({
                                                             placeholder={t(
                                                                 'usernamePlaceholder'
                                                             )}
-                                                            value={
-                                                                username
-                                                            }
-                                                            onChange={(
-                                                                e
-                                                            ) =>
+                                                            value={username}
+                                                            onChange={(e) =>
                                                                 setUsername(
-                                                                    e
-                                                                        .target
+                                                                    e.target
                                                                         .value
                                                                 )
                                                             }
@@ -267,9 +273,7 @@ export function CloneProjectModal({
                                                         htmlFor="password"
                                                         className="text-muted-foreground"
                                                     >
-                                                        {t(
-                                                            'password'
-                                                        )}
+                                                        {t('password')}
                                                     </IGRPLabel>
                                                     <div className="relative">
                                                         <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -279,12 +283,8 @@ export function CloneProjectModal({
                                                             placeholder={t(
                                                                 'passwordPlaceholder'
                                                             )}
-                                                            value={
-                                                                password
-                                                            }
-                                                            onChange={(
-                                                                value
-                                                            ) =>
+                                                            value={password}
+                                                            onChange={(value) =>
                                                                 setPassword(
                                                                     value
                                                                 )
@@ -295,16 +295,17 @@ export function CloneProjectModal({
                                                 </div>
                                             </div>
                                         </IGRPTabsContentPrimitive>
-                                        
-                                        <IGRPTabsContentPrimitive value="token" className="mt-4">
+
+                                        <IGRPTabsContentPrimitive
+                                            value="token"
+                                            className="mt-4"
+                                        >
                                             <div className="grid gap-2">
                                                 <IGRPLabel
                                                     htmlFor="token"
                                                     className="text-muted-foreground"
                                                 >
-                                                    {t(
-                                                        'token'
-                                                    )}
+                                                    {t('token')}
                                                 </IGRPLabel>
                                                 <div className="relative">
                                                     <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -314,15 +315,9 @@ export function CloneProjectModal({
                                                         placeholder={t(
                                                             'tokenPlaceholder'
                                                         )}
-                                                        value={
-                                                            token
-                                                        }
-                                                        onChange={(
-                                                            value
-                                                        ) =>
-                                                            setToken(
-                                                                value
-                                                            )
+                                                        value={token}
+                                                        onChange={(value) =>
+                                                            setToken(value)
                                                         }
                                                         className="pl-8 bg-background text-foreground placeholder-muted-foreground"
                                                     />
@@ -343,7 +338,7 @@ export function CloneProjectModal({
                                     : t('cloneProject')}
                             </IGRPButtonPrimitive>
                         </IGRPTabsContentPrimitive>
-                        
+
                         <IGRPTabsContentPrimitive value="search">
                             <RepositoryList />
                         </IGRPTabsContentPrimitive>

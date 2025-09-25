@@ -1,4 +1,15 @@
-import { IGRPButtonPrimitive, IGRPCardContentPrimitive, IGRPCardHeaderPrimitive, IGRPCardPrimitive, IGRPCardTitlePrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardPrimitive,
+    IGRPCardTitlePrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
@@ -60,20 +71,26 @@ export function CreateComponentModal({
     const { showErrorToast, showSuccessToast } = useToast();
 
     const [arguments_, setArguments] = useState<Arguments[]>([]);
-    const [formInitialValues, setFormInitialValues] = useState<ComponentConfig>(initialValues);
+    const [formInitialValues, setFormInitialValues] =
+        useState<ComponentConfig>(initialValues);
 
     useEffect(() => {
         const loadCurrentData = async () => {
             if (currentComponent?.path) {
                 try {
-                    const currentData = await window.api.getJsonContent(currentComponent.path);
+                    const currentData = await window.api.getJsonContent(
+                        currentComponent.path
+                    );
                     console.log('Current component data loaded:', currentData);
                     setFormInitialValues({
                         ...initialValues,
                         ...currentData,
                     });
                 } catch (error) {
-                    console.warn('Failed to load current component data:', error);
+                    console.warn(
+                        'Failed to load current component data:',
+                        error
+                    );
                     // Fallback to currentComponent.content if API call fails
                     setFormInitialValues({
                         ...initialValues,
@@ -101,7 +118,6 @@ export function CreateComponentModal({
         pageConfig: ComponentConfig
     ): Promise<void> => {
         try {
-
             const { error } = await window.engine.createPage(
                 { ...pageConfig, id: getId() },
                 ENV_TYPES.NEXTJS,
@@ -169,7 +185,9 @@ export function CreateComponentModal({
     return (
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
             <IGRPDialogContentPrimitive className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
-                <IGRPDialogTitlePrimitive>{t('createNewComponent')}</IGRPDialogTitlePrimitive>
+                <IGRPDialogTitlePrimitive>
+                    {t('createNewComponent')}
+                </IGRPDialogTitlePrimitive>
                 <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Component' })}
                 </IGRPDialogDescriptionPrimitive>
@@ -203,7 +221,9 @@ export function CreateComponentModal({
                                 placeholder="TodoItem"
                             />
                             <div className="grid grid-cols-1 items-center gap-3">
-                                <IGRPLabel htmlFor="Associar">{t('pages')}</IGRPLabel>
+                                <IGRPLabel htmlFor="Associar">
+                                    {t('pages')}
+                                </IGRPLabel>
                                 <IGRPCombobox
                                     name="pagePath"
                                     className="col-span-3"
@@ -215,13 +235,17 @@ export function CreateComponentModal({
                                         const selected = pageOptions.find(
                                             (opt) => opt.value === selectedValue
                                         );
-                                        
+
                                         // Update all fields at once to avoid double-click issue
                                         formik.setValues({
                                             ...formik.values,
-                                            pagePath: selected?.path || undefined,
-                                            pageName: selected?.value || undefined,
-                                            scope: selectedValue ? 'page' : 'app',
+                                            pagePath:
+                                                selected?.path || undefined,
+                                            pageName:
+                                                selected?.value || undefined,
+                                            scope: selectedValue
+                                                ? 'page'
+                                                : 'app',
                                         });
                                     }}
                                 />
@@ -304,7 +328,11 @@ export function CreateComponentModal({
                         </div>
                     </div>
                     <IGRPDialogFooterPrimitive className="flex justify-between">
-                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
+                        <IGRPButtonPrimitive
+                            type="button"
+                            variant="ghost"
+                            onClick={onClose}
+                        >
                             {t('cancel')}
                         </IGRPButtonPrimitive>
                         <IGRPButtonPrimitive

@@ -667,9 +667,7 @@ export const BPMNProjectSelector = ({
                                                         <IGRPCardHeaderPrimitive>
                                                             <div className="flex items-start justify-between">
                                                                 <div className="flex-1">
-                                                                    <IGRPCardTitlePrimitive
-                                                                        className="text-base font-medium"
-                                                                    >
+                                                                    <IGRPCardTitlePrimitive className="text-base font-medium">
                                                                         {
                                                                             artifact.name
                                                                         }

@@ -128,7 +128,9 @@ const ImportComponent = ({
                                 onChange={(e) => setNewImport(e.target.value)}
                                 placeholder={t('imports.placeholder')}
                                 className="h-8 flex-1"
-                                onKeyDown={(e) => e.key === 'Enter' && addImport()}
+                                onKeyDown={(e) =>
+                                    e.key === 'Enter' && addImport()
+                                }
                             />
                             <IGRPButtonPrimitive
                                 type="button"

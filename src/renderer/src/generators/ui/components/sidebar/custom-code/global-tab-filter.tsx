@@ -15,7 +15,7 @@ interface GlobalTabFilterProps {
 }
 
 export const GlobalTabFilter = ({
-    placeholder = "Search across all tabs...",
+    placeholder = 'Search across all tabs...',
     value,
     onChange,
     onClear,
@@ -28,7 +28,7 @@ export const GlobalTabFilter = ({
     };
 
     return (
-        <div className={cn("space-y-2 border-b pb-3", className)}>
+        <div className={cn('space-y-2 border-b pb-3', className)}>
             <div className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <IGRPInputText
@@ -63,4 +63,4 @@ export const useGlobalTabFilter = (initialValue = '') => {
         setFilterValue,
         clearFilter,
     };
-}; 
+};

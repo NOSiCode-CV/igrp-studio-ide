@@ -12,7 +12,7 @@ import { baseColors } from './base-color';
 import { useTheme } from 'next-themes';
 import { Check } from 'lucide-react';
 import { ThemeService } from '@renderer/services/ThemeService';
-import { useThemeConfig } from '@renderer/components/ActiveThemeProvider';
+import { useThemeConfig } from '@renderer/components/active-theme-provider';
 
 export function AppearanceSettings() {
     const { t } = useTranslation();

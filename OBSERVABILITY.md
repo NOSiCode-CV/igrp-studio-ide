@@ -34,9 +34,9 @@ We use `process.on('uncaughtException')` to catch any unhandled exceptions in th
 
 ```typescript
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  // Trigger the reporting mechanism
-  sendErrorReport(error);
+    console.error('Uncaught Exception:', error);
+    // Trigger the reporting mechanism
+    sendErrorReport(error);
 });
 ```
 
@@ -46,10 +46,10 @@ In the renderer process, we use a global error event listener to catch errors.
 
 ```typescript
 window.addEventListener('error', (event) => {
-  event.preventDefault();
-  console.error('Unhandled Error:', event.error);
-  // Trigger the reporting mechanism
-  sendErrorReport(event.error);
+    event.preventDefault();
+    console.error('Unhandled Error:', event.error);
+    // Trigger the reporting mechanism
+    sendErrorReport(event.error);
 });
 ```
 
@@ -61,27 +61,30 @@ The `sendErrorReport` function can be implemented as follows:
 
 ```typescript
 async function sendErrorReport(error) {
-  try {
-    const response = await fetch('https://your-backend.com/api/error-report', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: error.message,
-        stack: error.stack,
-        // Include other relevant info like app version, OS, etc.
-        appVersion: '1.0.0',
-        platform: process.platform
-      }),
-    });
+    try {
+        const response = await fetch(
+            'https://your-backend.com/api/error-report',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: error.message,
+                    stack: error.stack,
+                    // Include other relevant info like app version, OS, etc.
+                    appVersion: '1.0.0',
+                    platform: process.platform,
+                }),
+            }
+        );
 
-    if (!response.ok) {
-      console.error('Failed to send error report.');
+        if (!response.ok) {
+            console.error('Failed to send error report.');
+        }
+    } catch (e) {
+        console.error('Failed to send error report:', e);
     }
-  } catch (e) {
-    console.error('Failed to send error report:', e);
-  }
 }
 ```
 

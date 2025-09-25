@@ -1,6 +1,13 @@
 'use client';
 
-import { IGRPCheckboxPrimitive, IGRPInputPrimitive, IGRPLabel, IGRPRadioGroupItemPrimitive, IGRPRadioGroupPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCheckboxPrimitive,
+    IGRPInputPrimitive,
+    IGRPLabel,
+    IGRPRadioGroupItemPrimitive,
+    IGRPRadioGroupPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
@@ -101,12 +108,22 @@ export function DotNetConfig({
                         className="flex gap-4"
                     >
                         <div className="flex items-center space-x-2">
-                            <IGRPRadioGroupItemPrimitive value="technical" id="technical" />
-                            <IGRPLabel htmlFor="technical">{t('technical')}</IGRPLabel>
+                            <IGRPRadioGroupItemPrimitive
+                                value="technical"
+                                id="technical"
+                            />
+                            <IGRPLabel htmlFor="technical">
+                                {t('technical')}
+                            </IGRPLabel>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <IGRPRadioGroupItemPrimitive value="domain" id="domain" />
-                            <IGRPLabel htmlFor="domain">{t('domainDriven')}</IGRPLabel>
+                            <IGRPRadioGroupItemPrimitive
+                                value="domain"
+                                id="domain"
+                            />
+                            <IGRPLabel htmlFor="domain">
+                                {t('domainDriven')}
+                            </IGRPLabel>
                         </div>
                     </IGRPRadioGroupPrimitive>
                 </div>

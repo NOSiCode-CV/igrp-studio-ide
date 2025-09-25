@@ -39,13 +39,11 @@ export function FieldOptionsPopover({
 
     const handleChange = (key: keyof SchemaField, value: any) => {
         setLocalField((prev) => ({ ...prev, [key]: value }));
-		const updatedField = { ...field, [key]: value  };
+        const updatedField = { ...field, [key]: value };
         onUpdate(updatedField);
     };
 
-    const handleChangeEditor = (_: any)=>{
-
-    }
+    const handleChangeEditor = (_: any) => {};
 
     return (
         <IGRPPopoverPrimitive>
@@ -71,9 +69,12 @@ export function FieldOptionsPopover({
                         </IGRPTabsTriggerPrimitive>
                     </IGRPTabsListPrimitive>
 
-                    <IGRPTabsContentPrimitive value="dataType" className="space-y-4">
+                    <IGRPTabsContentPrimitive
+                        value="dataType"
+                        className="space-y-4"
+                    >
                         <p className="text-sm text-muted-foreground">
-                             {t('configureFieldOptions')}
+                            {t('configureFieldOptions')}
                         </p>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="grid grid-cols-3 gap-2 col-span-2">
@@ -84,7 +85,7 @@ export function FieldOptionsPopover({
                                     >
                                         {t('required')}
                                     </IGRPLabel>
-                                    <IGRPSwitchPrimitive 
+                                    <IGRPSwitchPrimitive
                                         id="required"
                                         checked={localField.required || false}
                                         onCheckedChange={(checked) =>

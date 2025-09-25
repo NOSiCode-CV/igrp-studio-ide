@@ -124,15 +124,28 @@ export const FunctionSettingsSidebar = ({
                         )}
                     >
                         {formik && (
-                            <IGRPTabsTriggerPrimitive value="props">Props</IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="props">
+                                Props
+                            </IGRPTabsTriggerPrimitive>
                         )}
-                        <IGRPTabsTriggerPrimitive value="states">States</IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="functions">Functions</IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="snippets">Snippets</IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="types">Types</IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="states">
+                            States
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="functions">
+                            Functions
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="snippets">
+                            Snippets
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="types">
+                            Types
+                        </IGRPTabsTriggerPrimitive>
                     </IGRPTabsListPrimitive>
                     {formik && (
-                        <IGRPTabsContentPrimitive value="props" className="space-y-4">
+                        <IGRPTabsContentPrimitive
+                            value="props"
+                            className="space-y-4"
+                        >
                             <TextInput
                                 label={t('name')}
                                 id="name"
@@ -214,7 +227,10 @@ export const FunctionSettingsSidebar = ({
                             />
                         </IGRPTabsContentPrimitive>
                     )}
-                    <IGRPTabsContentPrimitive value="states" className="space-y-4">
+                    <IGRPTabsContentPrimitive
+                        value="states"
+                        className="space-y-4"
+                    >
                         <TabStates
                             states={states}
                             pageArguments={componentArguments}
@@ -222,7 +238,10 @@ export const FunctionSettingsSidebar = ({
                             globalFilter={filterValue}
                         />
                     </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="snippets" className="space-y-4">
+                    <IGRPTabsContentPrimitive
+                        value="snippets"
+                        className="space-y-4"
+                    >
                         <TabSnipptes
                             snippets={snippets}
                             editorRef={editorRef}
@@ -230,7 +249,10 @@ export const FunctionSettingsSidebar = ({
                             globalFilter={filterValue}
                         />
                     </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="functions" className="space-y-4">
+                    <IGRPTabsContentPrimitive
+                        value="functions"
+                        className="space-y-4"
+                    >
                         <TabsFunctions
                             functions={functions}
                             editorRef={editorRef}
@@ -239,7 +261,10 @@ export const FunctionSettingsSidebar = ({
                             globalFilter={filterValue}
                         />
                     </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="types" className="space-y-4">
+                    <IGRPTabsContentPrimitive
+                        value="types"
+                        className="space-y-4"
+                    >
                         <TabTypes
                             types={types}
                             editorRef={editorRef}
@@ -352,9 +377,16 @@ export const FunctionArguments = ({
     return (
         <div className="flex flex-col gap-2">
             <IGRPLabelPrimitive>Define Arguments</IGRPLabelPrimitive>
-            <IGRPAccordionPrimitive type="single" collapsible className="w-full">
+            <IGRPAccordionPrimitive
+                type="single"
+                collapsible
+                className="w-full"
+            >
                 {arguments_.map((arg, index) => (
-                    <IGRPAccordionItemPrimitive value={`argName-${index}`} key={arg.id}>
+                    <IGRPAccordionItemPrimitive
+                        value={`argName-${index}`}
+                        key={arg.id}
+                    >
                         <IGRPAccordionTriggerPrimitive>
                             <div className="flex justify-between items-center w-full">
                                 <div className="flex items-center space-x-2">
@@ -473,7 +505,9 @@ export const FunctionArguments = ({
 
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
-                                                    <IGRPLabelPrimitive>Parameters</IGRPLabelPrimitive>
+                                                    <IGRPLabelPrimitive>
+                                                        Parameters
+                                                    </IGRPLabelPrimitive>
                                                     <IGRPButtonPrimitive
                                                         type="button"
                                                         variant="outline"

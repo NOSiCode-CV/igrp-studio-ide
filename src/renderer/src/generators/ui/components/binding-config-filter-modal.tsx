@@ -180,7 +180,8 @@ export const BindingConfigurationFilterModal = ({
         <>
             <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
                 <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[70vh]">
-                    <IGRPScrollAreaPrimitive className="h-full p-4">IGRPScrollAreaPrimitive
+                    <IGRPScrollAreaPrimitive className="h-full p-4">
+                        IGRPScrollAreaPrimitive
                         <IGRPDialogHeaderPrimitive className="mb-4">
                             <IGRPDialogTitlePrimitive>
                                 Binding Filter Configuration

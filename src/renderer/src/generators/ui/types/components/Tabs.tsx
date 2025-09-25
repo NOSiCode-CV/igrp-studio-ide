@@ -7,7 +7,12 @@ import BoxWrapper from '../tools/BoxWrapper';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 import BoxField from '../tools/BoxFields';
-import { IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 const IGRPStudioTabs: React.FC<CardComponentProps> = ({
     comp,

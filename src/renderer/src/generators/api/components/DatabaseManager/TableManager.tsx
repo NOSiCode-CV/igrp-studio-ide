@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { IGRPCheckboxPrimitive, IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCheckboxPrimitive,
+    IGRPScrollAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTablePrimitive,
     IGRPTableBodyPrimitive,
@@ -8,7 +11,10 @@ import {
     IGRPTableHeaderPrimitive,
     IGRPTableRowPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { ColumnDef, IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import {
+    ColumnDef,
+    IGRPCombobox,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
@@ -252,7 +258,9 @@ export function TableManager({
                                 <IGRPTablePrimitive>
                                     <IGRPTableHeaderPrimitive>
                                         <IGRPTableRowPrimitive>
-                                            <IGRPTableHeadPrimitive>{t('column')}</IGRPTableHeadPrimitive>
+                                            <IGRPTableHeadPrimitive>
+                                                {t('column')}
+                                            </IGRPTableHeadPrimitive>
                                             <IGRPTableHeadPrimitive>
                                                 {t('dataType')}
                                             </IGRPTableHeadPrimitive>
@@ -262,21 +270,26 @@ export function TableManager({
                                         </IGRPTableRowPrimitive>
                                     </IGRPTableHeaderPrimitive>
                                     <IGRPTableBodyPrimitive>
-                                        {previewColumns && previewColumns.map((column, key) => (
-                                            <IGRPTableRowPrimitive key={key}>
-                                                <IGRPTableCellPrimitive>
-                                                    {column?.name}
-                                                </IGRPTableCellPrimitive>
-                                                <IGRPTableCellPrimitive>
-                                                    {column?.data_type}
-                                                </IGRPTableCellPrimitive>
-                                                <IGRPTableCellPrimitive>
-                                                    {column?.is_nullable
-                                                        ? t('yes')
-                                                        : t('no')}
-                                                </IGRPTableCellPrimitive>
-                                            </IGRPTableRowPrimitive>
-                                        ))}
+                                        {previewColumns &&
+                                            previewColumns.map(
+                                                (column, key) => (
+                                                    <IGRPTableRowPrimitive
+                                                        key={key}
+                                                    >
+                                                        <IGRPTableCellPrimitive>
+                                                            {column?.name}
+                                                        </IGRPTableCellPrimitive>
+                                                        <IGRPTableCellPrimitive>
+                                                            {column?.data_type}
+                                                        </IGRPTableCellPrimitive>
+                                                        <IGRPTableCellPrimitive>
+                                                            {column?.is_nullable
+                                                                ? t('yes')
+                                                                : t('no')}
+                                                        </IGRPTableCellPrimitive>
+                                                    </IGRPTableRowPrimitive>
+                                                )
+                                            )}
                                     </IGRPTableBodyPrimitive>
                                 </IGRPTablePrimitive>
                             </IGRPScrollAreaPrimitive>

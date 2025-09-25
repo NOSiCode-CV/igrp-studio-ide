@@ -120,13 +120,18 @@ export const BPMNManager = ({
 
             <IGRPTabsPrimitive defaultValue="projects" className="space-y-4">
                 <IGRPTabsListPrimitive>
-                    <IGRPTabsTriggerPrimitive value="projects">Projects</IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="projects">
+                        Projects
+                    </IGRPTabsTriggerPrimitive>
                     <IGRPTabsTriggerPrimitive value="configuration">
                         API Configuration
                     </IGRPTabsTriggerPrimitive>
                 </IGRPTabsListPrimitive>
 
-                <IGRPTabsContentPrimitive value="projects" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="projects"
+                    className="space-y-4"
+                >
                     <BPMNProjectSelector
                         onPageClick={onPageClick}
                         bpmnProcesses={bpmnProcesses}
@@ -134,7 +139,10 @@ export const BPMNManager = ({
                     />
                 </IGRPTabsContentPrimitive>
 
-                <IGRPTabsContentPrimitive value="configuration" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="configuration"
+                    className="space-y-4"
+                >
                     {configs.configs.length > 0 ? (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {configs.configs.map((config) => (
@@ -162,14 +170,20 @@ export const BPMNManager = ({
                                                 );
                                             } else {
                                                 // If deactivating, set no active config
-                                                await window.igrpStudioSettings.setActiveBPMNConfig('');
+                                                await window.igrpStudioSettings.setActiveBPMNConfig(
+                                                    ''
+                                                );
                                             }
                                             // Clear BPMN service cache to force refresh
                                             bpmnService.clearConfig();
                                             // Reload configurations to reflect changes
                                             await loadConfigs();
                                             // Dispatch custom event to notify other components
-                                            window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
+                                            window.dispatchEvent(
+                                                new CustomEvent(
+                                                    'bpmn-config-changed'
+                                                )
+                                            );
                                             toast.success(
                                                 `Configuration ${isActive ? 'activated' : 'deactivated'} successfully`
                                             );

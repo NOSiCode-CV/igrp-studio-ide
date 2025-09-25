@@ -40,7 +40,8 @@ export interface SidebarItemProps {
     type: 'collapsible' | 'group' | 'item';
 }
 
-export interface SidebarProps extends React.ComponentProps<typeof IGRPSidebarPrimitive> {
+export interface SidebarProps
+    extends React.ComponentProps<typeof IGRPSidebarPrimitive> {
     children: React.ReactNode;
     items?: SidebarProps[];
     collapsible?: 'offcanvas' | 'icon' | 'none';
@@ -80,81 +81,78 @@ const Sidebar = ({
     );
 };
 
-const SidebarContent = React.forwardRef<
-    HTMLDivElement,
-    SidebarContentProps
->(({ items, searchActive = true, children, className, ...props }, ref) => {
-    const [searchTerm, setSearchTerm] = React.useState('');
+const SidebarContent = React.forwardRef<HTMLDivElement, SidebarContentProps>(
+    ({ items, searchActive = true, children, className, ...props }, ref) => {
+        const [searchTerm, setSearchTerm] = React.useState('');
 
-    const filteredItems = items.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        const filteredItems = items.filter((item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
-    return (
-        <IGRPSidebarContentPrimitive
-            ref={ref}
-            {...props}
-            className={cn('gap-0 py-3', className)}
-        >
-            <IGRPScrollAreaPrimitive className="h-[calc(100svh-var(--header-height-two))]">
-                <div className="flex flex-col h-full px-3">
-                    {searchActive && (
-                        <div className="group-data-[collapsible=icon]:hidden">
-                            <SearchInput
-                                value={searchTerm}
-                                placeholder="Search"
-                                onChange={(value) => setSearchTerm(value)}
-                                className="lg:w-auto"
-                            />
-                        </div>
-                    )}
+        return (
+            <IGRPSidebarContentPrimitive
+                ref={ref}
+                {...props}
+                className={cn('gap-0 py-3', className)}
+            >
+                <IGRPScrollAreaPrimitive className="h-[calc(100svh-var(--header-height-two))]">
+                    <div className="flex flex-col h-full px-3">
+                        {searchActive && (
+                            <div className="group-data-[collapsible=icon]:hidden">
+                                <SearchInput
+                                    value={searchTerm}
+                                    placeholder="Search"
+                                    onChange={(value) => setSearchTerm(value)}
+                                    className="lg:w-auto"
+                                />
+                            </div>
+                        )}
 
-                    {children}
+                        {children}
 
-                    {renderMenu(filteredItems, null)}
-                </div>
-            </IGRPScrollAreaPrimitive>
-        </IGRPSidebarContentPrimitive>
-    );
-});
+                        {renderMenu(filteredItems, null)}
+                    </div>
+                </IGRPScrollAreaPrimitive>
+            </IGRPSidebarContentPrimitive>
+        );
+    }
+);
 
 SidebarContent.displayName = 'SidebarContent';
 
-const SidebarHeader = React.forwardRef<
-    HTMLDivElement,
-    SidebarHeaderProps
->(({ className, children, ...props }, ref) => {
-    return (
-        <IGRPSidebarHeaderPrimitive
-            ref={ref}
-            className={cn(
-                'p-2 flex items-center justify-center border-b border-border',
-                className
-            )}
-            {...props}
-        >
-            {children}
-        </IGRPSidebarHeaderPrimitive>
-    );
-});
+const SidebarHeader = React.forwardRef<HTMLDivElement, SidebarHeaderProps>(
+    ({ className, children, ...props }, ref) => {
+        return (
+            <IGRPSidebarHeaderPrimitive
+                ref={ref}
+                className={cn(
+                    'p-2 flex items-center justify-center border-b border-border',
+                    className
+                )}
+                {...props}
+            >
+                {children}
+            </IGRPSidebarHeaderPrimitive>
+        );
+    }
+);
 
 SidebarHeader.displayName = 'SidebarHeader';
 
-const SidebarFooter = React.forwardRef<
-    HTMLDivElement,
-    SidebarFooterProps
->(({ items, children, className, ...props }, ref) => {
-    return (
-        <IGRPSidebarFooterPrimitive
-            ref={ref}
-            className={cn('px-3 py-2 border-t border-border', className)}
-            {...props}
-        >
-            {children}
-            {renderMenu(items, 'sm')}
-        </IGRPSidebarFooterPrimitive>
-    );
-});
+const SidebarFooter = React.forwardRef<HTMLDivElement, SidebarFooterProps>(
+    ({ items, children, className, ...props }, ref) => {
+        return (
+            <IGRPSidebarFooterPrimitive
+                ref={ref}
+                className={cn('px-3 py-2 border-t border-border', className)}
+                {...props}
+            >
+                {children}
+                {renderMenu(items, 'sm')}
+            </IGRPSidebarFooterPrimitive>
+        );
+    }
+);
 
 SidebarFooter.displayName = 'SidebarFooter';
 
@@ -173,12 +171,16 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null) => {
                     </IGRPSidebarMenuPrimitive>
                 ) : item.type === 'group' ? (
                     <IGRPSidebarGroupPrimitive key={item.name} className="px-0">
-                        <IGRPSidebarGroupLabelPrimitive>{item.name}</IGRPSidebarGroupLabelPrimitive>
+                        <IGRPSidebarGroupLabelPrimitive>
+                            {item.name}
+                        </IGRPSidebarGroupLabelPrimitive>
                         {item.items && (
                             <IGRPSidebarGroupContentPrimitive>
                                 <IGRPSidebarMenuPrimitive>
                                     {item.items.map((subItem) => (
-                                        <IGRPSidebarMenuItemPrimitive key={subItem.name}>
+                                        <IGRPSidebarMenuItemPrimitive
+                                            key={subItem.name}
+                                        >
                                             <IGRPSidebarMenuButtonPrimitive
                                                 asChild
                                                 isActive={subItem.isActive}
@@ -211,7 +213,9 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null) => {
                             >
                                 {item.items ? (
                                     <IGRPCollapsibleTriggerPrimitive asChild>
-                                        <IGRPSidebarMenuButtonPrimitive tooltip={item.name}>
+                                        <IGRPSidebarMenuButtonPrimitive
+                                            tooltip={item.name}
+                                        >
                                             {item.icon && <item.icon />}
                                             <span>{item.name}</span>
                                             <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
@@ -269,9 +273,4 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null) => {
         </>
     );
 };
-export {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-    SidebarFooter,
-};
+export { Sidebar, SidebarContent, SidebarHeader, SidebarFooter };

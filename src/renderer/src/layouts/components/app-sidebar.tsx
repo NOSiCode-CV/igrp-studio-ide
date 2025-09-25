@@ -22,7 +22,10 @@ import { filterSubItems } from '@renderer/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProjectData, MenuItem } from 'src/main/types';
-import { IGRPScrollAreaPrimitive, IGRPScrollBarPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPScrollAreaPrimitive,
+    IGRPScrollBarPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { useNavigate } from 'react-router-dom';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
@@ -121,7 +124,9 @@ export function AppIGRPSidebar({
                             <IGRPSidebarGroupContentPrimitive className="md:px-0">
                                 <IGRPSidebarMenuPrimitive>
                                     {menuIcons.map((item, index) => (
-                                        <IGRPSidebarMenuItemPrimitive key={index}>
+                                        <IGRPSidebarMenuItemPrimitive
+                                            key={index}
+                                        >
                                             <IGRPSidebarMenuButtonPrimitive
                                                 tooltip={{
                                                     children: item.label,
@@ -157,13 +162,16 @@ export function AppIGRPSidebar({
                             </IGRPSidebarGroupContentPrimitive>
                         </IGRPSidebarGroupPrimitive>
                     </IGRPSidebarContentPrimitive>
-                    <IGRPSidebarFooterPrimitive  className="items-center justify-center">
+                    <IGRPSidebarFooterPrimitive className="items-center justify-center">
                         <IGRPSidebarTriggerPrimitive className="items-center justify-center" />
                     </IGRPSidebarFooterPrimitive>
                 </IGRPSidebarPrimitive>
 
                 {/* Second IGRPSidebar */}
-                <IGRPSidebarPrimitive collapsible="none" className="hidden flex-1 md:flex">
+                <IGRPSidebarPrimitive
+                    collapsible="none"
+                    className="hidden flex-1 md:flex"
+                >
                     {header && (
                         <AppSidebarHeader
                             name={config?.name}
@@ -199,7 +207,9 @@ export function AppIGRPSidebar({
                                                     item: MenuItem,
                                                     index: number
                                                 ) => (
-                                                    <IGRPSidebarMenuPrimitive key={index}>
+                                                    <IGRPSidebarMenuPrimitive
+                                                        key={index}
+                                                    >
                                                         <Three
                                                             key={index}
                                                             level={index}

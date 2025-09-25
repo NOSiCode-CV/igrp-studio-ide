@@ -28,7 +28,9 @@ const SnnipetComponent = ({
         <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
             <IGRPDialogContentPrimitive className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
                 <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{snippet?.title}</IGRPDialogTitlePrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {snippet?.title}
+                    </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive></IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 <div className="flex-1 border rounded">

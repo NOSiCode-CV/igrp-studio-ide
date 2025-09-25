@@ -152,7 +152,9 @@ export const AddComponentModal = ({
                         <IGRPDialogHeaderPrimitive className="p-4">
                             <div className="flex justify-between">
                                 <div>
-                                    <IGRPDialogTitlePrimitive>Add Component</IGRPDialogTitlePrimitive>
+                                    <IGRPDialogTitlePrimitive>
+                                        Add Component
+                                    </IGRPDialogTitlePrimitive>
                                     <IGRPDialogDescriptionPrimitive>
                                         Select a component to add to your{' '}
                                         {componentName}

@@ -54,7 +54,7 @@ export const usePageData = (
 
     useEffect(() => {
         console.log('[Debug] usePageData: useEffect triggered', { pagePath });
-        
+
         if (pagePath) {
             loadPageData();
         }
@@ -64,4 +64,4 @@ export const usePageData = (
         isLoading,
         loadPageData,
     };
-}; 
+};

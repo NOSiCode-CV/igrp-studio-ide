@@ -2,7 +2,12 @@
 
 import * as React from 'react';
 import { Plus, ChevronRight } from 'lucide-react';
-import { IGRPButtonPrimitive, IGRPHoverCardContentPrimitive, IGRPHoverCardPrimitive, IGRPHoverCardTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPHoverCardContentPrimitive,
+    IGRPHoverCardPrimitive,
+    IGRPHoverCardTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPPopoverPrimitive,
     IGRPPopoverContentPrimitive,

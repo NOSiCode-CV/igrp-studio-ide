@@ -1,4 +1,8 @@
-import { IGRPCombobox, IGRPPopoverTriggerPrimitive, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCombobox,
+    IGRPPopoverTriggerPrimitive,
+    IGRPSwitchPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
@@ -17,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { toInitCap } from '@renderer/utils';
 import {
     IGRPTooltipPrimitive,
-    IGRPTooltipContentPrimitive ,
+    IGRPTooltipContentPrimitive,
     IGRPTooltipTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { PackageCheck } from 'lucide-react';
@@ -81,7 +85,11 @@ export function PopoverDto({
                     {t('openAdvancedSettings')}
                 </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
-            <IGRPPopoverContentPrimitive className="w-100" align="end" side="bottom">
+            <IGRPPopoverContentPrimitive
+                className="w-100"
+                align="end"
+                side="bottom"
+            >
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <IGRPTabsPrimitive defaultValue="validations">
@@ -235,7 +243,10 @@ export function PopoverDto({
                                     </div>
                                 </div>
                             </IGRPTabsContentPrimitive>
-                            <IGRPTabsContentPrimitive value="others" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="others"
+                                className="space-y-4"
+                            >
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('setOtherSettingsForDataObjects')}
                                 </p>
@@ -244,7 +255,9 @@ export function PopoverDto({
                                         key={`${field}-${index}`}
                                         className="flex flex-1 items-center gap-4"
                                     >
-                                        <IGRPLabel htmlFor={`${field}-${index}`}>
+                                        <IGRPLabel
+                                            htmlFor={`${field}-${index}`}
+                                        >
                                             {t('identifier')}
                                         </IGRPLabel>
                                         <IGRPSwitchPrimitive

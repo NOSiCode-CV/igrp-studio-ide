@@ -50,7 +50,7 @@ const IGRPStudioRepetitive: React.FC<CardComponentProps> = ({
                                     path={path}
                                     onEdit={() => handleEdit(child, path)}
                                 >
-                                    < CardComponent
+                                    <CardComponent
                                         comp={child}
                                         onDragEnd={onDragEnd}
                                     />

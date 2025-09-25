@@ -8,7 +8,11 @@ import {
     IGRPDropdownMenuTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { useTheme } from '@renderer/components/theme-provider';
-import { IGRPTooltipPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 export function ModeToggle() {
     const { t } = useTranslation();
@@ -27,21 +31,24 @@ export function ModeToggle() {
                     </IGRPDropdownMenuTriggerPrimitive>
                 </IGRPTooltipTriggerPrimitive>
                 <IGRPTooltipContentPrimitive>
-                <p>{t('toggleTheme')}</p>
+                    <p>{t('toggleTheme')}</p>
                 </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
             <IGRPDropdownMenuContentPrimitive align="end">
-                <IGRPDropdownMenuItemPrimitive onClick={() => setTheme('light')}>
-                {t('light')}
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => setTheme('light')}
+                >
+                    {t('light')}
                 </IGRPDropdownMenuItemPrimitive>
                 <IGRPDropdownMenuItemPrimitive onClick={() => setTheme('dark')}>
-                {t('dark')}
+                    {t('dark')}
                 </IGRPDropdownMenuItemPrimitive>
-                <IGRPDropdownMenuItemPrimitive onClick={() => setTheme('system')}>
-                {t('system')}
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => setTheme('system')}
+                >
+                    {t('system')}
                 </IGRPDropdownMenuItemPrimitive>
             </IGRPDropdownMenuContentPrimitive>
         </IGRPDropdownMenuPrimitive>
     );
 }
-

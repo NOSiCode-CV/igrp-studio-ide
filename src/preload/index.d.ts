@@ -1,11 +1,22 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
-import { AppLogicEnvironment, ConnectionTest, FileTree, ToolCheck, IOpenProject, HandlerResponse } from '../main/types';
-import { IConnenctionRepository, IWorkspaceRepository, IBaseEngine, IDocker } from '../main/interfaces';
+import { ElectronAPI } from '@electron-toolkit/preload';
+import {
+    AppLogicEnvironment,
+    ConnectionTest,
+    FileTree,
+    ToolCheck,
+    IOpenProject,
+    HandlerResponse,
+} from '../main/types';
+import {
+    IConnenctionRepository,
+    IWorkspaceRepository,
+    IBaseEngine,
+    IDocker,
+} from '../main/interfaces';
 import { IDEDetails } from '../main/helpers/ideDetection';
 
 interface CustomAPI {
-
-    fetchSelectors: (module: string, basePath: string) => Promise<[]>
+    fetchSelectors: (module: string, basePath: string) => Promise<[]>;
 
     openDirectory: (buttonLabel?: string) => Promise<IOpenProject>;
     fetchFiles: (basePath: string) => Promise<FileTree[]>;
@@ -14,80 +25,97 @@ interface CustomAPI {
     readDirectory: (basePath: string) => Promise<FileTree[]>;
     readProjectFile(filePath: string): Promise<any>;
 
-    openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<void>;
+    openIDE: ({
+        basePath,
+        ideType,
+    }: {
+        basePath: string;
+        ideType: string;
+    }) => Promise<void>;
 
     getIDEs: () => Promise<Array<{ key: string; config: IDEDetails }>>;
 
-    getVersions: (endpoint: string) => Promise<HandlerResponse>,
+    getVersions: (endpoint: string) => Promise<HandlerResponse>;
 
-    fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>,
+    fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>;
 
     runDoctorChecks: () => Promise<ToolCheck[]>;
-    saveDoctorReport: (results: ToolCheck[] ) => Promise<void>
+    saveDoctorReport: (results: ToolCheck[]) => Promise<void>;
 
-    saveProjectIcon: (data: { filePath: string; fileData: ArrayBuffer; assetsPath: string }) => Promise<any>;
+    saveProjectIcon: (data: {
+        filePath: string;
+        fileData: ArrayBuffer;
+        assetsPath: string;
+    }) => Promise<any>;
     getIconFile: (iconPath: string, workspacePath: string) => Promise<any>;
 
-    i18nextElectronBackend: any,
-
+    i18nextElectronBackend: any;
 }
 
 interface CustomMenu {
-    minimizeWindow: () => void,
-    maximizeWindow: () => void,
-    closeWindow: () => void,
-    restoreWindow: () => void,
-    isMaximized: () => Promise<boolean>,
+    minimizeWindow: () => void;
+    maximizeWindow: () => void;
+    closeWindow: () => void;
+    restoreWindow: () => void;
+    isMaximized: () => Promise<boolean>;
 }
 interface AppLogicAPI {
-  
-  // Environments
-  getEnvironments: () => Promise<AppLogicEnvironment[]>
-  addEnvironment: (environment: AppLogicEnvironment) => Promise<AppLogicEnvironment>
-  updateEnvironment: (id: string, updates: Partial<AppLogicEnvironment>) => Promise<boolean>
-  deleteEnvironment: (id: string) => Promise<boolean>
-  getEnvironment: (id: string) => Promise<AppLogicEnvironment | null> 
+    // Environments
+    getEnvironments: () => Promise<AppLogicEnvironment[]>;
+    addEnvironment: (
+        environment: AppLogicEnvironment
+    ) => Promise<AppLogicEnvironment>;
+    updateEnvironment: (
+        id: string,
+        updates: Partial<AppLogicEnvironment>
+    ) => Promise<boolean>;
+    deleteEnvironment: (id: string) => Promise<boolean>;
+    getEnvironment: (id: string) => Promise<AppLogicEnvironment | null>;
 
-  // History
-  addConnectionTest: (test: ConnectionTest) => Promise<boolean>
-  getEnvironmentHistory: (environmentId: string) => Promise<ConnectionTest[]>
+    // History
+    addConnectionTest: (test: ConnectionTest) => Promise<boolean>;
+    getEnvironmentHistory: (environmentId: string) => Promise<ConnectionTest[]>;
 
-  // Export/Import
-  exportData: () => Promise<string>
-  importData: (jsonData: string) => Promise<{ success: boolean; error?: string }>
+    // Export/Import
+    exportData: () => Promise<string>;
+    importData: (
+        jsonData: string
+    ) => Promise<{ success: boolean; error?: string }>;
 
-  // Test
-  testEnvironment: (environment: AppLogicEnvironment) => Promise<{
-    isValid: boolean
-    responseTime?: number
-    error?: string
-    statusCode?: number
-  }>
+    // Test
+    testEnvironment: (environment: AppLogicEnvironment) => Promise<{
+        isValid: boolean;
+        responseTime?: number;
+        error?: string;
+        statusCode?: number;
+    }>;
 
-  // Store info
-  getStoreInfo: () => Promise<{
-    isReady: boolean
-    storeName: string
-    environmentsCount: number
-    path: string | null
-  }>
+    // Store info
+    getStoreInfo: () => Promise<{
+        isReady: boolean;
+        storeName: string;
+        environmentsCount: number;
+        path: string | null;
+    }>;
 
-  // Events
-  onEnvironmentsChanged: (callback: (environments: AppLogicEnvironment[]) => void) => () => void
-  removeAllListeners: () => void
+    // Events
+    onEnvironmentsChanged: (
+        callback: (environments: AppLogicEnvironment[]) => void
+    ) => () => void;
+    removeAllListeners: () => void;
 }
 
 interface IGRPStudioSettings {
-  setBPMNConfigs: (configs: any) => Promise<any>;
-  getBPMNConfigs: () => Promise<any>;
-  getBPMNConfig: () => Promise<any>;
-  addBPMNConfig: (config: any) => Promise<any>;
-  updateBPMNConfig: (config: any) => Promise<any>;
-  deleteBPMNConfig: (configId: string) => Promise<any>;
-  setActiveBPMNConfig: (configId: string) => Promise<any>;
-  deleteAllBPMNConfigs: () => Promise<any>;
-  getLanguage: () => Promise<string>;
-  setLanguage: (lang: string) => Promise<void>;
+    setBPMNConfigs: (configs: any) => Promise<any>;
+    getBPMNConfigs: () => Promise<any>;
+    getBPMNConfig: () => Promise<any>;
+    addBPMNConfig: (config: any) => Promise<any>;
+    updateBPMNConfig: (config: any) => Promise<any>;
+    deleteBPMNConfig: (configId: string) => Promise<any>;
+    setActiveBPMNConfig: (configId: string) => Promise<any>;
+    deleteAllBPMNConfigs: () => Promise<any>;
+    getLanguage: () => Promise<string>;
+    setLanguage: (lang: string) => Promise<void>;
 }
 declare global {
     interface Window {
@@ -99,15 +127,22 @@ declare global {
             watchFolder: (folderPath: string) => Promise<any>;
             onFolderChange: (callback: (event: any) => void) => void;
             ipcRenderer: {
-                on: (channel: string, callback: (event: any, ...args: any[]) => void) => void;
+                on: (
+                    channel: string,
+                    callback: (event: any, ...args: any[]) => void
+                ) => void;
             };
             reportError: (error: Error) => void;
         };
-        api: CustomAPI,
-        igrpStudio: { workspace: IWorkspaceRepository, connection: IConnenctionRepository, docker: IDocker },
-        menu: CustomMenu,
-        engine: IBaseEngine,
-        appLogicAPI: AppLogicAPI,
-        igrpStudioSettings: IGRPStudioSettings
+        api: CustomAPI;
+        igrpStudio: {
+            workspace: IWorkspaceRepository;
+            connection: IConnenctionRepository;
+            docker: IDocker;
+        };
+        menu: CustomMenu;
+        engine: IBaseEngine;
+        appLogicAPI: AppLogicAPI;
+        igrpStudioSettings: IGRPStudioSettings;
     }
 }

@@ -4,7 +4,12 @@ import { Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BindingConfigurationFilterModal } from '../../components/binding-config-filter-modal';
 import { useEffect, useState } from 'react';
-import { IGRPBadgePrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPBadgePrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import useStudio from '@renderer/hooks/use-studio';

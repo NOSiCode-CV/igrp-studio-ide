@@ -1,4 +1,7 @@
-import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPInputPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +80,9 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="flex space-x-2">
-                <IGRPButtonPrimitive onClick={handleSave}>{t('save_configuration')}</IGRPButtonPrimitive>
+                <IGRPButtonPrimitive onClick={handleSave}>
+                    {t('save_configuration')}
+                </IGRPButtonPrimitive>
                 <IGRPButtonPrimitive variant="outline" onClick={onCancel}>
                     {t('cancel')}
                 </IGRPButtonPrimitive>
@@ -143,19 +148,31 @@ function Account({
 
             <div className="flex items-center space-x-2">
                 {!isActive && connected && (
-                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onActivate}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        size="sm"
+                        onClick={onActivate}
+                    >
                         {t('activate')}
                     </IGRPButtonPrimitive>
                 )}
 
                 {!isDefault && onEdit && (
-                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onEdit}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        size="sm"
+                        onClick={onEdit}
+                    >
                         <Settings size={16} />
                     </IGRPButtonPrimitive>
                 )}
 
                 {!isDefault && onDelete && (
-                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onDelete}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        size="sm"
+                        onClick={onDelete}
+                    >
                         <Trash2 size={16} />
                     </IGRPButtonPrimitive>
                 )}
@@ -226,7 +243,7 @@ export function ConnectedAccountsSettings() {
 
     const isGithubConnected =
         activeProviderId === 'github' && !!activeProvider?.user;
-   /*  const isGitLabConnected =
+    /*  const isGitLabConnected =
         activeProviderId !== 'github' && !!activeProvider?.user;
  */
     useEffect(() => {

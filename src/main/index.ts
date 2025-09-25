@@ -44,7 +44,11 @@ import './helpers/fetch-request';
 import { buildTaskbar } from './helpers/taskbar';
 
 import NextJsManager from './helpers/nextjsManager';
-import { initComponents, loadEngineConfiguration, setEngineConfiguration } from '@igrp/igrp-studio-nextjs-engine';
+import {
+    initComponents,
+    loadEngineConfiguration,
+    setEngineConfiguration,
+} from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
 import AppUpdater from './helpers/electron-updater';
 import { autoUpdater } from 'electron-updater';
@@ -208,13 +212,13 @@ app.whenReady().then(async () => {
     const initializeGitHubService = async () => {
         try {
             await GitHubService.initializeServices();
-        } catch { }
+        } catch {}
     };
 
     const initializeGitLabService = async () => {
         try {
             await GitLabService.initializeServices();
-        } catch { }
+        } catch {}
     };
 
     const initializeAllServices = async () => {
@@ -266,10 +270,10 @@ app.whenReady().then(async () => {
     await IGRPStudioSettings.initialize();
 
     setEngineConfiguration({
-        environment: "production",
+        environment: 'production',
     });
 
-    loadEngineConfiguration()
+    loadEngineConfiguration();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -495,8 +499,6 @@ app.on('open-url', (event, url) => {
     }
 });
 
-
-
 // NEXTJS
 ipcMain.on('start-nextjs', (_event, basePath) => {
     nextJsManager.setNextJsPath(basePath);
@@ -538,4 +540,3 @@ ipcMain.handle('watch-folder', (_, folderPath: string) => {
         mainWindow?.webContents.send('folder-change', event);
     });
 });
-

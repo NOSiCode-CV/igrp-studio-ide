@@ -1,7 +1,12 @@
 'use client';
 
-import { IGRPButtonPrimitive, IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
-
+import {
+    IGRPButtonPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 import {
     ExternalLink,
@@ -33,14 +38,16 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
         actions: { removeService },
     } = useWorkspace();
 
-    const { getServiceUrl, stopService, restartService } = useDocker({workspace});
+    const { getServiceUrl, stopService, restartService } = useDocker({
+        workspace,
+    });
 
     const { t } = useTranslation();
 
     const handleServiceUrl = () => {
         const url = getServiceUrl(service);
         if (url) {
-            window.electron.ipcRenderer.send(t("openExternalUrl"), url);
+            window.electron.ipcRenderer.send(t('openExternalUrl'), url);
         }
     };
 
@@ -57,7 +64,11 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
         <>
             <IGRPDropdownMenuPrimitive>
                 <IGRPDropdownMenuTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive variant="ghost" size="icon" className="h-7 w-7">
+                    <IGRPButtonPrimitive
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                    >
                         <MoreVertical className="h-4 w-4" />
                     </IGRPButtonPrimitive>
                 </IGRPDropdownMenuTriggerPrimitive>
@@ -95,7 +106,9 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                     </IGRPDropdownMenuItemPrimitive>
 
                     {getServiceUrl(service) && (
-                        <IGRPDropdownMenuItemPrimitive onClick={handleServiceUrl}>
+                        <IGRPDropdownMenuItemPrimitive
+                            onClick={handleServiceUrl}
+                        >
                             <ExternalLink className="mr-2 h-4 w-4" />
                             {t('openInBrowser')}
                         </IGRPDropdownMenuItemPrimitive>
@@ -115,7 +128,6 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                 </IGRPDropdownMenuContentPrimitive>
             </IGRPDropdownMenuPrimitive>
 
-
             <AlertDialogDelete
                 onConfirm={handleDelete}
                 onClose={() => setIsDialogOpen(false)}
@@ -130,7 +142,7 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                 open={isEditService}
                 setOpen={setEditService}
             >
-                <span className='sr-only'>Edit</span>
+                <span className="sr-only">Edit</span>
             </ConfigurationDialog>
         </>
     );

@@ -18,7 +18,6 @@ export const useComponentRegistration = ({
     fetchComponents,
     page,
 }: ComponentRegistrationProps): UseComponentRegistrationReturn => {
-
     // Use shared context for components
     const { loadRegistryComponent } = useComponentsContext();
 
@@ -29,9 +28,8 @@ export const useComponentRegistration = ({
             customComponents,
             appComponents,
             currentPage: page.pageName,
-            loadRegistryComponent
+            loadRegistryComponent,
         });
-
     }, [customComponents, page]);
 
     useEffect(() => {
@@ -51,4 +49,4 @@ export const useComponentRegistration = ({
     return {
         registerComponents,
     };
-}; 
+};

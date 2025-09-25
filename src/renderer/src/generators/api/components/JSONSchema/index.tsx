@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTablePrimitive,
     IGRPTableBodyPrimitive,
@@ -372,9 +375,15 @@ export function JSONSchemaBuilder({
             <IGRPTablePrimitive>
                 <IGRPTableHeaderPrimitive>
                     <IGRPTableRowPrimitive>
-                        <IGRPTableHeadPrimitive>{t('name')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('type')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('description')}</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('name')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('type')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('description')}
+                        </IGRPTableHeadPrimitive>
                         <IGRPTableHeadPrimitive className="text-right flex flex-1 items-center">
                             {fieldOrder.length === 0 &&
                                 Object.entries(newFields).length === 0 && (

@@ -1,6 +1,9 @@
 'use client';
 
-import { IGRPButtonPrimitive, IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPCheckboxPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { CircleArrowUp, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';

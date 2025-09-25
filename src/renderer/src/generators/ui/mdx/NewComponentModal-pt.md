@@ -7,6 +7,7 @@ O `NewComponentModal` é um componente React abrangente que fornece uma interfac
 ## 🎯 **Propósito**
 
 O NewComponentModal serve como interface principal para:
+
 - Criar componentes React reutilizáveis
 - Configurar argumentos e parâmetros de componentes
 - Associar componentes a páginas específicas
@@ -16,6 +17,7 @@ O NewComponentModal serve como interface principal para:
 ## 🚀 **Funcionalidades Principais**
 
 ### Funcionalidade Básica
+
 - **Criação de Componentes**: Criar novos componentes com configuração completa
 - **Gestão de Argumentos**: Definir e configurar argumentos de componentes
 - **Seleção de Ícones**: Escolher de uma biblioteca de ícones para componentes
@@ -24,6 +26,7 @@ O NewComponentModal serve como interface principal para:
 - **Validação**: Validação abrangente de formulários com tratamento de erros
 
 ### Funcionalidades Avançadas
+
 - **Argumentos de Função**: Suporte para parâmetros de função complexos
 - **Sistema de Tipos**: Suporte completo para tipos TypeScript
 - **Gestão de Escopo**: Componentes de nível de aplicação ou específicos de página
@@ -33,6 +36,7 @@ O NewComponentModal serve como interface principal para:
 ## 📋 **Interface do Componente**
 
 ### Interface de Props
+
 ```typescript
 interface NewComponentModalProps {
     isOpen: boolean;
@@ -45,46 +49,50 @@ interface NewComponentModalProps {
 ```
 
 ### Campos do Formulário
+
 1. **Título do Componente** (Descrição)
-   - Campo obrigatório
-   - Auto-gera nome do componente no blur
-   - Placeholder: "Todo Item"
+    - Campo obrigatório
+    - Auto-gera nome do componente no blur
+    - Placeholder: "Todo Item"
 
 2. **Nome do Componente**
-   - Campo obrigatório
-   - Deve seguir convenções de nomenclatura (sem espaços/hífens)
-   - Auto-gerado a partir do título
+    - Campo obrigatório
+    - Deve seguir convenções de nomenclatura (sem espaços/hífens)
+    - Auto-gerado a partir do título
 
 3. **Associação de Página**
-   - Dropdown opcional
-   - Liga componente a páginas específicas
-   - Altera escopo de 'app' para 'page'
+    - Dropdown opcional
+    - Liga componente a páginas específicas
+    - Altera escopo de 'app' para 'page'
 
 4. **Navegador de Ícones**
-   - Seleção visual de ícones
-   - Biblioteca de ícones pesquisável
-   - Pré-visualização do ícone selecionado
+    - Seleção visual de ícones
+    - Biblioteca de ícones pesquisável
+    - Pré-visualização do ícone selecionado
 
 5. **Argumentos de Função**
-   - Configuração complexa de argumentos
-   - Suporte para parâmetros opcionais
-   - Validação de tipos
-   - Suporte para listas/arrays
+    - Configuração complexa de argumentos
+    - Suporte para parâmetros opcionais
+    - Validação de tipos
+    - Suporte para listas/arrays
 
 ## 🔧 **Implementação Técnica**
 
 ### Gestão de Formulário
+
 - **Integração Formik**: Gerencia estado e validação do formulário
 - **Validação Yup**: Esquema de validação abrangente
 - **Auto-geração**: Preenchimento inteligente de campos
 - **Tratamento de Erros**: Mensagens de erro amigáveis
 
 ### Gestão de Estado
+
 ```typescript
 const [arguments_, setArguments] = useState<Arguments[]>([]);
 ```
 
 ### Esquema de Validação
+
 ```typescript
 const validationSchema = Yup.object({
     description: Yup.string().required(
@@ -99,34 +107,38 @@ const validationSchema = Yup.object({
 ## 🎨 **Interface do Utilizador**
 
 ### Layout do Modal
+
 - **Layout de Duas Colunas**: Campos do formulário à esquerda, argumentos à direita
 - **Design Responsivo**: Adapta-se a diferentes tamanhos de ecrã
 - **Separador Visual**: Distinção clara entre secções
 
 ### Secções do Formulário
+
 1. **Informação Básica**
-   - Título e nome do componente
-   - Dropdown de associação de página
+    - Título e nome do componente
+    - Dropdown de associação de página
 
 2. **Configuração Visual**
-   - Navegador de ícones com pesquisa
-   - Pré-visualização de ícone
+    - Navegador de ícones com pesquisa
+    - Pré-visualização de ícone
 
 3. **Configuração Avançada**
-   - Painel de argumentos de função
-   - Seleção de tipos
-   - Configuração de parâmetros
+    - Painel de argumentos de função
+    - Seleção de tipos
+    - Configuração de parâmetros
 
 4. **Secção de Pré-visualização**
-   - Assinatura de componente gerada
-   - Pré-visualização de código em tempo real
+    - Assinatura de componente gerada
+    - Pré-visualização de código em tempo real
 
 ## 🔧 **Componente FunctionArguments**
 
 ### Visão Geral
+
 O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewComponentModal que permite aos utilizadores definir e configurar parâmetros de função para os seus componentes. Este componente fornece uma interface intuitiva para criar assinaturas de componentes complexas com tipagem TypeScript adequada.
 
 ### Propósito
+
 - **Definição de Parâmetros**: Definir parâmetros de função com tipos adequados
 - **Segurança de Tipos**: Garantir compatibilidade TypeScript
 - **Parâmetros Opcionais**: Marcar parâmetros como opcionais
@@ -136,12 +148,14 @@ O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewCompone
 ### Funcionalidades Principais
 
 #### 1. **Gestão de Argumentos**
+
 - **Adicionar Argumentos**: Clicar "+" para adicionar novos parâmetros de função
 - **Remover Argumentos**: Eliminar parâmetros indesejados
 - **Reordenar Argumentos**: Arrastar e largar para reordenar parâmetros
 - **Duplicar Argumentos**: Copiar argumentos existentes para parâmetros semelhantes
 
 #### 2. **Sistema de Tipos**
+
 - **Tipos Básicos**: string, number, boolean, Date, etc.
 - **Tipos Complexos**: object, array, function, tipos personalizados
 - **Tipos Opcionais**: Marcar parâmetros como opcionais com '?'
@@ -149,6 +163,7 @@ O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewCompone
 - **Tipos de Função**: Definir funções de callback com parâmetros
 
 #### 3. **Configuração de Parâmetros**
+
 - **Nome**: Nome do parâmetro (deve ser identificador JavaScript válido)
 - **Tipo**: Tipo de dados para o parâmetro
 - **Obrigatório/Opcional**: Alternar requisito do parâmetro
@@ -156,6 +171,7 @@ O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewCompone
 - **Descrição**: Adicionar documentação para o parâmetro
 
 #### 4. **Funcionalidades Avançadas**
+
 - **Parâmetros de Função**: Definir parâmetros para funções de callback
 - **Tipos de Retorno**: Especificar tipos de retorno para parâmetros de função
 - **Tipos Genéricos**: Suporte para parâmetros de tipo genérico
@@ -165,12 +181,14 @@ O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewCompone
 ### Elementos da Interface do Utilizador
 
 #### Lista de Argumentos
+
 - **Lista Visual**: Cada argumento exibido como um cartão
 - **Cartões Expansíveis**: Clicar para expandir/colapsar detalhes do argumento
 - **Ações Rápidas**: Botões editar, eliminar, duplicar em cada cartão
 - **Alça de Arrastar**: Reordenar argumentos arrastando
 
 #### Formulário de Argumento
+
 - **Campo de Nome**: Entrada do nome do parâmetro
 - **Seletor de Tipo**: Dropdown com tipos disponíveis
 - **Alternância Obrigatório**: Checkbox para opcional/obrigatório
@@ -178,6 +196,7 @@ O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewCompone
 - **Descrição**: Área de texto para documentação do parâmetro
 
 #### Configuração de Tipos
+
 - **Seletor de Tipo Básico**: Escolher de tipos primitivos
 - **Construtor de Tipos Complexos**: Construir tipos complexos passo a passo
 - **Construtor de Tipos de Função**: Definir assinaturas de função
@@ -187,6 +206,7 @@ O componente `FunctionArguments` é uma ferramenta poderosa dentro do NewCompone
 ### Exemplos de Uso
 
 #### Parâmetro String Básico
+
 ```typescript
 // Configuração
 {
@@ -203,6 +223,7 @@ function myComponent(title: string) {
 ```
 
 #### Parâmetro Number Opcional
+
 ```typescript
 // Configuração
 {
@@ -220,6 +241,7 @@ function myComponent(title: string, count?: number = 0) {
 ```
 
 #### Parâmetro Array
+
 ```typescript
 // Configuração
 {
@@ -237,6 +259,7 @@ function myComponent(title: string, count?: number = 0, items: string[]) {
 ```
 
 #### Parâmetro Função
+
 ```typescript
 // Configuração
 {
@@ -252,9 +275,9 @@ function myComponent(title: string, count?: number = 0, items: string[]) {
 
 // Assinatura Gerada
 function myComponent(
-    title: string, 
-    count?: number = 0, 
-    items: string[], 
+    title: string,
+    count?: number = 0,
+    items: string[],
     onClick: (event: MouseEvent, data?: any) => void
 ) {
     // Implementação do componente
@@ -264,21 +287,25 @@ function myComponent(
 ### Fluxo de Trabalho
 
 #### Passo 1: Adicionar Argumentos
+
 1. Clicar no botão "+" no painel FunctionArguments
 2. Um novo cartão de argumento aparece
 3. Preencher informação básica (nome, tipo)
 
 #### Passo 2: Configurar Tipos
+
 1. Selecionar o tipo apropriado do dropdown
 2. Para tipos complexos, usar o construtor de tipos
 3. Configurar opções adicionais de tipo (array, opcional, etc.)
 
 #### Passo 3: Definir Propriedades
+
 1. Marcar como obrigatório ou opcional
 2. Adicionar valores padrão se opcional
 3. Fornecer descrição para documentação
 
 #### Passo 4: Revisar Pré-visualização
+
 1. Verificar a assinatura gerada no painel de pré-visualização
 2. Verificar a compatibilidade TypeScript
 3. Fazer ajustes conforme necessário
@@ -286,18 +313,21 @@ function myComponent(
 ### Melhores Práticas
 
 #### Convenções de Nomenclatura
+
 - **Nomes Descritivos**: Usar nomes de parâmetros claros e significativos
 - **Camel Case**: Seguir convenções de nomenclatura JavaScript
 - **Evitar Abreviações**: Usar palavras completas para clareza
 - **Nomenclatura Consistente**: Manter consistência entre parâmetros semelhantes
 
 #### Seleção de Tipos
+
 - **Escolher Tipos Apropriados**: Selecionar o tipo mais específico possível
 - **Usar Tipos Opcionais**: Marcar parâmetros como opcionais quando apropriado
 - **Considerar Valores Padrão**: Fornecer padrões sensatos para parâmetros opcionais
 - **Documentar Tipos Complexos**: Adicionar descrições para parâmetros complexos
 
 #### Organização
+
 - **Ordem Lógica**: Organizar parâmetros em ordem lógica
 - **Obrigatórios Primeiro**: Colocar parâmetros obrigatórios antes dos opcionais
 - **Parâmetros Relacionados**: Agrupar parâmetros relacionados
@@ -306,6 +336,7 @@ function myComponent(
 ### Casos de Uso Comuns
 
 #### Componentes de Formulário
+
 ```typescript
 // Parâmetros comuns de componentes de formulário
 {
@@ -327,6 +358,7 @@ function myComponent(
 ```
 
 #### Componentes de Lista
+
 ```typescript
 // Parâmetros comuns de componentes de lista
 {
@@ -350,6 +382,7 @@ function myComponent(
 ```
 
 #### Componentes Modal
+
 ```typescript
 // Parâmetros comuns de componentes modal
 {
@@ -401,18 +434,21 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 ### Funcionalidades Avançadas
 
 #### Suporte de Tipos Personalizados
+
 - **Referências de Interface**: Ligar a interfaces TypeScript existentes
 - **Tipos Genéricos**: Suporte para parâmetros de tipo genérico
 - **Tipos de União**: Combinar múltiplos tipos com operadores de união
 - **Tipos de Interseção**: Mesclar múltiplos tipos com operadores de interseção
 
 #### Regras de Validação
+
 - **Validação de Nome**: Garantir identificadores JavaScript válidos
 - **Validação de Tipo**: Verificar compatibilidade TypeScript
 - **Validação de Campo Obrigatório**: Garantir que todos os campos obrigatórios estão preenchidos
 - **Prevenção de Nomes Duplicados**: Prevenir nomes de parâmetros duplicados
 
 #### Otimização de Performance
+
 - **Carregamento Preguiçoso**: Definições de tipo carregadas sob demanda
 - **Atualizações com Debounce**: Atualizações de pré-visualização com debounce para performance
 - **Scrolling Virtual**: Listas grandes de argumentos usam scrolling virtual
@@ -423,6 +459,7 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 ## 📝 **Exemplos de Uso**
 
 ### Criação Básica de Componente
+
 ```typescript
 <NewComponentModal
     isOpen={showFormComponent}
@@ -434,6 +471,7 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 ```
 
 ### Com Componente Atual (Edição)
+
 ```typescript
 <NewComponentModal
     isOpen={showFormComponent}
@@ -448,24 +486,29 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 ## 🔄 **Fluxo de Trabalho**
 
 ### Passo 1: Abrir Modal
+
 - Utilizador clica no botão "Criar Novo Componente"
 - Modal abre com formulário vazio
 
 ### Passo 2: Preencher Informação Básica
+
 - Inserir título do componente
 - Nome do componente auto-gera
 - Selecionar associação de página (opcional)
 
 ### Passo 3: Configurar Elementos Visuais
+
 - Escolher ícone do navegador
 - Pré-visualizar ícone selecionado
 
 ### Passo 4: Configurar Argumentos
+
 - Adicionar argumentos de função
 - Configurar tipos de parâmetros
 - Definir status opcional/obrigatório
 
 ### Passo 5: Revisar e Criar
+
 - Revisar assinatura gerada
 - Validar formulário
 - Criar componente
@@ -473,16 +516,19 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 ## ⚙️ **Opções de Configuração**
 
 ### Escopo do Componente
+
 - **Escopo de App**: Disponível globalmente na aplicação
 - **Escopo de Página**: Disponível apenas em páginas específicas
 
 ### Tipos de Argumentos
+
 - **Tipos Básicos**: string, number, boolean, etc.
 - **Tipos Complexos**: objetos, arrays, funções
 - **Parâmetros Opcionais**: Marcados com sufixo '?'
 - **Suporte de Lista**: Tipos de array com sufixo '[]'
 
 ### Sistema de Ícones
+
 - **Biblioteca Pesquisável**: Encontrar ícones por nome
 - **Pré-visualização Visual**: Ver ícone antes da seleção
 - **Organização por Categoria**: Ícones organizados por tipo
@@ -490,6 +536,7 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 ## 🎯 **Saída Gerada**
 
 ### Assinatura do Componente
+
 ```typescript
 export default function myComponent(
     param1: string,
@@ -501,6 +548,7 @@ export default function myComponent(
 ```
 
 ### Estrutura de Ficheiros
+
 ```
 components/
 ├── MyComponent/
@@ -512,16 +560,19 @@ components/
 ## ⚠️ **Regras de Validação**
 
 ### Convenções de Nomenclatura
+
 - **Nome do Componente**: `[a-zA-Z0-9]+` (sem espaços/hífens)
 - **Descrição**: Obrigatória, texto descritivo
 - **Argumentos**: Tipos TypeScript válidos
 
 ### Campos Obrigatórios
+
 - Título do componente (descrição)
 - Nome do componente
 - Tipos de argumentos válidos
 
 ### Tratamento de Erros
+
 - **Validação de Campo**: Feedback de validação em tempo real
 - **Verificação de Tipos**: Validação de tipos TypeScript
 - **Prevenção de Duplicados**: Verificar nomes existentes
@@ -529,6 +580,7 @@ components/
 ## 🔗 **Pontos de Integração**
 
 ### Integração com Engine
+
 ```typescript
 const { error } = await window.engine.createPage(
     { ...pageConfig, id: getId() },
@@ -538,26 +590,27 @@ const { error } = await window.engine.createPage(
 ```
 
 ### Integração com Git
+
 ```typescript
-createGitCommit(
-    basePath,
-    t('addComponent', { name: pageConfig.name })
-);
+createGitCommit(basePath, t('addComponent', { name: pageConfig.name }));
 ```
 
 ### Notificações Toast
+
 - **Sucesso**: Componente criado com sucesso
 - **Erro**: Erros de validação ou criação
 
 ## 📈 **Melhores Práticas**
 
 ### Design de Componentes
+
 1. **Nomes Descritivos**: Usar nomes claros e significativos
 2. **Escopo Adequado**: Escolher escopo apropriado (app vs página)
 3. **Seleção de Ícones**: Escolher ícones relevantes para melhor UX
 4. **Planeamento de Argumentos**: Planear argumentos antes da criação
 
 ### Fluxo de Desenvolvimento
+
 1. **Planear Componente**: Definir propósito e requisitos
 2. **Configurar Argumentos**: Configurar parâmetros necessários
 3. **Escolher Ícone**: Selecionar representação visual apropriada
@@ -582,6 +635,7 @@ R: Sim, passe o componente existente como prop `currentComponent`.
 ## 🔮 **Melhorias Futuras**
 
 ### Funcionalidades Planeadas
+
 - **Biblioteca de Modelos**: Modelos de componentes pré-construídos
 - **Sistema de Tipos Avançado**: Definições de tipos mais complexas
 - **Pré-visualização de Componentes**: Pré-visualização ao vivo do componente
@@ -589,6 +643,7 @@ R: Sim, passe o componente existente como prop `currentComponent`.
 - **Importar/Exportar**: Partilha de configuração de componentes
 
 ### Melhorias Técnicas
+
 - **Otimização de Performance**: Renderização de formulário mais rápida
 - **Validação Melhorada**: Regras de validação mais sofisticadas
 - **Melhor Tratamento de Erros**: Mensagens de erro mais detalhadas
@@ -599,4 +654,4 @@ R: Sim, passe o componente existente como prop `currentComponent`.
 **Componente**: NewComponentModal  
 **Versão**: 1.0  
 **Última Atualização**: Dezembro 2024  
-**Autor**: Equipa IGRP Studio 
+**Autor**: Equipa IGRP Studio

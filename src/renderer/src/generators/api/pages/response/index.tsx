@@ -1,4 +1,10 @@
-import { IGRPCardContentPrimitive, IGRPCardHeaderPrimitive, IGRPCardPrimitive, IGRPCardTitlePrimitive, IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardPrimitive,
+    IGRPCardTitlePrimitive,
+    IGRPInputText,
+} from '@igrp/igrp-framework-react-design-system';
 
 import NavigationBar from '../../components/navigation-bar';
 import { LabelRequired } from '@renderer/components/label-required';
@@ -54,11 +60,17 @@ export const ResponseLayout = ({
                                 options={httpStatusCodes}
                                 value={formik.values.statusCode}
                                 onChange={(value) => {
-                                    formik.setFieldValue(t("statusCode"), value);
+                                    formik.setFieldValue(
+                                        t('statusCode'),
+                                        value
+                                    );
                                     handleChangeCode(value as string);
                                 }}
                                 onBlur={(value) => {
-                                    formik.setFieldValue(t("statusCode"), value);
+                                    formik.setFieldValue(
+                                        t('statusCode'),
+                                        value
+                                    );
                                     handleChangeCode(value);
                                 }}
                                 error={formik.errors.statusCode}
@@ -102,7 +114,9 @@ export const ResponseLayout = ({
                         />
                         <IGRPCardPrimitive>
                             <IGRPCardHeaderPrimitive>
-                                <IGRPCardTitlePrimitive>{t('dataSchema')}</IGRPCardTitlePrimitive>
+                                <IGRPCardTitlePrimitive>
+                                    {t('dataSchema')}
+                                </IGRPCardTitlePrimitive>
                             </IGRPCardHeaderPrimitive>
                             <IGRPCardContentPrimitive>
                                 <JSONSchemaBuilder

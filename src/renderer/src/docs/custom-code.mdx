@@ -24,18 +24,18 @@ In the `Custom Code` Navigation, clicking on `+` `Dropdown` and selecting `Funct
 - **Imports**: add external libraries using the `import` syntax.
 - **Function Body**: function body where the code is inserted.
 - **Function Settings**:
-  - `Name`: function name.
-  - `Return Type`: return type (`Void`, `String`, `Number`, etc).
-  - `Is List` / `Nullable`: defines if the return is a list and if it allows `null`.
-  - `Arguments`: add arguments with name, type, and default value.
+    - `Name`: function name.
+    - `Return Type`: return type (`Void`, `String`, `Number`, etc).
+    - `Is List` / `Nullable`: defines if the return is a list and if it allows `null`.
+    - `Arguments`: add arguments with name, type, and default value.
 
 ### Example:
 
 ```tsx
 function getStatusBadge(status: string): string {
-  if (status === "active") return "✅ Active";
-  if (status === "inactive") return "❌ Inactive";
-  return "ℹ️ Unknown";
+    if (status === 'active') return '✅ Active';
+    if (status === 'inactive') return '❌ Inactive';
+    return 'ℹ️ Unknown';
 }
 ```
 
@@ -87,4 +87,4 @@ It allows registering:
   functions: ['client/forms/useUserForm']
   components: ['components/shared-ui']
 }
-``` 
+```

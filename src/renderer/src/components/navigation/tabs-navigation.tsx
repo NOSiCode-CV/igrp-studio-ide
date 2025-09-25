@@ -1,6 +1,15 @@
 import React, { ReactNode, useRef } from 'react';
 import { Book, Plus, X } from 'lucide-react';
-import { IGRPContextMenuContentPrimitive, IGRPContextMenuItemPrimitive, IGRPContextMenuPrimitive, IGRPContextMenuShortcutPrimitive, IGRPContextMenuTriggerPrimitive, IGRPScrollAreaPrimitive, IGRPScrollBarPrimitive, IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPContextMenuContentPrimitive,
+    IGRPContextMenuItemPrimitive,
+    IGRPContextMenuPrimitive,
+    IGRPContextMenuShortcutPrimitive,
+    IGRPContextMenuTriggerPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPScrollBarPrimitive,
+    IGRPSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { getIcon } from '@renderer/utils';
 import { useTranslation } from 'react-i18next';
@@ -158,7 +167,7 @@ const TabsNavigation = ({
                                                 >
                                                     {t('closeLeft')}
                                                 </IGRPContextMenuItemPrimitive>
-                                                <IGRPContextMenuItemPrimitive   
+                                                <IGRPContextMenuItemPrimitive
                                                     onClick={() =>
                                                         handleCloseOthers(
                                                             tab.id
@@ -183,7 +192,10 @@ const TabsNavigation = ({
                             );
                         })}
                     </div>
-                    <IGRPScrollBarPrimitive orientation="horizontal" className="h-2" />
+                    <IGRPScrollBarPrimitive
+                        orientation="horizontal"
+                        className="h-2"
+                    />
                 </IGRPScrollAreaPrimitive>
                 {btnNew && (
                     <div className="flex items-center px-2 gap-2">

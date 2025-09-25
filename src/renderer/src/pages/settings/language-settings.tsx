@@ -44,7 +44,9 @@ export function LanguageSettings() {
             </div>
             <div className="space-y-4">
                 <div className="space-y-2 flex flex-col">
-                    <IGRPLabel htmlFor="language">{t('language_label')}</IGRPLabel>
+                    <IGRPLabel htmlFor="language">
+                        {t('language_label')}
+                    </IGRPLabel>
                     <IGRPCombobox
                         value={currentLanguage}
                         options={languages}

@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import Loader from '@renderer/components/loader';
-import { Container, FolderKanban, Network, Settings, Timer } from 'lucide-react';
+import {
+    Container,
+    FolderKanban,
+    Network,
+    Settings,
+    Timer,
+} from 'lucide-react';
 import WelcomeHeader from './workspaces/welcome-header';
 import Resources from './workspaces/resources';
 import { WorkspaceDocker } from './workspaces/workspace-docker';
@@ -9,18 +15,19 @@ import { WorkspaceSettings } from './workspaces/workspace-settings';
 import CreateWorkspace from './workspaces/components/create-workspace';
 import { useTranslation } from 'react-i18next';
 import { EmptyList } from '@renderer/components/empty-list';
-import { IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
-
+import {
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 const IDEInitialScreen = () => {
     const { t } = useTranslation();
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
     const [hasWorkspace, setHasWorkspace] = useState(false);
 
-    const {
-        workspace,
-        loading: workspacesLoading,
-    } = useWorkspace();
+    const { workspace, loading: workspacesLoading } = useWorkspace();
 
     useEffect(() => {
         const checkWorkspaces = async () => {
@@ -38,7 +45,6 @@ const IDEInitialScreen = () => {
         setShowWorkspaceDialog(false);
         setHasWorkspace(true);
     };
-
 
     if (workspacesLoading) {
         return (
@@ -60,7 +66,7 @@ const IDEInitialScreen = () => {
                             {t('workspaceNotExist')}
                         </p>
                     </div>
-                 {/*    <div className="flex gap-3">
+                    {/*    <div className="flex gap-3">
                         <IGRPButtonPrimitive
                             onClick={handleOpenWorkspace}
                             variant="outline"
@@ -108,8 +114,12 @@ const IDEInitialScreen = () => {
                             {hasWorkspace && workspace && <Resources />}
                         </IGRPTabsContentPrimitive>
 
-                        <IGRPTabsContentPrimitive value="diagram" className="mt-0">
-                            {/* <WorkspaceDiagram workspace={workspace} /> */
+                        <IGRPTabsContentPrimitive
+                            value="diagram"
+                            className="mt-0"
+                        >
+                            {
+                                /* <WorkspaceDiagram workspace={workspace} /> */
                                 <EmptyList
                                     title="Coming soon"
                                     description="Here you will find soon a diagram of your workspace using React Flow."
@@ -119,11 +129,17 @@ const IDEInitialScreen = () => {
                             }
                         </IGRPTabsContentPrimitive>
 
-                        <IGRPTabsContentPrimitive value="config" className="mt-0">
+                        <IGRPTabsContentPrimitive
+                            value="config"
+                            className="mt-0"
+                        >
                             <WorkspaceDocker workspace={workspace} />
                         </IGRPTabsContentPrimitive>
 
-                        <IGRPTabsContentPrimitive value="settings" className="mt-0">
+                        <IGRPTabsContentPrimitive
+                            value="settings"
+                            className="mt-0"
+                        >
                             <WorkspaceSettings workspace={workspace} />
                         </IGRPTabsContentPrimitive>
                     </IGRPTabsPrimitive>

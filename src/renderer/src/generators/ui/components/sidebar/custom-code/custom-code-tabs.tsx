@@ -138,7 +138,7 @@ const TabStates = ({
 
                                     <div className="flex items-center gap-2">
                                         <IGRPBadge variant="outline">
-                                            {state.type} 
+                                            {state.type}
                                             {state.defaultValue &&
                                                 ` - Default: ${state.defaultValue}`}
                                         </IGRPBadge>
@@ -148,7 +148,9 @@ const TabStates = ({
                                 <div className="flex items-center gap-2 ml-3">
                                     <IGRPTooltipProviderPrimitive>
                                         <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IGRPButtonPrimitive
                                                     size={'sm'}
                                                     variant="outline"
@@ -174,7 +176,9 @@ const TabStates = ({
                                     ) && (
                                         <IGRPTooltipProviderPrimitive>
                                             <IGRPTooltipPrimitive>
-                                                <IGRPTooltipTriggerPrimitive asChild>
+                                                <IGRPTooltipTriggerPrimitive
+                                                    asChild
+                                                >
                                                     <IGRPButtonPrimitive
                                                         size={'sm'}
                                                         variant="outline"
@@ -310,7 +314,9 @@ const TabSnipptes = ({
                                 <div className="flex items-center gap-2 ml-3">
                                     <IGRPTooltipProviderPrimitive>
                                         <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IGRPButtonPrimitive
                                                     variant="outline"
                                                     size={'sm'}
@@ -515,7 +521,9 @@ const TabsFunctions = ({
                                 <div className="flex items-center gap-2 ml-3">
                                     <IGRPTooltipProviderPrimitive>
                                         <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IGRPButtonPrimitive
                                                     size={'sm'}
                                                     variant="outline"
@@ -655,7 +663,9 @@ const TabTypes = ({
                                 <div className="flex items-center gap-2 ml-3">
                                     <IGRPTooltipProviderPrimitive>
                                         <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IGRPButtonPrimitive
                                                     variant="outline"
                                                     size={'sm'}

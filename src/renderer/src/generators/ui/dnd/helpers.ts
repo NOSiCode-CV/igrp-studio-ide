@@ -1,24 +1,25 @@
-import { StructuredComponent } from "@renderer/lib/dnd/types";
-import { generateId } from "@renderer/utils";
-import { ComponentRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
-import { nanoid } from "@reduxjs/toolkit";
+import { StructuredComponent } from '@renderer/lib/dnd/types';
+import { generateId } from '@renderer/utils';
+import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { nanoid } from '@reduxjs/toolkit';
 
 // Utility function to set default values based on the schemaconst setDefaultProperties = (schema: any): any => {const setDefaultProperties = (schema: any): any => {
-export const getDefaultProperties = (schema: any,tag?:string): any => {
+export const getDefaultProperties = (schema: any, tag?: string): any => {
     const properties: any = {};
 
     for (const key in schema) {
-
         const prop = schema[key];
 
         if (prop.type === 'array' && !prop.items?.enum) {
             properties[key] = [];
         } else if (prop.type === 'object' && prop.properties) {
             properties[key] = getDefaultProperties(prop.properties, tag); // Recursive call
-        } else if (prop.required || prop.default){
-            properties[key] = prop.default === '{{id}}' ? `${tag}-${nanoid(4)}` : prop.default
+        } else if (prop.required || prop.default) {
+            properties[key] =
+                prop.default === '{{id}}'
+                    ? `${tag}-${nanoid(4)}`
+                    : prop.default;
         }
-           
     }
 
     return properties;
@@ -26,21 +27,22 @@ export const getDefaultProperties = (schema: any,tag?:string): any => {
 
 // Utility function to set default values based on the schema
 export const getDefaultInteractions = (schema: any) => {
-
     const interactions: any = {};
     for (const key in schema) {
-        if (schema[key].type === 'object' && schema[key].properties &&
-            (schema[key].required || schema[key].required === undefined)) {
+        if (
+            schema[key].type === 'object' &&
+            schema[key].properties &&
+            (schema[key].required || schema[key].required === undefined)
+        ) {
             interactions[key] = getDefaultInteractions(schema[key].properties);
-        }
+        } else if (schema[key].type === 'array' && !schema[key].items?.enum) {
         /*  else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
              interactions[key] = getDefaultInteractions(schema[key].properties);
          } */
-        else if (schema[key].type === 'array' && !schema[key].items?.enum) {
             interactions[key] = [];
-        }
-        else if (schema[key].required || schema[key].visible) {
-            interactions[key] = /* schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : */
+        } else if (schema[key].required || schema[key].visible) {
+            interactions[key] =
+                /* schema[key].default && schema[key].visible ? schema[key].default.replace(/{{id}}/g, tag || '') : */
                 schema[key].default;
         }
     }
@@ -53,45 +55,49 @@ export const getRequiredDataSchema = (schema: any): any => {
     // Verifica se é um objeto com propriedades
 
     for (const index in schema) {
+        const tempResult: any = {};
 
-        const tempResult: any = {}
+        Object.entries(schema[index].properties).forEach(
+            ([key, property]: [string, any]) => {
+                // Se for o objeto state que queremos validar
+                if (
+                    key === 'state' &&
+                    property.type === 'object' &&
+                    property.required
+                ) {
+                    if (isState(property.properties))
+                        tempResult[key] = {
+                            id: property.properties?.id?.default ?? '',
+                            type: property.properties?.type?.default ?? 'any',
+                            name: property.properties?.name?.default ?? '',
+                            defaultValue:
+                                property.properties?.defaultValue?.default ??
+                                'undefined',
+                            imports:
+                                property.properties?.imports?.default ?? [],
+                            generate:
+                                property.properties?.generate?.default ?? true,
+                        };
+                    else tempResult[key] = undefined;
 
-        Object.entries(schema[index].properties).forEach(([key, property]: [string, any]) => {
-
-            // Se for o objeto state que queremos validar
-            if (key === 'state' && property.type === 'object' && property.required) {
-                if (isState(property.properties))
-                    tempResult[key] = {
-                        id: property.properties?.id?.default ?? "",
-                        type: property.properties?.type?.default ?? "any",
-                        name: property.properties?.name?.default ?? "",
-                        defaultValue: property.properties?.defaultValue?.default ?? "undefined",
-                        imports: property.properties?.imports?.default ?? [],
-                        generate: property.properties?.generate?.default ?? true
-                    };
-                else tempResult[key] = undefined
-
-                result[index] = tempResult;
-
+                    result[index] = tempResult;
+                }
             }
-
-        });
+        );
     }
 
     return result;
 };
 
 function isState(obj: any) {
-    return obj?.name && obj?.name?.default && obj?.name?.default !== undefined
+    return obj?.name && obj?.name?.default && obj?.name?.default !== undefined;
 }
-
 
 export const newStructuredComponent = (
     name: string,
     children?: Array<StructuredComponent>,
-    componentRegister?: ComponentRegisterConfig,
+    componentRegister?: ComponentRegisterConfig
 ) => {
-
     const newRowId = generateId(name);
 
     const {

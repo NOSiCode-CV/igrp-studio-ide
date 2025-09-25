@@ -37,7 +37,9 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     onSuccess,
 }) => {
     const { t } = useTranslation();
-    const { actions: { updateProject } } = useWorkspace();
+    const {
+        actions: { updateProject },
+    } = useWorkspace();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,7 +52,10 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             )
             .max(100, t('maxLengthExceeded', { max: 100 })),
         config: Yup.object().shape({
-            description: Yup.string().max(500, t('maxLengthExceeded', { max: 500 })),
+            description: Yup.string().max(
+                500,
+                t('maxLengthExceeded', { max: 500 })
+            ),
         }),
     });
 
@@ -92,7 +97,9 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
         },
     });
 
-    const handleIconUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleIconUpload = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
@@ -113,7 +120,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             const timestamp = Date.now();
             const fileExtension = file.name.split('.').pop();
             const fileName = `project-icon-${timestamp}.${fileExtension}`;
-            
+
             // For now, we'll store the file name as the icon path
             // In a real implementation, you'd want to save the file to the workspace
             formik.setFieldValue('icon', `icons/${fileName}`);
@@ -156,12 +163,17 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     <div className="space-y-4">
                         {/* Project Icon */}
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
+                            <IGRPLabelPrimitive>
+                                {t('projectIcon')}
+                            </IGRPLabelPrimitive>
                             <div className="flex items-center space-x-4">
                                 <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
                                     {formik.values.icon ? (
                                         <ProjectIcon
-                                            project={{ ...project, icon: formik.values.icon }}
+                                            project={{
+                                                ...project,
+                                                icon: formik.values.icon,
+                                            }}
                                             workspacePath=""
                                         />
                                     ) : (
@@ -182,7 +194,9 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => fileInputRef.current?.click()}
+                                        onClick={() =>
+                                            fileInputRef.current?.click()
+                                        }
                                         className="w-full"
                                     >
                                         <Upload className="w-4 h-4 mr-2" />
@@ -231,7 +245,10 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                 id="description"
                                 value={formik.values.config.description}
                                 onChange={(e) =>
-                                    formik.setFieldValue('config.description', e.target.value)
+                                    formik.setFieldValue(
+                                        'config.description',
+                                        e.target.value
+                                    )
                                 }
                                 onBlur={formik.handleBlur}
                                 placeholder={t('projectDescription')}
@@ -240,7 +257,12 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                             />
                             {formik.touched.config && formik.errors.config && (
                                 <p className="text-xs text-destructive">
-                                    {typeof formik.errors.config === 'object' && 'description' in formik.errors.config ? String(formik.errors.config.description) : ''}
+                                    {typeof formik.errors.config === 'object' &&
+                                    'description' in formik.errors.config
+                                        ? String(
+                                              formik.errors.config.description
+                                          )
+                                        : ''}
                                 </p>
                             )}
                         </div>
@@ -255,12 +277,22 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                     type="color"
                                     id="themeColor"
                                     value={formik.values.themeColor}
-                                    onChange={(e) => formik.setFieldValue('themeColor', e.target.value)}
+                                    onChange={(e) =>
+                                        formik.setFieldValue(
+                                            'themeColor',
+                                            e.target.value
+                                        )
+                                    }
                                     className="w-12 h-8 border border-gray-300 rounded cursor-pointer"
                                 />
                                 <IGRPInputPrimitive
                                     value={formik.values.themeColor}
-                                    onChange={(e) => formik.setFieldValue('themeColor', e.target.value)}
+                                    onChange={(e) =>
+                                        formik.setFieldValue(
+                                            'themeColor',
+                                            e.target.value
+                                        )
+                                    }
                                     placeholder="#000000"
                                     className="flex-1"
                                 />

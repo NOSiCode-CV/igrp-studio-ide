@@ -1,7 +1,19 @@
 import { Github, Gitlab, GitlabIcon, LogOut, User2Icon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useGitAuth from '@renderer/hooks/use-git-auth';
-import { IGRPButtonPrimitive, IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive, IGRPUserAvatarFallbackPrimitive, IGRPUserAvatarImagePrimitive, IGRPUserAvatarPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+    IGRPUserAvatarFallbackPrimitive,
+    IGRPUserAvatarImagePrimitive,
+    IGRPUserAvatarPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 function GitConnectionMenu() {
     const { t } = useTranslation();
@@ -18,7 +30,11 @@ function GitConnectionMenu() {
         <IGRPDropdownMenuPrimitive>
             <IGRPDropdownMenuTriggerPrimitive asChild>
                 {userGitHub || userGitLab ? (
-                    <IGRPButtonPrimitive variant="ghost" size="icon" className="p-0">
+                    <IGRPButtonPrimitive
+                        variant="ghost"
+                        size="icon"
+                        className="p-0"
+                    >
                         <IGRPUserAvatarPrimitive className="h-8 w-8">
                             <>
                                 <IGRPUserAvatarImagePrimitive
@@ -43,7 +59,11 @@ function GitConnectionMenu() {
                         </IGRPUserAvatarPrimitive>
                     </IGRPButtonPrimitive>
                 ) : (
-                    <IGRPButtonPrimitive variant="ghost" size="icon" className="p-0">
+                    <IGRPButtonPrimitive
+                        variant="ghost"
+                        size="icon"
+                        className="p-0"
+                    >
                         <User2Icon className="h-4 w-4" />
                     </IGRPButtonPrimitive>
                 )}
@@ -53,7 +73,7 @@ function GitConnectionMenu() {
                     {userGitHub ? (
                         <div className="flex items-center justify-between space-x-3 w-full">
                             <div className="flex items-center space-x-2">
-                                <Github className="h-3 w-3"/>
+                                <Github className="h-3 w-3" />
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium leading-none">
                                         {userGitHub?.login}
@@ -63,7 +83,7 @@ function GitConnectionMenu() {
                                     </p>
                                 </div>
                             </div>
-                                <IGRPTooltipPrimitive>
+                            <IGRPTooltipPrimitive>
                                 <IGRPTooltipTriggerPrimitive asChild>
                                     <IGRPButtonPrimitive
                                         variant="ghost"

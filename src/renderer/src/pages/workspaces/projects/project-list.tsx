@@ -25,9 +25,9 @@ interface ProjectListProps {
 
 export function ProjectList({ projects, services }: ProjectListProps) {
     const handleProjectClick = (project: ProjectData) => {
-        saveOrOpenProject({project});
+        saveOrOpenProject({ project });
     };
-    
+
     const { t } = useTranslation();
 
     const {
@@ -40,10 +40,18 @@ export function ProjectList({ projects, services }: ProjectListProps) {
             <IGRPTablePrimitive className="compact-table">
                 <IGRPTableHeaderPrimitive>
                     <IGRPTableRowPrimitive>
-                        <IGRPTableHeadPrimitive>{t('name')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('framework')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('dependencies')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('lastUpdated')}</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('name')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('framework')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('dependencies')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('lastUpdated')}
+                        </IGRPTableHeadPrimitive>
                         <IGRPTableHeadPrimitive className="w-[80px]"></IGRPTableHeadPrimitive>
                     </IGRPTableRowPrimitive>
                 </IGRPTableHeaderPrimitive>
@@ -56,7 +64,10 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                         >
                             <IGRPTableCellPrimitive className="font-medium">
                                 <div className="flex items-center gap-1.5">
-                                    <ProjectIcon project={project} workspacePath={workspace.path} />
+                                    <ProjectIcon
+                                        project={project}
+                                        workspacePath={workspace.path}
+                                    />
                                     <div>
                                         <div className="text-xs">
                                             {project.name}
@@ -68,7 +79,9 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                                 </div>
                             </IGRPTableCellPrimitive>
                             <IGRPTableCellPrimitive className="text-xs">
-                                <IGRPBadgePrimitive>{project.framework}</IGRPBadgePrimitive>
+                                <IGRPBadgePrimitive>
+                                    {project.framework}
+                                </IGRPBadgePrimitive>
                             </IGRPTableCellPrimitive>
                             <IGRPTableCellPrimitive>
                                 <Dependency

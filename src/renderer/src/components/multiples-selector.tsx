@@ -12,7 +12,10 @@ import {
     IGRPCommandItemPrimitive,
     IGRPPopoverTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPPopoverPrimitive, IGRPPopoverContentPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPPopoverPrimitive,
+    IGRPPopoverContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 
@@ -44,8 +47,7 @@ export default function MultipleSelector({
 
     return (
         <IGRPPopoverPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPPopoverTriggerPrimitive
-             asChild>
+            <IGRPPopoverTriggerPrimitive asChild>
                 <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     {value && value.length > 0 ? (
                         value.map((item) => (
@@ -86,8 +88,12 @@ export default function MultipleSelector({
                 <IGRPScrollAreaPrimitive>
                     <div className="max-h-[60svh]">
                         <IGRPCommandPrimitive>
-                            <IGRPCommandInputPrimitive placeholder={placeholder} />
-                            <IGRPCommandEmptyPrimitive>{t('noItemFound')}</IGRPCommandEmptyPrimitive>
+                            <IGRPCommandInputPrimitive
+                                placeholder={placeholder}
+                            />
+                            <IGRPCommandEmptyPrimitive>
+                                {t('noItemFound')}
+                            </IGRPCommandEmptyPrimitive>
                             <IGRPCommandGroupPrimitive>
                                 {options &&
                                     options.map((option) => (
@@ -137,7 +143,7 @@ export default function MultipleSelector({
                             </IGRPCommandGroupPrimitive>
                         </IGRPCommandPrimitive>
                     </div>
-                    </IGRPScrollAreaPrimitive>
+                </IGRPScrollAreaPrimitive>
             </IGRPPopoverContentPrimitive>
         </IGRPPopoverPrimitive>
     );

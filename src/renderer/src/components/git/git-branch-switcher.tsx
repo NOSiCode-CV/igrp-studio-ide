@@ -7,7 +7,22 @@ import {
     GitFork,
 } from 'lucide-react';
 
-import { IGRPButtonPrimitive, IGRPCommandEmptyPrimitive, IGRPCommandGroupPrimitive, IGRPCommandInputPrimitive, IGRPCommandItemPrimitive, IGRPCommandListPrimitive, IGRPCommandPrimitive, IGRPCommandSeparatorPrimitive, IGRPPopoverContentPrimitive, IGRPPopoverPrimitive, IGRPPopoverTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPCommandEmptyPrimitive,
+    IGRPCommandGroupPrimitive,
+    IGRPCommandInputPrimitive,
+    IGRPCommandItemPrimitive,
+    IGRPCommandListPrimitive,
+    IGRPCommandPrimitive,
+    IGRPCommandSeparatorPrimitive,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -80,7 +95,9 @@ export function BranchSwitcher({
             );
             dispatch(setBranches(branchList));
 
-            const activeBranch = branchList.find((branch: any) => branch.isActive);
+            const activeBranch = branchList.find(
+                (branch: any) => branch.isActive
+            );
             if (activeBranch) {
                 dispatch(setActiveBranch(activeBranch.name));
             }
@@ -191,9 +208,13 @@ export function BranchSwitcher({
             </IGRPPopoverTriggerPrimitive>
             <IGRPPopoverContentPrimitive className="w-[300px] p-0">
                 <IGRPCommandPrimitive>
-                    <IGRPCommandInputPrimitive placeholder={t('searchBranch')} />
+                    <IGRPCommandInputPrimitive
+                        placeholder={t('searchBranch')}
+                    />
                     <IGRPCommandListPrimitive>
-                        <IGRPCommandEmptyPrimitive>{t('noBranchFound')}</IGRPCommandEmptyPrimitive>
+                        <IGRPCommandEmptyPrimitive>
+                            {t('noBranchFound')}
+                        </IGRPCommandEmptyPrimitive>
                         <IGRPCommandGroupPrimitive heading={t('branches')}>
                             {branches.map((branch) => (
                                 <IGRPCommandItemPrimitive

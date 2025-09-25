@@ -89,12 +89,14 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     </IGRPDropdownMenuItemPrimitive>
 
                     {service?.status === 'running' && (
-                        <IGRPDropdownMenuItemPrimitive onClick={handleExternalLink}>
+                        <IGRPDropdownMenuItemPrimitive
+                            onClick={handleExternalLink}
+                        >
                             <ExternalLink className="mr-2 h-4 w-4" />
                             {t('openInBrowser')}
                         </IGRPDropdownMenuItemPrimitive>
                     )}
-                 
+
                     {project.framework === ENV_TYPES.DOTNET && (
                         <IGRPDropdownMenuItemPrimitive
                             onClick={onConvertToSpringBoot}
@@ -109,7 +111,10 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     )}
 
                     {project.framework === ENV_TYPES.SPRING && (
-                        <IGRPDropdownMenuItemPrimitive onClick={onConvertToDotNet} disabled>
+                        <IGRPDropdownMenuItemPrimitive
+                            onClick={onConvertToDotNet}
+                            disabled
+                        >
                             <Repeat className="mr-2 h-4 w-4 text-gray-500" />
                             {t('convertToDotNet')}
                             <span className="ml-auto text-xs text-muted-foreground">
@@ -131,7 +136,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                                 className="focus:bg-accent"
                             >
                                 <Edit className="mr-2 h-4 w-4" />
-                               {t('configureService')}
+                                {t('configureService')}
                             </IGRPDropdownMenuItemPrimitive>
                         </ConfigurationDialog>
                     )}

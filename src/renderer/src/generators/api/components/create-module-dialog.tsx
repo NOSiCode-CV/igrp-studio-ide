@@ -4,7 +4,21 @@ import * as React from 'react';
 import { Plus } from 'lucide-react';
 import * as Yup from 'yup';
 
-import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPDialogTriggerPrimitive, IGRPInputPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipProviderPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogTriggerPrimitive,
+    IGRPInputPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
@@ -73,13 +87,16 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
             formik.resetForm();
 
-             createGitCommit(basePath, `${t("addModule")} ${formik.values.name}`);
+            createGitCommit(
+                basePath,
+                `${t('addModule')} ${formik.values.name}`
+            );
 
             dispatch(onSetChangeStatus(true));
 
             showSuccessToast(
                 t('moduleAdded', { name: formik.values.name })
-               // `Module ${formik.values.name} have been successfully added.`
+                // `Module ${formik.values.name} have been successfully added.`
             );
         } catch (error) {
             showErrorToast(error);
@@ -106,7 +123,9 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                 </IGRPTooltipPrimitive>
                 <IGRPDialogContentPrimitive className="max-w-[425px]">
                     <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive>{t('createNewModule')}</IGRPDialogTitlePrimitive>
+                        <IGRPDialogTitlePrimitive>
+                            {t('createNewModule')}
+                        </IGRPDialogTitlePrimitive>
                         <IGRPDialogDescriptionPrimitive>
                             {t('dialogDescription')}
                         </IGRPDialogDescriptionPrimitive>
@@ -119,8 +138,11 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                     >
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <IGRPLabelPrimitive htmlFor="name" className="text-right">
-                                {t('moduleName')}
+                                <IGRPLabelPrimitive
+                                    htmlFor="name"
+                                    className="text-right"
+                                >
+                                    {t('moduleName')}
                                 </IGRPLabelPrimitive>
                                 <div className="col-span-3">
                                     <IGRPInputPrimitive
@@ -145,7 +167,9 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                             </div>
                         </div>
                         <IGRPDialogFooterPrimitive>
-                            <IGRPButtonPrimitive type="submit">{t('saveModule')}</IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive type="submit">
+                                {t('saveModule')}
+                            </IGRPButtonPrimitive>
                         </IGRPDialogFooterPrimitive>
                     </form>
                 </IGRPDialogContentPrimitive>

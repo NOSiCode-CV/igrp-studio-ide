@@ -1,6 +1,9 @@
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { nanoid } from '@reduxjs/toolkit';
-import { IGRPButtonPrimitive, IGRPDialogClosePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogClosePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPDialogPrimitive,
     IGRPDialogContentPrimitive,
@@ -155,7 +158,9 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                         label={t('isArray')}
                         id="isArray"
                         value={formik.values.isArray}
-                        onChange={(value) => formik.setFieldValue('isArray', value)}
+                        onChange={(value) =>
+                            formik.setFieldValue('isArray', value)
+                        }
                         isTouched={formik.touched.isArray}
                         error={formik.errors.isArray}
                     />
@@ -168,8 +173,13 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                     />
 
                     <IGRPDialogFooterPrimitive className="space-x-2">
-                        <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
-                        <IGRPButtonPrimitive type="submit" disabled={formik.isSubmitting}>
+                        <IGRPDialogClosePrimitive>
+                            Close
+                        </IGRPDialogClosePrimitive>
+                        <IGRPButtonPrimitive
+                            type="submit"
+                            disabled={formik.isSubmitting}
+                        >
                             {formik.isSubmitting && (
                                 <Loader2 className="animate-spin" />
                             )}

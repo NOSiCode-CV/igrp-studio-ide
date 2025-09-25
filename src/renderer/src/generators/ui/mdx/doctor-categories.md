@@ -7,43 +7,52 @@ The Doctor feature has been enhanced with a categorized approach to provide a mo
 ## Categories
 
 ### 🌐 Frontend Development
+
 Tools required for frontend development with React, Next.js, and modern web technologies.
 
 **Tools included:**
+
 - **Node.js** (Required) - JavaScript runtime for frontend development
 - **npm** (Required) - Node.js package manager
 - **pnpm** (Optional) - Fast, disk space efficient package manager
 - **yarn** (Optional) - Alternative package manager for Node.js
 
 ### ⚙️ Backend Development
+
 Tools required for backend development with Java, Spring Boot, and .NET.
 
 **Tools included:**
+
 - **Java** (Required) - Java runtime for backend development
 - **Maven** (Required) - Java build and dependency management tool
 - **.NET SDK** (Optional) - .NET development framework
 
 ### 🛠️ Development Infrastructure
+
 Essential development tools and infrastructure requirements.
 
 **Tools included:**
+
 - **Docker** (Required) - Containerization platform for development
 - **Git** (Required) - Version control system
 
 ## Features
 
 ### Visual Organization
+
 - **Category Cards**: Each category is displayed in its own card with an icon and description
 - **Status Indicators**: Clear visual indicators showing the health status of each category
 - **Progress Badges**: Shows how many required tools are working in each category
 
 ### Enhanced Information
+
 - **Tool Descriptions**: Each tool includes a description explaining its purpose
 - **Version Information**: Displays current versions for working tools
 - **Error Details**: Shows specific error messages for failed tools
 - **Download Links**: Direct links to download missing tools
 
 ### Status Reporting
+
 - **Overall Status**: Green checkmark when all systems are healthy
 - **Category Status**: Individual status for each development category
 - **Required vs Optional**: Clear distinction between required and optional tools
@@ -68,8 +77,9 @@ Essential development tools and infrastructure requirements.
 ## Technical Implementation
 
 The categorized approach uses:
+
 - **TypeScript interfaces** for type safety
 - **Category-based filtering** for organized display
 - **Status calculation** for each category
 - **Responsive design** for different screen sizes
-- **Accessibility features** for better user experience 
+- **Accessibility features** for better user experience

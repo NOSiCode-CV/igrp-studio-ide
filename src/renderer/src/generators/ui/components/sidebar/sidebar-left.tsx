@@ -16,8 +16,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MenuItem } from 'src/main/types';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
-import { IGRPScrollAreaPrimitive, IGRPScrollBarPrimitive, IGRPSidebarMenuButtonPrimitive, IGRPSidebarMenuPrimitive, IGRPSidebarHeaderPrimitive, IGRPSidebarPrimitive, useIGRPSidebarPrimitive, IGRPSidebarMenuItemPrimitive, IGRPSidebarContentPrimitive, IGRPSidebarGroupPrimitive, IGRPSidebarGroupContentPrimitive, IGRPSidebarFooterPrimitive, IGRPSidebarTriggerPrimitive, IGRPSidebarGroupLabelPrimitive, IGRPCollapsibleTriggerPrimitive, IGRPCollapsibleContentPrimitive, IGRPSidebarInputPrimitive, IGRPCollapsiblePrimitive } from '@igrp/igrp-framework-react-design-system';
-import Draggable from '@renderer/lib/dnd/Draggable';     
+import {
+    IGRPScrollAreaPrimitive,
+    IGRPScrollBarPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarHeaderPrimitive,
+    IGRPSidebarPrimitive,
+    useIGRPSidebarPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+    IGRPSidebarContentPrimitive,
+    IGRPSidebarGroupPrimitive,
+    IGRPSidebarGroupContentPrimitive,
+    IGRPSidebarFooterPrimitive,
+    IGRPSidebarTriggerPrimitive,
+    IGRPSidebarGroupLabelPrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+    IGRPCollapsibleContentPrimitive,
+    IGRPSidebarInputPrimitive,
+    IGRPCollapsiblePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import Draggable from '@renderer/lib/dnd/Draggable';
 import NavigatorSidebar from './sidebar-navigator';
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut';
 //import SidebarAppComponents from './sidebar-app-components';
@@ -54,7 +73,7 @@ export function AppSidebar({
 
     const [searchQuery, setSearchQuery] = useState('');
 
-   /*  useEffect(() => {
+    /*  useEffect(() => {
         getRegistryComponent();
     }, []); */
 
@@ -157,13 +176,16 @@ export function AppSidebar({
                         </IGRPSidebarGroupContentPrimitive>
                     </IGRPSidebarGroupPrimitive>
                 </IGRPSidebarContentPrimitive>
-                <IGRPSidebarFooterPrimitive  className="items-center justify-center">
+                <IGRPSidebarFooterPrimitive className="items-center justify-center">
                     <IGRPSidebarTriggerPrimitive className="items-center justify-center" />
                 </IGRPSidebarFooterPrimitive>
             </IGRPSidebarPrimitive>
 
             {/* Second Sidebar */}
-            <IGRPSidebarPrimitive collapsible="none" className="hidden flex-1 md:flex">
+            <IGRPSidebarPrimitive
+                collapsible="none"
+                className="hidden flex-1 md:flex"
+            >
                 <IGRPSidebarHeaderPrimitive className="gap-3.5 border-b">
                     <div className="flex w-full items-center justify-between max-w-72">
                         <div className="flex flex-1 space-x-2  items-center">
@@ -214,7 +236,7 @@ export function AppSidebar({
                                     className="group/collapsible"
                                 >
                                     <IGRPSidebarGroupPrimitive>
-                                        <IGRPSidebarGroupLabelPrimitive 
+                                        <IGRPSidebarGroupLabelPrimitive
                                             asChild
                                             className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                         >
@@ -271,7 +293,7 @@ export function AppSidebar({
                                 </IGRPCollapsiblePrimitive>
                             ))
                         )}
-                         <IGRPScrollBarPrimitive orientation="horizontal" />
+                        <IGRPScrollBarPrimitive orientation="horizontal" />
                     </IGRPScrollAreaPrimitive>
                 </IGRPSidebarContentPrimitive>
             </IGRPSidebarPrimitive>

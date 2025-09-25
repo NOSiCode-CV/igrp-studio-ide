@@ -23,7 +23,13 @@ interface SearchInputProps {
 }
 
 // Get project type icon
-function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspacePath?: string }) {
+function ProjectIcon({
+    project,
+    workspacePath,
+}: {
+    project: ProjectData;
+    workspacePath?: string;
+}) {
     const [iconUrl, setIconUrl] = React.useState<string | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
 
@@ -41,20 +47,31 @@ function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspa
             }
 
             // If it's a relative path, load it securely
-            if (project.icon.startsWith('icons/') || project.icon.startsWith('assets/')) {
+            if (
+                project.icon.startsWith('icons/') ||
+                project.icon.startsWith('assets/')
+            ) {
                 if (!workspacePath) {
-                    console.warn('Workspace path not provided for project icon loading');
+                    console.warn(
+                        'Workspace path not provided for project icon loading'
+                    );
                     setIconUrl(null);
                     return;
                 }
-                
+
                 setIsLoading(true);
                 try {
-                    const result = await window.api.getIconFile(project.icon, workspacePath);
+                    const result = await window.api.getIconFile(
+                        project.icon,
+                        workspacePath
+                    );
                     if (result.success) {
                         setIconUrl(result.data);
                     } else {
-                        console.warn('Failed to load project icon:', result.error);
+                        console.warn(
+                            'Failed to load project icon:',
+                            result.error
+                        );
                         setIconUrl(null);
                     }
                 } catch (error) {

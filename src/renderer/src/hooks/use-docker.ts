@@ -4,13 +4,20 @@ import useToast from '@renderer/hooks/useToast';
 import { DockerComposeConfig, IWorkspace, ServiceInfo } from 'src/main/types';
 import { IDocker } from 'src/main/interfaces';
 
-export function useDocker({ workspace, changeStatus = false }: { workspace: IWorkspace, changeStatus?: boolean }) {
+export function useDocker({
+    workspace,
+    changeStatus = false,
+}: {
+    workspace: IWorkspace;
+    changeStatus?: boolean;
+}) {
     const [isDockerRunning, setIsDockerRunning] = useState<boolean>(false);
 
     const [fileContent, setFileContent] = useState<any>(null);
     const [services, setServices] = useState<ServiceInfo[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [composeConfig, setComposeConfig] = useState<DockerComposeConfig | null>(null);
+    const [composeConfig, setComposeConfig] =
+        useState<DockerComposeConfig | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
     const { showErrorToast } = useToast();
@@ -23,10 +30,12 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
             return window.igrpStudio.docker.down(projectPath, { dropVolume });
         },
         status: async (projectPath: string) => {
-            return window.igrpStudio.docker.status(projectPath).then((services: ServiceInfo[]) => {
-                setServices(services);
-                return services;
-            });
+            return window.igrpStudio.docker
+                .status(projectPath)
+                .then((services: ServiceInfo[]) => {
+                    setServices(services);
+                    return services;
+                });
         },
         check: async () => {
             return window.igrpStudio.docker.check();
@@ -35,24 +44,29 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
             return window.igrpStudio.docker.daemonStatus();
         },
         stop: async (projectPath: string, { services }) => {
-            await window.igrpStudio.docker.stop(projectPath, { services })
+            await window.igrpStudio.docker.stop(projectPath, { services });
         },
         restart: async (projectPath: string, { services, timeout }) => {
-            await window.igrpStudio.docker.restart(projectPath, { services, timeout })
-        }
+            await window.igrpStudio.docker.restart(projectPath, {
+                services,
+                timeout,
+            });
+        },
     };
 
     const checkDocker = useCallback(async () => {
         try {
             const daemonStatus = await dockerOperations.daemonStatus();
             setIsDockerRunning(daemonStatus.isRunning);
-            
+
             if (!daemonStatus.isRunning) {
-                setError(new Error(`${daemonStatus.error}: ${daemonStatus.details}`));
+                setError(
+                    new Error(`${daemonStatus.error}: ${daemonStatus.details}`)
+                );
             } else {
                 setError(null);
             }
-            
+
             return daemonStatus.isRunning;
         } catch (err) {
             setIsDockerRunning(false);
@@ -61,53 +75,74 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
         }
     }, []);
 
+    const handleDockerOperation = useCallback(
+        async (
+            operation: keyof IDocker,
+            options?: {
+                services?: string[];
+                timeout?: number;
+                dropVolume?: boolean;
+            }
+        ): Promise<
+            | ServiceInfo[]
+            | boolean
+            | void
+            | { isRunning: boolean; error?: string; details?: string }
+        > => {
+            const { services, timeout, dropVolume } = options || {};
 
-    const handleDockerOperation = useCallback(async (
-        operation: keyof IDocker,
-        options?: {
-            services?: string[],
-            timeout?: number,
-            dropVolume?: boolean
-        }
-    ): Promise<ServiceInfo[] | boolean | void | { isRunning: boolean; error?: string; details?: string }> => {
+            setLoading(true);
 
-        const { services, timeout, dropVolume } = options || {}
+            if (!isDockerRunning && operation !== 'status') {
+                const isRunning = await checkDocker();
+                if (!isRunning) {
+                    setLoading(false);
+                    setError(new Error('Docker daemon is not running'));
+                    throw new Error('Docker daemon is not running');
+                }
+            }
 
-        setLoading(true);
-
-        if (!isDockerRunning && operation !== 'status') {
-            const isRunning = await checkDocker();
-            if (!isRunning) {
+            try {
+                return await dockerOperations[operation](workspace.path, {
+                    services: services ?? [],
+                    timeout,
+                    dropVolume,
+                });
+            } catch (err) {
+                setError(err as Error);
+                if (
+                    err instanceof Error &&
+                    (err.message.includes('ENOENT') ||
+                        err.message.includes('docker.sock'))
+                ) {
+                    setIsDockerRunning(false);
+                    throw new Error('Docker daemon is not running');
+                }
+                throw err;
+            } finally {
                 setLoading(false);
-                setError(new Error('Docker daemon is not running'));
-                throw new Error('Docker daemon is not running');
             }
-        }
-
-        try {
-            return await dockerOperations[operation](workspace.path, { services: services ?? [], timeout, dropVolume });
-        } catch (err) {
-            setError(err as Error);
-            if (err instanceof Error &&
-                (err.message.includes('ENOENT') || err.message.includes('docker.sock'))) {
-                setIsDockerRunning(false);
-                throw new Error('Docker daemon is not running');
-            }
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, [isDockerRunning, dockerOperations]);
+        },
+        [isDockerRunning, dockerOperations]
+    );
 
     const getServiceUrl = (service: ServiceInfo) => {
-        if (service.status !== 'running' || !service.ports || service.ports.length === 0 || !['file', 'web'].some(type => service.labels?.type?.includes(type))) return null;
+        if (
+            service.status !== 'running' ||
+            !service.ports ||
+            service.ports.length === 0 ||
+            !['file', 'web'].some((type) =>
+                service.labels?.type?.includes(type)
+            )
+        )
+            return null;
 
-        const normalizedPorts = service.ports.map(port => {
+        const normalizedPorts = service.ports.map((port) => {
             if (typeof port === 'string') {
                 const [published, target] = port.split(':');
                 return {
                     published: parseInt(published),
-                    target: parseInt(target)
+                    target: parseInt(target),
                 };
             }
             return port;
@@ -119,23 +154,27 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
 
     useEffect(() => {
         if (error) {
-            showErrorToast(error)
+            showErrorToast(error);
         }
     }, [error]);
 
-    const loadComposeFile = useCallback(async (projectPath: string): Promise<void> => {
-        const fileContent = await window.api
-            .getFileContent(`${projectPath}/igrp-compose.yaml`);
+    const loadComposeFile = useCallback(
+        async (projectPath: string): Promise<void> => {
+            const fileContent = await window.api.getFileContent(
+                `${projectPath}/igrp-compose.yaml`
+            );
 
-        const composeConfig = yaml.load(fileContent) as DockerComposeConfig;
+            const composeConfig = yaml.load(fileContent) as DockerComposeConfig;
 
-        setFileContent(fileContent);
-        setComposeConfig(composeConfig);
-    }, [])
+            setFileContent(fileContent);
+            setComposeConfig(composeConfig);
+        },
+        []
+    );
 
     useEffect(() => {
         const refreshContainers = async () => {
-            handleDockerOperation('status')
+            handleDockerOperation('status');
         };
 
         if (workspace && changeStatus) refreshContainers();
@@ -150,9 +189,12 @@ export function useDocker({ workspace, changeStatus = false }: { workspace: IWor
         getServiceUrl,
         loadComposeFile,
         startContainers: () => handleDockerOperation('up'),
-        stopContainers: (dropVolume: boolean) => handleDockerOperation('down', { dropVolume }),
+        stopContainers: (dropVolume: boolean) =>
+            handleDockerOperation('down', { dropVolume }),
         refreshContainers: () => handleDockerOperation('status'),
-        stopService: (services?: string[]) => handleDockerOperation('stop', { services }),
-        restartService: (services?: string[], timeout?: number) => handleDockerOperation('restart', { services, timeout }),
+        stopService: (services?: string[]) =>
+            handleDockerOperation('stop', { services }),
+        restartService: (services?: string[], timeout?: number) =>
+            handleDockerOperation('restart', { services, timeout }),
     };
 }

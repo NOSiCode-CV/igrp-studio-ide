@@ -23,7 +23,13 @@ import { CustomPropertiesSection } from './components/CustomPropertiesSection';
 import { StyleComponent } from './types';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { generateAllClasses } from './utils';
-import { IGRPAccordionItemPrimitive, IGRPAccordionContentPrimitive, IGRPAccordionPrimitive, IGRPAccordionTriggerPrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPAccordionItemPrimitive,
+    IGRPAccordionContentPrimitive,
+    IGRPAccordionPrimitive,
+    IGRPAccordionTriggerPrimitive,
+    IGRPButtonPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface StyleSection {
     id: string;
@@ -162,9 +168,16 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
 
     return (
         <div className="p-1.5">
-            <IGRPAccordionPrimitive type="single" collapsible className="w-full">
+            <IGRPAccordionPrimitive
+                type="single"
+                collapsible
+                className="w-full"
+            >
                 {sections.map((section) => (
-                    <IGRPAccordionItemPrimitive key={section.id} value={section.id}>
+                    <IGRPAccordionItemPrimitive
+                        key={section.id}
+                        value={section.id}
+                    >
                         <IGRPAccordionTriggerPrimitive className="group">
                             <div className="flex align-middle items-center gap-2">
                                 {section.icon}
@@ -184,7 +197,7 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-5"
                                     title={`Reset ${section.title} styles`}
                                 >
-                                    <RotateCcw className='h-4'/>
+                                    <RotateCcw className="h-4" />
                                 </IGRPButtonPrimitive>
                             </div>
                         </IGRPAccordionTriggerPrimitive>

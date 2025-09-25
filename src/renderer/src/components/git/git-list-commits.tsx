@@ -9,7 +9,11 @@ import {
     IGRPTooltipProviderPrimitive,
     IGRPTooltipTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPCardContentPrimitive, IGRPCardHeaderPrimitive, IGRPCardTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
@@ -163,7 +167,9 @@ export function GitCommitsSidebar({
                     )}
                 </div>
             </IGRPCardHeaderPrimitive>
-            <IGRPCardContentPrimitive className="p-0">{renderContent()}</IGRPCardContentPrimitive>
+            <IGRPCardContentPrimitive className="p-0">
+                {renderContent()}
+            </IGRPCardContentPrimitive>
         </div>
     );
 }

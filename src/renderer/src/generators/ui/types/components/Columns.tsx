@@ -35,8 +35,8 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
 
             // Use the function directly instead of the hook
             const finalClasses = generateResponsiveClasses(variant);
-            const spanClasses = `span ${finalClasses} ${className || ''}`.trim();
-
+            const spanClasses =
+                `span ${finalClasses} ${className || ''}`.trim();
 
             return (
                 <Draggable
@@ -67,7 +67,15 @@ const IGRPStudioColumns: React.FC<CardComponentProps> = ({
         className
     );
 
-    return <div className={cn('p-2 py-5', children.length > 0 && finalClasses)}>{children.length > 0 ? renderColumns() : <GenNoInfoComp type='COLUMNS'/>}</div>;
+    return (
+        <div className={cn('p-2 py-5', children.length > 0 && finalClasses)}>
+            {children.length > 0 ? (
+                renderColumns()
+            ) : (
+                <GenNoInfoComp type="COLUMNS" />
+            )}
+        </div>
+    );
 };
 
 export default IGRPStudioColumns;

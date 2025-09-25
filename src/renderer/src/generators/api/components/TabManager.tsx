@@ -14,9 +14,6 @@ interface ContentProps {
 }
 
 const TabManager = ({ currentItem }: ContentProps) => {
-
-
-
     const {
         tabs,
         activeTab,

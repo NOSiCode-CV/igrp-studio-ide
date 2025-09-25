@@ -65,25 +65,20 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
         if (!selectedPage || !currentComp || !pageOptions.length) return [];
 
         const page = pageOptions.find(
-            (p: any) => p.content.pageName === selectedPage,
+            (p: any) => p.content.pageName === selectedPage
         );
 
         if (!page) return [];
 
         const componentsMap = extractComponentsFromPage(
             page.components,
-            currentComp.componentName,
+            currentComp.componentName
         );
 
         const allComponents = Array.from(componentsMap.values());
 
         return allComponents.filter((comp) => comp.id !== currentComp.id);
-    }, [
-        selectedPage,
-        currentComp,
-        pageOptions,
-        extractComponentsFromPage,
-    ]);
+    }, [selectedPage, currentComp, pageOptions, extractComponentsFromPage]);
 
     const handlePageChange = (value: string | boolean) => {
         setSelectedPage(value as string);
@@ -111,7 +106,7 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
                 label: page.content.description,
                 value: page.content.pageName || page.content.name,
             })),
-        [pageOptions],
+        [pageOptions]
     );
 
     const componentSelectOptions = useMemo(
@@ -120,7 +115,7 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
                 label: `${comp.label || comp.tag} - ${comp.tag}`,
                 value: comp.id,
             })),
-        [availableComponents],
+        [availableComponents]
     );
 
     return (

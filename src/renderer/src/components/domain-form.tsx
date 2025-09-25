@@ -152,7 +152,9 @@ export default function DynamicKeyValueForm({
                     {items.map((item) => (
                         <IGRPTableRowPrimitive key={item.id}>
                             {fieldPairs.map((pair) => (
-                                <IGRPTableCellPrimitive key={`${item.id}-${pair.key}`}>
+                                <IGRPTableCellPrimitive
+                                    key={`${item.id}-${pair.key}`}
+                                >
                                     <div className="flex flex-col">
                                         {pair.options &&
                                         pair.options.length > 0 ? (

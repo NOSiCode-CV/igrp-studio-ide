@@ -204,10 +204,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         {t('manageDatabaseConnections')}
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
-                <IGRPTabsPrimitive
-                    defaultValue="tables"
-                    className="w-full"
-                >
+                <IGRPTabsPrimitive defaultValue="tables" className="w-full">
                     <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
                         <IGRPTabsTriggerPrimitive value="tables">
                             {t('importDataTables')}
@@ -226,10 +223,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         {t('manageDatabaseConnections')}
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
-                <IGRPTabsPrimitive
-                    defaultValue="tables"
-                    className="w-full"
-                >
+                <IGRPTabsPrimitive defaultValue="tables" className="w-full">
                     <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
                         <IGRPTabsTriggerPrimitive value="tables">
                             {t('importDataTables')}

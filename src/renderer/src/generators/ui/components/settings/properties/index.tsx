@@ -138,9 +138,15 @@ const RenderPropsConfig = ({
         else if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties;
             return (
-                <IGRPAccordionPrimitive type="single" collapsible className="w-full">
+                <IGRPAccordionPrimitive
+                    type="single"
+                    collapsible
+                    className="w-full"
+                >
                     <IGRPAccordionItemPrimitive key={key} value={key}>
-                        <IGRPAccordionTriggerPrimitive>{xMetaLabel}</IGRPAccordionTriggerPrimitive>
+                        <IGRPAccordionTriggerPrimitive>
+                            {xMetaLabel}
+                        </IGRPAccordionTriggerPrimitive>
                         <IGRPAccordionContentPrimitive className="space-y-3">
                             {Object.keys(props).map((nestedKey) =>
                                 renderField(
@@ -151,7 +157,7 @@ const RenderPropsConfig = ({
                             )}
                         </IGRPAccordionContentPrimitive>
                     </IGRPAccordionItemPrimitive>
-                    </IGRPAccordionPrimitive>
+                </IGRPAccordionPrimitive>
             );
         } else if (key === 'iconName' || xUiWidget === 'icon') {
             return (

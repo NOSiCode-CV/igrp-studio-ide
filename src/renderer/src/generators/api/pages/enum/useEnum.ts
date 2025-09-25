@@ -23,7 +23,9 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
 
     const [title, setTitle] = useState('');
     const [data, setData] = useState<any>(null);
-    const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({});
+    const [tablesColumns, setTableColumns] = useState<{
+        [value: string]: IColumnsTabelProps[];
+    }>({});
 
     const validationSchema = Yup.object({
         name: Yup.string()
@@ -95,12 +97,13 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
                 })
             );
 
-            const attributes = tablesColumns.values
-                ?.filter((attr: any) => attr.name !== 'Name')
-                .map(({ type, name }: { type: string, name: string }) => ({
-                    type: type === 'text' ? 'string' : type,
-                    name,
-                })) || [];
+            const attributes =
+                tablesColumns.values
+                    ?.filter((attr: any) => attr.name !== 'Name')
+                    .map(({ type, name }: { type: string; name: string }) => ({
+                        type: type === 'text' ? 'string' : type,
+                        name,
+                    })) || [];
 
             const values = {
                 ...formik.values,
@@ -119,7 +122,9 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
 
             createGitCommit(basePath, `Add enum ${formik.values.name}`);
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('createdSuccess', { name: t('enum'), value: values.name }));
+            showSuccessToast(
+                t('createdSuccess', { name: t('enum'), value: values.name })
+            );
             handleRenameTab(currentItem.id, values.name);
         } catch (error) {
             showErrorToast(error);

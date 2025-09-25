@@ -12,7 +12,17 @@ import {
     PlusCircle,
     Server,
 } from 'lucide-react';
-import { IGRPButtonPrimitive, IGRPSelectContentPrimitive, IGRPSelectItemPrimitive, IGRPSelectPrimitive, IGRPSelectTriggerPrimitive, IGRPSelectValuePrimitive, IGRPToggleGroupItemPrimitive, IGRPToggleGroupPrimitive, IGRPTogglePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPSelectContentPrimitive,
+    IGRPSelectItemPrimitive,
+    IGRPSelectPrimitive,
+    IGRPSelectTriggerPrimitive,
+    IGRPSelectValuePrimitive,
+    IGRPToggleGroupItemPrimitive,
+    IGRPToggleGroupPrimitive,
+    IGRPTogglePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { ProjectWizard } from '@renderer/pages/project';
 import { CloneProjectModal } from '@renderer/components/git/clone-project-modal';
@@ -129,7 +139,7 @@ const ResourceSection = ({
                                 placeholder={t('orderBy')}
                             />
                         </IGRPSelectTriggerPrimitive>
-                        <IGRPSelectContentPrimitive >
+                        <IGRPSelectContentPrimitive>
                             <IGRPSelectItemPrimitive value="lastModified">
                                 {t('lastModified')}
                             </IGRPSelectItemPrimitive>

@@ -1,4 +1,8 @@
-import { IGRPCheckboxPrimitive, IGRPLabel, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCheckboxPrimitive,
+    IGRPLabel,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { SpringConfigData } from 'src/main/types';
 import {

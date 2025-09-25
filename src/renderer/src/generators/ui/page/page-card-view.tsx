@@ -1,5 +1,14 @@
 // page-card-view.tsx
-import { IGRPBadgePrimitive, IGRPButtonPrimitive, IGRPCardContentPrimitive, IGRPCardPrimitive, IGRPCollapsibleContentPrimitive, IGRPCollapsiblePrimitive, IGRPCollapsibleTriggerPrimitive, IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardPrimitive,
+    IGRPCollapsibleContentPrimitive,
+    IGRPCollapsiblePrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+    IGRPSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { ChevronRight, ComponentIcon } from 'lucide-react';
 import { PageDefinition } from './page-manager';
 import { useState } from 'react';
@@ -13,8 +22,8 @@ export interface PageCardProps {
     onDelete: (page: any) => void;
     onEdit: (page: any) => void;
     onAddComponents: (page: PageDefinition) => void;
-    openDialogNewPage?: (page: PageDefinition, isSubPage?: boolean  ) => void;
-    onDuplicate?: (page: PageDefinition) => void;   
+    openDialogNewPage?: (page: PageDefinition, isSubPage?: boolean) => void;
+    onDuplicate?: (page: PageDefinition) => void;
     setIsSubPage: (isSubPage: boolean) => void;
 }
 
@@ -200,7 +209,7 @@ export function PageCardView({
                             </div>
                         )}
                     </IGRPCollapsibleContentPrimitive>
-                </IGRPCollapsiblePrimitive  >
+                </IGRPCollapsiblePrimitive>
             </IGRPCardContentPrimitive>
         </IGRPCardPrimitive>
     );

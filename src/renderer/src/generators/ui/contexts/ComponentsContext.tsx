@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    ReactNode,
+    useCallback,
+} from 'react';
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 
@@ -9,10 +15,16 @@ interface ComponentsContextType {
     isLoading: boolean;
 }
 
-const ComponentsContext = createContext<ComponentsContextType | undefined>(undefined);
+const ComponentsContext = createContext<ComponentsContextType | undefined>(
+    undefined
+);
 
-export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [componentsRegistered, setComponentsRegistered] = useState<ComponentRegisterConfig[]>([]);
+export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({
+    children,
+}) => {
+    const [componentsRegistered, setComponentsRegistered] = useState<
+        ComponentRegisterConfig[]
+    >([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const loadRegistryComponent = useCallback(async () => {
@@ -26,7 +38,10 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
             setComponentsRegistered(components);
             return components;
         } catch (error) {
-            console.error('[Debug] ComponentsContext: Failed to load components:', error);
+            console.error(
+                '[Debug] ComponentsContext: Failed to load components:',
+                error
+            );
             return [];
         } finally {
             setIsLoading(false);
@@ -50,7 +65,9 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
 export const useComponentsContext = () => {
     const context = useContext(ComponentsContext);
     if (context === undefined) {
-        throw new Error('useComponentsContext must be used within a ComponentsProvider');
+        throw new Error(
+            'useComponentsContext must be used within a ComponentsProvider'
+        );
     }
     return context;
-}; 
+};

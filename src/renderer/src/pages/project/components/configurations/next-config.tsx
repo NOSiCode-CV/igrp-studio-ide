@@ -1,6 +1,9 @@
 'use client';
 
-import { IGRPLabelPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPLabelPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { NextConfigData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +50,9 @@ export function NextConfig({
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
+                <IGRPLabelPrimitive htmlFor="description">
+                    {t('description')}
+                </IGRPLabelPrimitive>
                 <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}

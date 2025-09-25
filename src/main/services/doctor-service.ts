@@ -1,21 +1,31 @@
-import { checkCommand, isVersionValid, parseVersion, runDockerInfoCheck } from "../helpers/doctor/doctor";
-import { toolConfig } from "../helpers/doctor/doctor-config";
-import { ToolCheck } from "../types";
+import {
+    checkCommand,
+    isVersionValid,
+    parseVersion,
+    runDockerInfoCheck,
+} from '../helpers/doctor/doctor';
+import { toolConfig } from '../helpers/doctor/doctor-config';
+import { ToolCheck } from '../types';
 
 export const DoctorService = {
-
     async run(): Promise<ToolCheck[]> {
         const results: ToolCheck[] = [];
 
         for (const tool of toolConfig) {
             const result = await checkCommand(tool.command);
 
-            const parsedVersion = result.version ? parseVersion(result.version) : undefined;
+            const parsedVersion = result.version
+                ? parseVersion(result.version)
+                : undefined;
             let success = !result.error;
 
             // Version range validation
             if (parsedVersion && tool.versionCheck) {
-                success = isVersionValid(parsedVersion, tool.versionCheck.minMajor, tool.versionCheck.maxMajor);
+                success = isVersionValid(
+                    parsedVersion,
+                    tool.versionCheck.minMajor,
+                    tool.versionCheck.maxMajor
+                );
                 if (!success) {
                     result.error = `Unsupported version: ${parsedVersion}. Required: ${tool.versionCheck.minMajor}–${tool.versionCheck.maxMajor}`;
                 }
@@ -42,6 +52,5 @@ export const DoctorService = {
         }
 
         return results;
-    }
-
-}
+    },
+};

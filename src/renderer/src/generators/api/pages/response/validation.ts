@@ -1,5 +1,5 @@
 import { httpStatusCodes } from '@renderer/constants/appConstants';
-import * as Yup from 'yup'
+import * as Yup from 'yup';
 
 export function useResponseValidation({ t }: { t: any }) {
     const validationSchema = Yup.object({
@@ -13,7 +13,6 @@ export function useResponseValidation({ t }: { t: any }) {
             .required(t('nameRequired'))
             .max(50, t('nameMaxLength')),
     });
-
 
     return validationSchema;
 }

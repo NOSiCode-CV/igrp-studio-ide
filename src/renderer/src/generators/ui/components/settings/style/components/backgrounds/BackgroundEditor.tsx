@@ -34,7 +34,11 @@ export function BackgroundEditor({
     return (
         <IGRPPopoverPrimitive>
             <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPButtonPrimitive variant="ghost" size={'icon'} onClick={onEdit}>
+                <IGRPButtonPrimitive
+                    variant="ghost"
+                    size={'icon'}
+                    onClick={onEdit}
+                >
                     <Edit2 />
                 </IGRPButtonPrimitive>
             </IGRPPopoverTriggerPrimitive>

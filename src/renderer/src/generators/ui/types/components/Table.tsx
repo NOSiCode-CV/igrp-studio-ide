@@ -23,10 +23,7 @@ import { faker } from '@faker-js/faker';
 import Droppable from '@renderer/lib/dnd/Droppable';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
-const IGRPStudioTable: React.FC<CardComponentProps> = ({
-    comp,
-    onDragEnd,
-}) => {
+const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const { children: components, componentName } = comp;
     const [columns, setColumns] = useState<StructuredComponent[]>([]);
     const [filters, setFilters] = useState<StructuredComponent[]>([]);

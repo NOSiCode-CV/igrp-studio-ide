@@ -3,7 +3,18 @@
 import { Bug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { IGRPButtonPrimitive, IGRPDrawerContentPrimitive, IGRPDrawerHeaderPrimitive, IGRPDrawerPrimitive, IGRPDrawerTitlePrimitive, IGRPDrawerTriggerPrimitive, IGRPScrollAreaPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDrawerContentPrimitive,
+    IGRPDrawerHeaderPrimitive,
+    IGRPDrawerPrimitive,
+    IGRPDrawerTitlePrimitive,
+    IGRPDrawerTriggerPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -34,7 +45,9 @@ export function DebugTerminal() {
                         </IGRPButtonPrimitive>
                     </IGRPDrawerTriggerPrimitive>
                 </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>{t('debug')}</IGRPTooltipContentPrimitive>
+                <IGRPTooltipContentPrimitive>
+                    {t('debug')}
+                </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
             <IGRPDrawerContentPrimitive
                 aria-describedby={undefined}

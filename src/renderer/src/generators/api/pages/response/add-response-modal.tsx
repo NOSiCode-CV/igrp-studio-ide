@@ -1,4 +1,9 @@
-import { IGRPButtonPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPDialogPrimitive,
     IGRPDialogClosePrimitive,
@@ -55,9 +60,10 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
             <IGRPDialogContentPrimitive>
                 <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('addResponse')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                    </IGRPDialogDescriptionPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('addResponse')}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive></IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 <form
                     onSubmit={(e) => {
@@ -71,7 +77,9 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             <IGRPCombobox
                                 options={httpStatusCodes}
                                 value={statusCode}
-                                onChange={(selected: string | string[]) => handleChangeCode(selected as string)}
+                                onChange={(selected: string | string[]) =>
+                                    handleChangeCode(selected as string)
+                                }
                                 className="w-full"
                                 placeholder={t('httpStatusCodePlaceholder')}
                             />
@@ -87,22 +95,31 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <IGRPLabel className="">{t('contentType')}</IGRPLabel>
+                            <IGRPLabel className="">
+                                {t('contentType')}
+                            </IGRPLabel>
                             <IGRPCombobox
                                 options={contentTypes}
                                 value={contentType}
-                                onChange={(value) => setContentType(value as string)}
+                                onChange={(value) =>
+                                    setContentType(value as string)
+                                }
                                 className="w-full"
                             />
                         </div>
 
                         <IGRPDialogFooterPrimitive>
                             <IGRPDialogClosePrimitive asChild>
-                                <IGRPButtonPrimitive type="button" variant="secondary">
+                                <IGRPButtonPrimitive
+                                    type="button"
+                                    variant="secondary"
+                                >
                                     {t('close')}
                                 </IGRPButtonPrimitive>
                             </IGRPDialogClosePrimitive>
-                            <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive type="submit">
+                                {t('save')}
+                            </IGRPButtonPrimitive>
                         </IGRPDialogFooterPrimitive>
                     </div>
                 </form>

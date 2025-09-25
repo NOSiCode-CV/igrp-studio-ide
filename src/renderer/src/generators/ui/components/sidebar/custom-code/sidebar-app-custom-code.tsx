@@ -192,7 +192,7 @@ const ResourceList = <
                     <IGRPSidebarGroupPrimitive>
                         <IGRPSidebarMenuPrimitive>
                             <IGRPSidebarMenuItemPrimitive key={title}>
-                                    <IGRPSidebarMenuButtonPrimitive asChild>
+                                <IGRPSidebarMenuButtonPrimitive asChild>
                                     <span className="font-medium">{title}</span>
                                 </IGRPSidebarMenuButtonPrimitive>
                                 <IGRPSidebarMenuSubPrimitive>
@@ -206,8 +206,12 @@ const ResourceList = <
                                             : !!item.id;
 
                                         return (
-                                            <IGRPSidebarMenuSubItemPrimitive key={index}>
-                                                <IGRPSidebarMenuSubButtonPrimitive asChild>
+                                            <IGRPSidebarMenuSubItemPrimitive
+                                                key={index}
+                                            >
+                                                <IGRPSidebarMenuSubButtonPrimitive
+                                                    asChild
+                                                >
                                                     <div className="flex items-center justify-between w-full group/item relative">
                                                         <span className="">
                                                             {renderItemName(
@@ -282,13 +286,17 @@ const CustomCodeMenu = () => {
                     </IGRPButtonPrimitive>
                 </IGRPDropdownMenuTriggerPrimitive>
                 <IGRPDropdownMenuContentPrimitive className="w-48">
-                    <IGRPDropdownMenuItemPrimitive onClick={() => setOpenFnc(true)}>
+                    <IGRPDropdownMenuItemPrimitive
+                        onClick={() => setOpenFnc(true)}
+                    >
                         <div className="flex flex-1 justify-between items-center">
                             <span>Function</span>
                             <ChevronRight className="w-8 h-8" />
                         </div>
                     </IGRPDropdownMenuItemPrimitive>
-                    <IGRPDropdownMenuItemPrimitive onClick={() => setOpenState(true)}>
+                    <IGRPDropdownMenuItemPrimitive
+                        onClick={() => setOpenState(true)}
+                    >
                         <div className="flex flex-1 justify-between items-center">
                             <span>State</span>
                             <ChevronRight className="w-8 h-8" />

@@ -367,7 +367,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                             {/* Descritpion */}
                             <div className="flex flex-col gap-2">
-                                <IGRPLabelPrimitive>{t('description')}</IGRPLabelPrimitive>
+                                <IGRPLabelPrimitive>
+                                    {t('description')}
+                                </IGRPLabelPrimitive>
                                 <IGRPInputText
                                     type="text"
                                     name="description"

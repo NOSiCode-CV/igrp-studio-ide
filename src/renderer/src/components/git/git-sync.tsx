@@ -1,5 +1,10 @@
 import { RefreshCw } from 'lucide-react';
-import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import AlertDialogSync from './alert-dialog';
 import { useState } from 'react';
@@ -7,7 +12,7 @@ import useToast from '../../hooks/useToast';
 import { useGit } from '@renderer/hooks/use-git';
 import { useSelector } from 'react-redux';
 import { RootState } from '@renderer/redux';
-import { useTranslation } from 'react-i18next';   
+import { useTranslation } from 'react-i18next';
 import { RemoteUrlDialog } from './remote-url-dialog';
 
 const SyncButton = ({ basePath }: { basePath: string }) => {
@@ -20,31 +25,31 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
     const { showErrorToast } = useToast();
 
     const handleSync = async () => {
-      setIsSyncing(true);
-      try {
-          await syncChanges(basePath, activeBranch);
-      } catch (error: any) {
-          if (error.name === 'NO_REMOTE_CONFIGURED') {
-              setShowRemoteDialog(true);
-          } else {
-              showErrorToast(error.message || t('failedSyncChanges'));
-          }
-      } finally {
-          setIsSyncing(false);
-          setShowConfirm(false);
-      }
+        setIsSyncing(true);
+        try {
+            await syncChanges(basePath, activeBranch);
+        } catch (error: any) {
+            if (error.name === 'NO_REMOTE_CONFIGURED') {
+                setShowRemoteDialog(true);
+            } else {
+                showErrorToast(error.message || t('failedSyncChanges'));
+            }
+        } finally {
+            setIsSyncing(false);
+            setShowConfirm(false);
+        }
     };
 
     const handleAddRemote = async (remoteUrl: string) => {
-      try {
-        await window.electron.ipcRenderer.invoke('add-git-remote', {
-          projectPath: basePath,
-          remoteUrl,
-        });
-        handleSync();
-      } catch (error: any) {
-        showErrorToast(t('failedAddRemoteInvalidUrl'));
-      }
+        try {
+            await window.electron.ipcRenderer.invoke('add-git-remote', {
+                projectPath: basePath,
+                remoteUrl,
+            });
+            handleSync();
+        } catch (error: any) {
+            showErrorToast(t('failedAddRemoteInvalidUrl'));
+        }
     };
 
     return (
@@ -59,8 +64,8 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
                     >
                         <RefreshCw
                             className={cn(
-                              'h-4 w-4',
-                              isSyncing && 'animate-spin'
+                                'h-4 w-4',
+                                isSyncing && 'animate-spin'
                             )}
                         />
                         {isSyncing && t('syncing')}

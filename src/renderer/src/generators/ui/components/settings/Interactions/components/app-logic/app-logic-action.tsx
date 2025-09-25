@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { IGRPButtonPrimitive, IGRPInputPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPInputPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPSelectPrimitive,
@@ -294,7 +298,7 @@ export function AppLogicAction({
         }
     };
 
-   /*  const getSelectedEnvironment = (): AppLogicEnvironment | undefined => {
+    /*  const getSelectedEnvironment = (): AppLogicEnvironment | undefined => {
         return environments.find((env) => env.id === selectedEnvironmentId);
     }; */
 
@@ -389,10 +393,16 @@ export function AppLogicAction({
                 onValueChange={setActiveTab}
                 value={activeTab}
             >
-                <IGRPTabsListPrimitive   className="grid w-full grid-cols-3">
-                    <IGRPTabsTriggerPrimitive value="config">Configuration</IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="headers">Headers</IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="preview">Preview</IGRPTabsTriggerPrimitive>
+                <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
+                    <IGRPTabsTriggerPrimitive value="config">
+                        Configuration
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="headers">
+                        Headers
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="preview">
+                        Preview
+                    </IGRPTabsTriggerPrimitive>
                 </IGRPTabsListPrimitive>
 
                 <IGRPTabsContentPrimitive value="config" className="space-y-4">
@@ -473,7 +483,7 @@ export function AppLogicAction({
                                     value={selectedApplicationTag}
                                     onValueChange={handleApplicationSelect}
                                 >
-                                    <IGRPSelectTriggerPrimitive className='w-full truncate'>
+                                    <IGRPSelectTriggerPrimitive className="w-full truncate">
                                         <IGRPSelectValuePrimitive placeholder="Select application" />
                                     </IGRPSelectTriggerPrimitive>
                                     <IGRPSelectContentPrimitive>
@@ -503,7 +513,10 @@ export function AppLogicAction({
                                         value={selectedEndpointId}
                                         onValueChange={handleEndpointSelect}
                                     >
-                                        <IGRPSelectTriggerPrimitive className='w-full truncate' disabled>
+                                        <IGRPSelectTriggerPrimitive
+                                            className="w-full truncate"
+                                            disabled
+                                        >
                                             <IGRPSelectValuePrimitive placeholder="Select endpoint" />
                                         </IGRPSelectTriggerPrimitive>
                                         <IGRPSelectContentPrimitive>

@@ -1,4 +1,9 @@
-import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -37,7 +42,7 @@ const SectionTool = ({ onClickAddControl }: RowOptionsProps) => {
                         <Plus className="h-7 w-7" />
                     </IGRPButtonPrimitive>
                 </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive    >
+                <IGRPTooltipContentPrimitive>
                     <p>{t('addNewRowBottom')}</p>
                 </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>

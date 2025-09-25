@@ -257,7 +257,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                 <IGRPTableHeaderPrimitive>
                     <IGRPTableRowPrimitive>
                         {columns.map(({ name, width }, index) => (
-                            <IGRPTableHeadPrimitive style={{ width }} key={index}>
+                            <IGRPTableHeadPrimitive
+                                style={{ width }}
+                                key={index}
+                            >
                                 {index === 0 ? (
                                     <span className="flex items-center">
                                         <button className="me-1" disabled>
@@ -458,7 +461,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle label type
         if (type === 'label') {
             return (
-                <IGRPLabelPrimitive htmlFor={`${key}_${index}`}>{row?.[key] || ''}</IGRPLabelPrimitive>
+                <IGRPLabelPrimitive htmlFor={`${key}_${index}`}>
+                    {row?.[key] || ''}
+                </IGRPLabelPrimitive>
             );
         }
 
@@ -613,7 +618,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                         <div className="flex">
                                             {index2 === 0 && (
                                                 <button
-                                                    className={cn("opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0", className)}
+                                                    className={cn(
+                                                        'opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0',
+                                                        className
+                                                    )}
                                                     {...provided.dragHandleProps}
                                                 >
                                                     <GripVertical className="h-4 w-4 text-muted-foreground" />

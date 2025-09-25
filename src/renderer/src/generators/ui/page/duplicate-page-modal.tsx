@@ -1,4 +1,11 @@
-import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +54,6 @@ export function DuplicatePageModal({
     onConfirm,
     pageToDuplicate,
 }: DuplicatePageModalProps) {
-  
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { showErrorToast, showSuccessToast } = useToast();
@@ -66,9 +72,7 @@ export function DuplicatePageModal({
         name: originalContent?.pageName
             ? `${originalContent.pageName}Copy`
             : '',
-        path: originalContent?.path
-            ? `${originalContent.path}-copy`
-            : '',
+        path: originalContent?.path ? `${originalContent.path}-copy` : '',
         pagePath: originalContent?.pagePath || '',
         pageName: originalContent?.pageName
             ? `${originalContent.pageName}Copy`
@@ -108,7 +112,7 @@ export function DuplicatePageModal({
                           pageName: values.name,
                           path: values.path,
                           description: values.description,
-                          id: getId()
+                          id: getId(),
                       } as PageConfig)
                     : ({
                           // Include all other properties from original
@@ -118,7 +122,7 @@ export function DuplicatePageModal({
                           id: getId(),
                       } as ComponentConfig);
 
-                console.log(config)
+                console.log(config);
 
                 const { error } = await window.engine.createPage(
                     config,
@@ -242,7 +246,11 @@ export function DuplicatePageModal({
                         )}
                     </div>
                     <IGRPDialogFooterPrimitive className="flex justify-between">
-                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
+                        <IGRPButtonPrimitive
+                            type="button"
+                            variant="ghost"
+                            onClick={onClose}
+                        >
                             {t('cancel')}
                         </IGRPButtonPrimitive>
                         <IGRPButtonPrimitive

@@ -1,7 +1,12 @@
-
 import { PageCardProps } from './page-card-view';
 import { useTranslation } from 'react-i18next';
-import { IGRPButtonPrimitive, IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     Component,
     Edit,
@@ -37,12 +42,19 @@ export const PageActionMenu = ({
                 </IGRPButtonPrimitive>
             </IGRPDropdownMenuTriggerPrimitive>
             <IGRPDropdownMenuContentPrimitive align="end">
-                <IGRPDropdownMenuItemPrimitive onClick={onEdit}><Edit/>{t('edit')}</IGRPDropdownMenuItemPrimitive>
-                <IGRPDropdownMenuItemPrimitive onClick={() => onDuplicate?.(page)}>
+                <IGRPDropdownMenuItemPrimitive onClick={onEdit}>
+                    <Edit />
+                    {t('edit')}
+                </IGRPDropdownMenuItemPrimitive>
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => onDuplicate?.(page)}
+                >
                     <Copy />
                     {t('duplicate')}
                 </IGRPDropdownMenuItemPrimitive>
-                <IGRPDropdownMenuItemPrimitive onClick={() => onAddComponents(page)}>
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => onAddComponents(page)}
+                >
                     <Component />
                     {t('addComponents')}
                 </IGRPDropdownMenuItemPrimitive>

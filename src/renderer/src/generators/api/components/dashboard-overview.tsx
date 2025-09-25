@@ -1,7 +1,11 @@
 'use client';
 
 import { useTabs } from '@renderer/components/navigation/TabContext';
-import { IGRPCardPrimitive, IGRPCardContentPrimitive, IGRPCardHeaderPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { OPTION_TYPE, OptionType } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { Activity, Box, Database, FileText, Plus } from 'lucide-react';

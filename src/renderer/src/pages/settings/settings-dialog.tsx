@@ -81,7 +81,9 @@ export function SettingsDialog() {
                         </IGRPButtonPrimitive>
                     </IGRPDialogTriggerPrimitive>
                 </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>{t('settings')}</IGRPTooltipContentPrimitive>
+                <IGRPTooltipContentPrimitive>
+                    {t('settings')}
+                </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
             <IGRPDialogContentPrimitive className="overflow-hidden p-0 md:max-h-[500px] sm:max-w-[600px] md:max-w-[700px] max-w-4xl">
                 <IGRPDialogHeaderPrimitive className="pb-3">
@@ -89,17 +91,22 @@ export function SettingsDialog() {
                         {t('settings')}
                     </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive className="sr-only">
-                       {t('customizeSettingsHere')}
+                        {t('customizeSettingsHere')}
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 <IGRPSidebarProviderPrimitive className="items-start">
-                    <IGRPSidebarPrimitive collapsible="none" className="hidden md:flex">
+                    <IGRPSidebarPrimitive
+                        collapsible="none"
+                        className="hidden md:flex"
+                    >
                         <IGRPSidebarContentPrimitive>
                             <IGRPSidebarGroupPrimitive>
                                 <IGRPSidebarGroupContentPrimitive>
                                     <IGRPSidebarMenuPrimitive>
                                         {data.nav.map((item) => (
-                                            <IGRPSidebarMenuItemPrimitive key={item.name}>
+                                            <IGRPSidebarMenuItemPrimitive
+                                                key={item.name}
+                                            >
                                                 <IGRPSidebarMenuButtonPrimitive
                                                     asChild
                                                     isActive={
@@ -125,7 +132,7 @@ export function SettingsDialog() {
                     </IGRPSidebarPrimitive>
 
                     <main className="flex h-[480px] flex-1 flex-col">
-                        <IGRPScrollAreaPrimitive className='h-full'>
+                        <IGRPScrollAreaPrimitive className="h-full">
                             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                                 <div className="flex items-center gap-2 px-4">
                                     <IGRPBreadcrumbPrimitive>

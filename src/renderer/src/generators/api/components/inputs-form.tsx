@@ -1,4 +1,9 @@
-import { IGRPCheckboxPrimitive, IGRPCombobox, IGRPLabelPrimitive, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCheckboxPrimitive,
+    IGRPCombobox,
+    IGRPLabelPrimitive,
+    IGRPSwitchPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 
 import { LabelRequired } from '@renderer/components/label-required';
@@ -130,7 +135,11 @@ export const CheckboxInput = ({
     error,
 }: CheckboxProps) => (
     <div className="flex flex-1 gap-2">
-        <IGRPCheckboxPrimitive name={id} checked={value} onCheckedChange={onChange} />
+        <IGRPCheckboxPrimitive
+            name={id}
+            checked={value}
+            onCheckedChange={onChange}
+        />
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
@@ -157,7 +166,11 @@ export const SwitchInput = ({
         ) : (
             <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
         )}
-        <IGRPSwitchPrimitive name={id} checked={value} onCheckedChange={onChange} />
+        <IGRPSwitchPrimitive
+            name={id}
+            checked={value}
+            onCheckedChange={onChange}
+        />
         {error && isTouched && (
             <p className="text-xs text-destructive">{error}</p>
         )}

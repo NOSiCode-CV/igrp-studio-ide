@@ -2,7 +2,16 @@ import { useMemo, useState } from 'react';
 import { icons } from 'lucide-react';
 import { getLabel } from '@renderer/utils';
 import { useDebounce } from 'use-debounce';
-import { IGRPInputSearch, IGRPPopoverContentPrimitive, IGRPPopoverPrimitive, IGRPPopoverTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipProviderPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPInputSearch,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface IconBrowserProps {
@@ -42,7 +51,7 @@ const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                         {SelectedIconComp && <SelectedIconComp />}
                         {selectedIcon || 'Select Icon'}
                     </IGRPButtonPrimitive>
-                    </IGRPPopoverTriggerPrimitive>
+                </IGRPPopoverTriggerPrimitive>
 
                 <IGRPPopoverContentPrimitive className="w-[435px] z-[60]">
                     <IGRPInputSearch
@@ -62,7 +71,9 @@ const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                                         className="p-2 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded"
                                     >
                                         <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IconComponent
                                                     onClick={() =>
                                                         handleIconClick(

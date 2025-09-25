@@ -105,40 +105,45 @@ export default function DependencySelector({
                         className="h-9"
                     />
                     {open && (
-                        
                         <IGRPCommandListPrimitive className="max-h-[200px] overflow-auto">
-                            <IGRPCommandEmptyPrimitive>{t('noDependencies')}</IGRPCommandEmptyPrimitive>
+                            <IGRPCommandEmptyPrimitive>
+                                {t('noDependencies')}
+                            </IGRPCommandEmptyPrimitive>
                             <IGRPCommandGroupPrimitive>
-                                {availableForSelection.map((dependency, index) => (
-                                    <IGRPCommandItemPrimitive
-                                        key={index}
-                                        onSelect={() =>
-                                            handleAddDependency(dependency)
-                                        }
-                                        className="flex items-center justify-between p-2 cursor-pointer"
-                                    >
-                                        <div>
-                                            <div className="font-medium">
-                                                {getDependencyFullName(
-                                                    dependency
-                                                )}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {dependency.name} (
-                                                {dependency.scope})
-                                            </div>
-                                        </div>
-                                        <button
-                                            className="text-gray-500 hover:text-gray-700"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddDependency(dependency);
-                                            }}
+                                {availableForSelection.map(
+                                    (dependency, index) => (
+                                        <IGRPCommandItemPrimitive
+                                            key={index}
+                                            onSelect={() =>
+                                                handleAddDependency(dependency)
+                                            }
+                                            className="flex items-center justify-between p-2 cursor-pointer"
                                         >
-                                            <Plus className="h-4 w-4" />
-                                        </button>
-                                    </IGRPCommandItemPrimitive>
-                                ))}
+                                            <div>
+                                                <div className="font-medium">
+                                                    {getDependencyFullName(
+                                                        dependency
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {dependency.name} (
+                                                    {dependency.scope})
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="text-gray-500 hover:text-gray-700"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAddDependency(
+                                                        dependency
+                                                    );
+                                                }}
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </button>
+                                        </IGRPCommandItemPrimitive>
+                                    )
+                                )}
                             </IGRPCommandGroupPrimitive>
                         </IGRPCommandListPrimitive>
                     )}
@@ -161,7 +166,7 @@ export default function DependencySelector({
                     </IGRPBadgePrimitive>
                 ))}
                 <p className="text-sm text-gray-500 mt-2">
-                {t('igrpStudioInfo')}
+                    {t('igrpStudioInfo')}
                 </p>
             </div>
         </div>

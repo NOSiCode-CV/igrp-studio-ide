@@ -13,7 +13,10 @@ import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 import { Footer } from './components/footer';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
-import { IGRPSidebarInsetPrimitive, IGRPSidebarProviderPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPSidebarInsetPrimitive,
+    IGRPSidebarProviderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Toaster } from '@igrp/igrp-framework-react-design-system/dist/components/primitives/sonner';
 import { AppIGRPSidebar } from './components/app-sidebar';
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {  IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { FormList } from '../../../../components/form-list';
 import {
     IGRPTabsPrimitive,
@@ -175,7 +175,6 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         };
 
         updateFormik(content);
-
     }, [data]);
 
     const getContentToSchemaProps = () => {

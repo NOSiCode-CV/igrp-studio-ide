@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPDialogPrimitive,
     IGRPDialogTitlePrimitive,
@@ -32,16 +38,24 @@ export function JSONSchemaModal({ generateJSONSchema }: JSONSchemaModalProps) {
             <IGRPTooltipPrimitive>
                 <IGRPTooltipTriggerPrimitive asChild>
                     <IGRPDialogTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive variant="ghost" size={'sm'} className="h-6 w-6">
+                        <IGRPButtonPrimitive
+                            variant="ghost"
+                            size={'sm'}
+                            className="h-6 w-6"
+                        >
                             <FileJson className="h-4 w-4" />
                         </IGRPButtonPrimitive>
                     </IGRPDialogTriggerPrimitive>
                 </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>{t('jsonSchemaPreview')}</IGRPTooltipContentPrimitive>
+                <IGRPTooltipContentPrimitive>
+                    {t('jsonSchemaPreview')}
+                </IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
             <IGRPDialogContentPrimitive className="md:max-h-[70vh] md:max-w-[700px] max-w-[800px]">
                 <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('jsonSchemaPreview')}</IGRPDialogTitlePrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('jsonSchemaPreview')}
+                    </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive>
                         {t('jsonSchemaPreview')}
                     </IGRPDialogDescriptionPrimitive>

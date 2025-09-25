@@ -1,4 +1,7 @@
-import { IGRPCardContentPrimitive, IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCardContentPrimitive,
+    IGRPCardPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import NavigationBar from '../../components/navigation-bar';
 import { TextInput } from '../../components/inputs-form';
 import { FormList } from '../../../../components/form-list';

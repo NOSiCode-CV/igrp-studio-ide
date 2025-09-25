@@ -17,7 +17,6 @@ import { useDocker } from '@renderer/hooks/use-docker';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useTranslation } from 'react-i18next';
 
-
 interface WorkspaceConfigProps {
     workspace: IWorkspace;
 }
@@ -25,7 +24,7 @@ interface WorkspaceConfigProps {
 export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
     const [copied, setCopied] = useState(false);
 
-    const { fileContent, services, loadComposeFile } = useDocker({workspace});
+    const { fileContent, services, loadComposeFile } = useDocker({ workspace });
     const [content, setContent] = useState(fileContent);
 
     const {
@@ -58,17 +57,17 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
             <IGRPCard>
                 <IGRPCardHeader className="compact-card-header">
                     <IGRPCardTitle className="text-sm">
-                    {t('dockerComposeConfiguration')}
+                        {t('dockerComposeConfiguration')}
                     </IGRPCardTitle>
                     <IGRPCardDescription className="text-xs">
-                    {t('manageComposeFile')}
+                        {t('manageComposeFile')}
                     </IGRPCardDescription>
                 </IGRPCardHeader>
                 <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="border rounded-md overflow-hidden">
                         <div className="bg-muted/30 border-b py-1.5 flex items-center justify-between">
                             <div className="text-xs font-medium px-3">
-                            {t('igrpComposeYml')}
+                                {t('igrpComposeYml')}
                             </div>
                             <IGRPButtonPrimitive
                                 size="sm"

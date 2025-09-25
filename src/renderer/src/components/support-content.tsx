@@ -1,9 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import {
-    Headset,
-} from 'lucide-react';
+import { Headset } from 'lucide-react';
 import {
     IGRPTooltipPrimitive,
     IGRPTooltipContentPrimitive,
@@ -62,7 +60,9 @@ export default function SupportContent({}: SupportContentProps) {
                     <span className="h-6 w-6">
                         <Headset />
                     </span>
-                    <h2 className="text-base font-semibold">{t('supportTitle')}</h2>
+                    <h2 className="text-base font-semibold">
+                        {t('supportTitle')}
+                    </h2>
                 </div>
                 <div className="px-1">
                     <p className="text-muted-foreground">
@@ -76,7 +76,9 @@ export default function SupportContent({}: SupportContentProps) {
                                         variant={'ghost'}
                                         size={'icon'}
                                         className={channel.iconClassName}
-                                        aria-label={t('supportContactVia', { channel: channel.name })}
+                                        aria-label={t('supportContactVia', {
+                                            channel: channel.name,
+                                        })}
                                         onClick={() =>
                                             handleClick(channel?.href)
                                         }
@@ -92,7 +94,9 @@ export default function SupportContent({}: SupportContentProps) {
                                     </IGRPButtonPrimitive>
                                 </IGRPTooltipTriggerPrimitive>
                                 <IGRPTooltipContentPrimitive>
-                                    {t('supportContactVia', { channel: channel.name })}
+                                    {t('supportContactVia', {
+                                        channel: channel.name,
+                                    })}
                                 </IGRPTooltipContentPrimitive>
                             </IGRPTooltipPrimitive>
                         ))}

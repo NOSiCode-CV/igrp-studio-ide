@@ -34,4 +34,9 @@ async function closeKnexConnection(knex: any) {
     await knex.destroy();
 }
 
-export { createKnexConnection, closeKnexConnection, getTables, getTableStructure }
+export {
+    createKnexConnection,
+    closeKnexConnection,
+    getTables,
+    getTableStructure,
+};

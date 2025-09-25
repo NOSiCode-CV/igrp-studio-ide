@@ -52,7 +52,6 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
     const { t } = useTranslation();
 
-
     const {
         actions: { updateWorkspace, deleteWorkspace },
     } = useWorkspace();
@@ -72,7 +71,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
             dispatch(setWorkspace(uodatedWorkspace));
 
-            showSuccessToast(`${t('workspace')} "${workspaceName}" ${t('updated')}`);
+            showSuccessToast(
+                `${t('workspace')} "${workspaceName}" ${t('updated')}`
+            );
 
             setIsSaving(false);
         }, 800);
@@ -102,12 +103,14 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         {t('workspaceInformation')}
                     </IGRPCardTitle>
                     <IGRPCardDescription className="text-xs">
-                    {t('workspaceInformation')}
+                        {t('workspaceInformation')}
                     </IGRPCardDescription>
                 </IGRPCardHeader>
                 <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="workspace-id">{t('workspaceId')}</IGRPLabel>
+                        <IGRPLabel htmlFor="workspace-id">
+                            {t('workspaceId')}
+                        </IGRPLabel>
                         <div className="flex space-x-2">
                             <IGRPInputText
                                 id="workspace-id"
@@ -129,12 +132,14 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             </IGRPButtonPrimitive>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
-                                {t('workspaceIdDescription')}
+                            {t('workspaceIdDescription')}
                         </p>
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="workspace-name">{t('nameDescription')}</IGRPLabel>
+                        <IGRPLabel htmlFor="workspace-name">
+                            {t('nameDescription')}
+                        </IGRPLabel>
                         <IGRPInputText
                             id="workspace-name"
                             value={workspaceName}
@@ -186,17 +191,21 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
             <IGRPCard>
                 <IGRPCardHeader className="compact-card-header">
-                    <IGRPCardTitle className="text-sm">{t('advancedSettings')}</IGRPCardTitle>
+                    <IGRPCardTitle className="text-sm">
+                        {t('advancedSettings')}
+                    </IGRPCardTitle>
                     <IGRPCardDescription className="text-xs">
-                             {t('configureAdvancedOptions')}
+                        {t('configureAdvancedOptions')}
                     </IGRPCardDescription>
                 </IGRPCardHeader>
                 <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="flex items-center justify-between">
                         <div>
-                            <div className="text-xs font-medium">{t('autoSave')}</div>
+                            <div className="text-xs font-medium">
+                                {t('autoSave')}
+                            </div>
                             <div className="text-sm text-muted-foreground">
-                              {t('autoSaveChanges')}
+                                {t('autoSaveChanges')}
                             </div>
                         </div>
                         <IGRPSwitch name="auto-save" defaultChecked />
@@ -207,10 +216,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-xs font-medium">
-                            {t('enableVersioning')}
+                                {t('enableVersioning')}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                             {t('trackChanges')}
+                                {t('trackChanges')}
                             </div>
                         </div>
                         <IGRPSwitch name="enable-versioning" defaultChecked />
@@ -221,10 +230,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-xs font-medium">
-                            {t('experimentalFeatures')} 
+                                {t('experimentalFeatures')}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                            {t('enableExperimentalFeatures')}
+                                {t('enableExperimentalFeatures')}
                             </div>
                         </div>
                         <IGRPSwitch name="experimental-features" />
@@ -245,10 +254,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         <div className="flex items-start justify-between">
                             <div>
                                 <h4 className="text-xs font-medium">
-                                {t('deleteWorkspace')}
+                                    {t('deleteWorkspace')}
                                 </h4>
                                 <p className="text-sm text-muted-foreground">
-                                {t('deleteWarning')}
+                                    {t('deleteWarning')}
                                 </p>
                             </div>
                             <IGRPModalDialog>
@@ -269,7 +278,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                             {t('deleteWorkspace')}
                                         </IGRPModalDialogTitle>
                                         <IGRPModalDialogDescription className="text-xs">
-                                             {t('cannotUndoAction')}
+                                            {t('cannotUndoAction')}
                                             <span className="font-medium">
                                                 {' '}
                                                 {workspace.name}{' '}
@@ -287,7 +296,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                             </div>
                                             <div className="text-sm mt-1">
                                                 <span className="text-muted-foreground">
-                                                {t('id')}  {' '}
+                                                    {t('id')}{' '}
                                                 </span>
                                                 <span className="font-mono">
                                                     {workspace.id}
@@ -308,7 +317,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         >
                                             {isDeleting
                                                 ? t('deleting')
-                                                :  t('deleteWorkspace')}
+                                                : t('deleteWorkspace')}
                                         </IGRPButtonPrimitive>
                                     </IGRPModalDialogFooter>
                                 </IGRPModalDialogContent>

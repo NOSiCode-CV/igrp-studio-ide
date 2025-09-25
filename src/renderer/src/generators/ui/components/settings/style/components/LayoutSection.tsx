@@ -9,7 +9,11 @@ import {
 } from 'lucide-react';
 import { FlexControls } from './FlexControls';
 import { GridControls } from './GridControls';
-import { IGRPTabsPrimitive, IGRPTabsListPrimitive, IGRPTabsTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTabsPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { LayoutStyle, SectionProps } from '../types';
 
 export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
@@ -214,7 +218,10 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                     Display
                 </label>
 
-                <IGRPTabsPrimitive   defaultValue="block" value={layoutStyle.type}>
+                <IGRPTabsPrimitive
+                    defaultValue="block"
+                    value={layoutStyle.type}
+                >
                     <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
                         {layoutTypes.main.map((option) => (
                             <IGRPTabsTriggerPrimitive

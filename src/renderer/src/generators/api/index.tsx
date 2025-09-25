@@ -9,7 +9,7 @@ interface PageBuilderProps {
 const Index = ({ basePath, currentItem }: PageBuilderProps) => {
     return (
         <TabProvider>
-            <TabManager basePath={basePath} currentItem={currentItem}/>
+            <TabManager basePath={basePath} currentItem={currentItem} />
         </TabProvider>
     );
 };

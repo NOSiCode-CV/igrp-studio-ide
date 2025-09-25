@@ -12,8 +12,12 @@ const SHORTCUTS = {
     DELETE: 'Delete',
     CLOSE_TAB: isMac ? '⌘ W' : 'Ctrl+W',
     FORCE_QUIT_TAB: isMac ? '⌘ ⌥ W' : 'Ctrl+Alt+W',
-    SWITCH_TO_NEXT_TAB: isMac ? ['⌘ ⌥ →', '⌘ ⇧ ]'] : ['Ctrl+Alt+Right', 'Ctrl+Shift+]'],
-    SWITCH_TO_PREVIOUS_TAB: isMac ? ['⌘ ⌥ ←', '⌘ ⇧ ['] : ['Ctrl+Alt+Left', 'Ctrl+Shift+['],
+    SWITCH_TO_NEXT_TAB: isMac
+        ? ['⌘ ⌥ →', '⌘ ⇧ ]']
+        : ['Ctrl+Alt+Right', 'Ctrl+Shift+]'],
+    SWITCH_TO_PREVIOUS_TAB: isMac
+        ? ['⌘ ⌥ ←', '⌘ ⇧ [']
+        : ['Ctrl+Alt+Left', 'Ctrl+Shift+['],
     JUMP_TO_SPECIFIC_TAB: isMac ? '⌘ 1-8' : 'Ctrl+1-8',
     JUMP_TO_LAST_TAB: isMac ? '⌘ 9' : 'Ctrl+9',
 
@@ -34,7 +38,7 @@ enum KeyboardKey {
     find = 'f',
     model = 'm',
     endpoint = 'e',
-    dto = 'o'
+    dto = 'o',
 }
 
-export { KeyboardKey, SHORTCUTS }
+export { KeyboardKey, SHORTCUTS };

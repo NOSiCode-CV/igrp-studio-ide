@@ -9,7 +9,10 @@ import {
     Stethoscope,
 } from 'lucide-react';
 
-import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTooltipPrimitive,
     IGRPTooltipProviderPrimitive,
@@ -89,7 +92,7 @@ export function Footer() {
     const simulateError = () => {
         throw new Error('This is a simulated error from the renderer process.');
     };
-    
+
     return (
         <IGRPTooltipProviderPrimitive>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
@@ -129,7 +132,9 @@ export function Footer() {
                                 <Stethoscope className="text-muted-foreground" />
                             </IGRPButtonPrimitive>
                         </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">Doctor</IGRPTooltipContentPrimitive>
+                        <IGRPTooltipContentPrimitive side="top">
+                            Doctor
+                        </IGRPTooltipContentPrimitive>
                     </IGRPTooltipPrimitive>
 
                     <DebugTerminal />
@@ -170,6 +175,6 @@ export function Footer() {
                     <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
-        </IGRPTooltipProviderPrimitive >
+        </IGRPTooltipProviderPrimitive>
     );
 }

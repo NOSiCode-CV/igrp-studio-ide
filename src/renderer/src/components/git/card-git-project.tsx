@@ -1,5 +1,8 @@
 import { Repository } from 'src/main/types';
-import { IGRPButtonPrimitive, IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPCardPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { GitFork } from 'lucide-react';
 import useToast from '../../hooks/useToast';
 import { useTranslation } from 'react-i18next';

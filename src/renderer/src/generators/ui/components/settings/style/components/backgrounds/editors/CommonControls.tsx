@@ -33,9 +33,7 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
                     </select>
                 </div>
                 <div className="space-y-0.5">
-                    <label className="text-xs text-gray-500">
-                        Position
-                    </label>
+                    <label className="text-xs text-gray-500">Position</label>
                     <select
                         value={background.position}
                         onChange={(e) =>
@@ -73,9 +71,7 @@ export function CommonControls({ background, onChange }: CommonControlsProps) {
                     </select>
                 </div>
                 <div className="space-y-0.5">
-                    <label className="text-xs text-gray-500">
-                        Attachment
-                    </label>
+                    <label className="text-xs text-gray-500">Attachment</label>
                     <select
                         value={background.attachment}
                         onChange={(e) =>

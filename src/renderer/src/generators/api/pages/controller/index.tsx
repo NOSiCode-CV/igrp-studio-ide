@@ -3,7 +3,7 @@ import {
     IGRPCardPrimitive,
     IGRPCardContentPrimitive,
     IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive ,
+    IGRPCardHeaderPrimitive,
     IGRPCardTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import {
@@ -94,7 +94,9 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
             <div className="space-y-4 p-4">
                 <IGRPCardPrimitive>
                     <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive>{t('definition')}</IGRPCardTitlePrimitive>
+                        <IGRPCardTitlePrimitive>
+                            {t('definition')}
+                        </IGRPCardTitlePrimitive>
                         <IGRPCardDescriptionPrimitive>
                             {t('controllerDefinition')}
                         </IGRPCardDescriptionPrimitive>

@@ -1,5 +1,18 @@
 import { Plus, Trash2, Edit2, Mouse } from 'lucide-react';
-import { IGRPButtonPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuTriggerPrimitive, IGRPDialogTitlePrimitive, IGRPSidebarInsetPrimitive, IGRPScrollAreaPrimitive, IGRPDialogPrimitive, IGRPDialogContentPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPSidebarInsetPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
@@ -527,7 +540,9 @@ const InteractionEditor = ({
                     <IGRPDialogHeaderPrimitive className="p-4">
                         <div className="flex flex-1 justify-between">
                             <div className="space-y-2">
-                                    <IGRPDialogTitlePrimitive>Edit Interaction</IGRPDialogTitlePrimitive>
+                                <IGRPDialogTitlePrimitive>
+                                    Edit Interaction
+                                </IGRPDialogTitlePrimitive>
                                 <IGRPDialogDescriptionPrimitive>
                                     Configure what happens when this interaction
                                     is triggered

@@ -1,12 +1,20 @@
 import { File, Folder, ChevronRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
-
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
-import { IGRPCollapsibleContentPrimitive, IGRPCollapsiblePrimitive, IGRPCollapsibleTriggerPrimitive, IGRPScrollAreaPrimitive, IGRPSidebarMenuButtonPrimitive, IGRPSidebarMenuItemPrimitive, IGRPSidebarMenuPrimitive, IGRPSidebarMenuSubPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCollapsibleContentPrimitive,
+    IGRPCollapsiblePrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarMenuSubPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface FileExplorerSidebarProps {
     basePath: string;
@@ -95,7 +103,9 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
                         </IGRPCollapsibleContentPrimitive>
                     </IGRPCollapsiblePrimitive>
                 ) : (
-                    <IGRPSidebarMenuButtonPrimitive onClick={() => handleFileSelect(item)}>
+                    <IGRPSidebarMenuButtonPrimitive
+                        onClick={() => handleFileSelect(item)}
+                    >
                         <div className="flex items-center gap-2">
                             <File className="w-4 h-4" />
                             <span>{item.componentName || item.label}</span>
@@ -108,7 +118,9 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
 
     return (
         <IGRPScrollAreaPrimitive className="flex-1 p-2">
-            <IGRPSidebarMenuPrimitive>{renderTree(fileTree)}</IGRPSidebarMenuPrimitive>
+            <IGRPSidebarMenuPrimitive>
+                {renderTree(fileTree)}
+            </IGRPSidebarMenuPrimitive>
         </IGRPScrollAreaPrimitive>
     );
 };

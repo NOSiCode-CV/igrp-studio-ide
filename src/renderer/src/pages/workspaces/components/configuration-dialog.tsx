@@ -1,7 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { IGRPBadgePrimitive, IGRPButtonPrimitive, IGRPCheckboxPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPScrollAreaPrimitive, IGRPSelectContentPrimitive, IGRPSelectItemPrimitive, IGRPSelectPrimitive, IGRPSelectTriggerPrimitive, IGRPSelectValuePrimitive, IGRPSwitchPrimitive, IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPCheckboxPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPSelectContentPrimitive,
+    IGRPSelectItemPrimitive,
+    IGRPSelectPrimitive,
+    IGRPSelectTriggerPrimitive,
+    IGRPSelectValuePrimitive,
+    IGRPSwitchPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, X } from 'lucide-react';
@@ -414,7 +436,9 @@ export function ConfigurationDialog({
                     className="flex-1 overflow-hidden flex flex-col"
                 >
                     <IGRPTabsListPrimitive className="grid grid-cols-4 mb-4 w-full">
-                        <IGRPTabsTriggerPrimitive value="basic">{t('basic')}</IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="basic">
+                            {t('basic')}
+                        </IGRPTabsTriggerPrimitive>
                         <IGRPTabsTriggerPrimitive value="config">
                             {t('configuration')}
                         </IGRPTabsTriggerPrimitive>
@@ -434,7 +458,9 @@ export function ConfigurationDialog({
                             >
                                 {isNew && (
                                     <div className="space-y-2">
-                                        <IGRPLabel>{t('templateOptional')}</IGRPLabel>
+                                        <IGRPLabel>
+                                            {t('templateOptional')}
+                                        </IGRPLabel>
                                         <IGRPCombobox
                                             value={template}
                                             onChange={(tmpl) =>
@@ -834,7 +860,9 @@ export function ConfigurationDialog({
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <IGRPLabel>{t('projectDependencies')}</IGRPLabel>
+                                    <IGRPLabel>
+                                        {t('projectDependencies')}
+                                    </IGRPLabel>
                                     <p className="text-xs text-muted-foreground">
                                         {t('selectProjects')}
                                     </p>
@@ -963,7 +991,10 @@ export function ConfigurationDialog({
                 </IGRPTabsPrimitive>
 
                 <IGRPDialogFooterPrimitive className="pt-2">
-                    <IGRPButtonPrimitive variant="outline" onClick={() => setOpen?.(false)}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={() => setOpen?.(false)}
+                    >
                         {t('cancel')}
                     </IGRPButtonPrimitive>
                     <IGRPButtonPrimitive

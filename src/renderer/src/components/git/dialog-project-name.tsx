@@ -29,7 +29,9 @@ export const ProjectNameDialog = ({
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
             <IGRPDialogContentPrimitive>
                 <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('enterProjectName')}</IGRPDialogTitlePrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('enterProjectName')}
+                    </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive />
                 </IGRPDialogHeaderPrimitive>
                 <div className="py-4">

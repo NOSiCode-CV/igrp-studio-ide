@@ -1,6 +1,6 @@
 import {
     ColumnDef,
-  IGRPAlertDialog,
+    IGRPAlertDialog,
     IGRPContainer,
     IGRPDataTable,
 } from '@igrp/igrp-framework-react-design-system';

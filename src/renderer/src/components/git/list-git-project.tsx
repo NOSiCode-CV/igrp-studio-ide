@@ -8,8 +8,14 @@ import {
     Lock,
     AlertCircle,
 } from 'lucide-react';
-import { IGRPButtonPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipProviderPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
-    
+import {
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+
 import { Repository, RepositoryPlatform } from 'src/main/types';
 import useToast from '@renderer/hooks/useToast';
 import { PlatformIcon } from './platform-icon';
@@ -113,7 +119,8 @@ export function ListGitProject({
                             <p className="text-sm text-gray-600 truncate">
                                 {repo.description || (
                                     <span className="flex items-center gap-1 text-gray-400 italic">
-                                        <AlertCircle className="h-3 w-3" /> {t('noDescriptionProvided')}
+                                        <AlertCircle className="h-3 w-3" />{' '}
+                                        {t('noDescriptionProvided')}
                                     </span>
                                 )}
                             </p>
@@ -142,7 +149,7 @@ export function ListGitProject({
                                 <span className="sr-only">{t('view')}</span>
                             </IGRPButtonPrimitive>
                         </IGRPTooltipTriggerPrimitive>
-                            <IGRPTooltipContentPrimitive>
+                        <IGRPTooltipContentPrimitive>
                             <p>{t('viewRepository')}</p>
                         </IGRPTooltipContentPrimitive>
                     </IGRPTooltipPrimitive>

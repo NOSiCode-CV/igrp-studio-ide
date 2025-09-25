@@ -25,7 +25,8 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                         <IGRPBadgePrimitive
                             key={`${dependency}-${i}`}
                             variant="outline"
-                            className={cn("w-full md:max-w-50 truncate whitespace-nowrap inline-block rounded-lg text-xs font-medium",
+                            className={cn(
+                                'w-full md:max-w-50 truncate whitespace-nowrap inline-block rounded-lg text-xs font-medium',
                                 getServiceColor(dependency)
                             )}
                         >
@@ -42,8 +43,8 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
                         variant="outline"
                         className="text-xs truncate overflow-hidden text-ellipsis  wrap-break-word"
                     >
-                      {depId}
-                     {/*  {config?.condition ? ` (${config.condition})` : ''} */}
+                        {depId}
+                        {/*  {config?.condition ? ` (${config.condition})` : ''} */}
                     </IGRPBadgePrimitive>
                 ));
             })}
@@ -57,7 +58,7 @@ const Dependency = ({ dependsOn, isTable = false }: DependencyProps) => {
             ) : (
                 <div className="py-1">
                     <div className="text-xs text-muted-foreground">
-                    {t('dependsOn')}
+                        {t('dependsOn')}
                     </div>
                     <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
                         {content}

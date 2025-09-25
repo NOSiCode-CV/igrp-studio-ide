@@ -1,6 +1,9 @@
 import { IGRPContainer } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPCardPrimitive, IGRPCardContentPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTooltipPrimitive,
     IGRPTooltipContentPrimitive,

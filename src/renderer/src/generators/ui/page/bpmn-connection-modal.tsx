@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
-import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPInputPrimitive, IGRPSwitchPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPInputPrimitive,
+    IGRPSwitchPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import { toast } from 'sonner';
@@ -59,7 +70,7 @@ export const BPMNConfigModal = ({
     // Reset form when modal opens
     useEffect(() => {
         if (isOpen) {
-            setRenderKey(prev => prev + 1);
+            setRenderKey((prev) => prev + 1);
             if (config) {
                 setFormData({
                     name: config.name || '',
@@ -82,9 +93,8 @@ export const BPMNConfigModal = ({
         }
     }, [isOpen, config?.id]);
 
-
     const handleInputChange = (field: keyof BPMNConfig, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleTestConnection = async () => {
@@ -144,12 +154,14 @@ export const BPMNConfigModal = ({
                 await window.igrpStudioSettings.addBPMNConfig(configData);
                 toast.success('API configuration saved successfully');
             }
-            
+
             // If this is the first config or if it's set as active, make it the active config
             if (formData.isActive) {
-                await window.igrpStudioSettings.setActiveBPMNConfig(configData.id);
+                await window.igrpStudioSettings.setActiveBPMNConfig(
+                    configData.id
+                );
             }
-            
+
             onConfirm();
             setRenderKey(0);
             handleClose();
@@ -178,22 +190,32 @@ export const BPMNConfigModal = ({
 
     return (
         <IGRPDialogPrimitive open={isOpen} onOpenChange={handleClose}>
-            <IGRPDialogContentPrimitive key={`${config?.id || 'new'}-${renderKey}`} className="max-w-[500px] w-[95vw] mx-auto">
+            <IGRPDialogContentPrimitive
+                key={`${config?.id || 'new'}-${renderKey}`}
+                className="max-w-[500px] w-[95vw] mx-auto"
+            >
                 <IGRPDialogHeaderPrimitive>
                     <IGRPDialogTitlePrimitive>
-                        {config ? 'Edit BPMN API Configuration' : 'BPMN API Configuration'}
+                        {config
+                            ? 'Edit BPMN API Configuration'
+                            : 'BPMN API Configuration'}
                     </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive>
-                        Configure connection to your BPMN REST API (Camunda, Flowable, etc.)
+                        Configure connection to your BPMN REST API (Camunda,
+                        Flowable, etc.)
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="name">Configuration Name *</IGRPLabel>
+                        <IGRPLabel htmlFor="name">
+                            Configuration Name *
+                        </IGRPLabel>
                         <IGRPInputText
                             id="name"
                             value={formData.name || ''}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('name', e.target.value)
+                            }
                             placeholder="My BPMN API"
                         />
                     </div>
@@ -202,7 +224,9 @@ export const BPMNConfigModal = ({
                         <IGRPInputText
                             id="apiUrl"
                             value={formData.apiUrl || ''}
-                            onChange={(e) => handleInputChange('apiUrl', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('apiUrl', e.target.value)
+                            }
                             placeholder="https://my-bpmn-server.com"
                         />
                     </div>
@@ -211,17 +235,23 @@ export const BPMNConfigModal = ({
                         <IGRPInputText
                             id="basePath"
                             value={formData.basePath || ''}
-                            onChange={(e) => handleInputChange('basePath', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('basePath', e.target.value)
+                            }
                             placeholder="/api/v1"
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="token">Access Token (Optional)</IGRPLabel>
+                        <IGRPLabel htmlFor="token">
+                            Access Token (Optional)
+                        </IGRPLabel>
                         <IGRPInputPrimitive
                             id="token"
                             type="password"
                             value={formData.token || ''}
-                            onChange={(e) => handleInputChange('token', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('token', e.target.value)
+                            }
                             placeholder="Bearer token or API key (optional)"
                         />
                     </div>
@@ -230,7 +260,9 @@ export const BPMNConfigModal = ({
                         <IGRPTextAreaPrimitive
                             id="description"
                             value={formData.description || ''}
-                            onChange={(e) => handleInputChange('description', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('description', e.target.value)
+                            }
                             placeholder="Optional description for this API configuration"
                             rows={3}
                         />
@@ -239,9 +271,13 @@ export const BPMNConfigModal = ({
                         <IGRPSwitchPrimitive
                             id="isActive"
                             checked={formData.isActive ?? true}
-                            onCheckedChange={(checked) => handleInputChange('isActive', checked)}
+                            onCheckedChange={(checked) =>
+                                handleInputChange('isActive', checked)
+                            }
                         />
-                        <IGRPLabel htmlFor="isActive">Active Configuration</IGRPLabel>
+                        <IGRPLabel htmlFor="isActive">
+                            Active Configuration
+                        </IGRPLabel>
                     </div>
                 </div>
                 <IGRPDialogFooterPrimitive className="flex justify-between">
@@ -253,15 +289,25 @@ export const BPMNConfigModal = ({
                         {isTesting ? 'Testing...' : 'Test Connection'}
                     </IGRPButtonPrimitive>
                     <div className="flex gap-2">
-                        <IGRPButtonPrimitive variant="outline" onClick={handleClose}>
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            onClick={handleClose}
+                        >
                             Cancel
                         </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive onClick={handleSave} disabled={isLoading}>
-                            {isLoading ? 'Saving...' : (config ? 'Update' : 'Save')}
+                        <IGRPButtonPrimitive
+                            onClick={handleSave}
+                            disabled={isLoading}
+                        >
+                            {isLoading
+                                ? 'Saving...'
+                                : config
+                                  ? 'Update'
+                                  : 'Save'}
                         </IGRPButtonPrimitive>
                     </div>
                 </IGRPDialogFooterPrimitive>
             </IGRPDialogContentPrimitive>
         </IGRPDialogPrimitive>
     );
-}; 
+};

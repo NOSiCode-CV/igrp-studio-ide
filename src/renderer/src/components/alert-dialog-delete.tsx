@@ -44,11 +44,10 @@ const AlertDialogDelete: React.FC<DeleteModalProps> = ({
             <IGRPModalDialogContent>
                 <IGRPModalDialogHeader>
                     <IGRPModalDialogTitle>
-                    {t('areYouAbsolutelySure')}
+                        {t('areYouAbsolutelySure')}
                     </IGRPModalDialogTitle>
                     <IGRPModalDialogDescription>
-                    {t('confirmRemoveRecord')}{' '}
-                        {recordId ? recordId : ''}?
+                        {t('confirmRemoveRecord')} {recordId ? recordId : ''}?
                     </IGRPModalDialogDescription>
                 </IGRPModalDialogHeader>
                 <IGRPModalDialogFooter>

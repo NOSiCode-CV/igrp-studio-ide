@@ -10,11 +10,11 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { 
-    IGRPTooltipPrimitive, 
-    IGRPTooltipContentPrimitive, 
+import {
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
     IGRPTooltipTriggerPrimitive,
-    IGRPTooltipProviderPrimitive 
+    IGRPTooltipProviderPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 
 interface DockerControlsProps {
@@ -85,7 +85,10 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                             <ChevronDown className="h-3.5 w-3.5 text-igrp" />
                         </IGRPButtonPrimitive>
                     </IGRPDropdownMenuTriggerPrimitive>
-                    <IGRPDropdownMenuContentPrimitive align="end" className="w-48">
+                    <IGRPDropdownMenuContentPrimitive
+                        align="end"
+                        className="w-48"
+                    >
                         <IGRPDropdownMenuItemPrimitive
                             onClick={() => onStopAll()}
                             className="group"
@@ -133,7 +136,7 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                                         </IGRPTooltipTriggerPrimitive>
                                         <IGRPTooltipContentPrimitive>
                                             <p>
-                                            {t('deleteContainersVolumes')}
+                                                {t('deleteContainersVolumes')}
                                             </p>
                                         </IGRPTooltipContentPrimitive>
                                     </IGRPTooltipPrimitive>

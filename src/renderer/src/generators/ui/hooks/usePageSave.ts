@@ -42,62 +42,81 @@ export const usePageSave = ({
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
 
-    const handleSave = useCallback(async (components: StructuredLayout): Promise<void> => {
-        try {
-            if (!basePath) {
-                throw new Error('Base path is required');
-            }
+    const handleSave = useCallback(
+        async (components: StructuredLayout): Promise<void> => {
+            try {
+                if (!basePath) {
+                    throw new Error('Base path is required');
+                }
 
-            const isBpmnProcess = content.type === 'processStep'
+                const isBpmnProcess = content.type === 'processStep';
 
-            const config = {
-                ...content,
-                id,
-                components,
-                functions,
-                types,
-                states,
-                imports,
-            };
-
-            console.log('Saving configuration:', config);
-
-            let error;
-            
-            if (isBpmnProcess) {
-                const result = await window.engine.createProcessStep(
-                    config,
-                    ENV_TYPES.NEXTJS,
-                    basePath
-                );
-                error = result.error;
-            } else {
-                const result = await window.engine.createPage(
-                    config,
-                    ENV_TYPES.NEXTJS,
-                    basePath
-                );
-                error = result.error;
-            }
-
-            if (error) {
-                const saveError: SaveError = {
-                    message: error,
-                    code: 'SAVE_ERROR',
+                const config = {
+                    ...content,
+                    id,
+                    components,
+                    functions,
+                    types,
+                    states,
+                    imports,
                 };
-                throw saveError;
-            }
 
-            showSuccessToast('Components saved successfully');
-            dispatch(onSetChangeStatus(true));
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-            showErrorToast(errorMessage);
-            console.error('Save error:', error);
-        }
-    }, [basePath, content, id, functions, types, states, imports, isPage, showSuccessToast, showErrorToast, dispatch, page]);
+                console.log('Saving configuration:', config);
+
+                let error;
+
+                if (isBpmnProcess) {
+                    const result = await window.engine.createProcessStep(
+                        config,
+                        ENV_TYPES.NEXTJS,
+                        basePath
+                    );
+                    error = result.error;
+                } else {
+                    const result = await window.engine.createPage(
+                        config,
+                        ENV_TYPES.NEXTJS,
+                        basePath
+                    );
+                    error = result.error;
+                }
+
+                if (error) {
+                    const saveError: SaveError = {
+                        message: error,
+                        code: 'SAVE_ERROR',
+                    };
+                    throw saveError;
+                }
+
+                showSuccessToast('Components saved successfully');
+                dispatch(onSetChangeStatus(true));
+            } catch (error) {
+                const errorMessage =
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred';
+                showErrorToast(errorMessage);
+                console.error('Save error:', error);
+            }
+        },
+        [
+            basePath,
+            content,
+            id,
+            functions,
+            types,
+            states,
+            imports,
+            isPage,
+            showSuccessToast,
+            showErrorToast,
+            dispatch,
+            page,
+        ]
+    );
 
     return {
         handleSave,
     };
-}; 
+};

@@ -16,10 +16,10 @@ import {
     IGRPDialogTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import {
-    IGRPDropdownMenuPrimitive   ,
+    IGRPDropdownMenuPrimitive,
     IGRPDropdownMenuContentPrimitive,
     IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuTriggerPrimitive    ,
+    IGRPDropdownMenuTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import {
     Plus,
@@ -70,7 +70,7 @@ export default function AppLogicPage() {
     );
     const filteredEnvironments = searchTerm
         ? searchEnvironments(searchTerm)
-        : environments;    
+        : environments;
 
     const getStatusIcon = (status: AppLogicEnvironment['status']) => {
         switch (status) {
@@ -171,7 +171,10 @@ export default function AppLogicPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <IGRPButtonPrimitive variant="outline" onClick={exportEnvironments}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={exportEnvironments}
+                    >
                         <Download className="h-4 w-4 mr-2" />
                         Export
                     </IGRPButtonPrimitive>
@@ -185,7 +188,11 @@ export default function AppLogicPage() {
                                 New Environment
                             </IGRPButtonPrimitive>
                         </IGRPDialogTriggerPrimitive>
-                        <IGRPDialogContentPrimitive onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()} className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <IGRPDialogContentPrimitive
+                            onInteractOutside={(e) => e.preventDefault()}
+                            onEscapeKeyDown={(e) => e.preventDefault()}
+                            className="max-w-2xl max-h-[90vh] overflow-y-auto"
+                        >
                             <IGRPDialogHeaderPrimitive>
                                 <IGRPDialogTitlePrimitive>
                                     Create New Environment
@@ -198,7 +205,7 @@ export default function AppLogicPage() {
                         </IGRPDialogContentPrimitive>
                     </IGRPDialogPrimitive>
                 </div>
-            </div>            
+            </div>
 
             {/* Search */}
             <div className="relative w-64">
@@ -251,7 +258,9 @@ export default function AppLogicPage() {
                                         </IGRPCardTitlePrimitive>
                                     </div>
                                     <IGRPDropdownMenuPrimitive>
-                                        <IGRPDropdownMenuTriggerPrimitive asChild>
+                                        <IGRPDropdownMenuTriggerPrimitive
+                                            asChild
+                                        >
                                             <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
@@ -389,7 +398,9 @@ export default function AppLogicPage() {
             >
                 <IGRPDialogContentPrimitive className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive>Edit Environment</IGRPDialogTitlePrimitive>
+                        <IGRPDialogTitlePrimitive>
+                            Edit Environment
+                        </IGRPDialogTitlePrimitive>
                     </IGRPDialogHeaderPrimitive>
                     {editingEnvironment && (
                         <EnvironmentForm

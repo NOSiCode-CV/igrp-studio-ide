@@ -9,7 +9,12 @@ import {
     PlusCircle,
     Loader2,
 } from 'lucide-react';
-import { IGRPButtonPrimitive, IGRPDialogDescriptionPrimitive, IGRPInputPrimitive, IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPInputPrimitive,
+    IGRPLabelPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPDialogPrimitive,
     IGRPDialogContentPrimitive,
@@ -549,7 +554,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-4">
             {SelectedComponent ? (
                 <>
-                    <IGRPLabelPrimitive>{t('frameworkConfiguration')}</IGRPLabelPrimitive>
+                    <IGRPLabelPrimitive>
+                        {t('frameworkConfiguration')}
+                    </IGRPLabelPrimitive>
                     <div className="mt-3">
                         <ProjectConfigForm
                             type={formik.values.framework}
@@ -576,7 +583,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             <div className="rounded-lg border p-4 space-y-6">
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="name">{t('projectName')}</IGRPLabelPrimitive>
+                        <IGRPLabelPrimitive htmlFor="name">
+                            {t('projectName')}
+                        </IGRPLabelPrimitive>
                         <IGRPInputPrimitive
                             id="name"
                             name="name"
@@ -592,7 +601,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="path">{t('projectDirectory')}</IGRPLabelPrimitive>
+                        <IGRPLabelPrimitive htmlFor="path">
+                            {t('projectDirectory')}
+                        </IGRPLabelPrimitive>
                         <div className="flex gap-2">
                             <IGRPInputPrimitive
                                 id="path"
@@ -625,7 +636,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
                     {isFrontend && (
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>{t('themeColor')}</IGRPLabelPrimitive>
+                            <IGRPLabelPrimitive>
+                                {t('themeColor')}
+                            </IGRPLabelPrimitive>
                             <div className="grid grid-cols-12 gap-2 mt-2">
                                 {THEME_COLORS.map((color) => (
                                     <button
@@ -688,8 +701,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
                 <IGRPDialogHeaderPrimitive className="p-4">
-                    <IGRPDialogTitlePrimitive>{t('newProject')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>{t('newProject')}</IGRPDialogDescriptionPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('newProject')}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
+                        {t('newProject')}
+                    </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 <IGRPScrollAreaPrimitive className="max-h-[calc(80svh-80px)]">
                     <form onSubmit={formik.handleSubmit} className="mx-6 mb-6">

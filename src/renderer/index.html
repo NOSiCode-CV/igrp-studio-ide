@@ -1,27 +1,28 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>IGRP Studio 3.0</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IGRP Studio 3.0</title>
-  
-  <!-- Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy" content="
+        <!-- Content Security Policy -->
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="
     default-src 'self';
     script-src 'self';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: filesystem: blob: https://www.svgrepo.com https://cdn.jsdelivr.net https://igrp.cv https://avatars.githubusercontent.com https://www.gravatar.com;
     connect-src 'self' http://localhost:* https://localhost:* ws://localhost:* wss://localhost:*;
-  ">
-</head>
+  "
+        />
+    </head>
 
-<body>
-  <div id="root"></div>
-  
-  <!-- Main Application Script -->
-  <script type="module" src="/src/main.tsx"></script>
-</body>
+    <body>
+        <div id="root"></div>
 
+        <!-- Main Application Script -->
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
 </html>

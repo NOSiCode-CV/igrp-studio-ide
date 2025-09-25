@@ -122,8 +122,16 @@ const useNavdata = (filesThree: FileTree[]) => {
                 menuItemsConfig.newDto,
                 menuItemsConfig.importJsonSchemaFiles,
             ],
-            subMenus: [menuItemsConfig.newAction, menuItemsConfig.duplicate, menuItemsConfig.delete],
-            modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.duplicate, menuItemsConfig.delete],
+            subMenus: [
+                menuItemsConfig.newAction,
+                menuItemsConfig.duplicate,
+                menuItemsConfig.delete,
+            ],
+            modelMenus: [
+                menuItemsConfig.convertToDto,
+                menuItemsConfig.duplicate,
+                menuItemsConfig.delete,
+            ],
             defaultMenus: [menuItemsConfig.duplicate, menuItemsConfig.delete],
             controllersExtension: [menuItemsConfig.newControllers],
         }),
@@ -201,9 +209,7 @@ const useNavdata = (filesThree: FileTree[]) => {
                 const isShared = folder.name === 'shared';
 
                 const dropdownMenus = isShared
-                    ? [
-                          ...dropdownConfigs.baseDropdownMenus,
-                      ]
+                    ? [...dropdownConfigs.baseDropdownMenus]
                     : [
                           ...dropdownConfigs.controllersExtension,
                           ...dropdownConfigs.baseDropdownMenus,

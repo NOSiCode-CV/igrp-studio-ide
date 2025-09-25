@@ -1,5 +1,15 @@
-
-import { IGRPDropdownMenuContentPrimitive, IGRPDropdownMenuItemPrimitive, IGRPDropdownMenuLabelPrimitive, IGRPDropdownMenuPrimitive, IGRPDropdownMenuSeparatorPrimitive, IGRPDropdownMenuTriggerPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipProviderPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuLabelPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { LayoutGrid } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +39,10 @@ const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
 
     return (
         <IGRPTooltipProviderPrimitive>
-            <IGRPDropdownMenuPrimitive open={dropdownOpen} onOpenChange={setDropdownOpen}>
+            <IGRPDropdownMenuPrimitive
+                open={dropdownOpen}
+                onOpenChange={setDropdownOpen}
+            >
                 <IGRPTooltipPrimitive>
                     <IGRPTooltipTriggerPrimitive>
                         <IGRPDropdownMenuTriggerPrimitive asChild>
@@ -41,13 +54,17 @@ const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
                             </a>
                         </IGRPDropdownMenuTriggerPrimitive>
                     </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>{t('columnsSettings')}</IGRPTooltipContentPrimitive>
+                    <IGRPTooltipContentPrimitive>
+                        {t('columnsSettings')}
+                    </IGRPTooltipContentPrimitive>
                 </IGRPTooltipPrimitive>
                 <IGRPDropdownMenuContentPrimitive
                     className="w-56"
                     onPointerLeave={closeDropdown}
                 >
-                    <IGRPDropdownMenuLabelPrimitive>{t('columnsSettings')}</IGRPDropdownMenuLabelPrimitive>
+                    <IGRPDropdownMenuLabelPrimitive>
+                        {t('columnsSettings')}
+                    </IGRPDropdownMenuLabelPrimitive>
                     <IGRPDropdownMenuSeparatorPrimitive />
                     <div className="grid grid-cols-3 gap-2 p-2">
                         {gridStructures.map((structure, index) => (

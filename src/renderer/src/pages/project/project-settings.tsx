@@ -80,7 +80,9 @@ export default function ProjectSettings({
 
                 <IGRPCardPrimitive className="border-border/50">
                     <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive>{t('general_info')}</IGRPCardTitlePrimitive>
+                        <IGRPCardTitlePrimitive>
+                            {t('general_info')}
+                        </IGRPCardTitlePrimitive>
                     </IGRPCardHeaderPrimitive>
                     <IGRPCardContentPrimitive className="space-y-0 divide-y divide-border/50">
                         <SettingsRow

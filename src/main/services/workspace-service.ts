@@ -3,24 +3,50 @@ import fs from 'fs';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { FrameworkType, IWorkspace, ProjectData, HandlerResponse } from '../types';
-import { addProjectToWorkspace, addServiceToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, removeServiceFromWorkspace, saveCustomWorkspaceComposeFile, updateProjectToWorkspace, updateServiceToWorkspace } from '@igrp/igrp-studio-nextjs-engine';
+import {
+    FrameworkType,
+    IWorkspace,
+    ProjectData,
+    HandlerResponse,
+} from '../types';
+import {
+    addProjectToWorkspace,
+    addServiceToWorkspace,
+    newWorkspace as engineNewWorkspace,
+    removeProjectFromWorkspace,
+    removeServiceFromWorkspace,
+    saveCustomWorkspaceComposeFile,
+    updateProjectToWorkspace,
+    updateServiceToWorkspace,
+} from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
-import { ProjectWorkspace, ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    ProjectWorkspace,
+    ServiceWorkspace,
+    WorkspaceService,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
-const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json');
+const WORKSPACE_FILE = path.join(
+    app.getPath('userData'),
+    'igrpstudio.workspaces.json'
+);
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
 
 export class WorkspaceRepository {
-
-    private async ensureFileExists(filePath: string, defaultContent: string): Promise<void> {
+    private async ensureFileExists(
+        filePath: string,
+        defaultContent: string
+    ): Promise<void> {
         if (!fs.existsSync(filePath)) {
             await writeFile(filePath, defaultContent);
         }
     }
 
     private async loadData(): Promise<{ workspaces: IWorkspace[] }> {
-        await this.ensureFileExists(WORKSPACE_FILE, JSON.stringify({ workspaces: [] }, null, 2));
+        await this.ensureFileExists(
+            WORKSPACE_FILE,
+            JSON.stringify({ workspaces: [] }, null, 2)
+        );
         const raw = await readFile(WORKSPACE_FILE, 'utf-8');
         if (!raw) return { workspaces: [] };
         try {
@@ -32,12 +58,18 @@ export class WorkspaceRepository {
                     await mkdir(BACKUP_DIR, { recursive: true });
                 }
                 const safeTime = new Date().toISOString().replace(/:/g, '-');
-                const backupPath = path.join(BACKUP_DIR, `corrupt-workspaces-${safeTime}.json`);
+                const backupPath = path.join(
+                    BACKUP_DIR,
+                    `corrupt-workspaces-${safeTime}.json`
+                );
                 await writeFile(backupPath, raw);
             } catch (backupErr) {
                 // ignore backup errors to avoid blocking app startup
             }
-            await writeFile(WORKSPACE_FILE, JSON.stringify({ workspaces: [] }, null, 2));
+            await writeFile(
+                WORKSPACE_FILE,
+                JSON.stringify({ workspaces: [] }, null, 2)
+            );
             return { workspaces: [] };
         }
     }
@@ -47,20 +79,25 @@ export class WorkspaceRepository {
     }
 
     async initialize(): Promise<void> {
-        await this.ensureFileExists(WORKSPACE_FILE, JSON.stringify({ workspaces: [] }, null, 2));
+        await this.ensureFileExists(
+            WORKSPACE_FILE,
+            JSON.stringify({ workspaces: [] }, null, 2)
+        );
         if (!fs.existsSync(BACKUP_DIR)) {
             await mkdir(BACKUP_DIR, { recursive: true });
         }
     }
 
     // Workspace CRUD Operations
-    async createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<IWorkspace> {
+    async createWorkspace(
+        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>
+    ): Promise<IWorkspace> {
         const data = await this.loadData();
         const newWorkspace: IWorkspace = {
             ...workspace,
             id: uuidv4(),
             createdAt: new Date().toISOString(),
-            projects: []
+            projects: [],
         };
 
         const { path, createdAt, ...baseConfigWorkspace } = newWorkspace;
@@ -68,27 +105,33 @@ export class WorkspaceRepository {
         data.workspaces.push(newWorkspace);
 
         try {
-            await engineNewWorkspace({ ...baseConfigWorkspace }, workspace.path)
+            await engineNewWorkspace(
+                { ...baseConfigWorkspace },
+                workspace.path
+            );
         } catch (error) {
-            throw error
+            throw error;
         }
         await this.saveData(data);
 
         return newWorkspace;
     }
 
-    async updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace | null> {
+    async updateWorkspace(
+        id: string,
+        updates: Partial<IWorkspace>
+    ): Promise<IWorkspace | null> {
         const data = await this.loadData();
-        const workspace = data.workspaces.find(w => w.id === id);
+        const workspace = data.workspaces.find((w) => w.id === id);
 
         if (!workspace) {
-            return null
+            return null;
         }
 
         const updatedWorkspace = {
             ...workspace,
             ...updates,
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
         };
 
         const index = data.workspaces.indexOf(workspace);
@@ -101,7 +144,7 @@ export class WorkspaceRepository {
     async deleteWorkspace(id: string): Promise<void> {
         const data = await this.loadData();
         const initialLength = data.workspaces.length;
-        data.workspaces = data.workspaces.filter(w => w.id !== id);
+        data.workspaces = data.workspaces.filter((w) => w.id !== id);
 
         if (data.workspaces.length === initialLength) {
             throw new Error(`Workspace ${id} not found`);
@@ -124,10 +167,12 @@ export class WorkspaceRepository {
     }
 
     // Project CRUD Operations
-    async addProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<ProjectData> {
-
+    async addProject(
+        workspaceId: string,
+        project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>
+    ): Promise<ProjectData> {
         const data = await this.loadData();
-        const workspace = data.workspaces.find(w => w.id === workspaceId);
+        const workspace = data.workspaces.find((w) => w.id === workspaceId);
 
         if (!workspace) {
             throw new Error(`Workspace ${workspaceId} not found`);
@@ -138,7 +183,7 @@ export class WorkspaceRepository {
             id: uuidv4(),
             workspaceId,
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
         };
 
         await this.addProjectToStudioWorkspace(workspace, newProject, false);
@@ -154,32 +199,44 @@ export class WorkspaceRepository {
         return newProject;
     }
 
-    async addProjectToStudioWorkspace(workspace: IWorkspace, newProject: ProjectData, move: boolean) {
+    async addProjectToStudioWorkspace(
+        workspace: IWorkspace,
+        newProject: ProjectData,
+        move: boolean
+    ) {
+        const { config, id: projectId, framework } = newProject;
 
-        const { config, id: projectId, framework } = newProject
-
-        const { path: workspacePath, id: workspaceId } = workspace
+        const { path: workspacePath, id: workspaceId } = workspace;
 
         const workspaceConfig: ProjectWorkspace = {
             config: { ...config, id: projectId, type: framework },
             id: workspaceId,
-        }
+        };
 
         //call engine
         await addProjectToWorkspace(workspaceConfig, workspacePath);
 
-        if (move)
-            await this.validateAndMoveProject(newProject, workspacePath)
-
+        if (move) await this.validateAndMoveProject(newProject, workspacePath);
     }
 
-    async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {
+    async updateProject(
+        projectId: string,
+        updates: Partial<ProjectData>
+    ): Promise<ProjectData> {
         const data = await this.loadData();
         let foundProject: ProjectData | undefined;
-        const { config: project, workspaceId, framework, path: projectPath, type, icon } = updates;
+        const {
+            config: project,
+            workspaceId,
+            framework,
+            path: projectPath,
+            type,
+            icon,
+        } = updates;
 
         for (const workspace of data.workspaces) {
-            const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
+            const projectIndex =
+                workspace.projects?.findIndex((p) => p.id === projectId) ?? -1;
             if (projectIndex !== -1 && workspace.projects) {
                 const oldProject = workspace.projects[projectIndex];
 
@@ -188,26 +245,35 @@ export class WorkspaceRepository {
                     try {
                         if (oldProject.icon.startsWith('icons/')) {
                             // New centralized icons directory
-                            const oldIconPath = path.join(workspace.path, oldProject.icon);
+                            const oldIconPath = path.join(
+                                workspace.path,
+                                oldProject.icon
+                            );
                             if (fs.existsSync(oldIconPath)) {
                                 fs.unlinkSync(oldIconPath);
                             }
                         } else if (oldProject.icon.startsWith('assets/')) {
                             // Legacy project-specific assets directory
-                            const oldIconPath = path.join(oldProject.path || '', oldProject.icon);
+                            const oldIconPath = path.join(
+                                oldProject.path || '',
+                                oldProject.icon
+                            );
                             if (fs.existsSync(oldIconPath)) {
                                 fs.unlinkSync(oldIconPath);
                             }
                         }
                     } catch (error) {
-                        console.warn('Failed to clean up old project icon file:', error);
+                        console.warn(
+                            'Failed to clean up old project icon file:',
+                            error
+                        );
                     }
                 }
 
                 const updatedProject = {
                     ...oldProject,
                     ...updates,
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
                 };
                 workspace.projects[projectIndex] = updatedProject;
                 workspace.updatedAt = new Date().toISOString();
@@ -217,13 +283,13 @@ export class WorkspaceRepository {
         }
 
         if (!foundProject) {
-            const workspace = data.workspaces.find(w => w.id === workspaceId);
+            const workspace = data.workspaces.find((w) => w.id === workspaceId);
 
             if (!workspace) {
                 throw new Error(`Workspace ${workspaceId} not found`);
             }
 
-            if ((!framework || !project.name)) {
+            if (!framework || !project.name) {
                 throw new Error(`Invalid project configuration`);
             }
 
@@ -242,10 +308,13 @@ export class WorkspaceRepository {
 
             workspace.updatedAt = new Date().toISOString();
 
-            await this.addProjectToStudioWorkspace(workspace, updatedProject, true);
+            await this.addProjectToStudioWorkspace(
+                workspace,
+                updatedProject,
+                true
+            );
 
             foundProject = updatedProject;
-
         }
 
         await this.saveData(data);
@@ -253,15 +322,21 @@ export class WorkspaceRepository {
         return foundProject;
     }
 
-    async configureService(config: ProjectWorkspace, basePath: string): Promise<void> {
+    async configureService(
+        config: ProjectWorkspace,
+        basePath: string
+    ): Promise<void> {
+        const { id: workspaceId, service, config: projectData } = config;
 
-        const { id: workspaceId, service, config: projectData } = config
-
-        const { config: projectDataConfig, id: projectId, framework } = projectData
+        const {
+            config: projectDataConfig,
+            id: projectId,
+            framework,
+        } = projectData;
 
         const data = await this.loadData();
 
-        const workspace = data.workspaces.find(w => w.id === workspaceId);
+        const workspace = data.workspaces.find((w) => w.id === workspaceId);
 
         if (!workspace) {
             throw new Error(`Workspace ${workspaceId} not found`);
@@ -271,21 +346,22 @@ export class WorkspaceRepository {
             config: { ...projectDataConfig, id: projectId, type: framework },
             service,
             id: workspaceId,
-        }
+        };
 
         await updateProjectToWorkspace(projectConfig, basePath);
 
-        const projectIndex = workspace.projects?.findIndex(p => p.id === projectId) ?? -1;
+        const projectIndex =
+            workspace.projects?.findIndex((p) => p.id === projectId) ?? -1;
         workspace.projects = workspace.projects ?? [];
         workspace.projects[projectIndex] = {
             ...workspace.projects[projectIndex],
             id: projectId,
             config: projectDataConfig,
             service,
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
         };
 
-        this.updateWorkspace(workspaceId, workspace)
+        this.updateWorkspace(workspaceId, workspace);
     }
 
     async deleteProject(projectId: string, basePath: string): Promise<void> {
@@ -295,7 +371,9 @@ export class WorkspaceRepository {
 
         for (const workspace of data.workspaces) {
             if (workspace.projects) {
-                const projectIndex = workspace.projects.findIndex(p => p.id === projectId);
+                const projectIndex = workspace.projects.findIndex(
+                    (p) => p.id === projectId
+                );
                 if (projectIndex !== -1) {
                     projectToDelete = workspace.projects[projectIndex];
                     workspace.projects.splice(projectIndex, 1);
@@ -325,7 +403,10 @@ export class WorkspaceRepository {
                     }
                     // Also try to remove the assets directory if it's empty
                     const assetsDir = path.dirname(iconPath);
-                    if (fs.existsSync(assetsDir) && fs.readdirSync(assetsDir).length === 0) {
+                    if (
+                        fs.existsSync(assetsDir) &&
+                        fs.readdirSync(assetsDir).length === 0
+                    ) {
                         fs.rmdirSync(assetsDir);
                     }
                 }
@@ -342,12 +423,14 @@ export class WorkspaceRepository {
     }
 
     async saveCustomCompose(yaml: object, basePath: string) {
-        await saveCustomWorkspaceComposeFile(yaml, basePath)
+        await saveCustomWorkspaceComposeFile(yaml, basePath);
     }
 
     async addService(serviceWorkspace: ServiceWorkspace, basePath: string) {
         const data = await this.loadData();
-        const workspace = data.workspaces.find(w => w.id === serviceWorkspace.id);
+        const workspace = data.workspaces.find(
+            (w) => w.id === serviceWorkspace.id
+        );
 
         if (!workspace) {
             throw new Error(`Workspace ${serviceWorkspace.id} not found`);
@@ -359,31 +442,35 @@ export class WorkspaceRepository {
             id: serviceId,
             properties: {
                 ...serviceWorkspace.service.properties,
-                labels: serviceWorkspace.service.properties?.labels?.map(label =>
-                    label.key === "uuid"
-                        ? { ...label, value: serviceId }
-                        : label
-                ) || []
-            }
+                labels:
+                    serviceWorkspace.service.properties?.labels?.map((label) =>
+                        label.key === 'uuid'
+                            ? { ...label, value: serviceId }
+                            : label
+                    ) || [],
+            },
         };
         workspace.services = workspace?.services || [];
         workspace.services.push(newService);
 
-        await addServiceToWorkspace({ ...serviceWorkspace, service: newService }, basePath)
+        await addServiceToWorkspace(
+            { ...serviceWorkspace, service: newService },
+            basePath
+        );
 
         await this.saveData(data);
-
     }
 
     async deleteService(serviceId: string, basePath: string) {
-
         const data = await this.loadData();
         let deleted = false;
 
         for (const workspace of data.workspaces) {
             if (workspace.services) {
                 const initialLength = workspace.services.length;
-                workspace.services = workspace.services.filter(p => p.id !== serviceId);
+                workspace.services = workspace.services.filter(
+                    (p) => p.id !== serviceId
+                );
                 if (workspace.services.length !== initialLength) {
                     workspace.updatedAt = new Date().toISOString();
                     deleted = true;
@@ -392,7 +479,7 @@ export class WorkspaceRepository {
             }
         }
 
-        await removeServiceFromWorkspace(serviceId, basePath)
+        await removeServiceFromWorkspace(serviceId, basePath);
 
         if (!deleted) {
             throw new Error(`Project ${serviceId} not found`);
@@ -402,18 +489,18 @@ export class WorkspaceRepository {
     }
 
     async updateService(config: ServiceWorkspace, basePath: string) {
-
         const data = await this.loadData();
         let foundService: WorkspaceService | undefined;
-        const { service } = config
+        const { service } = config;
 
         for (const workspace of data.workspaces) {
-            const serviceIndex = workspace.services?.findIndex(p => p.id === service.id) ?? -1;
+            const serviceIndex =
+                workspace.services?.findIndex((p) => p.id === service.id) ?? -1;
             if (serviceIndex !== -1 && workspace.services) {
                 const updatedService = {
                     ...workspace.services[serviceIndex],
                     ...service,
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
                 };
                 workspace.services[serviceIndex] = updatedService;
                 workspace.updatedAt = new Date().toISOString();
@@ -422,7 +509,7 @@ export class WorkspaceRepository {
             }
         }
 
-        await updateServiceToWorkspace(config, basePath)
+        await updateServiceToWorkspace(config, basePath);
 
         await this.saveData(data);
 
@@ -431,20 +518,20 @@ export class WorkspaceRepository {
 
     async listServices(workspaceId: string): Promise<WorkspaceService[]> {
         const data = await this.loadData();
-        const workspace = data.workspaces.find(w => w.id === workspaceId);
+        const workspace = data.workspaces.find((w) => w.id === workspaceId);
         return workspace?.services || [];
     }
 
     // Query Methods
     async getWorkspace(id: string): Promise<IWorkspace | undefined> {
         const data = await this.loadData();
-        return data.workspaces.find(w => w.id === id);
+        return data.workspaces.find((w) => w.id === id);
     }
 
     async getProject(id: string): Promise<ProjectData | undefined> {
         const data = await this.loadData();
         for (const workspace of data.workspaces) {
-            const project = workspace.projects?.find(p => p.id === id);
+            const project = workspace.projects?.find((p) => p.id === id);
             if (project) return project;
         }
         return undefined;
@@ -457,12 +544,18 @@ export class WorkspaceRepository {
 
     async listProjects(workspaceId: string): Promise<ProjectData[]> {
         const data = await this.loadData();
-        const workspace = data.workspaces.find(w => w.id === workspaceId);
-        return workspace?.projects?.sort((a, b) => {
-            const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z');
-            const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z');
-            return dateB.getTime() - dateA.getTime();
-        }) || [];
+        const workspace = data.workspaces.find((w) => w.id === workspaceId);
+        return (
+            workspace?.projects?.sort((a, b) => {
+                const dateA = new Date(
+                    a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z'
+                );
+                const dateB = new Date(
+                    b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z'
+                );
+                return dateB.getTime() - dateA.getTime();
+            }) || []
+        );
     }
 
     async getRecentWorkspaces(limit = 15): Promise<IWorkspace[]> {
@@ -483,65 +576,101 @@ export class WorkspaceRepository {
         }
 
         // Validate that .igrpstudio/workspace.json exists
-        const workspaceConfigPath = path.join(workspacePath, '.igrpstudio', 'workspace.json');
+        const workspaceConfigPath = path.join(
+            workspacePath,
+            '.igrpstudio',
+            'workspace.json'
+        );
         if (!fs.existsSync(workspaceConfigPath)) {
-            throw new Error('Invalid workspace: .igrpstudio/workspace.json not found');
+            throw new Error(
+                'Invalid workspace: .igrpstudio/workspace.json not found'
+            );
         }
 
         // Check if this workspace is already in our database
         const existingWorkspaces = await this.listWorkspaces();
-        const existingWorkspace = existingWorkspaces.find(w => w.path === workspacePath);
+        const existingWorkspace = existingWorkspaces.find(
+            (w) => w.path === workspacePath
+        );
 
         if (existingWorkspace) {
             // Update the last accessed time
-            return await this.updateWorkspace(existingWorkspace.id, {
-                updatedAt: new Date().toISOString()
-            }) || existingWorkspace;
+            return (
+                (await this.updateWorkspace(existingWorkspace.id, {
+                    updatedAt: new Date().toISOString(),
+                })) || existingWorkspace
+            );
         }
 
         try {
             // Load workspace configuration from .igrpstudio/workspace.json
-            const workspaceConfigContent = await readFile(workspaceConfigPath, 'utf-8');
+            const workspaceConfigContent = await readFile(
+                workspaceConfigPath,
+                'utf-8'
+            );
             const workspaceConfig = JSON.parse(workspaceConfigContent);
 
             // Create workspace from the configuration
             const newWorkspace: IWorkspace = {
                 id: uuidv4(),
                 name: workspaceConfig.name || path.basename(workspacePath),
-                slug: workspaceConfig.workspace || path.basename(workspacePath).toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                slug:
+                    workspaceConfig.workspace ||
+                    path
+                        .basename(workspacePath)
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, '-'),
                 path: workspacePath,
-                description: workspaceConfig.description || `Opened workspace from ${workspacePath}`,
-                createdAt: workspaceConfig.createdAt || new Date().toISOString(),
+                description:
+                    workspaceConfig.description ||
+                    `Opened workspace from ${workspacePath}`,
+                createdAt:
+                    workspaceConfig.createdAt || new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 services: workspaceConfig.services || [],
-                projects: []
+                projects: [],
             };
 
             // Load projects from workspace configuration
-            if (workspaceConfig.projects && Array.isArray(workspaceConfig.projects)) {
+            if (
+                workspaceConfig.projects &&
+                Array.isArray(workspaceConfig.projects)
+            ) {
                 for (const projectConfig of workspaceConfig.projects) {
                     try {
                         const updatedProject: ProjectData = {
                             id: uuidv4(),
-                            name: projectConfig?.config?.name || 'Unnamed Project',
+                            name:
+                                projectConfig?.config?.name ||
+                                'Unnamed Project',
                             path: `${workspacePath}/projects/${projectConfig?.config?.name}`,
-                            type: projectConfig.config?.type === 'frontend' ? 'frontend' : 'backend',
+                            type:
+                                projectConfig.config?.type === 'frontend'
+                                    ? 'frontend'
+                                    : 'backend',
                             framework: projectConfig.config?.type || 'nextjs',
                             workspaceId: newWorkspace.id,
                             config: projectConfig.config || {},
-                            themeColor: projectConfig.config?.themeColor || '#000000',
+                            themeColor:
+                                projectConfig.config?.themeColor || '#000000',
                             icon: projectConfig.config?.icon || '',
-                            createdAt: projectConfig.createdAt || new Date().toISOString(),
-                            updatedAt: new Date().toISOString()
+                            createdAt:
+                                projectConfig.createdAt ||
+                                new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
                         };
                         // Push project to workspace
-                        newWorkspace.projects?.push(updatedProject as ProjectData);
+                        newWorkspace.projects?.push(
+                            updatedProject as ProjectData
+                        );
                     } catch (error) {
-                        console.warn(`Failed to load project ${projectConfig.name}:`, error);
+                        console.warn(
+                            `Failed to load project ${projectConfig.name}:`,
+                            error
+                        );
                     }
                 }
             }
-
 
             // Save the new workspace to app data
             const data = await this.loadData();
@@ -549,14 +678,16 @@ export class WorkspaceRepository {
             await this.saveData(data);
 
             return newWorkspace;
-
         } catch (error) {
             console.error('Failed to parse workspace configuration:', error);
             throw new Error('Invalid workspace configuration file');
         }
     }
 
-    async addProjectToWorkspace(workspaceId: string, project: ProjectData): Promise<HandlerResponse> {
+    async addProjectToWorkspace(
+        workspaceId: string,
+        project: ProjectData
+    ): Promise<HandlerResponse> {
         try {
             const workspace = await this.getWorkspace(workspaceId);
             if (!workspace) {
@@ -564,7 +695,9 @@ export class WorkspaceRepository {
             }
 
             // Check if project already exists
-            const existingProject = workspace.projects?.find(p => p.path === project.path);
+            const existingProject = workspace.projects?.find(
+                (p) => p.path === project.path
+            );
             if (existingProject) {
                 return { error: 'Project already exists in this workspace' };
             }
@@ -579,17 +712,25 @@ export class WorkspaceRepository {
             // Update workspace in database
             await this.updateWorkspace(workspaceId, {
                 ...workspace,
-                updatedAt: new Date().toISOString()
+                updatedAt: new Date().toISOString(),
             });
 
             return { result: project };
         } catch (error) {
             console.error('Failed to add project to workspace:', error);
-            return { error: error instanceof Error ? error.message : 'Failed to add project to workspace' };
+            return {
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : 'Failed to add project to workspace',
+            };
         }
     }
 
-    async getRecentProjects(workspaceId: string, limit = 5): Promise<ProjectData[]> {
+    async getRecentProjects(
+        workspaceId: string,
+        limit = 5
+    ): Promise<ProjectData[]> {
         const projects: any = await this.listProjects(workspaceId);
         return projects
             .sort((a, b) => {
@@ -600,9 +741,16 @@ export class WorkspaceRepository {
             .slice(0, limit);
     }
 
-    async validateAndMoveProject(project: ProjectData, workspacePath: string): Promise<void> {
+    async validateAndMoveProject(
+        project: ProjectData,
+        workspacePath: string
+    ): Promise<void> {
         // Expected project path pattern: <workspacePath>/projects/<projectName>
-        const expectedPath = path.join(workspacePath, 'projects', project.config.name);
+        const expectedPath = path.join(
+            workspacePath,
+            'projects',
+            project.config.name
+        );
 
         // If project is already in correct location, do nothing
         if (project.path === expectedPath) {
@@ -622,8 +770,13 @@ export class WorkspaceRepository {
 
         // Move the project
         try {
-            await fs.promises.cp(project.path, expectedPath, { recursive: true });
-            await fs.promises.rm(project.path, { recursive: true, force: true });
+            await fs.promises.cp(project.path, expectedPath, {
+                recursive: true,
+            });
+            await fs.promises.rm(project.path, {
+                recursive: true,
+                force: true,
+            });
             project.path = expectedPath;
             project.updatedAt = new Date().toISOString();
         } catch (error: any) {
@@ -633,7 +786,9 @@ export class WorkspaceRepository {
 
     // Backup Methods
     async backupData(backupPath?: string): Promise<void> {
-        const targetPath = backupPath || path.join(BACKUP_DIR, `backup-${new Date().toISOString()}.json`);
+        const targetPath =
+            backupPath ||
+            path.join(BACKUP_DIR, `backup-${new Date().toISOString()}.json`);
         const data = await this.loadData();
         await writeFile(targetPath, JSON.stringify(data, null, 2));
     }

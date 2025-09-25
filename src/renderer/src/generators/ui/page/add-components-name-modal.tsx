@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import {
     SelectInput,
@@ -149,7 +157,10 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
                 </div>
 
                 <IGRPDialogFooterPrimitive className="gap-2">
-                    <IGRPButtonPrimitive variant="outline" onClick={handleCancel}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={handleCancel}
+                    >
                         Cancel
                     </IGRPButtonPrimitive>
                     <IGRPButtonPrimitive

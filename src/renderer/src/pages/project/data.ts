@@ -6,7 +6,7 @@ export const STEPS = [
 ];
 
 export const THEME_COLORS = [
-    { name: 'Black', value: '#000000' }, 
+    { name: 'Black', value: '#000000' },
     { name: 'Slate', value: '#64748b' }, // Dark grayish-blue
     { name: 'Indigo', value: '#6366f1' }, // Deep bluish-purple
     { name: 'Blue', value: '#3b82f6' }, // Bright blue
@@ -28,7 +28,7 @@ export const frontendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '164K',
         views: '5.6K',
-        availableSupport: true
+        availableSupport: true,
     },
     {
         id: 'vuejs',
@@ -37,7 +37,7 @@ export const frontendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '91K',
         views: '4K',
-        availableSupport: false
+        availableSupport: false,
     },
     {
         id: 'angular',
@@ -46,7 +46,7 @@ export const frontendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '87K',
         views: '4.7K',
-        availableSupport: false
+        availableSupport: false,
     },
 ];
 
@@ -58,7 +58,7 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '75K',
         views: '1.3K',
-        availableSupport: true
+        availableSupport: true,
     },
     {
         id: 'dotnet',
@@ -67,7 +67,7 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '74K',
         views: '2K',
-        availableSupport: true
+        availableSupport: true,
     },
     {
         id: 'django',
@@ -76,7 +76,7 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '72K',
         views: '2.3K',
-        availableSupport: false
+        availableSupport: false,
     },
     {
         id: 'go',
@@ -85,6 +85,6 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '72K',
         views: '2.3K',
-        availableSupport: false
-    }
+        availableSupport: false,
+    },
 ];

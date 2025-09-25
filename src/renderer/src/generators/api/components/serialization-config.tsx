@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import {
     IGRPDialogPrimitive,
     IGRPDialogContentPrimitive,
-    IGRPDialogHeaderPrimitive   ,
+    IGRPDialogHeaderPrimitive,
     IGRPDialogTitlePrimitive,
     IGRPDialogFooterPrimitive,
     IGRPDialogDescriptionPrimitive,
@@ -150,7 +150,9 @@ export default function SerializationConfigModal({
                 onClick={(e) => e.stopPropagation()}
             >
                 <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('import')}</IGRPDialogTitlePrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('import')}
+                    </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive />
                 </IGRPDialogHeaderPrimitive>
                 <form
@@ -197,7 +199,9 @@ export default function SerializationConfigModal({
                         }}
                     />
                     <IGRPDialogFooterPrimitive>
-                        <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive type="submit">
+                            {t('save')}
+                        </IGRPButtonPrimitive>
                     </IGRPDialogFooterPrimitive>
                 </form>
             </IGRPDialogContentPrimitive>

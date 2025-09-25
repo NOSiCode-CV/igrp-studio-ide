@@ -148,7 +148,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             findComponentById,
             generateTag,
             setAllComponents,
-            findComponent
+            findComponent,
         });
 
         useEffect(() => {
@@ -167,7 +167,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                     setAllImports(data.imports);
 
                     if (data.components) setAllComponents(data.components);
-                    
                 } catch (error) {
                     console.error('Failed to load JSON content:', error);
                 } finally {

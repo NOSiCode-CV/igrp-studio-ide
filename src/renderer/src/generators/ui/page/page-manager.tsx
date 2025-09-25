@@ -3,7 +3,15 @@ import { useDispatch } from 'react-redux';
 
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
-import { IGRPButtonPrimitive, IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive, IGRPToggleGroupItemPrimitive, IGRPToggleGroupPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+    IGRPToggleGroupItemPrimitive,
+    IGRPToggleGroupPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { LayoutGrid, Plus, TableIcon, Workflow } from 'lucide-react';
 import { PageCardView } from './page-card-view';
 import { CreatePageModal } from './create-page-modal';
@@ -238,12 +246,15 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                     <IGRPTabsTriggerPrimitive value="bpmn">
                         <Workflow className="h-4 w-4 mr-2" />
                         BPMN
-                    </IGRPTabsTriggerPrimitive          >
+                    </IGRPTabsTriggerPrimitive>
                     <IGRPTabsTriggerPrimitive value="settings">
                         {t('settings')}
                     </IGRPTabsTriggerPrimitive>
                 </IGRPTabsListPrimitive>
-                <IGRPTabsContentPrimitive value="pages" className="space-y-4 pt-3 group">
+                <IGRPTabsContentPrimitive
+                    value="pages"
+                    className="space-y-4 pt-3 group"
+                >
                     <>
                         <div className="flex justify-between">
                             <SubHeadline
@@ -287,7 +298,10 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                 </IGRPToggleGroupPrimitive>
                                 <IGRPDropdownMenuPrimitive>
                                     <IGRPDropdownMenuTriggerPrimitive asChild>
-                                        <IGRPButtonPrimitive size="sm" variant="default">
+                                        <IGRPButtonPrimitive
+                                            size="sm"
+                                            variant="default"
+                                        >
                                             <Plus className="h-4 w-4" />
                                             {t('add')}
                                         </IGRPButtonPrimitive>
@@ -367,14 +381,20 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                         )}
                     </>
                 </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="bpmn" className="space-y-4 pt-3">
+                <IGRPTabsContentPrimitive
+                    value="bpmn"
+                    className="space-y-4 pt-3"
+                >
                     <BPMNManager
                         onPageClick={handleAddComponents}
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
                 </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="settings" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="settings"
+                    className="space-y-4"
+                >
                     <ProjectSettings
                         hasTitle={false}
                         project={project}

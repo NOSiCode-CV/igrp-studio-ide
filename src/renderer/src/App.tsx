@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import React, { useEffect, useState } from 'react';
 import rootReducer from './redux';
 import { ThemeProvider } from './components/theme-provider';
-import { ActiveThemeProvider } from './components/ActiveThemeProvider';
+import { ActiveThemeProvider } from './components/active-theme-provider';
 import { ThemeService } from './services/ThemeService';
 
 import '@igrp/framework-process-studio-bpmn-editor/dist/src/styles.css';
