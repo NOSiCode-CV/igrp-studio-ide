@@ -16,13 +16,13 @@ import {
     IGRPTooltipTriggerPrimitive,
     IGRPTooltipProviderPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
+import { useTranslation } from 'react-i18next';
 
 interface DockerControlsProps {
     loading: boolean;
     onRun: () => Promise<void>;
     onStopAll: () => Promise<void>;
     onDropAll: (dropVolume: boolean) => Promise<void>;
-    t: (key: string) => string;
 }
 
 const DockerControls: React.FC<DockerControlsProps> = ({
@@ -30,8 +30,8 @@ const DockerControls: React.FC<DockerControlsProps> = ({
     onRun,
     onStopAll,
     onDropAll,
-    t,
 }) => {
+    const { t } = useTranslation();
     const [dropVolume, setDropVolume] = useState<boolean>(false);
 
     return (

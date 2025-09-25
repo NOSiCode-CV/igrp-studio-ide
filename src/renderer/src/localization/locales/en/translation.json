@@ -464,7 +464,7 @@
     "newService": "New Service",
     "services": "Services",
     "enableCustonValidation": "Enable Custom Validation",
-    "run": "Run",
+    "run": "Run in Docker",
     "savedSuccessfully": "'{{name}}' saved successfully",
     "stop": "Stop",
     "appearance": "Appearance",

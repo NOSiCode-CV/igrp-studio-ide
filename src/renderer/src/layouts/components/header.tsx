@@ -1,5 +1,5 @@
 import logo from '@renderer/assets/images/igrp-green.svg';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
@@ -67,21 +67,21 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const handleMinimize = () => {
+    const handleMinimize = (): void => {
         window.menu.minimizeWindow();
         window.menu.isMaximized;
     };
 
-    const handleMaximize = () => {
+    const handleMaximize = (): void => {
         window.menu.maximizeWindow();
         setIsMaximized(!isMaximized);
     };
 
-    const handleClose = () => {
+    const handleClose = (): void => {
         window.menu.closeWindow();
     };
 
-    const openIDE = async (ideType: string) => {
+    const openIDE = async (ideType: string): Promise<void> => {
         const path = basePath || workspace.path;
         if (!path) return;
         try {
@@ -92,7 +92,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     };
 
     useEffect(() => {
-        const laodIdes = async () => {
+        const laodIdes = async (): Promise<void> => {
             await window.api.getIDEs().then((data) => {
                 setInstalledIDEs(data);
             });
@@ -101,7 +101,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     }, []);
 
     useEffect(() => {
-        const checkMaximized = async () => {
+        const checkMaximized = async (): Promise<void> => {
             try {
                 const maximized = await window.menu.isMaximized();
                 setIsMaximized(maximized);
@@ -131,7 +131,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
         icon: React.ReactNode;
         label: string;
         className?: string;
-    }) => (
+    }): JSX.Element => (
         <button
             onClick={onClick}
             className={cn(
@@ -145,15 +145,15 @@ const Header = ({ config, basePath }: HeaderProps) => {
         </button>
     );
 
-    const handleRun = async () => {
+    const handleRun = async (): Promise<void> => {
         await startContainers();
     };
 
-    const handleDowm = async (dropVolume: boolean) => {
+    const handleDowm = async (dropVolume: boolean): Promise<void> => {
         await stopContainers(dropVolume);
     };
 
-    const handleStop = async () => {
+    const handleStop = async (): Promise<void> => {
         await stopService();
     };
 
@@ -205,13 +205,14 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             )}
                         </div>
                         <div className="flex items-center space-x-2 ">
-                            <DockerControls
-                                loading={loading}
-                                onRun={handleRun}
-                                onDropAll={handleDowm}
-                                onStopAll={handleStop}
-                                t={t}
-                            />
+                            {!basePath && (
+                                <DockerControls
+                                    loading={loading}
+                                    onRun={handleRun}
+                                    onDropAll={handleDowm}
+                                    onStopAll={handleStop}
+                                />
+                            )}
 
                             {basePath && (
                                 <>
@@ -248,7 +249,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 </IGRPTooltipPrimitive>
                                 <IGRPDropdownMenuContentPrimitive align="end">
                                     {installedIDEs.map(
-                                        ({ key, config }, index) => {
+                                        (
+                                            { key, config },
+                                            index
+                                        ): React.ReactNode => {
                                             return (
                                                 <IGRPDropdownMenuItemPrimitive
                                                     key={index}
