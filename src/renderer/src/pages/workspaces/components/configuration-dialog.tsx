@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { IGRPBadgePrimitive, IGRPButtonPrimitive, IGRPCheckboxPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogFooterPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPScrollAreaPrimitive, IGRPSelectContentPrimitive, IGRPSelectItemPrimitive, IGRPSelectPrimitive, IGRPSelectTriggerPrimitive, IGRPSelectValuePrimitive, IGRPSwitchPrimitive, IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGRPTabsTriggerPrimitive, IGRPTextAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
-import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
@@ -486,7 +485,7 @@ export function ConfigurationDialog({
                                         placeholder={t(
                                             'describeServicePlaceholder'
                                         )}
-                                        className="h-20 resize-none"
+                                        className="resize-none"
                                     />
                                 </div>
 
@@ -529,7 +528,7 @@ export function ConfigurationDialog({
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
                                         <IGRPLabel>{t('ports')}</IGRPLabel>
-                                        <IGRPBadge
+                                        <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
                                         >
@@ -537,7 +536,7 @@ export function ConfigurationDialog({
                                             {ports.length === 1
                                                 ? 'port'
                                                 : 'ports'}
-                                        </IGRPBadge>
+                                        </IGRPBadgePrimitive>
                                     </div>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -608,7 +607,7 @@ export function ConfigurationDialog({
                                         <IGRPLabel>
                                             {t('environmentVariables')}
                                         </IGRPLabel>
-                                        <IGRPBadge
+                                        <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
                                         >
@@ -616,7 +615,7 @@ export function ConfigurationDialog({
                                             {environments.length === 1
                                                 ? t('variable')
                                                 : t('variables')}
-                                        </IGRPBadge>
+                                        </IGRPBadgePrimitive>
                                     </div>
 
                                     <div className="border rounded-md p-3 space-y-2">

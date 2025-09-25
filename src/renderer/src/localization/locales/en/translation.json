@@ -861,5 +861,15 @@
   "databasePassword": "Database Password",
   "edit_connection": "Edit Connection",
   "edit_connection_description": "Modify the details of your database connection",
-  "template": "Template"
+  "template": "Template",
+  "editProjectDescription": "Modify the project details below",
+  "noIcon": "No Icon",
+  "uploadIcon": "Upload Icon",
+  "removeIcon": "Remove Icon",
+  "updatedSuccessfully": "{{name}} updated successfully",
+  "invalidFileType": "Please select a valid image file",
+  "fileTooLarge": "File size must be less than 2MB",
+  "openWorkspace": "Open Workspace",
+  "selectWorkspaceDirectory": "Select Workspace Directory",
+  "workspaceOpenedSuccessfully": "{{name}} opened successfully"
 }

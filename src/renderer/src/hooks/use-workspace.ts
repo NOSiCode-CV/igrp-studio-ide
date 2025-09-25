@@ -82,10 +82,13 @@ export const useWorkspace = () => {
     const refreshWorkspaces = async () => {
         setLoading(true);
         try {
-            await getWorkspaces().then((data) => {
-                setWorkspaces(data);
-                markWorkspaceAccessed(data)
-            });
+            const data = await getWorkspaces();
+            setWorkspaces(data);
+            if (data.length > 0) {
+                markWorkspaceAccessed(data);
+            } else {
+                dispatch(setWorkspace(null));
+            }
         } catch (err) {
             showErrorToast('Failed to load workspaces');
         } finally {
@@ -120,6 +123,9 @@ export const useWorkspace = () => {
     };
 
     const markWorkspaceAccessed = async (workspaces: IWorkspace[]) => {
+        if (workspaces.length === 0) {
+            return;
+        }
         const workspace = [...workspaces].sort((a, b) => {
             const aLastAccess = new Date(a.updatedAt || a.createdAt);
             const bLastAccess = new Date(b.updatedAt || b.createdAt);
@@ -159,7 +165,9 @@ export const useWorkspace = () => {
     };
 
     const switchWorkspace = async (upWorkspace: IWorkspace) => {
-        if (!upWorkspace || currentWorkspace?.id === upWorkspace.id) return
+        if (!upWorkspace || currentWorkspace?.id === upWorkspace.id) {
+            return;
+        }
 
         setCurrentWorkspace(upWorkspace)
         dispatch(setWorkspace(upWorkspace))
@@ -326,6 +334,42 @@ export const useWorkspace = () => {
         }
     };
 
+    const updateProject = async (projectId: string, updates: Partial<ProjectData>) => {
+        try {
+            const result = await window.igrpStudio.workspace.updateProject(projectId, updates);
+            
+            showSuccessToast(t('updatedSuccessfully', { name: updates.name || 'Project' }));
+            dispatch(setChangeStatus(true));
+            return result;
+        } catch (error: unknown) {
+            showErrorToast(error);
+            return null;
+        }
+    };
+
+    const openWorkspace = async (workspacePath: string) => {
+        try {
+            // Check if the workspace path exists and contains workspace files
+            const result = await window.igrpStudio.workspace.openWorkspace(workspacePath);
+            
+            if (result.error) {
+                showErrorToast(result.error);
+                return null;
+            }
+
+            showSuccessToast(t('workspaceOpenedSuccessfully', { name: result.result?.name || 'Workspace' }));
+            dispatch(setChangeStatus(true));
+            
+            // Refresh workspaces to include the newly opened one
+            await refreshWorkspaces();
+            
+            return result.result;
+        } catch (error: unknown) {
+            showErrorToast(error);
+            return null;
+        }
+    };
+
     useEffect(() => {
         refreshWorkspaces();
     }, []);
@@ -350,7 +394,9 @@ export const useWorkspace = () => {
             createOrUpdateService,
             removeService,
             configureService,
-            removeProject
+            removeProject,
+            updateProject,
+            openWorkspace
         },
         state: {
             hasWorkspaces: workspaces.length > 0,

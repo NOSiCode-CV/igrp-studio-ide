@@ -104,6 +104,14 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, async (_, yaml: obj
     return await repo.saveCustomCompose(yaml, basePath);
 });
 
+handleWithCustomErrors(EVENTS.REPOSITORY.WORKSPACE.OPEN, async (_, workspacePath: string) => {
+    try {
+        return { result: await repo.openWorkspace(workspacePath) };
+    } catch (error) {
+        return { error: error instanceof Error ? error.message : 'Failed to open workspace' };
+    }
+});
+
 // Project Handlers
 handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.CREATE, async (_event, workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt'>) => {
     return await repo.addProject(workspaceId, project);
@@ -115,6 +123,10 @@ handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.UPDATE, async (_, projectId: st
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.CONFIGURE_SERVICE, async (_, config: ProjectWorkspace, basePath: string) => {
     await repo.configureService(config, basePath);
+});
+
+handleWithCustomErrors(EVENTS.REPOSITORY.PROJECT.ADD_TO_WORKSPACE, async (_, workspaceId: string, project: ProjectData) => {
+    return await repo.addProjectToWorkspace(workspaceId, project);
 });
 
 ipcMain.handle(EVENTS.REPOSITORY.PROJECT.DELETE, async (_, projectId: string, basePath: string) => {

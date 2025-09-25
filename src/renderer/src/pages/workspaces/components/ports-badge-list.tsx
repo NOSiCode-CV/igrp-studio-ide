@@ -1,4 +1,4 @@
-import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 
 interface PortsBadgeListProps {
@@ -29,13 +29,13 @@ export const PortsBadgeList = ({
             <div className="text-xs text-muted-foreground">{title}</div>
             <div className="text-xs font-mono flex flex-wrap gap-1 mt-0.5">
                 {ports.map((port, index) => (
-                    <IGRPBadge
+                    <IGRPBadgePrimitive
                         key={`${port}-${index}`}
                         variant="outline"
                         className={badgeClassName}
                     >
                         {port}
-                    </IGRPBadge>
+                    </IGRPBadgePrimitive>
                 ))}
             </div>
         </div>

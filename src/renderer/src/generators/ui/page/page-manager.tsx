@@ -231,7 +231,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             />
 
             <IGRPTabsPrimitive value={activeTab} onValueChange={setActiveTab}>
-                <IGRPTabsListPrimitive className="w-full">
+                <IGRPTabsListPrimitive>
                     <IGRPTabsTriggerPrimitive value="pages">
                         {t('pages')}
                     </IGRPTabsTriggerPrimitive>

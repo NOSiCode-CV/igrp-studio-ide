@@ -301,6 +301,27 @@ const repo = {
             ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET, workspaceId),
         getLastAccessedWorkspace: () =>
             ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT),
+        openWorkspace: async (workspacePath: string): Promise<HandlerResponse> => {
+            try {
+                return await ipcRenderer.invoke(
+                    EVENTS.REPOSITORY.WORKSPACE.OPEN,
+                    workspacePath
+                );
+            } catch (error) {
+                return handleError(error);
+            }
+        },
+        addProjectToWorkspace: async (workspaceId: string, project: ProjectData): Promise<HandlerResponse> => {
+            try {
+                return await ipcRenderer.invoke(
+                    EVENTS.REPOSITORY.PROJECT.ADD_TO_WORKSPACE,
+                    workspaceId,
+                    project
+                );
+            } catch (error) {
+                return handleError(error);
+            }
+        },
 
         // Service methods
         createService: (service: ServiceWorkspace, basePath: string) =>

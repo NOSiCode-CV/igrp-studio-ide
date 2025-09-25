@@ -1,6 +1,9 @@
 'use client';
 
-import { IGRPButtonPrimitive, IGRPSkeletonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPButtonPrimitive,
+    IGRPSkeletonPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
@@ -10,7 +13,6 @@ import { useTheme } from 'next-themes';
 import { Check } from 'lucide-react';
 import { ThemeService } from '@renderer/services/ThemeService';
 import { useThemeConfig } from '@renderer/components/ActiveThemeProvider';
-
 
 export function AppearanceSettings() {
     const { t } = useTranslation();
@@ -36,8 +38,10 @@ export function AppearanceSettings() {
             </div>
             <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                    <IGRPLabel className="text-xs"> {t('accentColor')}</IGRPLabel>
-                    <div className="grid w-full grid-cols-6 gap-3">
+                    <IGRPLabel className="text-xs">
+                        {t('accentColor')}
+                    </IGRPLabel>
+                    <div className="grid w-full md:grid-cols-4 grid-cols-6 gap-3">
                         {baseColors.map((theme) => {
                             const isActive = activeTheme === theme.name;
 
@@ -53,16 +57,17 @@ export function AppearanceSettings() {
                                     className={cn(
                                         'rounded-lg lg:px-2.5 xl:w-[86px]',
                                         isActive &&
-                                        'border-primary/50 ring-[2px] ring-primary/30'
+                                            'border-primary/50 ring-[2px] ring-primary/30'
                                     )}
                                     style={
                                         {
-                                            '--theme-primary': `hsl(${theme?.activeColor[
-                                                mode === 'dark'
-                                                    ? 'dark'
-                                                    : 'light'
-                                            ]
-                                                })`,
+                                            '--theme-primary': `hsl(${
+                                                theme?.activeColor[
+                                                    mode === 'dark'
+                                                        ? 'dark'
+                                                        : 'light'
+                                                ]
+                                            })`,
                                         } as React.CSSProperties
                                     }
                                 >
@@ -72,12 +77,13 @@ export function AppearanceSettings() {
                                         )}
                                         style={
                                             {
-                                                background: `hsl(${theme?.activeColor[
-                                                    mode === 'dark'
-                                                        ? 'dark'
-                                                        : 'light'
-                                                ]
-                                                    })`,
+                                                background: `hsl(${
+                                                    theme?.activeColor[
+                                                        mode === 'dark'
+                                                            ? 'dark'
+                                                            : 'light'
+                                                    ]
+                                                })`,
                                             } as React.CSSProperties
                                         }
                                     >
@@ -87,7 +93,7 @@ export function AppearanceSettings() {
                                     </span>
                                     <span className="hidden md:block">
                                         {theme.label === 'Zinc'
-                                            ? t('default')
+                                            ? 'default'
                                             : theme.label}
                                     </span>
                                 </IGRPButtonPrimitive>
@@ -99,7 +105,6 @@ export function AppearanceSettings() {
                             );
                         })}
                     </div>
-
                 </div>
             </div>
         </div>

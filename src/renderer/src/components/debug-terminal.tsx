@@ -3,13 +3,8 @@
 import { Bug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import {
-    IGRPScrollAreaPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive,
-    IGRPTooltipContentPrimitive,
-} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive, IGRPDrawerContentPrimitive, IGRPDrawerHeaderPrimitive, IGRPDrawerPrimitive, IGRPDrawerTitlePrimitive, IGRPDrawerTriggerPrimitive, IGRPScrollAreaPrimitive, IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+
 import { useEffect, useRef, useState } from 'react';
 import {
     IGRPTabs,
@@ -26,23 +21,29 @@ interface ConsoleMessage {
 export function DebugTerminal() {
     const { t } = useTranslation();
     return (
-        <div>
+        <IGRPDrawerPrimitive modal={false}>
             <IGRPTooltipPrimitive>
                 <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
-                        <Bug className="h-3.5 w-3.5 text-muted-foreground" />
-                    </IGRPButtonPrimitive>
+                    <IGRPDrawerTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                        >
+                            <Bug className="h-3.5 w-3.5 text-muted-foreground" />
+                        </IGRPButtonPrimitive>
+                    </IGRPDrawerTriggerPrimitive>
                 </IGRPTooltipTriggerPrimitive>
                 <IGRPTooltipContentPrimitive>{t('debug')}</IGRPTooltipContentPrimitive>
             </IGRPTooltipPrimitive>
-            <div
+            <IGRPDrawerContentPrimitive
                 aria-describedby={undefined}
                 className="h-[40vh] z-40 mb-8"
             >
                 <div className="flex h-full flex-col -mt-6">
-                    <div className="p-0">
-                        <div />
-                    </div>
+                    <IGRPDrawerHeaderPrimitive className="p-0">
+                        <IGRPDrawerTitlePrimitive />
+                    </IGRPDrawerHeaderPrimitive>
                     <IGRPTabs
                         defaultValue="debug"
                         className="flex h-full flex-col"
@@ -66,8 +67,8 @@ export function DebugTerminal() {
                         </div>
                     </IGRPTabs>
                 </div>
-            </div>
-        </div>
+            </IGRPDrawerContentPrimitive>
+        </IGRPDrawerPrimitive>
     );
 }
 

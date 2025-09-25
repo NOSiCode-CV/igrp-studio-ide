@@ -7,6 +7,7 @@ import {
     IGRPTableHeadPrimitive,
     IGRPTableHeaderPrimitive,
     IGRPTableRowPrimitive,
+    IGRPBadgePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { formatDistanceToNow } from 'date-fns';
 import { ProjectData, ServiceInfo } from 'src/main/types';
@@ -19,11 +20,10 @@ import { useTranslation } from 'react-i18next';
 interface ProjectListProps {
     projects: ProjectData[];
     workspaceId?: string;
-    onEdit?: (project: ProjectData) => void;
     services: ServiceInfo[];
 }
 
-export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
+export function ProjectList({ projects, services }: ProjectListProps) {
     const handleProjectClick = (project: ProjectData) => {
         saveOrOpenProject({project});
     };
@@ -68,7 +68,7 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
                                 </div>
                             </IGRPTableCellPrimitive>
                             <IGRPTableCellPrimitive className="text-xs">
-                                {project.framework}
+                                <IGRPBadgePrimitive>{project.framework}</IGRPBadgePrimitive>
                             </IGRPTableCellPrimitive>
                             <IGRPTableCellPrimitive>
                                 <Dependency
@@ -88,11 +88,6 @@ export function ProjectList({ projects, services, onEdit }: ProjectListProps) {
                                     project={project}
                                     projects={projects}
                                     basePath={workspace.path}
-                                    onEdit={
-                                        onEdit
-                                            ? () => onEdit(project)
-                                            : undefined
-                                    }
                                     services={services}
                                 />
                             </IGRPTableCellPrimitive>

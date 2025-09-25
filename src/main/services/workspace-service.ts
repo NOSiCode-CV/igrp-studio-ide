@@ -3,7 +3,7 @@ import fs from 'fs';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { FrameworkType, IWorkspace, ProjectData } from '../types';
+import { FrameworkType, IWorkspace, ProjectData, HandlerResponse } from '../types';
 import { addProjectToWorkspace, addServiceToWorkspace, newWorkspace as engineNewWorkspace, removeProjectFromWorkspace, removeServiceFromWorkspace, saveCustomWorkspaceComposeFile, updateProjectToWorkspace, updateServiceToWorkspace } from '@igrp/igrp-studio-nextjs-engine';
 import { EngineFactory } from '../engines/EngineFactory';
 import { ProjectWorkspace, ServiceWorkspace, WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
@@ -242,8 +242,6 @@ export class WorkspaceRepository {
 
             workspace.updatedAt = new Date().toISOString();
 
-            console.log(updatedProject)
-
             await this.addProjectToStudioWorkspace(workspace, updatedProject, true);
 
             foundProject = updatedProject;
@@ -476,6 +474,119 @@ export class WorkspaceRepository {
                 return dateB.getTime() - dateA.getTime();
             })
             .slice(0, limit);
+    }
+
+    async openWorkspace(workspacePath: string): Promise<IWorkspace> {
+        // Check if the workspace path exists
+        if (!fs.existsSync(workspacePath)) {
+            throw new Error('Workspace path does not exist');
+        }
+
+        // Validate that .igrpstudio/workspace.json exists
+        const workspaceConfigPath = path.join(workspacePath, '.igrpstudio', 'workspace.json');
+        if (!fs.existsSync(workspaceConfigPath)) {
+            throw new Error('Invalid workspace: .igrpstudio/workspace.json not found');
+        }
+
+        // Check if this workspace is already in our database
+        const existingWorkspaces = await this.listWorkspaces();
+        const existingWorkspace = existingWorkspaces.find(w => w.path === workspacePath);
+
+        if (existingWorkspace) {
+            // Update the last accessed time
+            return await this.updateWorkspace(existingWorkspace.id, {
+                updatedAt: new Date().toISOString()
+            }) || existingWorkspace;
+        }
+
+        try {
+            // Load workspace configuration from .igrpstudio/workspace.json
+            const workspaceConfigContent = await readFile(workspaceConfigPath, 'utf-8');
+            const workspaceConfig = JSON.parse(workspaceConfigContent);
+
+            // Create workspace from the configuration
+            const newWorkspace: IWorkspace = {
+                id: uuidv4(),
+                name: workspaceConfig.name || path.basename(workspacePath),
+                slug: workspaceConfig.workspace || path.basename(workspacePath).toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                path: workspacePath,
+                description: workspaceConfig.description || `Opened workspace from ${workspacePath}`,
+                createdAt: workspaceConfig.createdAt || new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                services: workspaceConfig.services || [],
+                projects: []
+            };
+
+            // Load projects from workspace configuration
+            if (workspaceConfig.projects && Array.isArray(workspaceConfig.projects)) {
+                for (const projectConfig of workspaceConfig.projects) {
+                    try {
+                        const updatedProject: ProjectData = {
+                            id: uuidv4(),
+                            name: projectConfig?.config?.name || 'Unnamed Project',
+                            path: `${workspacePath}/projects/${projectConfig?.config?.name}`,
+                            type: projectConfig.config?.type === 'frontend' ? 'frontend' : 'backend',
+                            framework: projectConfig.config?.type || 'nextjs',
+                            workspaceId: newWorkspace.id,
+                            config: projectConfig.config || {},
+                            themeColor: projectConfig.config?.themeColor || '#000000',
+                            icon: projectConfig.config?.icon || '',
+                            createdAt: projectConfig.createdAt || new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        // Push project to workspace
+                        newWorkspace.projects?.push(updatedProject as ProjectData);
+                    } catch (error) {
+                        console.warn(`Failed to load project ${projectConfig.name}:`, error);
+                    }
+                }
+            }
+
+
+            // Save the new workspace to app data
+            const data = await this.loadData();
+            data.workspaces.push(newWorkspace);
+            await this.saveData(data);
+
+            return newWorkspace;
+
+        } catch (error) {
+            console.error('Failed to parse workspace configuration:', error);
+            throw new Error('Invalid workspace configuration file');
+        }
+    }
+
+    async addProjectToWorkspace(workspaceId: string, project: ProjectData): Promise<HandlerResponse> {
+        try {
+            const workspace = await this.getWorkspace(workspaceId);
+            if (!workspace) {
+                return { error: 'Workspace not found' };
+            }
+
+            // Check if project already exists
+            const existingProject = workspace.projects?.find(p => p.path === project.path);
+            if (existingProject) {
+                return { error: 'Project already exists in this workspace' };
+            }
+
+            // Add project to workspace
+            if (!workspace.projects) {
+                workspace.projects = [];
+            }
+
+            workspace.projects.push(project);
+
+            // Update workspace in database
+            await this.updateWorkspace(workspaceId, {
+                ...workspace,
+                updatedAt: new Date().toISOString()
+            });
+
+            return { result: project };
+        } catch (error) {
+            console.error('Failed to add project to workspace:', error);
+            return { error: error instanceof Error ? error.message : 'Failed to add project to workspace' };
+        }
     }
 
     async getRecentProjects(workspaceId: string, limit = 5): Promise<ProjectData[]> {

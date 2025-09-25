@@ -39,6 +39,7 @@ export const EVENTS = {
             GET: 'repository:workspace:get',
             FIND_ALL: 'repository:workspace:find-all',
             FIND_RECENT: 'repository:workspace:find-recent',
+            OPEN: 'repository:workspace:open',
             SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
         },
         PROJECT: {
@@ -48,7 +49,8 @@ export const EVENTS = {
             GET: 'repository:project:get',
             FIND_ALL: 'repository:project:find-all',
             FIND_RECENT: 'repository:project:find-recent',
-            CONFIGURE_SERVICE: 'repository:configure-service'
+            CONFIGURE_SERVICE: 'repository:configure-service',
+            ADD_TO_WORKSPACE: 'repository:project:add-to-workspace'
         },
         SERVICE: {
             CREATE: 'repository:service:create',

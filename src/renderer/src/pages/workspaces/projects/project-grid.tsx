@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 
 interface ProjectProps {
     projects: ProjectData[];
-    onEdit?: () => void;
     workspaceId: string;
     projectOrder: string;
     services: ServiceInfo[];
@@ -32,7 +31,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
     const { t } = useTranslation();
 
     const handleOpenProject = async (project: ProjectData): Promise<void> => {
-        saveOrOpenProject({  project, openProject: true });
+        saveOrOpenProject({ project, openProject: true });
     };
 
     const sortProjects = (projects: any[]) => {
@@ -63,15 +62,15 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                     const dependsOn = service?.dependsOn || [];
                     const ports = service?.ports || [];
                     return (
-                        <IGRPCardPrimitive
-                            key={index}
-                            className="cursor-pointer group gap-2 border rounded-lg shadow-sm"
-                        >
+                        <IGRPCardPrimitive key={index} className="group">
                             <IGRPCardHeaderPrimitive>
                                 <IGRPCardTitlePrimitive>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
-                                            <ProjectIcon project={project} workspacePath={workspace.path} />
+                                            <ProjectIcon
+                                                project={project}
+                                                workspacePath={workspace.path}
+                                            />
                                             <span className="text-xs truncate text-ellipsis md:max-w-40">
                                                 {project.name}
                                             </span>

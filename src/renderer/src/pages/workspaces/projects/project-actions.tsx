@@ -17,13 +17,13 @@ import { useTranslation } from 'react-i18next';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { ConfigurationDialog } from '../components/configuration-dialog';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { EditProjectModal } from './edit-project-modal';
 
 interface ProjectDropdownProps {
     project: ProjectData;
     basePath: string;
     services?: ServiceInfo[];
     projects?: ProjectData[];
-    onEdit?: () => void;
     onConvertToSpringBoot?: () => void;
     onConvertToDotNet?: () => void;
 }
@@ -32,11 +32,11 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     project,
     services = [],
     projects = [],
-    onEdit,
     onConvertToSpringBoot,
     onConvertToDotNet,
 }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
 
@@ -56,6 +56,10 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     const handleExternalLink = () => {
         // Implement your external link logic here
         console.log(t('openExternalLinkFor'), project.name, service);
+    };
+
+    const handleEditProject = () => {
+        setIsEditModalOpen(true);
     };
 
     const findServiceByProjectName = (
@@ -79,12 +83,10 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     </IGRPButtonPrimitive>
                 </IGRPDropdownMenuTriggerPrimitive>
                 <IGRPDropdownMenuContentPrimitive className="min-w-48">
-                    {onEdit && (
-                        <IGRPDropdownMenuItemPrimitive onClick={onEdit}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            {t('editProject')}
-                        </IGRPDropdownMenuItemPrimitive>
-                    )}
+                    <IGRPDropdownMenuItemPrimitive onClick={handleEditProject}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        {t('editProject')}
+                    </IGRPDropdownMenuItemPrimitive>
 
                     {service?.status === 'running' && (
                         <IGRPDropdownMenuItemPrimitive onClick={handleExternalLink}>
@@ -152,6 +154,16 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                 onClose={() => setIsDialogOpen(false)}
                 recordId={project.name}
                 isOpen={isDialogOpen}
+            />
+
+            <EditProjectModal
+                project={project}
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onSuccess={() => {
+                    // Refresh the projects list or trigger a re-render
+                    window.location.reload();
+                }}
             />
         </>
     );

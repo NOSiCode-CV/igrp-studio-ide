@@ -13,6 +13,7 @@ import { IGRPTabsContentPrimitive, IGRPTabsListPrimitive, IGRPTabsPrimitive, IGR
 
 
 const IDEInitialScreen = () => {
+    const { t } = useTranslation();
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
     const [hasWorkspace, setHasWorkspace] = useState(false);
 
@@ -33,12 +34,11 @@ const IDEInitialScreen = () => {
         checkWorkspaces();
     }, [workspace, workspacesLoading]);
 
-    const { t } = useTranslation();
-
     const handleCreationSuccess = () => {
         setShowWorkspaceDialog(false);
         setHasWorkspace(true);
     };
+
 
     if (workspacesLoading) {
         return (
@@ -51,13 +51,32 @@ const IDEInitialScreen = () => {
     return (
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
             {!workspace ? (
-                <div className="p-3">
-                    <h1 className="text-lg font-medium">
-                        {t('workspaceNotFound')}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t('workspaceNotExist')}
-                    </p>
+                <div className="p-3 space-y-4">
+                    <div>
+                        <h1 className="text-lg font-medium">
+                            {t('workspaceNotFound')}
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            {t('workspaceNotExist')}
+                        </p>
+                    </div>
+                 {/*    <div className="flex gap-3">
+                        <IGRPButtonPrimitive
+                            onClick={handleOpenWorkspace}
+                            variant="outline"
+                            className="flex items-center gap-2"
+                        >
+                            <FolderOpen className="h-4 w-4" />
+                            {t('openWorkspace')}
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
+                            onClick={() => setShowWorkspaceDialog(true)}
+                            className="flex items-center gap-2"
+                        >
+                            <FolderKanban className="h-4 w-4" />
+                            {t('addWorkspace')}
+                        </IGRPButtonPrimitive>
+                    </div> */}
                 </div>
             ) : (
                 <>

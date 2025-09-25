@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import {
     IGRPCommandPrimitive,
@@ -146,7 +146,7 @@ export default function DependencySelector({
             </div>
             <div className="flex flex-wrap gap-2">
                 {selectedDependencies.map((dependency) => (
-                    <IGRPBadge
+                    <IGRPBadgePrimitive
                         key={`${dependency.groupId}:${dependency.artifactId}`}
                         variant="soft"
                         className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md flex items-center gap-2"
@@ -158,7 +158,7 @@ export default function DependencySelector({
                         >
                             <X className="h-4 w-4" />
                         </button>
-                    </IGRPBadge>
+                    </IGRPBadgePrimitive>
                 ))}
                 <p className="text-sm text-gray-500 mt-2">
                 {t('igrpStudioInfo')}

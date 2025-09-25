@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import { FolderKanban, ListFilter, Pin, Plus } from 'lucide-react';
+import { FolderKanban, ListFilter, Pin, Plus, FolderOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -31,34 +30,33 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
+import { useEffect, useState } from 'react';
 
-export function WorkspaceSwitcher({
+export const WorkspaceSwitcher = ({
     defaultWorkspace,
     onWorkspaceChange,
 }: {
     defaultWorkspace: IWorkspace;
     onWorkspaceChange: (workspace: IWorkspace) => void;
-}) {
+}) => {
     const navigate = useNavigate();
-    const [workspaces, setWorkspaces] = React.useState<IWorkspace[]>([]);
-    const [pinnedWorkspaces, setPinnedWorkspaces] = React.useState<
-        IWorkspace[]
-    >([]);
+    const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
+    const [pinnedWorkspaces, setPinnedWorkspaces] = useState<IWorkspace[]>([]);
 
     const { t } = useTranslation();
 
-    const [showWorkspaceDialog, setShowWorkspaceDialog] = React.useState(false);
+    const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
 
     const [selectedWorkspace, setSelectedWorkspace] =
-        React.useState<IWorkspace>(defaultWorkspace);
-    const [searchTerm, setSearchTerm] = React.useState<string>('');
-    const [filteredWorkspaces, setFilteredWorkspaces] = React.useState<
-        IWorkspace[]
-    >([]);
+        useState<IWorkspace>(defaultWorkspace);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [filteredWorkspaces, setFilteredWorkspaces] = useState<IWorkspace[]>(
+        []
+    );
 
     const {
         state: { changeStatus },
-        actions: { getWorkspaces, updateWorkspace },
+        actions: { getWorkspaces, updateWorkspace, openWorkspace },
     } = useWorkspace();
 
     const loadPinnedWorkspace = () => {
@@ -75,7 +73,7 @@ export function WorkspaceSwitcher({
         navigate(ROUTES.HOME);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         const result = workspaces.filter((workspace) =>
             workspace.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -86,7 +84,7 @@ export function WorkspaceSwitcher({
         loadPinnedWorkspace();
     }, [searchTerm, defaultWorkspace, workspaces]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const loadWorkspaces = async () => {
             await getWorkspaces().then((data) => {
                 setWorkspaces(data);
@@ -95,10 +93,7 @@ export function WorkspaceSwitcher({
         loadWorkspaces();
     }, [changeStatus]);
 
-    const togglePinWorkspace = (
-        workspace: IWorkspace,
-        e?: React.MouseEvent
-    ) => {
+    const togglePinWorkspace = (workspace: IWorkspace, e?: MouseEvent) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -109,6 +104,19 @@ export function WorkspaceSwitcher({
         });
 
         loadPinnedWorkspace();
+    };
+
+    const handleOpenWorkspace = async () => {
+        try {
+            // Use the Electron dialog to select a directory
+            const result = await window.api.openDirectory(t('openWorkspace'));
+
+            if (!result.canceled && result.basePath) {
+                await openWorkspace(result.basePath);
+            }
+        } catch (error) {
+            console.error('Error opening workspace:', error);
+        }
     };
 
     return (
@@ -148,10 +156,9 @@ export function WorkspaceSwitcher({
                                             handleChangeWorkspace(workspace)
                                         }
                                         className={cn(
-                                            workspace.name ===
-                                                selectedWorkspace.name
-                                                ? 'text-primary bg-primary/5'
-                                                : ''
+                                            workspace.slug ===
+                                                selectedWorkspace.slug &&
+                                                'text-primary bg-primary/5'
                                         )}
                                     >
                                         {workspace.name}
@@ -162,6 +169,20 @@ export function WorkspaceSwitcher({
                                     </IGRPDropdownMenuItemPrimitive>
                                 ))}
                                 <IGRPDropdownMenuSeparatorPrimitive />
+                                <IGRPDropdownMenuItemPrimitive
+                                    className="gap-2 p-2"
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        handleOpenWorkspace();
+                                    }}
+                                >
+                                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                                        <FolderOpen className="size-4" />
+                                    </div>
+                                    <div className="font-medium text-muted-foreground">
+                                        {t('openWorkspace')}
+                                    </div>
+                                </IGRPDropdownMenuItemPrimitive>
                                 <IGRPDropdownMenuItemPrimitive
                                     className="gap-2 p-2"
                                     onSelect={(e) => {
@@ -186,12 +207,10 @@ export function WorkspaceSwitcher({
                             >
                                 <IGRPSidebarMenuButtonPrimitive
                                     asChild
-                                    className={
-                                        workspace.name ===
-                                        selectedWorkspace.name
-                                            ? t('bgMuted')
-                                            : ''
-                                    }
+                                    className={cn(
+                                        workspace.slug ===
+                                            selectedWorkspace.slug && 'bg-muted'
+                                    )}
                                     onClick={() =>
                                         handleChangeWorkspace(workspace)
                                     }
@@ -201,22 +220,28 @@ export function WorkspaceSwitcher({
                                             <span>{workspace.name}</span>
                                         </div>
                                         <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IGRPButtonPrimitive
-                                                    variant="ghost"
                                                     size="icon"
-                                                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    onClick={() =>
+                                                    variant="ghost"
+                                                    className={cn(
+                                                        'h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity'
+                                                    )}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
                                                         togglePinWorkspace(
                                                             workspace
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
                                                 >
                                                     <Pin
                                                         className={cn(
                                                             'h-3 w-3',
                                                             workspace.pinned &&
-                                                                'text-igrp'
+                                                                'text-primary'
                                                         )}
                                                     />
                                                 </IGRPButtonPrimitive>
@@ -240,4 +265,4 @@ export function WorkspaceSwitcher({
             />
         </>
     );
-}
+};

@@ -6,10 +6,16 @@ import {
     IGRPDialogHeaderPrimitive,
     IGRPDialogPrimitive,
     IGRPDialogTitlePrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText, IGRPInputPassword } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPInputText,
+    IGRPInputPassword,
+} from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
-import { IGRPTabs } from '@igrp/igrp-framework-react-design-system';
 import { GitFork, Key, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RepositoryList } from './repository-list';
@@ -158,169 +164,190 @@ export function CloneProjectModal({
 
     return (
         <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="sm:max-w-[700px] lg:max-w-[650px] max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
-                <IGRPDialogHeaderPrimitive className="p-6 pb-2">
-                    <IGRPDialogTitlePrimitive className="text-2xl font-bold">
+            <IGRPDialogContentPrimitive className="sm:max-w-[700px] lg:max-w-[650px] max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+                <IGRPDialogHeaderPrimitive className="">
+                    <IGRPDialogTitlePrimitive className="">
                         {t('cloneProject')}
                     </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive />
                 </IGRPDialogHeaderPrimitive>
-                <div className="flex-1 overflow-hidden flex flex-col p-6 pt-2">
-                    <IGRPTabs   
-                        defaultValue="url"
-                        className="w-full flex-1 flex flex-col"
-                        items={[
-                            {
-                                value: "url",
-                                label: t('repositoryUrl'),
-                                icon: "Link",
-                                content: (
-                                    <div className="space-y-4 flex-1 overflow-auto">
-                                        <div className="grid gap-6 py-6">
+                <div className="flex-1 overflow-hidden flex flex-col">
+                    <IGRPTabsPrimitive defaultValue="url" className="w-full flex-1 flex flex-col">
+                        <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
+                            <IGRPTabsTriggerPrimitive value="url">
+                                {t('repositoryUrl')}
+                            </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="search">
+                                {t('searchRepositories')}
+                            </IGRPTabsTriggerPrimitive>
+                        </IGRPTabsListPrimitive>
+                        
+                        <IGRPTabsContentPrimitive value="url" className="space-y-4 flex-1 overflow-auto">
+                            <div className="grid gap-6 py-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="col-span-2 grid gap-2">
+                                        <IGRPLabel
+                                            htmlFor="project-url"
+                                            className="text-muted-foreground"
+                                        >
+                                            {t('repositoryUrl')}
+                                        </IGRPLabel>
+                                        <IGRPInputText
+                                            id="project-url"
+                                            placeholder={t(
+                                                'repositoryUrlPlaceholder'
+                                            )}
+                                            value={projectUrl}
+                                            onChange={(e) =>
+                                                setProjectUrl(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="bg-background text-foreground placeholder-muted-foreground"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid gap-2">
+                                    <IGRPLabel className="text-muted-foreground">
+                                        {t('authentication')}
+                                    </IGRPLabel>
+                                    <IGRPTabsPrimitive value={authType} onValueChange={setAuthType}>
+                                        <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
+                                            <IGRPTabsTriggerPrimitive value="none">
+                                                {t('none')}
+                                            </IGRPTabsTriggerPrimitive>
+                                            <IGRPTabsTriggerPrimitive value="basic">
+                                                {t('basic')}
+                                            </IGRPTabsTriggerPrimitive>
+                                            <IGRPTabsTriggerPrimitive value="token">
+                                                {t('token')}
+                                            </IGRPTabsTriggerPrimitive>
+                                        </IGRPTabsListPrimitive>
+                                        
+                                        <IGRPTabsContentPrimitive value="none" className="mt-4">
+                                            {/* No authentication content */}
+                                        </IGRPTabsContentPrimitive>
+                                        
+                                        <IGRPTabsContentPrimitive value="basic" className="mt-4">
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div className="col-span-2 grid gap-2">
+                                                <div className="grid gap-2">
                                                     <IGRPLabel
-                                                        htmlFor="project-url"
+                                                        htmlFor="username"
                                                         className="text-muted-foreground"
                                                     >
-                                                        {t('repositoryUrl')}
-                                                    </IGRPLabel>
-                                                    <IGRPInputText
-                                                        id="project-url"
-                                                        placeholder={t(
-                                                            'repositoryUrlPlaceholder'
+                                                        {t(
+                                                            'username'
                                                         )}
-                                                        value={projectUrl}
-                                                        onChange={(e) =>
-                                                            setProjectUrl(e.target.value)
+                                                    </IGRPLabel>
+                                                    <div className="relative">
+                                                        <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <IGRPInputText
+                                                            id="username"
+                                                            placeholder={t(
+                                                                'usernamePlaceholder'
+                                                            )}
+                                                            value={
+                                                                username
+                                                            }
+                                                            onChange={(
+                                                                e
+                                                            ) =>
+                                                                setUsername(
+                                                                    e
+                                                                        .target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="pl-8 bg-background text-foreground placeholder-muted-foreground"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid gap-2">
+                                                    <IGRPLabel
+                                                        htmlFor="password"
+                                                        className="text-muted-foreground"
+                                                    >
+                                                        {t(
+                                                            'password'
+                                                        )}
+                                                    </IGRPLabel>
+                                                    <div className="relative">
+                                                        <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <IGRPInputPassword
+                                                            id="password"
+                                                            name="password"
+                                                            placeholder={t(
+                                                                'passwordPlaceholder'
+                                                            )}
+                                                            value={
+                                                                password
+                                                            }
+                                                            onChange={(
+                                                                value
+                                                            ) =>
+                                                                setPassword(
+                                                                    value
+                                                                )
+                                                            }
+                                                            className="pl-8 bg-background text-foreground placeholder-muted-foreground"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </IGRPTabsContentPrimitive>
+                                        
+                                        <IGRPTabsContentPrimitive value="token" className="mt-4">
+                                            <div className="grid gap-2">
+                                                <IGRPLabel
+                                                    htmlFor="token"
+                                                    className="text-muted-foreground"
+                                                >
+                                                    {t(
+                                                        'token'
+                                                    )}
+                                                </IGRPLabel>
+                                                <div className="relative">
+                                                    <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <IGRPInputPassword
+                                                        id="token"
+                                                        name="token"
+                                                        placeholder={t(
+                                                            'tokenPlaceholder'
+                                                        )}
+                                                        value={
+                                                            token
                                                         }
-                                                        className="bg-background text-foreground placeholder-muted-foreground"
+                                                        onChange={(
+                                                            value
+                                                        ) =>
+                                                            setToken(
+                                                                value
+                                                            )
+                                                        }
+                                                        className="pl-8 bg-background text-foreground placeholder-muted-foreground"
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="grid gap-2">
-                                                <IGRPLabel className="text-muted-foreground">
-                                                    {t('authentication')}
-                                                </IGRPLabel>
-                                                <IGRPTabs
-                                                    value={authType}
-                                                    onValueChange={setAuthType}
-                                                    items={[
-                                                        {
-                                                            value: "none",
-                                                            label: t('none'),
-                                                            content: null
-                                                        },
-                                                        {
-                                                            value: "basic",
-                                                            label: t('basic'),
-                                                            content: (
-                                                                <div className="grid grid-cols-2 gap-4 mt-4">
-                                                                    <div className="grid gap-2">
-                                                                        <IGRPLabel
-                                                                            htmlFor="username"
-                                                                            className="text-muted-foreground"
-                                                                        >
-                                                                            {t('username')}
-                                                                        </IGRPLabel>
-                                                                        <div className="relative">
-                                                                            <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                            <IGRPInputText
-                                                                                id="username"
-                                                                                placeholder={t(
-                                                                                    'usernamePlaceholder'
-                                                                                )}
-                                                                                value={username}
-                                                                                onChange={(e) =>
-                                                                                    setUsername(
-                                                                                        e.target.value
-                                                                                    )
-                                                                                }
-                                                                                className="pl-8 bg-background text-foreground placeholder-muted-foreground"
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="grid gap-2">
-                                                                        <IGRPLabel
-                                                                            htmlFor="password"
-                                                                            className="text-muted-foreground"
-                                                                        >
-                                                                            {t('password')}
-                                                                        </IGRPLabel>
-                                                                        <div className="relative">
-                                                                            <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                            <IGRPInputPassword
-                                                                                id="password"
-                                                                                name="password"
-                                                                                placeholder={t(
-                                                                                    'passwordPlaceholder'
-                                                                                )}
-                                                                                value={password}
-                                                                                onChange={(value) =>
-                                                                                    setPassword(value)
-                                                                                }
-                                                                                className="pl-8 bg-background text-foreground placeholder-muted-foreground"
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        },
-                                                        {
-                                                            value: "token",
-                                                            label: t('token'),
-                                                            content: (
-                                                                <div className="grid gap-2 mt-4">
-                                                                    <IGRPLabel
-                                                                        htmlFor="token"
-                                                                        className="text-muted-foreground"
-                                                                    >
-                                                                        {t('token')}
-                                                                    </IGRPLabel>
-                                                                    <div className="relative">
-                                                                        <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                        <IGRPInputPassword
-                                                                            id="token"
-                                                                            name="token"
-                                                                            placeholder={t(
-                                                                                'tokenPlaceholder'
-                                                                            )}
-                                                                            value={token}
-                                                                            onChange={(value) =>
-                                                                                setToken(value)
-                                                                            }
-                                                                            className="pl-8 bg-background text-foreground placeholder-muted-foreground"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        }
-                                                    ]}
-                                                />
-                                            </div>
-                                        </div>
-                                        <IGRPButtonPrimitive
-                                            onClick={handleCloneProject}
-                                            className="w-full"
-                                            disabled={isCloning}
-                                        >
-                                            <GitFork className="w-4 h-4 mr-2" />
-                                            {isCloning
-                                                ? t('cloningProject')
-                                                : t('cloneProject')}
-                                        </IGRPButtonPrimitive>
-                                    </div>
-                                )
-                            },
-                            {
-                                value: "search",
-                                label: t('searchRepositories'),
-                                icon: "GitFork",
-                                content: <RepositoryList />
-                            }
-                        ]}
-                    />
-
+                                        </IGRPTabsContentPrimitive>
+                                    </IGRPTabsPrimitive>
+                                </div>
+                            </div>
+                            <IGRPButtonPrimitive
+                                onClick={handleCloneProject}
+                                className="w-full"
+                                disabled={isCloning}
+                            >
+                                <GitFork className="w-4 h-4 mr-2" />
+                                {isCloning
+                                    ? t('cloningProject')
+                                    : t('cloneProject')}
+                            </IGRPButtonPrimitive>
+                        </IGRPTabsContentPrimitive>
+                        
+                        <IGRPTabsContentPrimitive value="search">
+                            <RepositoryList />
+                        </IGRPTabsContentPrimitive>
+                    </IGRPTabsPrimitive>
                 </div>
             </IGRPDialogContentPrimitive>
         </IGRPDialogPrimitive>

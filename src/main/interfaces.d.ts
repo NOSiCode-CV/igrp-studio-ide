@@ -42,6 +42,7 @@ export interface IWorkspaceRepository {
     getWorkspace(id: string): Promise<IWorkspace | undefined>;
     findAllWorkspaces(): Promise<IWorkspace[]>;
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
+    openWorkspace(workspacePath: string): Promise<HandlerResponse>;
     saveCustomWorkspaceComposeFile(yaml: object, basePath: string): Promise<void>;
 
     // Project Operations
@@ -52,6 +53,7 @@ export interface IWorkspaceRepository {
     getProject(id: string): Promise<ProjectData | undefined>;
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
     getRecentProjects(workspaceId: string, limit?: number): Promise<ProjectData[]>;
+    addProjectToWorkspace(workspaceId: string, project: ProjectData): Promise<HandlerResponse>;
 
     //Service Operations
     createService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;

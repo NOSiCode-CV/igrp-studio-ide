@@ -153,11 +153,12 @@ const CreateWorkspace = ({
 
                     <div className="space-y-2">
                         <IGRPLabel>{t('workspace.locationLabel')}</IGRPLabel>
-                        <div className="flex gap-2">
+                        <div className="flex  gap-2">
                             <IGRPInputText
                                 value={directoryPath}
                                 readOnly
                                 placeholder={t('workspace.locationPlaceholder')}
+                                className="w-full flex-1"
                             />
                             <IGRPButtonPrimitive
                                 variant="outline"
