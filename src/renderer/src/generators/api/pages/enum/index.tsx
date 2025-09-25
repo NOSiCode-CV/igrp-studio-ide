@@ -1,4 +1,4 @@
-import { IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCardContentPrimitive, IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system';
 import NavigationBar from '../../components/navigation-bar';
 import { TextInput } from '../../components/inputs-form';
 import { FormList } from '../../../../components/form-list';
@@ -39,43 +39,49 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive className="rounded-sm p-6">
-                    <div className="flex flex-col gap-4">
-                        <TextInput
-                            id="name"
-                            label={t('name')}
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.errors.name}
-                            isTouched={formik.touched.name}
-                            isRequired
-                        />
-                        <div className="border pt-3 rounded-sm">
-                            <FormList
-                                columns={tablesColumns.values || []}
-                                formik={formik}
-                                data={formik.values.values}
-                                changeValue={(element, position, result) =>
-                                    changeValue(
-                                        formik,
-                                        element,
-                                        position,
-                                        result,
-                                        tableName
-                                    )
-                                }
-                                addRow={() =>
-                                    addNewRow(formik, tableName, defaultValue)
-                                }
-                                removeRow={(position) =>
-                                    removeRow(formik, tableName, position)
-                                }
-                                btnLabels={t('enum')}
-                                name={tableName}
+                <IGRPCardPrimitive>
+                    <IGRPCardContentPrimitive>
+                        <div className="flex flex-col gap-4">
+                            <TextInput
+                                id="name"
+                                label={t('name')}
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.errors.name}
+                                isTouched={formik.touched.name}
+                                isRequired
                             />
+                            <div className="border rounded-lg pb-2">
+                                <FormList
+                                    columns={tablesColumns.values || []}
+                                    formik={formik}
+                                    data={formik.values.values}
+                                    changeValue={(element, position, result) =>
+                                        changeValue(
+                                            formik,
+                                            element,
+                                            position,
+                                            result,
+                                            tableName
+                                        )
+                                    }
+                                    addRow={() =>
+                                        addNewRow(
+                                            formik,
+                                            tableName,
+                                            defaultValue
+                                        )
+                                    }
+                                    removeRow={(position) =>
+                                        removeRow(formik, tableName, position)
+                                    }
+                                    btnLabels={t('enum')}
+                                    name={tableName}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    </IGRPCardContentPrimitive>
                 </IGRPCardPrimitive>
             </div>
         </form>

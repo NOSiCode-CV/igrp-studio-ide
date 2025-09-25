@@ -1,6 +1,5 @@
-import { IGRPCheckboxPrimitive, IGRPCombobox, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCheckboxPrimitive, IGRPCombobox, IGRPLabelPrimitive, IGRPSwitchPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 
 import { LabelRequired } from '@renderer/components/label-required';
 import { cn } from '@renderer/lib/utils';
@@ -53,7 +52,7 @@ export const TextInput = ({
             {isRequired ? (
                 <LabelRequired>{label}</LabelRequired>
             ) : (
-                <IGRPLabel htmlFor={id}>{label}</IGRPLabel>
+                <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
             )}
             <IGRPInputText
                 id={id}
@@ -97,9 +96,9 @@ export const SelectInput = ({
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <IGRPLabel htmlFor={id} className={cn(classNameLabel)}>
+            <IGRPLabelPrimitive htmlFor={id} className={cn(classNameLabel)}>
                 {label}
-            </IGRPLabel>
+            </IGRPLabelPrimitive>
         )}
         <IGRPCombobox
             name={id}
@@ -135,7 +134,7 @@ export const CheckboxInput = ({
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <IGRPLabel htmlFor={id}>{label}</IGRPLabel>
+            <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
         )}
         {error && isTouched && (
             <p className="text-xs text-destructive">{error}</p>
@@ -156,7 +155,7 @@ export const SwitchInput = ({
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <IGRPLabel htmlFor={id}>{label}</IGRPLabel>
+            <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
         )}
         <IGRPSwitchPrimitive name={id} checked={value} onCheckedChange={onChange} />
         {error && isTouched && (

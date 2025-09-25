@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
@@ -264,7 +264,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <IGRPLabel>{t('name')}</IGRPLabel>
+                                    <IGRPLabelPrimitive>
+                                        {t('name')}
+                                    </IGRPLabelPrimitive>
                                     <IGRPInputText
                                         name={t('name')}
                                         value={name}
@@ -325,7 +327,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    <IGRPLabel>{t('collectionType')}</IGRPLabel>
+                                    <IGRPLabelPrimitive>
+                                        {t('collectionType')}
+                                    </IGRPLabelPrimitive>
                                     <IGRPCombobox
                                         options={collectionTypes}
                                         value={collectionType}
@@ -363,7 +367,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                             {/* Descritpion */}
                             <div className="flex flex-col gap-2">
-                                <IGRPLabel>{t('description')}</IGRPLabel>
+                                <IGRPLabelPrimitive>{t('description')}</IGRPLabelPrimitive>
                                 <IGRPInputText
                                     type="text"
                                     name="description"
@@ -383,9 +387,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             </div>
                             {typeValue === 'object' && (
                                 <>
-                                    <p className="">
-                                        {t('dataSchema')}
-                                    </p>
+                                    <p className="">{t('dataSchema')}</p>
                                     <div className="border rounded">
                                         <JSONSchemaBuilder
                                             schemaTypes={schemaTypes}

@@ -100,7 +100,7 @@ export const ResponseLayout = ({
                             placeholder={t('description')}
                             className="w-full"
                         />
-                        <IGRPCardPrimitive className="rounded">
+                        <IGRPCardPrimitive>
                             <IGRPCardHeaderPrimitive>
                                 <IGRPCardTitlePrimitive>{t('dataSchema')}</IGRPCardTitlePrimitive>
                             </IGRPCardHeaderPrimitive>

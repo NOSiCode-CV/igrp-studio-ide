@@ -92,7 +92,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                 onClose={() => setIsModalOpen(false)}
             />
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive className="rounded">
+                <IGRPCardPrimitive>
                     <IGRPCardHeaderPrimitive>
                         <IGRPCardTitlePrimitive>{t('definition')}</IGRPCardTitlePrimitive>
                         <IGRPCardDescriptionPrimitive>
