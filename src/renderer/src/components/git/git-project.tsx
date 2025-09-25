@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setBasePath, setConfig } from '@renderer/redux/thunks';
 import useGitAuth from '@renderer/hooks/use-git-auth';
-import { LoadingSpinner } from '../loading-spinner';
+import { LoadingSpinner } from '../loader';
 import { useGit } from '@renderer/hooks/use-git';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
