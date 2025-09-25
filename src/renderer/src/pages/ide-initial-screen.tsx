@@ -57,15 +57,11 @@ const IDEInitialScreen = () => {
     return (
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
             {!workspace ? (
-                <div className="p-3 space-y-4">
-                    <div>
-                        <h1 className="text-lg font-medium">
-                            {t('workspaceNotFound')}
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            {t('workspaceNotExist')}
-                        </p>
-                    </div>
+                <div className="p-3 space-y-4 border-dashed rounded-lg">
+                    <EmptyList
+                        title={t('workspaceNotFound')}
+                        description={t('workspaceNotExist')}
+                    />
                     {/*    <div className="flex gap-3">
                         <IGRPButtonPrimitive
                             onClick={handleOpenWorkspace}
