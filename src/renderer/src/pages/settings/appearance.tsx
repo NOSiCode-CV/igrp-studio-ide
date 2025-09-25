@@ -6,7 +6,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { baseColors } from './base-color';
 import { useTheme } from 'next-themes';
@@ -27,7 +27,7 @@ export function AppearanceSettings() {
 
     const { resolvedTheme: mode } = useTheme();
 
-    async function saveTheme(newTheme: string) {
+    async function saveTheme(newTheme: string): Promise<void> {
         await ThemeService.setActiveTheme(newTheme);
     }
 
@@ -38,9 +38,9 @@ export function AppearanceSettings() {
             </div>
             <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                    <IGRPLabel className="text-xs">
+                    <IGRPLabelPrimitive className="text-xs">
                         {t('accentColor')}
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>    
                     <div className="grid w-full md:grid-cols-4 grid-cols-6 gap-3">
                         {baseColors.map((theme) => {
                             const isActive = activeTheme === theme.name;

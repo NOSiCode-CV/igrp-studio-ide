@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Search, X } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
@@ -31,7 +31,7 @@ export const GlobalTabFilter = ({
         <div className={cn('space-y-2 border-b pb-3', className)}>
             <div className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <IGRPInputText
+                <IGRPInputPrimitive
                     placeholder={placeholder}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}

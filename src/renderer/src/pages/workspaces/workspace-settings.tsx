@@ -10,8 +10,8 @@ import {
     IGRPCardHeader,
     IGRPCardTitle,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { IGRPSwitch } from '@igrp/igrp-framework-react-design-system';
 import { Copy, Check, Trash2, AlertTriangle, Clock } from 'lucide-react';
@@ -108,11 +108,11 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                 </IGRPCardHeader>
                 <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="workspace-id">
+                        <IGRPLabelPrimitive>
                             {t('workspaceId')}
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                         <div className="flex space-x-2">
-                            <IGRPInputText
+                            <IGRPInputPrimitive
                                 id="workspace-id"
                                 value={workspace.id}
                                 readOnly
@@ -137,10 +137,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="workspace-name">
+                        <IGRPLabelPrimitive htmlFor="workspace-name">
                             {t('nameDescription')}
-                        </IGRPLabel>
-                        <IGRPInputText
+                        </IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="workspace-name"
                             value={workspaceName}
                             onChange={(e) => setWorkspaceName(e.target.value)}
@@ -149,9 +149,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="workspace-description">
+                        <IGRPLabelPrimitive htmlFor="workspace-description">
                             {t('description')}
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                         <IGRPTextarea
                             name="workspace-description"
                             id="workspace-description"

@@ -10,7 +10,7 @@ import {
     IGRPDialogDescriptionPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
@@ -165,7 +165,7 @@ export default function SerializationConfigModal({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="items-center space-y-2">
                             <LabelRequired>{t('name')}</LabelRequired>
-                            <IGRPInputText
+                            <IGRPInputPrimitive
                                 id="name"
                                 name="name"
                                 value={config.name}

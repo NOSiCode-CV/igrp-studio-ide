@@ -10,8 +10,7 @@ import {
     IGRPTooltipTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPSwitch } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPPopoverPrimitive,
     IGRPPopoverContentPrimitive,
@@ -152,7 +151,7 @@ export function FormValidationPopover({
             case 'minLength':
             case 'maxLength':
                 return (
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         type="number"
                         className="h-8"
                         value={value || ''}
@@ -172,7 +171,7 @@ export function FormValidationPopover({
                 );
             case 'regex':
                 return (
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         className="h-8"
                         value={value || ''}
                         placeholder="/pattern/"
@@ -367,14 +366,14 @@ export function FormValidationPopover({
                                                     key={`${validation}-${index}`}
                                                     className="flex items-center gap-4"
                                                 >
-                                                    <IGRPLabel
+                                                    <IGRPLabelPrimitive
                                                         htmlFor={`${validation}-${index}`}
                                                         className="w-24"
                                                     >
                                                         {toInitCap(
                                                             t(validation)
                                                         )}
-                                                    </IGRPLabel>
+                                                    </IGRPLabelPrimitive>
                                                     <div className="flex-1">
                                                         {renderValidationField(
                                                             validation

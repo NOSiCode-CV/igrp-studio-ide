@@ -7,7 +7,7 @@ import {
     IGRPTooltipPrimitive,
     IGRPTooltipTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { SchemaField } from '../../types/schema';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
@@ -238,7 +238,7 @@ export function SchemaFieldRow({
                             </IGRPTooltipContentPrimitive>
                         </IGRPTooltipPrimitive>
                     )}
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         ref={nameInputRef}
                         value={name}
                         onChange={handleNameChange}
@@ -275,7 +275,7 @@ export function SchemaFieldRow({
                     </div>
                 </IGRPTableCellPrimitive>
                 <IGRPTableCellPrimitive className="py-1!">
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         ref={descInputRef}
                         value={description}
                         onChange={handleDescChange}

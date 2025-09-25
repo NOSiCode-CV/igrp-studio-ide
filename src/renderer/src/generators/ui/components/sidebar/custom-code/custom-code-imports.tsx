@@ -2,8 +2,8 @@ import { Import } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { nanoid } from '@reduxjs/toolkit';
 import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPCollapsiblePrimitive,
     IGRPCollapsibleContentPrimitive,
@@ -45,7 +45,7 @@ const ImportComponent = ({
         };
     };
 
-    const addImport = () => {
+    const addImport = (): void => {
         const parsed = parseImport(newImport);
         if (
             parsed &&
@@ -57,7 +57,7 @@ const ImportComponent = ({
         }
     };
 
-    const removeImport = (id: string) => {
+    const removeImport = (id: string): void => {
         const unRemovedImports = imports.filter((imp) => imp.id !== id);
         setImports(unRemovedImports);
         onChange?.(unRemovedImports);
@@ -82,9 +82,9 @@ const ImportComponent = ({
                                     isOpen && 'rotate-90'
                                 )}
                             />
-                            <IGRPLabel className="cursor-pointer">
+                            <IGRPLabelPrimitive className="cursor-pointer">
                                 {t('imports.title')}
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
                         </IGRPButtonPrimitive>
                     </IGRPCollapsibleTriggerPrimitive>
                     <IGRPBadge variant="outline" className="text-xs">
@@ -123,7 +123,7 @@ const ImportComponent = ({
                         )}
 
                         <div className="flex gap-2">
-                            <IGRPInputText
+                            <IGRPInputPrimitive
                                 value={newImport}
                                 onChange={(e) => setNewImport(e.target.value)}
                                 placeholder={t('imports.placeholder')}

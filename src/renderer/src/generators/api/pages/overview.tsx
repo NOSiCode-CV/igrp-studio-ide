@@ -16,7 +16,7 @@ import {
     IGRPTabsPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Check,
     Copy,
@@ -292,7 +292,7 @@ const Overview = () => {
                                         {t('projectId')}
                                     </IGRPLabelPrimitive>
                                     <div className="flex space-x-2">
-                                        <IGRPInputText
+                                        <IGRPInputPrimitive
                                             id="project-id"
                                             value={projectId}
                                             readOnly

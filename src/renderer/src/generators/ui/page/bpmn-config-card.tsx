@@ -16,7 +16,7 @@ import {
     IGRPDropdownMenuSeparatorPrimitive,
     IGRPDropdownMenuTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Settings,
     TestTube,
@@ -49,7 +49,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     const [isTesting, setIsTesting] = React.useState(false);
     const [isToggling, setIsToggling] = React.useState(false);
 
-    const handleTestConnection = async () => {
+    const handleTestConnection = async (): Promise<void> => {
         setIsTesting(true);
         try {
             await onTestConnection(config);
@@ -58,7 +58,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
         }
     };
 
-    const handleToggleActive = async () => {
+    const handleToggleActive = async (): Promise<void> => {
         setIsToggling(true);
         try {
             await onToggleActive(config.id, !isActive);
@@ -67,7 +67,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
         }
     };
 
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -97,12 +97,12 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                                 onCheckedChange={handleToggleActive}
                                 disabled={isToggling}
                             />
-                            <IGRPLabel
+                            <IGRPLabelPrimitive
                                 htmlFor={`active-${config.id}`}
                                 className="text-xs"
                             >
                                 Active
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
                         </div>
                         <IGRPDropdownMenuPrimitive>
                             <IGRPDropdownMenuTriggerPrimitive asChild>

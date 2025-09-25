@@ -12,10 +12,10 @@ import {
     IGRPTabsTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import {
-    IGRPInputText,
+    IGRPInputPrimitive,
     IGRPInputPassword,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { GitFork, Key, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RepositoryList } from './repository-list';
@@ -192,13 +192,13 @@ export function CloneProjectModal({
                             <div className="grid gap-6 py-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 grid gap-2">
-                                        <IGRPLabel
-                                            htmlFor="project-url"
-                                            className="text-muted-foreground"
-                                        >
-                                            {t('repositoryUrl')}
-                                        </IGRPLabel>
-                                        <IGRPInputText
+                                                    <IGRPLabelPrimitive
+                                                        htmlFor="project-url"
+                                                        className="text-muted-foreground"
+                                                    >
+                                                        {t('repositoryUrl')}
+                                                    </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="project-url"
                                             placeholder={t(
                                                 'repositoryUrlPlaceholder'
@@ -212,9 +212,9 @@ export function CloneProjectModal({
                                     </div>
                                 </div>
                                 <div className="grid gap-2">
-                                    <IGRPLabel className="text-muted-foreground">
+                                    <IGRPLabelPrimitive className="text-muted-foreground">
                                         {t('authentication')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <IGRPTabsPrimitive
                                         value={authType}
                                         onValueChange={setAuthType}
@@ -244,15 +244,15 @@ export function CloneProjectModal({
                                         >
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="grid gap-2">
-                                                    <IGRPLabel
+                                                    <IGRPLabelPrimitive
                                                         htmlFor="username"
                                                         className="text-muted-foreground"
                                                     >
                                                         {t('username')}
-                                                    </IGRPLabel>
+                                                    </IGRPLabelPrimitive>
                                                     <div className="relative">
                                                         <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <IGRPInputText
+                                                        <IGRPInputPrimitive
                                                             id="username"
                                                             placeholder={t(
                                                                 'usernamePlaceholder'
@@ -269,12 +269,12 @@ export function CloneProjectModal({
                                                     </div>
                                                 </div>
                                                 <div className="grid gap-2">
-                                                    <IGRPLabel
+                                                    <IGRPLabelPrimitive
                                                         htmlFor="password"
                                                         className="text-muted-foreground"
                                                     >
                                                         {t('password')}
-                                                    </IGRPLabel>
+                                                    </IGRPLabelPrimitive>
                                                     <div className="relative">
                                                         <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                                         <IGRPInputPassword
@@ -301,12 +301,12 @@ export function CloneProjectModal({
                                             className="mt-4"
                                         >
                                             <div className="grid gap-2">
-                                                <IGRPLabel
+                                                <IGRPLabelPrimitive
                                                     htmlFor="token"
                                                     className="text-muted-foreground"
                                                 >
                                                     {t('token')}
-                                                </IGRPLabel>
+                                                </IGRPLabelPrimitive>
                                                 <div className="relative">
                                                     <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                                     <IGRPInputPassword

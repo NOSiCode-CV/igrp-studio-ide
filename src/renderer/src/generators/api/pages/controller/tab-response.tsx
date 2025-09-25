@@ -3,7 +3,7 @@ import AddResponseModal from '../response/add-response-modal';
 import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
@@ -267,7 +267,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     <IGRPLabelPrimitive>
                                         {t('name')}
                                     </IGRPLabelPrimitive>
-                                    <IGRPInputText
+                                    <IGRPInputPrimitive
                                         name={t('name')}
                                         value={name}
                                         onChange={(e) =>
@@ -370,7 +370,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 <IGRPLabelPrimitive>
                                     {t('description')}
                                 </IGRPLabelPrimitive>
-                                <IGRPInputText
+                                <IGRPInputPrimitive
                                     type="text"
                                     name="description"
                                     value={description}

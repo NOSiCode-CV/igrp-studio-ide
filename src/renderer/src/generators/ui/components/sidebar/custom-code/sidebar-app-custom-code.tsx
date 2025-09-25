@@ -46,7 +46,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import { PATTERNS } from '@renderer/constants/appConstants';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { StateComponent } from './custom-code-state';
 import useCustomCode from '../../../hooks/useCustomCode';
 import { SnnipetComponent } from './custom-code-snippet';
@@ -104,7 +104,7 @@ const SidebarAppCustomCode = ({ searchTerm }: { searchTerm: string }) => {
                                 <FncComponent
                                     open={openFnc}
                                     setOpen={setOpenFnc}
-                                    funct={currentFunction}
+                                    funct={currentFunction || undefined}
                                 />
                             )
                         }
@@ -273,7 +273,7 @@ const ResourceList = <
     );
 };
 
-const CustomCodeMenu = () => {
+const CustomCodeMenu = (): React.ReactNode => {
     const [openfnc, setOpenFnc] = useState<boolean>(false);
     const [openState, setOpenState] = useState<boolean>(false);
 
@@ -317,7 +317,7 @@ const FncComponent = ({
     setOpen,
     funct,
 }: {
-    funct?: any;
+    funct?: CustomFunctionConfig;
     open: boolean;
     setOpen: (prompt: boolean) => void;
 }) => {
@@ -343,48 +343,51 @@ const FncComponent = ({
         }),
     });
 
-    const formik: FormikProps<CustomFunctionConfig> = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            id: '',
-            name: '',
-            code: '',
-            returnValue: {
-                type: 'void',
-                isNullable: true,
-                isList: false,
+    const formik: FormikProps<CustomFunctionConfig> =
+        useFormik<CustomFunctionConfig>({
+            enableReinitialize: true,
+            initialValues: {
+                id: '',
+                name: '',
+                code: '',
+                returnValue: {
+                    type: 'void',
+                    isNullable: true,
+                    isList: false,
+                },
+                imports: [],
+                arguments: [],
+                isAsync: false,
+                ...funct,
             },
-            imports: [],
-            isAsync: false,
-            ...funct,
-        },
-        validationSchema: functionValidationSchema,
-        onSubmit: (values, actions) => {
-            try {
-                const fncData: CustomFunctionConfig = {
-                    ...values,
-                    code: codeRef.current,
-                };
+            validationSchema: functionValidationSchema,
+            onSubmit: (values, actions) => {
+                try {
+                    const fncData: CustomFunctionConfig = {
+                        ...values,
+                        code: codeRef.current,
+                        arguments: values.arguments || [],
+                    };
 
-                if (fncData.id === '') {
-                    addFunction({
-                        ...fncData,
-                        id: `fnc_${nanoid(6).replace(/-/g, '')}`,
-                    });
-                } else {
-                    updateFunction(fncData.id, fncData);
+                    if (fncData.id === '') {
+                        addFunction({
+                            ...fncData,
+                            id: `fnc_${nanoid(6).replace(/-/g, '')}`,
+                        });
+                    } else {
+                        updateFunction(fncData.id, fncData);
+                    }
+
+                    setOpen(false);
+                } catch (error) {
+                    console.error('Submission failed:', error);
+                } finally {
+                    actions.setSubmitting(false);
                 }
+            },
+        });
 
-                setOpen(false);
-            } catch (error) {
-                console.error('Submission failed:', error);
-            } finally {
-                actions.setSubmitting(false);
-            }
-        },
-    });
-
-    const handleChangeImport = (importObj: Import) => {
+    const handleChangeImport = (importObj: Import): void => {
         formik.setFieldValue('imports', [
             ...(formik.values.imports || []),
             importObj,
@@ -453,9 +456,9 @@ const FncComponent = ({
                         />
 
                         <div className="flex-1 border rounded">
-                            <IGRPLabel className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                            <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                 {t('Function body')}
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
 
                             {/* Function Preview */}
                             <div className="border-b bg-background p-3  font-mono text-sm">
@@ -499,7 +502,7 @@ const FncComponent = ({
                                 ref={editorRef}
                                 content={funct?.code || ''}
                                 filePath=""
-                                onChange={(newCode) => {
+                                onChange={(newCode: string) => {
                                     codeRef.current = newCode;
                                 }}
                                 height="40vh"

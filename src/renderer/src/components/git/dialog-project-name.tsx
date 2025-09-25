@@ -8,7 +8,7 @@ import {
     IGRPDialogTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 export const ProjectNameDialog = ({
@@ -35,7 +35,7 @@ export const ProjectNameDialog = ({
                     <IGRPDialogDescriptionPrimitive />
                 </IGRPDialogHeaderPrimitive>
                 <div className="py-4">
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         type="text"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}

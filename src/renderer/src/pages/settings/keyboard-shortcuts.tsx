@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Search } from 'lucide-react';
 import {
-    IGRPInputText,
+    IGRPInputPrimitive,
     IGRPSwitchPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
@@ -157,7 +157,7 @@ export default function KeyboardShortcuts() {
 
                 <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         placeholder={t('searchShortcuts')}
                         className="pl-8"
                         value={search}

@@ -11,8 +11,7 @@ import {
     IGRPSwitchPrimitive,
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { toast } from 'sonner';
 import { BPMNConfig } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
@@ -207,10 +206,10 @@ export const BPMNConfigModal = ({
                 </IGRPDialogHeaderPrimitive>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="name">
+                        <IGRPLabelPrimitive htmlFor="name">
                             Configuration Name *
-                        </IGRPLabel>
-                        <IGRPInputText
+                        </IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="name"
                             value={formData.name || ''}
                             onChange={(e) =>
@@ -220,8 +219,8 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="apiUrl">API URL *</IGRPLabel>
-                        <IGRPInputText
+                        <IGRPLabelPrimitive htmlFor="apiUrl">API URL *</IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="apiUrl"
                             value={formData.apiUrl || ''}
                             onChange={(e) =>
@@ -231,8 +230,8 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="basePath">Base Path</IGRPLabel>
-                        <IGRPInputText
+                        <IGRPLabelPrimitive htmlFor="basePath">Base Path</IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="basePath"
                             value={formData.basePath || ''}
                             onChange={(e) =>
@@ -242,9 +241,9 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="token">
+                        <IGRPLabelPrimitive htmlFor="token">
                             Access Token (Optional)
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                         <IGRPInputPrimitive
                             id="token"
                             type="password"
@@ -256,7 +255,7 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabel htmlFor="description">Description</IGRPLabel>
+                        <IGRPLabelPrimitive htmlFor="description">Description</IGRPLabelPrimitive>
                         <IGRPTextAreaPrimitive
                             id="description"
                             value={formData.description || ''}
@@ -275,9 +274,9 @@ export const BPMNConfigModal = ({
                                 handleInputChange('isActive', checked)
                             }
                         />
-                        <IGRPLabel htmlFor="isActive">
+                        <IGRPLabelPrimitive htmlFor="isActive">
                             Active Configuration
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                     </div>
                 </div>
                 <IGRPDialogFooterPrimitive className="flex justify-between">

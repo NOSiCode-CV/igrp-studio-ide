@@ -3,12 +3,11 @@
 import {
     IGRPCheckboxPrimitive,
     IGRPInputPrimitive,
-    IGRPLabel,
+    IGRPLabelPrimitive,
     IGRPRadioGroupItemPrimitive,
     IGRPRadioGroupPrimitive,
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import { DotNetConfigData, ProjectData } from 'src/main/types';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { DatabaseOptions } from '@renderer/constants/appConstants';
@@ -35,14 +34,14 @@ const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
 export function DotNetConfig({
     data = DEFAULT_DOTNET_CONFIG,
     onChange,
-}: DotNetConfigProps) {
+}: DotNetConfigProps): React.ReactNode {
     const { t } = useTranslation();
 
     return (
         <div className="space-y-6">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputText
+                <IGRPInputPrimitive
                     id="name"
                     value={data.name}
                     onChange={(e) =>
@@ -54,7 +53,7 @@ export function DotNetConfig({
             </div>
 
             <div className="space-y-2">
-                <IGRPLabel htmlFor="description">{t('description')}</IGRPLabel>
+                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
                 <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}
@@ -94,7 +93,7 @@ export function DotNetConfig({
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
-                    <IGRPLabel>{t('projectStructureStyle')}</IGRPLabel>
+                    <IGRPLabelPrimitive>{t('projectStructureStyle')}</IGRPLabelPrimitive>
                     <IGRPRadioGroupPrimitive
                         value={data.projectStructureStyle}
                         onValueChange={(value) =>
@@ -112,18 +111,18 @@ export function DotNetConfig({
                                 value="technical"
                                 id="technical"
                             />
-                            <IGRPLabel htmlFor="technical">
+                            <IGRPLabelPrimitive htmlFor="technical">
                                 {t('technical')}
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
                         </div>
                         <div className="flex items-center space-x-2">
                             <IGRPRadioGroupItemPrimitive
                                 value="domain"
                                 id="domain"
                             />
-                            <IGRPLabel htmlFor="domain">
+                            <IGRPLabelPrimitive htmlFor="domain">
                                 {t('domainDriven')}
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
                         </div>
                     </IGRPRadioGroupPrimitive>
                 </div>
@@ -139,9 +138,9 @@ export function DotNetConfig({
                             })
                         }
                     />
-                    <IGRPLabel htmlFor="observability">
+                    <IGRPLabelPrimitive htmlFor="observability">
                         {t('enableObservability')}
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>
                 </div>
             </div>
         </div>

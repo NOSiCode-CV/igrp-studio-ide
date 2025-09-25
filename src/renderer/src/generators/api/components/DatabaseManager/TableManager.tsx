@@ -17,7 +17,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPDataTable } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils';
 import { useTranslation } from 'react-i18next';
@@ -203,7 +203,7 @@ export function TableManager({
         <>
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
-                    <IGRPLabel>{t('databaseConnections')}</IGRPLabel>
+                    <IGRPLabelPrimitive>{t('databaseConnections')}</IGRPLabelPrimitive>
                     <IGRPCombobox
                         value={selectedConnection}
                         onChange={(selected) => {
@@ -215,9 +215,9 @@ export function TableManager({
                     />
                 </div>
                 <div className="space-y-2">
-                    <IGRPLabel className="text-xs">
+                    <IGRPLabelPrimitive className="text-xs">
                         {t('whileMatchingSchema')}
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>
                     <IGRPCombobox
                         value={action}
                         onChange={(value) => setAction(value as string)}

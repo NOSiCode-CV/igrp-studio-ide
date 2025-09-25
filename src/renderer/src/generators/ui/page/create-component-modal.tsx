@@ -10,7 +10,7 @@ import {
     IGRPDialogPrimitive,
     IGRPDialogTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -221,9 +221,9 @@ export function CreateComponentModal({
                                 placeholder="TodoItem"
                             />
                             <div className="grid grid-cols-1 items-center gap-3">
-                                <IGRPLabel htmlFor="Associar">
+                                <IGRPLabelPrimitive htmlFor="Associar">
                                     {t('pages')}
-                                </IGRPLabel>
+                                </IGRPLabelPrimitive>
                                 <IGRPCombobox
                                     name="pagePath"
                                     className="col-span-3"

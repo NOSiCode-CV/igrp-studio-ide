@@ -6,10 +6,10 @@ import {
     IGRPDialogPrimitive,
     IGRPDialogTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { FolderOpen } from 'lucide-react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
@@ -81,7 +81,7 @@ const CreateWorkspace = ({
         }
     };
 
-    const handleSelectDirectory = async () => {
+    const handleSelectDirectory = async (): Promise<void> => {
         window.electron.ipcRenderer.send('open-directory-dialog');
         window.electron.ipcRenderer.on(
             'file-content',
@@ -110,10 +110,10 @@ const CreateWorkspace = ({
                 </IGRPDialogHeaderPrimitive>
                 <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="workspaceName">
+                        <IGRPLabelPrimitive htmlFor="workspaceName">
                             {t('workspace.nameLabel')}
-                        </IGRPLabel>
-                        <IGRPInputText
+                        </IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             ref={inputRef}
                             id="workspaceName"
                             value={workspaceName}
@@ -124,10 +124,10 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabel htmlFor="slug">
+                        <IGRPLabelPrimitive htmlFor="slug">
                             {t('workspace.slug')}
-                        </IGRPLabel>
-                        <IGRPInputText
+                        </IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="slug"
                             value={slug}
                             onChange={(e) => setSlug(e.target.value)}
@@ -136,9 +136,9 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="compact-form-field space-y-2">
-                        <IGRPLabel htmlFor="description">
+                        <IGRPLabelPrimitive htmlFor="description">
                             {t('description')}
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                         <IGRPTextarea
                             id="description"
                             name="description"
@@ -152,9 +152,9 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabel>{t('workspace.locationLabel')}</IGRPLabel>
+                        <IGRPLabelPrimitive>{t('workspace.locationLabel')}</IGRPLabelPrimitive>
                         <div className="flex  gap-2">
-                            <IGRPInputText
+                            <IGRPInputPrimitive
                                 value={directoryPath}
                                 readOnly
                                 placeholder={t('workspace.locationPlaceholder')}

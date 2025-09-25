@@ -3,7 +3,7 @@ import {
     IGRPCardHeaderPrimitive,
     IGRPCardPrimitive,
     IGRPCardTitlePrimitive,
-    IGRPInputText,
+    IGRPInputPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 
 import NavigationBar from '../../components/navigation-bar';
@@ -93,7 +93,7 @@ export const ResponseLayout = ({
                                 <LabelRequired>
                                     {t('contentType')}
                                 </LabelRequired>
-                                <IGRPInputText
+                                <IGRPInputPrimitive
                                     name="contentType"
                                     value={'application/json'}
                                     readOnly

@@ -26,8 +26,8 @@ import { DataValue, StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
 import Interactions from '../settings/Interactions';
 import { StyleTab } from '../settings/style';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useCustomCode from '../../hooks/useCustomCode';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
@@ -586,10 +586,10 @@ const SidebarRight = ({
                 ) : (
                     <>
                         <div className="space-y-2 p-2">
-                            <IGRPLabel htmlFor={'tab'}>
+                            <IGRPLabelPrimitive htmlFor={'tab'}>
                                 {`${label || componentName} - ${componentId}`}
-                            </IGRPLabel>
-                            <IGRPInputText
+                            </IGRPLabelPrimitive>
+                            <IGRPInputPrimitive
                                 id="tag"
                                 value={tempEditingComponent?.tag}
                                 onChange={udpateTag}

@@ -15,7 +15,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useEffect, useRef, useState } from 'react';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPCombobox,
     IGRPOptionsProps,
@@ -105,7 +105,7 @@ export function TriggerControls({
         setLocalInteractions(interactions);
     }, [interactions]);
 
-    const addInteraction = (int: string) => {
+    const addInteraction = (int: string): void => {
         const updated = {
             ...localInteractions,
             [int]: {
@@ -117,14 +117,14 @@ export function TriggerControls({
         setLocalInteractions(updated);
     };
 
-    const removeInteraction = (key: string) => {
+    const removeInteraction = (key: string): void => {
         const newInteractions = { ...localInteractions };
         delete newInteractions[key];
         setLocalInteractions(newInteractions);
         onInteractionsChange(newInteractions);
     };
 
-    const AddDropdown = () => {
+    const AddDropdown = (): React.ReactNode => {
         return (
             <IGRPDropdownMenuPrimitive>
                 <IGRPDropdownMenuTriggerPrimitive asChild>
@@ -283,7 +283,7 @@ const InteractionEditor = ({
         properties?.function?.properties.fnCustomCode.properties?.imports
             ?.visible;
 
-    const saveInteraction = () => {
+    const saveInteraction = (): void => {
         const updated = {
             ...localInteractions,
             [interactionKey]: currentAction,
@@ -297,7 +297,7 @@ const InteractionEditor = ({
         fnCustomSetRef.current = '';
     };
 
-    const handleChangeFnName = (fnName: string) => {
+    const handleChangeFnName = (fnName: string): void => {
         if (fnName) {
             const functionOption = functionOptions.find(
                 (option) => option.value === fnName
@@ -324,7 +324,7 @@ const InteractionEditor = ({
         });
     };
 
-    const handleChangeImport = (importObj: Import) => {
+    const handleChangeImport = (importObj: Import): void => {
         setImports?.((prev) => [...prev, importObj]);
     };
 
@@ -341,7 +341,7 @@ const InteractionEditor = ({
         });
     }, [imports]);
 
-    const renderActionConfig = () => {
+    const renderActionConfig = (): React.ReactNode => {
         switch (actionType) {
             case 'function':
                 return (
@@ -369,9 +369,9 @@ const InteractionEditor = ({
                         {hasfnCustomSetOption && (
                             <>
                                 <div className="flex-1 border rounded">
-                                    <IGRPLabel className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                                    <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                         Inline Function
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <MonacoEditor
                                         content={
                                             currentAction.function
@@ -416,9 +416,9 @@ const InteractionEditor = ({
 
                         {hasfnCodeOption && (
                             <div className="flex-1 border rounded">
-                                <IGRPLabel className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                                <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                     Custom Code
-                                </IGRPLabel>
+                                </IGRPLabelPrimitive>
                                 <MonacoEditor
                                     content={
                                         currentAction.function?.fnCustomCode

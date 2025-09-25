@@ -4,8 +4,8 @@ import {
     IGRPSwitchPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPPopoverPrimitive,
     IGRPPopoverContentPrimitive,
@@ -116,11 +116,11 @@ export function PopoverDto({
                                                 key={`${field}-${index}`}
                                                 className="flex flex-1 items-center gap-4"
                                             >
-                                                <IGRPLabel
+                                                <IGRPLabelPrimitive
                                                     htmlFor={`${field}-${index}`}
                                                 >
                                                     {toInitCap(t(field))}
-                                                </IGRPLabel>
+                                                </IGRPLabelPrimitive>
                                                 <IGRPSwitchPrimitive
                                                     id={`${field}-${index}`}
                                                     onCheckedChange={(
@@ -151,11 +151,11 @@ export function PopoverDto({
                                                 key={`${field}-${index}`}
                                                 className="flex flex-1 items-center gap-4"
                                             >
-                                                <IGRPLabel
+                                                <IGRPLabelPrimitive
                                                     htmlFor={`${field}-${index}`}
                                                 >
                                                     {toInitCap(t(field))}
-                                                </IGRPLabel>
+                                                </IGRPLabelPrimitive>
                                                 <IGRPSwitchPrimitive
                                                     id={`${field}-${index}`}
                                                     onCheckedChange={(
@@ -176,10 +176,10 @@ export function PopoverDto({
                                 </div>
                                 <div className="grid grid-cols-2 items-center gap-4">
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="minLength">
+                                        <IGRPLabelPrimitive htmlFor="minLength">
                                             {t('minLength')}
-                                        </IGRPLabel>
-                                        <IGRPInputText
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="minLength"
                                             type="number"
                                             className="h-8"
@@ -201,10 +201,10 @@ export function PopoverDto({
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="maxLength">
+                                        <IGRPLabelPrimitive htmlFor="maxLength">
                                             {t('maxLength')}
-                                        </IGRPLabel>
-                                        <IGRPInputText
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="maxLength"
                                             type="number"
                                             className="h-8"
@@ -225,10 +225,10 @@ export function PopoverDto({
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="regex">
+                                        <IGRPLabelPrimitive htmlFor="regex">
                                             {t('regex')}
-                                        </IGRPLabel>
-                                        <IGRPInputText
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="regex"
                                             className="col-span-2 h-8"
                                             value={row?.['regex'] || ''}
@@ -255,11 +255,11 @@ export function PopoverDto({
                                         key={`${field}-${index}`}
                                         className="flex flex-1 items-center gap-4"
                                     >
-                                        <IGRPLabel
+                                        <IGRPLabelPrimitive
                                             htmlFor={`${field}-${index}`}
                                         >
                                             {t('identifier')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <IGRPSwitchPrimitive
                                             id={`${field}-${index}`}
                                             onCheckedChange={(checked) =>
@@ -276,9 +276,9 @@ export function PopoverDto({
                                 <IGRPSeparator orientation="horizontal" />
                                 <div className="grid grid-cols-2 items-center gap-4">
                                     <div className="space-y-2 flex flex-col">
-                                        <IGRPLabel htmlFor="collectionType">
+                                        <IGRPLabelPrimitive htmlFor="collectionType">
                                             {t('collectionType')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <IGRPCombobox
                                             key={`${index}`}
                                             placeholder={t(

@@ -15,8 +15,8 @@ import {
     IGRPPopoverContentPrimitive,
     IGRPPopoverTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { RelationTypeSelector } from './relation-type-selector';
 import {
     CascadeTypes,
@@ -97,7 +97,7 @@ export function RelationPopover({
         }
     }, [localRelation.entity, models]);
 
-    const handleUpdate = () => {
+    const handleUpdate = (): void => {
         if (!localRelation.entity) {
             setErrors({ ['entity']: t('entityRequired') });
             return;
@@ -172,11 +172,11 @@ export function RelationPopover({
                             <div className="grid grid-cols-2 gap-3">
                                 {localRelation.type === 'ManyToMany' && (
                                     <div className="col-span-2 space-y-2 flex flex-col">
-                                        <IGRPLabel htmlFor="joinTable">
+                                        <IGRPLabelPrimitive htmlFor="joinTable">
                                             {t('entityName')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <div>
-                                            <IGRPInputText
+                                            <IGRPInputPrimitive
                                                 id="joinTable"
                                                 value={
                                                     localRelation.joinTable ||
@@ -205,9 +205,9 @@ export function RelationPopover({
                                     </div>
                                 )}
                                 <div className="space-y-2 flex flex-col">
-                                    <IGRPLabel htmlFor="entity">
+                                    <IGRPLabelPrimitive htmlFor="entity">
                                         {t('entity')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <TypeSelectorDropdown
                                         type={localRelation.entity}
                                         onTypeChange={({ value, module }) =>
@@ -231,9 +231,9 @@ export function RelationPopover({
                                     )}
                                 </div>
                                 <div className="space-y-2 flex flex-col">
-                                    <IGRPLabel htmlFor="referencedColumnName">
+                                    <IGRPLabelPrimitive htmlFor="referencedColumnName">
                                         {t('referenceColumnName')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <IGRPCombobox
                                         value={
                                             localRelation.referencedColumnName
@@ -258,11 +258,11 @@ export function RelationPopover({
                             {localRelation.cardinality === 'twoWay' &&
                                 localRelation.type === 'ManyToMany' && (
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="inverseJoinColumn">
+                                        <IGRPLabelPrimitive htmlFor="inverseJoinColumn">
                                             {t('fieldNameIn')}{' '}
                                             {localRelation.joinTable}
-                                        </IGRPLabel>
-                                        <IGRPInputText
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="inverseJoinColumn"
                                             value={
                                                 localRelation.inverseJoinColumn ||
@@ -286,11 +286,11 @@ export function RelationPopover({
                                 localRelation.type === 'OneToMany') &&
                                 localRelation.type !== 'ManyToMany' && (
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="mappedBy">
+                                        <IGRPLabelPrimitive htmlFor="mappedBy">
                                             {t('fieldNameIn')}{' '}
                                             {localRelation.entity}
-                                        </IGRPLabel>
-                                        <IGRPInputText
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="mappedBy"
                                             value={localRelation.mappedBy || ''}
                                             onChange={(e) =>
@@ -321,9 +321,9 @@ export function RelationPopover({
                                         })
                                     }
                                 />
-                                <IGRPLabel htmlFor="cardinality">
+                                <IGRPLabelPrimitive htmlFor="cardinality">
                                     {t('twoWayRelationship')}
-                                </IGRPLabel>
+                                </IGRPLabelPrimitive>
                             </div>
                         </div>
                     </IGRPTabsContentPrimitive>
@@ -362,9 +362,9 @@ export function RelationPopover({
                                     })
                                 }
                             />
-                            <IGRPLabel htmlFor="orphanRemoval">
+                            <IGRPLabelPrimitive htmlFor="orphanRemoval">
                                 {t('orphanRemoval')}
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
                         </div>
                         <div className="space-y-2 flex flex-col">
                             <LabelRequired>{t('cascadeType')}</LabelRequired>

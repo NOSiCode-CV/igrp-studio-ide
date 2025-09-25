@@ -11,7 +11,7 @@ import {
     IGRPTableRowPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { Plus, Trash2 } from 'lucide-react';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 
@@ -171,7 +171,7 @@ export default function DynamicKeyValueForm({
                                                 placeholder={pair.placeholder}
                                             />
                                         ) : (
-                                            <IGRPInputText
+                                            <IGRPInputPrimitive
                                                 value={item[pair.key] || ''}
                                                 onChange={(e) =>
                                                     updateItem(

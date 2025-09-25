@@ -6,7 +6,7 @@ import {
     IGRPInputPrimitive,
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPSelectPrimitive,
     IGRPSelectContentPrimitive,
@@ -14,7 +14,6 @@ import {
     IGRPSelectTriggerPrimitive,
     IGRPSelectValuePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTabsPrimitive,
     IGRPTabsContentPrimitive,
@@ -407,7 +406,7 @@ export function AppLogicAction({
 
                 <IGRPTabsContentPrimitive value="config" className="space-y-4">
                     <div className="space-y-2">
-                        <IGRPLabel>Environment</IGRPLabel>
+                        <IGRPLabelPrimitive>Environment</IGRPLabelPrimitive>
                         <IGRPSelectPrimitive
                             value={selectedEnvironmentId}
                             onValueChange={handleEnvironmentSelect}
@@ -443,8 +442,8 @@ export function AppLogicAction({
 
                     {selectedEnvironment && (
                         <div className="space-y-2">
-                            <IGRPLabel>Base URL</IGRPLabel>
-                            <IGRPInputText
+                            <IGRPLabelPrimitive>Base URL</IGRPLabelPrimitive>
+                            <IGRPInputPrimitive
                                 value={selectedEnvironment.url}
                                 disabled
                                 className="bg-gray-50 text-gray-500"
@@ -463,7 +462,7 @@ export function AppLogicAction({
                         <>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <IGRPLabel>Application (Tag)</IGRPLabel>
+                                    <IGRPLabelPrimitive>Application (Tag)</IGRPLabelPrimitive>
                                     <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="sm"
@@ -508,7 +507,7 @@ export function AppLogicAction({
 
                             {selectedApplication && (
                                 <div className="space-y-2">
-                                    <IGRPLabel>Endpoint</IGRPLabel>
+                                    <IGRPLabelPrimitive>Endpoint</IGRPLabelPrimitive>
                                     <IGRPSelectPrimitive
                                         value={selectedEndpointId}
                                         onValueChange={handleEndpointSelect}
@@ -571,7 +570,7 @@ export function AppLogicAction({
                             selectedEndpoint.method === 'PUT' ||
                             selectedEndpoint.method === 'PATCH') && (
                             <div className="space-y-2">
-                                <IGRPLabel>Request Body (JSON)</IGRPLabel>
+                                <IGRPLabelPrimitive>Request Body (JSON)</IGRPLabelPrimitive>
                                 <IGRPTextAreaPrimitive
                                     className="w-full h-32 p-2 border rounded-md font-mono text-sm"
                                     placeholder='{"key": "value"}'
@@ -590,7 +589,7 @@ export function AppLogicAction({
 
                 <IGRPTabsContentPrimitive value="headers" className="space-y-4">
                     <div className="space-y-2">
-                        <IGRPLabel>Custom Headers</IGRPLabel>
+                        <IGRPLabelPrimitive>Custom Headers</IGRPLabelPrimitive>
                         <div className="space-y-2">
                             {Object.entries(customHeaders).map(
                                 ([key, value], index) => (
@@ -708,9 +707,9 @@ export function AppLogicAction({
                                 <div className="p-4">
                                     <div className="space-y-3">
                                         <div>
-                                            <IGRPLabel className="text-sm font-medium">
+                                            <IGRPLabelPrimitive className="text-sm font-medium">
                                                 Headers
-                                            </IGRPLabel>
+                                            </IGRPLabelPrimitive>
                                             <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                 {JSON.stringify(
                                                     {
@@ -728,9 +727,9 @@ export function AppLogicAction({
 
                                         {selectedEndpoint.inputBody && (
                                             <div>
-                                                <IGRPLabel className="text-sm font-medium">
+                                                <IGRPLabelPrimitive className="text-sm font-medium">
                                                     Request body
-                                                </IGRPLabel>
+                                                </IGRPLabelPrimitive>
                                                 <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                     {JSON.stringify(
                                                         selectedEndpoint.inputBody,
@@ -751,9 +750,9 @@ export function AppLogicAction({
                                         <div className="p-4">
                                             <div className="space-y-3">
                                                 <div>
-                                                    <IGRPLabel className="text-sm font-medium">
+                                                    <IGRPLabelPrimitive className="text-sm font-medium">
                                                         Request Body
-                                                    </IGRPLabel>
+                                                    </IGRPLabelPrimitive>
                                                     <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                         {requestBody}
                                                     </pre>
@@ -768,9 +767,9 @@ export function AppLogicAction({
                                     <div className="p-4">
                                         <div className="space-y-3">
                                             <div>
-                                                <IGRPLabel className="text-sm font-medium">
+                                                <IGRPLabelPrimitive className="text-sm font-medium">
                                                     Response Body
-                                                </IGRPLabel>
+                                                </IGRPLabelPrimitive>
                                                 <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                     {requestBody}
                                                 </pre>
@@ -783,9 +782,9 @@ export function AppLogicAction({
                                     <div className="p-4">
                                         <div className="space-y-3">
                                             <div>
-                                                <IGRPLabel className="text-sm font-medium">
+                                                <IGRPLabelPrimitive className="text-sm font-medium">
                                                     Response Body
-                                                </IGRPLabel>
+                                                </IGRPLabelPrimitive>
                                                 <pre className="bg-gray-50 p-3 rounded-md text-xs mt-1">
                                                     {JSON.stringify(
                                                         {},
@@ -801,9 +800,9 @@ export function AppLogicAction({
                             {/* cURL Command Preview */}
                             <div>
                                 <div className="flex items-center justify-between">
-                                    <IGRPLabel className="text-sm font-medium">
+                                    <IGRPLabelPrimitive className="text-sm font-medium">
                                         cURL Command
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                 </div>
                                 <pre className="bg-gray-900 text-green-400 p-3 rounded-md text-xs mt-1 overflow-x-auto relative group">
                                     {generateCurlCommand()}

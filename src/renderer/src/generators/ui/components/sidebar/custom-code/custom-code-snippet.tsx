@@ -7,7 +7,7 @@ import {
     IGRPDialogHeaderPrimitive,
     IGRPDialogTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 interface SnippetComponentProps {
@@ -34,13 +34,13 @@ const SnnipetComponent = ({
                     <IGRPDialogDescriptionPrimitive></IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 <div className="flex-1 border rounded">
-                    <IGRPLabel className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                    <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                         {t('Code Snippet')}
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>
                     <MonacoEditor
                         content={snippet?.code || ''}
                         filePath=""
-                        onChange={(newCode) => {
+                        onChange={(newCode: string) => {
                             importRef.current = newCode;
                         }}
                         height="30vh"

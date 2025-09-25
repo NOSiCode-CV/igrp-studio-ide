@@ -10,8 +10,8 @@ import {
     IGRPDialogContentPrimitive,
     IGRPDialogFooterPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import React, { useState } from 'react';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
@@ -41,7 +41,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
     const [statusCode, setStatusCode] = useState('');
     const [contentType, setContentType] = useState('');
 
-    const handleSave = () => {
+    const handleSave = (): void => {
         if (name && statusCode && contentType) {
             onSave({ name, statusCode, contentType });
             setName('');
@@ -51,7 +51,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
         }
     };
 
-    const handleChangeCode = (value: string) => {
+    const handleChangeCode = (value: string): void => {
         setStatusCode(value);
         if (name === '') setName(getStatusLabel(value));
     };
@@ -73,7 +73,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                 >
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3">
-                            <IGRPLabel>{t('httpStatusCode')}</IGRPLabel>
+                            <IGRPLabelPrimitive>{t('httpStatusCode')}</IGRPLabelPrimitive>
                             <IGRPCombobox
                                 options={httpStatusCodes}
                                 value={statusCode}
@@ -85,8 +85,8 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <IGRPLabel className="">{t('name')}</IGRPLabel>
-                            <IGRPInputText
+                            <IGRPLabelPrimitive className="">{t('name')}</IGRPLabelPrimitive>
+                            <IGRPInputPrimitive
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -95,9 +95,9 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <IGRPLabel className="">
+                            <IGRPLabelPrimitive className="">
                                 {t('contentType')}
-                            </IGRPLabel>
+                            </IGRPLabelPrimitive>
                             <IGRPCombobox
                                 options={contentTypes}
                                 value={contentType}

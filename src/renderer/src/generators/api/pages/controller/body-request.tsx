@@ -12,8 +12,8 @@ import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useTranslation } from 'react-i18next';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 type TbodyType = 'none' | 'multipart/form-data' | 'application/json';
 
@@ -98,7 +98,11 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         if (bodyType === 'multipart/form-data') setData(data);
     }, [bodyType]);
 
-    const onChangeBody = (element: string, position: number, value: string) => {
+    const onChangeBody = (
+        element: string,
+        position: number,
+        value: string
+    ): void => {
         setData((prev: any) =>
             prev.map((row: any, index: number) =>
                 index === position ? { ...row, [element]: value } : row
@@ -106,7 +110,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         );
     };
 
-    const handleSchemaChange = (newSchema: JSONSchema) => {
+    const handleSchemaChange = (newSchema: JSONSchema): void => {
         const properties = newSchema.properties || {};
         const firstKey = Object.keys(properties)[0];
 
@@ -124,7 +128,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         updateFormik(content);
     };
 
-    const handleChangeEditor = (value: string) => {
+    const handleChangeEditor = (value: string): void => {
         const content = {
             [bodyType]: {
                 schema: JSON.parse(value),
@@ -177,7 +181,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         updateFormik(content);
     }, [data]);
 
-    const getContentToSchemaProps = () => {
+    const getContentToSchemaProps = (): {
+        type: string;
+        properties: { [key: string]: any };
+    } | null => {
         return localSchema
             ? {
                   type: 'object',
@@ -188,10 +195,10 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
             : null;
     };
 
-    const RenderFields = () => (
+    const RenderFields = (): React.ReactNode => (
         <>
             <div className="flex flex-col gap-2 w-full">
-                <IGRPLabel>{t('collectionType')}</IGRPLabel>
+                <IGRPLabelPrimitive>{t('collectionType')}</IGRPLabelPrimitive>
                 <IGRPCombobox
                     options={collectionTypes}
                     value={collectionType}
@@ -203,8 +210,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 />
             </div>
             <div className="flex flex-col gap-2">
-                <IGRPLabel>{t('name')}</IGRPLabel>
-                <IGRPInputText
+                <IGRPLabelPrimitive>{t('name')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     name={t('name')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -285,7 +292,9 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-3">
                         <div className="flex flex-col gap-2">
-                            <IGRPLabel>{t('contentType')}</IGRPLabel>
+                            <IGRPLabelPrimitive>
+                                {t('contentType')}
+                            </IGRPLabelPrimitive>
                             <IGRPCombobox
                                 value={bodyType}
                                 placeholder={t('selectContentType')}

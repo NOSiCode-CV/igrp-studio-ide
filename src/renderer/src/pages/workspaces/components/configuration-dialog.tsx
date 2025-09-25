@@ -24,7 +24,7 @@ import {
     IGRPTabsTriggerPrimitive,
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -487,7 +487,7 @@ export function ConfigurationDialog({
                                     <IGRPLabelPrimitive htmlFor="name">
                                         {t('serviceName')}
                                     </IGRPLabelPrimitive>
-                                    <IGRPInputText
+                                    <IGRPInputPrimitive
                                         id="name"
                                         value={name}
                                         onChange={(e) =>
@@ -520,7 +520,7 @@ export function ConfigurationDialog({
                                         <IGRPLabelPrimitive htmlFor="image">
                                             {t('dockerImage')}
                                         </IGRPLabelPrimitive>
-                                        <IGRPInputText
+                                        <IGRPInputPrimitive
                                             id="image"
                                             value={image}
                                             onChange={(e) =>
@@ -604,7 +604,7 @@ export function ConfigurationDialog({
                                         )}
 
                                         <div className="flex gap-2">
-                                            <IGRPInputText
+                                            <IGRPInputPrimitive
                                                 value={newPort}
                                                 onChange={(e) =>
                                                     setNewPort(e.target.value)
@@ -684,7 +684,7 @@ export function ConfigurationDialog({
                                         )}
 
                                         <div className="grid grid-cols-2 gap-2">
-                                            <IGRPInputText
+                                            <IGRPInputPrimitive
                                                 value={newEnvName}
                                                 onChange={(e) =>
                                                     setNewEnvName(
@@ -695,7 +695,7 @@ export function ConfigurationDialog({
                                                 className="h-8"
                                             />
                                             <div className="flex gap-2">
-                                                <IGRPInputText
+                                                <IGRPInputPrimitive
                                                     value={newEnvValue}
                                                     onChange={(e) =>
                                                         setNewEnvValue(
@@ -769,7 +769,7 @@ export function ConfigurationDialog({
                                         )}
 
                                         <div className="flex gap-2">
-                                            <IGRPInputText
+                                            <IGRPInputPrimitive
                                                 value={newVolume}
                                                 onChange={(e) =>
                                                     setNewVolume(e.target.value)
@@ -966,7 +966,7 @@ export function ConfigurationDialog({
                                             <IGRPLabelPrimitive htmlFor="network-name">
                                                 {t('networkName')}
                                             </IGRPLabelPrimitive>
-                                            <IGRPInputText
+                                            <IGRPInputPrimitive
                                                 id="network-name"
                                                 value={customNetwork}
                                                 onChange={(e) =>

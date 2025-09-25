@@ -19,8 +19,8 @@ import {
     IGRPPopoverContentPrimitive,
     IGRPPopoverTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPSwitch } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { capitalize, getLabel } from '@renderer/utils';
@@ -117,13 +117,17 @@ const RenderPropsConfig = ({
     dataProperties,
     onInputChange,
     onSelectState,
-}: SettingsProps) => {
+}: SettingsProps): React.ReactNode => {
     const { getRefsOptions, getArqumentsOptions } = useComponents();
 
     const refsOptions = getRefsOptions();
     const argumentsOptions = getArqumentsOptions();
 
-    const renderField = (key: string, fieldConfig: any, parentKey?: string) => {
+    const renderField = (
+        key: string,
+        fieldConfig: any,
+        parentKey?: string
+    ): React.ReactNode => {
         const { enum: enumValues, type: typeDefault, items } = fieldConfig;
         const type = enumValues ? 'enum' : typeDefault;
 
@@ -162,7 +166,10 @@ const RenderPropsConfig = ({
         } else if (key === 'iconName' || xUiWidget === 'icon') {
             return (
                 <div className=" group space-y-2">
-                    <IGRPLabel htmlFor={key} className="flex justify-between ">
+                    <IGRPLabelPrimitive
+                        htmlFor={key}
+                        className="flex justify-between "
+                    >
                         <span>{xMetaLabel}</span>
                         <FieldActions
                             field={key}
@@ -174,7 +181,7 @@ const RenderPropsConfig = ({
                             onSelectState={onSelectState}
                             dataProperties={dataProperties}
                         />
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>
                     <IconBrowser
                         selectedIcon={value}
                         onSelectedIcon={(icon: string) => {
@@ -194,7 +201,7 @@ const RenderPropsConfig = ({
         } else if (xUiWidget === 'uri') {
             return (
                 <div className="group space-y-3">
-                    <IGRPLabel
+                    <IGRPLabelPrimitive
                         htmlFor={key}
                         className="flex justify-between items-center"
                     >
@@ -209,7 +216,7 @@ const RenderPropsConfig = ({
                             onSelectState={onSelectState}
                             dataProperties={dataProperties}
                         />
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>
                     <SlugBindingConfig
                         key={key}
                         label={xMetaLabel}
@@ -228,12 +235,12 @@ const RenderPropsConfig = ({
         } else if (xUiWidget === 'ref') {
             return (
                 <div className="space-y-2">
-                    <IGRPLabel
+                    <IGRPLabelPrimitive
                         htmlFor={key}
                         className="flex justify-between items-center"
                     >
                         <span>{xMetaLabel}</span>
-                    </IGRPLabel>
+                    </IGRPLabelPrimitive>
                     <IGRPCombobox
                         value={value}
                         onChange={(value) => {
@@ -257,7 +264,7 @@ const RenderPropsConfig = ({
                 )}
                 key={key}
             >
-                <IGRPLabel
+                <IGRPLabelPrimitive
                     htmlFor={key}
                     className="flex justify-between items-center"
                 >
@@ -274,7 +281,7 @@ const RenderPropsConfig = ({
                             dataProperties={dataProperties}
                         />
                     )}
-                </IGRPLabel>
+                </IGRPLabelPrimitive>
 
                 {(() => {
                     switch (type) {
@@ -320,7 +327,7 @@ const RenderPropsConfig = ({
                         case 'string':
                         case 'any':
                             return (
-                                <IGRPInputText
+                                <IGRPInputPrimitive
                                     id={parentKey ? `${parentKey}.${key}` : key}
                                     type="text"
                                     name={key}
@@ -335,7 +342,7 @@ const RenderPropsConfig = ({
                             );
                         case 'number':
                             return (
-                                <IGRPInputText
+                                <IGRPInputPrimitive
                                     id={parentKey ? `${parentKey}.${key}` : key}
                                     type="number"
                                     name={key}
@@ -416,7 +423,7 @@ const FieldActions = ({
         state: State | undefined,
         value: DataValue | undefined
     ) => void;
-}) => {
+}): React.ReactNode => {
     const [open, setOpen] = useState<boolean>(false);
     const [selected, setSelected] = useState<Data>({});
     const [inputValue, setInputValue] = useState<string>('');
@@ -518,8 +525,11 @@ const FieldActions = ({
                     <>
                         <IGRPSeparator />
                         <div className="space-y-2">
-                            <IGRPLabel>Variable Name</IGRPLabel>
-                            <IGRPInputText
+                            <IGRPLabelPrimitive>
+                                {' '}
+                                Variable Name
+                            </IGRPLabelPrimitive>
+                            <IGRPInputPrimitive
                                 id={`${field}-variable-name`}
                                 type="text"
                                 value={inputValue}
@@ -572,7 +582,7 @@ export const PageSelectionConfig = ({
     showNavigationParams = false,
     navigationParams = [],
     onNavigationParamsChange,
-}: PageSelectionConfigProps) => {
+}: PageSelectionConfigProps): React.ReactNode => {
     const [selectedPagePath, setSelectedPagePath] = useState<string>(value);
 
     const [dynamicSegments, setDynamicPagePath] = useState(
@@ -584,7 +594,7 @@ export const PageSelectionConfig = ({
     }, [selectedPagePath]);
 
     // Handler to create segments with proper context
-    const handleSegmentsChange = (items: Record<string, string>[]) => {
+    const handleSegmentsChange = (items: Record<string, string>[]): void => {
         const mappedSegments = items.map((item) => {
             // Find the selected data field to determine contextp
             const selectedField = columnsOptions.find(
@@ -602,7 +612,7 @@ export const PageSelectionConfig = ({
     };
 
     // Handler to create segments with proper context
-    const handleParamsChange = (items: Record<string, string>[]) => {
+    const handleParamsChange = (items: Record<string, string>[]): void => {
         const mappedParams = items.map((item) => {
             const selectedField = columnsOptions.find(
                 (option) => option.value === item.paramName
@@ -621,7 +631,11 @@ export const PageSelectionConfig = ({
     };
 
     // Handler to get default segments for the form
-    const getDefaultSegments = () => {
+    const getDefaultSegments = (): {
+        name: string;
+        columnName: string;
+        value: string;
+    }[] => {
         if (segments && segments.length > 0) {
             return segments.map((item: Segment) => ({
                 name: item.name,
@@ -633,7 +647,7 @@ export const PageSelectionConfig = ({
     };
 
     // Handler to get route segment options
-    const getRouteSegmentOptions = () => {
+    const getRouteSegmentOptions = (): { label: string; value: string }[] => {
         return dynamicSegments.map((segment: RouteSegment) => ({
             label: `${segment.name} (${segment.type})`,
             value: segment.originalSegment,
@@ -641,14 +655,17 @@ export const PageSelectionConfig = ({
     };
 
     // Handler to get data field options
-    const getDataFieldOptions = () => {
+    const getDataFieldOptions = (): { label: string; value: string }[] => {
         return columnsOptions.map((option) => ({
             ...option,
             label: option.label || option.value,
         }));
     };
 
-    const getNavigationParamsOptions = () => {
+    const getNavigationParamsOptions = (): {
+        paramName: string;
+        paramValue: string;
+    }[] => {
         return navigationParams && navigationParams.length > 0
             ? navigationParams.map((param) => ({
                   paramName: param.name,
@@ -698,7 +715,9 @@ export const PageSelectionConfig = ({
 
             {selectedPagePath && dynamicSegments.length > 0 && (
                 <div className="space-y-2">
-                    <IGRPLabel>Available Dynamic Segments</IGRPLabel>
+                    <IGRPLabelPrimitive>
+                        Available Dynamic Segments
+                    </IGRPLabelPrimitive>
                     <div className="flex flex-wrap gap-2">
                         {dynamicSegments.map((segment, index) => (
                             <IGRPBadge key={index} variant="outline">
@@ -735,7 +754,9 @@ export const PageSelectionConfig = ({
 
             {showNavigationParams && (
                 <div className="space-y-2">
-                    <IGRPLabel>Navigation Parameters</IGRPLabel>
+                    <IGRPLabelPrimitive>
+                        Navigation Parameters
+                    </IGRPLabelPrimitive>
 
                     <DynamicKeyValueForm
                         defaultItems={getNavigationParamsOptions()}
@@ -771,7 +792,7 @@ const SlugBindingConfig = ({
     segments: Segment[];
     navigationParams: Segment[];
     onInputChange: (fieldPath: string, value: any) => void;
-}) => {
+}): React.ReactNode => {
     const [linkType, setLinkType] = useState<string>();
 
     useEffect(() => {
@@ -800,7 +821,7 @@ const SlugBindingConfig = ({
                 ]}
             />
             {linkType === 'LINK' ? (
-                <IGRPInputText
+                <IGRPInputPrimitive
                     id={parentKey ? `${parentKey}.${key}` : key}
                     type="email"
                     name={key}

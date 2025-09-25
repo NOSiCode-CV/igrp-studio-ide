@@ -1,13 +1,12 @@
 import {
     IGRPButtonPrimitive,
     IGRPInputPrimitive,
+    IGRPLabelPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useEffect, useState } from 'react';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import { nanoid } from '@reduxjs/toolkit';
 import { GitLabProvider } from '@renderer/redux/git/reducer';
@@ -21,7 +20,7 @@ function GitLabConfigForm({
     config: GitLabProvider;
     onSave: (config: GitLabProvider) => void;
     onCancel: () => void;
-}) {
+}): React.ReactNode {
     const { t } = useTranslation();
     const [name, setName] = useState(config.name);
     const [baseUrl, setBaseUrl] = useState(config.baseUrl);
@@ -35,15 +34,15 @@ function GitLabConfigForm({
         setClientSecret(config.clientSecret);
     }, [config]);
 
-    const handleSave = () => {
+    const handleSave = (): void => {
         onSave({ ...config, name, baseUrl, clientId, clientSecret });
     };
 
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <IGRPLabel>{t('custom_gitlab_name')}</IGRPLabel>
-                <IGRPInputText
+                <IGRPLabelPrimitive>{t('custom_gitlab_name')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -52,8 +51,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <IGRPLabel>{t('gitlab_base_url')}</IGRPLabel>
-                <IGRPInputText
+                <IGRPLabelPrimitive>{t('gitlab_base_url')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="text"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
@@ -62,8 +61,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <IGRPLabel>{t('client_id')}</IGRPLabel>
-                <IGRPInputText
+                <IGRPLabelPrimitive>{t('client_id')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="text"
                     value={clientId}
                     onChange={(e) => setClientId(e.target.value)}
@@ -71,7 +70,7 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <IGRPLabel>{t('client_secret')}</IGRPLabel>
+                <IGRPLabelPrimitive>{t('client_secret')}</IGRPLabelPrimitive>
                 <IGRPInputPrimitive
                     type="password"
                     value={clientSecret}
@@ -115,10 +114,10 @@ function Account({
     onEdit,
     isDefault,
     isConfigured,
-}: AccountProps) {
+}: AccountProps): React.ReactNode {
     const { t } = useTranslation();
 
-    const handleClick = () => {
+    const handleClick = (): void => {
         if (action) action();
     };
 
@@ -189,7 +188,7 @@ function Account({
     );
 }
 
-export function ConnectedAccountsSettings() {
+export function ConnectedAccountsSettings(): React.ReactNode {
     const { t } = useTranslation();
     const {
         getGitlabConfig,
@@ -211,7 +210,7 @@ export function ConnectedAccountsSettings() {
     const [editingProvider, setEditingProvider] =
         useState<GitLabProvider | null>(null);
 
-    const handleGitLabConfigSave = async (config: GitLabProvider) => {
+    const handleGitLabConfigSave = async (config: GitLabProvider): Promise<void> => {
         const response = await saveGitlabConfig(config);
         if (response.success) {
             showSuccessToast(t('configSaved'));
@@ -222,7 +221,7 @@ export function ConnectedAccountsSettings() {
         }
     };
 
-    const handleActivateProvider = (providerId: string) => {
+    const handleActivateProvider = (providerId: string): void => {
         setActiveProvider(providerId);
         showSuccessToast(t('providerActivated'));
     };
@@ -236,7 +235,7 @@ export function ConnectedAccountsSettings() {
         }
     };
 
-    const handleEditProvider = (provider: GitLabProvider) => {
+    const handleEditProvider = (provider: GitLabProvider): void => {
         setEditingProvider(provider);
         setIsGitLabConfigVisible(true);
     };

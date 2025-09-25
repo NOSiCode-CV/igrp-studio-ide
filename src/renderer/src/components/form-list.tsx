@@ -9,7 +9,7 @@ import {
     IGRPTableRowPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { GripVertical, Plus, Trash } from 'lucide-react';
 import { IGRPCheckbox } from '@igrp/igrp-framework-react-design-system';
 import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
@@ -436,7 +436,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle input types (text, number)
         if (type === 'text' || type === 'number') {
             return (
-                <IGRPInputText
+                <IGRPInputPrimitive
                     className={cn(
                         'h-8 text-sm',
                         errors?.[index]?.[key] && touched?.[index]?.[key]

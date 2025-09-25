@@ -1,10 +1,10 @@
 import {
     IGRPCheckboxPrimitive,
     IGRPCombobox,
+    IGRPInputPrimitive,
     IGRPLabelPrimitive,
     IGRPSwitchPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
 
 import { LabelRequired } from '@renderer/components/label-required';
 import { cn } from '@renderer/lib/utils';
@@ -51,7 +51,7 @@ export const TextInput = ({
     error,
     isTouched = false,
     ...props
-}: TextInputProps) => {
+}: TextInputProps): React.ReactNode => {
     return (
         <div className="flex flex-col gap-2">
             {isRequired ? (
@@ -59,7 +59,7 @@ export const TextInput = ({
             ) : (
                 <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
             )}
-            <IGRPInputText
+            <IGRPInputPrimitive
                 id={id}
                 type="text"
                 className={cn(
@@ -96,7 +96,7 @@ export const SelectInput = ({
     error,
     classNameLabel,
     placeholder,
-}: SelectInputProps) => (
+}: SelectInputProps): React.ReactNode => (
     <div className="flex flex-col gap-2">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
@@ -133,7 +133,7 @@ export const CheckboxInput = ({
     onChange,
     isTouched = false,
     error,
-}: CheckboxProps) => (
+}: CheckboxProps): React.ReactNode => (
     <div className="flex flex-1 gap-2">
         <IGRPCheckboxPrimitive
             name={id}
@@ -159,7 +159,7 @@ export const SwitchInput = ({
     onChange,
     isTouched = false,
     error,
-}: CheckboxProps) => (
+}: CheckboxProps): React.ReactNode => (
     <div className="flex flex-1 gap-2">
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>

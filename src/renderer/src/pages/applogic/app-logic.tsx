@@ -7,7 +7,7 @@ import {
     IGRPCardTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPDialogPrimitive,
     IGRPDialogContentPrimitive,
@@ -210,7 +210,7 @@ export default function AppLogicPage() {
             {/* Search */}
             <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <IGRPInputText
+                <IGRPInputPrimitive
                     placeholder="Search environments..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}

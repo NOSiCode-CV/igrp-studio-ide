@@ -3,7 +3,7 @@ import {
     IGRPLabelPrimitive,
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { SpringConfigData } from 'src/main/types';
 import {
     DatabaseOptions,
@@ -63,7 +63,7 @@ export function SpringConfig({
         <div className="rounded-lg border p-4  space-y-6">
             <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputText
+                <IGRPInputPrimitive
                     id="name"
                     value={data.name}
                     onChange={(e) =>
@@ -96,7 +96,7 @@ export function SpringConfig({
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-3">
                     <LabelRequired>{t('group')}</LabelRequired>
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         id="group"
                         value={data.group}
                         onChange={(e) =>
@@ -114,7 +114,7 @@ export function SpringConfig({
 
                 <div className="flex flex-col gap-3">
                     <LabelRequired>{t('artifact')}</LabelRequired>
-                    <IGRPInputText
+                    <IGRPInputPrimitive
                         id="artifact"
                         value={data.artifact}
                         onChange={(e) =>
