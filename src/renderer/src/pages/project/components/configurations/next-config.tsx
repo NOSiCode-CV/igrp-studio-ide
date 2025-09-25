@@ -30,7 +30,7 @@ export function NextConfig({
 }: NextConfigProps) {
     const { t } = useTranslation();
     return (
-        <div className="space-y-6">
+        <div className="rounded-lg border p-4  space-y-6">
             <div className="space-y-2">
                 <LabelRequired>{t('applicationName')}</LabelRequired>
                 <IGRPInputPrimitive

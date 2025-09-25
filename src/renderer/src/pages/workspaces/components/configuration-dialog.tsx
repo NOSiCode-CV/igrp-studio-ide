@@ -25,7 +25,7 @@ import {
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
-import { IGRPLabel } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
@@ -458,9 +458,9 @@ export function ConfigurationDialog({
                             >
                                 {isNew && (
                                     <div className="space-y-2">
-                                        <IGRPLabel>
+                                        <IGRPLabelPrimitive>
                                             {t('templateOptional')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <IGRPCombobox
                                             value={template}
                                             onChange={(tmpl) =>
@@ -484,9 +484,9 @@ export function ConfigurationDialog({
                                 )}
 
                                 <div className="space-y-2">
-                                    <IGRPLabel htmlFor="name">
+                                    <IGRPLabelPrimitive htmlFor="name">
                                         {t('serviceName')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <IGRPInputText
                                         id="name"
                                         value={name}
@@ -499,9 +499,9 @@ export function ConfigurationDialog({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <IGRPLabel htmlFor="description">
+                                    <IGRPLabelPrimitive htmlFor="description">
                                         {t('description')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <IGRPTextAreaPrimitive
                                         id="description"
                                         value={description}
@@ -517,9 +517,9 @@ export function ConfigurationDialog({
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="image">
+                                        <IGRPLabelPrimitive htmlFor="image">
                                             {t('dockerImage')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <IGRPInputText
                                             id="image"
                                             value={image}
@@ -532,9 +532,9 @@ export function ConfigurationDialog({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <IGRPLabel htmlFor="type">
+                                        <IGRPLabelPrimitive htmlFor="type">
                                             {t('serviceType')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <IGRPCombobox
                                             value={type}
                                             onChange={(type) =>
@@ -553,7 +553,7 @@ export function ConfigurationDialog({
                             >
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <IGRPLabel>{t('ports')}</IGRPLabel>
+                                        <IGRPLabelPrimitive>{t('ports')}</IGRPLabelPrimitive>
                                         <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
@@ -630,9 +630,9 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <IGRPLabel>
+                                        <IGRPLabelPrimitive>
                                             {t('environmentVariables')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                         <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
@@ -721,7 +721,7 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <IGRPLabel>{t('volumes')}</IGRPLabel>
+                                        <IGRPLabelPrimitive>{t('volumes')}</IGRPLabelPrimitive>
                                         <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
@@ -799,9 +799,9 @@ export function ConfigurationDialog({
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <IGRPLabel>
+                                    <IGRPLabelPrimitive>
                                         {t('describeServicePlaceholder')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <p className="text-xs text-muted-foreground">
                                         {t('connectedService')}
                                     </p>
@@ -842,12 +842,12 @@ export function ConfigurationDialog({
                                                                             ?.type
                                                                     )}
                                                                 </div>
-                                                                <IGRPLabel
+                                                                <IGRPLabelPrimitive
                                                                     htmlFor={`depends-${s.name}`}
                                                                     className="text-sm font-normal cursor-pointer"
                                                                 >
                                                                     {s.name}
-                                                                </IGRPLabel>
+                                                                </IGRPLabelPrimitive>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -860,9 +860,9 @@ export function ConfigurationDialog({
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <IGRPLabel>
+                                    <IGRPLabelPrimitive>
                                         {t('projectDependencies')}
-                                    </IGRPLabel>
+                                    </IGRPLabelPrimitive>
                                     <p className="text-xs text-muted-foreground">
                                         {t('selectProjects')}
                                     </p>
@@ -895,12 +895,12 @@ export function ConfigurationDialog({
                                                                 <ProjectIcon
                                                                     project={p}
                                                                 />
-                                                                <IGRPLabel
+                                                                <IGRPLabelPrimitive
                                                                     htmlFor={`depends-${p.id}`}
                                                                     className="text-sm font-normal cursor-pointer"
                                                                 >
                                                                     {p.name}
-                                                                </IGRPLabel>
+                                                                </IGRPLabelPrimitive>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -919,7 +919,7 @@ export function ConfigurationDialog({
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <IGRPLabel>{t('networkType')}</IGRPLabel>
+                                    <IGRPLabelPrimitive>{t('networkType')}</IGRPLabelPrimitive>
                                     <IGRPSelectPrimitive
                                         value={networkType}
                                         onValueChange={setNetworkType}
@@ -956,16 +956,16 @@ export function ConfigurationDialog({
                                                 setUseCustomNetwork
                                             }
                                         />
-                                        <IGRPLabel htmlFor="custom-network">
+                                        <IGRPLabelPrimitive htmlFor="custom-network">
                                             {t('useCustomNetwork')}
-                                        </IGRPLabel>
+                                        </IGRPLabelPrimitive>
                                     </div>
 
                                     {useCustomNetwork && (
                                         <div className="pl-6 space-y-2">
-                                            <IGRPLabel htmlFor="network-name">
+                                            <IGRPLabelPrimitive htmlFor="network-name">
                                                 {t('networkName')}
-                                            </IGRPLabel>
+                                            </IGRPLabelPrimitive>
                                             <IGRPInputText
                                                 id="network-name"
                                                 value={customNetwork}

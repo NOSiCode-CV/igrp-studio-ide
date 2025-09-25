@@ -550,7 +550,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         </div>
     );
 
-    const renderStep3 = () => (
+    const renderStep3 = (): React.ReactNode => (
         <div className="space-y-4">
             {SelectedComponent ? (
                 <>
@@ -578,92 +578,90 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         </div>
     );
 
-    const renderStep4 = () => (
-        <div className="space-y-6">
-            <div className="rounded-lg border p-4 space-y-6">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="name">
-                            {t('projectName')}
-                        </IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
-                            id="name"
-                            name="name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
-                        {formik.touched.name && formik.errors.name && (
-                            <p className="text-xs text-destructive">
-                                {formik.errors.name}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="path">
-                            {t('projectDirectory')}
-                        </IGRPLabelPrimitive>
-                        <div className="flex gap-2">
-                            <IGRPInputPrimitive
-                                id="path"
-                                name="path"
-                                value={formik.values.path}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                placeholder={t('enterProjectDirectory')}
-                                readOnly
-                            />
-                            <IGRPButtonPrimitive
-                                variant="outline"
-                                size="icon"
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleOpenDirectory();
-                                }}
-                                disabled
-                            >
-                                <FolderOpen className="h-4 w-4" />
-                            </IGRPButtonPrimitive>
-                        </div>
-                        {formik.touched.path && formik.errors.path && (
-                            <p className="text-xs text-destructive">
-                                {formik.errors.path}
-                            </p>
-                        )}
-                    </div>
-
-                    {isFrontend && (
-                        <div className="space-y-2">
-                            <IGRPLabelPrimitive>
-                                {t('themeColor')}
-                            </IGRPLabelPrimitive>
-                            <div className="grid grid-cols-12 gap-2 mt-2">
-                                {THEME_COLORS.map((color) => (
-                                    <button
-                                        key={color.value}
-                                        type="button"
-                                        onClick={() =>
-                                            formik.setFieldValue(
-                                                'themeColor',
-                                                color.value
-                                            )
-                                        }
-                                        className={`
-                              w-8 h-8 rounded-full 
-                              ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
-                            `}
-                                        style={{
-                                            backgroundColor: color.value,
-                                        }}
-                                        title={color.name}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+    const renderStep4 = (): React.ReactNode => (
+        <div className="rounded-lg border p-4 space-y-6">
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <IGRPLabelPrimitive htmlFor="name">
+                        {t('projectName')}
+                    </IGRPLabelPrimitive>
+                    <IGRPInputPrimitive
+                        id="name"
+                        name="name"
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.name && formik.errors.name && (
+                        <p className="text-xs text-destructive">
+                            {formik.errors.name}
+                        </p>
                     )}
                 </div>
+
+                <div className="space-y-2">
+                    <IGRPLabelPrimitive htmlFor="path">
+                        {t('projectDirectory')}
+                    </IGRPLabelPrimitive>
+                    <div className="flex gap-2">
+                        <IGRPInputPrimitive
+                            id="path"
+                            name="path"
+                            value={formik.values.path}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            placeholder={t('enterProjectDirectory')}
+                            readOnly
+                        />
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            size="icon"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleOpenDirectory();
+                            }}
+                            disabled
+                        >
+                            <FolderOpen className="h-4 w-4" />
+                        </IGRPButtonPrimitive>
+                    </div>
+                    {formik.touched.path && formik.errors.path && (
+                        <p className="text-xs text-destructive">
+                            {formik.errors.path}
+                        </p>
+                    )}
+                </div>
+
+                {isFrontend && (
+                    <div className="space-y-2">
+                        <IGRPLabelPrimitive>
+                            {t('themeColor')}
+                        </IGRPLabelPrimitive>
+                        <div className="grid grid-cols-12 gap-2 mt-2">
+                            {THEME_COLORS.map((color) => (
+                                <button
+                                    key={color.value}
+                                    type="button"
+                                    onClick={() =>
+                                        formik.setFieldValue(
+                                            'themeColor',
+                                            color.value
+                                        )
+                                    }
+                                    className={`
+                      w-8 h-8 rounded-full 
+                      ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
+                    `}
+                                    style={{
+                                        backgroundColor: color.value,
+                                    }}
+                                    title={color.name}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

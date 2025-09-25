@@ -1,6 +1,6 @@
 import {
     IGRPCheckboxPrimitive,
-    IGRPLabel,
+    IGRPLabelPrimitive,
     IGRPTextAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputText } from '@igrp/igrp-framework-react-design-system';
@@ -15,6 +15,7 @@ import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { SelectInput } from '@renderer/generators/api/components/inputs-form';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import DependencySelector from '@renderer/components/dependency-selector';
+import { JSX } from 'react';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -40,10 +41,10 @@ export function SpringConfig({
     data = DEFAULT_SPRING_CONFIG,
     errors,
     onChange,
-}: SpringConfigProps) {
+}: SpringConfigProps): JSX.Element {
     const { t } = useTranslation(); // Hook for translations
 
-    const PackageName = () => {
+    const PackageName = (): React.ReactNode => {
         return (
             <>
                 {data.group && data.artifact && (
@@ -59,7 +60,7 @@ export function SpringConfig({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="rounded-lg border p-4  space-y-6">
             <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
                 <IGRPInputText
@@ -79,7 +80,9 @@ export function SpringConfig({
             </div>
 
             <div className="flex flex-col gap-3">
-                <IGRPLabel htmlFor="description">{t('description')}</IGRPLabel>
+                <IGRPLabelPrimitive htmlFor="description">
+                    {t('description')}
+                </IGRPLabelPrimitive>
                 <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}
@@ -189,9 +192,9 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <IGRPLabel htmlFor="observability">
+                        <IGRPLabelPrimitive htmlFor="observability">
                             {t('enableObservability')}
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                     </div>
                     <div className="flex items-center space-x-2">
                         <IGRPCheckboxPrimitive
@@ -204,9 +207,9 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <IGRPLabel htmlFor="enableEntityRevision">
+                        <IGRPLabelPrimitive htmlFor="enableEntityRevision">
                             {t('enableEntityRevision')}
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                     </div>
                     <div className="flex items-center space-x-2">
                         <IGRPCheckboxPrimitive
@@ -219,9 +222,9 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <IGRPLabel htmlFor="enableGraalVm">
+                        <IGRPLabelPrimitive htmlFor="enableGraalVm">
                             {t('enableGraalVm')}
-                        </IGRPLabel>
+                        </IGRPLabelPrimitive>
                     </div>
                 </div>
             </div>
